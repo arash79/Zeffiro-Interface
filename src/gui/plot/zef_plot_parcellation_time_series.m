@@ -1,6 +1,49 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef_plot_parcellation_time_series(void)
+% --- Zeffiro documentation header ---
+% zef_plot_parcellation_time_series — Renders or updates a plot_parcellation_time_series figure from current `zef` state.
+%
+% Purpose:
+%   Renders or updates a plot_parcellation_time_series figure from current `zef` state.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   void
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.colormap_cell (read)
+%   zef.colortune_param (read)
+%   zef.frame_start (read)
+%   zef.frame_step (read)
+%   zef.frame_stop (read)
+%   zef.h_axes1 (read)
+%   zef.h_parcellation_plot_type (read)
+%   zef.h_time_series_tools_list (read)
+%   zef.h_zeffiro (read)
+%   zef.inv_colormap (read)
+%   zef.inv_time_1 (read)
+%   zef.inv_time_2 (read)
+%   zef.inv_time_3 (read)
+%   zef.parcellation_colormap (read)
+%   zef.parcellation_colortable (read)
+%   … (5 more)
+%
+% Calls (project):
+%   zef_plot_parcellation_time_series
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_plot_parcellation_time_series(void)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 void = [];
 

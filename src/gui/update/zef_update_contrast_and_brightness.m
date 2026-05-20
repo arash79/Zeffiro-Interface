@@ -1,4 +1,35 @@
 function [contrast_val, brightness_val] = zef_update_contrast(varargin)
+% --- Zeffiro documentation header ---
+% zef_update_contrast — Syncs GUI control values into `zef` for contrast.
+%
+% Purpose:
+%   Syncs GUI control values into `zef` for contrast.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   contrast_val
+%   brightness_val
+%
+% Zef fields (observed):
+%   zef.h_zeffiro (read)
+%
+% Calls (project):
+%   zef_brightness_and_contrast
+%   zef_colormap
+%   zef_update_contrast
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[contrast_val, brightness_val]] = zef_update_contrast(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');

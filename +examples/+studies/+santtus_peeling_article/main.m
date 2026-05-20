@@ -1,3 +1,35 @@
+% --- Zeffiro documentation header ---
+% examples.studies.santtus_peeling_article.function [ sensitivities_with_statistics, L ] = main ( ... — Example or study script demonstrating function [ sensitivities_with_statistics, L ] = main ( .
+%
+% Purpose:
+%   Example or study script demonstrating function [ sensitivities_with_statistics, L ] = main ( ....
+%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%
+% Inputs:
+%   project_path
+%   inverse_method
+%   n_of_runs
+%   noise_level_db
+%   diff_type
+%   dispersion_radius
+%   args
+%   mustBeGreaterThanOrEqual
+%   mustBeLessThanOrEqual
+%
+% Calls (project):
+%   zef_create_finite_element_mesh
+%   zef_eeg_lead_field
+%   zef_minimum_norm_estimation
+%   zef_sensitivity_map_dipoleScan
+%   zef_sensitivity_map_mne
+%
+% Side effects:
+%   - base/caller workspace
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `examples.studies.santtus_peeling_article.function [ sensitivities_with_statistics, L ] = main ( ...(project_path, inverse_method, n_of_runs, noise_level_db, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 function [ sensitivities_with_statistics, L ] = main ( ...
     project_path, ...
     inverse_method, ...
@@ -7,116 +39,6 @@ function [ sensitivities_with_statistics, L ] = main ( ...
     dispersion_radius, ...
     args ...
 )
-%
-% examples.studies.santtus_peeling_article.main
-%
-% Computes normed distance, direction and magnitude differences between
-% given project dipoles and their reconstructions, determined by a given
-% inverse method name.
-%
-% Inputs:
-%
-% - project_path
-%
-%   Path to a Zeffiro project .mat for zeffiro_interface('open_project', ...).
-%   May be empty (char(0,0)) when args.zef is provided instead.
-%
-% - args.zef
-%
-%   Optional in-memory project struct. When non-empty, zeffiro_interface is not
-%   called (avoids "another instance is already open" when base zef exists).
-%   After zef_minimum_norm_estimation, base workspace zef is assignin-synced so
-%   legacy eval('zef...') inverse code sees consistent fields.
-%
-% - inverse_method
-%
-%   The name of an inverse method as a string. Valid names are "sLORETA",
-%   "dSPM", "MNE" and "Dipole Scan".
-%
-% - n_of_runs
-%
-%   The number of reconstructions that will be constructed for statistical
-%   purposes. Multiple are needed, if noise is added to the model via...
-%
-% - noise_level_db
-%
-%   The assumed noise level that is to be used when inverting the computed
-%   lead field.
-%
-% - diff_type
-%
-%   One of "L2" or "minabs". Determines how the position difference
-%   metrics between reconstructions and the original dipoles are computed.
-%
-% - dispersion_radius
-%
-%   The range (in mm) within which the dispersion is calculated for each
-%   reconstructed source. Here dispersion refers to the standard deviation
-%   of the dipole moments within the ROI defined by the source position
-%   and the sphere of this radius around it.
-%
-% - args.use_gpu
-%
-%   A name–value argument which determines whether a GPU will be used to
-%   perform the relevant computations (if available).
-%
-% - args.build_mesh
-%
-%   A boolean for deciding whether to rebuild the FEM mesh.
-%
-% - args.mesh_resolution
-%
-%   The resolution of the mesh that will be constructed based on the
-%   project_path.
-%
-% - args.build_lead_field
-%
-%   A boolean for deciding whether to build the lead field matrix.
-%
-% - args.acceptable_source_depth
-%
-%   The depth at which tetra are accepted as valid source positions.
-%
-%   NOTE: a depth of 0 still peels the top layer off the active regions to
-%   enforce the positioning of dipole ends inside the active region.
-%
-% - args.n_of_sources
-%
-%   The number of sources that are to be placed into the mesh during lead
-%   field construction.
-%
-% - args.optimization_system_type
-%
-%   "PBO" or "MPO".
-%
-% - args.source_model
-%
-%   The interpolation model used by the lead field construction routine.
-%
-% - args.build_reconstructions
-%
-%   A Boolean flag for choosing whether the reconstructions will be
-%   computed.
-%
-% - args.lead_field_filter_quantile
-%
-%   A quantile q ∈ [0, 1], based on which the lead field columns are
-%   filtered based on their norms. With this set to 1, no columns are
-%   filtered and with a value of 0, all columns are filtered.
-%
-% Output:
-%
-% - sensitivities_with_statistics
-%
-%   The computed sensitivities or differences between positions,
-%   orientations and magnitudes of the source and inverted dipoles.
-%
-% - L
-%
-%   The lead field matrix store in zef wither before this routine started
-%   or computed here. NOTE: if a lead field cannot be located within zef
-%   at a crucial moment, this will be set to [NaN].
-%
 
     arguments
 
@@ -149,7 +71,7 @@ function [ sensitivities_with_statistics, L ] = main ( ...
             ["pbo", "mpo", "none"] ...
         ) } = "pbo"
 
-        args.source_model (1,1) core.ZefSourceModel = core.ZefSourceModel.Hdiv
+        args.source_model (1,1) core.types.ZefSourceModel = core.types.ZefSourceModel.Hdiv
 
         args.build_reconstructions (1,1) logical = true
 
@@ -240,7 +162,7 @@ function [ sensitivities_with_statistics, L ] = main ( ...
 
         if strcmpi(im, "sLORETA") || strcmpi(im, "dSPM") || strcmpi(im, "MNE")
 
-            sensitivities = examples.studies.santtus_peeling_article.zef_sensitivity_map_mne( ...
+            sensitivities = examples.studies.santtus_peeling_article.helpers.zef_sensitivity_map_mne( ...
                 project_struct, ...
                 im, ...
                 n_of_runs, ...
@@ -251,7 +173,7 @@ function [ sensitivities_with_statistics, L ] = main ( ...
 
         elseif strcmpi(im, "Dipole Scan")
 
-            sensitivities = examples.studies.santtus_peeling_article.zef_sensitivity_map_dipoleScan( ...
+            sensitivities = examples.studies.santtus_peeling_article.helpers.zef_sensitivity_map_dipoleScan( ...
                 project_struct, ...
                 n_of_runs, ...
                 noise_level_db, ...

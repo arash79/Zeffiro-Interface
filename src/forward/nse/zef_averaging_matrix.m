@@ -1,4 +1,27 @@
 function M = zef_averaging_matrix(nodes,tetra,I)
+% --- Zeffiro documentation header ---
+% zef_averaging_matrix — Zef averaging matrix.
+%
+% Purpose:
+%   Zef averaging matrix.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   nodes
+%   tetra
+%   I
+%
+% Outputs:
+%   M
+%
+% Calls (project):
+%   zef_averaging_matrix
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[M] = zef_averaging_matrix(nodes, tetra, I)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 3
 

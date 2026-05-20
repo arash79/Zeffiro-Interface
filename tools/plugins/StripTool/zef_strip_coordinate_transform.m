@@ -1,4 +1,27 @@
 function points = zef_strip_coordinate_transform(strip_struct,transform_type,points) 
+% --- Zeffiro documentation header ---
+% zef_strip_coordinate_transform — Zef strip coordinate transform.
+%
+% Purpose:
+%   Zef strip coordinate transform.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   strip_struct
+%   transform_type
+%   points
+%
+% Outputs:
+%   points
+%
+% Calls (project):
+%   zef_strip_coordinate_transform
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[points] = zef_strip_coordinate_transform(strip_struct, transform_type, points)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
     if nargin > 2
     points = mat2cell(points,1);

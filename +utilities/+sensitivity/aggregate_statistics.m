@@ -1,32 +1,24 @@
 function stats = aggregate_statistics(runs)
-%AGGREGATE_STATISTICS Mean / std across Monte-Carlo realisations.
+% --- Zeffiro documentation header ---
+% utilities.sensitivity.aggregate_statistics — Aggregate statistics.
 %
-%   stats = aggregate_statistics(runs)
-%
-% Vectorised replacement for the local add_statistics_to_struct helper in
-% +examples/+studies/+santtus_peeling_article/main.m. Two for-loops over
-% n_reconstructions become two cat + mean/std calls. The output struct
-% keeps the field names downstream code already expects:
-%
-%   dist_vec / angle_vec / mag_vec / dispersion_vec - 1 x n_runs cell of
-%       per-realisation metric vectors (preserved verbatim from `runs`).
-%   dist_vec_avg / angle_vec_avg / mag_vec_avg / dispersion_avg - column
-%       vectors of length n_rec (3 * n_sources for modes 1/2, n_sources for
-%       mode 3), mean over realisations. NaN entries from failed/empty
-%       probes are skipped via "omitnan" so a single bad probe does not
-%       poison the average.
-%   dist_vec_std / angle_vec_std / mag_vec_std / dispersion_std - column
-%       vectors of the same shape, std with the legacy (n - 1) divisor.
-%       For n_runs == 1 these are returned as NaN columns (std of a single
-%       sample is undefined and the legacy code happened to do the same
-%       through a divide-by-zero).
+% Purpose:
+%   Aggregate statistics.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   runs   1 x n_runs cell of structs, each with the fields
-%          dist_vec / angle_vec / mag_vec / dispersion_vec produced by
-%          utilities.sensitivity.compute_metrics. Empty cells are tolerated
-%          (treated as a realisation of NaN entries) so that a partial
-%          Monte-Carlo run still produces a meaningful summary.
+%   runs
+%
+% Outputs:
+%   stats
+%
+% Calls (project):
+%   utilities.sensitivity.aggregate_statistics
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[stats] = utilities.sensitivity.aggregate_statistics(runs)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     runs (1,:) cell

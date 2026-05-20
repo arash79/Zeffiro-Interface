@@ -1,3 +1,28 @@
+% --- Zeffiro documentation header ---
+% pat='p2'; — Pat='p2';.
+%
+% Purpose:
+%   Pat='p2';.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Zef fields (observed):
+%   zef.dataBank (read)
+%   zef.reconstruction (read)
+%   zef.reconstruction_information (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_distance_to_resection
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `pat='p2';` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 pat='p2';
 
 load(strcat(pat, '_resectionStuff.mat'));

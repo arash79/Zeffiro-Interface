@@ -1,5 +1,32 @@
-
-%LeadFieldProcessingTool_start
+% --- Zeffiro documentation header ---
+% zef.LeadFieldProcessingTool — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%
+% Purpose:
+%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.GMMclustering (read)
+%   zef.LeadFieldProcessingTool (read)
+%   zef.font_size (read)
+%   zef.imaging_method (read)
+%   zef.imaging_method_cell (read)
+%   zef.lead_field_id (read)
+%   zef.lead_field_id_max (read)
+%   zef.lf_tag (read, write)
+%   zef.sensors (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_update_lead_field_id
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef.LeadFieldProcessingTool` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 zef.LeadFieldProcessingTool.app = LeadFieldProcessingTool_app;
 

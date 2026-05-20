@@ -1,4 +1,36 @@
 function zef = zef_ES_clear_plot_data(zef)
+% --- Zeffiro documentation header ---
+% zef_ES_clear_plot_data — Zef ES clear plot data.
+%
+% Purpose:
+%   Zef ES clear plot data.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.ES_plot_type (read)
+%   zef.h_barplot_ES (read)
+%   zef.h_colorbar_ES (read)
+%   zef.h_current_ES (read)
+%
+% Calls (project):
+%   zef_ES_clear_plot_data
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_ES_clear_plot_data(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0 
 zef = eval('zef');

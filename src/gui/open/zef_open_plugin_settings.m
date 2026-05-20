@@ -1,3 +1,39 @@
+% --- Zeffiro documentation header ---
+% zef_data = zef_plugin_settings; — Zef data = zef plugin settings;.
+%
+% Purpose:
+%   Zef data = zef plugin settings;.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.fieldnames (read, write)
+%   zef.font_size (read)
+%   zef.h_menu_plugin_settings_table_add (read)
+%   zef.h_menu_plugin_settings_table_delete (read)
+%   zef.h_plugin_settings (read)
+%   zef.h_plugin_settings_apply (read)
+%   zef.h_plugin_settings_save (read)
+%   zef.h_plugin_settings_table (read)
+%   zef.h_plugin_settings_update_from_profile (read)
+%   zef.plugin_cell (read, write)
+%   zef.plugin_settings_current_size (read, write)
+%   zef.plugin_settings_relative_size (read, write)
+%   zef.plugin_settings_selected (read)
+%   zef.profile_name (read)
+%   zef.program_path (read)
+%
+% Calls (project):
+%   zef_change_size_function
+%   zef_get_relative_size
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_data = zef_plugin_settings;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef_data = zef_plugin_settings;
 zef.fieldnames = fieldnames(zef_data);
 for zef_i = 1:length(zef.fieldnames)

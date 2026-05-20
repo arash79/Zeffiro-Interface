@@ -1,30 +1,49 @@
-# Tool figure templates and images (`fig/tools/`)
+# assets/fig/tools
 
-This subdirectory contains **MATLAB figure templates** (`.fig`) and **tool-specific images** (`.png`) used by Zeffiro Interface tools. For full documentation of the entire `fig` directory, path usage, and file descriptions, see the parent [README](../README.md).
+## Purpose of this folder
 
----
+Static GUI resources (`.fig` layouts) used by App Designer tools.
 
-## Contents summary
+## Contents
 
-### Figure templates (`.fig`)
+Other files:
+- `zef_find_synthetic_eit_data.fig`
+- `zef_find_synthetic_source.fig`
+- `zeffiro_interface.png`
+- `zeffiro_interface_butterfly_plot.fig`
+- `zeffiro_interface_figure_tool.fig`
+- `zeffiro_interface_mesh_tool.fig`
+- `zeffiro_interface_parcellation_tool.fig`
+- `zeffiro_interface_ramus_inversion_tool.fig`
+- `zeffiro_interface_segmentation_tool.fig`
+- `zeffiro_logo.png`
+- `zeffiro_small_logo.png`
 
-- **zef_find_synthetic_eit_data.fig** — Find synthetic EIT data tool (loaded by `m/zef_find_synthetic_eit_data.m`).
-- **zef_find_synthetic_source.fig** — Find synthetic source tool layout.
-- **zeffiro_interface_butterfly_plot.fig** — Butterfly plot window layout.
-- **zeffiro_interface_figure_tool.fig** — Figure tool window layout.
-- **zeffiro_interface_mesh_tool.fig** — Mesh tool window layout.
-- **zeffiro_interface_parcellation_tool.fig** — Parcellation tool window layout.
-- **zeffiro_interface_ramus_inversion_tool.fig** — RAMUS inversion tool layout.
-- **zeffiro_interface_segmentation_tool.fig** — Segmentation tool window layout.
+## How this folder fits into the overall workflow
 
-### Images (`.png`)
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-- **zeffiro_interface.png** — Interface/splash image.
-- **zeffiro_logo.png** — Logo for tool windows.
-- **zeffiro_small_logo.png** — Small logo for compact UI areas.
+## GUI usage
 
----
+No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
 
-## Usage note
+## Programmatic usage
 
-The `fig` directory (including `tools/`) is added to the MATLAB path at startup. Tools load these files by filename (e.g. `open('zef_find_synthetic_eit_data.fig')`). Do not rename or remove files without updating the corresponding loaders and the parent [README](../README.md).
+Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+
+## Examples
+
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+
+## Dependencies and assumptions
+
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+
+## Notes for developers
+
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

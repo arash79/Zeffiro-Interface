@@ -2,6 +2,32 @@
 %See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 function [I] = tetra_in_compartment(reuna_p,reuna_t,nodes,compartment_info)
+% --- Zeffiro documentation header ---
+% tetra_in_compartment — Tetra in compartment.
+%
+% Purpose:
+%   Tetra in compartment.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   reuna_p
+%   reuna_t
+%   nodes
+%   compartment_info
+%
+% Outputs:
+%   I
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[I] = tetra_in_compartment(reuna_p, reuna_t, nodes, compartment_info)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 max_x = max(reuna_p(:,1));
 min_x = min(reuna_p(:,1));
@@ -70,5 +96,3 @@ ind_vec(I) = gather(ind_vec_aux);
 I = find(ind_vec > 0.5);
 
 end
-
-

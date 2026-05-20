@@ -1,4 +1,34 @@
 function zef = zef_GMModel_window(zef)
+% --- Zeffiro documentation header ---
+% zef_GMModel_window — Zef GMModel window.
+%
+% Purpose:
+%   Zef GMModel window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.GMModel (read)
+%
+% Calls (project):
+%   zef_GMModel_update
+%   zef_GMModel_window
+%   zef_cluster_reconstruction
+%
+% Side effects:
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_GMModel_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 
 h1 = figure(...

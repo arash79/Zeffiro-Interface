@@ -1,6 +1,42 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [c_table,c_points] = zef_parcellation_roi_embed(zef)
+% --- Zeffiro documentation header ---
+% zef_parcellation_roi_embed — Zef parcellation roi embed.
+%
+% Purpose:
+%   Zef parcellation roi embed.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   c_table
+%   c_points
+%
+% Zef fields (observed):
+%   zef.parcellation_colortable (read)
+%   zef.parcellation_merge (read)
+%   zef.parcellation_points (read)
+%   zef.parcellation_roi_center (read)
+%   zef.parcellation_roi_color (read)
+%   zef.parcellation_roi_name (read)
+%   zef.parcellation_roi_radius (read)
+%   zef.parcellation_selected (read, write)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_parcellation_roi_embed
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[c_table, c_points]] = zef_parcellation_roi_embed(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 c_table = cell(0);
 c_points = cell(0);

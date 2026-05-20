@@ -1,11 +1,39 @@
 function [f,t] = zef_getTimeStep(f_data, f_ind, zef)
-%zef_getTimeStep gets the time windows and segments of f_data that are
-%specified in the zef.inv_time* parameters. f_ind gives the number of the given window (first, second, third ...)
-% if there is only one time step, f_data is returned.
-%Should the specified time steps exceed the data length, an empty array is
-%returned.
-%If a window is specified, averaging can be applied. The behavior is
-%specified in Optional_averaging_bool, with a default of true
+% --- Zeffiro documentation header ---
+% zef_getTimeStep — Zef get Time Step.
+%
+% Purpose:
+%   Zef get Time Step.
+%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%
+% Inputs:
+%   f_data
+%   f_ind
+%   zef
+%
+% Outputs:
+%   f
+%   t
+%
+% Zef fields (observed):
+%   zef.inv_data_mode (read)
+%   zef.inv_sampling_frequency (read)
+%   zef.inv_time_1 (read)
+%   zef.inv_time_2 (read, write)
+%   zef.inv_time_3 (read)
+%   zef.inv_time_interval_averaging (read)
+%
+% Calls (project):
+%   zef_getTimeStep
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[f, t]] = zef_getTimeStep(f_data, f_ind, zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if nargin < 3
 zef = evalin('base','zef');

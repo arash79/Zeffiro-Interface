@@ -1,10 +1,29 @@
-
-%% make all reconstructions for data
-
-%set all parameters!
-% beamformer app needs to be open
-%choose node to add to
-%enjoy!
+% --- Zeffiro documentation header ---
+% allHashes=fieldnames(zef.dataBank — All Hashes=fieldnames(zef.data Bank.
+%
+% Purpose:
+%   All Hashes=fieldnames(zef.data Bank.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Zef fields (observed):
+%   zef.beamformer (read)
+%   zef.bf_var_loc (read)
+%   zef.dataBank (read)
+%   zef.reconstruction (read)
+%   zef.reconstruction_information (read)
+%
+% Calls (project):
+%   zef_dataBank_add
+%   zef_dataBank_getData
+%   zef_ramus_iteration
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `allHashes=fieldnames(zef.dataBank` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 allHashes=fieldnames(zef.dataBank.tree);
 

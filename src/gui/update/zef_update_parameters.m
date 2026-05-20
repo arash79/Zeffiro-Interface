@@ -1,3 +1,29 @@
+% --- Zeffiro documentation header ---
+% zef.aux_field_1 = zef.h_parameters_table — Zef.aux field 1 = zef.h parameters table.
+%
+% Purpose:
+%   Zef.aux field 1 = zef.h parameters table.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.aux_field_1 (read)
+%   zef.aux_field_2 (read, write)
+%   zef.current_parameters (read)
+%   zef.current_sensor_name (read)
+%   zef.current_sensors (read)
+%   zef.current_tag (read)
+%   zef.current_transform (read)
+%   zef.imaging_method_cell (read)
+%   zef.parameter_profile (read)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.aux_field_1 = zef.h_parameters_table` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef.aux_field_1 = zef.h_parameters_table.Data;
 
 if isequal(zef.current_parameters,'transform')

@@ -1,6 +1,54 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_update(zef)
+% --- Zeffiro documentation header ---
+% zef_update — Syncs GUI control values into `zef` for zef_update.
+%
+% Purpose:
+%   Syncs GUI control values into `zef` for zef_update.
+%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.aux_field_1 (read, write)
+%   zef.aux_field_2 (read, write)
+%   zef.aux_field_3 (read, write)
+%   zef.aux_field_4 (read, write)
+%   zef.compartment_table_size (read)
+%   zef.compartment_tags (read, write)
+%   zef.current_sensors (read, write)
+%   zef.h_aux (read, write)
+%   zef.h_axes1 (read, write)
+%   zef.h_compartment_table (read)
+%   zef.h_menu_window (read)
+%   zef.h_mesh_tool (read)
+%   zef.h_mesh_visualization_tool (read)
+%   zef.h_parameters_table (read)
+%   zef.h_profile_name (read)
+%   … (19 more)
+%
+% Calls (project):
+%   zef_init_sensors_name_table
+%   zef_update
+%   zef_update_compartment_table_data
+%   zef_update_fig_details
+%
+% Side effects:
+%   - base/caller workspace
+%   - creates/updates figures
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_update(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

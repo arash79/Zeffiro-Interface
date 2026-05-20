@@ -1,4 +1,27 @@
 function [fnc_call, fnc_str, fnc_name] = zef_read_function_call(file_name)
+% --- Zeffiro documentation header ---
+% zef_read_function_call — Zef read function call.
+%
+% Purpose:
+%   Zef read function call.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   file_name
+%
+% Outputs:
+%   fnc_call
+%   fnc_str
+%   fnc_name
+%
+% Calls (project):
+%   zef_read_function_call
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[fnc_call, fnc_str, fnc_name]] = zef_read_function_call(file_name)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 
 [~,fnc_name,~] = fileparts(file_name);

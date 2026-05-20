@@ -1,4 +1,28 @@
 function [L_eeg] = zef_lead_field_eeg_multilayer_sphere(electrodes,source_positions,source_directions,sphere_model)
+% --- Zeffiro documentation header ---
+% zef_lead_field_eeg_multilayer_sphere — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%
+% Purpose:
+%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   electrodes
+%   source_positions
+%   source_directions
+%   sphere_model
+%
+% Outputs:
+%   L_eeg
+%
+% Calls (project):
+%   zef_lead_field_eeg_multilayer_sphere
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[L_eeg] = zef_lead_field_eeg_multilayer_sphere(electrodes, source_positions, source_directions, sphere_model)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 lam_berg = sphere_model.lambda_berg;
 mu_berg = sphere_model.mu_berg;

@@ -1,5 +1,36 @@
 
 function  zef_nse_plot_histogram(zef, plot_vec, x_label, legend_text)
+% --- Zeffiro documentation header ---
+% zef_nse_plot_histogram — Zef nse plot histogram.
+%
+% Purpose:
+%   Zef nse plot histogram.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%   plot_vec
+%   x_label
+%   legend_text
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.font_size (read)
+%   zef.h_axes1 (read)
+%
+% Calls (project):
+%   zef_nse_plot_histogram
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_nse_plot_histogram(zef, plot_vec, x_label, legend_text)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 4 
     legend_text = cell(0);

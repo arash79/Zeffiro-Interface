@@ -2,6 +2,47 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_source_interpolation(zef)
+% --- Zeffiro documentation header ---
+% zef_source_interpolation — Zef source interpolation.
+%
+% Purpose:
+%   Zef source interpolation.
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.L (read, write)
+%   zef.active_compartment_ind (read)
+%   zef.compartment_tags (read)
+%   zef.location_unit_current (read)
+%   zef.nodes (read)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   zef.source_directions (read, write)
+%   zef.source_interpolation_ind (read, write)
+%   zef.source_positions (read, write)
+%   zef.tetra (read)
+%
+% Calls (project):
+%   zef_source_interpolation
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_source_interpolation(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

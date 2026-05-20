@@ -1,4 +1,26 @@
 function [colormap_vec] = zef_monterosso_colormap(colortune_param, colormap_size)
+% --- Zeffiro documentation header ---
+% zef_monterosso_colormap — Zef monterosso colormap.
+%
+% Purpose:
+%   Zef monterosso colormap.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   colortune_param
+%   colormap_size
+%
+% Outputs:
+%   colormap_vec
+%
+% Calls (project):
+%   zef_monterosso_colormap
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[colormap_vec] = zef_monterosso_colormap(colortune_param, colormap_size)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 color_mat = [26 26 26;   0.2 11.8 13.2; 42.5   98.5  108.5; 203 203 100];
 

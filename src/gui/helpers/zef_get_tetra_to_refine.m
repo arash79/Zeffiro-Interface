@@ -1,4 +1,33 @@
 function tetra_ind = zef_get_tetra_to_refine(domain_ind, thresh_val, k_param, nodes, tetra, domain_labels, reuna_p,reuna_t)
+% --- Zeffiro documentation header ---
+% zef_get_tetra_to_refine — Zef get tetra to refine.
+%
+% Purpose:
+%   Zef get tetra to refine.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   domain_ind
+%   thresh_val
+%   k_param
+%   nodes
+%   tetra
+%   domain_labels
+%   reuna_p
+%   reuna_t
+%
+% Outputs:
+%   tetra_ind
+%
+% Calls (project):
+%   zef_get_tetra_to_refine
+%   zef_surface_mesh
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[tetra_ind] = zef_get_tetra_to_refine(domain_ind, thresh_val, k_param, nodes, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 tetra_ind = [];
 I_aux = find(sum(ismember(domain_labels,domain_ind),2));

@@ -1,66 +1,31 @@
 function [meshStruct, tissueTable] = export_from_gmsh_mesh(meshFile, tissueListingFile, kwargs)
+% --- Zeffiro documentation header ---
+% utilities.sn2zef.export_from_gmsh_mesh — Export from gmsh mesh.
 %
-% [meshStruct, tissueTable] = utilities.sn2zef.export_from_gmsh_mesh(meshFile, tissueListingFile, kwargs)
-%
-% Mesh-based export: loads a SimNIBS Gmsh mesh and tissue listing, then
-% optionally writes per-compartment STL surfaces and the full mesh (MAT/HDF5).
-% Use this when you have a .msh file and tissue table (e.g. from the charm
-% pipeline). For the volume-based ZEF pipeline (final_tissues.nii.gz + LUT),
-% use utilities.sn2zef.run instead.
+% Purpose:
+%   Export from gmsh mesh.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%
-%   meshFile (1,1) string { mustBeFile }
-%
-% Path to a Gmsh .msh file (nodes, triangles, tetrahedra, region labels)
-% produced by SimNIBS (e.g. charm pipeline).
-%
-%   tissueListingFile (1,1) string { mustBeFile }
-%
-% Path to the tissue listing file (label numbers, names, colors). Typically
-% columns: #No., Label_Name:, R, G, B, Alpha.
-%
-%   kwargs.outputFolder (1,1) string = ""
-%
-% If non-empty, a timestamped subfolder is created here and filled with:
-%   - One STL per compartment: <Name>.triangles.stl
-%   - wholemesh.mat  (nodes, triangles, triangleLabels, tetra, tetraLabels)
-%   - wholemesh.hdf5 (same structure)
-%
-%   kwargs.dateTimeFormat (1,1) string = "yyyy-MM-dd-HH-mm-ss-SSS"
-%
-% Format for the timestamp in the output folder name.
-%
-%   kwargs.labelNameStr (1,1) string = "Label_Name:"
-%
-% Column name in the tissue table for compartment names (for format changes).
-%
-%   kwargs.labelStr (1,1) string = "#No."
-%
-% Column name in the tissue table for numeric labels (for format changes).
-%
-%   kwargs.stlOutputFormat (1,1) string { mustBeMember(kwargs.stlOutputFormat, ["text", "binary"]) } = "binary"
-%
-% STL format: "binary" (compact) or "text" (ASCII).
-%
-%   kwargs.subjectName (1,1) string = ""
-%
-% Optional subject name included in the output folder name.
+%   meshFile
+%   tissueListingFile
+%   kwargs
 %
 % Outputs:
+%   meshStruct
+%   tissueTable
 %
-%   meshStruct - Struct from meshLoadGmsh4: nodes, triangles, triangle_regions,
-%                tetrahedra, tetrahedron_regions, and optional node_data/element_data.
-%   tissueTable - Table of tissue labels, names, and colors from the listing file.
+% Calls (project):
+%   utilities.sn2zef.export_from_gmsh_mesh
+%   utilities.sn2zef.meshLoadGmsh4
 %
-% Example:
+% Side effects:
+%   - filesystem I/O
 %
-%   [m, tbl] = utilities.sn2zef.export_from_gmsh_mesh( ...
-%       "path/to/mesh.msh", "path/to/tissue_listing.txt", ...
-%       "outputFolder", "path/to/out", "subjectName", "Sub01");
-%
-% See also: run, meshLoadGmsh4, export_segmentation_meshes
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[meshStruct, tissueTable]] = utilities.sn2zef.export_from_gmsh_mesh(meshFile, tissueListingFile, kwargs)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
     arguments
         meshFile (1,1) string { mustBeFile }

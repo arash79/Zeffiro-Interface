@@ -1,11 +1,36 @@
 function [f,t] = zef_getTimeStepClassObj(f_data, f_ind, zef, ClassObj)
-%zef_getTimeStep gets the time windows and segments of f_data that are
-%specified in the zef.inv_time* parameters. f_ind gives the number of the given window (first, second, third ...)
-% if there is only one time step, f_data is returned.
-%Should the specified time steps exceed the data length, an empty array is
-%returned.
-%If a window is specified, averaging can be applied. The behavior is
-%specified in Optional_averaging_bool, with a default of true
+% --- Zeffiro documentation header ---
+% zef_getTimeStepClassObj — Zef get Time Step Class Obj.
+%
+% Purpose:
+%   Zef get Time Step Class Obj.
+%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%
+% Inputs:
+%   f_data
+%   f_ind
+%   zef
+%   ClassObj
+%
+% Outputs:
+%   f
+%   t
+%
+% Zef fields (observed):
+%   zef.inv_data_mode (read)
+%   zef.inv_time_interval_averaging (read)
+%
+% Calls (project):
+%   zef_getTimeStepClassObj
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[f, t]] = zef_getTimeStepClassObj(f_data, f_ind, zef, ClassObj)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if nargin < 3
 zef = evalin('base','zef');

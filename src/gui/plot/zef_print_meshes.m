@@ -1,6 +1,63 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [void] = zef_print_meshes(~);
+% --- Zeffiro documentation header ---
+% zef_print_meshes — Zef print meshes.
+%
+% Purpose:
+%   Zef print meshes.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   ~
+%
+% Outputs:
+%   void
+%
+% Zef fields (observed):
+%   zef.active_compartment_ind (read)
+%   zef.attach_electrodes (read)
+%   zef.axes_visible (read)
+%   zef.azimuth (read)
+%   zef.brain_transparency (read)
+%   zef.cam_va (read)
+%   zef.colormap_cell (read)
+%   zef.colormap_size (read)
+%   zef.colortune_param (read)
+%   zef.compartment_tags (read)
+%   zef.contour_set (read)
+%   zef.cp2_a (read)
+%   zef.cp2_b (read)
+%   zef.cp2_c (read)
+%   zef.cp2_d (read)
+%   … (67 more)
+%
+% Calls (project):
+%   zef_attach_sensors_volume
+%   zef_clipping_plane
+%   zef_fix_sensors_get_functions_array_size
+%   zef_get_profile_parameters
+%   zef_minimal_mesh
+%   zef_plot_cone_field
+%   zef_plot_contour
+%   zef_plot_dpq
+%   zef_print_meshes
+%   zef_sensor_get_function_eval
+%   zef_set_sliders_print
+%   zef_smooth_field
+%   … (3 more)
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[void] = zef_print_meshes(~)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 zef = evalin('base','zef');
 f_ind = 1;

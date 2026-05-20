@@ -1,4 +1,35 @@
 function perfusion_estimate = zef_nse_calculate_perfusion(nse_field,nodes,tetra,domain_labels,mvd_length)
+% --- Zeffiro documentation header ---
+% zef_nse_calculate_perfusion — Zef nse calculate perfusion.
+%
+% Purpose:
+%   Zef nse calculate perfusion.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   nse_field
+%   nodes
+%   tetra
+%   domain_labels
+%   mvd_length
+%
+% Outputs:
+%   perfusion_estimate
+%
+% Calls (project):
+%   zef_find_adjacent_tetra
+%   zef_get_submesh
+%   zef_nse_calculate_perfusion
+%   zef_surface_mesh
+%   zef_surface_scalar_vector_F
+%   zef_surface_scalar_vector_Fn
+%   zef_volume_barycentric
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[perfusion_estimate] = zef_nse_calculate_perfusion(nse_field, nodes, tetra, domain_labels, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 mm_conversion = 0.001;
 ml_min_conversion = 1e-6/60;
@@ -49,8 +80,3 @@ perfusion_estimate(i) = (sum((nse_field.bp_vessels{i}-p_hydrostatic/hgmm_convers
 end
 
 end
-
-
-
-
-

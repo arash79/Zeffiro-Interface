@@ -1,4 +1,30 @@
 function h_struct = zef_gather_object_handles(zef,window_name)
+% --- Zeffiro documentation header ---
+% zef_gather_object_handles — Zef gather object handles.
+%
+% Purpose:
+%   Zef gather object handles.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   window_name
+%
+% Outputs:
+%   h_struct
+%
+% Calls (project):
+%   zef_find_object_handles
+%   zef_gather_object_handles
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[h_struct] = zef_gather_object_handles(zef, window_name)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 1
     window_name = 'ZEFFIRO Interface';

@@ -17,10 +17,25 @@
 %   See also matlab.apps.AppBase, zef_mesh_visualization_tool_app.
 
 classdef zef_mesh_visualization_tool_app_exported < matlab.apps.AppBase
+% --- Zeffiro documentation header ---
+% zef_mesh_visualization_tool_app_exported — Zef mesh visualization tool app exported.
+%
+% Purpose:
+%   Zef mesh visualization tool app exported.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   Constructor and method arguments are declared in classdef methods below.
+%
+% Side effects:
+%   - creates/updates figures
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_mesh_visualization_tool_app_exported(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
+% --- End Zeffiro documentation header
 
-    % -------------------------------------------------------------------------
-    % Properties: figure, buttons, dropdowns, edit fields, checkboxes, listboxes
-    % -------------------------------------------------------------------------
     properties (Access = public)
         h_mesh_visualization_tool       matlab.ui.Figure
         h_pushbutton31                  matlab.ui.control.Button

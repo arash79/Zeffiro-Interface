@@ -1,4 +1,36 @@
 function zef = zef_set_position(zef)
+% --- Zeffiro documentation header ---
+% zef_set_position — Zef set position.
+%
+% Purpose:
+%   Zef set position.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.h_segmentation_tool_toggle (read)
+%   zef.h_zeffiro_window_main (read)
+%   zef.ini_cell (read, write)
+%   zef.program_path (read)
+%   zef.segmentation_tool_default_position (read, write)
+%
+% Calls (project):
+%   zef_set_position
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_set_position(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

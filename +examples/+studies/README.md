@@ -1,64 +1,43 @@
-# Studies — Advanced Research Workflows
+# +examples/+studies
 
-This folder contains modules from research studies that use Zeffiro Interface. They are more specialized than the root-level examples and show how the interface can be used for specific analyses: sensitivity evaluation, focal epilepsy source localization, and transcranial electrical stimulation (tES) optimization.
+## Purpose of this folder
 
-## Who Are These For?
+Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
 
-These examples are for users who already understand the basics of Zeffiro (mesh, lead field, inverse methods) and want to see:
+## Contents
 
-- How to compare multiple inverse methods and quantify their performance.
-- How to structure a clinical workflow (e.g., epilepsy) with DataBank and clustering.
-- How to optimize parameters for the electrical stimulation (ES) tool.
+Subfolders:
+- `+decision_making/`
+- `+santtus_peeling_article/`
+- `+tES_hyperparameter_optimization/`
 
-If you are new to Zeffiro, start with the root-level examples (`+examples/README.md`) before exploring these.
+## How this folder fits into the overall workflow
 
-## How to Run Study Modules
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-Each module lives in a subfolder prefixed with `+`. From the Zeffiro project root:
+## GUI usage
 
-```matlab
-[results, …] = examples.studies.module_name.main(arguments…);
-```
+No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
 
-For usage and arguments:
+## Programmatic usage
 
-```matlab
-help examples.studies.module_name.main
-doc examples.studies.module_name.main
-```
+Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
 
----
+## Examples
 
-## Module: `+santtus_peeling_article`
+Run scripts directly after startup, e.g. `run('+examples/+studies/script.m')`.
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
 
-**Purpose:** Evaluate how different EEG inverse methods respond when superficial head layers are “peeled” (removed) in the FEM model. This helps understand the impact of head model simplification on source reconstruction accuracy.
+## Dependencies and assumptions
 
-**What you’ll learn about the interface:** How to build mesh and lead field programmatically, run MNE, sLORETA, dSPM, and Dipole Scan, and compute metrics (position error, direction error, dispersion) over many source positions and noise realizations.
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
 
-**When to explore:** After you’ve run `lead_field_example` and understand what a lead field is. Useful if you work with FEM head models and inverse methods.
+## Notes for developers
 
-**Publication:** *The Effects of Peeling on Finite Element Method–based EEG Source Reconstruction* ([arXiv:2308.04908](https://doi.org/10.48550/arXiv.2308.04908))
-
----
-
-## Module: `+decision_making`
-
-**Purpose:** Focal epilepsy source localization using 11 inverse methods and credibility-based clustering. The workflow compares many methods (MNE, sLORETA, dSPM, MNE-RAMUS, Dipole Scan, Beamformer, IAS variants, EXP-L1) and selects the most credible reconstructions for a final estimate.
-
-**What you’ll learn about the interface:** How the DataBank organizes data (EEG, MEG, MEEG), how to run multiple inverse methods in sequence, and how to combine results with clustering. The scripts show a full clinical-style pipeline.
-
-**When to explore:** When you have (or can create) a DataBank project with lead fields and measurements. Requires familiarity with the DataBank structure.
-
-**Prerequisites:** DataBank, patient project with EEG/MEG/MEEG lead fields, scripts in `zef.program_path/scripts` on the path.
-
----
-
-## Module: `+tES_hyperparameter_optimization`
-
-**Purpose:** Recursive search for tES hyperparameters (alpha, epsilon) in the Electrical Stimulation (ES) tool. The algorithm refines the parameter grid around the best objective value.
-
-**What you’ll learn about the interface:** How the ES tool’s parameters (alpha, epsilon) affect current optimization, and how to run adaptive hyperparameter search from a script.
-
-**When to explore:** When you use transcranial electrical stimulation (tES) in Zeffiro and want to tune parameters programmatically rather than by hand.
-
-**Prerequisites:** ES tool configured in the project struct (zef).
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

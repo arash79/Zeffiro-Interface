@@ -1,3 +1,30 @@
+% --- Zeffiro documentation header ---
+% if isfield(zef,'source_positions_original_field') — If isfield(zef,'source positions original field').
+%
+% Purpose:
+%   If isfield(zef,'source positions original field').
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Zef fields (observed):
+%   zef.L (read, write)
+%   zef.L_original_field (read, write)
+%   zef.n_sources (read)
+%   zef.rand_vec_aux (read, write)
+%   zef.source_direction_mode (read)
+%   zef.source_directions (read, write)
+%   zef.source_directions_original_field (read, write)
+%   zef.source_interpolation_ind (read, write)
+%   zef.source_interpolation_ind_original_field (read, write)
+%   zef.source_positions (read, write)
+%   zef.source_positions_original_field (read, write)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if isfield(zef,'source_positions_original_field')` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 if isfield(zef,'source_positions_original_field')
     if isempty(zef.source_positions_original_field)

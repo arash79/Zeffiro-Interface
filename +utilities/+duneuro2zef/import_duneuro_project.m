@@ -44,8 +44,42 @@
 % See also: run.m, get_default_config.m, Duneuro2Zeffiro_import.zef
 
 function results = import_duneuro_project(config, import_to_zeffiro)
+% --- Zeffiro documentation header ---
+% utilities.duneuro2zef.import_duneuro_project — Import duneuro project.
+%
+% Purpose:
+%   Import duneuro project.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   config
+%   import_to_zeffiro
+%
+% Outputs:
+%   results
+%
+% Zef fields (observed):
+%   zef.file (read, write)
+%   zef.file_path (read, write)
+%   zef.new_empty_project (read, write)
+%
+% Calls (project):
+%   utilities.duneuro2zef.get_default_config
+%   utilities.duneuro2zef.import_duneuro_project
+%   utilities.duneuro2zef.run
+%   zef_build_compartment_table
+%   zef_import_segmentation
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[results] = utilities.duneuro2zef.import_duneuro_project(config, import_to_zeffiro)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-    % Initialize results structure
     results = struct();
     results.success = false;
     results.errors = {};

@@ -1,4 +1,31 @@
 function h_output = zef_find_object_handles(zef, h_input, h_output, node_name)
+% --- Zeffiro documentation header ---
+% zef_find_object_handles — Zef find object handles.
+%
+% Purpose:
+%   Zef find object handles.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   h_input
+%   h_output
+%   node_name
+%
+% Outputs:
+%   h_output
+%
+% Calls (project):
+%   zef_find_object_handles
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[h_output] = zef_find_object_handles(zef, h_input, h_output, node_name)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 3
     h_output = struct;

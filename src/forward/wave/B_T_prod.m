@@ -3,6 +3,33 @@
 
 
 function [div_u] = B_T_prod(p_1, p_2, p_3, div_vec, n, t, gpu_extended_memory)
+% --- Zeffiro documentation header ---
+% B_T_prod — B T prod.
+%
+% Purpose:
+%   B T prod.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   p_1
+%   p_2
+%   p_3
+%   div_vec
+%   n
+%   t
+%   gpu_extended_memory
+%
+% Outputs:
+%   div_u
+%
+% Side effects:
+%   - GPU
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[div_u] = B_T_prod(p_1, p_2, p_3, div_vec, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 n = gpuArray(n);
 t = gpuArray(t);

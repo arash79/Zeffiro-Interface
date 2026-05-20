@@ -1,4 +1,48 @@
 function zef = zef_nse_tool_window(zef)
+% --- Zeffiro documentation header ---
+% zef_nse_tool_window — Zef nse tool window.
+%
+% Purpose:
+%   Zef nse tool window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.domain_labels (read)
+%   zef.inv_time_1 (read, write)
+%   zef.inv_time_2 (read, write)
+%   zef.inv_time_3 (read, write)
+%   zef.nodes (read)
+%   zef.nse_field (read)
+%   zef.nse_sigma (read, write)
+%   zef.reconstruction (read)
+%   zef.reconstruction_information (read)
+%   zef.sigma (read)
+%   zef.source_interpolation_ind (read)
+%   zef.tetra (read)
+%
+% Calls (project):
+%   zef_nse_interpolate
+%   zef_nse_reconstruction
+%   zef_nse_sigma
+%   zef_nse_tool_init
+%   zef_nse_tool_update
+%   zef_nse_tool_window
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_nse_tool_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 zef_data = zef_nse_app;
 

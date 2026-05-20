@@ -1,10 +1,40 @@
-
-%open source simulation tool and select the correct source
+% --- Zeffiro documentation header ---
+% meg_max=0 — Meg max=0.
 %
-%check the noise like below and update the values
+% Purpose:
+%   Meg max=0.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Zef fields (observed):
+%   zef.GMM (read)
+%   zef.L (read, write)
+%   zef.beamformer (read)
+%   zef.bf_var_loc (read)
+%   zef.dataBank (read)
+%   zef.dipole_app (read)
+%   zef.fss_bg_noise (read, write)
+%   zef.h_ramus_snr (read)
+%   zef.inv_snr (read, write)
+%   zef.measurements (read, write)
+%   zef.mne_snr (read, write)
+%   zef.reconstruction (read)
+%   zef.reconstruction_information (read)
+%
+% Calls (project):
+%   zef_dataBank_add
+%   zef_dataBank_getData
+%   zef_ramus_iteration
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `meg_max=0` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
-%check max data without noise
-%max(abs(zef.measurements),[],'all')
 meg_max=0.0078; %%%%%%%%%%%%%%%%%%%%
 eeg_max=0.6928; %%%%%%%%%%%
 

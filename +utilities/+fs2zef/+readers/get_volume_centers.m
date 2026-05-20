@@ -1,4 +1,27 @@
 function [c_r, c_s, c_a] = get_volume_centers(mgzFile)
+% --- Zeffiro documentation header ---
+% utilities.fs2zef.readers.get_volume_centers — Get volume centers.
+%
+% Purpose:
+%   Get volume centers.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   mgzFile
+%
+% Outputs:
+%   c_r
+%   c_s
+%   c_a
+%
+% Calls (project):
+%   utilities.fs2zef.readers.get_volume_centers
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[c_r, c_s, c_a]] = utilities.fs2zef.readers.get_volume_centers(mgzFile)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %get_volume_centers Read FreeSurfer volume center offsets via mri_info
 %
 %   [c_r, c_s, c_a] = get_volume_centers(mgzFile) sets up the FreeSurfer

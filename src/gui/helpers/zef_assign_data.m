@@ -1,8 +1,29 @@
 function zef = zef_assign_data(zef, zef_data)
-%zef_assign_data assigns the fields of struct zef_data as
-%fields of struct zef.
-%Input: struct zef, struct zef_data
-%Output: struct zef.
+% --- Zeffiro documentation header ---
+% zef_assign_data — Zef assign data.
+%
+% Purpose:
+%   Zef assign data.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   zef_data
+%
+% Outputs:
+%   zef
+%
+% Calls (project):
+%   zef_assign_data
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_assign_data(zef, zef_data)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if nargin == 0
     zef_data = evalin('base','zef_data');

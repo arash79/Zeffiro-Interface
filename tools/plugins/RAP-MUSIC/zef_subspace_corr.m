@@ -1,4 +1,28 @@
 function [S_C,orj] = zef_subspace_corr(A,B,chararcter)
+% --- Zeffiro documentation header ---
+% zef_subspace_corr — Zef subspace corr.
+%
+% Purpose:
+%   Zef subspace corr.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   A
+%   B
+%   chararcter
+%
+% Outputs:
+%   S_C
+%   orj
+%
+% Calls (project):
+%   zef_subspace_corr
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[S_C, orj]] = zef_subspace_corr(A, B, chararcter)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 [U_A,S_A,V_A]=svd(A,'econ');
 U_A = U_A(:,abs(diag(S_A))>0);

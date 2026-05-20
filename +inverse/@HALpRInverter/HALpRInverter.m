@@ -1,4 +1,28 @@
 classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
+% --- Zeffiro documentation header ---
+% inverse.HALpRInverter.HALpRInverter — Inverse solver class implementing HALpR reconstruction.
+%
+% Purpose:
+%   Inverse solver class implementing HALpR reconstruction.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   args
+%
+% Calls (project):
+%   inverse.CommonInverseParameters
+%   zef_make_multires_dec
+%
+% Side effects:
+%   - GPU
+%   - filesystem I/O
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `inverse.HALpRInverter.HALpRInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
+% --- End Zeffiro documentation header
+
 
     %
     % HALpRInverter, Copyright © 2025- Joonas Lahtinen

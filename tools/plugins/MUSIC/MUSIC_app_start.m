@@ -1,6 +1,36 @@
-%This is the startup script for MUSIC app. One must add this as launch
-%script to zeffiro_plugins file:
-%MUSIC, inverse_tools, MUSIC_app_start
+% --- Zeffiro documentation header ---
+% zef — Zef.
+%
+% Purpose:
+%   Zef.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.MUSIC (read)
+%   zef.MUSIC_L_reg_type (read, write)
+%   zef.MUSIC_leadfield_lambda (read, write)
+%   zef.MUSIC_type (read, write)
+%   zef.font_size (read)
+%   zef.inv_data_segment (read, write)
+%   zef.inv_high_cut_frequency (read, write)
+%   zef.inv_low_cut_frequency (read, write)
+%   zef.inv_sampling_frequency (read, write)
+%   zef.inv_snr (read, write)
+%   zef.inv_time_1 (read, write)
+%   zef.inv_time_2 (read, write)
+%   zef.inv_time_3 (read, write)
+%   zef.normalize_data (read, write)
+%   zef.number_of_frames (read, write)
+%   … (1 more)
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 zef.MUSIC = MUSIC_app;
 

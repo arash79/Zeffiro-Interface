@@ -1,4 +1,56 @@
 function [z, info] = zef_find_mne_reconstruction(zef,data_mode)
+% --- Zeffiro documentation header ---
+% zef_find_mne_reconstruction — Zef find mne reconstruction.
+%
+% Purpose:
+%   Zef find mne reconstruction.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%   data_mode
+%
+% Outputs:
+%   z
+%   info
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.inv_amplitude_db (read)
+%   zef.inv_high_pass (read, write)
+%   zef.inv_low_pass (read, write)
+%   zef.inv_prior_over_measurement_db (read)
+%   zef.inv_sampling_frequency (read, write)
+%   zef.inv_snr (read)
+%   zef.inv_time_1 (read, write)
+%   zef.inv_time_2 (read, write)
+%   zef.inv_time_3 (read, write)
+%   zef.mne_high_cut_frequency (read)
+%   zef.mne_low_cut_frequency (read)
+%   zef.mne_normalize_data (read)
+%   zef.mne_number_of_frames (read)
+%   zef.mne_prior (read)
+%   … (10 more)
+%
+% Calls (project):
+%   zef_find_gaussian_prior
+%   zef_find_mne_reconstruction
+%   zef_getFilteredData
+%   zef_getTimeStep
+%   zef_normalizeInverseReconstruction
+%   zef_postProcessInverse
+%   zef_processLeadfields
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[z, info]] = zef_find_mne_reconstruction(zef, data_mode)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 2
     data_mode = 'filtered';

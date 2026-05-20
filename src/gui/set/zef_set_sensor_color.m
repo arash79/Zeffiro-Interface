@@ -1,4 +1,27 @@
+% --- Zeffiro documentation header ---
+% function zef_set_sensor_color — Function zef set sensor color.
+%
+% Purpose:
+%   Function zef set sensor color.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.current_sensors (read)
+%   zef.h_sensor_visible_color (read)
+%
+% Calls (project):
+%   zef_set_sensor_color
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function zef_set_sensor_color` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function zef_set_sensor_color
+
 
 color_vec = uisetcolor;
 item_ind_1 = evalin('base','zef.h_sensor_visible_color.Value');

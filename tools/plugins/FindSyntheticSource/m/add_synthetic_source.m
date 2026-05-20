@@ -1,6 +1,22 @@
-%Script for add synthetic source button of find_synthetic_source_app.
+% --- Zeffiro documentation header ---
+% zef.find_synth_source.h_source_parameters.Data=zef — Zef.find synth source.h source parameters.Data=zef.
+%
+% Purpose:
+%   Zef.find synth source.h source parameters.Data=zef.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.find_synth_source (read)
+%   zef.synth_source_data (read, write)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.find_synth_source.h_source_parameters.Data=zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
-%Display Initial parameters on the list
 zef.find_synth_source.h_source_parameters.Data=zef.synth_source_init;
 
 %Define a possible index for banked method name and add it to the list of selected inversion methods

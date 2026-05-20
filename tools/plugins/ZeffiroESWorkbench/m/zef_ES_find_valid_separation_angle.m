@@ -1,7 +1,19 @@
 function angles_list = zef_ES_find_valid_separation_angle
-% Function that evaluates all possible separation angles in order to obtain
-% 5 different electrodes for a HD-TDCS 4+1 montage.
-% Returns a list in the form of a table.
+% --- Zeffiro documentation header ---
+% angles_list — Angles list.
+%
+% Purpose:
+%   Angles list.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Calls (project):
+%   zef_ES_4x1_sensors
+%   zef_ES_find_valid_separation_angle
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `angles_list` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 ell = zeros(360,6);
 for i = 0:359;

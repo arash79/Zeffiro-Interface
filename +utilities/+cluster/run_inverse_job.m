@@ -1,5 +1,31 @@
 function result = run_inverse_job(bundle_path, result_path, opts)
-%RUN_INVERSE_JOB Worker entry point for cluster inverse computation.
+% --- Zeffiro documentation header ---
+% utilities.cluster.run_inverse_job — Run inverse job.
+%
+% Purpose:
+%   Run inverse job.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   bundle_path
+%   result_path
+%   opts
+%
+% Outputs:
+%   result
+%
+% Calls (project):
+%   utilities.cluster.dispatch_inverse
+%   utilities.cluster.run_inverse_job
+%
+% Side effects:
+%   - filesystem I/O
+%   - parallel/cluster
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[result] = utilities.cluster.run_inverse_job(bundle_path, result_path, opts)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     bundle_path (1,1) string {mustBeFile}

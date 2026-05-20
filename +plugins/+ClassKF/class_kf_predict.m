@@ -1,18 +1,25 @@
 function [m, P] = class_kf_predict(KFclassObj)
-%CLASS_KF_PREDICT Prediction step of the Kalman filter (object-oriented interface).
+% --- Zeffiro documentation header ---
+% plugins.ClassKF.class_kf_predict — Class kf predict.
 %
-%   [M, P] = CLASS_KF_PREDICT(KFclassObj) performs the Kalman filter prediction
-%   step using the state transition model and evolution covariance from
-%   KFclassObj. Optimizes when the state transition matrix A is identity.
+% Purpose:
+%   Class kf predict.
+%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
 %
-%   Input:
-%     KFclassObj - Kalman filter object with fields:
-%                  state_transition_model_A, prev_step_reconstruction,
-%                  prev_step_posterior_cov, evolution_cov
+% Inputs:
+%   KFclassObj
 %
-%   Outputs:
-%     M - Predicted state mean: m_pred = A * m_prev (or m_prev if A = I)
-%     P - Predicted state covariance: P_pred = A*P_prev*A' + Q (or P_prev + Q if A = I)
+% Outputs:
+%   m
+%   P
+%
+% Calls (project):
+%   plugins.ClassKF.class_kf_predict
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[m, P]] = plugins.ClassKF.class_kf_predict(KFclassObj)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if (isdiag(KFclassObj.state_transition_model_A) && all(diag(KFclassObj.state_transition_model_A) - 1) < eps)
     % Identity transition: m unchanged, P = P + Q

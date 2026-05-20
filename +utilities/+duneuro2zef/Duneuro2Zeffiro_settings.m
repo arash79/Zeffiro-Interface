@@ -46,8 +46,42 @@
 % See also: Duneuro2Zeffiro_convert.m, import_duneuro_project.m, Duneuro2Zeffiro_import.zef
 
 function zef = Duneuro2Zeffiro_settings(zef)
+% --- Zeffiro documentation header ---
+% utilities.duneuro2zef.Duneuro2Zeffiro_settings — Duneuro2Zeffiro settings.
+%
+% Purpose:
+%   Duneuro2Zeffiro settings.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.inv_high_cut_frequency (read, write)
+%   zef.inv_low_cut_frequency (read, write)
+%   zef.inv_sampling_frequency (read, write)
+%   zef.source_direction_mode (read, write)
+%
+% Calls (project):
+%   utilities.duneuro2zef.Duneuro2Zeffiro_settings
+%   zef_build_compartment_table
+%   zef_downsample_surfaces
+%   zef_process_meshes
+%   zef_source_interpolation
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = utilities.duneuro2zef.Duneuro2Zeffiro_settings(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-    % Get zef from base workspace if not provided
     if nargin < 1 || isempty(zef)
         if evalin('base', 'exist(''zef'', ''var'')')
             zef = evalin('base', 'zef');

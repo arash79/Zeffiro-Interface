@@ -1,6 +1,58 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,reconstruction_information] = zef_ramus_iteration(zef)
+% --- Zeffiro documentation header ---
+% zef_ramus_iteration — Zef ramus iteration.
+%
+% Purpose:
+%   Zef ramus iteration.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   z
+%   reconstruction_information
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.inv_amplitude_db (read)
+%   zef.inv_high_cut_frequency (read, write)
+%   zef.inv_hyperprior (read)
+%   zef.inv_hyperprior_tail_length_db (read)
+%   zef.inv_hyperprior_weight (read)
+%   zef.inv_low_cut_frequency (read, write)
+%   zef.inv_prior_over_measurement_db (read)
+%   zef.inv_sampling_frequency (read, write)
+%   zef.number_of_frames (read, write)
+%   zef.ramus_high_cut_frequency (read)
+%   zef.ramus_hyperprior (read)
+%   zef.ramus_init_guess_mode (read)
+%   zef.ramus_low_cut_frequency (read)
+%   zef.ramus_multires_count (read)
+%   … (18 more)
+%
+% Calls (project):
+%   zef_find_g_hyperprior
+%   zef_find_ig_hyperprior
+%   zef_getFilteredData
+%   zef_getTimeStep
+%   zef_normalizeInverseReconstruction
+%   zef_postProcessInverse
+%   zef_processLeadfields
+%   zef_ramus_iteration
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[z, reconstruction_information]] = zef_ramus_iteration(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h = zef_waitbar([0 0 0], [1 1 1],['RAMUS iteration.']);
 [s_ind_1] = unique(eval('zef.source_interpolation_ind{1}'));

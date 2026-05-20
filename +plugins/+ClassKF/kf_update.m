@@ -1,25 +1,30 @@
 function [m, P, K] = kf_update(m, P, y, H, R)
-%KF_UPDATE Kalman filter update step.
+% --- Zeffiro documentation header ---
+% plugins.ClassKF.kf_update — Kf update.
 %
-%   [M, P, K] = KF_UPDATE(M, P, Y, H, R) performs the Kalman filter update
-%   given predicted state (m, P) and new measurement y:
-%     v = y - H*m                    (innovation)
-%     S = H*P*H' + R                 (innovation covariance)
-%     K = P*H'/S                     (Kalman gain)
-%     m = m + K*v                    (updated mean)
-%     P = (I - K*H)*P                (updated covariance)
+% Purpose:
+%   Kf update.
+%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
 %
-%   Inputs:
-%     M - Predicted state mean
-%     P - Predicted state covariance
-%     Y - Measurement vector
-%     H - Observation matrix (lead field)
-%     R - Measurement noise covariance
+% Inputs:
+%   m
+%   P
+%   y
+%   H
+%   R
 %
-%   Outputs:
-%     M - Updated state mean
-%     P - Updated state covariance
-%     K - Kalman gain matrix
+% Outputs:
+%   m
+%   P
+%   K
+%
+% Calls (project):
+%   plugins.ClassKF.kf_update
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[m, P, K]] = plugins.ClassKF.kf_update(m, P, y, H, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 v = y - H*m;
 PHt = P * H';

@@ -1,6 +1,51 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z] = ramus_sampling_process(void)
+% --- Zeffiro documentation header ---
+% ramus_sampling_process — Ramus sampling process.
+%
+% Purpose:
+%   Ramus sampling process.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   void
+%
+% Outputs:
+%   z
+%
+% Zef fields (observed):
+%   zef.L (read)
+%   zef.compartment_tags (read)
+%   zef.gpu_count (read)
+%   zef.inv_beta (read)
+%   zef.inv_data_segment (read)
+%   zef.inv_high_cut_frequency (read)
+%   zef.inv_hyperprior (read)
+%   zef.inv_init_guess_mode (read)
+%   zef.inv_likelihood_std (read)
+%   zef.inv_low_cut_frequency (read)
+%   zef.inv_multires_dec (read)
+%   zef.inv_multires_ind (read)
+%   zef.inv_multires_n_decompositions (read)
+%   zef.inv_multires_n_iter (read)
+%   zef.inv_multires_n_levels (read)
+%   … (18 more)
+%
+% Calls (project):
+%   zef_smooth_field
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[z] = ramus_sampling_process(void)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h = zef_waitbar(0,1,['RAMUS Sampler.']);
 [s_ind_1] = unique(evalin('base','zef.source_interpolation_ind{1}'));

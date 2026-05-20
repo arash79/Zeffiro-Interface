@@ -1,4 +1,31 @@
 function [L, source_positions,source_directions] = zef_lead_field_filter(L,source_positions,source_directions,filter_quantile,varargin)
+% --- Zeffiro documentation header ---
+% zef_lead_field_filter — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%
+% Purpose:
+%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Inputs:
+%   L
+%   source_positions
+%   source_directions
+%   filter_quantile
+%   varargin
+%
+% Outputs:
+%   L
+%   source_positions
+%   source_directions
+%
+% Calls (project):
+%   zef_lead_field_filter
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[L, source_positions, source_directions]] = zef_lead_field_filter(L, source_positions, source_directions, filter_quantile, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 
 amp_vec = sqrt(sum(L.^2));

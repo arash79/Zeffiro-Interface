@@ -1,5 +1,38 @@
 function [zef, run_result] = zef_inverse_run(zef, method_id, opts)
-%ZEF_INVERSE_RUN Run inverse computation locally or on cluster.
+% --- Zeffiro documentation header ---
+% zef_inverse_run — Zef inverse run.
+%
+% Purpose:
+%   Zef inverse run.
+%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%
+% Inputs:
+%   zef
+%   method_id
+%   opts
+%
+% Outputs:
+%   zef
+%   run_result
+%
+% Zef fields (observed):
+%   zef.reconstruction (read, write)
+%   zef.reconstruction_information (read, write)
+%
+% Calls (project):
+%   utilities.cluster.collect_inverse_results
+%   utilities.cluster.dispatch_inverse
+%   utilities.cluster.submit_inverse_jobs
+%   zef_inverse_extract_bundle
+%   zef_inverse_run
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Programmatic inverse entry; GUI plugins often call legacy `zef_*_iteration` instead.
+%   Programmatic: `[[zef, run_result]] = zef_inverse_run(zef, method_id, opts)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     zef (1,1) struct

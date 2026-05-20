@@ -1,4 +1,34 @@
 function  zef_close_all(zef)
+% --- Zeffiro documentation header ---
+% zef_close_all — Zef close all.
+%
+% Purpose:
+%   Zef close all.
+%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.h_window_aux (read, write)
+%   zef.zeffiro_restart (read)
+%
+% Calls (project):
+%   zef_close_all
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_close_all(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     if evalin('base','exist(''zef'',''var'')')
@@ -32,4 +62,3 @@ end
 evalin('base','clear zef zef_data zef_i zef_j zef_k;');
 
 end
-

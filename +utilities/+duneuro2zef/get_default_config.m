@@ -15,8 +15,24 @@
 % See also: run.m, validate_config.m
 
 function config = get_default_config()
+% --- Zeffiro documentation header ---
+% utilities.duneuro2zef.get_default_config — Get default config.
+%
+% Purpose:
+%   Get default config.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Outputs:
+%   config
+%
+% Calls (project):
+%   utilities.duneuro2zef.get_default_config
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `utilities.duneuro2zef.get_default_config` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
-    % File paths
     config.input_folder = 'data/exported';
     config.output_folder = 'data/converted';
     

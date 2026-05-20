@@ -1,4 +1,33 @@
 function zef = zef_dataBank_exportButtonPress(zef)
+% --- Zeffiro documentation header ---
+% zef_dataBank_exportButtonPress — Zef data Bank export Button Press.
+%
+% Purpose:
+%   Zef data Bank export Button Press.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.dataBank (read)
+%
+% Calls (project):
+%   zef_dataBank_exportButtonPress
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_dataBank_exportButtonPress(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

@@ -1,5 +1,29 @@
 function self = precompute(self, L, procFile)
-%PRECOMPUTE Build cached eLORETA inverse operator.
+% --- Zeffiro documentation header ---
+% inverse.ELORETAInverter.precompute — Precomputes cached operators before the per-frame inversion loop.
+%
+% Purpose:
+%   Precomputes cached operators before the per-frame inversion loop.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   self
+%   L
+%   procFile
+%
+% Outputs:
+%   self
+%
+% Calls (project):
+%   inverse.precompute
+%
+% Side effects:
+%   - GPU
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[self] = inverse.ELORETAInverter.precompute(self, L, procFile)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     self (1,1) inverse.ELORETAInverter

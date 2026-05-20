@@ -1,28 +1,25 @@
 function pts_filename = save_atlas_points(mesh, out_folder)
+% --- Zeffiro documentation header ---
+% utilities.sn2zef.save_atlas_points — Save atlas points.
 %
-% save_atlas_points - Write SimNIBS parcellation points from a mesh.
-%
-% Builds the point file directly from the SimNIBS Gmsh mesh tetrahedra. The
-% tetra centroids provide the parcellation point coordinates. No coordinate
-% transformation is applied here; callers should pass mesh.nodes in the frame
-% that should be written.
+% Purpose:
+%   Save atlas points.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%
-% - mesh (1,1) struct
-%   Output of utilities.sn2zef.meshLoadGmsh4. Must expose nodes (N-by-3),
-%   tetrahedra (M-by-4, 1-indexed), and tetrahedron_regions (M-by-1 labels).
-%
-% - out_folder (1,1) string { mustBeFolder }
-%   Existing directory where sn_atlas_points.dat is written.
+%   mesh
+%   out_folder
 %
 % Outputs:
+%   pts_filename
 %
-% - pts_filename (1,1) string
-%   Basename of the written point file.
+% Calls (project):
+%   utilities.sn2zef.save_atlas_points
 %
-% See also: utilities.sn2zef.run, utilities.sn2zef.meshLoadGmsh4
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[pts_filename] = utilities.sn2zef.save_atlas_points(mesh, out_folder)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
     arguments
         mesh       (1,1) struct

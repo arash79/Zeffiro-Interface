@@ -1,5 +1,30 @@
 function [results, summary] = collect_inverse_results(submissions, opts)
-%COLLECT_INVERSE_RESULTS Wait jobs and collect saved inverse results.
+% --- Zeffiro documentation header ---
+% utilities.cluster.collect_inverse_results — Collect inverse results.
+%
+% Purpose:
+%   Collect inverse results.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   submissions
+%   opts
+%
+% Outputs:
+%   results
+%   summary
+%
+% Calls (project):
+%   utilities.cluster.collect_inverse_results
+%
+% Side effects:
+%   - filesystem I/O
+%   - parallel/cluster
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[results, summary]] = utilities.cluster.collect_inverse_results(submissions, opts)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     submissions (1,:) struct

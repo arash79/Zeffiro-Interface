@@ -1,4 +1,29 @@
 function [pos, label] = getElectrodePositions(data, OptionalNameforElectrodeFile, OptionalNameForLabelFile, OptionalSaveToFile0or1)
+% --- Zeffiro documentation header ---
+% getElectrodePositions — Get Electrode Positions.
+%
+% Purpose:
+%   Get Electrode Positions.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   data
+%   OptionalNameforElectrodeFile
+%   OptionalNameForLabelFile
+%   OptionalSaveToFile0or1
+%
+% Outputs:
+%   pos
+%   label
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[pos, label]] = getElectrodePositions(data, OptionalNameforElectrodeFile, OptionalNameForLabelFile, OptionalSaveToFile0or1)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin==3
     OptionalSaveToFile0or1=1;

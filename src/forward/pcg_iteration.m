@@ -3,6 +3,31 @@
 
 
 function [x,conv_val,n_iter] = pcg_iteration(A,b,tol_val,max_it,M,x)
+% --- Zeffiro documentation header ---
+% pcg_iteration — Pcg iteration.
+%
+% Purpose:
+%   Pcg iteration.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   A
+%   b
+%   tol_val
+%   max_it
+%   M
+%   x
+%
+% Outputs:
+%   x
+%   conv_val
+%   n_iter
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[x, conv_val, n_iter]] = pcg_iteration(A, b, tol_val, max_it, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 5
     M = [];

@@ -1,25 +1,27 @@
 function value = zef_bst_get_compartment_property(compartment_name, property_cell, default_value)
-%ZEF_BST_GET_COMPARTMENT_PROPERTY Gets a property value for a compartment from key-value cell array.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst_get_compartment_property — Zef bst get compartment property.
 %
-% This utility function extracts property values (like conductivity or DOF space)
-% from a key-value cell array format used in settings. It handles both exact
-% and normalized name matching for robustness.
+% Purpose:
+%   Zef bst get compartment property.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   compartment_name - Name of the compartment (e.g., 'Scalp', 'Cortex')
-%   property_cell    - Cell array with alternating keys and values
-%                      Example: {'Scalp', 0.34, 'Cortex', 0.33}
-%   default_value    - Default value to return if compartment not found
+%   compartment_name
+%   property_cell
+%   default_value
 %
 % Outputs:
-%   value - Property value for the compartment, or default_value if not found
+%   value
 %
-% Example:
-%   conductivity = utilities.brainstorm2zef.zef_bst_get_compartment_property(...
-%       'Scalp', {'Scalp', 0.34, 'Cortex', 0.33}, 1.0);
-%   % Returns: 0.34
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_get_compartment_property
+%   utilities.brainstorm2zef.zef_bst_normalize_compartment_name
 %
-% See also: ZEF_BST_COMPARTMENT_SETTINGS
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[value] = utilities.brainstorm2zef.zef_bst_get_compartment_property(compartment_name, property_cell, default_value)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if nargin < 3
     default_value = [];

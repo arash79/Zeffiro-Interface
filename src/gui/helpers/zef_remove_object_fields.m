@@ -1,3 +1,15 @@
+% --- Zeffiro documentation header ---
+% zef_data — Zef data.
+%
+% Purpose:
+%   Zef data.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef_data` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef_data.fieldnames = fieldnames(zef_data);
 zef_data.remove_fieldnames = cell(0);
 zef_j = 0;

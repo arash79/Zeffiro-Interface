@@ -1,55 +1,29 @@
 function metrics = compute_metrics(z, source_positions, source_indices, diff_type, dispersion_radius, opts)
-%COMPUTE_METRICS Position / direction / magnitude / dispersion metrics.
+% --- Zeffiro documentation header ---
+% utilities.sensitivity.compute_metrics — Compute metrics.
 %
-%   metrics = compute_metrics(z, source_positions, source_indices, ...
-%                             diff_type, dispersion_radius)
-%   metrics = compute_metrics(z, source_positions, source_indices, ...
-%                             diff_type, dispersion_radius, ...
-%                             "SourceDirectionMode", mode, ...
-%                             "SourceDirections",    Q, ...
-%                             "ProbesPerSource",     p)
-%
-% Strict re-implementation of the per-(i, j) metric loop and per-element
-% rangesearch in +examples/+studies/+santtus_peeling_article/zef_rec_diff.m,
-% with two structural changes that do not alter the formulas:
-%   1. The dispersion stage builds the KD-tree once and resolves all queries
-%      with a single multi-query rangesearch instead of one rangesearch per
-%      reconstruction (which rebuilt the tree every call in the legacy code).
-%   2. Per-cell reshape, max, and normalisation are kept in a tight loop;
-%      the BLAS calls inside dominate per-iteration cost and the loop
-%      overhead is small relative to the inverse stage.
-%
-% When source_indices = 1:size(source_positions, 1) and SourceDirectionMode
-% is 1 or 2 (the only mode the legacy zef_rec_diff supported), the output
-% vectors match the legacy ones element-for-element. For mode 3 the layout
-% degenerates to one probe per source along the source's intrinsic
-% direction, and the metrics are computed accordingly.
+% Purpose:
+%   Compute metrics.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   z                  Cell array of length probes_per_source * numel(source_indices).
-%                      probes_per_source is 3 for modes 1/2 and 1 for mode 3.
-%                      Cell k holds the reconstructed dipole-vector for one
-%                      synthetic probe; cells may be shorter than 3 * n_full
-%                      (the class-based inverter only writes into active
-%                      source positions) and are zero-padded.
-%   source_positions   n_full x 3 matrix of every mesh source position.
-%                      The reconstruction can land on any of these, so this
-%                      is also the search pool for dispersion.
-%   source_indices     Column vector of 1-based indices into source_positions
-%                      that were probed. Defaults to (1:n_full)'.
-%   diff_type          "L2" or "minabs". Position-difference metric.
-%   dispersion_radius  Radius (mm) for the dispersion ROI.
-%   opts.SourceDirectionMode 1 | 2 | 3 (default 1).
-%   opts.SourceDirections    n_full x 3, required when mode == 3 (intrinsic
-%                            direction per mesh source).
+%   z
+%   source_positions
+%   source_indices
+%   diff_type
+%   dispersion_radius
+%   opts
 %
-% Output (struct):
-%   dist_vec       (n_rec x 1) Position error per reconstruction.
-%   angle_vec      (n_rec x 1) Direction error in degrees.
-%   mag_vec        (n_rec x 1) Reconstructed peak magnitude / sqrt(3).
-%   dispersion_vec (n_rec x 1) Weighted spatial spread.
-%   max_ind_vec    (n_rec x 1) Peak source-position index per
-%                  reconstruction (into source_positions, range 1:n_full).
+% Outputs:
+%   metrics
+%
+% Calls (project):
+%   utilities.sensitivity.compute_metrics
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[metrics] = utilities.sensitivity.compute_metrics(z, source_positions, source_indices, diff_type, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     z (1,:) cell

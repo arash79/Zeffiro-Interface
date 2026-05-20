@@ -1,4 +1,38 @@
 function zef = zef_start_log(zef)
+% --- Zeffiro documentation header ---
+% zef_start_log — Zef start log.
+%
+% Purpose:
+%   Zef start log.
+%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.current_log_file (read, write)
+%   zef.current_version (read)
+%   zef.h_zeffiro_menu (read)
+%   zef.max_n_log_files (read)
+%   zef.program_path (read)
+%   zef.use_log (read)
+%   zef.zeffiro_log_file_name (read)
+%
+% Calls (project):
+%   zef_start_log
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_start_log(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if zef.use_log
     if not(exist([zef.program_path filesep 'data' filesep 'log'],'dir'))

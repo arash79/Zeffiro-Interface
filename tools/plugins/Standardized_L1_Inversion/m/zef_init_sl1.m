@@ -1,6 +1,50 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_init_sl1(zef)
+% --- Zeffiro documentation header ---
+% zef_init_sl1 — Initializes GUI widgets and default `zef` fields for sl1.
+%
+% Purpose:
+%   Initializes GUI widgets and default `zef` fields for sl1.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.font_size (read)
+%   zef.h_sl1_apply (read)
+%   zef.h_sl1_cancel (read)
+%   zef.h_sl1_high_cut_frequency (read)
+%   zef.h_sl1_hyperprior (read)
+%   zef.h_sl1_low_cut_frequency (read)
+%   zef.h_sl1_map_estimation (read)
+%   zef.h_sl1_n_map_iterations (read)
+%   zef.h_sl1_normalize_data (read)
+%   zef.h_sl1_number_of_frames (read)
+%   zef.h_sl1_sampling_frequency (read)
+%   zef.h_sl1_snr (read)
+%   zef.h_sl1_start (read)
+%   zef.h_sl1_time_1 (read)
+%   zef.h_sl1_time_2 (read)
+%   … (26 more)
+%
+% Calls (project):
+%   zef_init_sl1
+%   zef_sl1_iteration
+%   zef_sl1_map_estimation_window
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_init_sl1(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 zef = zef_sl1_map_estimation_window(zef);
 

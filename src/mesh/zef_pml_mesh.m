@@ -1,4 +1,34 @@
 function [X, Y, Z, pml_ind] = zef_pml_mesh(inner_radius,outer_radius,lattice_size,max_size)
+% --- Zeffiro documentation header ---
+% zef_pml_mesh — Zef pml mesh.
+%
+% Purpose:
+%   Zef pml mesh.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   inner_radius
+%   outer_radius
+%   lattice_size
+%   max_size
+%
+% Outputs:
+%   X
+%   Y
+%   Z
+%   pml_ind
+%
+% Calls (project):
+%   zef_pml_mesh
+%
+% Side effects:
+%   - creates/updates figures
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[X, Y, Z]] = zef_pml_mesh(inner_radius, outer_radius, lattice_size, max_size)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 growth_param = 1 + 1e-15;
 

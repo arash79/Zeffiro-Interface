@@ -1,5 +1,38 @@
 
 function  zef_nse_plot_full(zef, nse_field, plot_vec, y_label, legend_text)
+% --- Zeffiro documentation header ---
+% zef_nse_plot_full — Zef nse plot full.
+%
+% Purpose:
+%   Zef nse plot full.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%   nse_field
+%   plot_vec
+%   y_label
+%   legend_text
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.font_size (read)
+%   zef.h_axes1 (read)
+%
+% Calls (project):
+%   zef_nse_plot_full
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_nse_plot_full(zef, nse_field, plot_vec, y_label, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h_axes = zef.h_axes1;
 axes(h_axes);

@@ -1,3 +1,32 @@
+% --- Zeffiro documentation header ---
+% if not(isfield(zef,'streamline_draw')) — If not(isfield(zef,'streamline draw')).
+%
+% Purpose:
+%   If not(isfield(zef,'streamline draw')).
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.colortune_param (read, write)
+%   zef.cone_alpha (read, write)
+%   zef.cone_field_lattice_resolution (read, write)
+%   zef.cone_scale (read, write)
+%   zef.contour_line_width (read, write)
+%   zef.contour_n_smoothing (read, write)
+%   zef.parcellation_quantile (read, write)
+%   zef.parcellation_type (read, write)
+%   zef.sensors_visual_size (read, write)
+%   zef.streamline_draw (read, write)
+%   zef.streamline_linestyle (read, write)
+%   zef.use_gpu_graphic (read, write)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if not(isfield(zef,'streamline_draw'))` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 if not(isfield(zef,'streamline_draw'))
     zef.streamline_draw = 0;
 end

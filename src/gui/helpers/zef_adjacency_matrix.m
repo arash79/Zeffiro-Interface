@@ -1,8 +1,28 @@
 function [A, I, J] = zef_adjacency_matrix(nodes, tetra)
-
-% Constructs a sparse square adjacency matrix or stensil A for a given set
-% of nodes and tetrahedra constructed from them. Also returns the nonzero
-% indices I and J of A.
+% --- Zeffiro documentation header ---
+% zef_adjacency_matrix — Zef adjacency matrix.
+%
+% Purpose:
+%   Zef adjacency matrix.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   nodes
+%   tetra
+%
+% Outputs:
+%   A
+%   I
+%   J
+%
+% Calls (project):
+%   zef_adjacency_matrix
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[A, I, J]] = zef_adjacency_matrix(nodes, tetra)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     nodes (:,3) double {mustBeNonNan}

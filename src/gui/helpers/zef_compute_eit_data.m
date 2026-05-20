@@ -1,6 +1,46 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [eit_data_vec] = zef_compute_eit_data(nodes,elements,sigma,electrodes,varargin)
+% --- Zeffiro documentation header ---
+% zef_compute_eit_data — Zef compute eit data.
+%
+% Purpose:
+%   Zef compute eit data.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   nodes
+%   elements
+%   sigma
+%   electrodes
+%   varargin
+%
+% Outputs:
+%   eit_data_vec
+%
+% Zef fields (observed):
+%   zef.current_pattern (read)
+%   zef.gpu_count (read)
+%   zef.inv_bg_data (read)
+%   zef.inv_eit_noise (read)
+%   zef.inv_roi_perturbation (read)
+%   zef.inv_roi_sphere (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   zef_compute_eit_data
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[eit_data_vec] = zef_compute_eit_data(nodes, elements, sigma, electrodes, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 N = size(nodes,1);
 

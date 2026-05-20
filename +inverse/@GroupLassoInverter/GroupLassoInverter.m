@@ -1,12 +1,28 @@
 %% Copyright © 2025- Joonas Lahtinen and Alexandra Koulouri
 classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
-
-    %
-    % GroupLassoInverter
-    %
-    % A class which defines the properties needed by the GroupLasso inversion method,
-    % and the method itself.
-    %
+% --- Zeffiro documentation header ---
+% inverse.GroupLassoInverter.GroupLassoInverter — Inverse solver class implementing GroupLasso reconstruction.
+%
+% Purpose:
+%   Inverse solver class implementing GroupLasso reconstruction.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   args
+%
+% Calls (project):
+%   inverse.CommonInverseParameters
+%   zef_make_multires_dec
+%
+% Side effects:
+%   - GPU
+%   - filesystem I/O
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `inverse.GroupLassoInverter.GroupLassoInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
+% --- End Zeffiro documentation header
 
     properties
 

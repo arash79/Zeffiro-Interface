@@ -1,5 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% zef.iasroi_roi_mode = get(zef — Zef.iasroi roi mode = get(zef.
+%
+% Purpose:
+%   Zef.iasroi roi mode = get(zef.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.h_iasroi_high_cut_frequency (read)
+%   zef.h_iasroi_hyperprior (read)
+%   zef.h_iasroi_low_cut_frequency (read)
+%   zef.h_iasroi_n_map_iterations (read)
+%   zef.h_iasroi_normalize_data (read)
+%   zef.h_iasroi_number_of_frames (read)
+%   zef.h_iasroi_rec_source_8 (read)
+%   zef.h_iasroi_rec_source_9 (read)
+%   zef.h_iasroi_roi_sphere_1 (read)
+%   zef.h_iasroi_roi_sphere_2 (read)
+%   zef.h_iasroi_roi_sphere_3 (read)
+%   zef.h_iasroi_roi_sphere_4 (read)
+%   zef.h_iasroi_roi_threshold (read)
+%   zef.h_iasroi_sampling_frequency (read)
+%   zef.h_iasroi_snr (read)
+%   … (26 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.iasroi_roi_mode = get(zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 zef.iasroi_roi_mode = get(zef.h_iasroi_roi_mode ,'value');
 if zef.iasroi_roi_mode == 1
     zef.iasroi_roi_sphere = str2num(get(zef.h_iasroi_roi_sphere_1 ,'string'));

@@ -1,4 +1,26 @@
 function [folder_list] = zef_add_path(import_path,varargin)
+% --- Zeffiro documentation header ---
+% zef_add_path — Zef add path.
+%
+% Purpose:
+%   Zef add path.
+%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%
+% Inputs:
+%   import_path
+%   varargin
+%
+% Outputs:
+%   folder_list
+%
+% Calls (project):
+%   zef_add_path
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[folder_list] = zef_add_path(import_path, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 folder_list_aux = [];
 subfolder_status = 0;

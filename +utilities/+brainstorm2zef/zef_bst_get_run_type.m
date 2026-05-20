@@ -1,19 +1,24 @@
 function [run_type] = zef_bst_get_run_type(h_parent)
-%ZEF_BST_GET_RUN_TYPE Gets the run type selection from the plugin GUI.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst_get_run_type — Zef bst get run type.
 %
-% This function retrieves the current value of the run type popup menu
-% from the Zeffiro-Brainstorm plugin interface.
+% Purpose:
+%   Zef bst get run type.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   h_parent - Handle to parent figure (optional, uses gcbo if not provided)
+%   h_parent
 %
 % Outputs:
-%   run_type - Integer value:
-%              1 = Fresh start (load compartments from Brainstorm)
-%              2 = Import compartments (use existing compartment data)
-%              3 = Use existing project
+%   run_type
 %
-% See also: ZEF_BST_PLUGIN_START
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_get_run_type
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[run_type] = utilities.brainstorm2zef.zef_bst_get_run_type(h_parent)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if nargin < 1
     h_parent = get(gcbo,'Parent');

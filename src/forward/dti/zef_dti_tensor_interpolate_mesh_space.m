@@ -38,8 +38,24 @@
 %   tensor_array - [M×6] Interpolated conductivity tensors (sym. pos. def.)
 
 function tensor_array = zef_dti_tensor_interpolate_mesh_space( ...
+% --- Zeffiro documentation header ---
+% tensor_array — Tensor array.
+%
+% Purpose:
+%   Tensor array.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Calls (project):
+%   zef_dti_tensor_interpolate_mesh_space
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `tensor_array` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
         mesh_centroids, dti_tensor, fa_nifti_info, register_transform, ...
         scale_value, roi_radius, mode, h_waitbar)
+
 
 if nargin < 8, h_waitbar = []; end
 

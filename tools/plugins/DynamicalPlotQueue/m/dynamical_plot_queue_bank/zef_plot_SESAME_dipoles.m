@@ -1,5 +1,27 @@
+% --- Zeffiro documentation header ---
+% function zef_plot_SESAME_dipoles — Function zef plot SESAME dipoles.
+%
+% Purpose:
+%   Function zef plot SESAME dipoles.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.SESAME_App (read)
+%   zef.SESAME_time_serie (read)
+%   zef.inv_rec_source (read, write)
+%
+% Calls (project):
+%   zef_plot_SESAME_dipoles
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function zef_plot_SESAME_dipoles` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function zef_plot_SESAME_dipoles
-%A dynamic plot of dipoles reconstructed by SESAME  
 
 zef = evalin('base','zef');
 h_axes_image = evalin('caller','h_axes_image');

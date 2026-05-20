@@ -1,6 +1,27 @@
 function [tree] = zef_dataBank_loadTreeNodes(tree)
-%changes the data in the tree nodes from matFileObject to struct by loading
-%the files
+% --- Zeffiro documentation header ---
+% zef_dataBank_loadTreeNodes — Zef data Bank load Tree Nodes.
+%
+% Purpose:
+%   Zef data Bank load Tree Nodes.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   tree
+%
+% Outputs:
+%   tree
+%
+% Calls (project):
+%   zef_dataBank_loadTreeNodes
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[tree] = zef_dataBank_loadTreeNodes(tree)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 dbFieldNames=fieldnames(tree);
 

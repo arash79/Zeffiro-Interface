@@ -1,5 +1,44 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% zef_data= zeffiro_interface_filter_tool; — Zef data= zeffiro interface filter tool;.
+%
+% Purpose:
+%   Zef data= zeffiro interface filter tool;.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.aux_field (read, write)
+%   zef.fieldnames (read, write)
+%   zef.filter_epoch_points (read, write)
+%   zef.filter_list_selected (read, write)
+%   zef.filter_pipeline (read)
+%   zef.filter_pipeline_selected (read, write)
+%   zef.filter_sampling_rate (read, write)
+%   zef.filter_tag (read, write)
+%   zef.font_size (read)
+%   zef.h_add_filter (read)
+%   zef.h_axes1 (read)
+%   zef.h_del_filter (read)
+%   zef.h_filter_get_epoch_points (read)
+%   zef.h_filter_import_data (read)
+%   zef.h_filter_list (read)
+%   … (21 more)
+%
+% Calls (project):
+%   zef_change_size_function
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_data= zeffiro_interface_filter_tool;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 zef_data= zeffiro_interface_filter_tool;
 zef.fieldnames = fieldnames(zef_data);
 for zef_i = 1:length(zef.fieldnames)

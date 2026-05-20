@@ -27,8 +27,38 @@
 % See also: run.m, get_default_config.m, import_duneuro_project.m, Duneuro2Zeffiro_import.zef
 
 function results = Duneuro2Zeffiro_convert(config)
+% --- Zeffiro documentation header ---
+% utilities.duneuro2zef.Duneuro2Zeffiro_convert — Duneuro2Zeffiro convert.
+%
+% Purpose:
+%   Duneuro2Zeffiro convert.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   config
+%
+% Outputs:
+%   results
+%
+% Zef fields (observed):
+%   zef.dataBank (read)
+%
+% Calls (project):
+%   utilities.duneuro2zef.Duneuro2Zeffiro_convert
+%   utilities.duneuro2zef.get_default_config
+%   utilities.duneuro2zef.run
+%   zef_start_dataBank
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[results] = utilities.duneuro2zef.Duneuro2Zeffiro_convert(config)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-    % Use default configuration if not provided
     if nargin < 1 || isempty(config)
         config = utilities.duneuro2zef.get_default_config();
     end

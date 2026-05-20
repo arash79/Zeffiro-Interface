@@ -80,6 +80,39 @@
 %See also: zef_visualize_nii_slices, zef_dti_get_mesh2voxel
 
 function out = zef_mri_mesh_tetra_histogram_snr(zef, mri_volume, varargin)
+% --- Zeffiro documentation header ---
+% zef_mri_mesh_tetra_histogram_snr — Zef mri mesh tetra histogram snr.
+%
+% Purpose:
+%   Zef mri mesh tetra histogram snr.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   zef
+%   mri_volume
+%   varargin
+%
+% Outputs:
+%   out
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.domain_labels (read)
+%   zef.nodes (read)
+%   zef.tetra (read)
+%
+% Calls (project):
+%   zef_mri_mesh_tetra_histogram_snr
+%
+% Side effects:
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[out] = zef_mri_mesh_tetra_histogram_snr(zef, mri_volume, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 p = inputParser;
 addParameter(p, 'A', [], @(x) isnumeric(x) && (isempty(x) || isequal(size(x), [3 3])));

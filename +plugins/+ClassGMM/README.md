@@ -1,61 +1,61 @@
-# +ClassGMM — Gaussian Mixture Model Clustering for Source Reconstruction
+# +plugins/+ClassGMM
 
-This package implements a **weighted Gaussian mixture model (GMM)** framework for clustering brain source reconstructions into discrete, interpretable dipolar sources. It extends standard GMM fitting to use observation weights (e.g., current density magnitudes), making it suitable for inverse solutions.
+## Purpose of this folder
 
-## Overview
+Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
 
-Given a spatial reconstruction (or a time series of reconstructions), the GMM models the active source space as a mixture of K Gaussian components. Each component represents a cluster of sources with:
+## Contents
 
-- **Mean (μ):** Spatial location and optionally orientation (spherical angles)
-- **Covariance (Σ):** Spatial (and orientational) spread
-- **Mixing proportion (π):** Relative contribution of the cluster
+MATLAB sources:
+- `ClassGMModeling.m` — **plugins.ClassGMM.ClassGMModeling**: Class GMModeling.
+- `EstepWeight.m` — **plugins.ClassGMM.EstepWeight**: Estep Weight.
+- `FitAdvGMM.m` — **plugins.ClassGMM.FitAdvGMM**: Fit Adv GMM.
+- `WeightedCondDensity.m` — **plugins.ClassGMM.WeightedCondDensity**: Weighted Cond Density.
+- `estep.m` — **plugins.ClassGMM.estep**: Estep.
+- `AdvGMModeling4Rec.m` — **plugins.ClassGMM.function [S,NlogL,optimInfo]...**: Function [S,Nlog L,optim Info]....
 
-The fit is performed via the **Expectation-Maximization (EM)** algorithm with a weighted likelihood to account for source intensity.
+## How this folder fits into the overall workflow
 
-## Files
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-| File | Description |
-|------|-------------|
-| `ClassGMModeling.m` | Main entry point: fits GMM to reconstruction, handles time frames, model selection, amplitude estimation |
-| `AdvGMModeling4Rec.m` | Core weighted GMM fitting engine with multiple initialization methods and replicate handling |
-| `FitAdvGMM.m` | Wrapper around AdvGMModeling4Rec; parses options and returns a GMM object compatible with gmdistribution interface |
-| `estep.m` | E-step: computes posterior probabilities and log-likelihood |
-| `EstepWeight.m` | Updates observation weights for weighted GMM (optimizes exponent α) |
-| `WeightedCondDensity.m` | Computes log component-conditional densities and Mahalanobis distances |
+## GUI usage
 
-## Key Parameters (via `ClassGMModeling` args)
+No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
 
-- `number_of_clusters` — Number of GMM components K
-- `sought_estimate` — `"Location & orientation"` or `"Location"`
-- `covariance_type` — `"full"` or `"diagonal"`
-- `SharedCovariance` — Whether all components share one covariance
-- `initial_cluster_finding_approach` — `"k-means ++"`, `"Maximum probability"`, or `"Maximum component-wise fit"`
-- `model_selection_criterion` — `"Given number of components"`, `"Bayesian information criterion"`, or `"L2 density error"`
-- `reconstruction_threshold` — Minimum normalized intensity for inclusion
-- `regularization_parameter` — Added to covariances for numerical stability
+## Programmatic usage
 
-## Usage Example
+From the project root:
 
 ```matlab
-MethodClassObj.GMM = [];
-MethodClassObj = ClassGMModeling(MethodClassObj, reconstruction, zef, ...
-    'number_of_clusters', 3, ...
-    'covariance_type', 'full', ...
-    'model_selection_criterion', 'Bayesian information criterion');
-% Results in MethodClassObj.GMM.Model, MethodClassObj.GMM.Dipoles, etc.
+projectRoot = fileparts(which('zeffiro_interface'));
+addpath(projectRoot);
+addpath(genpath(fullfile(projectRoot, 'src')));
+zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
 ```
 
-## Algorithm Summary
+Representative entry points in this folder:
+- ``[MethodClassObj] = plugins.ClassGMM.ClassGMModeling(MethodClassObj, reconstruction, zef, args)` with project root and `src` on the path.`
+- ``[weight] = plugins.ClassGMM.EstepWeight(log_lh, post, weight)` with project root and `src` on the path.`
+- ``[obj] = plugins.ClassGMM.FitAdvGMM(positions, weight, k, varargin)` with project root and `src` on the path.`
+- ``[[log_lh, mahalaD]] = plugins.ClassGMM.WeightedCondDensity(positions, mu, weight, Sigma, …)` with project root and `src` on the path.`
+- ``[[ll, post, logpdf]] = plugins.ClassGMM.estep(log_lh, prob_th)` with project root and `src` on the path.`
+- `Call `plugins.ClassGMM.function [S,NlogL,optimInfo]...` from MATLAB with the project root on the path.`
 
-1. Extract source positions and current density magnitudes from the reconstruction.
-2. Threshold and optionally smooth the activity map.
-3. Define the estimation space (positions and optionally directions).
-4. For each candidate K, fit GMM using `FitAdvGMM` with chosen initialization.
-5. Select best K via BIC, L2 error, or fixed count.
-6. Convert GMM parameters to dipoles (locations, directions, amplitudes).
+## Examples
 
-## Notes
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
 
-- Requires `GMM2amplitude` (from the GMMClustering plugin) for amplitude estimation when using maximal likelihood or MAP options.
-- Compatible with both single-frame and multi-frame (cell) reconstructions.
-- Supports restriction to selected parcellation regions via `use_selected_parcellations`.
+## Dependencies and assumptions
+
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
+- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+
+## Notes for developers
+
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

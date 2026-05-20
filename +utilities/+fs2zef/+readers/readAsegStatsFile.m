@@ -1,4 +1,26 @@
 function compartmentDataTable = readAsegStatsFile(asegFilePath, kwargs)
+% --- Zeffiro documentation header ---
+% utilities.fs2zef.readers.readAsegStatsFile — Read Aseg Stats File.
+%
+% Purpose:
+%   Read Aseg Stats File.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   asegFilePath
+%   kwargs
+%
+% Outputs:
+%   compartmentDataTable
+%
+% Calls (project):
+%   utilities.fs2zef.readers.readAsegStatsFile
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[compartmentDataTable] = utilities.fs2zef.readers.readAsegStatsFile(asegFilePath, kwargs)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %
 % compartmentDataTable = readAsegStatsFile(asegFilePath, kwargs)
 %

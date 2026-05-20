@@ -1,4 +1,25 @@
 function [result] = inverse_SESAME(full_data, leadfield, sourcespace, cfg)
+% --- Zeffiro documentation header ---
+% inverse_SESAME — Inverse SESAME.
+%
+% Purpose:
+%   Inverse SESAME.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   full_data
+%   leadfield
+%   sourcespace
+%   cfg
+%
+% Outputs:
+%   result
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[result] = inverse_SESAME(full_data, leadfield, sourcespace, cfg)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 % inverse_SESAME samples the posterior distribution of a
 % multi-dipole Bayesian model and provides an estimate of the number of

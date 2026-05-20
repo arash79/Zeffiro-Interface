@@ -1,31 +1,55 @@
-# Kalman Plugin — Cluster Scripts
+# tools/plugins/Kalman/clusterScripts
 
-Batch processing scripts for running Kalman filter reconstructions on MATLAB Parallel Server (HPC clusters). These scripts enable automated parallel execution of multiple reconstructions with different parameters or datasets.
+## Purpose of this folder
 
-## File Reference
+Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
 
-| File | Function | Description |
-|------|----------|-------------|
-| `createJob_runJob.m` | `createJob_runJob` | Creates a MATLAB Parallel Server batch job. Configures the cluster profile, sets up the attached files (including the Kalman plugin), defines the task function, and submits the job. |
-| `run_cluster_job.m` | `run_cluster_job` | Worker function executed on the cluster node. Loads a Zeffiro project file, runs `zef_KF` (or variant), saves results, and handles errors. Called by the batch job framework. |
-| `runKalmanScript.m` | `runKalmanScript` | Template script for cluster-based Kalman filter processing. Configures parameters, iterates over datasets or parameter sweeps, and collects results. |
+## Contents
 
-## Usage
+MATLAB sources:
+- `runKalmanScript.m` — **loadCarstenData = true;**: Load Carsten Data = true;.
+- `run_cluster_job.m` — **run_cluster_job**: Run cluster job.
+- `createJob_runJob.m` — **warning('plugins.Kalman.clusterScripts:Deprecated', ...**: Warning('plugins.Kalman.cluster Scripts:Deprecated', ....
+
+## How this folder fits into the overall workflow
+
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+
+## GUI usage
+
+- **loadCarstenData = true;**: GUI callback or dialog (`loadCarstenData = true;`).
+
+## Programmatic usage
+
+From the project root:
 
 ```matlab
-% 1. Configure cluster profile
-cluster = parcluster('your_cluster_profile');
-
-% 2. Submit batch job
-job = createJob_runJob(cluster, project_file, output_dir, params);
-
-% 3. Wait for completion and retrieve results
-wait(job);
-results = fetchOutputs(job);
+projectRoot = fileparts(which('zeffiro_interface'));
+addpath(projectRoot);
+addpath(genpath(fullfile(projectRoot, 'src')));
+zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
 ```
 
-## Notes
+Representative entry points in this folder:
+- `Call `loadCarstenData = true;` from MATLAB with the project root on the path.`
+- ``[result] = run_cluster_job(bundle_path, result_path, profiler_on)` with project root and `src` on the path.`
+- `Call `warning('plugins.Kalman.clusterScripts:Deprecated', ...` from MATLAB with the project root on the path.`
 
-- Ensure the Kalman plugin directory is on the cluster's MATLAB path or included via `AttachedFiles`
-- For DTI structural Q on the cluster, the DTI data must be accessible from the worker nodes (shared filesystem or pre-loaded in the project file)
-- Each worker needs sufficient memory for the state covariance P (see memory table in the parent README)
+## Examples
+
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+
+## Dependencies and assumptions
+
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
+- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+
+## Notes for developers
+
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

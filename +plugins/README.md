@@ -1,52 +1,42 @@
-# Zeffiro Interface +plugins Package
+# +plugins
 
-This package contains modular, object-oriented plugin components for the Zeffiro Interface—a finite element method (FEM) based tool for electromagnetic brain imaging and source reconstruction.
+## Purpose of this folder
 
-## Package Structure
+Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
 
-```
-+plugins/
-├── +ClassGMM/     Gaussian Mixture Model (GMM) clustering for source reconstruction
-├── +ClassKF/      Kalman Filter (KF) and Ensemble Kalman Filter for dynamic source estimation
-└── README.md      This file
-```
+## Contents
 
-## Subpackages
+Subfolders:
+- `+ClassGMM/`
+- `+ClassKF/`
 
-### +ClassGMM — Gaussian Mixture Model Clustering
+## How this folder fits into the overall workflow
 
-Provides weighted Gaussian mixture model fitting for identifying discrete source clusters from inverse reconstructions. Supports:
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-- Weighted EM algorithm for intensity-informed clustering
-- Multiple initialization strategies (k-means++, random, partition-based)
-- Full or diagonal covariance; shared or component-specific
-- Model selection via BIC, L2 density error, or fixed component count
-- Location-only or location-and-orientation estimation
+## GUI usage
 
-**Primary entry point:** `ClassGMModeling(MethodClassObj, reconstruction, zef, args)`
+No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
 
-See [+ClassGMM/README.md](+ClassGMM/README.md) for details.
+## Programmatic usage
 
-### +ClassKF — Kalman Filter Framework
+Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
 
-Provides sequential and ensemble Kalman filtering for dynamic brain source reconstruction from time-series M/EEG data. Supports:
+## Examples
 
-- Standard Kalman filter (filter type 1)
-- Ensemble Kalman Filter (EnKF) for high-dimensional state spaces (filter type 2)
-- sLORETA-weighted Kalman filter for reduced depth bias (filter type 3)
-- RTS (Rauch–Tung–Striebel) backward smoothing
-- Spatially adaptive evolution prior computation
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
 
-**Primary entry points:** `zef_KF(zef)`, `zef_kf_open_window(zef)`
+## Dependencies and assumptions
 
-See [+ClassKF/README.md](+ClassKF/README.md) for details.
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
+- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
 
-## Integration with Zeffiro Interface
+## Notes for developers
 
-These plugins are designed to integrate with the Zeffiro Interface via the `inverse.CommonInverseParameters` framework and the `zef` project structure. They can be invoked from the GUI or from batch scripts.
-
-## Dependencies
-
-- MATLAB (with Statistics and Machine Learning Toolbox for GMM)
-- Zeffiro Interface core (+core, m/, etc.)
-- Functions such as `zef_waitbar`, `zef_processLeadfields`, `zef_getFilteredData`, etc.
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

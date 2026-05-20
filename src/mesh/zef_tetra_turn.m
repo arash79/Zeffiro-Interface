@@ -1,4 +1,40 @@
 function [tetra, flag_val, nodes_ind] = zef_tetra_turn(zef, nodes, tetra, thresh_val)
+% --- Zeffiro documentation header ---
+% zef_tetra_turn — Zef tetra turn.
+%
+% Purpose:
+%   Zef tetra turn.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   zef
+%   nodes
+%   tetra
+%   thresh_val
+%
+% Outputs:
+%   tetra
+%   flag_val
+%   nodes_ind
+%
+% Zef fields (observed):
+%   zef.mesh_optimization_repetitions (read)
+%
+% Calls (project):
+%   zef_condition_number
+%   zef_fix_inverted_pair
+%   zef_tetra_turn
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[tetra, flag_val, nodes_ind]] = zef_tetra_turn(zef, nodes, tetra, thresh_val)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isempty(zef)
     zef = evalin('base','zef');

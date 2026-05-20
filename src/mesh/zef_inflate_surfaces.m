@@ -1,4 +1,43 @@
 function nodes = zef_inflate_surfaces(zef, nodes, tetra, domain_labels)
+% --- Zeffiro documentation header ---
+% zef_inflate_surfaces — Zef inflate surfaces.
+%
+% Purpose:
+%   Zef inflate surfaces.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   zef
+%   nodes
+%   tetra
+%   domain_labels
+%
+% Outputs:
+%   nodes
+%
+% Zef fields (observed):
+%   zef.fem_mesh_inflation_strength (read)
+%   zef.parallel_processes (read)
+%   zef.parallel_vectors (read)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   zef.reuna_type (read)
+%
+% Calls (project):
+%   zef_3by3_solver
+%   zef_inflate_surfaces
+%   zef_surface_mesh
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[nodes] = zef_inflate_surfaces(zef, nodes, tetra, domain_labels)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isempty(zef)
     zef = evalin('base','zef');

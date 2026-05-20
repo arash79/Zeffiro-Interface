@@ -1,3 +1,25 @@
+% --- Zeffiro documentation header ---
+% loop_indx = 1; — Loop indx = 1;.
+%
+% Purpose:
+%   Loop indx = 1;.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.h_axes1 (read)
+%   zef.h_frame_start (read)
+%   zef.h_frame_stop (read)
+%   zef.h_reconstruction_type (read)
+%
+% Side effects:
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `loop_indx = 1;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 loop_indx = 1;
 ms_after_stimulus = [14 16 20 22 30];
 

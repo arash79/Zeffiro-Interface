@@ -1,5 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if not(isfield(zef,'relax_preconditioner')); — If not(isfield(zef,'relax preconditioner'));.
+%
+% Purpose:
+%   If not(isfield(zef,'relax preconditioner'));.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.h_relax_db (read)
+%   zef.h_relax_high_cut_frequency (read)
+%   zef.h_relax_iteration_type (read)
+%   zef.h_relax_low_cut_frequency (read)
+%   zef.h_relax_multires_n_decompositions (read)
+%   zef.h_relax_multires_n_iter (read)
+%   zef.h_relax_multires_n_levels (read)
+%   zef.h_relax_multires_sparsity (read)
+%   zef.h_relax_normalize_data (read)
+%   zef.h_relax_number_of_frames (read)
+%   zef.h_relax_preconditioner_type (read)
+%   zef.h_relax_sampling_frequency (read)
+%   zef.h_relax_snr (read)
+%   zef.h_relax_time_1 (read)
+%   zef.h_relax_time_2 (read)
+%   … (29 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if not(isfield(zef,'relax_preconditioner'));` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 if not(isfield(zef,'relax_preconditioner'));
     zef.relax_multires_precondtioner = [];
 end;

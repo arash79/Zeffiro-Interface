@@ -1,21 +1,30 @@
 function [sensor_positions, sensor_orientations, sensor_ind, sensor_tag_cell] = zef_bst_2_zef_sensors(varargin)
-%ZEF_BST_2_ZEF_SENSORS Legacy function for loading Brainstorm sensor configurations.
+% --- Zeffiro documentation header ---
+% zef_bst_2_zef_sensors — Zef bst 2 zef sensors.
 %
-% This is a legacy import function for Brainstorm sensors. For new projects,
-% consider using the orchestrated pipeline in +utilities/+brainstorm2zef/run()
-% which provides better error handling, validation, and flexibility.
+% Purpose:
+%   Zef bst 2 zef sensors.
+%   Folder: Project load/save, segmentation import, figure import, FEM export.
 %
 % Inputs:
-%   varargin{1} - Sensor type filter (optional, cell array or string, empty = all types)
-%   varargin{2} - Study index (optional, empty = use current study)
+%   varargin
 %
 % Outputs:
-%   sensor_positions   - Sensor positions (in millimeters, scaled from meters)
-%   sensor_orientations - Sensor orientations (if available)
-%   sensor_ind         - Sensor indices
-%   sensor_tag_cell    - Sensor type tags
+%   sensor_positions
+%   sensor_orientations
+%   sensor_ind
+%   sensor_tag_cell
 %
-% See also: utilities.brainstorm2zef.run
+% Calls (project):
+%   zef_bst_2_zef_sensors
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[sensor_positions, sensor_orientations, sensor_ind]] = zef_bst_2_zef_sensors(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 sensor_counter = 0;
 sensor_num = 0;

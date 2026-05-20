@@ -3,6 +3,30 @@
 
 
 function [data_val_inphase,data_val_quad,amp_val] = qam_demod(wave_val,carrier_cycles_per_pulse_cycle,pulse_length,t_data,varargin)
+% --- Zeffiro documentation header ---
+% qam_demod — Qam demod.
+%
+% Purpose:
+%   Qam demod.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   wave_val
+%   carrier_cycles_per_pulse_cycle
+%   pulse_length
+%   t_data
+%   varargin
+%
+% Outputs:
+%   data_val_inphase
+%   data_val_quad
+%   amp_val
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[data_val_inphase, data_val_quad, amp_val]] = qam_demod(wave_val, carrier_cycles_per_pulse_cycle, pulse_length, t_data, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 equalize_components = 1;
 

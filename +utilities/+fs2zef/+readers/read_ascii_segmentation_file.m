@@ -1,4 +1,31 @@
 function [nodes, faces] =  read_ascii_segmentation_file ( fname )
+% --- Zeffiro documentation header ---
+% utilities.fs2zef.readers.read_ascii_segmentation_file — Read ascii segmentation file.
+%
+% Purpose:
+%   Read ascii segmentation file.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   fname
+%
+% Outputs:
+%   nodes
+%   faces
+%
+% Calls (project):
+%   utilities.fs2zef.readers.read_ascii_segmentation_file
+%   utilities.io.float_is_int
+%   utilities.io.is_eof
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[nodes, faces]] = utilities.fs2zef.readers.read_ascii_segmentation_file(fname)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %
 % read_ascii_segmentation_file ( fname )
 %
@@ -45,7 +72,7 @@ function [nodes, faces] =  read_ascii_segmentation_file ( fname )
     % Read and validate first line (header)
     first_line = fgetl(fid);
 
-    if utilities.is_eof(first_line)
+    if utilities.io.is_eof(first_line)
         error(ERR + "Empty file");
     end
 
@@ -59,7 +86,7 @@ function [nodes, faces] =  read_ascii_segmentation_file ( fname )
     % Read second line to get number of nodes and faces
     second_line = string(fgetl(fid));
 
-    if utilities.is_eof(second_line)
+    if utilities.io.is_eof(second_line)
         error(ERR + "No second line");
     end
 
@@ -74,11 +101,11 @@ function [nodes, faces] =  read_ascii_segmentation_file ( fname )
     n_of_faces = double(n_of_nodes_and_faces(2));
 
     % Validate that counts are positive integers
-    if not(utilities.float_is_int(n_of_nodes)) || n_of_nodes < 1
+    if not(utilities.io.float_is_int(n_of_nodes)) || n_of_nodes < 1
         error(ERR + "Number of nodes on 2nd line was not a positive integer");
     end
 
-    if not(utilities.float_is_int(n_of_faces)) || n_of_faces < 1
+    if not(utilities.io.float_is_int(n_of_faces)) || n_of_faces < 1
         error(ERR + "Number of faces on 2nd line was not a positive integer");
     end
 
@@ -90,7 +117,7 @@ function [nodes, faces] =  read_ascii_segmentation_file ( fname )
     for ii = 1 : n_of_nodes
         this_line = fgetl(fid);
 
-        if utilities.is_eof(this_line)
+        if utilities.io.is_eof(this_line)
             error(ERR + "Reached end of file before all nodes were handled");
         end
 
@@ -123,7 +150,7 @@ function [nodes, faces] =  read_ascii_segmentation_file ( fname )
 
         this_line = fgetl(fid);
 
-        if utilities.is_eof(this_line)
+        if utilities.io.is_eof(this_line)
             error(ERR + "Reached end of file before all faces were handled");
         end
 
@@ -138,7 +165,7 @@ function [nodes, faces] =  read_ascii_segmentation_file ( fname )
         face = double(coords);
 
         % Validate that face indices are integers
-        if not(utilities.float_is_int(face(1:3)))
+        if not(utilities.io.float_is_int(face(1:3)))
             error(ERR + "One of the face coordinates '" + this_line + "' on line " + linenum + " was not an integer.");
         end
 

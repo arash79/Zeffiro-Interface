@@ -15,6 +15,32 @@
 % See also: run.m, get_default_config.m, process_sensors.m
 
 function [success, error_msg] = process_meg_data(config)
+% --- Zeffiro documentation header ---
+% utilities.duneuro2zef.process_meg_data — Process meg data.
+%
+% Purpose:
+%   Process meg data.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   config
+%
+% Outputs:
+%   success
+%   error_msg
+%
+% Calls (project):
+%   utilities.duneuro2zef.process_meg_data
+%   utilities.duneuro2zef.process_sensors
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[success, error_msg]] = utilities.duneuro2zef.process_meg_data(config)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
     success = false;
     error_msg = '';

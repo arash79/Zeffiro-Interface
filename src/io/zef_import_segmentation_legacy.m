@@ -1,6 +1,58 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_import_segmentation_legacy(zef, file_name, folder_name)
+% --- Zeffiro documentation header ---
+% zef_import_segmentation_legacy — Loads external data or a saved Zeffiro project into `zef`.
+%
+% Purpose:
+%   Loads external data or a saved Zeffiro project into `zef`.
+%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%
+% Inputs:
+%   zef
+%   file_name
+%   folder_name
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.domain_labels (read)
+%   zef.file (read)
+%   zef.file_path (read)
+%   zef.nodes (read)
+%   zef.s_directions (read, write)
+%   zef.s_points (read, write)
+%   zef.s_scaling (read, write)
+%   zef.s_x_correction (read, write)
+%   zef.s_xy_correction (read, write)
+%   zef.s_xy_rotation (read, write)
+%   zef.s_y_correction (read, write)
+%   zef.s_yz_correction (read, write)
+%   zef.s_yz_rotation (read, write)
+%   zef.s_z_correction (read, write)
+%   zef.s_zx_correction (read, write)
+%   … (4 more)
+%
+% Calls (project):
+%   zef_import_asc
+%   zef_import_mat_struct
+%   zef_import_segmentation_legacy
+%   zef_smooth_surface
+%   zef_surface_mesh
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_import_segmentation_legacy(zef, file_name, folder_name)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 void = [];
 

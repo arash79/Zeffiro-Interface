@@ -1,11 +1,27 @@
 function method_info = inverse_method_registry(method_id)
-%INVERSE_METHOD_REGISTRY Resolve inverse method execution metadata.
+% --- Zeffiro documentation header ---
+% utilities.cluster.inverse_method_registry — Inverse method registry.
 %
-% Output fields:
-%   - method_id
-%   - execution_kind: "class" or "legacy"
-%   - class_name: inverse class name when execution_kind is "class"
-%   - legacy_function: function name when execution_kind is "legacy"
+% Purpose:
+%   Inverse method registry.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   method_id
+%
+% Outputs:
+%   method_info
+%
+% Calls (project):
+%   utilities.cluster.inverse_method_registry
+%
+% Side effects:
+%   - parallel/cluster
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[method_info] = utilities.cluster.inverse_method_registry(method_id)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     method_id (1,1) string {mustBeNonempty}

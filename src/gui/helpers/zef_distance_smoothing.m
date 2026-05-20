@@ -1,4 +1,30 @@
 function [nodes] = zef_distance_smoothing(tetra, nodes, distance_vec, smoothing_exponent, smoothing_strength, smoothing_steps_dist) 
+% --- Zeffiro documentation header ---
+% zef_distance_smoothing — Zef distance smoothing.
+%
+% Purpose:
+%   Zef distance smoothing.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   tetra
+%   nodes
+%   distance_vec
+%   smoothing_exponent
+%   smoothing_strength
+%   smoothing_steps_dist
+%
+% Outputs:
+%   nodes
+%
+% Calls (project):
+%   zef_distance_smoothing
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[nodes] = zef_distance_smoothing(tetra, nodes, distance_vec, smoothing_exponent, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 N = size(nodes,1);
 B = sparse(N,N,0);

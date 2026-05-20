@@ -1,3 +1,27 @@
+% --- Zeffiro documentation header ---
+% function [ ... — Function [ .
+%
+% Purpose:
+%   Function [ ....
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.use_gpu (read)
+%   zef.use_gpu_graphic (read)
+%
+% Calls (project):
+%   zef_surface_mesh
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [ ...` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [ ...
     surface_triangles, ...
     surface_nodes, ...
@@ -7,40 +31,6 @@ function [ ...
     node_ind, ...
     node_pair, ...
     face_ind] = zef_surface_mesh(tetra, nodes, I, gpu_mode)
-
-% TODO Documentation
-%
-% The basic idea is that this function returns the surface triangles of a
-% given tetrahedral volume in different formats, depending on the
-% combination of input and output arguments.
-%
-% Input:
-%
-% - tetra: the set of volume tetrahedra whose surface is to be constructed (?)
-%
-% - varargin{1}: the nodes that constitute the tetrahedra (?)
-%
-% - varargin{2}: the indices that denote which tetrahedra are to be chosen
-%   as a part of the volume from the given ones (?)
-%
-% Output:
-%
-% - surface_triangles: Triples of node indices that make up the surface
-%   triangles
-%
-% - surface_nodes: the nodes that constitute the surface triangles.
-%
-% - tetra_ind: the indices of the tetrahedra that have the surface
-%   triangles as a face.
-%
-% - tetra_ind_global: TODO
-%
-% - tetra_ind_diff: TODO
-%
-% - node_ind: TODO
-%
-% - node_pair: TODO: pairs of neigbouring nodes on different sides of the
-%   triangular surface.
 
 surface_triangles = [];
 surface_nodes = [];

@@ -7,6 +7,28 @@
 %This is needed for streamline visualization.
 
 function [v1_data, v1_info] = zef_freesurfer_load_v1(v1_file)
+% --- Zeffiro documentation header ---
+% zef_freesurfer_load_v1 — Zef freesurfer load v1.
+%
+% Purpose:
+%   Zef freesurfer load v1.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   v1_file
+%
+% Outputs:
+%   v1_data
+%   v1_info
+%
+% Calls (project):
+%   zef_freesurfer_load_v1
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[v1_data, v1_info]] = zef_freesurfer_load_v1(v1_file)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 arguments
     v1_file (1,1) string

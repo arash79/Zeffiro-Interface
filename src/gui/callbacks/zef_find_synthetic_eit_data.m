@@ -10,8 +10,36 @@
 %
 % Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 % See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if ismac — If ismac.
+%
+% Purpose:
+%   If ismac.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.font_size (read)
+%   zef.h_find_synthetic_source (read, write)
+%   zef.h_inv_compute_data (read)
+%   zef.h_inv_plot_roi (read)
+%   zef.h_inv_roi_perturbation (read)
+%   zef.h_inv_roi_sphere_1 (read)
+%   zef.h_inv_roi_sphere_2 (read)
+%   zef.h_inv_roi_sphere_3 (read)
+%   zef.h_inv_roi_sphere_4 (read)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if ismac` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 % Load the .fig template from fig/tools/ (path added at startup in zeffiro_interface.m).
+
+
+
 if ismac
     zef.h_find_synthetic_source = open('zef_find_synthetic_eit_data.fig');
 elseif ispc

@@ -1,3 +1,35 @@
+% --- Zeffiro documentation header ---
+% label_ind = uint32(label_ind); — Label ind = uint32(label ind);.
+%
+% Purpose:
+%   Label ind = uint32(label ind);.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Zef fields (observed):
+%   zef.distance_smoothing_exp (read)
+%   zef.distance_smoothing_on (read)
+%   zef.priority_mode (read, write)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   zef.smoothing_steps_dist (read)
+%   zef.smoothing_strength (read)
+%
+% Calls (project):
+%   zef_choose_domain_labels
+%   zef_distance_smoothing
+%   zef_mesh_relabeling
+%   zef_point_in_compartment
+%   zef_solid_angle_labeling
+%   zef_surface_mesh
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `label_ind = uint32(label_ind);` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 label_ind = uint32(label_ind);
 
 if isequal(labeling_flag,1)

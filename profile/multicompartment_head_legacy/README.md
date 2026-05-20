@@ -1,32 +1,43 @@
-# Profile: Multicompartment Head (Legacy)
+# profile/multicompartment_head_legacy
 
-This profile provides a **fixed, legacy head compartment structure** for Zeffiro Interface. It uses the same EEG/MEG/EIT/tES lead fields as the main multicompartment_head profile but predefines **30 compartments**: skin, skull, CSF, grey matter, white matter, and 22 “detail” compartments (d1–d22). It is intended for compatibility with older projects and workflows that rely on this specific compartment naming and ordering.
+## Purpose of this folder
 
-## Use Case
+Startup profiles and `zeffiro_plugins.ini` that attach plugin menus.
 
-- Legacy EEG/MEG/EIT/tES projects that assume the standard 30-compartment layout.
-- Reproducibility of older studies using the fixed tag set (sc, sk, c, g, w, d1–d22).
-- Predefined conductivity (sigma) and colors for each compartment.
+## Contents
 
-## Files in This Profile
+Other files:
+- `zeffiro_forward_simulation.ini`
+- `zeffiro_init.ini`
+- `zeffiro_parameters.ini`
+- `zeffiro_plugins.ini`
+- `zeffiro_segmentation.ini`
 
-| File | Purpose |
-|------|--------|
-| **zeffiro_init.ini** | Richer than the main head profile: default plot size; modalities EEG, MEG magnetometer, MEG gradiometers; CEM electrode creation; **compartment structure** (full list of tags); **sensor structure** (`s`); imaging method name and index; sensors on/visible; current sensors, names, and colors. |
-| **zeffiro_parameters.ini** | Same as multicompartment_head: sigma, rho, epsilon, mu, filtered_tetra, electrode impedance/radii, kappa, condition number. |
-| **zeffiro_forward_simulation.ini** | Same as multicompartment_head: EEG, MEG (magnetometers, gradiometers), EIT, tES; isotropic and anisotropic. |
-| **zeffiro_plugins.ini** | Same as multicompartment_head except: no DTI conductivity tool, no synthetic extended source patch; includes Kalman and NSE tool. Slight naming (e.g. “Github” vs “GitHub”) and “ReconstructionTool”/“LeadFieldProcessingTool” style. |
-| **zeffiro_segmentation.ini** | **Full 30-compartment definition:** tags `sc, sk, c, g, w, d1–d22`; names (Skin, Skull, Cerebrospinal fluid, Grey matter, White matter, Detail 1–22); RGB colors; activity (sources) per compartment; **Parameter setting** row for **sigma** with default conductivities (e.g. skin 0.43 S/m, skull 0.0064 S/m, CSF 1.79 S/m, grey 0.33 S/m, white 0.14 S/m, details 0.33 S/m). |
+## How this folder fits into the overall workflow
 
-## Compartment Layout (Order)
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-1. **sc** — Skin  
-2. **sk** — Skull  
-3. **c** — Cerebrospinal fluid  
-4. **g** — Grey matter  
-5. **w** — White matter  
-6. **d1–d22** — Detail 1 through Detail 22  
+## GUI usage
 
-Parameter setting (sigma) and activity are aligned with this order. Changing the number or order of compartments in this file would break compatibility with legacy projects that expect this exact layout.
+No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
 
-For the overall profile system and INI format, see the parent [../README.md](../README.md).
+## Programmatic usage
+
+Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+
+## Examples
+
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+
+## Dependencies and assumptions
+
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+
+## Notes for developers
+
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

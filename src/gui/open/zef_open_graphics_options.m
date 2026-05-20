@@ -1,3 +1,39 @@
+% --- Zeffiro documentation header ---
+% zef_init_graphics_options; — Initializes GUI widgets and default `zef` fields for graphics_options;.
+%
+% Purpose:
+%   Initializes GUI widgets and default `zef` fields for graphics_options;.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.colormap_size (read)
+%   zef.colortune_param (read)
+%   zef.cone_alpha (read)
+%   zef.cone_lattice_resolution (read)
+%   zef.cone_scale (read)
+%   zef.contour_line_width (read)
+%   zef.contour_n_smoothing (read)
+%   zef.fieldnames (read, write)
+%   zef.font_size (read)
+%   zef.graphics_options_current_size (read, write)
+%   zef.h_colormap_size (read)
+%   zef.h_colortune_param (read)
+%   zef.h_cone_alpha (read)
+%   zef.h_cone_lattice_resolution (read)
+%   zef.h_cone_scale (read)
+%   … (19 more)
+%
+% Calls (project):
+%   zef_change_size_function
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_init_graphics_options;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef_init_graphics_options;
 
 zef_data = zef_graphics_processing_options;

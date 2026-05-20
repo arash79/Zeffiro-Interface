@@ -1,5 +1,38 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% function [L_eit, bg_data, dof_positions, dof_directions, dof_ind, dof_count] = lead_field_eit_fem( ... — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%
+% Purpose:
+%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Zef fields (observed):
+%   zef.current_pattern (read)
+%   zef.eit_count (read)
+%   zef.eit_ind (read)
+%   zef.gpu_count (read)
+%   zef.parallel_processes (read)
+%   zef.processes_per_core (read)
+%   zef.redo_eit_dec (read)
+%   zef.source_positions (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   zef_decompose_dof_space
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - filesystem I/O
+%   - parallel/cluster
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [L_eit, bg_data, dof_positions, dof_directions, dof_ind, dof_count] = lead_field_eit_fem( ...` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [L_eit, bg_data, dof_positions, dof_directions, dof_ind, dof_count] = lead_field_eit_fem( ...
     zef, ...
     nodes, ...
@@ -9,6 +42,7 @@ function [L_eit, bg_data, dof_positions, dof_directions, dof_ind, dof_count] = l
     p_nearest_neighbour_inds, ...
     varargin ...
     )
+
 
 N = size(nodes,1);
 
@@ -546,5 +580,3 @@ L_eit = L_eit_aux;
 dof_directions = ones(size(dof_positions));
 
 end
-
-

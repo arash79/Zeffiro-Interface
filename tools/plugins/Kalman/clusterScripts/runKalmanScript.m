@@ -1,20 +1,43 @@
-%================================================
-% Some of the setting might already applied to the 
-% saved project. 
-
+% --- Zeffiro documentation header ---
+% loadCarstenData = true; — Load Carsten Data = true;.
 %
-% This script:
+% Purpose:
+%   Load Carsten Data = true;.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.KF (read)
+%   zef.dataBank (read)
+%   zef.find_synth_source (read)
+%   zef.fss_bg_noise (read, write)
+%   zef.h_mne_high_cut_frequency (read)
+%   zef.h_mne_low_cut_frequency (read)
+%   zef.h_mne_normalize_data (read)
+%   zef.h_mne_number_of_frames (read)
+%   zef.h_mne_prior (read)
+%   zef.h_mne_sampling_frequency (read)
+%   zef.h_mne_time_1 (read)
+%   zef.h_mne_time_2 (read)
+%   zef.h_mne_time_3 (read)
+%   zef.h_mne_type (read)
+%   zef.h_parcellation_interpolation (read)
+%   … (17 more)
+%
+% Calls (project):
+%   zef_find_mne_reconstruction
+%   zef_parcellation_interpolation
+%   zef_parcellation_time_series
+%   zef_plot_parcellation_time_series
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `loadCarstenData = true;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
-% 1. Set noise of the measurement
-% 2. Selects the leadfield
-% 3. creates a measurement data 
-% 4. runs kalman
-% 5. saves measurement and reconstruction to 
-%    data bank
-% 6. creates a figure with parcellation tool
-% 7. saves the figure
-
-%================================================
 loadCarstenData = true;
 loadAuditoryData = false;
 

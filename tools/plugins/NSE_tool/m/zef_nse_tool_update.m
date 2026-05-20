@@ -1,4 +1,31 @@
 function zef = zef_nse_tool_update(zef)
+% --- Zeffiro documentation header ---
+% zef_nse_tool_update — Zef nse tool update.
+%
+% Purpose:
+%   Zef nse tool update.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.nse_field (read)
+%
+% Calls (project):
+%   zef_nse_tool_update
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_nse_tool_update(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 zef.nse_field.use_gpu = zef.nse_field.h_use_gpu.Value;
 zef.nse_field.pcg_tol = zef.nse_field.h_pcg_tol.Value;
@@ -93,4 +120,3 @@ zef.nse_field.relative_blood_oxygenation = zef.nse_field.h_relative_blood_oxygen
 zef.nse_field.oxygen_consumption_rate = zef.nse_field.h_oxygen_consumption_rate.Value;
 
 end
-

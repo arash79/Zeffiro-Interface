@@ -1,4 +1,36 @@
 function zef = zef_update_labeling_priority(zef,update_type,labeling_priority_vec)
+% --- Zeffiro documentation header ---
+% zef_update_labeling_priority — Syncs GUI control values into `zef` for labeling_priority.
+%
+% Purpose:
+%   Syncs GUI control values into `zef` for labeling_priority.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   update_type
+%   labeling_priority_vec
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.h_labeling_priority_order (read)
+%   zef.reuna_mesh_ind (read)
+%
+% Calls (project):
+%   zef_choose_domain_labels
+%   zef_update_labeling_priority
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_update_labeling_priority(zef, update_type, labeling_priority_vec)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 use_settings = 0;
 

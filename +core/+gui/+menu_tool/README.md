@@ -1,32 +1,52 @@
-# menu_tool
+# +core/+gui/+menu_tool
 
-The **+menu_tool** package holds callbacks for the Zeffiro Interface **Menu tool** submenu. Each function is tied to a specific menu action (e.g. Import electrodes) and updates the central application struct **zef** using data from user-selected files or dialogs.
+## Purpose of this folder
 
-Invocation is through the `core.gui.menu_tool` namespace, typically from the menu system rather than from user scripts.
+Menu callbacks wired from `src/gui/tools/zef_menu_tool.m` into refactored package code.
 
-## Functions
+## Contents
 
-| Function | Menu action | Description |
-|----------|-------------|-------------|
-| **import_electrodes_callback** | *Menu tool > Import > Import electrodes* | Opens a file dialog for .dat or .csv files, imports electrode positions (and optional labels and CEM data), and writes them into **zef**. |
+MATLAB sources:
+- `import_electrodes_callback.m` — **core.gui.menu_tool.import_electrodes_callback**: GUI callback for import_electrodes actions.
 
-## import_electrodes_callback
+## How this folder fits into the overall workflow
 
-- **Purpose:** Lets the user choose a .dat or .csv electrode file, parses it via **core.import.electrodes_from_dat** or **core.import.electrodes_from_csv**, and updates **zef** with sensor data.
-- **Behavior:**
-  - Shows a file dialog filtered to `*.dat` and `*.csv`.
-  - On Cancel, returns immediately without changing **zef**.
-  - On success: sets **zef.sensors**, **zef.(prefix)_points**, **zef.(prefix)_name_list**; if the file includes complete electrode model (CEM) data, **_(prefix)_points** also gets columns 4–6 (inner_radius, outer_radius, impedance). The prefix is **zef.current_sensors** if present, otherwise **"s"** (e.g. **s_points**, **s_name_list**).
-  - On read or validation errors, displays an error dialog and returns without modifying **zef**.
-  - Calls **zef_update(zef)** before returning so the UI reflects the new data.
-- **Usage:** Normally not called directly; invoked by the menu when the user selects *Import electrodes*. For programmatic import, use **core.import.electrodes_from_dat** or **core.import.electrodes_from_csv** and then assign into **zef** and call **zef_update**.
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-## File formats
+## GUI usage
 
-Supported formats are the same as in **core.import**: see [+import/README.md](../../+import/README.md) for .dat and .csv column layouts, optional labels, and CEM fields.
+- **core.gui.menu_tool.import_electrodes_callback**: Edit → Import electrodes (wired in `zef_menu_tool.m`).
 
-## See also
+## Programmatic usage
 
-- [core.gui/README.md](../README.md) — GUI package overview.
-- [core.import](../../+import/README.md) — Electrode import functions.
-- [core/README.md](../../README.md) — Core package overview.
+From the project root:
+
+```matlab
+projectRoot = fileparts(which('zeffiro_interface'));
+addpath(projectRoot);
+addpath(genpath(fullfile(projectRoot, 'src')));
+zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+```
+
+Representative entry points in this folder:
+- ``[zef] = core.gui.menu_tool.import_electrodes_callback(zef)` with project root and `src` on the path.`
+
+## Examples
+
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+GUI: **Edit → Import electrodes** (`.dat` / `.csv`).
+
+## Dependencies and assumptions
+
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
+- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+
+## Notes for developers
+
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

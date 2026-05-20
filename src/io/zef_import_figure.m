@@ -14,6 +14,40 @@
 % Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 % See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_import_figure(zef,varargin)
+% --- Zeffiro documentation header ---
+% zef_import_figure — Loads external data or a saved Zeffiro project into `zef`.
+%
+% Purpose:
+%   Loads external data or a saved Zeffiro project into `zef`.
+%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%
+% Inputs:
+%   zef
+%   varargin
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.file (read)
+%   zef.file_path (read)
+%   zef.save_file_path (read)
+%   zef.use_display (read)
+%   zef.zeffiro_current_size (read, write)
+%   zef.zeffiro_current_size_aux (read, write)
+%
+% Calls (project):
+%   zef_import_figure
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_import_figure(zef, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isempty(zef)
     zef = evalin('base','zef');

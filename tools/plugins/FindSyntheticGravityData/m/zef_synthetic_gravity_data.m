@@ -1,3 +1,38 @@
+% --- Zeffiro documentation header ---
+% tic; — Tic;.
+%
+% Purpose:
+%   Tic;.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.aux_vec (read, write)
+%   zef.brain_ind (read)
+%   zef.imaging_method (read)
+%   zef.lf_param (read)
+%   zef.measurements (read)
+%   zef.n_sources (read, write)
+%   zef.n_sources_mod (read, write)
+%   zef.n_sources_old (read, write)
+%   zef.nodes (read)
+%   zef.nodes_aux (read, write)
+%   zef.non_source_ind (read)
+%   zef.preconditioner (read, write)
+%   zef.preconditioner_tolerance (read)
+%   zef.rho (read)
+%   zef.sensors (read)
+%   … (7 more)
+%
+% Calls (project):
+%   zef_compute_gravity_data
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `tic;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 tic;
 

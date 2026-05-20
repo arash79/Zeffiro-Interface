@@ -1,6 +1,44 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [multires_dec, multires_ind, multires_count] = zef_make_multires_dec(varargin)
+% --- Zeffiro documentation header ---
+% zef_make_multires_dec — Zef make multires dec.
+%
+% Purpose:
+%   Zef make multires dec.
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   multires_dec
+%   multires_ind
+%   multires_count
+%
+% Zef fields (observed):
+%   zef.gpu_num (read)
+%   zef.inv_multires_n_decompositions (read)
+%   zef.inv_multires_n_levels (read)
+%   zef.inv_multires_sparsity (read)
+%   zef.parallel_vectors (read)
+%   zef.source_interpolation_ind (read)
+%   zef.source_positions (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   zef_make_multires_dec
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[multires_dec, multires_ind, multires_count]] = zef_make_multires_dec(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if not(isempty(varargin))
     n_decompositions = varargin{1};

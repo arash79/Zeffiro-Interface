@@ -1,3 +1,18 @@
+% --- Zeffiro documentation header ---
+% full_address = 'exportImage'; — Full address = 'export Image';.
+%
+% Purpose:
+%   Full address = 'export Image';.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Side effects:
+%   - creates/updates figures
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `full_address = 'exportImage';` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 full_address = 'exportImage';
 file_name = 'parcellation_plot_real_auditoryRH';
 

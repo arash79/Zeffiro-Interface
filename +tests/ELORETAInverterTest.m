@@ -1,4 +1,33 @@
 classdef ELORETAInverterTest < matlab.unittest.TestCase
+% --- Zeffiro documentation header ---
+% tests.ELORETAInverterTest — Inverse solver class implementing ELORETATest reconstruction.
+%
+% Purpose:
+%   Inverse solver class implementing ELORETATest reconstruction.
+%   Folder: MATLAB unit and integration tests for refactored inverse dispatch, lead fields, cluster jobs, and legacy/class parity.
+%
+% Inputs:
+%   Constructor and method arguments are declared in classdef methods below.
+%
+% Zef fields (observed):
+%   zef.inv_snr (read)
+%   zef.measurements (read)
+%   zef.normalize_data (read)
+%   zef.source_direction_mode (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   inverse.ELORETAInverter
+%   zef_processLeadfields
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `tests.ELORETAInverterTest(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
+% --- End Zeffiro documentation header
+
 
     methods (Test)
         function testOutputShapeMatchesLeadField(testCase)

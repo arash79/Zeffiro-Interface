@@ -1,6 +1,49 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_dpq_window(zef)
+% --- Zeffiro documentation header ---
+% zef_dpq_window — Zef dpq window.
+%
+% Purpose:
+%   Zef dpq window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.aux_field (read, write)
+%   zef.dpq_dir (read, write)
+%   zef.dpq_selected (read)
+%   zef.dynamica_plot_queue_description (read, write)
+%   zef.dynamical_plot_queue_current_size (read, write)
+%   zef.dynamical_plot_queue_description (read)
+%   zef.dynamical_plot_queue_list (read, write)
+%   zef.dynamical_plot_queue_table (read, write)
+%   zef.fieldnames (read, write)
+%   zef.font_size (read)
+%   zef.h_dynamical_plot_queue (read)
+%   zef.h_dynamical_plot_queue_description (read)
+%   zef.h_dynamical_plot_queue_list (read)
+%   zef.h_dynamical_plot_queue_menu_add (read)
+%   zef.h_dynamical_plot_queue_menu_delete (read)
+%   … (3 more)
+%
+% Calls (project):
+%   zef_change_size_function
+%   zef_dpq_window
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_dpq_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 zef_data=zeffiro_interface_dynamical_plot_queue_app;
 zef.fieldnames = fieldnames(zef_data);

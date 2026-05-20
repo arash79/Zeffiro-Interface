@@ -2,6 +2,30 @@
 %See: https://github.com/sampsapursiainen/GPU-Torre
 
 function [nodes,triangles,interp_vec] = zef_triangular_mesh_refinement(nodes,triangles)
+% --- Zeffiro documentation header ---
+% zef_triangular_mesh_refinement — Zef triangular mesh refinement.
+%
+% Purpose:
+%   Zef triangular mesh refinement.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   nodes
+%   triangles
+%
+% Outputs:
+%   nodes
+%   triangles
+%   interp_vec
+%
+% Calls (project):
+%   zef_triangular_mesh_refinement
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[nodes, triangles, interp_vec]] = zef_triangular_mesh_refinement(nodes, triangles)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 eps_val = 15;
 

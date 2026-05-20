@@ -1,13 +1,15 @@
-%ZEF_BST_DEFAULT Default settings file for Zeffiro-Brainstorm plugin.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst — Zef bst.
 %
-% This file contains parameter overrides for the Brainstorm-to-Zeffiro
-% conversion pipeline. Only parameters that differ from the defaults
-% (defined in zef_bst_init.m) need to be specified here.
+% Purpose:
+%   Zef bst.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
-% All available parameters and their descriptions are listed in zef_bst_init.m
-% and the main README.md file.
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `utilities.brainstorm2zef.zef_bst` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
-% Mesh generation parameters
 zef_bst.mesh_resolution = 3;
 zef_bst.compartment_list = {'Scalp','OuterSkull','InnerSkull','Cortex','Other','white','subcortical'};
 zef_bst.refine_surface = {'Scalp','OuterSkull','InnerSkull','Cortex','Other','white','subcortical'};

@@ -47,6 +47,38 @@
 %See also: zef_visualize_dti_streamlines, zef_freesurfer_read_volume_geometry
 
 function [T_mesh2voxel, info] = zef_dti_get_mesh2voxel(zef)
+% --- Zeffiro documentation header ---
+% zef_dti_get_mesh2voxel — Zef dti get mesh2voxel.
+%
+% Purpose:
+%   Zef dti get mesh2voxel.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   T_mesh2voxel
+%   info
+%
+% Zef fields (observed):
+%   zef.dti_ref_geometry (read)
+%   zef.freesurfer_fa_file (read)
+%   zef.freesurfer_fa_info (read)
+%   zef.freesurfer_register_transform (read)
+%
+% Calls (project):
+%   zef_dti_get_mesh2voxel
+%   zef_freesurfer_read_volume_geometry
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[T_mesh2voxel, info]] = zef_dti_get_mesh2voxel(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 arguments
     zef (1,1) struct

@@ -1,21 +1,44 @@
 function nse_field = zef_nse_poisson(nse_field,nodes,tetra,domain_labels,mvd_length)
-
-%Output:
-%nse_field.bf_capillaries
-%nse_field.bp_vessels
-%nse_field.bf_capillary_node_ind
-%nse_field.bp_vessel_node_ind
-
-%Input:
-%nse_field.artery_domain_ind
-%nse_field.capillary_domain_ind
-%nse_field.total_flow
-%nse_field.gravity_x
-%nse_field.gravity_y
-%nse_field.gravity_z
-%nse_field.rho
-%nse_field.mu
-%nse_field.pressure
+% --- Zeffiro documentation header ---
+% zef_nse_poisson — Zef nse poisson.
+%
+% Purpose:
+%   Zef nse poisson.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   nse_field
+%   nodes
+%   tetra
+%   domain_labels
+%   mvd_length
+%
+% Outputs:
+%   nse_field
+%
+% Calls (project):
+%   zef_find_adjacent_tetra
+%   zef_get_submesh
+%   zef_nse_poisson
+%   zef_nse_signal_pulse
+%   zef_surface_mesh
+%   zef_surface_scalar_matrix_FF
+%   zef_surface_scalar_vector_F
+%   zef_surface_scalar_vector_Fn
+%   zef_volume_barycentric
+%   zef_volume_scalar_matrix_FF
+%   zef_volume_scalar_matrix_FG
+%   zef_volume_scalar_matrix_GG
+%   … (2 more)
+%
+% Side effects:
+%   - filesystem I/O
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[nse_field] = zef_nse_poisson(nse_field, nodes, tetra, domain_labels, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 nse_field.bp_vessels = cell(0);
 nse_field.bv_vessels_1 = cell(0);

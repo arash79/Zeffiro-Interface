@@ -1,28 +1,43 @@
-# Profile: Multicompartment Head
+# profile/multicompartment_head
 
-This is the **main neuroimaging profile** for Zeffiro Interface. It targets **EEG**, **MEG**, **EIT**, and **tES** (transcranial electrical stimulation) forward and inverse problems with a flexible multicompartment head model. No predefined compartment list is imposed; users define their own mesh and compartments.
+## Purpose of this folder
 
-## Use Case
+Startup profiles and `zeffiro_plugins.ini` that attach plugin menus.
 
-- Electroencephalography (EEG) and magnetoencephalography (MEG) source reconstruction.
-- Electrical impedance tomography (EIT) and transcranial electrical stimulation (tES) modelling.
-- Isotropic and anisotropic electrical conductivity.
-- Full plugin set: Kalman filter, NSE tool, DTI conductivity, synthetic extended source patch, etc.
+## Contents
 
-## Files in This Profile
+Other files:
+- `zeffiro_forward_simulation.ini`
+- `zeffiro_init.ini`
+- `zeffiro_parameters.ini`
+- `zeffiro_plugins.ini`
+- `zeffiro_segmentation.ini`
 
-| File | Purpose |
-|------|--------|
-| **zeffiro_init.ini** | Default plot size; modalities `EEG`, `MEG magnetometer`, `MEG gradiometers`; **CEM electrode creation** callback `@zef_cem_electrode` for patch sensors. |
-| **zeffiro_parameters.ini** | Conductivity (`sigma`), mass density (`rho`), permittivity (`epsilon`), permeability (`mu`), filter labels (`filtered_tetra`), electrode impedance and radii, thermal conductivity (`kappa`), finite element condition number. Electrical conductivity is primary for EEG/MEG/EIT/tES. |
-| **zeffiro_forward_simulation.ini** | Ten lead-field options: EEG, MEG (magnetometers, gradiometers), EIT, tES; each in **isotropic** and **anisotropic** electrical conductivity variants. Functions follow the pattern `zef_*_lead_field_isotropic;` and `zef_*_lead_field_anisotropic;`. |
-| **zeffiro_plugins.ini** | Full menu: multi lead field, filter, topography, RAMUS/IAS/EXP, standardized L1/L2 (Lasso), MNE, beamformer, CSM, MUSIC, GMM (SP and JL), lead field processing, reconstruction, dipole scan, data bank, dynamical plot queue, preconditioned relaxation, synthetic source legacy, GitHub pusher, **Kalman**, **NSE tool**, **synthetic extended source patch**, **DTI conductivity tool**. Includes a test plugin item. |
-| **zeffiro_segmentation.ini** | **Empty** compartment lists (no default tags, colors, or names). The **Parameter setting** row is tied to **sigma** (electrical conductivity). Users define compartments and values when building their own head mesh. |
+## How this folder fits into the overall workflow
 
-## Notes
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-- **Compartments:** Left blank so that any segmentation (e.g. skin, skull, CSF, grey/white matter, custom regions) can be defined by the user.
-- **Plugins:** This profile includes the widest set of tools (Kalman, NSE, DTI, extended source patch) compared to legacy and NSE-only variants.
-- **Forward simulation:** Choose isotropic or anisotropic lead fields depending on whether conductivity is scalar or tensor in your mesh.
+## GUI usage
 
-For the overall profile system and INI format, see the parent [../README.md](../README.md).
+No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
+
+## Programmatic usage
+
+Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+
+## Examples
+
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+
+## Dependencies and assumptions
+
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+
+## Notes for developers
+
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

@@ -1,5 +1,41 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% zef_data = zef_relax; — Zef data = zef relax;.
+%
+% Purpose:
+%   Zef data = zef relax;.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.fieldnames (read, write)
+%   zef.font_size (read)
+%   zef.h_relax_find_preconditioner (read)
+%   zef.h_relax_iteration_type (read)
+%   zef.h_relax_normalize_data (read)
+%   zef.h_relax_preconditioner_type (read)
+%   zef.h_relax_start_iteration (read)
+%   zef.h_relax_tool (read)
+%   zef.reconstruction (read)
+%   zef.reconstruction_information (read)
+%   zef.relax_preconditioner (read)
+%   zef.relax_preconditioner_permutation (read)
+%   zef.relax_tool_current_size (read, write)
+%
+% Calls (project):
+%   zef_change_size_function
+%   zef_relax_iteration
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_data = zef_relax;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 zef_data = zef_relax;
 zef.fieldnames = fieldnames(zef_data);

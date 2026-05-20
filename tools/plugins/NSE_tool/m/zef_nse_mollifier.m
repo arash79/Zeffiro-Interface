@@ -1,4 +1,29 @@
 function [f, df] = zef_nse_mollifier(r,t,t_min,t_max)
+% --- Zeffiro documentation header ---
+% zef_nse_mollifier — Zef nse mollifier.
+%
+% Purpose:
+%   Zef nse mollifier.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   r
+%   t
+%   t_min
+%   t_max
+%
+% Outputs:
+%   f
+%   df
+%
+% Calls (project):
+%   zef_nse_mollifier
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[f, df]] = zef_nse_mollifier(r, t, t_min, t_max)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 3
 t_min = t(1);
@@ -24,4 +49,3 @@ df(I2) = 0;
 df(isnan(df)) = 0;
 
 end
-

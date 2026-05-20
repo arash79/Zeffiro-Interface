@@ -1,3 +1,39 @@
+% --- Zeffiro documentation header ---
+% zef_init_gaussian_prior_options; — Initializes GUI widgets and default `zef` fields for gaussian_prior_options;.
+%
+% Purpose:
+%   Initializes GUI widgets and default `zef` fields for gaussian_prior_options;.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.fieldnames (read, write)
+%   zef.font_size (read)
+%   zef.gaussian_prior_options_current_size (read, write)
+%   zef.h_inv_amplitude_db (read)
+%   zef.h_inv_evolution_prior (read)
+%   zef.h_inv_hyperprior (read)
+%   zef.h_inv_hyperprior_tail_length_db (read)
+%   zef.h_inv_hyperprior_weight (read)
+%   zef.h_inv_prior_over_measurement_db (read)
+%   zef.h_inv_snr (read)
+%   zef.h_plot_hyperprior (read)
+%   zef.h_zef_gaussian_prior_options (read)
+%   zef.inv_amplitude_db (read)
+%   zef.inv_evolution_prior (read)
+%   zef.inv_hyperprior (read)
+%   … (4 more)
+%
+% Calls (project):
+%   zef_change_size_function
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_init_gaussian_prior_options;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef_init_gaussian_prior_options;
 
 zef_data = zef_gaussian_prior_options;

@@ -1,4 +1,32 @@
 function [z_inverse] = ext_sL(timeSteps,P_store,L,R, number_of_frames, smoothing, sL,standardization_exponent)
+% --- Zeffiro documentation header ---
+% ext_sL — Ext s L.
+%
+% Purpose:
+%   Ext s L.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   timeSteps
+%   P_store
+%   L
+%   R
+%   number_of_frames
+%   smoothing
+%   sL
+%   standardization_exponent
+%
+% Outputs:
+%   z_inverse
+%
+% Calls (project):
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[z_inverse] = ext_sL(timeSteps, P_store, L, R, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 h = zef_waitbar(0,1, 'Filtering');
 z_inverse = cell(0);
 

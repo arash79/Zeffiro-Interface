@@ -1,6 +1,26 @@
 function [tree, newText] = zef_dataBank_sortTree(tree)
-%sorts the tree with the numbers of the hashes, so that e.g. node_11>node_7
-%this is needed to build the tree easily
+% --- Zeffiro documentation header ---
+% zef_dataBank_sortTree — Zef data Bank sort Tree.
+%
+% Purpose:
+%   Zef data Bank sort Tree.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   tree
+%
+% Outputs:
+%   tree
+%   newText
+%
+% Calls (project):
+%   zef_dataBank_number2hash
+%   zef_dataBank_sortTree
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[tree, newText]] = zef_dataBank_sortTree(tree)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if isstruct(tree)
     text=fieldnames(tree);

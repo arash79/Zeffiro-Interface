@@ -1,6 +1,30 @@
 function [interp_ind, L_projected] = zef_project_L_in_roi(s_roi,s_o,L,n_interp,procFile)
+% --- Zeffiro documentation header ---
+% zef_project_L_in_roi — Zef project L in roi.
+%
+% Purpose:
+%   Zef project L in roi.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   s_roi
+%   s_o
+%   L
+%   n_interp
+%   procFile
+%
+% Outputs:
+%   interp_ind
+%   L_projected
+%
+% Calls (project):
+%   zef_project_L_in_roi
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[interp_ind, L_projected]] = zef_project_L_in_roi(s_roi, s_o, L, n_interp, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-%divide leadfield into x y z
 L_1 = L(:,1:n_interp);
 L_2 = L(:,n_interp+1:2*n_interp);
 L_3 = L(:,2*n_interp+1:3*n_interp);
@@ -29,8 +53,3 @@ L_projected(:,n_interp+not_projected) = L_0;
 L_projected(:,2*n_interp+not_projected) = L_0;
 
 end
-
-
-
-
-

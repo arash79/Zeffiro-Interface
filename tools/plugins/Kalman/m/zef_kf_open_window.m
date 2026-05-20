@@ -1,6 +1,51 @@
 %This is the startup function for KF app. 
 %Beamformer, inverse_tools, zef_KF_start
 function zef = zef_kf_open_window(zef)
+% --- Zeffiro documentation header ---
+% zef_kf_open_window — Zef kf open window.
+%
+% Purpose:
+%   Zef kf open window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.KF (read, write)
+%   zef.filter_type (read, write)
+%   zef.font_size (read)
+%   zef.inv_high_cut_frequency (read, write)
+%   zef.inv_low_cut_frequency (read, write)
+%   zef.inv_sampling_frequency (read, write)
+%   zef.inv_snr (read, write)
+%   zef.inv_time_1 (read, write)
+%   zef.inv_time_2 (read, write)
+%   zef.inv_time_3 (read, write)
+%   zef.kf_burn_in (read, write)
+%   zef.kf_smoothing (read, write)
+%   zef.normalize_data (read, write)
+%   zef.number_of_ensembles (read, write)
+%   zef.number_of_frames (read, write)
+%   … (1 more)
+%
+% Calls (project):
+%   zef_KF
+%   zef_kf_open_window
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_kf_open_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

@@ -15,10 +15,25 @@
 %   See also matlab.apps.AppBase, zef_menu_tool_app.
 
 classdef zef_menu_tool_app_exported < matlab.apps.AppBase
+% --- Zeffiro documentation header ---
+% zef_menu_tool_app_exported — Zef menu tool app exported.
+%
+% Purpose:
+%   Zef menu tool app exported.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   Constructor and method arguments are declared in classdef methods below.
+%
+% Side effects:
+%   - creates/updates figures
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_menu_tool_app_exported(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
+% --- End Zeffiro documentation header
 
-    % -------------------------------------------------------------------------
-    % Properties that correspond to app components (UI figure, menus, controls)
-    % -------------------------------------------------------------------------
     properties (Access = public)
         h_zeffiro_menu                  matlab.ui.Figure
         h_menu_project                  matlab.ui.container.Menu

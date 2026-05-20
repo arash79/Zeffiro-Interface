@@ -1,5 +1,33 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if isfield(zef,'h_lf_bank_tool') — If isfield(zef,'h lf bank tool').
+%
+% Purpose:
+%   If isfield(zef,'h lf bank tool').
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.h_lf_bank_scaling_factor (read)
+%   zef.h_lf_bank_tool (read)
+%   zef.h_lf_item_list (read)
+%   zef.h_lf_tag (read)
+%   zef.lf_bank_scaling_factor (read, write)
+%   zef.lf_bank_storage (read)
+%   zef.lf_item_list (read, write)
+%   zef.lf_item_selected (read)
+%   zef.lf_tag (read, write)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if isfield(zef,'h_lf_bank_tool')` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 if isfield(zef,'h_lf_bank_tool')
     if isvalid(zef.h_lf_bank_tool)
         set(zef.h_lf_item_list,'Value',cell(0),'Items',cell(0),'Multiselect','on');

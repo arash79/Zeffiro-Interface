@@ -1,4 +1,33 @@
 function zef = zef_create_sensors(zef,sensor_tag,field_cell_update)
+% --- Zeffiro documentation header ---
+% zef_create_sensors — Zef create sensors.
+%
+% Purpose:
+%   Zef create sensors.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   zef
+%   sensor_tag
+%   field_cell_update
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.current_sensors (read, write)
+%
+% Calls (project):
+%   zef_create_sensors
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_create_sensors(zef, sensor_tag, field_cell_update)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isequal(sensor_tag,'s') || isequal(sensor_tag,'s1')
     eval(['zef.current_sensors =''' sensor_tag ''';']);

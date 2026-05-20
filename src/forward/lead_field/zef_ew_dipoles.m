@@ -1,3 +1,18 @@
+% --- Zeffiro documentation header ---
+% function [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_nodes] = zef_ew_dipoles( ... — Function [stensil, signs, source moments, source directions, source locations, n of adj nodes] = zef ew dipoles( .
+%
+% Purpose:
+%   Function [stensil, signs, source moments, source directions, source locations, n of adj nodes] = zef ew dipoles( ....
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Calls (project):
+%   zef_ew_dipoles
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_nodes] = zef_ew_dipoles( ...` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_nodes] = zef_ew_dipoles( ...
     nodes       ...
     ,               ...
@@ -5,10 +20,6 @@ function [stensil, signs, source_moments, source_directions, source_locations, n
     ,               ...
     brain_ind   ...
     )
-
-% zef_ew_dipoles: generates the vectors related to edgewise dipoles in the
-% tetrahedral mesh: locations, directions and dipole moments. Also returns the
-% adjacent node pairs that form the dipoles.
 
 wb = zef_waitbar(0,1, 'Edgewise dipoles');
 

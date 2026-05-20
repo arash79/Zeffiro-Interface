@@ -1,6 +1,51 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z, reconstruction_information] = zef_dipoleScan(zef)
+% --- Zeffiro documentation header ---
+% zef_dipoleScan — Zef dipole Scan.
+%
+% Purpose:
+%   Zef dipole Scan.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   z
+%   reconstruction_information
+%
+% Zef fields (observed):
+%   zef.dipole_app (read)
+%   zef.inv_high_cut_frequency (read)
+%   zef.inv_hyperprior (read)
+%   zef.inv_low_cut_frequency (read)
+%   zef.inv_sampling_frequency (read)
+%   zef.inv_snr (read)
+%   zef.inv_time_1 (read)
+%   zef.inv_time_2 (read)
+%   zef.inv_time_3 (read)
+%   zef.number_of_frames (read)
+%   zef.source_direction_mode (read)
+%   zef.source_directions (read)
+%
+% Calls (project):
+%   zef_dipoleScan
+%   zef_getFilteredData
+%   zef_getTimeStep
+%   zef_normalizeInverseReconstruction
+%   zef_postProcessInverse
+%   zef_processLeadfields
+%   zef_waitbar
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[z, reconstruction_information]] = zef_dipoleScan(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 invMethod=eval( 'zef.dipole_app.InversionmethodDropDown.Value');
 regType=eval( 'zef.dipole_app.regType.Value');

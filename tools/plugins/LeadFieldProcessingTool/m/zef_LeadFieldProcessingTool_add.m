@@ -1,5 +1,34 @@
+% --- Zeffiro documentation header ---
+% zef.LeadFieldProcessingTool.auxData.source_interpolation_ind = zef — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%
+% Purpose:
+%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.L (read)
+%   zef.LeadFieldProcessingTool (read)
+%   zef.compartment_tags (read)
+%   zef.imaging_method (read)
+%   zef.imaging_method_cell (read)
+%   zef.lf_bank_scaling_factor (read)
+%   zef.lf_tag (read)
+%   zef.measurements (read)
+%   zef.noise_data (read)
+%   zef.parcellation_interp_ind (read)
+%   zef.sensors (read)
+%   zef.source_directions (read)
+%   zef.source_positions (read)
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.LeadFieldProcessingTool.auxData.source_interpolation_ind = zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
-%reads the current data into the aux field and adds it to the bank
 zef.LeadFieldProcessingTool.auxData.source_interpolation_ind = zef.source_interpolation_ind;
 zef.LeadFieldProcessingTool.auxData.parcellation_interp_ind = zef.parcellation_interp_ind;
 zef.LeadFieldProcessingTool.auxData.source_positions = zef.source_positions;

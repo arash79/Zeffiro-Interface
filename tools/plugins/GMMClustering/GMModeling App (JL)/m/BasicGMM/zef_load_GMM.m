@@ -1,4 +1,33 @@
 function zef_load_GMM(struct)
+% --- Zeffiro documentation header ---
+% zef_load_GMM — Loads external data or a saved Zeffiro project into `zef`.
+%
+% Purpose:
+%   Loads external data or a saved Zeffiro project into `zef`.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   struct
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.GMM (read, write)
+%   zef.reconstruction (read, write)
+%
+% Calls (project):
+%   zef_load_GMM
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_load_GMM(struct)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if evalin('base','isfield(zef,''GMM'')')
     GMM = evalin('base','zef.GMM');

@@ -1,4 +1,62 @@
 function zef = zef_import_segmentation(zef, file_name, folder_name)
+% --- Zeffiro documentation header ---
+% zef_import_segmentation — Loads external data or a saved Zeffiro project into `zef`.
+%
+% Purpose:
+%   Loads external data or a saved Zeffiro project into `zef`.
+%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%
+% Inputs:
+%   zef
+%   file_name
+%   folder_name
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.compartments_selected (read, write)
+%   zef.current_compartment (read, write)
+%   zef.current_sensors (read, write)
+%   zef.domain_labels (read)
+%   zef.file (read, write)
+%   zef.file_path (read, write)
+%   zef.h_compartment_table (read)
+%   zef.h_sensors_table (read)
+%   zef.imaging_method_cell (read)
+%   zef.nodes (read)
+%   zef.parcellation_colortable (read, write)
+%   zef.parcellation_compartment (read)
+%   zef.parcellation_points (read, write)
+%   zef.save_file_path (read)
+%   … (4 more)
+%
+% Calls (project):
+%   zef_add_bounding_box
+%   zef_add_compartment
+%   zef_apply_parameter_profile
+%   zef_bst_2_zef_atlas
+%   zef_bst_2_zef_sensors
+%   zef_bst_2_zef_surface
+%   zef_build_compartment_table
+%   zef_get_mesh
+%   zef_import_mat_struct
+%   zef_import_parcellation_colortable
+%   zef_import_parcellation_points
+%   zef_import_segmentation
+%   … (4 more)
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_import_segmentation(zef, file_name, folder_name)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

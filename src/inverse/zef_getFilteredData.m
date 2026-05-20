@@ -1,9 +1,36 @@
 function [f] = zef_getFilteredData(zef)
-%zef_getFilteredData reads the datafrom zef.measurement and applies the
-%filter that are specified in zef.inv_low_cut_frequency and
-%zef.inv_low_cut_frequency at a sampling frequency of
-%zef.inv_sampling_frequency.
-% f has the same size as the measurement
+% --- Zeffiro documentation header ---
+% zef_getFilteredData — Zef get Filtered Data.
+%
+% Purpose:
+%   Zef get Filtered Data.
+%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   f
+%
+% Zef fields (observed):
+%   zef.inv_data_mode (read)
+%   zef.inv_high_cut_frequency (read)
+%   zef.inv_low_cut_frequency (read)
+%   zef.inv_sampling_frequency (read)
+%   zef.measurements (read)
+%   zef.normalize_data (read)
+%
+% Calls (project):
+%   zef_getFilteredData
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[f] = zef_getFilteredData(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if (nargin == 0)
 zef = evalin('base','zef');

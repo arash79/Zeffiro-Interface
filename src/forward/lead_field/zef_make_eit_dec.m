@@ -1,6 +1,31 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [eit_ind,eit_count] = make_eit_dec(nodes,tetrahedra,brain_ind,source_ind)
+% --- Zeffiro documentation header ---
+% make_eit_dec — Make eit dec.
+%
+% Purpose:
+%   Make eit dec.
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Inputs:
+%   nodes
+%   tetrahedra
+%   brain_ind
+%   source_ind
+%
+% Outputs:
+%   eit_ind
+%   eit_count
+%
+% Calls (project):
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[eit_ind, eit_count]] = make_eit_dec(nodes, tetrahedra, brain_ind, source_ind)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h = zef_waitbar(0,1,'Field decomposition');
 

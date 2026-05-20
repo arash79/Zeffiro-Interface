@@ -1,25 +1,26 @@
 function zef_bst = zef_bst_get_settings(settings_file_name, zef_bst)
-%ZEF_BST_GET_SETTINGS Loads and merges settings from file with provided structure.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst_get_settings — Zef bst get settings.
 %
-% This function loads default settings, then applies settings from a
-% specified settings file, and finally merges any provided settings
-% (which take precedence). It also ensures parallel_processes doesn't
-% exceed system capabilities and validates the final settings.
+% Purpose:
+%   Zef bst get settings.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   settings_file_name - Name of settings file (without .m extension)
-%   zef_bst            - Structure with settings to override defaults (optional)
+%   settings_file_name
+%   zef_bst
 %
 % Outputs:
-%   zef_bst - Merged settings structure with:
-%             - Default values from zef_bst_init
-%             - Values from specified settings file
-%             - Overrides from input zef_bst (highest priority)
+%   zef_bst
 %
-% Example:
-%   zef_bst = utilities.brainstorm2zef.zef_bst_get_settings('zef_bst_default', struct());
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_get_settings
+%   utilities.brainstorm2zef.zef_bst_validate_settings
 %
-% See also: ZEF_BST_INIT, ZEF_BST_VALIDATE_SETTINGS
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef_bst] = utilities.brainstorm2zef.zef_bst_get_settings(settings_file_name, zef_bst)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if nargin < 2
     zef_bst = struct;

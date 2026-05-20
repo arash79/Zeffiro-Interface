@@ -1,13 +1,27 @@
 function [tree, hash] = zef_dataBank_add(tree, parentHash, data)
-
-%getData (before!)
-
-%make new node
-
-%identify parent
-%add to parent
-
-%update gui other function
+% --- Zeffiro documentation header ---
+% zef_dataBank_add — Zef data Bank add.
+%
+% Purpose:
+%   Zef data Bank add.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   tree
+%   parentHash
+%   data
+%
+% Outputs:
+%   tree
+%   hash
+%
+% Calls (project):
+%   zef_dataBank_add
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[tree, hash]] = zef_dataBank_add(tree, parentHash, data)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 node=[];
 node.data=data;

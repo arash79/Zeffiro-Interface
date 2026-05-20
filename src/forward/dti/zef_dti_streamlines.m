@@ -21,6 +21,34 @@
 %   dti_streamlines - Cell array of streamlines, each [N×3] points in voxel space
 
 function dti_streamlines = zef_dti_streamlines(dti_directions,dti_anisotropy,seed_point,roi_radius,n_dir,step_size,max_steps,fa_thresh);
+% --- Zeffiro documentation header ---
+% zef_dti_streamlines — Zef dti streamlines.
+%
+% Purpose:
+%   Zef dti streamlines.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   dti_directions
+%   dti_anisotropy
+%   seed_point
+%   roi_radius
+%   n_dir
+%   step_size
+%   max_steps
+%   fa_thresh
+%
+% Outputs:
+%   dti_streamlines
+%
+% Calls (project):
+%   zef_dti_streamlines
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[dti_streamlines] = zef_dti_streamlines(dti_directions, dti_anisotropy, seed_point, roi_radius, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 4
     roi_radius = 15;

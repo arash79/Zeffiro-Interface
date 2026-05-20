@@ -1,22 +1,38 @@
 function zef = zef_ES_recursive_search(zef, num_lattice)
+% --- Zeffiro documentation header ---
+% examples.studies.tES_hyperparameter_optimization.zef_ES_recursive_search — Example or study script demonstrating zef_ES_recursive_search.
 %
-% zef_ES_recursive_search - Recursive search for tES hyperparameters.
-%
-% Implements adaptive refinement of alpha and epsilon for transcranial
-% electrical stimulation (tES) current optimization. Uses an initial grid
-% search, then recursively narrows the parameter space around the best
-% (sr, sc) indices from the objective function.
+% Purpose:
+%   Example or study script demonstrating zef_ES_recursive_search.
+%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
 %
 % Inputs:
-%   zef         Project struct with ES tool configuration
-%   num_lattice Grid size for initial and adaptive search steps
+%   zef
+%   num_lattice
 %
-% Output:
-%   zef  Updated struct with adapted_y_ES (cell array of current solutions)
+% Outputs:
+%   zef
 %
-% See also: zef_ES_find_currents, zef_ES_find_parameters,
-%           examples.studies.tES_hyperparameter_optimization.zef_ES_centralize_recursive_search
+% Zef fields (observed):
+%   zef.ES_step_size (read, write)
+%   zef.adapted_y_ES (read, write)
+%   zef.y_ES_interval (read)
 %
+% Calls (project):
+%   zef_ES_centralize_recursive_search
+%   zef_ES_find_currents
+%   zef_ES_find_parameters
+%   zef_ES_objective_function
+%   zef_ES_recursive_search
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = examples.studies.tES_hyperparameter_optimization.zef_ES_recursive_search(zef, num_lattice)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
     zef.ES_step_size = num_lattice;
     zef_ES_find_currents;
     adapted_y_ES{1} = zef.y_ES_interval;
@@ -33,7 +49,7 @@ function zef = zef_ES_recursive_search(zef, num_lattice)
     for adapt_instances_ind = 2 : adapt_instances
     [sr, sc] = zef_ES_objective_function(zef);
 
-    [alpha_psi, epsilon_psi] = examples.studies.tES_hyperparameter_optimization.zef_ES_centralize_recursive_search( ...
+    [alpha_psi, epsilon_psi] = examples.studies.tES_hyperparameter_optimization.helpers.zef_ES_centralize_recursive_search( ...
         alpha, epsilon, sr, sc, original_window, s_alpha, s_epsilon, 0);
 
     zef_ES_find_currents(zef, alpha_psi, epsilon_psi, original_window)

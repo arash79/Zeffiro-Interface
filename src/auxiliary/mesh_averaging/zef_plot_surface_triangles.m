@@ -1,3 +1,29 @@
+% --- Zeffiro documentation header ---
+% number_of_points = 10; — Number of points = 10;.
+%
+% Purpose:
+%   Number of points = 10;.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Zef fields (observed):
+%   zef.nodes (read)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   zef.sigma (read)
+%   zef.tetra (read)
+%
+% Calls (project):
+%   zef_distance_to_mesh
+%   zef_get_surface_triangles
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `number_of_points = 10;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 number_of_points = 10;
 grey_matter_ind = 15;
 

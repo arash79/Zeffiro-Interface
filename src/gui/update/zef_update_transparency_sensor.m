@@ -1,4 +1,32 @@
 function slider_value_new = zef_update_transparency_sensor(varargin)
+% --- Zeffiro documentation header ---
+% zef_update_transparency_sensor — Syncs GUI control values into `zef` for transparency_sensor.
+%
+% Purpose:
+%   Syncs GUI control values into `zef` for transparency_sensor.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   slider_value_new
+%
+% Zef fields (observed):
+%   zef.h_zeffiro (read)
+%
+% Calls (project):
+%   zef_update_transparency_sensor
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[slider_value_new] = zef_update_transparency_sensor(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');

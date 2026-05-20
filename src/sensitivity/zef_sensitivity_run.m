@@ -1,66 +1,43 @@
 function [stats, run_result] = zef_sensitivity_run(zef, method_id, opts)
-%ZEF_SENSITIVITY_RUN Monte-Carlo sensitivity study for an inverse method.
+% --- Zeffiro documentation header ---
+% zef_sensitivity_run — Zef sensitivity run.
 %
-%   [stats, run_result] = zef_sensitivity_run(zef, method_id, opts)
-%
-% Public top-level entry that mirrors the shape of m/inverse/zef_inverse_run.m.
-% It builds synthetic dipole-scan measurements in bounded batches, dispatches
-% them through zef_inverse_run, stitches each realisation's metric vectors in
-% source/probe order, then aggregates per-realisation metrics into the same
-% struct shape as the legacy +examples/+studies/+santtus_peeling_article/main.m.
-%
-% This function does not depend on, and is not depended on by, any code
-% under +examples/. It is the in-codebase replacement for the example-based
-% sensitivity workflow that run_inverse_script.m previously called.
-%
-% Solver compatibility:
-%   The pipeline routes each method through utilities.sensitivity.method_capability:
-%     - linear_static / iterative_static -> bounded batched dispatches per
-%       realisation; metrics are stitched in the same source/probe order and
-%       the full-run dispersion metric is recomputed after chunking.
-%     - stateful_dynamic (Kalman family) -> one isolated dispatch per probe
-%       with IsolatedFramesPerProbe frames and a fresh inverter (slower, but
-%       each (source, direction) starts from a clean state).
-%     - unsupported -> rejected up front with a clear error message.
+% Purpose:
+%   Zef sensitivity run.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
 %
 % Inputs:
-%   zef                     Project struct containing a built lead field
-%                           (zef.L), source positions, source interpolation
-%                           data, and the inv_* fields zef_inverse_run reads.
-%   method_id               Inverse method id from
-%                           utilities.cluster.inverse_method_registry (for
-%                           example "sloreta" or "dipolescan").
-%   opts.MethodParams       Method-specific parameter struct (forwarded).
-%   opts.execution          "local" | "cluster".
-%   opts.ClusterProfile     parallel.Cluster or [].
-%   opts.NumberOfRuns       Monte-Carlo realisations (default 1).
-%   opts.NoiseLevelDb       Additive noise level for synthetic measurements
-%                           in dB, <= 0 (default -30, matching the legacy
-%                           examples.studies.santtus_peeling_article path).
-%   opts.DiffType           "L2" | "minabs" position-error metric.
-%   opts.DispersionRadius   Radius (mm) for the dispersion ROI.
-%   opts.SourceAmplitude    Synthetic source amplitude in nAm-equivalent
-%                           units (default 10, matching
-%                           zef_rec_diff's inv_synth_source(7)).
-%   opts.SourceMask         Logical mask of length size(zef.source_positions, 1).
-%                           Default: probe every active brain source returned
-%                           by zef_processLeadfields(zef) (procFile.s_ind_0).
-%                           User-supplied masks are intersected with the
-%                           active set.
-%   opts.MaxProbesPerBatch  Upper bound for probes in one static-method
-%                           dispatch (default 1000).
+%   zef
+%   method_id
+%   opts
 %
 % Outputs:
-%   stats        Struct with the per-realisation cells (dist_vec, angle_vec,
-%                mag_vec, dispersion_vec) and the aggregated mean / std
-%                (dist_vec_avg, dist_vec_std, ...). Field names match the
-%                legacy add_statistics_to_struct output so any downstream
-%                code that consumed examples.studies.santtus_peeling_article.main
-%                continues to work.
-%   run_result   Struct with the lead field used (.L), the resolved method
-%                id, the source-index list, the per-realisation metric
-%                structs, and lightweight per-realisation execution
-%                summaries.
+%   stats
+%   run_result
+%
+% Zef fields (observed):
+%   zef.L (read)
+%   zef.source_interpolation_ind (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   utilities.cluster.with_zef_in_base
+%   utilities.sensitivity.aggregate_statistics
+%   utilities.sensitivity.method_capability
+%   utilities.sensitivity.run_monte_carlo
+%   zef_make_multires_dec
+%   zef_processLeadfields
+%   zef_sensitivity_run
+%
+% Side effects:
+%   - filesystem I/O
+%   - parallel/cluster
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[stats, run_result]] = zef_sensitivity_run(zef, method_id, opts)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     zef (1,1) struct

@@ -1,5 +1,44 @@
 
 function [nodes,flag_val] = zef_fix_negatives(zef, nodes, tetra)
+% --- Zeffiro documentation header ---
+% zef_fix_negatives — Zef fix negatives.
+%
+% Purpose:
+%   Zef fix negatives.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   nodes
+%   tetra
+%
+% Outputs:
+%   nodes
+%   flag_val
+%
+% Zef fields (observed):
+%   zef.mesh_optimization_repetitions (read)
+%   zef.meshing_threshold (read)
+%
+% Calls (project):
+%   zef_condition_number
+%   zef_find_intersecting_triangle
+%   zef_fix_negatives
+%   zef_point_in_cluster
+%   zef_surface_mesh
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[nodes, flag_val]] = zef_fix_negatives(zef, nodes, tetra)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isempty(zef)
     zef = evalin('base','zef');

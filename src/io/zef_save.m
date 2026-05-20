@@ -1,6 +1,58 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_save(zef,file_name,path_name,save_switch)
+% --- Zeffiro documentation header ---
+% zef_save — Writes project, mesh, or reconstruction data to disk.
+%
+% Purpose:
+%   Writes project, mesh, or reconstruction data to disk.
+%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%
+% Inputs:
+%   zef
+%   file_name
+%   path_name
+%   save_switch
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.brain_ind (read)
+%   zef.current_sensors (read)
+%   zef.file (read, write)
+%   zef.file_index (read, write)
+%   zef.file_path (read, write)
+%   zef.h_fig_aux (read, write)
+%   zef.imaging_method (read, write)
+%   zef.min_ind (read)
+%   zef.min_val (read)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   zef.save_file (read, write)
+%   zef.save_file_path (read, write)
+%   zef.save_switch (read, write)
+%   zef.sensors (read)
+%   … (10 more)
+%
+% Calls (project):
+%   zef_attach_sensors_volume
+%   zef_postprocess_fem_mesh
+%   zef_process_meshes
+%   zef_remove_object_handles
+%   zef_save
+%   zef_update
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_save(zef, file_name, path_name, save_switch)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

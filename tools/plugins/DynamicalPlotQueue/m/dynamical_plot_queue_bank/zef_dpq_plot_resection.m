@@ -1,5 +1,32 @@
 function zef_dpq_plot_resection(varargin)
-%This function plots a convex hull enclosing a set of resection points.
+% --- Zeffiro documentation header ---
+% zef_dpq_plot_resection — Zef dpq plot resection.
+%
+% Purpose:
+%   Zef dpq plot resection.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.resection_points (read)
+%
+% Calls (project):
+%   zef_dpq_plot_resection
+%   zef_tetra_volume
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_dpq_plot_resection(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 alpha_value = 0;
 resection_color = 'g';

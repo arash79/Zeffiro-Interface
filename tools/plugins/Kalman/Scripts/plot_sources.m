@@ -1,3 +1,22 @@
+% --- Zeffiro documentation header ---
+% full_address = 'exportImage'; — Full address = 'export Image';.
+%
+% Purpose:
+%   Full address = 'export Image';.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.h_axes1 (read)
+%
+% Side effects:
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `full_address = 'exportImage';` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 full_address = 'exportImage';
 file_name = 'carsten';
 file_full = fullfile(full_address, file_name);
@@ -65,4 +84,3 @@ savefig(f2, [file_full 'cortex2' '.fig'])
 view(90,0)
 print(f2,'-dpng','-r150',[file_full 'cortex3' '.png'])
 savefig(f2, [file_full 'cortex3' '.fig'])
-

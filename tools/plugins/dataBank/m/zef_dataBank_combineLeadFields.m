@@ -1,4 +1,28 @@
 function [L, y] = zef_dataBank_combineLeadFieLds(tree, workingHashes, varargin)
+% --- Zeffiro documentation header ---
+% zef_dataBank_combineLeadFieLds — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%
+% Purpose:
+%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   tree
+%   workingHashes
+%   varargin
+%
+% Outputs:
+%   L
+%   y
+%
+% Calls (project):
+%   zef_dataBank_combineLeadFieLds
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[L, y]] = zef_dataBank_combineLeadFieLds(tree, workingHashes, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 L_aux = cell(0);
 y_aux = cell(0);

@@ -1,5 +1,35 @@
 function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
-%INVERT Reconstruct dipole sources with precomputed eLORETA operator.
+% --- Zeffiro documentation header ---
+% inverse.ELORETAInverter.invert — Runs one inverse reconstruction step for a single measurement frame.
+%
+% Purpose:
+%   Runs one inverse reconstruction step for a single measurement frame.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   self
+%   f
+%   L
+%   procFile
+%   source_direction_mode
+%   source_positions
+%   opts
+%
+% Outputs:
+%   z_vec
+%   self
+%
+% Calls (project):
+%   inverse.invert
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[z_vec, self]] = inverse.ELORETAInverter.invert(self, f, L, procFile, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     self (1,1) inverse.ELORETAInverter

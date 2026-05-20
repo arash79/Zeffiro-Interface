@@ -1,48 +1,36 @@
 function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
-
-    %
-    % invert
-    %
-    % Builds a reconstruction of source dipoles from a given lead field with
-    % the selected beamforming method.
-    %
-    % Inputs:
-    %
-    % - self
-    %
-    %   An instance of BeamformerInverter with the method-specific parameters.
-    %
-    % - f
-    %
-    %   measurement vector.
-    %
-    % - L
-    %
-    %   The lead field that is being inverted.
-    %
-    % - procFile
-    %
-    %   A struct with source space indices.
-    %
-    % - source_direction_mode
-    %
-    %   The way the orientations of the sources should be interpreted.
-    %
-    % - opts.use_gpu = false
-    %
-    %   A logical flag for choosing whether a GPU will be used in
-    %   computations, if available.
-    %
-    % Outputs:
-    %
-    % - reconstruction
-    %
-    %   The reconstrution of the dipoles.
-    %
-    % - self
-    %
-    %   An instance of possibly modified BeamformerInverter with the method-specific parameters.
-    %
+% --- Zeffiro documentation header ---
+% inverse.BeamformerInverter.invert — Runs one inverse reconstruction step for a single measurement frame.
+%
+% Purpose:
+%   Runs one inverse reconstruction step for a single measurement frame.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   self
+%   f
+%   L
+%   procFile
+%   source_direction_mode
+%   source_positions
+%   opts
+%
+% Outputs:
+%   z_vec
+%   self
+%
+% Calls (project):
+%   inverse.invert
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[z_vec, self]] = inverse.BeamformerInverter.invert(self, f, L, procFile, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
     arguments
 

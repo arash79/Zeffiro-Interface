@@ -1,4 +1,35 @@
 function [aux_compartment_ind, aux_brain_ind, property_compartment, property_brain] = zef_get_active_compartments(zef,varargin)
+% --- Zeffiro documentation header ---
+% zef_get_active_compartments — Zef get active compartments.
+%
+% Purpose:
+%   Zef get active compartments.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   varargin
+%
+% Outputs:
+%   aux_compartment_ind
+%   aux_brain_ind
+%   property_compartment
+%   property_brain
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%
+% Calls (project):
+%   zef_get_active_compartments
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[aux_compartment_ind, aux_brain_ind, property_compartment]] = zef_get_active_compartments(zef, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 property_name = cell(0);
 property_compartment = cell(0);

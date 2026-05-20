@@ -1,4 +1,27 @@
 function setup_freesurfer_env(FREESURFER_HOME, options)
+% --- Zeffiro documentation header ---
+% utilities.fs2zef.environment.setup_freesurfer_env — Setup freesurfer env.
+%
+% Purpose:
+%   Setup freesurfer env.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   FREESURFER_HOME
+%   options
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Calls (project):
+%   utilities.fs2zef.FREESURFER_ENV_VARS
+%   utilities.fs2zef.environment.setup_freesurfer_env
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `utilities.fs2zef.environment.setup_freesurfer_env(FREESURFER_HOME, options)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %
 % setup_freesurfer_env - Set up FreeSurfer environment variables
 %

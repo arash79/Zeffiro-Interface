@@ -19,6 +19,33 @@
 % See also: run.m, process_eeg_data.m, process_meg_data.m
 
 function [success, error_msg] = process_sensors(config, modality, channel_indices)
+% --- Zeffiro documentation header ---
+% utilities.duneuro2zef.process_sensors — Process sensors.
+%
+% Purpose:
+%   Process sensors.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   config
+%   modality
+%   channel_indices
+%
+% Outputs:
+%   success
+%   error_msg
+%
+% Calls (project):
+%   utilities.duneuro2zef.process_sensors
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[success, error_msg]] = utilities.duneuro2zef.process_sensors(config, modality, channel_indices)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
     success = false;
     error_msg = '';

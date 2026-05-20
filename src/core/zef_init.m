@@ -1,5 +1,31 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% zef_delete_original_surface_meshes; — Zef delete original surface meshes;.
+%
+% Purpose:
+%   Zef delete original surface meshes;.
+%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%
+% Zef fields (observed):
+%   zef.fieldnames (read, write)
+%   zef.file (read, write)
+%   zef.file_path (read, write)
+%   zef.font_size (read)
+%
+% Calls (project):
+%   zef_apply_parameter_profile
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_delete_original_surface_meshes;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 zef_delete_original_surface_meshes;
 zef_delete_original_field;

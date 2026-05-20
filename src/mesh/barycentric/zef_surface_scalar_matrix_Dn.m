@@ -1,41 +1,31 @@
 function M = zef_surface_scalar_matrix_Dn(nodes, tetra, g_i_ind, n_ind, scalar_field, weighting)
+% --- Zeffiro documentation header ---
+% zef_surface_scalar_matrix_Dn — Zef surface scalar matrix Dn.
 %
-% zef_surface_scalar_matrix_Dn
-%
-% TODO: Sampsa should document this.
+% Purpose:
+%   Zef surface scalar matrix Dn.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
 %
 % Inputs:
-%
-% - nodes
-%
-%   TODO: explanation.
-%
-% - tetra
-%
-%   TODO: explanation.
-%
-% - g_i_ind
-%
-%   TODO: explanation.
-%
-% - n_ind
-%
-%   TODO: explanation.
-%
-% - scalar_field
-%
-%   TODO: explanation.
-%
-% - weighting
-%
-%   TODO: explanation.
+%   nodes
+%   tetra
+%   g_i_ind
+%   n_ind
+%   scalar_field
+%   weighting
 %
 % Outputs:
+%   M
 %
-% - M
+% Calls (project):
+%   zef_surface_mesh
+%   zef_surface_scalar_matrix_Dn
+%   zef_volume_barycentric
 %
-%   TODO: explanation.
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[M] = zef_surface_scalar_matrix_Dn(nodes, tetra, g_i_ind, n_ind, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 N = size(nodes,1);
 K = size(tetra,1);

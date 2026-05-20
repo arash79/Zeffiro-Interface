@@ -1,6 +1,25 @@
 function vec = zef_ES_table(data_aux)
+% --- Zeffiro documentation header ---
+% zef_ES_table — Zef ES table.
+%
+% Purpose:
+%   Zef ES table.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   data_aux
+%
+% Outputs:
+%   vec
+%
+% Calls (project):
+%   zef_ES_table
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[vec] = zef_ES_table(data_aux)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-%% Pre-allocate table and properties
     var_names = {...
         'Residual', ...
         'Maximum current', ...

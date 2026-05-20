@@ -1,6 +1,49 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_init_ias_roi(zef)
+% --- Zeffiro documentation header ---
+% zef_init_ias_roi — Initializes GUI widgets and default `zef` fields for ias_roi.
+%
+% Purpose:
+%   Initializes GUI widgets and default `zef` fields for ias_roi.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.font_size (read)
+%   zef.h_iasroi_apply (read)
+%   zef.h_iasroi_cancel (read)
+%   zef.h_iasroi_high_cut_frequency (read)
+%   zef.h_iasroi_hyperprior (read)
+%   zef.h_iasroi_low_cut_frequency (read)
+%   zef.h_iasroi_map_estimation (read)
+%   zef.h_iasroi_n_map_iterations (read)
+%   zef.h_iasroi_normalize_data (read)
+%   zef.h_iasroi_number_of_frames (read)
+%   zef.h_iasroi_plot_roi (read)
+%   zef.h_iasroi_plot_source (read)
+%   zef.h_iasroi_rec_source_8 (read)
+%   zef.h_iasroi_rec_source_9 (read)
+%   zef.h_iasroi_roi_mode (read)
+%   … (36 more)
+%
+% Calls (project):
+%   zef_ias_map_estimation_roi_window
+%   zef_init_ias_roi
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_init_ias_roi(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 zef = zef_ias_map_estimation_roi_window(zef);
 

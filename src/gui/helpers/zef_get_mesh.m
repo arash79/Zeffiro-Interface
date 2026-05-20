@@ -1,6 +1,39 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [mesh_data_1,mesh_data_2,submesh_data] = zef_get_mesh(zef,file_str,field_id,file_type,varargin)
+% --- Zeffiro documentation header ---
+% zef_get_mesh — Zef get mesh.
+%
+% Purpose:
+%   Zef get mesh.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   file_str
+%   field_id
+%   file_type
+%   varargin
+%
+% Outputs:
+%   mesh_data_1
+%   mesh_data_2
+%   submesh_data
+%
+% Calls (project):
+%   zef_compact_mesh
+%   zef_get_mesh
+%   zef_import_asc
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[mesh_data_1, mesh_data_2, submesh_data]] = zef_get_mesh(zef, file_str, field_id, file_type, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 output_mode = 1;
 if not(isempty(varargin))

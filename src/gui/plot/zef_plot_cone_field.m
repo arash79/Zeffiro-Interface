@@ -1,4 +1,52 @@
 function [h_cone_field, h_streamline, h_colorbar] = zef_plot_cone_field(zef, h_axes, varargin)
+% --- Zeffiro documentation header ---
+% zef_plot_cone_field — Renders or updates a plot_cone_field figure from current `zef` state.
+%
+% Purpose:
+%   Renders or updates a plot_cone_field figure from current `zef` state.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   h_axes
+%   varargin
+%
+% Outputs:
+%   h_cone_field
+%   h_streamline
+%   h_colorbar
+%
+% Zef fields (observed):
+%   zef.colormap_size (read)
+%   zef.colortune_param (read)
+%   zef.cone_alpha (read)
+%   zef.cone_draw (read)
+%   zef.cone_lattice_resolution (read)
+%   zef.cone_scale (read)
+%   zef.cp2_a (read)
+%   zef.cp2_b (read)
+%   zef.cp2_c (read)
+%   zef.cp2_d (read)
+%   zef.cp2_on (read)
+%   zef.cp3_a (read)
+%   zef.cp3_b (read)
+%   zef.cp3_c (read)
+%   zef.cp3_d (read)
+%   … (15 more)
+%
+% Calls (project):
+%   zef_blue_brain_1_colormap
+%   zef_clipping_plane
+%   zef_plot_cone_field
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[h_cone_field, h_streamline, h_colorbar]] = zef_plot_cone_field(zef, h_axes, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if eval('zef.cone_draw') || eval('zef.streamline_draw')
 

@@ -1,3 +1,22 @@
+% --- Zeffiro documentation header ---
+% T=[-0.9995  -0.0280  -0.0112   133 — T=[-0.9995  -0.0280  -0.0112   133.
+%
+% Purpose:
+%   T=[-0.9995  -0.0280  -0.0112   133.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Zef fields (observed):
+%   zef.reconstruction_information (read)
+%   zef.source_positions (read)
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `T=[-0.9995  -0.0280  -0.0112   133` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 %%
 
@@ -6,6 +25,9 @@
 %get the voxel to ras matrix with freeSurfer from orig.mri
 
 %% voxel-to-ras
+
+
+
 T=[-0.9995  -0.0280  -0.0112   133.3754
     -0.0301   0.9302   0.3657  -142.3206
     -0.0002  -0.3659   0.9306   -40.3920

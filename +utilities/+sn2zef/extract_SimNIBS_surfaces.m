@@ -1,58 +1,27 @@
 function atlas_surfaces = extract_SimNIBS_surfaces( ...
+% --- Zeffiro documentation header ---
+% utilities.sn2zef.atlas_surfaces — Atlas surfaces.
+%
+% Purpose:
+%   Atlas surfaces.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Calls (project):
+%   utilities.sn2zef.extract_SimNIBS_surfaces
+%   zef_inflate_surface
+%   zef_waitbar
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `utilities.sn2zef.atlas_surfaces` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
     zef, atlas_struct, n_inflation_steps, transform_cell, compartment_type)
-%
-% extract_SimNIBS_surfaces
-%
-% Extracts triangular mesh surfaces from a labeled volume atlas using
-% marching cubes isosurface extraction. Optionally applies morphological
-% cleanup, surface inflation, and coordinate transformations. Designed for
-% processing SimNIBS tissue segmentation volumes.
-%
-% Inputs:
-%
-% - zef (1,1) struct
-%
-%   The ZEF context struct required for surface inflation operations.
-%
-% - atlas_struct (1,1) struct
-%
-%   A structure containing the atlas data with fields:
-%     • Cube        - 3D volume array with integer label values
-%     • Labels      - Cell array with label IDs, names, and RGB colors
-%     • Comment     - String description of the atlas
-%     • InitTransf  - Optional cell array containing transformation matrices
-%
-% - n_inflation_steps (1,1) double { mustBeNonnegative }
-%
-%   Number of surface inflation iterations to apply for smoothing. Set to
-%   0 to skip inflation. Large surfaces may skip inflation automatically
-%   to prevent performance issues.
-%
-% - transform_cell (:,1) cell = {}
-%
-%   Optional cell array of transformation flags. If 'InitTransf' is
-%   present, the initial transformation from atlas_struct.InitTransf will
-%   be applied to the extracted surfaces.
-%
-% - compartment_type (1,1) string = ''
-%
-%   Optional string identifier for the compartment type, stored in the
-%   output surface structures.
-%
-% Outputs:
-%
-% - atlas_surfaces (:,1) struct
-%
-%   Array of surface structures, one per extracted label. Each structure
-%   contains:
-%     • Name      - Label name string
-%     • Type      - Compartment type string
-%     • Color     - RGB color values (normalized to [0,1])
-%     • Points    - N-by-3 array of vertex coordinates
-%     • Triangles - M-by-3 array of triangle vertex indices
-%
 
-    % Set default values for optional arguments
     if nargin < 4
         transform_cell = {};
     end

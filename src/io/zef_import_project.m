@@ -1,6 +1,43 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef_import_project(file_name, folder_name)
+% --- Zeffiro documentation header ---
+% zef_import_project — Loads external data or a saved Zeffiro project into `zef`.
+%
+% Purpose:
+%   Loads external data or a saved Zeffiro project into `zef`.
+%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%
+% Inputs:
+%   file_name
+%   folder_name
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.h_mesh_tool (read)
+%   zef.imaging_method (read, write)
+%   zef.imaging_method_cell (read)
+%   zef.lf_tag (read, write)
+%   zef.save_file_path (read)
+%
+% Calls (project):
+%   zef_import_project
+%   zef_import_segmentation
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `zef_import_project(file_name, folder_name)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 void = [];
 

@@ -1,4 +1,39 @@
 function zef = zef_strip_tool_window(zef)
+% --- Zeffiro documentation header ---
+% zef_strip_tool_window — Zef strip tool window.
+%
+% Purpose:
+%   Zef strip tool window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.strip_tool (read)
+%
+% Calls (project):
+%   zef_strip_tool_add
+%   zef_strip_tool_add_contacts
+%   zef_strip_tool_delete
+%   zef_strip_tool_embed
+%   zef_strip_tool_init
+%   zef_strip_tool_plot
+%   zef_strip_tool_update
+%   zef_strip_tool_window
+%
+% Side effects:
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_strip_tool_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h1 = figure(...
 'PaperUnits',get(0,'defaultfigurePaperUnits'),...

@@ -1,4 +1,25 @@
 function [electrode_struct] = zef_electrode_struct(sensors_attached_volume)
+% --- Zeffiro documentation header ---
+% zef_electrode_struct — Zef electrode struct.
+%
+% Purpose:
+%   Zef electrode struct.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   sensors_attached_volume
+%
+% Outputs:
+%   electrode_struct
+%
+% Calls (project):
+%   zef_electrode_struct
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[electrode_struct] = zef_electrode_struct(sensors_attached_volume)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 electrode_struct = [];
 

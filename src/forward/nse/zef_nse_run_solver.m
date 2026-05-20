@@ -1,3 +1,31 @@
+% --- Zeffiro documentation header ---
+% if zef.nse_field — If zef.nse field.
+%
+% Purpose:
+%   If zef.nse field.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Zef fields (observed):
+%   zef.domain_labels (read)
+%   zef.mvd_length (read)
+%   zef.nodes (read)
+%   zef.nse_field (read, write)
+%   zef.tetra (read)
+%
+% Calls (project):
+%   zef_nse_haemodynamic_response_solver
+%   zef_nse_poisson
+%   zef_nse_poisson_dynamic
+%   zef_nse_tool_update
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if zef.nse_field` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 if zef.nse_field.solver_type == 1
     zef = zef_nse_tool_update(zef);
     zef.nse_field.microcirculation_model = 0;

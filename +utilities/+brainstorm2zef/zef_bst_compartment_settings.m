@@ -1,31 +1,26 @@
 function compartment_settings = zef_bst_compartment_settings(zef_bst, surface_meshes)
-%ZEF_BST_COMPARTMENT_SETTINGS Creates compartment settings array from Brainstorm surface meshes.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst_compartment_settings — Zef bst compartment settings.
 %
-% This function generates a cell array containing compartment settings for
-% each surface mesh, including refinement flags, electrical conductivity,
-% and degree-of-freedom (DOF) space parameters.
+% Purpose:
+%   Zef bst compartment settings.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   zef_bst       - Structure containing Brainstorm-to-Zeffiro configuration
-%   surface_meshes - Structure array of surface meshes with fields:
-%                    Name, Type, Points, Triangles
+%   zef_bst
+%   surface_meshes
 %
 % Outputs:
-%   compartment_settings - Cell array (Nx12) with columns:
-%                          [1] 'Compartment name' header
-%                          [2] Compartment name
-%                          [3] 'Compartment type' header
-%                          [4] Compartment type
-%                          [5] 'Refine surface' header
-%                          [6] Surface refinement flag (0 or 1)
-%                          [7] 'Refine volume' header
-%                          [8] Volume refinement flag (0 or 1)
-%                          [9] 'Electrical conductivity' header
-%                          [10] Electrical conductivity value
-%                          [11] 'DOF space' header
-%                          [12] DOF space value
+%   compartment_settings
 %
-% See also: ZEF_BST_CREATE_COMPARTMENT_DATA
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_compartment_settings
+%   utilities.brainstorm2zef.zef_bst_get_compartment_property
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[compartment_settings] = utilities.brainstorm2zef.zef_bst_compartment_settings(zef_bst, surface_meshes)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 n_compartments = length(surface_meshes);
 

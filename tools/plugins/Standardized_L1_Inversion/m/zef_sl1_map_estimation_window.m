@@ -1,4 +1,47 @@
 function zef = zef_sl1_map_estimation_window(zef)
+% --- Zeffiro documentation header ---
+% zef_sl1_map_estimation_window — Zef sl1 map estimation window.
+%
+% Purpose:
+%   Zef sl1 map estimation window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.h_sl1_apply (read, write)
+%   zef.h_sl1_cancel (read, write)
+%   zef.h_sl1_high_cut_frequency (read, write)
+%   zef.h_sl1_hyperprior (read, write)
+%   zef.h_sl1_low_cut_frequency (read, write)
+%   zef.h_sl1_map_estimation (read, write)
+%   zef.h_sl1_n_map_iterations (read, write)
+%   zef.h_sl1_normalize_data (read, write)
+%   zef.h_sl1_number_of_frames (read, write)
+%   zef.h_sl1_sampling_frequency (read, write)
+%   zef.h_sl1_snr (read, write)
+%   zef.h_sl1_start (read, write)
+%   zef.h_sl1_time_1 (read, write)
+%   zef.h_sl1_time_2 (read, write)
+%   zef.h_sl1_time_3 (read, write)
+%   … (14 more)
+%
+% Calls (project):
+%   zef_sl1_map_estimation_window
+%
+% Side effects:
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_sl1_map_estimation_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 
 h1 = figure(...

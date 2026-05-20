@@ -1,6 +1,54 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,rec_source] = zef_ias_iteration_roi(zef)
+% --- Zeffiro documentation header ---
+% zef_ias_iteration_roi — Zef ias iteration roi.
+%
+% Purpose:
+%   Zef ias iteration roi.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   z
+%   rec_source
+%
+% Zef fields (observed):
+%   zef.L (read)
+%   zef.compartment_tags (read)
+%   zef.gpu_count (read)
+%   zef.iasroi_data_segment (read)
+%   zef.iasroi_high_cut_frequency (read)
+%   zef.iasroi_hyperprior (read)
+%   zef.iasroi_low_cut_frequency (read)
+%   zef.iasroi_n_map_iterations (read)
+%   zef.iasroi_normalize_data (read)
+%   zef.iasroi_number_of_frames (read)
+%   zef.iasroi_rec_source (read)
+%   zef.iasroi_roi_mode (read)
+%   zef.iasroi_roi_sphere (read)
+%   zef.iasroi_roi_threshold (read)
+%   zef.iasroi_sampling_frequency (read)
+%   … (20 more)
+%
+% Calls (project):
+%   zef_find_g_hyperprior
+%   zef_find_ig_hyperprior
+%   zef_ias_iteration_roi
+%   zef_smooth_field
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[z, rec_source]] = zef_ias_iteration_roi(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h = zef_waitbar(0,1,['IAS MAP iteration.']);
 [s_ind_1] = unique(eval('zef.source_interpolation_ind{1}'));

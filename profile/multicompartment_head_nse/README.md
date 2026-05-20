@@ -1,27 +1,43 @@
-# Profile: Multicompartment Head (NSE)
+# profile/multicompartment_head_nse
 
-This profile extends the **multicompartment head** setup for workflows that combine **standard EEG/MEG/EIT/tES** with **NSE (e.g. Navier–Stokes or haemodynamic)** modelling. It adds NSE-specific parameters (microvessel density, NSE conductivity) and includes the NSE tool in the plugin list, while keeping the same forward lead fields and an empty compartment list like the main head profile.
+## Purpose of this folder
 
-## Use Case
+Startup profiles and `zeffiro_plugins.ini` that attach plugin menus.
 
-- Neuroimaging plus haemodynamic or fluid-dynamics modelling (e.g. NSE tool).
-- When microvessel density and NSE conductivity need to be defined per compartment or globally.
-- Same flexibility as multicompartment_head for defining compartments, with extra parameters for NSE.
+## Contents
 
-## Files in This Profile
+Other files:
+- `zeffiro_forward_simulation.ini`
+- `zeffiro_init.ini`
+- `zeffiro_parameters.ini`
+- `zeffiro_plugins.ini`
+- `zeffiro_segmentation.ini`
 
-| File | Purpose |
-|------|--------|
-| **zeffiro_init.ini** | Same as multicompartment_head: default plot size; modalities EEG, MEG magnetometer, MEG gradiometers; CEM electrode creation. |
-| **zeffiro_parameters.ini** | Same as multicompartment_head **plus**: **Microvessel density** (`mvd_length`, default 200, unit Count/mm³, On for segmentation); **NSE conductivity** (`nse_sigma`, default 0 S/m, Off for segmentation). Order: sigma, mvd_length, nse_sigma, then rho, epsilon, mu, filtered_tetra, electrode*, kappa, condition number. |
-| **zeffiro_forward_simulation.ini** | Identical to multicompartment_head: EEG, MEG, EIT, tES (isotropic and anisotropic). No NSE-specific lead field in this file; NSE is handled by the NSE tool and related solvers. |
-| **zeffiro_plugins.ini** | Same as multicompartment_head_legacy: multi lead field, filter, topography, RAMUS/IAS/EXP, MNE, beamformer, CSM, MUSIC, GMM (SP and JL), lead field processing, reconstruction, dipole scan, data bank, dynamical plot queue, preconditioned relaxation, synthetic source legacy, GitHub pusher, **Kalman**, **NSE tool**. No DTI conductivity tool or synthetic extended source patch in this list. |
-| **zeffiro_segmentation.ini** | **Empty** compartment lists (like multicompartment_head). Parameter setting row is **sigma**. Users define compartments when building the head mesh; they can then assign `mvd_length` and `nse_sigma` where relevant. |
+## How this folder fits into the overall workflow
 
-## Differences from Multicompartment Head
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-- **Parameters:** Two extra rows in `zeffiro_parameters.ini`: **Microvessel density** (`mvd_length`) and **NSE conductivity** (`nse_sigma`). These are available in the parameter profile and segmentation/compartment dialogs for NSE workflows.
-- **Plugins:** NSE tool is enabled; DTI conductivity and synthetic extended source patch are not listed in this profile’s plugin set.
-- **Compartments:** No predefined list; same “user-defined” approach as the main multicompartment_head profile.
+## GUI usage
 
-For the overall profile system and INI format, see the parent [../README.md](../README.md).
+No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
+
+## Programmatic usage
+
+Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+
+## Examples
+
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+
+## Dependencies and assumptions
+
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+
+## Notes for developers
+
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

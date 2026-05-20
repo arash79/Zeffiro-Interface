@@ -1,4 +1,55 @@
 function zef = zef_ES_optimization_window(zef)
+% --- Zeffiro documentation header ---
+% zef_ES_optimization_window — Zef ES optimization window.
+%
+% Purpose:
+%   Zef ES optimization window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.ES_HPO_recursive_instances (read, write)
+%   zef.ES_HPO_search_method (read)
+%   zef.ES_HPO_search_method_list (read)
+%   zef.ES_active_electrodes (read, write)
+%   zef.ES_inv_colormap (read)
+%   zef.ES_obj_fun (read)
+%   zef.ES_obj_fun_2 (read)
+%   zef.ES_opt_algorithm (read)
+%   zef.ES_opt_algorithm_list (read)
+%   zef.ES_opt_method (read)
+%   zef.ES_opt_method_list (read)
+%   zef.ES_opt_solver (read)
+%   zef.ES_opt_solver_list (read)
+%   zef.ES_plot_type (read)
+%   zef.ES_threshold_condition (read)
+%   … (25 more)
+%
+% Calls (project):
+%   zef_ES_find_currents
+%   zef_ES_find_currents_recursive
+%   zef_ES_fix_active_electrodes
+%   zef_ES_optimization_window
+%   zef_ES_plot_barplot
+%   zef_ES_plot_current_pattern
+%   zef_ES_plot_error_chart
+%   zef_change_size_function
+%   zef_get_relative_size
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_ES_optimization_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 zef_ES_optimization_init;
 zef_data = zef_ES_optimization_app;
 %% zef_data

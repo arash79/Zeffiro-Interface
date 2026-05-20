@@ -49,6 +49,30 @@
 %          zef_dti_structural_Q
 
 function Q_fa = zef_dti_fa_covariance(source_positions, fa_sources, v1_sources, varargin)
+% --- Zeffiro documentation header ---
+% zef_dti_fa_covariance — Zef dti fa covariance.
+%
+% Purpose:
+%   Zef dti fa covariance.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   source_positions
+%   fa_sources
+%   v1_sources
+%   varargin
+%
+% Outputs:
+%   Q_fa
+%
+% Calls (project):
+%   zef_dti_fa_covariance
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[Q_fa] = zef_dti_fa_covariance(source_positions, fa_sources, v1_sources, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 p = inputParser;
 addRequired(p, 'source_positions', @(x) isnumeric(x) && size(x,2)==3);

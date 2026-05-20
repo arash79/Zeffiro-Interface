@@ -1,5 +1,39 @@
 
 function  zef_nse_plot_epoched(zef, nse_field, plot_vec, y_label, plot_vec_ref)
+% --- Zeffiro documentation header ---
+% zef_nse_plot_epoched — Zef nse plot epoched.
+%
+% Purpose:
+%   Zef nse plot epoched.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%   nse_field
+%   plot_vec
+%   y_label
+%   plot_vec_ref
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.font_size (read)
+%   zef.h_axes1 (read)
+%   zef.nse_field (read)
+%
+% Calls (project):
+%   zef_nse_plot_epoched
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_nse_plot_epoched(zef, nse_field, plot_vec, y_label, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h_axes = zef.h_axes1;
 axes(h_axes);

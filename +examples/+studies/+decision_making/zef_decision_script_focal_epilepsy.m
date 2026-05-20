@@ -1,20 +1,23 @@
-% ZEF_DECISION_SCRIPT_FOCAL_EPILEPSY - Main workflow for focal epilepsy source localization
+% --- Zeffiro documentation header ---
+% examples.studies.decision_making.examples.studies.decision_making — Example or study script demonstrating examples.studies.decision_making.
 %
-% Assumes zef is loaded with a DataBank project containing reconstructions.
+% Purpose:
+%   Example or study script demonstrating examples.studies.decision_making.
+%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%
+% Calls (project):
+%   zef_dataBank_get_reconstructions
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
 % Workflow:
-%   1. Load parameters
-%   2. Retrieve inverse results from DataBank
-%   3. Cluster reconstructions (GMM + credibility-based selection)
-%   4. Compute final reconstruction (weighted average of selected methods)
-%   5. Display results (table + plots)
-%
-% Prerequisites: Run zef_find_reconstructions_focal_epilepsy first to populate
-% the DataBank with inverse results.
-%
-% See also: zef_find_reconstructions_focal_epilepsy, zef_create_training_data_focal_epilepsy
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 examples.studies.decision_making.zef_parameters_focal_epilepsy;
 [z_inverse_results, z_inverse_info] = zef_dataBank_get_reconstructions(zef, frame_number);
-examples.studies.decision_making.zef_cluster_reconstructions_focal_epilepsy;
-examples.studies.decision_making.zef_final_reconstruction_focal_epilepsy;
-examples.studies.decision_making.zef_show_results_focal_epilepsy;
+examples.studies.decision_making.helpers.zef_cluster_reconstructions_focal_epilepsy;
+examples.studies.decision_making.helpers.zef_final_reconstruction_focal_epilepsy;
+examples.studies.decision_making.helpers.zef_show_results_focal_epilepsy;

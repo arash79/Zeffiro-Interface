@@ -1,4 +1,33 @@
 function zef_segmentation_tool_toggle(zef,h_button)
+% --- Zeffiro documentation header ---
+% zef_segmentation_tool_toggle — Zef segmentation tool toggle.
+%
+% Purpose:
+%   Zef segmentation tool toggle.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   h_button
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.h_zeffiro_window_main (read)
+%
+% Calls (project):
+%   zef_segmentation_tool_toggle
+%   zef_set_size_change_function
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `zef_segmentation_tool_toggle(zef, h_button)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isequal(h_button.UserData,1)
     h_button.UserData = 0;

@@ -1,5 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if not(isfield(zef,'smoothing_steps_ele')); — If not(isfield(zef,'smoothing steps ele'));.
+%
+% Purpose:
+%   If not(isfield(zef,'smoothing steps ele'));.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.adaptive_refinement_compartments (read, write)
+%   zef.adaptive_refinement_k_param (read, write)
+%   zef.adaptive_refinement_number (read, write)
+%   zef.adaptive_refinement_on (read, write)
+%   zef.adaptive_refinement_thresh_val (read, write)
+%   zef.distance_smoothing_exp (read, write)
+%   zef.distance_smoothing_on (read, write)
+%   zef.exclude_box (read, write)
+%   zef.extensive_relabeling (read, write)
+%   zef.fem_mesh_inflation_strength (read, write)
+%   zef.fix_outer_surface (read, write)
+%   zef.gpu_num (read, write)
+%   zef.initial_mesh_mode (read, write)
+%   zef.lead_field_filter_quantile (read, write)
+%   zef.mesh_optimization_parameter (read, write)
+%   … (39 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if not(isfield(zef,'smoothing_steps_ele'));` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 if not(isfield(zef,'smoothing_steps_ele'));
     zef.smoothing_steps_ele = 100;
@@ -86,7 +121,7 @@ if not(isfield(zef,'use_depth_electrodes'));
 end;
 
 if not(isfield(zef,'source_model'));
-    zef.source_model = core.ZefSourceModel.Whitney;
+    zef.source_model = core.types.ZefSourceModel.Whitney;
 end;
 if not(isfield(zef,'preconditioner'));
     zef.preconditioner = 1;

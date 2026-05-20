@@ -1,149 +1,39 @@
 function [zef, output] = zef_inverse_pipeline_run(zef, cfg)
-%ZEF_INVERSE_PIPELINE_RUN Run a configured inverse + sensitivity pipeline.
+% --- Zeffiro documentation header ---
+% zef_inverse_pipeline_run — Zef inverse pipeline run.
 %
-%   [zef, output] = zef_inverse_pipeline_run(zef, cfg)
+% Purpose:
+%   Zef inverse pipeline run.
+%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
 %
-% Pure-function form of the legacy run_inverse_script.m. No base-workspace
-% reads or writes: the caller passes a zef struct (with a built lead field
-% and non-empty zef.measurements) plus a configuration struct, and gets
-% back the (possibly slightly mutated) zef and a results struct shaped as
+% Inputs:
+%   zef
+%   cfg
 %
-%   output.config         % the cfg actually used (after defaults merge)
-%   output.timestamp      % datetime("now") at start
-%   output.inverse.<key>  % .zef / .run / .seconds / .registry_id (or .err)
-%   output.sensitivity.<key>
-%                         % .method_id / .statistics / .L / .strategy /
-%                         % .seconds (or .err)
+% Outputs:
+%   zef
+%   output
 %
-% which is exactly the shape that run_inverse_script.m used to assignin
-% under the variable name 'inverse_pipeline_output'.
+% Zef fields (observed):
+%   zef.inv_snr (read, write)
+%   zef.measurements (read)
+%   zef.number_of_frames (read, write)
+%   zef.source_positions (read)
 %
-% cfg fields (all optional - any missing field falls back to the same
-% defaults that the legacy script used):
+% Calls (project):
+%   utilities.cluster.configure_cluster_profile
+%   zef_inverse_pipeline_run
+%   zef_inverse_run
+%   zef_sensitivity_run
 %
-%   execution        : "local" | "cluster"          (default "local")
-%   run_inverse      : logical                      (default true)
-%   run_sensitivity  : logical                      (default true)
-%   methods          : cell array (Nx3) of rows
-%                      {key, registry_id, methodParams}; see the comment
-%                      block below for the full menu of solvers and
-%                      method-specific parameters.
-%                      (default: sLORETA + dipolescan, the two rows that
-%                       run_inverse_script.m enabled out of the box.)
-%   inv_snr_db       : double                       (default 30)
-%   number_of_frames : double                       (default 1)
-%   sensitivity      : struct with fields
-%                          n_of_runs, noise_level_db, diff_type,
-%                          dispersion_radius, isolated_frames_per_probe,
-%                          max_probes_per_batch, source_mask (optional).
-%                      max_probes_per_batch bounds memory for static
-%                      sensitivity dispatches; dispersion is still computed
-%                      over the full selected source set after chunking.
-%                      source_mask, if present, restricts which sources
-%                      are probed by the sensitivity stage. Accepted
-%                      forms:
-%                        - empty (default): probe every active brain
-%                          source returned by zef_processLeadfields.
-%                        - logical column of length
-%                          size(zef.source_positions, 1).
-%                        - numeric index list (1-based) into
-%                          zef.source_positions.
-%                        - function handle @(zef) -> mask, evaluated on
-%                          the local zef just before the sensitivity
-%                          call. Useful when callers do not know
-%                          n_full ahead of time (e.g. the high-level
-%                          wrapper opens the project internally).
-%                      Forwarded to zef_sensitivity_run as 'SourceMask'.
-%                      Particularly important for stateful_dynamic
-%                      methods (Kalman family) where each probe is its
-%                      own isolated dispatch and probing all active
-%                      sources can take hours.
-%   cluster          : struct with fields
-%                          project, MemPerCPU, WallTime, Partition,
-%                          NumThreads. Only used when execution=="cluster".
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
 %
-% =========================================================================
-% SOLVER MENU (kept here so the documentation lives next to the dispatch
-% loop, exactly like the legacy script did):
-% =========================================================================
-% One row per solver: {key, registry_id, methodParams}
-%   - key          short identifier used in the output struct
-%                  (output.inverse.(key) and output.sensitivity.(key)).
-%   - registry_id  the id resolved by
-%                  utilities.cluster.inverse_method_registry. The same id
-%                  is consumed by both zef_inverse_run and zef_sensitivity_run.
-%   - methodParams struct of method-specific overrides forwarded to the
-%                  inverter constructor; only the field names that match
-%                  inverter properties are honoured.
-%
-% The solver capability for the sensitivity stage is resolved by
-% utilities.sensitivity.method_capability:
-%   - linear_static     : per-frame is T*f with cached operator.
-%   - iterative_static  : per-frame independent but iterative.
-%                         Static methods use bounded probe batches and
-%                         stitch the metrics back together before
-%                         aggregation, avoiding monolithic all-source
-%                         reconstruction matrices.
-%   - stateful_dynamic  : Kalman-family; sensitivity uses isolated dispatch
-%                         (one inversion per probe, ~T_KF frames each).
-%   - unsupported       : sensitivity stage will error with a clear message.
-%
-% Example rows (commented out - copy and edit into your cfg.methods):
-%
-% % ---- Default active rows (the two rows kept on by the legacy script).
-% "sloreta",       "sloreta",      struct("method_type","sLORETA","theta0",1e-3)
-% "dipolescan",    "dipolescan",   struct("method_type","SVD","reg_type","None","reg_parameter",1e-3)
-%
-% % ---- CSM family (linear_static): sLORETA / dSPM / sLORETA-3D / SBL ----
-% % "csm",         "csm",          struct("method_type","sLORETA","theta0",1e-3)
-% % "dspm",        "dspm",         struct("method_type","dSPM","theta0",1e-3)
-% % "sloreta3d",   "sloreta3d",    struct("method_type","sLORETA 3D","theta0",1e-3)
-% % "sbl",         "sbl",          struct("method_type","Sparse Bayesian learning","theta0",1e-3)
-%
-% % ---- MNE / wMNE (linear_static) ---------------------------------------
-% % "mne",         "mne",          struct("theta",[],"noise_cov",[],"initial_prior_steering_db",0)
-% % "wmne",        "wmne",         struct("theta",[],"noise_cov",[],"initial_prior_steering_db",0)
-%
-% % ---- eLORETA (linear_static, iterative precompute) --------------------
-% % "eloreta",     "eloreta",      struct("regularization_parameter",[],"noise_cov",[],"n_max_iterations",200,"convergence_tolerance",1e-6,"apply_average_reference",true)
-%
-% % ---- Beamformer (iterative_static) ------------------------------------
-% % "beamformer_lcmv", "beamformer", struct("method_type","Linearly constrained minimum variance (LCMV) beamformer","cov_reg_parameter",0.05,"leadfield_reg_parameter",1e-3,"leadfield_reg_type","Basic","leadfield_normalization","None","error_cov",[])
-% % "beamformer_ung",  "beamformer", struct("method_type","Unit noise gain (UNG) beamformer","cov_reg_parameter",0.05,"leadfield_reg_parameter",1e-3,"leadfield_reg_type","Basic","leadfield_normalization","None","error_cov",[])
-% % "beamformer_ugc",  "beamformer", struct("method_type","Unit-gain constrained beamformer","cov_reg_parameter",0.05,"leadfield_reg_parameter",1e-3,"leadfield_reg_type","Basic","leadfield_normalization","None","error_cov",[])
-%
-% % ---- IAS (iterative_static) -------------------------------------------
-% % "ias",         "ias",          struct("method_type","None","hyperprior","Inverse gamma","hyperprior_mode","Constant","n_map_iterations",25,"amplitude_db",20,"prior_over_measurement_db",20)
-%
-% % ---- RAMUS (iterative_static; multiresolution + IAS per frame) --------
-% % NOTE: zef_sensitivity_run auto-builds the multiresolution decomposition
-% % via the "ramus_decomposition" preflight hook if multiresolution_dec is
-% % empty. Outside the sensitivity pipeline call inverter.make_multires_dec()
-% % yourself before zef_inverse_run.
-% % "ramus",       "ramus",        struct("number_of_decompositions",20,"number_of_multiresolution_levels",3,"sparsity_factor",10,"n_map_iterations",10,"hyperprior","Inverse gamma","method_type","None")
-%
-% % ---- HALpR / SHALpR (iterative_static) --------------------------------
-% % NOTE: when use_multiresolution=true, zef_sensitivity_run auto-builds
-% % the decomposition via the "halpr_decomposition" preflight hook.
-% % "halpr",       "halpr",        struct("estimation_type","IAS","q",1,"beta",3,"theta0",1e-10,"hyperprior_mode","Sensitivity weighted","n_map_iterations",25,"n_L1_iterations",5,"use_multiresolution",false)
-% % "shalpr",      "halpr",        struct("estimation_type","Standardized","q",1,"beta",3,"theta0",1e-10,"hyperprior_mode","Sensitivity weighted","n_map_iterations",25,"n_L1_iterations",5,"use_multiresolution",false)
-%
-% % ---- Group Lasso (iterative_static) -----------------------------------
-% % NOTE: when use_multiresolution=true, zef_sensitivity_run auto-builds
-% % the decomposition via the "grouplasso_decomposition" preflight hook.
-% % "grouplasso",  "grouplasso",   struct("estimation_type","IAS","beta",3,"theta0",1e-10,"hyperprior_mode","Sensitivity weighted","n_map_iterations",25,"n_L1_iterations",5,"use_multiresolution",false)
-%
-% % ---- Kalman family (stateful_dynamic) ---------------------------------
-% % WARNING: Kalman is a time-series filter. The sensitivity stage runs
-% % each (source, direction) probe in isolation across IsolatedFramesPerProbe
-% % frames (default 4) with fresh noise per frame, then takes the final
-% % reconstruction. Set cfg.sensitivity.noise_level_db < 0 (default -30 is
-% % fine); a noise-free synthesis would leave the Kalman variance prior
-% % degenerate.
-% % "kalman_basic",     "kalman", struct("method_type","Basic Kalman filter","evolution_prior_model","Sensitivity scaling","evolution_prior_db",0,"initial_prior_steering_db",0,"number_of_noise_steps",2,"use_smoothing",false,"smoother_type","None")
-% % "kalman_standard",  "kalman", struct("method_type","Standardized Kalman filter","evolution_prior_model","Sensitivity scaling","evolution_prior_db",0,"initial_prior_steering_db",0,"number_of_noise_steps",2,"use_smoothing",false,"smoother_type","None")
-% % "kalman_approx",    "kalman", struct("method_type","Approximated Standardized Kalman filter","evolution_prior_model","Sensitivity scaling","evolution_prior_db",0,"initial_prior_steering_db",0,"number_of_noise_steps",2,"use_smoothing",false,"smoother_type","None")
-% % "kalman_ensembled", "kalman", struct("method_type","Ensembled Kalman filter","evolution_prior_model","Reworked original","number_of_ensembles",100,"evolution_prior_db",0,"initial_prior_steering_db",0,"number_of_noise_steps",2,"use_smoothing",false,"smoother_type","None")
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[zef, output]] = zef_inverse_pipeline_run(zef, cfg)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     zef (1,1) struct

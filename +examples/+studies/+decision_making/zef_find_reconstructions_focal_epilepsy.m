@@ -1,14 +1,38 @@
-% ZEF_FIND_RECONSTRUCTIONS_FOCAL_EPILEPSY - Run inverse methods and store in DataBank
+% --- Zeffiro documentation header ---
+% examples.studies.decision_making.examples.studies.decision_making — Example or study script demonstrating examples.studies.decision_making.
 %
-% Uses measurements from the DataBank (node_1_2, node_2_2, node_3_2) to run
-% 11 inverse methods per modality (EEG, MEG, MEEG) and stores reconstructions
-% in the corresponding DataBank nodes. Methods: MNE, sLORETA, MNE-RAMUS,
-% Dipole Scan, Beamformer, IAS (3 variants), dSPM, EXP-L1, EXP-L1-sLORETA.
+% Purpose:
+%   Example or study script demonstrating examples.studies.decision_making.
+%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
 %
-% Prerequisites: zef loaded with DataBank project containing measurements.
-% Run zef_parameters_focal_epilepsy first.
+% Zef fields (observed):
+%   zef.EXP (read)
+%   zef.L (read, write)
+%   zef.beamformer (read)
+%   zef.dataBank (read)
+%   zef.dipole_app (read)
+%   zef.h_ias_n_map_iterations (read)
+%   zef.h_ias_snr (read)
+%   zef.h_ias_start (read)
+%   zef.h_ias_type (read)
+%   zef.h_mne_prior (read)
+%   zef.h_mne_start (read)
+%   zef.h_mne_type (read)
+%   zef.h_ramus_hyperprior (read)
+%   zef.h_ramus_multires_n_decompositions (read)
+%   zef.h_ramus_snr (read)
+%   … (9 more)
 %
-% See also: zef_decision_script_focal_epilepsy, zef_create_training_data_focal_epilepsy
+% Calls (project):
+%   zef_exp_app_start
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 examples.studies.decision_making.zef_parameters_focal_epilepsy;
 

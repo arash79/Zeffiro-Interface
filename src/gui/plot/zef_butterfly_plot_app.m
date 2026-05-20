@@ -1,3 +1,39 @@
+% --- Zeffiro documentation header ---
+% h1 = figure(... — H1 = figure(.
+%
+% Purpose:
+%   H1 = figure(....
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.bf_data_segment (read, write)
+%   zef.bf_high_cut_frequency (read, write)
+%   zef.bf_low_cut_frequency (read, write)
+%   zef.bf_normalize_data (read, write)
+%   zef.bf_sampling_frequency (read, write)
+%   zef.bf_time_1 (read, write)
+%   zef.bf_time_2 (read, write)
+%   zef.h_bf_apply (read, write)
+%   zef.h_bf_cancel (read, write)
+%   zef.h_bf_data_segment (read, write)
+%   zef.h_bf_high_cut_frequency (read, write)
+%   zef.h_bf_low_cut_frequency (read, write)
+%   zef.h_bf_normalize_data (read, write)
+%   zef.h_bf_plot (read, write)
+%   zef.h_bf_sampling_frequency (read, write)
+%   … (3 more)
+%
+% Calls (project):
+%   zef_make_butterfly_plot
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `h1 = figure(...` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 h1 = figure(...
     'PaperUnits',get(0,'defaultfigurePaperUnits'),...

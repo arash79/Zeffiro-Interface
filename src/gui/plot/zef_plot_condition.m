@@ -1,4 +1,29 @@
+% --- Zeffiro documentation header ---
+% function zef_plot_condition — Function zef plot condition.
+%
+% Purpose:
+%   Function zef plot condition.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.h_axes1 (read)
+%   zef.nodes (read)
+%   zef.tetra (read)
+%
+% Calls (project):
+%   zef_condition_number
+%   zef_plot_condition
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function zef_plot_condition` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function zef_plot_condition
+
 
 axes(evalin('base','zef.h_axes1'));
 

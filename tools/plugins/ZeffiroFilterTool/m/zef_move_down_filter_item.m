@@ -1,5 +1,19 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% zef.filter_pipeline =  zef.filter_pipeline([setdiff([1:length(zef.filter_pipeline)],zef.filter_pipeline_selected) zef — Zef.filter pipeline =  zef.filter pipeline([setdiff([1:length(zef.filter pipeline)],zef.filter pipeline selected) zef.
+%
+% Purpose:
+%   Zef.filter pipeline =  zef.filter pipeline([setdiff([1:length(zef.filter pipeline)],zef.filter pipeline selected) zef.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.filter_pipeline =  zef.filter_pipeline([setdiff([1:length(zef.filter_pipeline)],zef.filter_pipeline_selected) zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 zef.filter_pipeline =  zef.filter_pipeline([setdiff([1:length(zef.filter_pipeline)],zef.filter_pipeline_selected) zef.filter_pipeline_selected]);
 

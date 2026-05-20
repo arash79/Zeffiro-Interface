@@ -1,6 +1,49 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_update_parcellation(zef)
+% --- Zeffiro documentation header ---
+% zef_update_parcellation — Syncs GUI control values into `zef` for parcellation.
+%
+% Purpose:
+%   Syncs GUI control values into `zef` for parcellation.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.h_import_parcellation_colortable (read)
+%   zef.h_parcellation_interpolation (read)
+%   zef.h_parcellation_list (read)
+%   zef.h_parcellation_merge (read)
+%   zef.h_parcellation_name (read)
+%   zef.h_parcellation_plot_type (read)
+%   zef.h_parcellation_roi_center (read)
+%   zef.h_parcellation_roi_color (read)
+%   zef.h_parcellation_roi_list (read)
+%   zef.h_parcellation_roi_name (read)
+%   zef.h_parcellation_roi_radius (read)
+%   zef.h_parcellation_segment (read)
+%   zef.h_parcellation_time_series_mode (read)
+%   zef.h_parcellation_tolerance (read)
+%   zef.h_use_parcellation (read)
+%   … (20 more)
+%
+% Calls (project):
+%   zef_update_parcellation
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_update_parcellation(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin==0
     zef = evalin('base','zef');

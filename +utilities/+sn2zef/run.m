@@ -1,4 +1,37 @@
 function run(zef, subject_id, outFolder, inflation_parameter, options) %#ok<INUSL>
+% --- Zeffiro documentation header ---
+% utilities.sn2zef.run — Run.
+%
+% Purpose:
+%   Run.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   zef
+%   subject_id
+%   outFolder
+%   inflation_parameter
+%   options
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Calls (project):
+%   utilities.simnibsToZef.main
+%   utilities.sn2zef.meshLoadGmsh4
+%   utilities.sn2zef.readSNLUT
+%   utilities.sn2zef.run
+%   utilities.sn2zef.save_atlas_points
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `utilities.sn2zef.run(zef, subject_id, outFolder, inflation_parameter, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %
 % run - Mesh-based SimNIBS-to-ZEF pipeline
 %

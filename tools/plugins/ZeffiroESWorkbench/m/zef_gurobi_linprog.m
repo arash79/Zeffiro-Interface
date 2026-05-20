@@ -1,4 +1,34 @@
 function [x,fval,exitflag] = zef_gurobi_linprog(f,A,b,Aeq,beq,lb,ub,options)
+% --- Zeffiro documentation header ---
+% zef_gurobi_linprog — Zef gurobi linprog.
+%
+% Purpose:
+%   Zef gurobi linprog.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   f
+%   A
+%   b
+%   Aeq
+%   beq
+%   lb
+%   ub
+%   options
+%
+% Outputs:
+%   x
+%   fval
+%   exitflag
+%
+% Calls (project):
+%   zef_gurobi_linprog
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[x, fval, exitflag]] = zef_gurobi_linprog(f, A, b, Aeq, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 4
     Aeq = [];

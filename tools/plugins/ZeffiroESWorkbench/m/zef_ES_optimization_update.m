@@ -1,3 +1,36 @@
+% --- Zeffiro documentation header ---
+% zef_ES_update_parameter_values; — Zef ES update parameter values;.
+%
+% Purpose:
+%   Zef ES update parameter values;.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.ES_HPO_search_method (read, write)
+%   zef.ES_fixed_active_electrodes (read, write)
+%   zef.ES_inv_colormap (read, write)
+%   zef.ES_obj_fun (read, write)
+%   zef.ES_obj_fun_2 (read, write)
+%   zef.ES_opt_algorithm (read, write)
+%   zef.ES_opt_algorithm_list (read)
+%   zef.ES_opt_method (read, write)
+%   zef.ES_opt_solver (read, write)
+%   zef.ES_plot_type (read, write)
+%   zef.ES_threshold_condition (read, write)
+%   zef.h_ES_HPO_search_method (read)
+%   zef.h_ES_fixed_active_electrodes (read)
+%   zef.h_ES_inv_colormap (read)
+%   zef.h_ES_obj_fun (read)
+%   … (6 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef_ES_update_parameter_values;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef_ES_update_parameter_values;
 
 zef.ES_opt_solver               = zef.h_ES_opt_solver.Value;

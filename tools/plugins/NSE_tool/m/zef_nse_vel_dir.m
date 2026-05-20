@@ -1,5 +1,35 @@
 function direction = zef_nse_vel_dir(zef,nse_field)
-% roi_ind = zef_nse_roi_ind(str2double(zef.nse_field.h_roi_x),str2double(zef.nse_field.h_roi_y),str2double(zef.nse_field.h_roi_z));
+% --- Zeffiro documentation header ---
+% zef_nse_vel_dir — Zef nse vel dir.
+%
+% Purpose:
+%   Zef nse vel dir.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%   nse_field
+%
+% Outputs:
+%   direction
+%
+% Zef fields (observed):
+%   zef.domain_labels (read)
+%   zef.nodes (read)
+%   zef.source_positions (read)
+%   zef.tetra (read)
+%
+% Calls (project):
+%   zef_get_submesh
+%   zef_nse_vel_dir
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[direction] = zef_nse_vel_dir(zef, nse_field)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 roi_ind = find(sqrt(sum((zef.source_positions - repmat([str2double(nse_field.h_roi_x.Value) str2double(nse_field.h_roi_y.Value) str2double(nse_field.h_roi_z.Value)],size(zef.source_positions,1),1)).^2,2))<= nse_field.roi_radius);
 towards = [nse_field.dir_v_x nse_field.dir_v_y nse_field.dir_v_z];

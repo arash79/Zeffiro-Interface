@@ -39,6 +39,27 @@
 %  - All geometry is extracted from mri_info output parsing
 
 function geom = zef_freesurfer_read_volume_geometry(input)
+% --- Zeffiro documentation header ---
+% zef_freesurfer_read_volume_geometry — Zef freesurfer read volume geometry.
+%
+% Purpose:
+%   Zef freesurfer read volume geometry.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   input
+%
+% Outputs:
+%   geom
+%
+% Calls (project):
+%   zef_freesurfer_read_volume_geometry
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[geom] = zef_freesurfer_read_volume_geometry(input)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 geom = struct('vox2ras', [], 'vox2ras_tkr', [], 'center_ras', [], ...
               'dimensions', [], 'voxel_sizes', [], 'source', '');

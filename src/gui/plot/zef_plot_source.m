@@ -1,6 +1,39 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function h_source = zef_plot_source(source_type)
+% --- Zeffiro documentation header ---
+% zef_plot_source — Renders or updates a plot_source figure from current `zef` state.
+%
+% Purpose:
+%   Renders or updates a plot_source figure from current `zef` state.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   source_type
+%
+% Outputs:
+%   h_source
+%
+% Zef fields (observed):
+%   zef.h_axes1 (read)
+%   zef.h_rec_source (read)
+%   zef.h_synth_source (read)
+%   zef.inv_rec_source (read)
+%   zef.inv_synth_source (read)
+%
+% Calls (project):
+%   zef_plot_source
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[h_source] = zef_plot_source(source_type)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if source_type == 1
     h_axes1 = evalin('base','zef.h_axes1');

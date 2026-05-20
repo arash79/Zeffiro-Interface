@@ -1,4 +1,42 @@
+% --- Zeffiro documentation header ---
+% function [z,Var_loc] = MUSIC_iteration — Function [z,Var loc] = MUSIC iteration.
+%
+% Purpose:
+%   Function [z,Var loc] = MUSIC iteration.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.L (read)
+%   zef.MUSIC_L_reg_type (read)
+%   zef.MUSIC_leadfield_lambda (read)
+%   zef.MUSIC_type (read)
+%   zef.c_color (read)
+%   zef.c_on (read)
+%   zef.c_priority (read)
+%   zef.c_sigma (read)
+%   zef.c_sources (read)
+%   zef.c_visible (read)
+%   zef.d10_color (read)
+%   zef.d10_on (read)
+%   zef.d10_priority (read)
+%   zef.d10_sigma (read)
+%   zef.d10_sources (read)
+%   … (167 more)
+%
+% Calls (project):
+%   zef_smooth_field
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [z,Var_loc] = MUSIC_iteration` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [z,Var_loc] = MUSIC_iteration
+
 
 h = zef_waitbar(0,1,['MUSIC.']);
 [s_ind_1] = unique(evalin('base','zef.source_interpolation_ind{1}'));

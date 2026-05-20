@@ -11,6 +11,49 @@
 %Critical for showing loaded data, applied status, etc.
 
 function zef = zef_dti_conductivity_update(zef)
+% --- Zeffiro documentation header ---
+% zef_dti_conductivity_update — Zef dti conductivity update.
+%
+% Purpose:
+%   Zef dti conductivity update.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.dti_anisotropy_threshold (read)
+%   zef.dti_applied (read)
+%   zef.dti_apply_to_compartments (read)
+%   zef.dti_conductivity_metadata (read)
+%   zef.dti_conductivity_model (read)
+%   zef.dti_conductivity_scale (read)
+%   zef.dti_extra_conductivity (read)
+%   zef.dti_fa_geometry (read)
+%   zef.dti_interpolation_mode (read)
+%   zef.dti_interpolation_radius (read)
+%   zef.dti_intra_conductivity (read)
+%   zef.dti_ref_geometry (read)
+%   zef.dti_ref_mri_file (read)
+%   zef.dti_volume_fraction (read)
+%   … (23 more)
+%
+% Calls (project):
+%   zef_dti_conductivity_update
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_dti_conductivity_update(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

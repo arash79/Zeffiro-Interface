@@ -1,4 +1,37 @@
 function zef_ES_plot_error_chart(varargin)
+% --- Zeffiro documentation header ---
+% zef_ES_plot_error_chart — Zef ES plot error chart.
+%
+% Purpose:
+%   Zef ES plot error chart.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.h_ES_error_chart (read, write)
+%   zef.use_display (read)
+%   zef.y_ES_interval (read)
+%
+% Calls (project):
+%   zef_ES_objective_function
+%   zef_ES_plot_error_chart
+%   zef_ES_table
+%
+% Side effects:
+%   - base/caller workspace
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_ES_plot_error_chart(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 switch nargin
     case {0, 1}
         if nargin == 0

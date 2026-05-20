@@ -1,4 +1,27 @@
 function affine_matrix = compute_simnibs_to_freesurfer_translation(simnibs_nii, freesurfer_mgz, options)
+% --- Zeffiro documentation header ---
+% utilities.sn2zef.transforms.compute_simnibs_to_freesurfer_translation — Compute simnibs to freesurfer translation.
+%
+% Purpose:
+%   Compute simnibs to freesurfer translation.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   simnibs_nii
+%   freesurfer_mgz
+%   options
+%
+% Outputs:
+%   affine_matrix
+%
+% Calls (project):
+%   utilities.sn2zef.transforms.compute_simnibs_to_freesurfer_translation
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[affine_matrix] = utilities.sn2zef.transforms.compute_simnibs_to_freesurfer_translation(simnibs_nii, freesurfer_mgz, options)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %
 % compute_simnibs_to_freesurfer_translation - Align SimNIBS RAS to FreeSurfer RAS
 %

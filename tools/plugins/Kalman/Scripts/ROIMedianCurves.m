@@ -1,3 +1,27 @@
+% --- Zeffiro documentation header ---
+% ROI_radius = 10;     %radius of the spherical region of interest, initial 2 cm diameter — ROI radius = 10;     %radius of the spherical region of interest, initial 2 cm diameter.
+%
+% Purpose:
+%   ROI radius = 10;     %radius of the spherical region of interest, initial 2 cm diameter.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.inv_time_1 (read)
+%   zef.inv_time_3 (read)
+%   zef.measurements (read, write)
+%   zef.number_of_frames (read)
+%   zef.reconstruction (read, write)
+%   zef.source_positions (read)
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `ROI_radius = 10;     %radius of the spherical region of interest, initial 2 cm diameter` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 ROI_radius = 10;     %radius of the spherical region of interest, initial 2 cm diameter
 load('AuditorySlowEP.mat')
 measurements = measurements(1:1);
@@ -83,6 +107,3 @@ xline(0.124, '-', '0.124 ms')
 xline(0.139, '-',  '0.139 ms')
 xline(0.159, '-', '0.159 ms')
 xline(0.184, '-', '0.184 ms')
-
-
-    

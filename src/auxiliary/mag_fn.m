@@ -1,19 +1,22 @@
 function mag = mag_fn(La, Lfem)
-
-% Documentation
+% --- Zeffiro documentation header ---
+% mag_fn — Mag fn.
 %
-% Calculates the MAG difference measure for a given analytical lead field
-% La and a numerically produced Lfem.
+% Purpose:
+%   Mag fn.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
 %
 % Inputs:
+%   La
+%   Lfem
 %
-% - La: the analytical lead field (or other matrix)
+% Outputs:
+%   mag
 %
-% - Lfem: the numerical matrix we are comparing to La.
-%
-% Output
-%
-% - rdm: the N × 1 MAG difference measure between the two matrices.
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[mag] = mag_fn(La, Lfem)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 mag = 1 - sqrt(sum(Lfem.^2))' ./ sqrt(sum(La.^2))';
 end

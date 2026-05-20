@@ -1,25 +1,34 @@
 function zef = import_electrodes_callback(zef)
-% import_electrodes_callback — Menu callback: Import electrodes from .dat or .csv.
+% --- Zeffiro documentation header ---
+% core.gui.menu_tool.import_electrodes_callback — GUI callback for import_electrodes actions.
 %
-% Invoked from Menu tool > Import > Import electrodes. Opens a file dialog
-% restricted to .dat and .csv files; reads electrode positions (and optional
-% labels and CEM data) and writes them into the central Zeffiro struct zef.
-% Overwrites existing sensor data if present. On read or validation errors,
-% shows an error dialog and returns without modifying zef.
+% Purpose:
+%   GUI callback for import_electrodes actions.
+%   Folder: Menu callbacks wired from `src/gui/tools/zef_menu_tool.m` into refactored package code.
 %
-% Input:
-%   zef (1,1) struct — Central Zeffiro application struct.
+% Inputs:
+%   zef
 %
-% Output:
-%   zef (1,1) struct — Same struct with sensor data updated:
-%       zef.sensors, zef.<prefix>_points, zef.<prefix>_name_list. Prefix
-%       comes from zef.current_sensors if set, otherwise "s" (e.g. s_points,
-%       s_name_list). If the file contained CEM data, _points includes
-%       columns 4–6 (inner_radius, outer_radius, impedance). zef_update is
-%       called before return.
+% Outputs:
+%   zef
 %
-% See also: core.import.electrodes_from_dat, core.import.electrodes_from_csv,
-%           uigetfile, zef_update.
+% Zef fields (observed):
+%   zef.current_sensors (read)
+%   zef.sensors (read, write)
+%
+% Calls (project):
+%   core.gui.menu_tool.import_electrodes_callback
+%   core.io.electrodes.from_csv
+%   core.io.electrodes.from_dat
+%   zef_update
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Edit → Import electrodes (wired in `zef_menu_tool.m`).
+%   Programmatic: `[zef] = core.gui.menu_tool.import_electrodes_callback(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
     arguments
         zef (1,1) struct
@@ -40,7 +49,7 @@ function zef = import_electrodes_callback(zef)
 
     if extension == ".dat"
         try
-            [ electrode_data, electrode_labels ] = core.import.electrodes_from_dat ( abspath ) ;
+            [ electrode_data, electrode_labels ] = core.io.electrodes.from_dat ( abspath ) ;
         catch err
             fig = errordlg ( err.message, "Could not read DAT file." ) ;
             uiwait ( fig ) ;
@@ -48,7 +57,7 @@ function zef = import_electrodes_callback(zef)
         end
     elseif extension == ".csv"
         try
-            [ electrode_data, electrode_labels ] = core.import.electrodes_from_csv ( abspath ) ;
+            [ electrode_data, electrode_labels ] = core.io.electrodes.from_csv ( abspath ) ;
         catch err
             fig = errordlg ( err.message, "Could not read CSV file." ) ;
             uiwait ( fig ) ;

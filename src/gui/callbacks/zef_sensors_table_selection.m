@@ -1,4 +1,43 @@
 function zef_sensors_table_selection(hObject,eventdata,handles)
+% --- Zeffiro documentation header ---
+% zef_sensors_table_selection — Zef sensors table selection.
+%
+% Purpose:
+%   Zef sensors table selection.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   hObject
+%   eventdata
+%   handles
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.current_sensors (read, write)
+%   zef.current_tag (read, write)
+%   zef.default_impedance_value (read)
+%   zef.h_parameters_table (read)
+%   zef.imaging_method (read, write)
+%   zef.imaging_method_cell (read)
+%   zef.sensor_sets_selected (read, write)
+%   zef.sensor_tags (read)
+%   zef.use_cem (read)
+%   zef.use_depth_electrodes (read)
+%
+% Calls (project):
+%   zef_sensors_table_selection
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `zef_sensors_table_selection(hObject, eventdata, handles)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 sensors_selected = eventdata.Indices(1);
 sensor_tags = evalin('base','zef.sensor_tags');

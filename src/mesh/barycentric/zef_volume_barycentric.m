@@ -1,37 +1,29 @@
 function [b_coord, det] = zef_volume_barycentric(nodes,tetra,p_ind,det)
+% --- Zeffiro documentation header ---
+% zef_volume_barycentric — Zef volume barycentric.
 %
-% zef_volume_barycentric
-%
-% TODO: Sampsa should document this.
+% Purpose:
+%   Zef volume barycentric.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
 %
 % Inputs:
-%
-% - nodes
-%
-%   TODO: explanation.
-%
-% - tetra
-%
-%   TODO: explanation.
-%
-% - p_ind
-%
-%   TODO: explanation.
-%
-% - det
-%
-%   TODO: explanation.
+%   nodes
+%   tetra
+%   p_ind
+%   det
 %
 % Outputs:
+%   b_coord
+%   det
 %
-% - b_coord
+% Calls (project):
+%   zef_3by3_solver
+%   zef_volume_barycentric
 %
-%   TODO: explanation.
-%
-% - det
-%
-%   TODO: explanation.
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[b_coord, det]] = zef_volume_barycentric(nodes, tetra, p_ind, det)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 b_coord = [];
 det_1 = [];
@@ -131,4 +123,3 @@ else
 
 end
 end
-

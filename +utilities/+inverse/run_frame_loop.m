@@ -1,3 +1,41 @@
+% --- Zeffiro documentation header ---
+% utilities.inverse.function [z_inverse, MethodClassObj] = run_frame_loop( ... — Function [z inverse, Method Class Obj] = run frame loop( .
+%
+% Purpose:
+%   Function [z inverse, Method Class Obj] = run frame loop( ....
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   zef
+%   MethodClassObj
+%   L
+%   procFile
+%   source_direction_mode
+%   source_positions
+%   waitbar_handle
+%   waitbar_title
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.inv_data_mode (read)
+%   zef.inverse_initialization_measurements (read)
+%   zef.normalize_data (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   utilities.inverse.run_frame_loop
+%   zef_getFilteredDataClassObj
+%   zef_getTimeStepClassObj
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `utilities.inverse.function [z_inverse, MethodClassObj] = run_frame_loop( ...(zef, MethodClassObj, L, procFile, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 function [z_inverse, MethodClassObj] = run_frame_loop( ...
     zef, ...
     MethodClassObj, ...
@@ -8,7 +46,6 @@ function [z_inverse, MethodClassObj] = run_frame_loop( ...
     waitbar_handle, ...
     waitbar_title ...
 )
-%RUN_FRAME_LOOP Compute inverse frames for a configured inverter.
 
 arguments
     zef (1,1) struct

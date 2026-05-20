@@ -1,5 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% zef.lf_item_selected = get(zef — Zef.lf item selected = get(zef.
+%
+% Purpose:
+%   Zef.lf item selected = get(zef.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.L (read, write)
+%   zef.L_aux (read)
+%   zef.aux_field (read, write)
+%   zef.h_mesh_tool (read)
+%   zef.imaging_method (read, write)
+%   zef.imaging_method_cell (read)
+%   zef.lf_bank_storage (read)
+%   zef.lf_item_selected (read)
+%   zef.lf_n_aux (read, write)
+%   zef.lf_normalization (read, write)
+%   zef.lf_normalization_functions_file_list (read)
+%   zef.lf_size_aux (read, write)
+%   zef.measurements (read, write)
+%   zef.measurements_aux (read)
+%   zef.parcellation_interp_ind (read, write)
+%   … (14 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.lf_item_selected = get(zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 zef.lf_item_selected = get(zef.h_lf_item_list,'value');
 zef.L = [];

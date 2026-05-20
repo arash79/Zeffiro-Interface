@@ -1,4 +1,35 @@
 function zef_closereq(tool_name)
+% --- Zeffiro documentation header ---
+% zef_closereq — Zef closereq.
+%
+% Purpose:
+%   Zef closereq.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   tool_name
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.matfile_object (read)
+%   zef.zeffiro_variable_data (read)
+%
+% Calls (project):
+%   zef_closereq
+%   zef_remove_object_handles
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_closereq(tool_name)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin==0
     tool_name ='';

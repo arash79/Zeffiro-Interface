@@ -1,3 +1,18 @@
+% --- Zeffiro documentation header ---
+% n_intervals = 5; — N intervals = 5;.
+%
+% Purpose:
+%   N intervals = 5;.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Side effects:
+%   - creates/updates figures
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `n_intervals = 5;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 n_intervals = 5;
 x_scale = 1.5;
 ecc_min = 0.95;

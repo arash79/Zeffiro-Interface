@@ -3,6 +3,29 @@
 
 
 function [mh_vec, d_mh_vec, d_2_mh_vec] = mh_window(t, T, carrier_cycles_per_pulse_cycle,carrier_mode)
+% --- Zeffiro documentation header ---
+% mh_window — Mh window.
+%
+% Purpose:
+%   Mh window.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   t
+%   T
+%   carrier_cycles_per_pulse_cycle
+%   carrier_mode
+%
+% Outputs:
+%   mh_vec
+%   d_mh_vec
+%   d_2_mh_vec
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[mh_vec, d_mh_vec, d_2_mh_vec]] = mh_window(t, T, carrier_cycles_per_pulse_cycle, carrier_mode)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 ones_vec = ones(size(t));
 T_ind = find(t>T);

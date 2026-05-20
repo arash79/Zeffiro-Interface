@@ -1,6 +1,58 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,reconstruction_information] = zef_sl1_iteration(zef)
+% --- Zeffiro documentation header ---
+% zef_sl1_iteration — Zef sl1 iteration.
+%
+% Purpose:
+%   Zef sl1 iteration.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   z
+%   reconstruction_information
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.inv_amplitude_db (read)
+%   zef.inv_hyperprior_tail_length_db (read)
+%   zef.inv_hyperprior_weight (read)
+%   zef.inv_prior_over_measurement_db (read)
+%   zef.sl1_high_cut_frequency (read)
+%   zef.sl1_hyperprior (read)
+%   zef.sl1_low_cut_frequency (read)
+%   zef.sl1_n_map_iterations (read)
+%   zef.sl1_normalize_data (read)
+%   zef.sl1_number_of_frames (read)
+%   zef.sl1_sampling_frequency (read)
+%   zef.sl1_snr (read)
+%   zef.sl1_time_1 (read)
+%   zef.sl1_time_2 (read)
+%   … (6 more)
+%
+% Calls (project):
+%   zef_find_ig_hyperprior
+%   zef_getFilteredData
+%   zef_getTimeStep
+%   zef_l2_l1_optimizer
+%   zef_normalizeInverseReconstruction
+%   zef_postProcessInverse
+%   zef_processLeadfields
+%   zef_sl1_iteration
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[z, reconstruction_information]] = zef_sl1_iteration(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 inverse_gamma_ind = [1:4];
 gamma_ind = [5:10];
@@ -131,5 +183,3 @@ end
 [z] = zef_normalizeInverseReconstruction(z);
 
 close(h);
-
-

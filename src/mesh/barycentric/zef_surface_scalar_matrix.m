@@ -1,33 +1,29 @@
 function M = zef_surface_scalar_matrix(nodes, tetra, scalar_field, weighting)
+% --- Zeffiro documentation header ---
+% zef_surface_scalar_matrix — Zef surface scalar matrix.
 %
-% zef_surface_scalar_matrix
-%
-% TODO: Sampsa should document this.
+% Purpose:
+%   Zef surface scalar matrix.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
 %
 % Inputs:
-%
-% - nodes
-%
-%   TODO: explanation.
-%
-% - tetra
-%
-%   TODO: explanation.
-%
-% - scalar_field
-%
-%   TODO: explanation.
-%
-% - weighting
-%
-%   TODO: explanation.
+%   nodes
+%   tetra
+%   scalar_field
+%   weighting
 %
 % Outputs:
+%   M
 %
-% - M
+% Calls (project):
+%   zef_surface_mesh
+%   zef_surface_scalar_matrix
+%   zef_volume_barycentric
 %
-%   TODO: explanation.
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[M] = zef_surface_scalar_matrix(nodes, tetra, scalar_field, weighting)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 ind_m = [ 2 4 3 ;
     1 3 4 ;

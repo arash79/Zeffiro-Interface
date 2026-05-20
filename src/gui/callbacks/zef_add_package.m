@@ -1,4 +1,32 @@
 function zef_add_package(package_path, package_folder, file_folder, file_folder_dir)
+% --- Zeffiro documentation header ---
+% zef_add_package — Zef add package.
+%
+% Purpose:
+%   Zef add package.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   package_path
+%   package_folder
+%   file_folder
+%   file_folder_dir
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Calls (project):
+%   zef_add_package
+%   zef_read_function_call
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_add_package(package_path, package_folder, file_folder, file_folder_dir)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if not(isempty(package_folder))
     mkdir([package_path filesep '+' package_folder]);

@@ -1,6 +1,53 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [time_series] = zef_parcellation_time_series(zef)
+% --- Zeffiro documentation header ---
+% zef_parcellation_time_series — Zef parcellation time series.
+%
+% Purpose:
+%   Zef parcellation time series.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   time_series
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.frame_start (read)
+%   zef.frame_step (read)
+%   zef.frame_stop (read)
+%   zef.nodes (read)
+%   zef.number_of_frames (read)
+%   zef.parcellation_interp_ind (read)
+%   zef.parcellation_quantile (read)
+%   zef.parcellation_selected (read)
+%   zef.parcellation_time_series_mode (read, write)
+%   zef.parcellation_type (read)
+%   zef.reconstruction (read)
+%   zef.reconstruction_type (read)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   … (3 more)
+%
+% Calls (project):
+%   zef_parcellation_time_series
+%   zef_smooth_field
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[time_series] = zef_parcellation_time_series(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

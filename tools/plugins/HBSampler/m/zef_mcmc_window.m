@@ -1,4 +1,48 @@
 function zef = zef_mcmc_window(zef)
+% --- Zeffiro documentation header ---
+% zef_mcmc_window — Zef mcmc window.
+%
+% Purpose:
+%   Zef mcmc window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.h_mcmc_apply (read, write)
+%   zef.h_mcmc_cancel (read, write)
+%   zef.h_mcmc_cm_estimation (read, write)
+%   zef.h_mcmc_high_cut_frequency (read, write)
+%   zef.h_mcmc_hyperprior (read, write)
+%   zef.h_mcmc_low_cut_frequency (read, write)
+%   zef.h_mcmc_n_burn_in (read, write)
+%   zef.h_mcmc_normalize_data (read, write)
+%   zef.h_mcmc_number_of_frames (read, write)
+%   zef.h_mcmc_sample_size (read, write)
+%   zef.h_mcmc_sampling_frequency (read, write)
+%   zef.h_mcmc_snr (read, write)
+%   zef.h_mcmc_start (read, write)
+%   zef.h_mcmc_time_1 (read, write)
+%   zef.h_mcmc_time_2 (read, write)
+%   … (14 more)
+%
+% Calls (project):
+%   zef_mcmc
+%   zef_mcmc_window
+%
+% Side effects:
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_mcmc_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h1 = figure(...
     'PaperUnits',get(0,'defaultfigurePaperUnits'),...

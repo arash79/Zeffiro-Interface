@@ -1,4 +1,29 @@
 function [sigma, phi, B, C, D] = Q_quantities(P, m, G, y)
+% --- Zeffiro documentation header ---
+% Q_quantities — Q quantities.
+%
+% Purpose:
+%   Q quantities.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   P
+%   m
+%   G
+%   y
+%
+% Outputs:
+%   sigma
+%   phi
+%   B
+%   C
+%   D
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[sigma, phi, B]] = Q_quantities(P, m, G, y)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
     T = size(m,2) - 1;
 

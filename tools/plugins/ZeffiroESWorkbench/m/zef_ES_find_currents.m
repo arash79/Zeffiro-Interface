@@ -1,5 +1,54 @@
 function zef = zef_ES_find_currents(varargin)
-%% Loading data
+% --- Zeffiro documentation header ---
+% zef_ES_find_currents — Zef ES find currents.
+%
+% Purpose:
+%   Zef ES find currents.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.ES_absolute_tolerance (read)
+%   zef.ES_active_electrodes (read)
+%   zef.ES_constraint_tolerance (read)
+%   zef.ES_display (read)
+%   zef.ES_max_current_channel (read)
+%   zef.ES_max_n_iterations (read)
+%   zef.ES_max_time (read)
+%   zef.ES_opt_algorithm (read)
+%   zef.ES_opt_method (read)
+%   zef.ES_opt_solver (read, write)
+%   zef.ES_opt_solver_list (read)
+%   zef.ES_relative_tolerance (read)
+%   zef.ES_relative_weight_nnz (read)
+%   zef.ES_roi_range (read)
+%   zef.ES_score_dose (read)
+%   … (11 more)
+%
+% Calls (project):
+%   zef_ES_find_currents
+%   zef_ES_find_parameters
+%   zef_ES_optimize_current
+%   zef_ES_rwnnz
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - parallel/cluster
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_ES_find_currents(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 switch nargin
     case {0,1}
         if nargin == 0

@@ -1,30 +1,43 @@
 function out_cell = zef_bst_default_fem_mesh_create(run_type, input_mode, settings_file_name, project_file_name, zef_bst)
-%ZEF_BST_DEFAULT_FEM_MESH_CREATE Default run script for creating FEM mesh from Brainstorm data.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst_default_fem_mesh_create — Zef bst default fem mesh create.
 %
-% This is the default run script that creates a finite element mesh from
-% Brainstorm surface meshes. It handles project creation, mesh generation,
-% and optionally saves the project file.
+% Purpose:
+%   Zef bst default fem mesh create.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   run_type          - Execution mode:
-%                       1 = Fresh start (load compartments from Brainstorm)
-%                       2 = Import compartments (use existing compartment data)
-%                       3 = Use existing project
-%                       0 = Return empty outputs (cancelled)
-%   input_mode        - Input handling mode:
-%                       1 = Use input files
-%                       2 = Ignore input files
-%   settings_file_name - Path to settings file
-%   project_file_name  - Path where project should be saved
-%   zef_bst           - Structure containing Brainstorm-to-Zeffiro configuration
+%   run_type
+%   input_mode
+%   settings_file_name
+%   project_file_name
+%   zef_bst
 %
 % Outputs:
-%   out_cell - Cell array containing:
-%             {1} - Node coordinates (converted back to meters)
-%             {2} - Tetrahedra with domain labels [tetra domain_labels]
-%             {3} - Compartment name tags
+%   out_cell
 %
-% See also: ZEF_BST_CREATE_PROJECT, ZEF_CREATE_FINITE_ELEMENT_MESH
+% Zef fields (observed):
+%   zef.domain_labels (read)
+%   zef.name_tags (read)
+%   zef.nodes (read)
+%   zef.tetra (read)
+%
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_create_project
+%   utilities.brainstorm2zef.zef_bst_default_fem_mesh_create
+%   utilities.brainstorm2zef.zef_bst_get_settings
+%   zef_bst_edit_project
+%   zef_close_all
+%   zef_create_finite_element_mesh
+%   zef_save
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[out_cell] = utilities.brainstorm2zef.zef_bst_default_fem_mesh_create(run_type, input_mode, settings_file_name, project_file_name, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if nargin < 4
     zef_bst = struct;

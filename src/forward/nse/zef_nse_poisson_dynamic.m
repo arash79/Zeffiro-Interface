@@ -1,4 +1,46 @@
 function nse_field = zef_nse_poisson_dynamic(nse_field,nodes,tetra,domain_labels,mvd_length)
+% --- Zeffiro documentation header ---
+% zef_nse_poisson_dynamic — Zef nse poisson dynamic.
+%
+% Purpose:
+%   Zef nse poisson dynamic.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   nse_field
+%   nodes
+%   tetra
+%   domain_labels
+%   mvd_length
+%
+% Outputs:
+%   nse_field
+%
+% Calls (project):
+%   zef_KDMD
+%   zef_find_adjacent_tetra
+%   zef_get_submesh
+%   zef_nse_poisson_dynamic
+%   zef_nse_signal_pulse
+%   zef_surface_mesh
+%   zef_surface_scalar_matrix_FF
+%   zef_surface_scalar_matrix_FGn
+%   zef_surface_scalar_vector_F
+%   zef_volume_barycentric
+%   zef_volume_scalar_matrix_FF
+%   zef_volume_scalar_matrix_FG
+%   … (3 more)
+%
+% Side effects:
+%   - GPU
+%   - filesystem I/O
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[nse_field] = zef_nse_poisson_dynamic(nse_field, nodes, tetra, domain_labels, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h_waitbar = zef_waitbar(0,1,'NSE solver: pressure');
 

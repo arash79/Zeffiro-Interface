@@ -1,5 +1,39 @@
 function zef = createSyntheticInverseZef()
-%CREATESYNTHETICINVERSEZEF Build a minimal zef struct for inverse tests.
+% --- Zeffiro documentation header ---
+% tests.createSyntheticInverseZef — Automated test: createSyntheticInverseZef.
+%
+% Purpose:
+%   Automated test: createSyntheticInverseZef.
+%   Folder: MATLAB unit and integration tests for refactored inverse dispatch, lead fields, cluster jobs, and legacy/class parity.
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.L (read, write)
+%   zef.csm_type (read, write)
+%   zef.filter_type (read, write)
+%   zef.gpu_count (read, write)
+%   zef.inv_amplitude_db (read, write)
+%   zef.inv_data_mode (read, write)
+%   zef.inv_evolution_prior (read, write)
+%   zef.inv_high_cut_frequency (read, write)
+%   zef.inv_low_cut_frequency (read, write)
+%   zef.inv_prior_over_measurement_db (read, write)
+%   zef.inv_sampling_frequency (read, write)
+%   zef.inv_snr (read, write)
+%   zef.inv_time_1 (read, write)
+%   zef.inv_time_2 (read, write)
+%   zef.inv_time_3 (read, write)
+%   … (23 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `tests.createSyntheticInverseZef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 n_sensors = 4;
 n_interp = 2;

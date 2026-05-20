@@ -1,25 +1,32 @@
 function [m, P, K, D] = kf_sL_update_approx(m, P, y, H, R)
-%KF_SL_UPDATE_APPROX Kalman update with approximated sLORETA resolution matrix.
+% --- Zeffiro documentation header ---
+% plugins.ClassKF.kf_sL_update_approx — Kf s L update approx.
 %
-%   [M, P, K, D] = KF_SL_UPDATE_APPROX(M, P, Y, H, R) performs the Kalman
-%   update step and computes an approximate resolution matrix D using
-%   Newton-Schulz iterations for matrix square root/inverse. Use when sqrtm(P)
-%   is too expensive; trade-off is approximation accuracy.
+% Purpose:
+%   Kf s L update approx.
+%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
 %
-%   Inputs:
-%     M - Predicted state mean
-%     P - Predicted state covariance
-%     Y - Measurement vector
-%     H - Observation matrix (lead field)
-%     R - Measurement noise covariance
+% Inputs:
+%   m
+%   P
+%   y
+%   H
+%   R
 %
-%   Outputs:
-%     M - Updated state mean
-%     P - Updated state covariance
-%     K - Kalman gain
-%     D - Approximate sLORETA resolution matrix
+% Outputs:
+%   m
+%   P
+%   K
+%   D
+%
+% Calls (project):
+%   plugins.ClassKF.kf_sL_update_approx
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[m, P, K]] = plugins.ClassKF.kf_sL_update_approx(m, P, y, H, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-% Newton-Schulz iterations to approximate P^(-1/2) and P^(1/2)
 N = 5; M_iter = 1;
     Z = eye(length(m));
     Y_mat = P;
@@ -53,4 +60,3 @@ N = 5; M_iter = 1;
 
 
 end
-

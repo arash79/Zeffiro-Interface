@@ -1,32 +1,31 @@
 %% Copyright © 2025- Joonas Lahtinen and Alexandra Koulouri 
 function self = initialize(self,L,f_data)
-        %
-        % initialization function
-        %
-        % Initialize recursively updated variables before the computation of
-        % the first time step.
-        %
-        % Inputs:
-        %
-        % - self
-        %
-        %   An instance of GroupLassoInverter with the method-specific parameters.
-        %
-        % - L
-        % The lead field matrix
-        %
-        % - f_data 
-        % The measurement vector that is in the matrix format 
-        % <# of challels> x <# of time steps>
-        % 
-        %
-        % Outputs:
-        %
-        % - self
-        %
-        %   Recursive variables initialized
-        %
-    
+% --- Zeffiro documentation header ---
+% inverse.GroupLassoInverter.initialize — Estimates priors, noise covariance, or regularization from multi-frame data.
+%
+% Purpose:
+%   Estimates priors, noise covariance, or regularization from multi-frame data.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   self
+%   L
+%   f_data
+%
+% Outputs:
+%   self
+%
+% Calls (project):
+%   inverse.initialize
+%
+% Side effects:
+%   - GPU
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[self] = inverse.GroupLassoInverter.initialize(self, L, f_data)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
         arguments
     
             self (1,1) inverse.GroupLassoInverter

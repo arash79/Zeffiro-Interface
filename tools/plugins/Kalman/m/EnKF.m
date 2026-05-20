@@ -1,10 +1,33 @@
 function [z_inverse] = EnKF(m, A, P, Q, L, R, timeSteps, number_of_frames, n_ensembles)
-%ENKF Ensemble Kalman Filter for EEG/MEG source localization.
-%  Supports both diagonal and structural (DTI-informed) covariance matrices.
-%  When Q or P is sparse (e.g., from zef_dti_structural_Q), it is converted
-%  to full for mvnrnd compatibility.
+% --- Zeffiro documentation header ---
+% EnKF — En KF.
+%
+% Purpose:
+%   En KF.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   m
+%   A
+%   P
+%   Q
+%   L
+%   R
+%   timeSteps
+%   number_of_frames
+%   n_ensembles
+%
+% Outputs:
+%   z_inverse
+%
+% Calls (project):
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[z_inverse] = EnKF(m, A, P, Q, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-% Convert sparse covariance matrices to full for mvnrnd
 P_full = P;
 Q_full = Q;
 if issparse(P), P_full = full(P); end

@@ -1,4 +1,46 @@
 function [I,dist_vec] = zef_point_in_compartment(zef,reuna_p,reuna_t,nodes,varargin)
+% --- Zeffiro documentation header ---
+% zef_point_in_compartment — Zef point in compartment.
+%
+% Purpose:
+%   Zef point in compartment.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   zef
+%   reuna_p
+%   reuna_t
+%   nodes
+%   varargin
+%
+% Outputs:
+%   I
+%   dist_vec
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.gpu_num (read)
+%   zef.meshing_accuracy (read)
+%   zef.meshing_threshold (read)
+%   zef.parallel_processes (read)
+%   zef.parallel_vectors (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   zef_point_in_compartment
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - parallel/cluster
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[I, dist_vec]] = zef_point_in_compartment(zef, reuna_p, reuna_t, nodes, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isempty(zef)
     zef = evalin('base','zef');

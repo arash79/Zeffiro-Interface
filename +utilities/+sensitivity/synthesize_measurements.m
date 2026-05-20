@@ -1,51 +1,35 @@
 function F = synthesize_measurements(L, source_indices, amp, noise_db, opts)
-%SYNTHESIZE_MEASUREMENTS Build sensitivity-study synthetic measurements.
+% --- Zeffiro documentation header ---
+% utilities.sensitivity.synthesize_measurements — Synthesize measurements.
 %
-%   F = synthesize_measurements(L, source_indices, amp, noise_db)
-%   F = synthesize_measurements(L, source_indices, amp, noise_db, ...
-%                               "SourceDirectionMode", mode, ...
-%                               "SourceDirections",    Q)
-%
-% Replacement for the per-position / per-direction loop in
-% +examples/+studies/+santtus_peeling_article/zef_rec_diff.m, which calls
-% zef_find_source_legacy(zef) once per (source, direction) pair. With a
-% unit Cartesian direction the per-call work collapses to scaling a single
-% column of the lead field by 1e-3 * amp, so the entire stage becomes a
-% single column-indexing expression for modes 1 and 2 and a single
-% direction-weighted sum of three columns per source for mode 3.
-%
-% Input L is always the raw zef.L: an n_ch x (3 * n_sources_total) matrix
-% laid out as (x_1, y_1, z_1, x_2, y_2, z_2, ...). The inverter receives a
-% downstream copy that may be reordered or collapsed to one column per
-% source for mode 3; this function reproduces that collapse internally so
-% the synthetic source matches what the inverter expects to recover.
+% Purpose:
+%   Synthesize measurements.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   L                Lead field. n_ch x (3 * n_sources_total).
-%   source_indices   Optional column vector of 1-based source indices.
-%                    Defaults to every source in L.
-%   amp              Source amplitude (matches zef.inv_synth_source(7);
-%                    zef_rec_diff hard-codes 10).
-%   noise_db         Additive Gaussian noise level (dB, <= 0). When 0 the
-%                    output is noise-free.
-%   opts.SourceDirectionMode  1 | 2 | 3 (default 1).
-%   opts.SourceDirections     Required when SourceDirectionMode == 3:
-%                             n_sources_total x 3 matrix giving the unit
-%                             direction of every source. Each output column
-%                             collapses the 3 lead-field columns of one
-%                             source via this direction so probes match
-%                             what the mode-3 inverter operates on.
+%   L
+%   source_indices
+%   amp
+%   noise_db
+%   opts
 %
-% Output:
-%   F                Measurement matrix.
-%                    - modes 1 and 2: n_ch x (3 * numel(source_indices));
-%                      column 3*(k-1)+j (j = 1..3) holds the EEG of a unit
-%                      Cartesian dipole along axis j placed at
-%                      source_indices(k).
-%                    - mode 3:        n_ch x numel(source_indices);
-%                      column k holds the EEG of a unit dipole along the
-%                      intrinsic direction of source_indices(k).
-%                    Compute_metrics adapts to either layout.
+% Outputs:
+%   F
+%
+% Zef fields (observed):
+%   zef.L (read)
+%
+% Calls (project):
+%   utilities.sensitivity.synthesize_measurements
+%
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[F] = utilities.sensitivity.synthesize_measurements(L, source_indices, amp, noise_db, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     L (:,:) {mustBeA(L, ["double", "gpuArray"])}

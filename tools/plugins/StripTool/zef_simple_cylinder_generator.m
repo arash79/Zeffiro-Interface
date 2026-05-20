@@ -1,4 +1,28 @@
 function [T, P] = zef_simple_cylinder_generator(R,N,L)
+% --- Zeffiro documentation header ---
+% zef_simple_cylinder_generator — Zef simple cylinder generator.
+%
+% Purpose:
+%   Zef simple cylinder generator.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   R
+%   N
+%   L
+%
+% Outputs:
+%   T
+%   P
+%
+% Calls (project):
+%   zef_simple_cylinder_generator
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[T, P]] = zef_simple_cylinder_generator(R, N, L)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 d_r = 2*pi*R/N;
 M = ceil(R/d_r);

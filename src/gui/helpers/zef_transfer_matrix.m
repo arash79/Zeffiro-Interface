@@ -1,3 +1,31 @@
+% --- Zeffiro documentation header ---
+% function [T, Schur_complement, A] = zef_transfer_matrix(zef, ... — Function [T, Schur complement, A] = zef transfer matrix(zef, .
+%
+% Purpose:
+%   Function [T, Schur complement, A] = zef transfer matrix(zef, ....
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.parallel_processes (read)
+%   zef.processes_per_core (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   zef_transfer_matrix
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - filesystem I/O
+%   - parallel/cluster
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [T, Schur_complement, A] = zef_transfer_matrix(zef, ...` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [T, Schur_complement, A] = zef_transfer_matrix(zef, ...
     A                                                    ...
     ,                                                        ...
@@ -25,94 +53,6 @@ function [T, Schur_complement, A] = zef_transfer_matrix(zef, ...
     ,                                                        ...
     schur_expression                                     ...
     )
-
-% Documentation
-%
-% Builds a transfer matrix T and an auxiliary matrix Schur_complement from
-% a given stiffness matrix A, matrices B and C, sizes n_of_fem_nodes and
-% n_of_electrodes, a permutation matrix and a precoditioner, through
-% preconditioned conjugate gradient (PCG) iteration.
-%
-% Input:
-%
-% - A
-%
-%   A stiffness matrix related to the FE system under observation.
-%
-% - B
-%
-%   A matrix whose columns are used in determining the direction vector at
-%   each optimization iteration. In the case of EEG, this is the electrode
-%   matrix B produced by zef_build_electrodes.
-%
-% - C
-%
-%   A matrix used in the construction of the Schur complement of T. In the
-%   case of EEG, this is the electrode matrix C produced by
-%   zef_build_electrodes.
-%
-% - n_of_fem_nodes
-%
-%   As the name implies, this is the number of FEM nodes in the system
-%   under observation.
-%
-% - n_of_electrodes
-%
-%   The number of sensors used to measure potentials, gradients or
-%   whatever.
-%
-% - electrode_model
-%
-%   The electode model (either 'PEM' or 'CEM') used in the modelling of
-%   the system under observation.
-%
-% - permutation
-%
-%   A permutation type used by the preconditioner of the PCG solver. In
-%   {symamd, symmd, symrcm}.
-%
-% - preconditioner
-%
-%   A type of preconditioner. Either 'ssor' or another arbitrary value, i
-%   which case a different default preconditioner will be used.
-%
-% - impedance_vec
-%
-%   A vector of impedances at the sensors used to measure potentials or
-%   magnetic fields.
-%
-% - impedance_inf
-%
-%   A boolean which tells whether the impedances used are infinite. mainly
-%   relevant in the PEM case (but still needed in any case).
-%
-% - tol val
-%
-%   A heuristic tolerance value for the PCG solver.
-%
-% - m_max
-%
-%   A heuristic number of iterations that the PCG solver performs at each
-%   step.
-%
-% - schur_expression
-%
-%   A 2-place function handle that specifies how the columns at index ind
-%   of the Schur complement of T should be calculated with B and C. For
-%   example. In the case of EEG and non-infinite impedance we would have
-%
-%       schur_expression = @(Tcol, ind) C(:,ind) - B'* Tcol;
-%
-%   where B and C were captured from the environment where the function
-%   handle was created (the call site of zef_transfer_matrix).
-%
-% Output:
-%
-% - T: a transfer matrix of the FE system under observation.
-%
-% - Schur_complement: the Schur complement of T.
-%
-% - A: a modified stiffness matrix A.
 
 if isequal(permutation,'symamd')
     perm_vec = symamd(A)';

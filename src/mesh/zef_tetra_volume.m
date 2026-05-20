@@ -1,6 +1,26 @@
 function V = zef_tetra_volume(nodes, tetrahedra, take_absolute_value)
-% VOLUME - Calculates a volume V from a given set of finite element nodes, the
-% corresponding tetrahedra and suitable index matrix.
+% --- Zeffiro documentation header ---
+% zef_tetra_volume — Zef tetra volume.
+%
+% Purpose:
+%   Zef tetra volume.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   nodes
+%   tetrahedra
+%   take_absolute_value
+%
+% Outputs:
+%   V
+%
+% Calls (project):
+%   zef_tetra_volume
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[V] = zef_tetra_volume(nodes, tetrahedra, take_absolute_value)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     nodes (:,3) double {mustBeNonNan}

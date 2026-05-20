@@ -1,11 +1,21 @@
 classdef BeamformerInverter < inverse.CommonInverseParameters & handle
-
-    %
-    % BeamformerInverter
-    %
-    % A class which defines the properties needed for different types of
-    % beamforming, and the method itself.
-    %
+% --- Zeffiro documentation header ---
+% inverse.BeamformerInverter.BeamformerInverter — Inverse solver class implementing Beamformer reconstruction.
+%
+% Purpose:
+%   Inverse solver class implementing Beamformer reconstruction.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   args
+%
+% Calls (project):
+%   inverse.CommonInverseParameters
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `inverse.BeamformerInverter.BeamformerInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
+% --- End Zeffiro documentation header
 
     properties
 

@@ -1,22 +1,30 @@
 function [vertices, faces, surface_data, surface] = zef_bst_2_zef_surface(varargin)
-%ZEF_BST_2_ZEF_SURFACE Legacy function for loading Brainstorm surface meshes.
+% --- Zeffiro documentation header ---
+% zef_bst_2_zef_surface — Zef bst 2 zef surface.
 %
-% This is a legacy import function for Brainstorm surfaces. For new projects,
-% consider using the orchestrated pipeline in +utilities/+brainstorm2zef/run()
-% which provides better error handling, validation, and flexibility.
+% Purpose:
+%   Zef bst 2 zef surface.
+%   Folder: Project load/save, segmentation import, figure import, FEM export.
 %
 % Inputs:
-%   varargin{1} - Subject index (optional, empty = use current)
-%   varargin{2} - Surface index (optional, empty = return all surfaces)
-%   varargin{3} - Surface properties to load (optional, cell array or string)
+%   varargin
 %
 % Outputs:
-%   vertices      - Surface vertices (in millimeters, scaled from meters)
-%   faces         - Surface faces (triangle indices)
-%   surface_data  - Loaded surface data structure
-%   surface       - Brainstorm surface structure
+%   vertices
+%   faces
+%   surface_data
+%   surface
 %
-% See also: utilities.brainstorm2zef.run, utilities.brainstorm2zef.zef_bst_create_compartment_data
+% Calls (project):
+%   zef_bst_2_zef_surface
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[vertices, faces, surface_data]] = zef_bst_2_zef_surface(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 surface_data = struct;
 surface_ind_aux = [];

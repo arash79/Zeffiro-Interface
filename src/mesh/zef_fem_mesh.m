@@ -1,6 +1,46 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [nodes, nodes_b, tetra, johtavuus_ind, surface_triangles,name_tags] = zef_fem_mesh(void)
+% --- Zeffiro documentation header ---
+% zef_fem_mesh — Zef fem mesh.
+%
+% Purpose:
+%   Zef fem mesh.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   void
+%
+% Outputs:
+%   nodes
+%   nodes_b
+%   tetra
+%   johtavuus_ind
+%   surface_triangles
+%   name_tags
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.mesh_labeling_approach (read)
+%   zef.mesh_resolution (read)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   zef.sensors (read)
+%
+% Calls (project):
+%   zef_fem_mesh
+%   zef_tetra_in_compartment
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[nodes, nodes_b, tetra]] = zef_fem_mesh(void)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 void = [];
 

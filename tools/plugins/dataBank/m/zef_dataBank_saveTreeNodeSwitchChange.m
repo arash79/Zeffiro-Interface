@@ -1,4 +1,35 @@
 function zef = zef_dataBank_saveTreeNodeSwitchChange(zef)
+% --- Zeffiro documentation header ---
+% zef_dataBank_saveTreeNodeSwitchChange — Zef data Bank save Tree Node Switch Change.
+%
+% Purpose:
+%   Zef data Bank save Tree Node Switch Change.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.dataBank (read)
+%
+% Calls (project):
+%   zef_dataBank_loadTreeNodes
+%   zef_dataBank_saveTreeNodeSwitchChange
+%   zef_dataBank_saveTreeNodes
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_dataBank_saveTreeNodeSwitchChange(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef')

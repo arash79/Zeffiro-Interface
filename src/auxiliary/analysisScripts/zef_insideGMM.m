@@ -1,10 +1,26 @@
 function [list] = zef_insideGMM(GMM, points, numberOfModels)
-%evaluates whether the points (p*3) are inside the elipsoid(s) of the GMM. If
-%there are N elipsoids, numberOfModels (1-N) decides how many of those are
-%evaluated. The Evaluation will be sorted according to the maximum power
-%inside?
-%the return value is a list of the size points*numberOfModels with
-%(x,n)=1 if point x in inside ellipsoid n and 0 if it is outside
+% --- Zeffiro documentation header ---
+% zef_insideGMM — Zef inside GMM.
+%
+% Purpose:
+%   Zef inside GMM.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   GMM
+%   points
+%   numberOfModels
+%
+% Outputs:
+%   list
+%
+% Calls (project):
+%   zef_insideGMM
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[list] = zef_insideGMM(GMM, points, numberOfModels)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if nargin==2
     numberOfModels=1;

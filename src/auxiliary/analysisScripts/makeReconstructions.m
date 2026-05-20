@@ -1,11 +1,27 @@
-%% make all reconstructions
+% --- Zeffiro documentation header ---
+% [zef.reconstruction, zef — [zef.reconstruction, zef.
+%
+% Purpose:
+%   [zef.reconstruction, zef.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Zef fields (observed):
+%   zef.beamformer (read)
+%   zef.bf_var_loc (read)
+%   zef.reconstruction (read)
+%   zef.reconstruction_information (read)
+%
+% Calls (project):
+%   zef_ramus_iteration
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `[zef.reconstruction, zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
-%set all parameters!
-% beamformer app needs to be open and set to 'Locations'
-%choose node to add to
-%enjoy!
-
-%mne
 [zef.reconstruction, zef.reconstruction_information]=zef_find_mne_reconstruction;
 zef_dataBank_addButtonPress;
 

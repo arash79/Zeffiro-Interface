@@ -2,6 +2,50 @@
 %script to zeffiro_plugins file:
 %Beamformer, inverse_tools, zef_beamformer_start
 function zef = zef_beamformer_window(zef)
+% --- Zeffiro documentation header ---
+% zef_beamformer_window — Zef beamformer window.
+%
+% Purpose:
+%   Zef beamformer window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.L_reg_type (read, write)
+%   zef.beamformer (read, write)
+%   zef.bf_type (read, write)
+%   zef.bf_var_loc (read)
+%   zef.cov_type (read, write)
+%   zef.font_size (read)
+%   zef.inv_cov_lambda (read, write)
+%   zef.inv_data_segment (read, write)
+%   zef.inv_high_cut_frequency (read, write)
+%   zef.inv_leadfield_lambda (read, write)
+%   zef.inv_low_cut_frequency (read, write)
+%   zef.inv_sampling_frequency (read, write)
+%   zef.inv_snr (read, write)
+%   zef.inv_time_1 (read, write)
+%   zef.inv_time_2 (read, write)
+%   … (6 more)
+%
+% Calls (project):
+%   zef_beamformer
+%   zef_beamformer_window
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_beamformer_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 zef.beamformer = zef_beamformer_app;
 

@@ -1,4 +1,38 @@
 function zef = zef_dataBank_add_data_item(zef,data_type,parent_node_name,node_name)
+% --- Zeffiro documentation header ---
+% zef_dataBank_add_data_item — Zef data Bank add data item.
+%
+% Purpose:
+%   Zef data Bank add data item.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%   data_type
+%   parent_node_name
+%   node_name
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.dataBank (read)
+%
+% Calls (project):
+%   zef_dataBank_addButtonPress
+%   zef_dataBank_add_data_item
+%   zef_dataBank_refreshTree
+%   zef_dataBank_treeSearch
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_dataBank_add_data_item(zef, data_type, parent_node_name, node_name)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 zef = zef_dataBank_refreshTree(zef);
 h_tree = zef.dataBank.app.Tree;

@@ -18,6 +18,30 @@
 % See also: run.m
 
 function [filepath, filename] = find_files(pattern, folder, priority)
+% --- Zeffiro documentation header ---
+% utilities.duneuro2zef.find_files — Find files.
+%
+% Purpose:
+%   Find files.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   pattern
+%   folder
+%   priority
+%
+% Outputs:
+%   filepath
+%   filename
+%
+% Calls (project):
+%   utilities.duneuro2zef.find_files
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[filepath, filename]] = utilities.duneuro2zef.find_files(pattern, folder, priority)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
     if nargin < 3
         priority = 'first';

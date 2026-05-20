@@ -1,4 +1,33 @@
 function zef = zef_strip_tool_update(zef)
+% --- Zeffiro documentation header ---
+% zef_strip_tool_update — Zef strip tool update.
+%
+% Purpose:
+%   Zef strip tool update.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.current_sensors (read)
+%   zef.strip_tool (read)
+%
+% Calls (project):
+%   zef_strip_tool_update
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_strip_tool_update(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 struct_aux = zef.([zef.current_sensors '_strip_cell']){zef.strip_tool.current_strip};
 

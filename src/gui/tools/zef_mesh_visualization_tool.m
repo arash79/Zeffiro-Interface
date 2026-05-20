@@ -1,3 +1,42 @@
+% --- Zeffiro documentation header ---
+% if isfield(zef,'h_mesh_visualization_tool') — If isfield(zef,'h mesh visualization tool').
+%
+% Purpose:
+%   If isfield(zef,'h mesh visualization tool').
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.attach_electrodes (read)
+%   zef.axes_visible (read)
+%   zef.azimuth (read)
+%   zef.brain_transparency (read)
+%   zef.cam_va (read)
+%   zef.colormap_items (read)
+%   zef.cone_draw (read)
+%   zef.contour_set (read, write)
+%   zef.contour_set_text (read)
+%   zef.cp2_a (read)
+%   zef.cp2_b (read)
+%   zef.cp2_c (read)
+%   zef.cp2_d (read)
+%   zef.cp2_on (read)
+%   zef.cp3_a (read)
+%   … (90 more)
+%
+% Calls (project):
+%   zef_change_size_function
+%   zef_get_profile_parameters
+%   zef_set_size_change_function
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `if isfield(zef,'h_mesh_visualization_tool')` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 if isfield(zef,'h_mesh_visualization_tool')
     if isvalid(zef.h_mesh_visualization_tool)
         delete(zef.h_mesh_visualization_tool)
@@ -162,4 +201,3 @@ zef.h_mesh_visualization_tool.ZefTool = mfilename;
 
 zef.h_mesh_visualization_tool.CloseRequestFcn = 'zef.h_mesh_visualization_tool.Visible=''off'';';
 zef.h_mesh_visualization_tool.DeleteFcn = 'zef.h_mesh_visualization_tool.Visible=''off'';';
-

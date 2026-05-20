@@ -1,28 +1,38 @@
 function atlas_surfaces = zef_bst_get_atlas_surfaces(zef, atlas_struct, n_inflation_steps, transform_cell, compartment_type, volume_extension_vec)
-%ZEF_BST_GET_ATLAS_SURFACES Extracts surface meshes from Brainstorm atlas volumetric data.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst_get_atlas_surfaces — Zef bst get atlas surfaces.
 %
-% This function converts Brainstorm atlas volumetric data (Cube format) into
-% individual surface meshes for each labeled region. It performs tetrahedral
-% decomposition of the volumetric grid and extracts boundary surfaces.
+% Purpose:
+%   Zef bst get atlas surfaces.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   zef                 - Zeffiro project structure
-%   atlas_struct        - Brainstorm atlas structure with fields:
-%                         Cube: 3D volumetric label array
-%                         Labels: Cell array of label information
-%                         InitTransf: Transformation matrix (optional)
-%   n_inflation_steps  - Number of surface inflation iterations
-%   transform_cell      - Cell array of transformation fields to apply
-%   compartment_type   - Type identifier for the compartment
-%   volume_extension_vec - Vector specifying volume extension for each label
+%   zef
+%   atlas_struct
+%   n_inflation_steps
+%   transform_cell
+%   compartment_type
+%   volume_extension_vec
 %
 % Outputs:
-%   atlas_surfaces - Structure array of surface meshes with fields:
-%                    Name, Type, Color, Points, Triangles
+%   atlas_surfaces
 %
-% See also: ZEF_SURFACE_MESH, ZEF_INFLATE_SURFACE
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_get_atlas_surfaces
+%   zef_inflate_surface
+%   zef_surface_mesh
+%   zef_waitbar
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[atlas_surfaces] = utilities.brainstorm2zef.zef_bst_get_atlas_surfaces(zef, atlas_struct, n_inflation_steps, transform_cell, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-% Set default values for optional inputs
 if nargin < 4
     transform_cell = cell(0);
 end

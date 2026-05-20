@@ -1,4 +1,29 @@
 function [processed_data] = zef_manual_epoching(f, epoch_points, start_time, end_time, sampling_frequency)
+% --- Zeffiro documentation header ---
+% zef_manual_epoching — Zef manual epoching.
+%
+% Purpose:
+%   Zef manual epoching.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   f
+%   epoch_points
+%   start_time
+%   end_time
+%   sampling_frequency
+%
+% Outputs:
+%   processed_data
+%
+% Calls (project):
+%   zef_manual_epoching
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[processed_data] = zef_manual_epoching(f, epoch_points, start_time, end_time, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 %This function processes the N-by-M data array f for N channels and M time

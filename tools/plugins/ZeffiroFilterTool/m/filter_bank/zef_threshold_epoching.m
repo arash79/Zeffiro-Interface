@@ -1,4 +1,30 @@
 function [processed_data] = zef_threshold_epoching(f, threshold_value, number_of_epochs, start_time, end_time, sampling_frequency)
+% --- Zeffiro documentation header ---
+% zef_threshold_epoching — Zef threshold epoching.
+%
+% Purpose:
+%   Zef threshold epoching.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   f
+%   threshold_value
+%   number_of_epochs
+%   start_time
+%   end_time
+%   sampling_frequency
+%
+% Outputs:
+%   processed_data
+%
+% Calls (project):
+%   zef_threshold_epoching
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[processed_data] = zef_threshold_epoching(f, threshold_value, number_of_epochs, start_time, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 %This function processes the N-by-M data array f for N channels and M time

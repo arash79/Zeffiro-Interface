@@ -1,4 +1,37 @@
 function zef_strip_tool_plot(zef)
+% --- Zeffiro documentation header ---
+% zef_strip_tool_plot — Zef strip tool plot.
+%
+% Purpose:
+%   Zef strip tool plot.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.current_sensors (read)
+%   zef.h_axes1 (read)
+%   zef.strip_tool (read)
+%
+% Calls (project):
+%   zef_create_strip
+%   zef_get_strip_contacts
+%   zef_strip_coordinate_transform
+%   zef_strip_tool_plot
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_strip_tool_plot(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 strip_struct = zef.([zef.current_sensors '_strip_cell']){zef.strip_tool.current_strip};
 [strip_struct] = zef_create_strip(strip_struct);

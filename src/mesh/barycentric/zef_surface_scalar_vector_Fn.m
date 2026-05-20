@@ -1,33 +1,29 @@
 function v = zef_surface_scalar_vector_Fn(nodes, tetra, n_ind, scalar_field)
+% --- Zeffiro documentation header ---
+% zef_surface_scalar_vector_Fn — Zef surface scalar vector Fn.
 %
-% zef_surface_scalar_vector_Fn
-%
-% TODO: Sampsa should document this.
+% Purpose:
+%   Zef surface scalar vector Fn.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
 %
 % Inputs:
-%
-% - nodes
-%
-%   TODO: explanation.
-%
-% - tetra
-%
-%   TODO: explanation.
-%
-% - n_ind
-%
-%   TODO: explanation.
-%
-% - scalar_field
-%
-%   TODO: explanation.
+%   nodes
+%   tetra
+%   n_ind
+%   scalar_field
 %
 % Outputs:
+%   v
 %
-% - v
+% Calls (project):
+%   zef_surface_mesh
+%   zef_surface_scalar_vector_Fn
+%   zef_volume_barycentric
 %
-%   TODO: explanation.
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[v] = zef_surface_scalar_vector_Fn(nodes, tetra, n_ind, scalar_field)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 ind_m = [ 2 4 3 ;
     1 3 4 ;

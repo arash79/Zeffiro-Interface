@@ -1,8 +1,24 @@
 function [A] = connectivity_matrix(source_positions, K, weighted_avg)
-% Connectivity matrix
-%SMOOTHING_MATRIX Summary of this function goes here
-%   Detailed explanation goes here
-% TODO: weighted avg
+% --- Zeffiro documentation header ---
+% connectivity_matrix — Connectivity matrix.
+%
+% Purpose:
+%   Connectivity matrix.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   source_positions
+%   K
+%   weighted_avg
+%
+% Outputs:
+%   A
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[A] = connectivity_matrix(source_positions, K, weighted_avg)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 if nargin < 3
     weighted_avg = false;
 end

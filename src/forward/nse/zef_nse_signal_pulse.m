@@ -1,4 +1,26 @@
 function y = zef_nse_signal_pulse(t,nse_field)
+% --- Zeffiro documentation header ---
+% zef_nse_signal_pulse — Zef nse signal pulse.
+%
+% Purpose:
+%   Zef nse signal pulse.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   t
+%   nse_field
+%
+% Outputs:
+%   y
+%
+% Calls (project):
+%   zef_nse_signal_pulse
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[y] = zef_nse_signal_pulse(t, nse_field)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 hgmm_conversion = 101325/760;
 

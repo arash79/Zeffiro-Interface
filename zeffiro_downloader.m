@@ -1,46 +1,21 @@
 function zeffiro_downloader( kwargs )
+% --- Zeffiro documentation header ---
+% zeffiro_downloader — Zeffiro downloader.
 %
-% zeffiro_downloader ( kwargs )
-%
-% This function downloads Zeffiro Interface in a given folder and sets it
-% to be a local repository of the remote origin at
-%
-%   https://github.com/sampsapursiainen/zeffiro_interface
-%
-% After downloading, the local repository will be updated in each startup
-% (each time when running zeffiro_interface.m).
+% Purpose:
+%   Zeffiro downloader.
+%   Folder: Repository root: startup (`zeffiro_interface`, `zeffiro_setup`), path configuration, and entry to `src/`, `+core`, `+inverse`, `+utilities`, `tools/plugins`, and bundled data.
 %
 % Inputs:
+%   kwargs
 %
-% - kwargs.install_directory = pwd
+% Outputs:
+%   See function signature and code below.
 %
-%   The directory into which the Zeffiro Interface folder will be placed.
-%
-% - kwargs.folder_name = "zeffiro_interface"
-%
-%   The name of the installation folder in kwargs.install_directory.
-%
-% - kwargs.branch_name = "main_development_branch"
-%
-%   The branch of Zeffiro Interface that will be installed.
-%
-% - kwargs.profile_name = "multicompartment_head"
-%
-%   The name of the default profile file for Zeffiro projects.
-%
-% - kwargs.run_setup = true
-%
-%   If this set to true, the dependencies of Zeffiro Interface will also be
-%   installed via a function that is reserved for it
-%
-% - kwargs.submodules = []
-%
-%   Determines which submodules will be installed by zeffiro_setup.
-%   The option "all" can be given to install all submodules.
-%
-% NOTE: Some other branch than the master should be used for pushes. The
-% preferred branch is main_development_branch which will be merged with
-% master on a monthly basis.
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zeffiro_downloader(kwargs)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     kwargs.install_directory (1,1) string { mustBeFolder } = pwd

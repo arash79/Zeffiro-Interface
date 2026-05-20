@@ -1,4 +1,28 @@
 function [d] = zef_determinant(a,b,c,varargin)
+% --- Zeffiro documentation header ---
+% zef_determinant — Zef determinant.
+%
+% Purpose:
+%   Zef determinant.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   a
+%   b
+%   c
+%   varargin
+%
+% Outputs:
+%   d
+%
+% Calls (project):
+%   zef_determinant
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[d] = zef_determinant(a, b, c, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 det_dir = 2;
 if not(isempty(varargin))

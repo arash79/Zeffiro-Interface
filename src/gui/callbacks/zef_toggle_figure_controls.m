@@ -1,4 +1,22 @@
+% --- Zeffiro documentation header ---
+% function zef_toggle_figure_controls — Function zef toggle figure controls.
+%
+% Purpose:
+%   Function zef toggle figure controls.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Calls (project):
+%   zef_toggle_figure_controls
+%
+% Side effects:
+%   - base/caller workspace
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function zef_toggle_figure_controls` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function zef_toggle_figure_controls
+
 
 toggle_mode = 'unlocked';
 current_figure = gcf;

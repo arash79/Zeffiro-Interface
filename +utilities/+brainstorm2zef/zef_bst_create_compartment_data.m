@@ -1,24 +1,37 @@
 function [compartment_settings, surface_meshes, zef] = zef_bst_create_compartment_data(settings_file_name, zef_bst, zef)
-%ZEF_BST_CREATE_COMPARTMENT_DATA Creates compartment data from Brainstorm subject structure.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst_create_compartment_data — Zef bst create compartment data.
 %
-% This function loads surface meshes from Brainstorm subject files and
-% converts them into Zeffiro-compatible format. It handles both standard
-% surface meshes and atlas-based volumetric data (Cube format).
+% Purpose:
+%   Zef bst create compartment data.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   settings_file_name - Path to settings file (currently unused, reserved for future use)
-%   zef_bst          - Structure containing Brainstorm-to-Zeffiro configuration
-%   zef              - Zeffiro project structure
+%   settings_file_name
+%   zef_bst
+%   zef
 %
 % Outputs:
-%   compartment_settings - Cell array containing compartment configuration
-%   surface_meshes       - Structure array of surface meshes with fields:
-%                          Name, Type, Points, Triangles, Color
-%   zef                  - Updated Zeffiro project structure
+%   compartment_settings
+%   surface_meshes
+%   zef
 %
-% See also: ZEF_BST_COMPARTMENT_SETTINGS, ZEF_BST_GET_ATLAS_SURFACES, ZEF_BST_FIND_COMPARTMENT
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_compartment_settings
+%   utilities.brainstorm2zef.zef_bst_create_compartment_data
+%   utilities.brainstorm2zef.zef_bst_find_compartment
+%   utilities.brainstorm2zef.zef_bst_get_atlas_surfaces
+%   utilities.brainstorm2zef.zef_bst_validate_environment
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[compartment_settings, surface_meshes, zef]] = utilities.brainstorm2zef.zef_bst_create_compartment_data(settings_file_name, zef_bst, zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-% Validate Brainstorm environment
 [is_valid, error_msg] = utilities.brainstorm2zef.zef_bst_validate_environment();
 if ~is_valid
     error('Brainstorm environment validation failed: %s', error_msg);

@@ -15,6 +15,32 @@
 %parameters, which is error-prone and not user-friendly.
 
 function zef = zef_dti_conductivity_open(zef)
+% --- Zeffiro documentation header ---
+% zef_dti_conductivity_open — Zef dti conductivity open.
+%
+% Purpose:
+%   Zef dti conductivity open.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Calls (project):
+%   zef_dti_conductivity_open
+%   zef_dti_conductivity_update
+%   zef_dti_conductivity_window
+%
+% Side effects:
+%   - base/caller workspace
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_dti_conductivity_open(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     try

@@ -1,5 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if not(isfield(zef,'exp_multires_dec')); — If not(isfield(zef,'exp multires dec'));.
+%
+% Purpose:
+%   If not(isfield(zef,'exp multires dec'));.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.exp_em_multires_beta (read, write)
+%   zef.exp_em_multires_hyper_type (read, write)
+%   zef.exp_em_multires_q (read, write)
+%   zef.exp_em_multires_theta0 (read, write)
+%   zef.exp_multires_count (read, write)
+%   zef.exp_multires_dec (read, write)
+%   zef.exp_multires_ind (read, write)
+%   zef.exp_multires_n_decompositions (read, write)
+%   zef.exp_multires_n_iter (read, write)
+%   zef.exp_multires_n_levels (read, write)
+%   zef.exp_multires_sparsity (read, write)
+%   zef.h_exp_em_map_estimation_multires (read)
+%   zef.h_exp_em_multires_beta (read)
+%   zef.h_exp_em_multires_data_segment (read)
+%   zef.h_exp_em_multires_high_cut_frequency (read)
+%   … (28 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if not(isfield(zef,'exp_multires_dec'));` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 if not(isfield(zef,'exp_multires_dec'));
     zef.exp_multires_dec = [];
 end;

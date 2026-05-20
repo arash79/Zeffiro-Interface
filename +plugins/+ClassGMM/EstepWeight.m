@@ -1,23 +1,27 @@
 function weight = EstepWeight(log_lh, post, weight)
-%ESTEPWEIGHT Update observation weights for weighted GMM E-step.
+% --- Zeffiro documentation header ---
+% plugins.ClassGMM.EstepWeight — Estep Weight.
 %
-%   WEIGHT = ESTEPWEIGHT(LOG_LH, POST, WEIGHT) computes an optimal exponent
-%   alpha such that weight.^alpha maximizes the weighted log-likelihood of
-%   the current GMM fit. This extension enables weighted GMM fitting for
-%   brain source reconstruction, where weights represent source intensities.
+% Purpose:
+%   Estep Weight.
+%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
 %
-%   Inputs:
-%     LOG_LH - N-by-K matrix of log component densities (from WeightedCondDensity)
-%     POST   - N-by-K matrix of posterior probabilities (from estep)
-%     WEIGHT - N-by-1 vector of current observation weights
+% Inputs:
+%   log_lh
+%   post
+%   weight
 %
-%   Output:
-%     WEIGHT - Updated N-by-1 weight vector (normalized to sum to 1)
+% Outputs:
+%   weight
 %
-%   The exponent alpha is found by maximizing sum(weight.^alpha .* log_lh_marg)
-%   over alpha in [0, 4], where log_lh_marg is the marginal log-density.
+% Calls (project):
+%   plugins.ClassGMM.EstepWeight
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[weight] = plugins.ClassGMM.EstepWeight(log_lh, post, weight)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-% Marginal log-likelihood contribution per observation
 log_lh = sum(post.*log_lh,2);
 
 % Find optimal exponent via 1D optimization
@@ -35,6 +39,3 @@ weight = weight.^s;
 weight = weight/sum(weight);
 val = -sum(weight.*p, 1);
 end
-
-
-

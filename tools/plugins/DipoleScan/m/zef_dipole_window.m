@@ -2,6 +2,50 @@
 %script to zeffiro_plugins file:
 %dipoleScan, inverse_tools, zef_dipole_start
 function zef = zef_dipole_window(zef)
+% --- Zeffiro documentation header ---
+% zef_dipole_window — Zef dipole window.
+%
+% Purpose:
+%   Zef dipole window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.L_reg_type (read, write)
+%   zef.beamformer (read)
+%   zef.dipole (read)
+%   zef.dipole_app (read, write)
+%   zef.dipole_type (read, write)
+%   zef.font_size (read)
+%   zef.inv_data_segment (read, write)
+%   zef.inv_default (read, write)
+%   zef.inv_high_cut_frequency (read, write)
+%   zef.inv_leadfield_lambda (read, write)
+%   zef.inv_low_cut_frequency (read, write)
+%   zef.inv_names (read, write)
+%   zef.inv_sampling_frequency (read, write)
+%   zef.inv_snr (read, write)
+%   zef.inv_time_1 (read, write)
+%   … (7 more)
+%
+% Calls (project):
+%   zef_dipoleScan
+%   zef_dipole_window
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_dipole_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 zef.dipole_app = dipole_app;
 appName='dipole_app';

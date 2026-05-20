@@ -1,81 +1,43 @@
 function [y_1, y_2, y_3, b_coord, volume] = zef_volume_scalar_matrix_uFG(nodes, tetra, h, x_1, x_2, x_3, u_field, scalar_field, i_node_ind, b_coord, volume)
+% --- Zeffiro documentation header ---
+% zef_volume_scalar_matrix_uFG — Zef volume scalar matrix u FG.
 %
-% zef_volume_scalar_matrix_uFG
-%
-% TODO: Sampsa should document this.
+% Purpose:
+%   Zef volume scalar matrix u FG.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
 %
 % Inputs:
-%
-% - nodes
-%
-%   TODO: explanation.
-%
-% - tetra
-%
-%   TODO: explanation.
-%
-% - h
-%
-%   TODO: documentation.
-%
-% - x_1
-%
-%   TODO: documentation.
-%
-% - x_2
-%
-%   TODO: documentation.
-%
-% - x_3
-%
-%   TODO: documentation.
-%
-% - u_field
-%
-%   TODO: explanation.
-%
-% - scalar_field
-%
-%   TODO: explanation.
-%
-% - i_node_ind
-%
-%   TODO: explanation.
-%
-% - b_coord
-%
-%   TODO: explanation.
-%
-% - volume
-%
-%   TODO: explanation.
+%   nodes
+%   tetra
+%   h
+%   x_1
+%   x_2
+%   x_3
+%   u_field
+%   scalar_field
+%   i_node_ind
+%   b_coord
+%   volume
 %
 % Outputs:
+%   y_1
+%   y_2
+%   y_3
+%   b_coord
+%   volume
 %
-% - M
+% Calls (project):
+%   zef_barycentric_weighting
+%   zef_volume_barycentric
+%   zef_volume_scalar_matrix_uFG
 %
-%   TODO: explanation.
+% Side effects:
+%   - GPU
 %
-% - y_1
-%
-%   TODO: explanation.
-%
-% - y_2
-%
-%   TODO: explanation.
-%
-% - y_3
-%
-%   TODO: explanation.
-%
-% - b_coord
-%
-%   TODO: explanation.
-%
-% - volume
-%
-%   TODO: explanation.
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[y_1, y_2, y_3]] = zef_volume_scalar_matrix_uFG(nodes, tetra, h, x_1, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if nargin < 10
     b_coord = zeros(size(tetra,1),size(tetra,2),4);

@@ -1,4 +1,40 @@
+% --- Zeffiro documentation header ---
+% function [GMModel,GMModelDipoles] = zef_GMMcluster — Function [GMModel,GMModel Dipoles] = zef GMMcluster.
+%
+% Purpose:
+%   Function [GMModel,GMModel Dipoles] = zef GMMcluster.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.GMMcluster_MaxIter (read)
+%   zef.GMMcluster_c_startframe (read)
+%   zef.GMMcluster_c_stopframe (read)
+%   zef.GMMcluster_clustnum (read)
+%   zef.GMMcluster_covident (read)
+%   zef.GMMcluster_covtype (read)
+%   zef.GMMcluster_domain (read)
+%   zef.GMMcluster_reg (read)
+%   zef.GMMcluster_threshold (read)
+%   zef.parcellation_interp_ind (read)
+%   zef.parcellation_selected (read)
+%   zef.reconstruction (read)
+%   zef.source_interpolation_ind (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_GMMcluster
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [GMModel,GMModelDipoles] = zef_GMMcluster` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [GMModel,GMModelDipoles] = zef_GMMcluster
+
 h = zef_waitbar(0,1,['Gaussian mixature model.']);
 
 %Options

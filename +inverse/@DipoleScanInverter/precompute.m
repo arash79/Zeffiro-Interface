@@ -1,21 +1,28 @@
 function self = precompute(self, L)
-%PRECOMPUTE Cache frame-invariant factorisations for the Dipole Scan inverter.
+% --- Zeffiro documentation header ---
+% inverse.DipoleScanInverter.precompute — Precomputes cached operators before the per-frame inversion loop.
 %
-% The dispatcher (utilities.cluster.dispatch_inverse via
-% utilities.inverse.run_frame_loop) calls this once before the per-frame
-% loop. The cached arrays let invert() process each frame with a single
-% pagemtimes/matrix-multiply pair instead of a per-source SVD inside the
-% per-frame loop.
+% Purpose:
+%   Precomputes cached operators before the per-frame inversion loop.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
 %
-% The cache holds the Mahalanobis whitening matrix (Chalf \ I), the
-% whitened lead field, and per-source thin SVDs of the (optionally
-% regularised) 3-column lead-field blocks. invert() uses the cache when it
-% is populated and falls back to the legacy per-call SVD path otherwise, so
-% callers that bypass run_frame_loop keep working unchanged.
+% Inputs:
+%   self
+%   L
 %
-% NOTE: Changing reg_type, reg_parameter, or noise_cov after this method
-% has been called invalidates the cache. Re-run precompute(L) (or call
-% invert directly with no precompute) in that case.
+% Outputs:
+%   self
+%
+% Calls (project):
+%   inverse.precompute
+%
+% Side effects:
+%   - GPU
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[self] = inverse.DipoleScanInverter.precompute(self, L)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     self (1,1) inverse.DipoleScanInverter

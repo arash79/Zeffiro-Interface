@@ -1,6 +1,37 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% function [exp_multires_dec, exp_multires_ind, exp_multires_count] = exp_make_multires_dec — Function [exp multires dec, exp multires ind, exp multires count] = exp make multires dec.
+%
+% Purpose:
+%   Function [exp multires dec, exp multires ind, exp multires count] = exp make multires dec.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.exp_multires_n_decompositions (read)
+%   zef.exp_multires_n_levels (read)
+%   zef.exp_multires_sparsity (read)
+%   zef.gpu_count (read)
+%   zef.gpu_num (read)
+%   zef.parallel_vectors (read)
+%   zef.source_interpolation_ind (read)
+%   zef.source_positions (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [exp_multires_dec, exp_multires_ind, exp_multires_count] = exp_make_multires_dec` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [exp_multires_dec, exp_multires_ind, exp_multires_count] = exp_make_multires_dec
+
 
 n_decompositions = evalin('base','zef.exp_multires_n_decompositions');
 [n_levels] = evalin('base','zef.exp_multires_n_levels');

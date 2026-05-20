@@ -1,4 +1,30 @@
 function [M, multigrid_perm_output] = zef_block_diagonal_preconditioner(L, multigrid_dec, multigrid_ind, multigrid_perm,varargin)
+% --- Zeffiro documentation header ---
+% zef_block_diagonal_preconditioner — Zef block diagonal preconditioner.
+%
+% Purpose:
+%   Zef block diagonal preconditioner.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   L
+%   multigrid_dec
+%   multigrid_ind
+%   multigrid_perm
+%   varargin
+%
+% Outputs:
+%   M
+%   multigrid_perm_output
+%
+% Calls (project):
+%   zef_block_diagonal_preconditioner
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[M, multigrid_perm_output]] = zef_block_diagonal_preconditioner(L, multigrid_dec, multigrid_ind, multigrid_perm, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if not(isempty(varargin))
     reg_param = varargin{1};

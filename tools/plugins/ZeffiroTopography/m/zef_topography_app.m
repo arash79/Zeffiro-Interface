@@ -1,3 +1,38 @@
+% --- Zeffiro documentation header ---
+% h1 = figure(... — H1 = figure(.
+%
+% Purpose:
+%   H1 = figure(....
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.h_top_apply (read, write)
+%   zef.h_top_cancel (read, write)
+%   zef.h_top_data_segment (read, write)
+%   zef.h_top_high_cut_frequency (read, write)
+%   zef.h_top_low_cut_frequency (read, write)
+%   zef.h_top_normalize_data (read, write)
+%   zef.h_top_number_of_frames (read, write)
+%   zef.h_top_regularization_parameter (read, write)
+%   zef.h_top_sampling_frequency (read, write)
+%   zef.h_top_start (read, write)
+%   zef.h_top_time_1 (read, write)
+%   zef.h_top_time_2 (read, write)
+%   zef.h_top_time_3 (read, write)
+%   zef.h_topography (read, write)
+%   zef.top_data_segment (read, write)
+%   … (10 more)
+%
+% Calls (project):
+%   zef_evaluate_topography
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `h1 = figure(...` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 h1 = figure(...
     'PaperUnits',get(0,'defaultfigurePaperUnits'),...

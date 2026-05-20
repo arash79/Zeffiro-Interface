@@ -1,6 +1,58 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,reconstruction_information] = zef_ias_iteration(zef)
+% --- Zeffiro documentation header ---
+% zef_ias_iteration — Zef ias iteration.
+%
+% Purpose:
+%   Zef ias iteration.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   z
+%   reconstruction_information
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.ias_high_cut_frequency (read)
+%   zef.ias_hyperprior (read)
+%   zef.ias_low_cut_frequency (read)
+%   zef.ias_n_map_iterations (read)
+%   zef.ias_normalize_data (read)
+%   zef.ias_number_of_frames (read)
+%   zef.ias_sampling_frequency (read)
+%   zef.ias_snr (read)
+%   zef.ias_time_1 (read)
+%   zef.ias_time_2 (read)
+%   zef.ias_time_3 (read)
+%   zef.ias_type (read)
+%   zef.inv_amplitude_db (read)
+%   zef.inv_hyperprior (read)
+%   … (7 more)
+%
+% Calls (project):
+%   zef_find_g_hyperprior
+%   zef_find_ig_hyperprior
+%   zef_getFilteredData
+%   zef_getTimeStep
+%   zef_ias_iteration
+%   zef_normalizeInverseReconstruction
+%   zef_postProcessInverse
+%   zef_processLeadfields
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[z, reconstruction_information]] = zef_ias_iteration(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 inverse_gamma_ind = [1:4];
 gamma_ind = [5:10];

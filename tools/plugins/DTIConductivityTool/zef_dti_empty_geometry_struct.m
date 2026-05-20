@@ -15,6 +15,24 @@
 %See also: zef_freesurfer_read_volume_geometry, zef_dti_conductivity_init
 
 function geom = zef_dti_empty_geometry_struct()
+% --- Zeffiro documentation header ---
+% zef_dti_empty_geometry_struct — Zef dti empty geometry struct.
+%
+% Purpose:
+%   Zef dti empty geometry struct.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Outputs:
+%   geom
+%
+% Calls (project):
+%   zef_dti_empty_geometry_struct
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef_dti_empty_geometry_struct` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 
 geom = struct( ...
     'vox2ras', [], ...

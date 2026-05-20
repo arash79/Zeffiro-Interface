@@ -1,5 +1,33 @@
 %Copyright © 2018, Sampsa Pursiainen
+% --- Zeffiro documentation header ---
+% function [inv_roi_sphere,h_roi_sphere] = zef_plot_gravity_roi — Function [inv roi sphere,h roi sphere] = zef plot gravity roi.
+%
+% Purpose:
+%   Function [inv roi sphere,h roi sphere] = zef plot gravity roi.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.h_axes1 (read)
+%   zef.h_inv_roi_sphere_1 (read)
+%   zef.h_inv_roi_sphere_2 (read)
+%   zef.h_inv_roi_sphere_3 (read)
+%   zef.h_inv_roi_sphere_4 (read)
+%   zef.h_roi_sphere (read)
+%
+% Calls (project):
+%   zef_plot_gravity_roi
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [inv_roi_sphere,h_roi_sphere] = zef_plot_gravity_roi` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [inv_roi_sphere,h_roi_sphere] = zef_plot_gravity_roi
+
 h_inv_roi_sphere_1 = evalin('base','zef.h_inv_roi_sphere_1');
 h_inv_roi_sphere_2 = evalin('base','zef.h_inv_roi_sphere_2');
 h_inv_roi_sphere_3 = evalin('base','zef.h_inv_roi_sphere_3');

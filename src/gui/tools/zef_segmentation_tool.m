@@ -1,3 +1,46 @@
+% --- Zeffiro documentation header ---
+% if isfield(zef,'h_zeffiro_window_main') — If isfield(zef,'h zeffiro window main').
+%
+% Purpose:
+%   If isfield(zef,'h zeffiro window main').
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.aux_cell (read, write)
+%   zef.aux_dir (read, write)
+%   zef.code_path (read)
+%   zef.fieldnames (read, write)
+%   zef.font_size (read)
+%   zef.h_compartment_table (read)
+%   zef.h_parameters_table (read)
+%   zef.h_profile_name (read)
+%   zef.h_project_notes (read)
+%   zef.h_project_tag (read)
+%   zef.h_segmentation_tool_toggle (read)
+%   zef.h_sensors_name_table (read)
+%   zef.h_sensors_table (read)
+%   zef.h_set_position (read)
+%   zef.h_transform_table (read)
+%   … (10 more)
+%
+% Calls (project):
+%   zef_arrange_windows
+%   zef_build_compartment_table
+%   zef_segmentation_tool_toggle
+%   zef_set_position
+%   zef_set_size_change_function
+%   zef_update
+%   zef_update_transform
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `if isfield(zef,'h_zeffiro_window_main')` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 if isfield(zef,'h_zeffiro_window_main')
     if isvalid(zef.h_zeffiro_window_main)
         delete(zef.h_zeffiro_window_main)
@@ -91,4 +134,4 @@ width_aux = relative_size*zef.segmentation_tool_default_position(3);
         height_aux = 1.15*zef.segmentation_tool_default_position(3);
         vertical_aux = zef.segmentation_tool_default_position(2)+zef.segmentation_tool_default_position(4)-height_aux;
         horizontal_aux = zef.segmentation_tool_default_position(1)+zef.segmentation_tool_default_position(3)-width_aux;
-        zef.h_zeffiro_window_main.Position = [horizontal_aux vertical_aux width_aux height_aux]; 
+        zef.h_zeffiro_window_main.Position = [horizontal_aux vertical_aux width_aux height_aux];

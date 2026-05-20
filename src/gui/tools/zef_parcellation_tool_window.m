@@ -1,4 +1,58 @@
 function zef = zef_parcellation_tool_window(zef)
+% --- Zeffiro documentation header ---
+% zef_parcellation_tool_window — Zef parcellation tool window.
+%
+% Purpose:
+%   Zef parcellation tool window.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.h_import_parcellation_colortable (read, write)
+%   zef.h_parcellation_interpolation (read, write)
+%   zef.h_parcellation_list (read, write)
+%   zef.h_parcellation_name (read, write)
+%   zef.h_parcellation_plot_type (read, write)
+%   zef.h_parcellation_reset (read, write)
+%   zef.h_parcellation_roi_center (read, write)
+%   zef.h_parcellation_roi_color (read, write)
+%   zef.h_parcellation_roi_list (read, write)
+%   zef.h_parcellation_roi_name (read, write)
+%   zef.h_parcellation_roi_radius (read, write)
+%   zef.h_parcellation_segment (read, write)
+%   zef.h_parcellation_time_series_mode (read, write)
+%   zef.h_parcellation_tolerance (read, write)
+%   zef.h_parcellation_tool (read, write)
+%   … (24 more)
+%
+% Calls (project):
+%   zef_parcellation_default
+%   zef_parcellation_interpolation
+%   zef_parcellation_roi_add
+%   zef_parcellation_roi_delete
+%   zef_parcellation_roi_embed
+%   zef_parcellation_roi_pick_center
+%   zef_parcellation_roi_pick_color
+%   zef_parcellation_roi_plot
+%   zef_parcellation_time_series
+%   zef_parcellation_tool_window
+%   zef_plot_parcellation_time_series
+%   zef_update_parcellation
+%
+% Side effects:
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_parcellation_tool_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h1 = figure(...
     'PaperUnits','inches',...

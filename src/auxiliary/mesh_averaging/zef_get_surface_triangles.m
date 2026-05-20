@@ -1,4 +1,27 @@
 function [surface_triangles] = zef_get_surface_triangles(tetra,labels,compartment_ind)
+% --- Zeffiro documentation header ---
+% zef_get_surface_triangles — Zef get surface triangles.
+%
+% Purpose:
+%   Zef get surface triangles.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   tetra
+%   labels
+%   compartment_ind
+%
+% Outputs:
+%   surface_triangles
+%
+% Calls (project):
+%   zef_get_surface_triangles
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[surface_triangles] = zef_get_surface_triangles(tetra, labels, compartment_ind)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 I = find(labels==compartment_ind);
 tetra = tetra(I,:);

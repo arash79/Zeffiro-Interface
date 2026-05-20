@@ -1,5 +1,32 @@
 function result = dispatch_inverse(bundle)
-%DISPATCH_INVERSE Execute an inverse method from a prebuilt bundle.
+% --- Zeffiro documentation header ---
+% utilities.cluster.dispatch_inverse — Dispatch inverse.
+%
+% Purpose:
+%   Dispatch inverse.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   bundle
+%
+% Outputs:
+%   result
+%
+% Calls (project):
+%   utilities.cluster.dispatch_inverse
+%   utilities.cluster.with_zef_in_base
+%   utilities.inverse.run_frame_loop
+%   zef_postProcessInverseClassObj
+%   zef_waitbar
+%
+% Side effects:
+%   - parallel/cluster
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[result] = utilities.cluster.dispatch_inverse(bundle)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     bundle (1,1) struct

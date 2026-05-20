@@ -1,3 +1,20 @@
+% --- Zeffiro documentation header ---
+% if not(isfield(zef,'strip_struct')) — If not(isfield(zef,'strip struct')).
+%
+% Purpose:
+%   If not(isfield(zef,'strip struct')).
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.strip_struct (read, write)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if not(isfield(zef,'strip_struct'))` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 if not(isfield(zef,'strip_struct'))
 zef.strip_struct = struct;
@@ -38,5 +55,3 @@ zef.strip_struct.h_dir_vec23.String = num2str(zef.strip_struct.dir_vec(2,3));
 zef.strip_struct.h_strip_type = zef.strip_struct.strip_type;
 
 zef.strip_struct.h_probe_num = zef.strip_struct.probe_num;
-
-

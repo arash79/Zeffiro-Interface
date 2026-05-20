@@ -1,29 +1,65 @@
 function zef = zef_bst_create_project(settings_file_name, project_file_name, run_type, input_mode, zef_bst, zef)
-%ZEF_BST_CREATE_PROJECT Creates a Zeffiro project from Brainstorm data.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst_create_project — Zef bst create project.
 %
-% This is the main function that orchestrates the conversion of Brainstorm
-% surface meshes into a Zeffiro finite element mesh project. It handles
-% compartment loading, mesh generation, and project saving.
+% Purpose:
+%   Zef bst create project.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   settings_file_name - Path to settings file containing configuration
-%   project_file_name  - Path where project should be saved (empty = don't save)
-%   run_type           - Execution mode:
-%                        1 = Fresh start (load compartments from Brainstorm)
-%                        2 = Import compartments (use existing compartment data)
-%                        3 = Use existing project
-%   input_mode         - Input handling mode:
-%                        1 = Use input files
-%                        2 = Ignore input files
-%   zef_bst            - Structure containing Brainstorm-to-Zeffiro configuration
-%   zef                 - Zeffiro project structure (optional)
+%   settings_file_name
+%   project_file_name
+%   run_type
+%   input_mode
+%   zef_bst
+%   zef
 %
 % Outputs:
-%   zef - Zeffiro project structure with loaded compartments and mesh settings
+%   zef
 %
-% See also: ZEF_BST_CREATE_COMPARTMENT_DATA, ZEF_BST_GET_SETTINGS
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.distance_smoothing_exp (read, write)
+%   zef.distance_smoothing_on (read, write)
+%   zef.extensive_relabeling (read, write)
+%   zef.fem_mesh_inflation_strength (read, write)
+%   zef.max_surface_face_count (read, write)
+%   zef.mesh_resolution (read, write)
+%   zef.mesh_smoothing_on (read, write)
+%   zef.priority_mode (read, write)
+%   zef.refinement_on (read, write)
+%   zef.refinement_surface_compartments (read, write)
+%   zef.refinement_surface_mode (read, write)
+%   zef.refinement_surface_number (read, write)
+%   zef.refinement_surface_on (read, write)
+%   zef.refinement_volume_compartments (read, write)
+%   … (7 more)
+%
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_create_compartment_data
+%   utilities.brainstorm2zef.zef_bst_create_project
+%   utilities.brainstorm2zef.zef_bst_get_settings
+%   utilities.brainstorm2zef.zef_bst_validate_environment
+%   zef_add_bounding_box
+%   zef_add_compartment
+%   zef_bst_create_project
+%   zef_bst_edit_project
+%   zef_build_compartment_table
+%   zef_close_all
+%   zef_process_meshes
+%   zef_save
+%   … (3 more)
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = utilities.brainstorm2zef.zef_bst_create_project(settings_file_name, project_file_name, run_type, input_mode, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-% Set default values for optional inputs
 if nargin < 6
     zef = struct;
 end

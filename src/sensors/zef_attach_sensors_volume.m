@@ -1,6 +1,49 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function  [sensors_attached_volume] = zef_attach_sensors_volume(zef,sensors,varargin)
+% --- Zeffiro documentation header ---
+% zef_attach_sensors_volume — Zef attach sensors volume.
+%
+% Purpose:
+%   Zef attach sensors volume.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   zef
+%   sensors
+%   varargin
+%
+% Outputs:
+%   sensors_attached_volume
+%
+% Zef fields (observed):
+%   zef.current_sensors (read)
+%   zef.imaging_method (read)
+%   zef.nodes (read, write)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   zef.reuna_type (read)
+%   zef.surface_triangles (read, write)
+%   zef.tetra (read, write)
+%   zef.use_depth_electrodes (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   zef_attach_sensors_volume
+%   zef_determinant
+%   zef_fix_sensors_get_functions_array_size
+%   zef_sensor_get_function_eval
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[sensors_attached_volume] = zef_attach_sensors_volume(zef, sensors, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isempty(zef)
     zef = evalin('base','zef');

@@ -14,8 +14,33 @@
 %After selection, the file path is stored in zef. The actual geometry
 %extraction happens when the user clicks the 'Load' button, which calls
 %zef_dti_conductivity_load_freesurfer.
+% --- Zeffiro documentation header ---
+% function zef_dti_conductivity_browse_ref — Function zef dti conductivity browse ref.
+%
+% Purpose:
+%   Function zef dti conductivity browse ref.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.dti_ref_mri_file (read, write)
+%   zef.freesurfer_fa_file (read)
+%   zef.h_dti_ref_mri_file (read)
+%   zef.save_file_path (read)
+%
+% Calls (project):
+%   zef_dti_conductivity_browse_ref
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `function zef_dti_conductivity_browse_ref` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 function zef_dti_conductivity_browse_ref
+
 
 zef = evalin('base','zef');
 

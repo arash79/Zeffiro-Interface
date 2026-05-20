@@ -1,7 +1,34 @@
 function zef_simple_plot_sphere_min(varargin)
-%Plots a red sphere showing the maximizer of the reconstruction.
-%The optional argument is the scale of the radius. This
-%function can be either static or dynamical.
+% --- Zeffiro documentation header ---
+% zef_simple_plot_sphere_min — Zef simple plot sphere min.
+%
+% Purpose:
+%   Zef simple plot sphere min.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.reconstruction (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_simple_plot_sphere_min
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_simple_plot_sphere_min(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 if not(isempty(varargin))
     radius_val = varargin{1};
     if length(varargin) > 1

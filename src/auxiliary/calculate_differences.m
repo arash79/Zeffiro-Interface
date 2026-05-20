@@ -1,3 +1,18 @@
+% --- Zeffiro documentation header ---
+% ary_model — Ary model.
+%
+% Purpose:
+%   Ary model.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Calls (project):
+%   zef_lead_field_eeg_multilayer_sphere
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `ary_model` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 load data/ary_model/ary_model.mat;
 
 load zeffiro_projects/pallomalli_pem.mat;

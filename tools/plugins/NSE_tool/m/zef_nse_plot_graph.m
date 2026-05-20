@@ -1,4 +1,47 @@
 function zef_nse_plot_graph(zef, nse_field)
+% --- Zeffiro documentation header ---
+% zef_nse_plot_graph — Zef nse plot graph.
+%
+% Purpose:
+%   Zef nse plot graph.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%   nse_field
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.domain_labels (read)
+%   zef.mvd_length (read)
+%   zef.nodes (read)
+%   zef.nse_field (read)
+%   zef.tetra (read)
+%
+% Calls (project):
+%   zef_nse_calculate_perfusion
+%   zef_nse_mean_velocity_roi
+%   zef_nse_plot_epoched
+%   zef_nse_plot_full
+%   zef_nse_plot_graph
+%   zef_nse_plot_histogram
+%   zef_nse_plot_signal_pulse
+%   zef_nse_roi_ind
+%   zef_nse_separate_waves_roi
+%   zef_nse_signal_pulse
+%   zef_nse_vel_dir
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_nse_plot_graph(zef, nse_field)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

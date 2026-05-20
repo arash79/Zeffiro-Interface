@@ -1,6 +1,47 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z] = zef_evaluate_topography(zef)
+% --- Zeffiro documentation header ---
+% zef_evaluate_topography — Zef evaluate topography.
+%
+% Purpose:
+%   Zef evaluate topography.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   z
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   zef.sensors (read)
+%   zef.top_high_cut_frequency (read)
+%   zef.top_low_cut_frequency (read)
+%   zef.top_number_of_frames (read)
+%   zef.top_regularization_parameter (read)
+%   zef.top_sampling_frequency (read)
+%   zef.top_time_3 (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   zef_evaluate_topography
+%   zef_getFilteredData
+%   zef_getTimeStep
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[z] = zef_evaluate_topography(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h = zef_waitbar(0,1,['Topography.']);
 sampling_freq = eval('zef.top_sampling_frequency');

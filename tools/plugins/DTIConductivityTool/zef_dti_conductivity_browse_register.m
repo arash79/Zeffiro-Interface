@@ -4,8 +4,33 @@
 %ZEF_DTI_CONDUCTIVITY_BROWSE_REGISTER
 %
 %Browse for FreeSurfer register.dat file (from dt_recon).
+% --- Zeffiro documentation header ---
+% function zef_dti_conductivity_browse_register — Function zef dti conductivity browse register.
+%
+% Purpose:
+%   Function zef dti conductivity browse register.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.freesurfer_fa_file (read)
+%   zef.freesurfer_register_file (read, write)
+%   zef.h_freesurfer_register_file (read)
+%   zef.save_file_path (read)
+%
+% Calls (project):
+%   zef_dti_conductivity_browse_register
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `function zef_dti_conductivity_browse_register` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 function zef_dti_conductivity_browse_register
+
 
 zef = evalin('base','zef');
 

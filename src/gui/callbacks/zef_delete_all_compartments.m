@@ -1,4 +1,39 @@
 function zef = zef_delete_all_compartments(zef)
+% --- Zeffiro documentation header ---
+% zef_delete_all_compartments — Zef delete all compartments.
+%
+% Purpose:
+%   Zef delete all compartments.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.compartments_selected (read, write)
+%   zef.h_compartment_table (read)
+%   zef.h_sensors_table (read)
+%   zef.sensor_sets_selected (read, write)
+%   zef.sensor_tags (read)
+%
+% Calls (project):
+%   zef_delete_all_compartments
+%   zef_delete_compartment
+%   zef_delete_sensor_sets
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_delete_all_compartments(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

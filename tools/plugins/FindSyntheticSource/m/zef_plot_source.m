@@ -1,6 +1,41 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function h_source = zef_plot_source(source_type)
+% --- Zeffiro documentation header ---
+% zef_plot_source — Renders or updates a plot_source figure from current `zef` state.
+%
+% Purpose:
+%   Renders or updates a plot_source figure from current `zef` state.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   source_type
+%
+% Outputs:
+%   h_source
+%
+% Zef fields (observed):
+%   zef.h_axes1 (read)
+%   zef.h_rec_source (read)
+%   zef.h_synth_source (read)
+%   zef.inv_rec_source (read)
+%   zef.inv_synth_source (read)
+%
+% Calls (project):
+%   zef_plot_3D_arrow
+%   zef_plot_meshes
+%   zef_plot_source
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[h_source] = zef_plot_source(source_type)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 arrow_scale = 1;
 arrow_type = 1;

@@ -1,5 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if  ismac — If  ismac.
+%
+% Purpose:
+%   If  ismac.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.font_size (read)
+%   zef.h_ias_map_estimation (read, write)
+%   zef.h_inv_apply (read)
+%   zef.h_inv_beta (read)
+%   zef.h_inv_cancel (read)
+%   zef.h_inv_data_segment (read)
+%   zef.h_inv_high_cut_frequency (read)
+%   zef.h_inv_hyperprior (read)
+%   zef.h_inv_likelihood_std (read)
+%   zef.h_inv_low_cut_frequency (read)
+%   zef.h_inv_multires_n_iter (read)
+%   zef.h_inv_multires_n_levels (read)
+%   zef.h_inv_multires_sparsity (read)
+%   zef.h_inv_n_burn_in (read)
+%   zef.h_inv_n_sampler (read)
+%   … (8 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if  ismac` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 if  ismac
     zef.h_ias_map_estimation = open('ramus_sampler.fig');
 elseif ispc

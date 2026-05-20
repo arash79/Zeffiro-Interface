@@ -1,6 +1,45 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_update_fig_details(zef)
+% --- Zeffiro documentation header ---
+% zef_update_fig_details — Syncs GUI control values into `zef` for fig_details.
+%
+% Purpose:
+%   Syncs GUI control values into `zef` for fig_details.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.aux_field (read, write)
+%   zef.compartment_tags (read)
+%   zef.current_sensors (read)
+%   zef.h_compartment_visible_color (read)
+%   zef.h_sensor_visible_color (read)
+%   zef.h_system_information (read)
+%   zef.inv_scale (read)
+%   zef.nodes (read)
+%   zef.on_screen (read)
+%   zef.reconstruction_type (read)
+%   zef.source_direction_mode (read)
+%   zef.tetra (read)
+%
+% Calls (project):
+%   zef_update_fig_details
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_update_fig_details(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

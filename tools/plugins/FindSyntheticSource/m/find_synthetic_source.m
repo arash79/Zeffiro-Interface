@@ -1,4 +1,50 @@
 function zef = find_synthetic_source(zef)
+% --- Zeffiro documentation header ---
+% find_synthetic_source — Find synthetic source.
+%
+% Purpose:
+%   Find synthetic source.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.find_synth_source (read, write)
+%   zef.find_synth_source_current_size (read, write)
+%   zef.find_synth_source_relative_size (read, write)
+%   zef.font_size (read)
+%   zef.fss_bg_noise (read, write)
+%   zef.fss_time_val (read, write)
+%   zef.h_synth_source (read, write)
+%   zef.inv_synth_sampling_frequency (read, write)
+%   zef.inv_synth_source (read)
+%   zef.measurements (read, write)
+%   zef.synth_source_data (read, write)
+%   zef.synth_source_init (read, write)
+%   zef.synth_source_updated_true (read, write)
+%   zef.time_sequence (read)
+%   zef.time_variable (read)
+%   … (1 more)
+%
+% Calls (project):
+%   zef_change_size_function
+%   zef_get_relative_size
+%   zef_plot_source
+%   zef_update_fss
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = find_synthetic_source(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 if nargin == 0
     zef = evalin('base', 'zef');
 end

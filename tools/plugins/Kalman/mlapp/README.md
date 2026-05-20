@@ -1,34 +1,39 @@
-# Kalman Plugin — GUI (`mlapp/`)
+# tools/plugins/Kalman/mlapp
 
-MATLAB App Designer graphical user interface for the Kalman filter plugin.
+## Purpose of this folder
 
-## File Reference
+Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
 
-| File | Description |
-|------|-------------|
-| `zef_kf_app.mlapp` | App Designer application file. Provides interactive controls for filter type, smoothing mode, SNR, prior parameters, evolution prior, number of ensembles (EnKF), standardization exponent, and burn-in frames. Opened via `zef_kf_open_window`. |
+## Contents
 
-## Opening the GUI
+Other files:
+- `zef_kf_app.mlapp`
 
-The Kalman filter GUI can be opened from:
+## How this folder fits into the overall workflow
 
-1. **Zeffiro menu:** Inverse Tools > Kalman Filter
-2. **Programmatically:** `zef_kf_open_window(zef)`
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-## GUI-to-Pipeline Connection
+## GUI usage
 
-The GUI writes parameter values to `zef` struct fields (e.g., `zef.filter_type`, `zef.kf_smoothing`, `zef.inv_snr`) and then calls `zef_KF(zef)` to execute the reconstruction. Results are stored in `zef.reconstruction`.
+Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
 
-## Modifying the GUI
+## Programmatic usage
 
-To edit the GUI layout and callbacks:
+Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
 
-```matlab
-appdesigner('zef_kf_app.mlapp')
-```
+## Examples
 
-The App Designer file contains the UI layout, component properties, and callback code in a single `.mlapp` package.
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
 
-## Note on DTI Structural Q
+## Dependencies and assumptions
 
-The DTI structural Q type (`zef.kf_structural_Q_type`) is currently configured programmatically rather than through this GUI. To add GUI support, add a dropdown or radio button group in the App Designer and wire its `ValueChangedFcn` to set `zef.kf_structural_Q_type` (0=diagonal, 1=FA-based, 2=tractography).
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+
+## Notes for developers
+
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

@@ -1,6 +1,40 @@
 %Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
 %See: https://github.com/sampsapursiainen/GPU-Torre-3D
 function [nodes,tetra,domain_labels_aux,distance_vec,tetra_interp_vec] = zef_mesh_refinement(zef,nodes,tetra,domain_labels_aux,distance_vec, varargin)
+% --- Zeffiro documentation header ---
+% zef_mesh_refinement — Zef mesh refinement.
+%
+% Purpose:
+%   Zef mesh refinement.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   zef
+%   nodes
+%   tetra
+%   domain_labels_aux
+%   distance_vec
+%   varargin
+%
+% Outputs:
+%   nodes
+%   tetra
+%   domain_labels_aux
+%   distance_vec
+%   tetra_interp_vec
+%
+% Calls (project):
+%   zef_mesh_refinement
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[nodes, tetra, domain_labels_aux]] = zef_mesh_refinement(zef, nodes, tetra, domain_labels_aux, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isempty(zef)
     zef = evalin('base',zef);

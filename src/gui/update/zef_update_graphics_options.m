@@ -1,3 +1,36 @@
+% --- Zeffiro documentation header ---
+% zef.use_gpu_graphic = get(zef — Zef.use gpu graphic = get(zef.
+%
+% Purpose:
+%   Zef.use gpu graphic = get(zef.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.colormap_size (read, write)
+%   zef.colortune_param (read, write)
+%   zef.cone_alpha (read, write)
+%   zef.cone_lattice_resolution (read, write)
+%   zef.cone_scale (read, write)
+%   zef.contour_line_width (read, write)
+%   zef.contour_n_smoothing (read, write)
+%   zef.h_colormap_size (read)
+%   zef.h_colortune_param (read)
+%   zef.h_cone_alpha (read)
+%   zef.h_cone_lattice_resolution (read)
+%   zef.h_cone_scale (read)
+%   zef.h_contour_line_width (read)
+%   zef.h_contour_n_smoothing (read)
+%   zef.h_n_streamline (read)
+%   … (13 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.use_gpu_graphic = get(zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef.use_gpu_graphic = get(zef.h_use_gpu_graphic,'Value');
 zef.parcellation_type = get(zef.h_parcellation_type,'Value');
 zef.parcellation_quantile = str2num(get(zef.h_parcellation_quantile,'Value'));

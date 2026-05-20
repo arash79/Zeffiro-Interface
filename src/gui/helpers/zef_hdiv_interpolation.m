@@ -1,3 +1,34 @@
+% --- Zeffiro documentation header ---
+% function [G, interpolation_positions] = zef_hdiv_interpolation( ... — Function [G, interpolation positions] = zef hdiv interpolation( .
+%
+% Purpose:
+%   Function [G, interpolation positions] = zef hdiv interpolation( ....
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   p_nodes
+%   p_tetrahedra
+%   p_brain_inds
+%   p_intended_source_inds
+%   p_nearest_neighbour_inds
+%   p_optimization_system_type
+%   mustBeText
+%   mustBeMember
+%
+% Calls (project):
+%   zef_ew_dipoles
+%   zef_fi_dipoles
+%   zef_hdiv_interpolation
+%   zef_hdiv_interpolation_discrete_local
+%   zef_mpo_system
+%   zef_pbo_system
+%   zef_tetra_barycentra
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `function [G, interpolation_positions] = zef_hdiv_interpolation( ...(p_nodes, p_tetrahedra, p_brain_inds, p_intended_source_inds, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 function [G, interpolation_positions] = zef_hdiv_interpolation( ...
     p_nodes, ...
     p_tetrahedra, ...
@@ -6,53 +37,6 @@ function [G, interpolation_positions] = zef_hdiv_interpolation( ...
     p_nearest_neighbour_inds, ...
     p_optimization_system_type ...
     )
-
-% Documentation
-%
-% Produces a lead field interpolation matrix G with position-based
-% optimization (PBO), based on the H(div) (face-intersecting + edgewise)
-% source model. Also returns the related interpolation positions.
-%
-% Input:
-%
-% - p_nodes
-%
-%   The nodes that form the tetrahedral mesh.
-%
-% - p_tetrahedra
-%
-%   The tetrahedra (4-tuples of node indices) that are formed from
-%   p_nodes.
-%
-% - p_brain_inds
-%
-%   The indices of the tetrahedra where sources can be placed in the first
-%   place. In other words, these tetra form the gray matter.
-%
-% - p_intended_source_inds
-%
-%   These are the subset of the tetrahedral indices which indicate where
-%   dipolar sources are to be placed in, not just where they can be
-%   placed.
-%
-% - p_nearest_neighbour_inds
-%
-%   Used in the case of continuous source models to determine which
-%   neighbours of neighbours of each central source tetrahedron are to be
-%   included in the interpolation. This is the first output value of
-%   zef_decompose_dof_space. If this is empty, the source model is
-%   interpreted as being discrete.
-%
-% Output:
-%
-% - G
-%
-%   Interpolation matrix that is to be multiplied by the transpose of the
-%   transfer matrix in the lead field routines.
-%
-% - interpolation_positions
-%
-%   The positions at which sources are the be placed after interpolation.
 
 arguments
     p_nodes (:,3) double {mustBeNonNan}

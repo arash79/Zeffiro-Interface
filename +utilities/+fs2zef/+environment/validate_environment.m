@@ -1,4 +1,25 @@
 function report = validate_environment(options)
+% --- Zeffiro documentation header ---
+% utilities.fs2zef.environment.validate_environment — Validate environment.
+%
+% Purpose:
+%   Validate environment.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   options
+%
+% Outputs:
+%   report
+%
+% Calls (project):
+%   utilities.fs2zef.environment.validate_environment
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[report] = utilities.fs2zef.environment.validate_environment(options)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %
 % validate_environment - Comprehensive validation of FreeSurfer environment
 %

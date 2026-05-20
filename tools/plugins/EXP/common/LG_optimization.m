@@ -1,23 +1,28 @@
 function x = LG_optimization(A,sigma,y,gamma,x,maxiter,estimation_type)
+% --- Zeffiro documentation header ---
+% LG_optimization — LG optimization.
+%
+% Purpose:
+%   LG optimization.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   A
+%   sigma
+%   y
+%   gamma
+%   x
+%   maxiter
+%   estimation_type
+%
+% Outputs:
+%   x
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[x] = LG_optimization(A, sigma, y, gamma, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-%MAP estimate using EM algorithm
-%L1 norm minimization problem (LASSO):
-%0.5|1/sigma(Lx-y)\|_2^2+0.5*\sum_i [gamma_i |x_i|]
-
-% L : lead field matrix
-% sigma: noise variance
-% y: measurements
-%for gamma->0 we have less sparse solutions...
-
-%Output: x: dipole amplitude
-
-%This code is used when dipole orientation is fixed!
-
-%EM: is a ridge regression solution given by d^(k) =(A'A+ Q^(k))^-1 A'y
-
-%This code was created by A. Koulouri 29.2.2020
-%modified 4.12.2024
-%modified to be stable (icreased accuracy) 04.12.2021
 dualObj = -Inf;
 reltol = 1e-4;
 

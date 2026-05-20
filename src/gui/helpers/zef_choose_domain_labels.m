@@ -1,4 +1,39 @@
 function [domain_labels, subcompartment_labeling_priority_vec, compartment_labeling_priority_vec] = zef_choose_domain_labels(zef, label_array, use_labeling_priority, ordinal_index)
+% --- Zeffiro documentation header ---
+% zef_choose_domain_labels — Zef choose domain labels.
+%
+% Purpose:
+%   Zef choose domain labels.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   label_array
+%   use_labeling_priority
+%   ordinal_index
+%
+% Outputs:
+%   domain_labels
+%   subcompartment_labeling_priority_vec
+%   compartment_labeling_priority_vec
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.reuna_mesh_ind (read)
+%   zef.reuna_p (read)
+%   zef.reuna_submesh_ind (read)
+%
+% Calls (project):
+%   zef_choose_domain_labels
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[domain_labels, subcompartment_labeling_priority_vec, compartment_labeling_priority_vec]] = zef_choose_domain_labels(zef, label_array, use_labeling_priority, ordinal_index)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 3
     priority_mode = 1; 

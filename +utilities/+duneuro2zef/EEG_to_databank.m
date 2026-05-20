@@ -27,8 +27,32 @@
 % See also: MEG_to_databank.m, zef_dataBank_add_data_item
 
 function zef = EEG_to_databank(zef)
+% --- Zeffiro documentation header ---
+% utilities.duneuro2zef.EEG_to_databank — EEG to databank.
+%
+% Purpose:
+%   EEG to databank.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Calls (project):
+%   utilities.duneuro2zef.EEG_to_databank
+%   zef_dataBank_add_data_item
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = utilities.duneuro2zef.EEG_to_databank(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-    % Get zef from base workspace if not provided
     if nargin < 1
         if evalin('base', 'exist(''zef'', ''var'')')
             zef = evalin('base', 'zef');

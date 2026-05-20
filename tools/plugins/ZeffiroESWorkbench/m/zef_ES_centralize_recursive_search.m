@@ -1,4 +1,34 @@
 function [alpha_psi, epsilon_psi] = zef_ES_centralize_recursive_search(alpha, epsilon, sr, sc, original_window, s_alpha, s_epsilon, varargin)
+% --- Zeffiro documentation header ---
+% zef_ES_centralize_recursive_search — Zef ES centralize recursive search.
+%
+% Purpose:
+%   Zef ES centralize recursive search.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   alpha
+%   epsilon
+%   sr
+%   sc
+%   original_window
+%   s_alpha
+%   s_epsilon
+%   varargin
+%
+% Outputs:
+%   alpha_psi
+%   epsilon_psi
+%
+% Calls (project):
+%   zef_ES_centralize_recursive_search
+%   zef_ES_find_parameters
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[alpha_psi, epsilon_psi]] = zef_ES_centralize_recursive_search(alpha, epsilon, sr, sc, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if ismember(varargin{1}, 1)
    non_floating_flag = varargin{1};

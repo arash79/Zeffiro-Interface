@@ -1,17 +1,27 @@
 function [posOri, magnetometerLabel, gradiometerLabel, tra] = getMagnetometerPositions(MEGdata, OptionalName, OptionalPlace, OptionalSave1or0)
-%getMagnetometerPositions extracts the important information about the MEG
-%gradiometers of fieldtrip processed MEGdata.
-%It extracts the postion and orientations of the magnetometer coils as one
-% 6*555 matrix posOri nad gives labels to each magnetometer. The later are
-% named after the gradiometer label with the postfix _mag1 or _mag2.
-%The gradiometer labels are given as gradiometerLavel.
-%The matrix tra can be applied to go from magnetometer data to first order
-%gradiometer data as grad=tra*mag.
-%All 4 output variables are saved as .dat files as
-%OptionalPlace/OptinalName_VARIABLENAME.dat, if OptionalSave1or0 is not set
-%to 0.
-%If not set,     OptionalPlace='', so the current matlab folder
-%                OptionalName='magnetometer'
+% --- Zeffiro documentation header ---
+% getMagnetometerPositions — Get Magnetometer Positions.
+%
+% Purpose:
+%   Get Magnetometer Positions.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   MEGdata
+%   OptionalName
+%   OptionalPlace
+%   OptionalSave1or0
+%
+% Outputs:
+%   posOri
+%   magnetometerLabel
+%   gradiometerLabel
+%   tra
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[posOri, magnetometerLabel, gradiometerLabel]] = getMagnetometerPositions(MEGdata, OptionalName, OptionalPlace, OptionalSave1or0)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if nargin==1
     OptionalSaveToFile0or1=1;

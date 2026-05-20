@@ -1,11 +1,18 @@
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.function zef_bst_settings_file — Function zef bst settings file.
+%
+% Purpose:
+%   Function zef bst settings file.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_settings_file
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `utilities.brainstorm2zef.function zef_bst_settings_file` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function zef_bst_settings_file
-%ZEF_BST_SETTINGS_FILE Opens file dialog to select a settings file.
-%
-% This callback function opens a file selection dialog allowing the user
-% to choose a settings file from the settings subfolder. The selected
-% file name is then displayed in the GUI and stored in the figure properties.
-%
-% See also: ZEF_BST_PLUGIN_START
 
 h_parent = get(gcbo,'Parent');
 h_text_1 = findobj(h_parent.Children,'Tag','settings_file');

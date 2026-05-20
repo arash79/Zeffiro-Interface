@@ -1,8 +1,34 @@
 %This function plot intensity as curves or histograms depending on is the
 %ground truth setted or not.
+% --- Zeffiro documentation header ---
+% function zef_plot_source_intensity — Function zef plot source intensity.
+%
+% Purpose:
+%   Function zef plot source intensity.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.find_synth_source (read)
+%   zef.fss_time_val (read)
+%   zef.h_axes1 (read)
+%   zef.h_zeffiro (read)
+%   zef.inv_synth_source (read)
+%   zef.time_sequence (read)
+%   zef.time_variable (read)
+%
+% Calls (project):
+%   zef_plot_source_intensity
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function zef_plot_source_intensity` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function zef_plot_source_intensity
 
-%Get needed variables
 if str2num(evalin('base','zef.find_synth_source.h_plot_switch.Value')) == 1
     name_label = evalin('base','zef.find_synth_source.h_source_list.Data(zef.find_synth_source.selected_source)');
     if size(evalin('base','zef.time_sequence'),1) > length(evalin('base','zef.find_synth_source.selected_source'))

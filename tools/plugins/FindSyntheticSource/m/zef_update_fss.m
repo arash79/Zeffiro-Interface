@@ -1,6 +1,43 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_update_fss(zef)
+% --- Zeffiro documentation header ---
+% zef_update_fss — Syncs GUI control values into `zef` for fss.
+%
+% Purpose:
+%   Syncs GUI control values into `zef` for fss.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.find_synth_source (read)
+%   zef.inv_oscillation_frequency (read, write)
+%   zef.inv_oscillation_phase (read, write)
+%   zef.inv_pulse_amplitude (read, write)
+%   zef.inv_pulse_length (read, write)
+%   zef.inv_pulse_peak_time (read, write)
+%   zef.inv_synth_sampling_frequency (read, write)
+%   zef.inv_synth_source (read, write)
+%   zef.synth_source_data (read)
+%   zef.synth_source_updated_true (read, write)
+%
+% Calls (project):
+%   zef_update_fss
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_update_fss(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 if nargin == 0
     zef = evalin('base','zef');
 end

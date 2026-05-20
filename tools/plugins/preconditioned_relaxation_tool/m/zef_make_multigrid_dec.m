@@ -1,4 +1,30 @@
 function [multigrid_dec, multigrid_ind, multigrid_perm] = zef_make_multigrid_dec(center_points,n_subset,n_decs,n_levels)
+% --- Zeffiro documentation header ---
+% zef_make_multigrid_dec — Zef make multigrid dec.
+%
+% Purpose:
+%   Zef make multigrid dec.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   center_points
+%   n_subset
+%   n_decs
+%   n_levels
+%
+% Outputs:
+%   multigrid_dec
+%   multigrid_ind
+%   multigrid_perm
+%
+% Calls (project):
+%   zef_make_multigrid_dec
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[multigrid_dec, multigrid_ind, multigrid_perm]] = zef_make_multigrid_dec(center_points, n_subset, n_decs, n_levels)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 multigrid_dec = cell(0);
 multigrid_ind = cell(0);

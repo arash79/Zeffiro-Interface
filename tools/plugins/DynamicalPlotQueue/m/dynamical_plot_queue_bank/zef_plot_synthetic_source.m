@@ -1,5 +1,31 @@
 function zef_plot_synthetic_source(varargin)
-%A static plot showing the active synthetic sources
+% --- Zeffiro documentation header ---
+% zef_plot_synthetic_source — Renders or updates a plot_synthetic_source figure from current `zef` state.
+%
+% Purpose:
+%   Renders or updates a plot_synthetic_source figure from current `zef` state.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.inv_synth_source (read)
+%
+% Calls (project):
+%   zef_plot_synthetic_source
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_plot_synthetic_source(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 color_cell = {'k','r','g','b','y','m','c'};
 h_axes = evalin('caller','h_axes_image');

@@ -1,6 +1,47 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function h_source = zef_plot_source_patch(zef, source_type)
+% --- Zeffiro documentation header ---
+% zef_plot_source_patch — Renders or updates a plot_source_patch figure from current `zef` state.
+%
+% Purpose:
+%   Renders or updates a plot_source_patch figure from current `zef` state.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%   source_type
+%
+% Outputs:
+%   h_source
+%
+% Zef fields (observed):
+%   zef.h_axes1 (read)
+%   zef.h_rec_source (read)
+%   zef.h_synth_source (read)
+%   zef.inv_rec_source (read)
+%   zef.inv_synth_source (read)
+%   zef.s2_points (read)
+%   zef.source_direction_mode (read, write)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_plot_3D_arrow
+%   zef_plot_cones_in_roi
+%   zef_plot_ellipsoid
+%   zef_plot_source_patch
+%   zef_plot_sphere
+%   zef_processLeadfields
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[h_source] = zef_plot_source_patch(zef, source_type)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 use_volume = eval('zef.inv_synth_source(1,11)');
 radius = eval('zef.inv_synth_source(:,12)');
@@ -128,4 +169,3 @@ else
     h_source = h_rec_source;
 end
 end
-

@@ -1,28 +1,25 @@
 function out_L = zef_set_lead_field_zero_potential( ...
+% --- Zeffiro documentation header ---
+% out_L — Out L.
+%
+% Purpose:
+%   Out L.
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Inputs:
+%   in_L
+%   in_electrodes
+%
+% Calls (project):
+%   zef_set_lead_field_zero_potential
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `out_L(in_L, in_electrodes)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
     in_L, ...
     in_electrodes ...
     )
-
-% Documentation
-%
-% Sets the zero potential level of a given lead field based on a given set
-% of electrodes.
-%
-% Input:
-%
-% - in_L:
-%
-%   The lead field matrix whose zero potential level we are adjusting.
-%
-% - in_electrodes:
-%
-%   The electrodes according to which we are setting the potential levels.
-%
-% Output:
-%
-% - out_L:
-%
-%   The lead field in_L after the zero potential level has been set.
 
 arguments
     in_L double

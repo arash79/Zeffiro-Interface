@@ -1,3 +1,38 @@
+% --- Zeffiro documentation header ---
+% zef.h_find_synthetic_source_legacy = figure(... — Zef.h find synthetic source legacy = figure(.
+%
+% Purpose:
+%   Zef.h find synthetic source legacy = figure(....
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.h_find_synthetic_source_legacy (read)
+%   zef.h_inv_synth_source_1 (read, write)
+%   zef.h_inv_synth_source_10 (read, write)
+%   zef.h_inv_synth_source_2 (read, write)
+%   zef.h_inv_synth_source_3 (read, write)
+%   zef.h_inv_synth_source_4 (read, write)
+%   zef.h_inv_synth_source_5 (read, write)
+%   zef.h_inv_synth_source_6 (read, write)
+%   zef.h_inv_synth_source_7 (read, write)
+%   zef.h_inv_synth_source_8 (read, write)
+%   zef.h_inv_synth_source_9 (read, write)
+%   zef.h_synth_source (read, write)
+%   zef.measurements (read, write)
+%
+% Calls (project):
+%   zef_find_source_legacy
+%   zef_plot_source_legacy
+%   zef_update_fss_legacy
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.h_find_synthetic_source_legacy = figure(...` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef.h_find_synthetic_source_legacy = figure(...
     'PaperUnits','inches',...
     'Units','normalized',...

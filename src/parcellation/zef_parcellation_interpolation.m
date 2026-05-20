@@ -1,6 +1,48 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [parcellation_interpolation_ind] = zef_parcellation_interpolation(zef)
+% --- Zeffiro documentation header ---
+% zef_parcellation_interpolation — Zef parcellation interpolation.
+%
+% Purpose:
+%   Zef parcellation interpolation.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   parcellation_interpolation_ind
+%
+% Zef fields (observed):
+%   zef.brain_ind (read)
+%   zef.compartment_tags (read)
+%   zef.domain_labels (read)
+%   zef.location_unit_current (read)
+%   zef.nodes (read)
+%   zef.parcellation_colortable (read)
+%   zef.parcellation_compartment (read)
+%   zef.parcellation_p (read, write)
+%   zef.parcellation_points (read)
+%   zef.parcellation_selected (read)
+%   zef.parcellation_tolerance (read)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   zef.submesh_ind (read)
+%   zef.tetra (read)
+%
+% Calls (project):
+%   zef_parcellation_interpolation
+%   zef_waitbar
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[parcellation_interpolation_ind] = zef_parcellation_interpolation(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 domain_labels = eval('zef.domain_labels(zef.brain_ind)');
 submesh_ind_vec = eval('zef.submesh_ind');

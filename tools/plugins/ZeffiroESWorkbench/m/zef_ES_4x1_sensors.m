@@ -1,6 +1,34 @@
 function ell_idx = zef_ES_4x1_sensors(varargin)
-% Returns the indices of the five sensors required for a HD-tDCS (4+1).
-% Based on the position and orientation of the synthetic source.
+% --- Zeffiro documentation header ---
+% zef_ES_4x1_sensors — Zef ES 4x1 sensors.
+%
+% Purpose:
+%   Zef ES 4x1 sensors.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   ell_idx
+%
+% Zef fields (observed):
+%   zef.ES_separation_angle (read)
+%   zef.inv_synth_source (read)
+%   zef.sensors (read)
+%
+% Calls (project):
+%   zef_ES_4x1_sensors
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[ell_idx] = zef_ES_4x1_sensors(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 if length(varargin) >= 1
     separation_angle = varargin{1};
 else

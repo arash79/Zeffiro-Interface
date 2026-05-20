@@ -58,6 +58,43 @@
 %See also: zef_dti_apply_to_sigma, zef_sigma, zef_visualize_nii_slices
 
 function zef = zef_nii_conductivity_to_sigma(nii_file, varargin)
+% --- Zeffiro documentation header ---
+% zef_nii_conductivity_to_sigma — Zef nii conductivity to sigma.
+%
+% Purpose:
+%   Zef nii conductivity to sigma.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   nii_file
+%   varargin
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.domain_labels (read)
+%   zef.nodes (read)
+%   zef.sigma (read)
+%   zef.sigma_anisotropy (read, write)
+%   zef.sigma_bypass (read, write)
+%   zef.tetra (read)
+%
+% Calls (project):
+%   zef_nii_conductivity_to_sigma
+%   zef_sigma
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_nii_conductivity_to_sigma(nii_file, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 arguments
     nii_file (1,:) char

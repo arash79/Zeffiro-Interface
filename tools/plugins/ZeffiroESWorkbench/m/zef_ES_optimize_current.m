@@ -1,5 +1,38 @@
 function [y_ES, ES_optimized_current_density, residual, flag_val, source_magnitude, source_position_index, source_directions] = zef_ES_optimize_current(zef_data, varargin)
-%% varargin
+% --- Zeffiro documentation header ---
+% zef_ES_optimize_current — Zef ES optimize current.
+%
+% Purpose:
+%   Zef ES optimize current.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef_data
+%   varargin
+%
+% Outputs:
+%   y_ES
+%   ES_optimized_current_density
+%   residual
+%   flag_val
+%   source_magnitude
+%   source_position_index
+%   source_directions
+%
+% Calls (project):
+%   zef_ES_optimize_current
+%   zef_ES_rwnnz
+%   zef_cvx_linprog
+%   zef_cvx_quadprog
+%   zef_cvx_semidefprog
+%   zef_gurobi_linprog
+%   zef_mosek_linprog
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[y_ES, ES_optimized_current_density, residual]] = zef_ES_optimize_current(zef_data, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 if nargin >= 2
 alpha = varargin{1};
 end

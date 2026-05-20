@@ -1,4 +1,27 @@
 function sensors_attached_volume = zef_pem2cem(sensors_attached_volume,tetra);
+% --- Zeffiro documentation header ---
+% zef_pem2cem — Zef pem2cem.
+%
+% Purpose:
+%   Zef pem2cem.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   sensors_attached_volume
+%   tetra
+%
+% Outputs:
+%   sensors_attached_volume
+%
+% Calls (project):
+%   zef_pem2cem
+%   zef_surface_mesh
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[sensors_attached_volume] = zef_pem2cem(sensors_attached_volume, tetra)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 n_electrodes = max(sensors_attached_volume(:,1),[],1);
 sensors_aux = [];

@@ -1,4 +1,42 @@
 function [zef] = zef_tool_start(zef,tool_script,relative_size,scale_positions)
+% --- Zeffiro documentation header ---
+% zef_tool_start — Zef tool start.
+%
+% Purpose:
+%   Zef tool start.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   tool_script
+%   relative_size
+%   scale_positions
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.font_size (read)
+%   zef.h_zeffiro_menu (read)
+%   zef.project_matfile (read)
+%   zef.use_display (read)
+%   zef.zeffiro_variable_data (read, write)
+%
+% Calls (project):
+%   zef_closereq
+%   zef_set_size_change_function
+%   zef_tool_start
+%
+% Side effects:
+%   - creates/updates figures
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_tool_start(zef, tool_script, relative_size, scale_positions)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 3
     relative_size = 1/2;

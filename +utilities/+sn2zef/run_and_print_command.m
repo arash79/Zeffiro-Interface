@@ -1,4 +1,25 @@
 function run_and_print_command(cmd)
+% --- Zeffiro documentation header ---
+% utilities.sn2zef.run_and_print_command — Run and print command.
+%
+% Purpose:
+%   Run and print command.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   cmd
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Calls (project):
+%   utilities.sn2zef.run_and_print_command
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `utilities.sn2zef.run_and_print_command(cmd)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %
 % run_and_print_command
 %

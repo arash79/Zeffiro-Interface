@@ -1,4 +1,39 @@
 function [time_serie,time_var] = zef_generate_time_sequence(zef)
+% --- Zeffiro documentation header ---
+% zef_generate_time_sequence — Zef generate time sequence.
+%
+% Purpose:
+%   Zef generate time sequence.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   time_serie
+%   time_var
+%
+% Zef fields (observed):
+%   zef.inv_oscillation_frequency (read)
+%   zef.inv_oscillation_phase (read)
+%   zef.inv_pulse_amplitude (read)
+%   zef.inv_pulse_length (read)
+%   zef.inv_pulse_peak_time (read)
+%   zef.inv_synth_sampling_frequency (read)
+%
+% Calls (project):
+%   zef_generate_time_sequence
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[time_serie, time_var]] = zef_generate_time_sequence(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 h = zef_waitbar(0,1,['Generate time sequence.']);
 if nargin == 0
     zef = evalin('base','zef');

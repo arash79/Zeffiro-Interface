@@ -18,6 +18,42 @@
 %
 % Copyright © 2025- Joonas Lahtinen
 function [MethodClassObj] = ClassGMModeling(MethodClassObj,reconstruction,zef,args)
+% --- Zeffiro documentation header ---
+% plugins.ClassGMM.ClassGMModeling — Class GMModeling.
+%
+% Purpose:
+%   Class GMModeling.
+%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
+%
+% Inputs:
+%   MethodClassObj
+%   reconstruction
+%   zef
+%   args
+%
+% Outputs:
+%   MethodClassObj
+%
+% Zef fields (observed):
+%   zef.parcellation_interp_ind (read)
+%   zef.parcellation_selected (read)
+%   zef.source_interpolation_ind (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   plugins.ClassGMM.ClassGMModeling
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[MethodClassObj] = plugins.ClassGMM.ClassGMModeling(MethodClassObj, reconstruction, zef, args)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 arguments
     MethodClassObj (1,1) inverse.CommonInverseParameters
     reconstruction (:,:) {mustBeA(reconstruction,["double","gpuArray","cell"])}
@@ -393,4 +429,3 @@ end     %end of t loop
 
 close(h);
 end
-    

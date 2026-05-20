@@ -1,6 +1,26 @@
 function [z] = zef_postProcessInverse(z_inverse, procFile)
-%zef_postProcessInverse reorders the inverse output z_inverse to fit the
-%visibility options. The procFile is given by zef_processLeadfield
+% --- Zeffiro documentation header ---
+% zef_postProcessInverse — Zef post Process Inverse.
+%
+% Purpose:
+%   Zef post Process Inverse.
+%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%
+% Inputs:
+%   z_inverse
+%   procFile
+%
+% Outputs:
+%   z
+%
+% Calls (project):
+%   zef_postProcessInverse
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[z] = zef_postProcessInverse(z_inverse, procFile)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 source_direction_mode=procFile.source_direction_mode;
 source_directions=procFile.source_directions;
 s_ind_1=procFile.s_ind_1;

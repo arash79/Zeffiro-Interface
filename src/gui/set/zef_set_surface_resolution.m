@@ -1,4 +1,34 @@
 function  patch_data = zef_set_surface_resolution(zef,patch_data,surface_resolution)
+% --- Zeffiro documentation header ---
+% zef_set_surface_resolution — Zef set surface resolution.
+%
+% Purpose:
+%   Zef set surface resolution.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   patch_data
+%   surface_resolution
+%
+% Outputs:
+%   patch_data
+%
+% Zef fields (observed):
+%   zef.mesh_resolution (read)
+%
+% Calls (project):
+%   zef_set_surface_resolution
+%   zef_triangular_mesh_refinement
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[patch_data] = zef_set_surface_resolution(zef, patch_data, surface_resolution)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if not(isempty(patch_data.vertices))
 

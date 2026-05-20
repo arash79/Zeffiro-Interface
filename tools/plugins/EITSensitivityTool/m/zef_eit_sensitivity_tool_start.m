@@ -1,3 +1,39 @@
+% --- Zeffiro documentation header ---
+% zef_data = zef_eit_sensitivity_tool; — Zef data = zef eit sensitivity tool;.
+%
+% Purpose:
+%   Zef data = zef eit sensitivity tool;.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.eit_sensitivity_tool_active (read, write)
+%   zef.eit_sensitivity_tool_current_size (read, write)
+%   zef.eit_sensitivity_tool_file (read, write)
+%   zef.eit_sensitivity_tool_file_2 (read, write)
+%   zef.eit_sensitivity_tool_lower_quantile (read, write)
+%   zef.eit_sensitivity_tool_upper_quantile (read, write)
+%   zef.font_size (read)
+%   zef.h_eit_sensitivity_tool (read, write)
+%   zef.h_eit_sensitivity_tool_activate (read, write)
+%   zef.h_eit_sensitivity_tool_distribution (read, write)
+%   zef.h_eit_sensitivity_tool_file (read, write)
+%   zef.h_eit_sensitivity_tool_file_2 (read, write)
+%   zef.h_eit_sensitivity_tool_import (read, write)
+%   zef.h_eit_sensitivity_tool_import_2 (read, write)
+%   zef.h_eit_sensitivity_tool_lower_quantile (read, write)
+%   … (3 more)
+%
+% Calls (project):
+%   zef_change_size_function
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_data = zef_eit_sensitivity_tool;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef_data = zef_eit_sensitivity_tool;
 
 if not(isfield(zef,'eit_sensitivity_tool_file'))

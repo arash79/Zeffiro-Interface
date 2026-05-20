@@ -17,6 +17,33 @@
 % See also: get_default_config.m, run.m
 
 function [config, is_valid, errors] = validate_config(config)
+% --- Zeffiro documentation header ---
+% utilities.duneuro2zef.validate_config — Validate config.
+%
+% Purpose:
+%   Validate config.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   config
+%
+% Outputs:
+%   config
+%   is_valid
+%   errors
+%
+% Calls (project):
+%   utilities.duneuro2zef.get_default_config
+%   utilities.duneuro2zef.validate_config
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[config, is_valid, errors]] = utilities.duneuro2zef.validate_config(config)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
     errors = {};
     is_valid = true;

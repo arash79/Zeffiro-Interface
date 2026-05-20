@@ -1,4 +1,35 @@
 function zef = zef_dataBank_addButtonPress(zef)
+% --- Zeffiro documentation header ---
+% zef_dataBank_addButtonPress — Zef data Bank add Button Press.
+%
+% Purpose:
+%   Zef data Bank add Button Press.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.dataBank (read)
+%
+% Calls (project):
+%   zef_dataBank_add
+%   zef_dataBank_addButtonPress
+%   zef_dataBank_getData
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_dataBank_addButtonPress(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

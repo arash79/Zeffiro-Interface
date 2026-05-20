@@ -1,13 +1,33 @@
 function [x, function_val, flag_val] = zef_cvx_linprog(z,A,b,Aeq,beq,lb,ub,varargin)
-%Finds the minimum of z'*x with respect to x and with the constraint A x  - b <= 0
-%Outputs: x (size: [n x 1]), flag_val (1 if the solution was found -2
-%otherwise)
-%Arguments: z (size: [n x 1]), A (size: [m x n]), b
-%(size: [m x 1])
-%Variable argument list: max_1_norm (size: [1 x 1], maximum 1-norm for x), max_infty_norm (size: [1 x 1], maximum infinity norm for x) 
-
-
-
+% --- Zeffiro documentation header ---
+% zef_cvx_linprog — Zef cvx linprog.
+%
+% Purpose:
+%   Zef cvx linprog.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   z
+%   A
+%   b
+%   Aeq
+%   beq
+%   lb
+%   ub
+%   varargin
+%
+% Outputs:
+%   x
+%   function_val
+%   flag_val
+%
+% Calls (project):
+%   zef_cvx_linprog
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[x, function_val, flag_val]] = zef_cvx_linprog(z, A, b, Aeq, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 opts = [];
 solver_package = 'sdpt3';

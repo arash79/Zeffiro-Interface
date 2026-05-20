@@ -1,5 +1,38 @@
 function [sr, sc] = zef_ES_objective_function(varargin)
-%% Check for zef
+% --- Zeffiro documentation header ---
+% zef_ES_objective_function — Zef ES objective function.
+%
+% Purpose:
+%   Zef ES objective function.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   sr
+%   sc
+%
+% Zef fields (observed):
+%   zef.ES_acceptable_threshold (read)
+%   zef.ES_obj_fun (read)
+%   zef.ES_obj_fun_2 (read)
+%   zef.ES_threshold_condition (read)
+%   zef.y_ES_interval (read)
+%
+% Calls (project):
+%   zef_ES_objective_function
+%   zef_ES_table
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[sr, sc]] = zef_ES_objective_function(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 switch nargin
     case {0, 1, 2}
         if nargin == 0

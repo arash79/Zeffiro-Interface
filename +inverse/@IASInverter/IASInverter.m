@@ -1,11 +1,24 @@
 classdef IASInverter < inverse.CommonInverseParameters & dynamicprops
-
-    %
-    % IASInverter
-    %
-    % A class which defines the properties needed by the IAS inversion method,
-    % and the method itself.
-    %
+% --- Zeffiro documentation header ---
+% inverse.IASInverter.IASInverter — Inverse solver class implementing IAS reconstruction.
+%
+% Purpose:
+%   Inverse solver class implementing IAS reconstruction.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   args
+%
+% Calls (project):
+%   inverse.CommonInverseParameters
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `inverse.IASInverter.IASInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
+% --- End Zeffiro documentation header
 
     properties
         %

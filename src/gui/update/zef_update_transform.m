@@ -1,4 +1,38 @@
 function zef = zef_update_transform(zef)
+% --- Zeffiro documentation header ---
+% zef_update_transform — Syncs GUI control values into `zef` for transform.
+%
+% Purpose:
+%   Syncs GUI control values into `zef` for transform.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.aux_field_1 (read, write)
+%   zef.aux_field_2 (read, write)
+%   zef.aux_field_3 (read, write)
+%   zef.aux_field_4 (read, write)
+%   zef.aux_field_5 (read, write)
+%   zef.current_tag (read)
+%   zef.h_transform_table (read)
+%
+% Calls (project):
+%   zef_update_transform
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_update_transform(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

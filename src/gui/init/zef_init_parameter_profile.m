@@ -1,3 +1,23 @@
+% --- Zeffiro documentation header ---
+% for zef_i = 1 : size(zef — For zef i = 1 : size(zef.
+%
+% Purpose:
+%   For zef i = 1 : size(zef.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.parameter_profile (read)
+%   zef.sensor_tags (read)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `for zef_i = 1 : size(zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 for zef_i = 1 : size(zef.parameter_profile,1)
 
     for zef_j = 1 : length(zef.compartment_tags)

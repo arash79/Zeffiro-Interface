@@ -1,6 +1,57 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,reconstruction_information] = exp_ias_iteration(void)
+% --- Zeffiro documentation header ---
+% exp_ias_iteration — Exp ias iteration.
+%
+% Purpose:
+%   Exp ias iteration.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   void
+%
+% Outputs:
+%   z
+%   reconstruction_information
+%
+% Zef fields (observed):
+%   zef.exp_ias_beta (read)
+%   zef.exp_ias_hyper_type (read)
+%   zef.exp_ias_q (read)
+%   zef.exp_ias_theta0 (read)
+%   zef.inv_amplitude_db (read)
+%   zef.inv_high_cut_frequency (read)
+%   zef.inv_hyperprior (read)
+%   zef.inv_hyperprior_tail_length_db (read)
+%   zef.inv_hyperprior_weight (read)
+%   zef.inv_low_cut_frequency (read)
+%   zef.inv_n_L1_iterations (read)
+%   zef.inv_n_map_iterations (read)
+%   zef.inv_prior_over_measurement_db (read)
+%   zef.inv_sampling_frequency (read)
+%   zef.inv_snr (read)
+%   … (8 more)
+%
+% Calls (project):
+%   zef_find_g_hyperprior
+%   zef_find_ig_hyperprior
+%   zef_getTimeStep
+%   zef_normalizeInverseReconstruction
+%   zef_postProcessInverse
+%   zef_processLeadfields
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[z, reconstruction_information]] = exp_ias_iteration(void)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 h = zef_waitbar(0,1,['IAS MAP iteration.']);
 
 hyper_type = evalin('base','zef.exp_ias_hyper_type');

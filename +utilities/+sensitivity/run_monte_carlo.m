@@ -1,61 +1,42 @@
 function results = run_monte_carlo(zef, method_id, opts)
-%RUN_MONTE_CARLO Monte-Carlo sensitivity loop on top of zef_inverse_run.
+% --- Zeffiro documentation header ---
+% utilities.sensitivity.run_monte_carlo — Run monte carlo.
 %
-%   results = run_monte_carlo(zef, method_id, opts)
-%
-% For each Monte-Carlo realisation:
-%   1. Synthesise an n_ch x n_probe_batch measurement matrix F via
-%      utilities.sensitivity.synthesize_measurements.
-%   2. Drop F into a clone of zef with inv_data_mode = "raw" and dispatch via
-%      zef_inverse_run. The path depends on the method's capability strategy:
-%        - linear_static / iterative_static: bounded probe batches per
-%          realisation. Class-based inverters still cache frame-invariant
-%          operators inside each batch, while the metric vectors are stitched
-%          back together in the same order as one monolithic dispatch.
-%        - stateful_dynamic (Kalman family): one dispatch per probe with
-%          IsolatedFramesPerProbe frames and a fresh inverter (so
-%          prev_step_* state never leaks between probes).
-%   3. Compute the per-reconstruction metrics with compute_metrics.
-%
-% The base-workspace zef is never modified; this function only mutates a
-% local copy.
+% Purpose:
+%   Run monte carlo.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   zef                     Project struct.
-%   method_id               Inverse method id (string).
-%   opts.Capability         Output of utilities.sensitivity.method_capability.
-%                           When omitted it is resolved internally so callers
-%                           outside zef_sensitivity_run can use this function
-%                           directly.
-%   opts.ProcFile           procFile struct from zef_processLeadfields(zef);
-%                           when omitted we recompute it.
-%   opts.NInterp            n_interp from zef_processLeadfields(zef); when
-%                           omitted we recompute it.
-%   opts.SourceIndices      Column vector of 1-based source indices to probe.
-%                           When omitted defaults to procFile.s_ind_0
-%                           (active brain sources).
-%   opts.MethodParams       Method parameters struct (forwarded).
-%   opts.execution          "local" | "cluster".
-%   opts.ClusterProfile     parallel.Cluster or [].
-%   opts.NumberOfRuns       Realisations to run (default 1).
-%   opts.NoiseLevelDb       Noise level (dB) added to F (default -30).
-%   opts.DiffType           "L2" | "minabs" position metric.
-%   opts.DispersionRadius   Radius (mm) for dispersion ROI.
-%   opts.SourceAmplitude    Synthetic source amplitude (default 10).
-%   opts.MaxProbesPerBatch  Upper bound for probes reconstructed in one
-%                           static-method dispatch. The full-run dispersion
-%                           metric is recomputed after stitching chunks, so
-%                           chunking does not change the metric definition.
+%   zef
+%   method_id
+%   opts
 %
-% Output (struct):
-%   results.runs           1 x NumberOfRuns cell of metric structs (see
-%                          utilities.sensitivity.compute_metrics).
-%   results.run_results    1 x NumberOfRuns cell of lightweight execution
-%                          summaries. Static-method entries describe chunk
-%                          sizes/timings rather than storing every
-%                          reconstruction vector.
-%   results.method_id      Echoed method id.
-%   results.source_indices Echoed source_indices.
+% Outputs:
+%   results
+%
+% Zef fields (observed):
+%   zef.L (read)
+%   zef.source_directions (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   utilities.sensitivity.compute_metrics
+%   utilities.sensitivity.method_capability
+%   utilities.sensitivity.run_monte_carlo
+%   utilities.sensitivity.synthesize_measurements
+%   zef_inverse_run
+%   zef_processLeadfields
+%
+% Side effects:
+%   - GPU
+%   - filesystem I/O
+%   - parallel/cluster
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[results] = utilities.sensitivity.run_monte_carlo(zef, method_id, opts)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     zef (1,1) struct

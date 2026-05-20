@@ -1,6 +1,61 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_load(zef,file_name,path_name)
+% --- Zeffiro documentation header ---
+% zef_load — Loads external data or a saved Zeffiro project into `zef`.
+%
+% Purpose:
+%   Loads external data or a saved Zeffiro project into `zef`.
+%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%
+% Inputs:
+%   zef
+%   file_name
+%   path_name
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.aux_field_1 (read, write)
+%   zef.code_path (read)
+%   zef.compartment_tags (read, write)
+%   zef.current_sensors (read, write)
+%   zef.current_version (read, write)
+%   zef.fieldnames (read, write)
+%   zef.h_compartment_visible_color (read)
+%   zef.h_sensor_visible_color (read)
+%   zef.h_sensors_table (read)
+%   zef.h_zeffiro (read)
+%   zef.profile_name (read, write)
+%   zef.program_path (read)
+%   zef.save_file (read, write)
+%   zef.save_file_path (read, write)
+%   zef.sensor_tags (read, write)
+%   … (2 more)
+%
+% Calls (project):
+%   zef_apply_system_settings
+%   zef_create_compartment
+%   zef_create_sensors
+%   zef_load
+%   zef_set_figure_tool_sliders
+%   zef_update
+%   zef_update_fig_details
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - creates/updates figures
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_load(zef, file_name, path_name)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

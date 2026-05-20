@@ -1,5 +1,30 @@
-
-%signal_pos=[-16, 56.5, 41.6];
+% --- Zeffiro documentation header ---
+% p='p1'; — P='p1';.
+%
+% Purpose:
+%   P='p1';.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Zef fields (observed):
+%   zef.GMM (read)
+%   zef.dataBank (read)
+%   zef.reconstruction (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_GMM_resection_volume
+%   zef_distance_to_resection
+%
+% Side effects:
+%   - base/caller workspace
+%   - creates/updates figures
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `p='p1';` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 p='p1';
 

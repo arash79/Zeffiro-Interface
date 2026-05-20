@@ -1,4 +1,34 @@
 function h_synth_source = zef_plot_cones_in_roi(zef,s_length)
+% --- Zeffiro documentation header ---
+% zef_plot_cones_in_roi — Renders or updates a plot_cones_in_roi figure from current `zef` state.
+%
+% Purpose:
+%   Renders or updates a plot_cones_in_roi figure from current `zef` state.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%   s_length
+%
+% Outputs:
+%   h_synth_source
+%
+% Zef fields (observed):
+%   zef.inv_synth_source (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_find_source_patch
+%   zef_plot_cones_in_roi
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[h_synth_source] = zef_plot_cones_in_roi(zef, s_length)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 [~,s_ind_all,s_o_all,n] = zef_find_source_patch(zef);
 
 

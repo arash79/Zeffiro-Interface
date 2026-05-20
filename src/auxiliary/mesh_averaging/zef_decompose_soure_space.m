@@ -1,4 +1,28 @@
 function [decomposition_ind, decomposition_count, dof_positions] = zef_decompose_soure_space(source_count, center_points)
+% --- Zeffiro documentation header ---
+% zef_decompose_soure_space — Zef decompose soure space.
+%
+% Purpose:
+%   Zef decompose soure space.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   source_count
+%   center_points
+%
+% Outputs:
+%   decomposition_ind
+%   decomposition_count
+%   dof_positions
+%
+% Calls (project):
+%   zef_decompose_soure_space
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[decomposition_ind, decomposition_count, dof_positions]] = zef_decompose_soure_space(source_count, center_points)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 min_x = min(center_points(:,1));
 max_x = max(center_points(:,1));

@@ -1,6 +1,54 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef_make_butterfly_plot(zef,h_axes_image)
+% --- Zeffiro documentation header ---
+% zef_make_butterfly_plot — Zef make butterfly plot.
+%
+% Purpose:
+%   Zef make butterfly plot.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   h_axes_image
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.bf_data_segment (read)
+%   zef.bf_high_cut_frequency (read)
+%   zef.bf_low_cut_frequency (read)
+%   zef.bf_normalize_data (read)
+%   zef.bf_sampling_frequency (read)
+%   zef.bf_time_1 (read)
+%   zef.bf_time_2 (read)
+%   zef.colormap_size (read)
+%   zef.font_size (read)
+%   zef.h_axes1 (read)
+%   zef.inv_data_segment (read, write)
+%   zef.inv_high_cut_frequency (read, write)
+%   zef.inv_low_cut_frequency (read, write)
+%   zef.inv_normalize_data (read, write)
+%   zef.inv_sampling_frequency (read, write)
+%   … (3 more)
+%
+% Calls (project):
+%   zef_getFilteredData
+%   zef_getTimeStep
+%   zef_make_butterfly_plot
+%   zef_set_timepointline
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_make_butterfly_plot(zef, h_axes_image)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 2
     if evalin('caller','exist(''h_axes_image'',''var'')')
@@ -43,4 +91,3 @@ h_legend = findobj(h_axes_image.Parent.Children,'Type','Legend');
 delete(h_legend)
 
 end
-

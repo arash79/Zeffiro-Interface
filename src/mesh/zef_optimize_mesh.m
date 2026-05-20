@@ -1,4 +1,35 @@
 function [nodes, tetra] = zef_optimize_mesh(nodes,tetra)
+% --- Zeffiro documentation header ---
+% zef_optimize_mesh — Zef optimize mesh.
+%
+% Purpose:
+%   Zef optimize mesh.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   nodes
+%   tetra
+%
+% Outputs:
+%   nodes
+%   tetra
+%
+% Zef fields (observed):
+%   zef.mesh_optimization_parameter (read)
+%
+% Calls (project):
+%   zef_optimize_mesh
+%   zef_tetra_turn
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[[nodes, tetra]] = zef_optimize_mesh(nodes, tetra)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 nodes_old = nodes;
 tetra_old = tetra;

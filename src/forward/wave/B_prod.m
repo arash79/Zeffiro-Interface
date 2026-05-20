@@ -2,6 +2,31 @@
 %See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 function [p] = B_prod(u,entry_ind,n,t,gpu_extended_memory)
+% --- Zeffiro documentation header ---
+% B_prod — B prod.
+%
+% Purpose:
+%   B prod.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   u
+%   entry_ind
+%   n
+%   t
+%   gpu_extended_memory
+%
+% Outputs:
+%   p
+%
+% Side effects:
+%   - GPU
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[p] = B_prod(u, entry_ind, n, t, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 u = gpuArray(single(u));
 n = gpuArray(n);

@@ -1,5 +1,39 @@
 function zef_3D_plot_specs(h)
-%Coordinate system's visualization parameters
+% --- Zeffiro documentation header ---
+% zef_3D_plot_specs — Zef 3D plot specs.
+%
+% Purpose:
+%   Zef 3D plot specs.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   h
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.axes_visible (read)
+%   zef.azimuth (read)
+%   zef.cam_va (read)
+%   zef.compartment_tags (read)
+%   zef.elevation (read)
+%   zef.h_zeffiro (read)
+%   zef.reuna_p (read)
+%
+% Calls (project):
+%   zef_3D_plot_specs
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_3D_plot_specs(h)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 head2axes_ratio = 1.0255;   %percentual empty space between surface and coordinate limits
 tick_number_limit = 8;      %maximum number of ticks on visualization
 

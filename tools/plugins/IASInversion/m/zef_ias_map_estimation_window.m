@@ -1,4 +1,47 @@
 function zef = ias_map_estimation_window(zef)
+% --- Zeffiro documentation header ---
+% ias_map_estimation_window — Ias map estimation window.
+%
+% Purpose:
+%   Ias map estimation window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.h_ias_apply (read, write)
+%   zef.h_ias_cancel (read, write)
+%   zef.h_ias_high_cut_frequency (read, write)
+%   zef.h_ias_hyperprior (read, write)
+%   zef.h_ias_low_cut_frequency (read, write)
+%   zef.h_ias_map_estimation (read, write)
+%   zef.h_ias_n_map_iterations (read, write)
+%   zef.h_ias_normalize_data (read, write)
+%   zef.h_ias_number_of_frames (read, write)
+%   zef.h_ias_sampling_frequency (read, write)
+%   zef.h_ias_snr (read, write)
+%   zef.h_ias_start (read, write)
+%   zef.h_ias_time_1 (read, write)
+%   zef.h_ias_time_2 (read, write)
+%   zef.h_ias_time_3 (read, write)
+%   … (14 more)
+%
+% Calls (project):
+%   zef_ias_iteration
+%
+% Side effects:
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = ias_map_estimation_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 
 h1 = figure(...

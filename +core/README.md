@@ -1,48 +1,71 @@
-# core
+# +core
 
-The **core** package provides shared type definitions, utilities, and subsystems used by central Zeffiro Interface functionality and by other top-level modules in the repository. By keeping these definitions under `+core`, they can be accessed without adding the legacy [`m/`](../m) folder to the MATLAB path.
+## Purpose of this folder
 
-## Package layout
+Refactored MATLAB **package** at the project root (not `src/core/`). Provides typed source models, electrode file parsers, one GUI menu callback, and standalone preconditioner builders. Available when `zeffiro_interface` executes `addpath(projectRoot)`.
 
-| Path | Description |
-|------|-------------|
-| **ZefSourceModel.m** | Enumeration of source and interpolation models (Whitney, H(div), St. Venant, and continuous variants) used in forward and inverse solvers. |
-| **+preconditioners/** | Linear-algebra preconditioners for iterative solvers (Jacobi, SSOR). |
-| **+import/** | Electrode and sensor import from external file formats (.dat, .csv). |
-| **+gui/+menu_tool/** | GUI callbacks for the menu-based tools (e.g. Import electrodes). |
+## Contents
 
-## Contents overview
+| Path | Symbols | Role |
+|------|---------|------|
+| `+types/ZefSourceModel.m` | `core.types.ZefSourceModel` | Enum: Whitney, H(div), St. Venant (+ continuous variants); `from`, `variants`, `to_string`, `loadobj` |
+| `ZefSourceModel.m` | `core.ZefSourceModel` | **Compatibility shim** for old `.mat` saves → delegates to `core.types` |
+| `+io/+electrodes/from_csv.m` | `core.io.electrodes.from_csv` | CSV electrodes (+ optional CEM columns) |
+| `+io/+electrodes/from_dat.m` | `core.io.electrodes.from_dat` | Whitespace `.dat` electrodes |
+| `+gui/+menu_tool/import_electrodes_callback.m` | `core.gui.menu_tool.import_electrodes_callback` | File picker → parsers → `zef.sensors` / `s*_points` → `zef_update` |
+| `+linalg/+preconditioners/jacobi.m` | `core.linalg.preconditioners.jacobi` | Jacobi preconditioner matrix |
+| `+linalg/+preconditioners/ssor.m` | `core.linalg.preconditioners.ssor` | SSOR preconditioner matrix |
 
-### ZefSourceModel
+## How this folder fits into the overall workflow
 
-- **Purpose:** Single source of truth for the finite-element source and interpolation model identifiers used across the codebase (e.g. when loading projects or configuring solvers).
-- **Main usage:** `core.ZefSourceModel.from(value)` to convert legacy numeric (1–6), string, or enum input into a `ZefSourceModel` member; `core.ZefSourceModel.variants()` to list all members; `core.ZefSourceModel.to_string(variant)` for display names.
-- **Enumeration members:** `Hdiv`, `Whitney`, `StVenant`, `ContinuousHdiv`, `ContinuousWhitney`, `ContinuousStVenant`, and sentinel `Error`.
+- **Forward:** `src/forward/lead_field/*` branches on `core.types.ZefSourceModel.from(zef.source_model)` when assembling `zef.L`.
+- **GUI:** `zef_init_options` / `zef_update_forward_and_inverse_options` bind `zef.h_source_model` to enum variants.
+- **Import:** Edit menu calls `import_electrodes_callback` instead of legacy import helpers.
+- **Preconditioners:** implemented here but lead-field PCG in `src/forward` still uses inline SSOR/`ichol` until wired.
 
-### +preconditioners
+## GUI usage
 
-- **jacobi(A)** — Builds the Jacobi (diagonal) preconditioner for the system `A*x = b`.
-- **ssor(A, coeff)** — Builds the symmetric successive over-relaxation (SSOR) preconditioner; optional `coeff` in (0, 2), default 1 (Gauss–Seidel).
+- **Edit → Import electrodes** → `core.gui.menu_tool.import_electrodes_callback(zef)` (see `src/gui/tools/zef_menu_tool.m`).
+- **Forward & inverse options** → source model dropdown synced via `core.types.ZefSourceModel`.
 
-Used by iterative linear solvers that need preconditioning for better convergence.
-
-### +import
-
-- **electrodes_from_dat(file)** — Imports electrode positions (and optional labels and CEM parameters) from a whitespace-separated text (.dat) file.
-- **electrodes_from_csv(file)** — Imports from a CSV file with header columns `x`, `y`, `z`, and optionally `label`, `inner_radius`, `outer_radius`, `impedance`.
-
-Both return `[electrode_data, electrode_labels]` in a form suitable for the Zeffiro central struct (e.g. `sensors`, `s_points`, `s_name_list`). See [+import/README.md](+import/README.md) for file formats and options.
-
-### +gui/+menu_tool
-
-- **import_electrodes_callback(zef)** — Callback for *Menu tool > Import > Import electrodes*. Opens a file dialog (.dat / .csv), reads electrodes via `core.import`, and updates `zef` with sensor data and optional CEM fields; on error, shows a dialog and returns without modifying `zef`.
-
-## Usage note
-
-From the Zeffiro Interface root folder, call package functions with the full namespace, for example:
+## Programmatic usage
 
 ```matlab
-model = core.ZefSourceModel.from(2);
-prec  = core.preconditioners.jacobi(A);
-[data, labels] = core.import.electrodes_from_csv("electrodes.csv");
+addpath(fileparts(which('zeffiro_interface')));  % exposes core.*
+
+% Source model
+model = core.types.ZefSourceModel.from(2);   % Hdiv
+allModels = core.types.ZefSourceModel.variants();
+
+% Electrodes (no zef)
+[pos, labels] = core.io.electrodes.from_csv("electrodes.csv");
+
+% With existing zef (opens uigetfile)
+zef = core.gui.menu_tool.import_electrodes_callback(zef);
+
+% Preconditioner (sparse A)
+prec = core.linalg.preconditioners.ssor(A, "coeff", 1);
 ```
+
+## Examples
+
+```matlab
+% After zeffiro_interface
+zef.source_model = core.types.ZefSourceModel.Whitney;
+zef = zef_update(zef);
+
+% See +examples/+forward/lead_field_example.m for typed lead-field usage
+```
+
+## Dependencies and assumptions
+
+- Project root on path (package folder `+core` must not be `addpath`'d directly).
+- `import_electrodes_callback` requires `zef_update` from `src/core`.
+- Electrode parsers: MATLAB `readtable` / `readlines`; CSV needs `x,y,z` columns; DAT allows 3/4/6/7 columns per line.
+- `zef.current_sensors` sets prefix for `s_points` / `s2_points` style fields.
+
+## Notes for developers
+
+- Add new **types** under `+types`, new **file I/O** under `+io`, new **menu hooks** under `+gui/+menu_tool`.
+- Keep `core.ZefSourceModel` shim if enum location changes again.
+- Wire `core.linalg.preconditioners` into `zef.lf_param.precond` paths in `src/forward` when replacing duplicated SSOR code.

@@ -1,43 +1,51 @@
 %Copyright © 2018, Sampsa Pursiainen
 function [L_eit,  bg_data, source_locations, source_directions] = lead_field_gravity_grad(nodes,elements,rho,sensors,varargin)
-% function [L_eeg, source_locations, source_directions] = lead_field_gravity_grad(nodes,elements,rho,sensors,gravity_ind,source_ind,additional_options)
+% --- Zeffiro documentation header ---
+% lead_field_gravity_grad — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
 %
-% Input:
-% ------
-% - nodes              = N x 3
-% - elements           = M x 4
-% - rho              = M x 1 (or M x 6, one row: rho_11 rho_22 rho_33 rho_12 rho_13 rho_23)
-% - sensors         = L x 6
-% - gravity_ind          = P x 1 (The set of elements that potentially contain source currents, by default contains all elements)
-% - source_ind         = R x 1 (The set of elements that are allowed to contain source currents, a subset of gravity_ind, by default equal to gravity_ind)
-% - additional_options = Struct, see below
+% Purpose:
+%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
 %
-% Fields of additional_options:
-% -----------------------------
+% Inputs:
+%   nodes
+%   elements
+%   rho
+%   sensors
+%   varargin
 %
-% - additional_options.direction_mode: Source directions; Values: 'mesh based' (default) or 'Cartesian' (optional).
-%   Note: If Cartesian directions are used, the columns of the lead field matrix correspond
-%   to directions x y z x y z x y z ..., respectively.
-% - additional_options.precond: Preconditioner type; Values: 'cholinc' (Incomplete Cholesky, default) or 'ssor' (SSOR, optional)
-% - additional_options.cholinc_tol: Tolerance of the Incomplete Cholesky; Values: Numeric (default is 0.001) or '0' (complete Cholesky)
-% - additional_options.pcg_tol: Tolerance of the PCG iteration; Values: Numeric (default is 1e-6)
-% - additional_options.maxit: Maximum number of PCG iteration steps; Values: Numeric (default is 3*floor(sqrt(N)))
-% - additional_options.source_mode: Element-wise source direction mode; Values: '1' (direction of the source moment, default) or '2' (line segment between nodes 4 and 5 with the numbering given in Pursiainen et al 2011)
-% - additional_options.permutation: Permutation of the linear system; Values: 'symamd' (default), 'symmmd' (optional), 'symrcm' (optional), or 'none' (optional)
+% Outputs:
+%   L_eit
+%   bg_data
+%   source_locations
+%   source_directions
 %
-% Output:
-% -------
-% - L_gravity             = L x K
-% - source_locations   = K x 3 (or K/3 x 3, if Cartesian are used)
-% - source_directions  = K x 3
+% Zef fields (observed):
+%   zef.gravity_field_type (read)
+%   zef.sensors (read)
+%   zef.source_model (read)
 %
+% Calls (project):
+%   core.types.ZefSourceModel.from
+%   zef_make_gravity_dec
+%   zef_tetra_volume
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[L_eit, bg_data, source_locations]] = lead_field_gravity_grad(nodes, elements, rho, sensors, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 N = size(nodes,1);
 source_model = evalin('base','zef.source_model');
 
 % Convert source model to new format.
 
-source_model = core.ZefSourceModel.from(source_model);
+source_model = core.types.ZefSourceModel.from(source_model);
 
 if iscell(elements)
     tetrahedra = elements{1};

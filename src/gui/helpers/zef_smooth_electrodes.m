@@ -1,3 +1,26 @@
+% --- Zeffiro documentation header ---
+% nodes_old = zef — Nodes old = zef.
+%
+% Purpose:
+%   Nodes old = zef.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.nodes (read, write)
+%   zef.sensors (read)
+%   zef.sensors_attached_volume (read)
+%
+% Calls (project):
+%   zef_attach_sensors_volume
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `nodes_old = zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 nodes_old = zef.nodes;
 nodes = zef.nodes;
 N = size(nodes,1);

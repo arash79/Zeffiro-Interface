@@ -1,3 +1,31 @@
+% --- Zeffiro documentation header ---
+% zef.aux_field_1 = zef.h_sensors_name_table — Zef.aux field 1 = zef.h sensors name table.
+%
+% Purpose:
+%   Zef.aux field 1 = zef.h sensors name table.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.aux_field_1 (read, write)
+%   zef.aux_field_2 (read, write)
+%   zef.aux_field_3 (read, write)
+%   zef.current_sensors (read)
+%   zef.h_sensors_name_table (read)
+%   zef.h_sensors_table (read)
+%   zef.parameter_profile (read)
+%
+% Calls (project):
+%   zef_fix_sensors_get_functions_array_size
+%   zef_update
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.aux_field_1 = zef.h_sensors_name_table` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef.aux_field_1 = zef.h_sensors_name_table.Data;
 zef.aux_field_2 = [];
 zef.aux_field_3 = [];

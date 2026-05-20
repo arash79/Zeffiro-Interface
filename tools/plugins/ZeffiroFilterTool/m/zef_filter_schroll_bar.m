@@ -1,3 +1,27 @@
+% --- Zeffiro documentation header ---
+% if isfield(zef,'h_scroll_bar') — If isfield(zef,'h scroll bar').
+%
+% Purpose:
+%   If isfield(zef,'h scroll bar').
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.filter_sampling_rate (read)
+%   zef.filter_zoom (read)
+%   zef.h_axes1 (read)
+%   zef.h_scroll_bar (read, write)
+%   zef.h_zeffiro (read)
+%   zef.processed_data (read)
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if isfield(zef,'h_scroll_bar')` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 if isfield(zef,'h_scroll_bar')
     delete(zef.h_scroll_bar);
 end

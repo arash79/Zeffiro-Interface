@@ -1,13 +1,24 @@
 classdef ELORETAInverter < inverse.CommonInverseParameters & handle
-
-    %
-    % ELORETAInverter
-    %
-    % A class that implements exact low-resolution electromagnetic
-    % tomography (eLORETA) using a fixed-point iteration over source-space
-    % weights. The frame-wise inversion is linear once the inverse operator
-    % has been precomputed.
-    %
+% --- Zeffiro documentation header ---
+% inverse.ELORETAInverter.ELORETAInverter — Inverse solver class implementing ELORETA reconstruction.
+%
+% Purpose:
+%   Inverse solver class implementing ELORETA reconstruction.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   args
+%
+% Calls (project):
+%   inverse.CommonInverseParameters
+%
+% Side effects:
+%   - GPU
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `inverse.ELORETAInverter.ELORETAInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
+% --- End Zeffiro documentation header
 
     properties
 

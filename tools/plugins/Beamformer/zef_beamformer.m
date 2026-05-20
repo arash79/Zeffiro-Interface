@@ -1,4 +1,54 @@
 function [z,Var_loc,reconstruction_information] = zef_beamformer(zef)
+% --- Zeffiro documentation header ---
+% zef_beamformer — Zef beamformer.
+%
+% Purpose:
+%   Zef beamformer.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   z
+%   Var_loc
+%   reconstruction_information
+%
+% Zef fields (observed):
+%   zef.L_reg_type (read)
+%   zef.beamformer (read)
+%   zef.bf_type (read)
+%   zef.cov_type (read)
+%   zef.inv_cov_lambda (read)
+%   zef.inv_high_cut_frequency (read)
+%   zef.inv_leadfield_lambda (read)
+%   zef.inv_low_cut_frequency (read)
+%   zef.inv_sampling_frequency (read)
+%   zef.inv_snr (read)
+%   zef.inv_time_1 (read)
+%   zef.inv_time_2 (read)
+%   zef.inv_time_3 (read)
+%   zef.number_of_frames (read)
+%   zef.source_direction_mode (read)
+%   … (2 more)
+%
+% Calls (project):
+%   zef_beamformer
+%   zef_getFilteredData
+%   zef_getTimeStep
+%   zef_normalizeInverseReconstruction
+%   zef_postProcessInverse
+%   zef_processLeadfields
+%   zef_waitbar
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[z, Var_loc, reconstruction_information]] = zef_beamformer(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h = zef_waitbar(0,1,['Beamformer.']);
 [procFile.s_ind_1] = unique(eval('zef.source_interpolation_ind{1}'));

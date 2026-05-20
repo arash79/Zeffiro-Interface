@@ -1,5 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if  ismac — If  ismac.
+%
+% Purpose:
+%   If  ismac.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.font_size (read)
+%   zef.h_exp_em_apply (read)
+%   zef.h_exp_em_beta (read)
+%   zef.h_exp_em_cancel (read)
+%   zef.h_exp_em_data_segment (read)
+%   zef.h_exp_em_high_cut_frequency (read)
+%   zef.h_exp_em_low_cut_frequency (read)
+%   zef.h_exp_em_map_estimation (read, write)
+%   zef.h_exp_em_n_L1_iterations (read)
+%   zef.h_exp_em_n_map_iterations (read)
+%   zef.h_exp_em_number_of_frames (read)
+%   zef.h_exp_em_sampling_frequency (read)
+%   zef.h_exp_em_snr (read)
+%   zef.h_exp_em_start (read)
+%   zef.h_exp_em_theta0 (read)
+%   … (4 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if  ismac` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 if  ismac
     zef.h_exp_em_map_estimation = open('exp_em_map_estimation.fig');
 elseif ispc

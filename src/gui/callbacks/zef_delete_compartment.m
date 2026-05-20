@@ -1,4 +1,35 @@
 function zef = zef_delete_compartment(zef,compartments_selected)
+% --- Zeffiro documentation header ---
+% zef_delete_compartment — Zef delete compartment.
+%
+% Purpose:
+%   Zef delete compartment.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   compartments_selected
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartments_selected (read)
+%   zef.h_compartment_table (read)
+%
+% Calls (project):
+%   zef_delete_compartment
+%   zef_update
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_delete_compartment(zef, compartments_selected)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 2
     compartments_selected = [];

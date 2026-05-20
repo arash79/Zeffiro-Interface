@@ -1,4 +1,29 @@
 function cluster_profile = configure_cluster_profile(computing_project, opts)
+% --- Zeffiro documentation header ---
+% utilities.cluster.configure_cluster_profile — Configure cluster profile.
+%
+% Purpose:
+%   Configure cluster profile.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   computing_project
+%   opts
+%
+% Outputs:
+%   cluster_profile
+%
+% Calls (project):
+%   utilities.cluster.configure_cluster_profile
+%
+% Side effects:
+%   - parallel/cluster
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[cluster_profile] = utilities.cluster.configure_cluster_profile(computing_project, opts)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %CONFIGURE_CLUSTER_PROFILE Configure a CSC Puhti cluster profile.
 %
 % This utility configures MATLAB's current cluster profile so that the

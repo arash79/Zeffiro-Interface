@@ -1,3 +1,32 @@
+% --- Zeffiro documentation header ---
+% zef_data = zef_github_updater; — Zef data = zef github updater;.
+%
+% Purpose:
+%   Zef data = zef github updater;.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.font_size (read)
+%   zef.github_updater_current_size (read, write)
+%   zef.h_github_author (read)
+%   zef.h_github_message (read)
+%   zef.h_github_pull_button (read)
+%   zef.h_github_reset_button (read)
+%   zef.h_github_updater (read)
+%   zef.h_github_updater_button (read)
+%   zef.user_tag (read)
+%
+% Calls (project):
+%   zef_change_size_function
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_data = zef_github_updater;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef_data = zef_github_updater;
 zef_assign_data;
 zef.h_github_updater.Name = 'ZEFFIRO Interface: GitHub pusher tool';

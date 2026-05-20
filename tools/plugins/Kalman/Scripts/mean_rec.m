@@ -1,4 +1,22 @@
-% Calculates the mean of the 50 rec of the project file
+% --- Zeffiro documentation header ---
+% z_inverse_results = cell(0); — Z inverse results = cell(0);.
+%
+% Purpose:
+%   Z inverse results = cell(0);.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.dataBank (read)
+%   zef.reconstruction (read, write)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `z_inverse_results = cell(0);` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 z_inverse_results = cell(0);
 
 data_tree = zef.dataBank.tree;

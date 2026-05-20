@@ -1,39 +1,31 @@
 function zeffiro_setup ( kwargs )
+% --- Zeffiro documentation header ---
+% zeffiro_setup — Zeffiro setup.
 %
-% zeffiro_setup ( kwargs )
-%
-% Downloads dependencies specified in the .gitmodules file into the external/
-% folder and calls their installation scripts.
+% Purpose:
+%   Zeffiro setup.
+%   Folder: Repository root: startup (`zeffiro_interface`, `zeffiro_setup`), path configuration, and entry to `src/`, `+core`, `+inverse`, `+utilities`, `tools/plugins`, and bundled data.
 %
 % Inputs:
+%   kwargs
 %
-% - kwargs.submodules = string([])
+% Outputs:
+%   See function signature and code below.
 %
-%   This column vector of submodule names specifies, which submodules listed in
-%   the .gitmodules files are installed by this function. In addition to the
-%   names in the .gitmodules file, the option "all" can be given, in which case
-%   all submodules are installed.
+% Zef fields (observed):
+%   zef.zeffiro_restart (read)
 %
-% - kwargs.init = true
+% Calls (project):
+%   utilities.io.read_gitmodules
 %
-%   Determines whether the submodules are initialized. This should probably be
-%   true at all times, as it does not harm if the submodules are already
-%   downloaded.
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
 %
-% - kwargs.remote = true
-%
-%   Whether to force the submodules be downloaded from the URL specified in the
-%   .gitmodules file, even when the folder is already populated.
-%
-% - kwargs.recursive = true
-%
-%   Whether to download the submodules of the submodules recursively.
-%
-% - kwargs.skip_submodules = false
-%
-%   If this is true, then only the zef_start_config file will be created, but
-%   no submodules will be downloaded.
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zeffiro_setup(kwargs)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     kwargs.submodules (:,1) string = string ( [] )
@@ -52,7 +44,7 @@ lower_submodule_names = unique ( lower ( kwargs.submodules ) ) ;
 
 gitmodules_file = fullfile ( this_folder, ".gitmodules" ) ;
 
-submodule_structs = utilities.read_gitmodules ( gitmodules_file ) ;
+submodule_structs = utilities.io.read_gitmodules ( gitmodules_file ) ;
 
 allowed_names = [ submodule_structs.name ] ;
 

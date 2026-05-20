@@ -1,6 +1,32 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [gravity_ind,gravity_count] = zef_make_gravity_dec(nodes,tetrahedra,brain_ind,source_ind)
+% --- Zeffiro documentation header ---
+% zef_make_gravity_dec — Zef make gravity dec.
+%
+% Purpose:
+%   Zef make gravity dec.
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Inputs:
+%   nodes
+%   tetrahedra
+%   brain_ind
+%   source_ind
+%
+% Outputs:
+%   gravity_ind
+%   gravity_count
+%
+% Calls (project):
+%   zef_make_gravity_dec
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[gravity_ind, gravity_count]] = zef_make_gravity_dec(nodes, tetrahedra, brain_ind, source_ind)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h = zef_waitbar(0,1,'Field decomposition');
 

@@ -11,6 +11,45 @@
 %nodes, describing the surface of the wireframe.
 
 function [m_triangles,m_nodes,filling_vec,w_vec,shape_vec] = wireframe(tetra,nodes,domain_labels,filling_vec,varargin)
+% --- Zeffiro documentation header ---
+% wireframe — Wireframe.
+%
+% Purpose:
+%   Wireframe.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   tetra
+%   nodes
+%   domain_labels
+%   filling_vec
+%   varargin
+%
+% Outputs:
+%   m_triangles
+%   m_nodes
+%   filling_vec
+%   w_vec
+%   shape_vec
+%
+% Zef fields (observed):
+%   zef.wireframe_n_iter (read)
+%   zef.wireframe_regularization_parameter (read)
+%   zef.wireframe_tolerance (read)
+%
+% Calls (project):
+%   zef_tetra_volume
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[m_triangles, m_nodes, filling_vec]] = wireframe(tetra, nodes, domain_labels, filling_vec, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h_w = zef_waitbar(0,1,'Wireframe optimization');
 

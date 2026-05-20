@@ -1,7 +1,26 @@
 function [newtree] = zef_dataBank_rebuildTree(tree)
+% --- Zeffiro documentation header ---
+% zef_dataBank_rebuildTree — Zef data Bank rebuild Tree.
+%
+% Purpose:
+%   Zef data Bank rebuild Tree.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   tree
+%
+% Outputs:
+%   newtree
+%
+% Calls (project):
+%   zef_dataBank_number2hash
+%   zef_dataBank_rebuildTree
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[newtree] = zef_dataBank_rebuildTree(tree)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-%nargin==1 means a normal tree that was not saved to disk. The other files
-%are needed to give a new savefile and an ordered hashList
 hashes=fieldnames(tree);
 newtree=struct;
 

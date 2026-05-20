@@ -1,24 +1,31 @@
 function [m, P, K, D] = kf_sL_update(m, P, y, H, R)
-%KF_SL_UPDATE Kalman update with sLORETA resolution matrix for depth bias correction.
+% --- Zeffiro documentation header ---
+% plugins.ClassKF.kf_sL_update — Kf s L update.
 %
-%   [M, P, K, D] = KF_SL_UPDATE(M, P, Y, H, R) performs the Kalman update step
-%   and computes the sLORETA-style resolution matrix D. Output estimate is D*m,
-%   which reduces depth bias in source localization compared to raw m.
+% Purpose:
+%   Kf s L update.
+%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
 %
-%   Inputs:
-%     M - Predicted state mean
-%     P - Predicted state covariance
-%     Y - Measurement vector
-%     H - Observation matrix (lead field)
-%     R - Measurement noise covariance
+% Inputs:
+%   m
+%   P
+%   y
+%   H
+%   R
 %
-%   Outputs:
-%     M - Updated state mean
-%     P - Updated state covariance
-%     K - Kalman gain
-%     D - sLORETA resolution matrix (apply to m for depth-unbiased estimate)
+% Outputs:
+%   m
+%   P
+%   K
+%   D
 %
-%   See also KF_UPDATE, KF_SL_UPDATE_APPROX.
+% Calls (project):
+%   plugins.ClassKF.kf_sL_update
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[m, P, K]] = plugins.ClassKF.kf_sL_update(m, P, y, H, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 method = '1';  % 1: sqrtm; 2: SVD-based (for singular/near-singular P)
 if method == '1'
@@ -50,4 +57,3 @@ P = P - K * PHt';
 P = (P + P')/2; % Ensure P is symmetric positive definite for numerical stability
 
 end
-

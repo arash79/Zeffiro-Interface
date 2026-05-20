@@ -1,3 +1,30 @@
+% --- Zeffiro documentation header ---
+% function [mag_fig, rdm_fig] = eccentricity_diff_fig_fn( ... — Function [mag fig, rdm fig] = eccentricity diff fig fn( .
+%
+% Purpose:
+%   Function [mag fig, rdm fig] = eccentricity diff fig fn( ....
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   source_points
+%   mags
+%   rdms
+%   legend_labels
+%   n_intervals
+%   x_scale
+%   min_ecc
+%   mustBeGreaterThanOrEqual
+%   mustBeLessThan
+%   mag_handle_num
+%   rdm_handle_num
+%
+% Side effects:
+%   - creates/updates figures
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `function [mag_fig, rdm_fig] = eccentricity_diff_fig_fn( ...(source_points, mags, rdms, legend_labels, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 function [mag_fig, rdm_fig] = eccentricity_diff_fig_fn( ...
     source_points, ...
     mags, ...
@@ -9,56 +36,6 @@ function [mag_fig, rdm_fig] = eccentricity_diff_fig_fn( ...
     mag_handle_num, ...
     rdm_handle_num ...
     )
-
-% eccentricity_diff_fig_fn
-%
-% A function that generates two figures comparing the MAG and RDM measures
-% between an analytical and numerical lead fields calculated based on a
-% set of source point at different eccentricities.
-%
-% Input:
-%
-% - source_points
-%
-%   An M × 1 or 1 × M cell array of 3 × N matrices of source point
-%   xyz-coordinates.
-%
-% - mags
-%
-%   The MAG measures calculated for the groups of source_points.
-%
-% - rdms
-%
-%   The RDM measures calculated for the groups of source_points.
-%
-% - legend_labels
-%
-%   The labels of the groups of points found in source_points. The size
-%   must match M, the number of source point groups in source_points.
-%
-% - n_intervals
-%
-%   The number of box plot groups one wishes to have displayed in the
-%   final figures.
-%
-% - x_scale
-%
-%   The scale of the x-axis.
-%
-% - min_ecc
-%
-%   The minimum eccentricity at which result display is attempted at.
-%
-% Output:
-%
-% - mag_fig
-%
-%   The MAG-related figure handle.
-%
-% - rdm_fig
-%
-%   The RDM-related figure handle.
-%
 
 arguments
 

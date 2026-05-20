@@ -1,29 +1,27 @@
 function v = zef_volume_scalar_vector_F(nodes, tetra, scalar_field)
+% --- Zeffiro documentation header ---
+% zef_volume_scalar_vector_F — Zef volume scalar vector F.
 %
-% zef_volume_scalar_vector_F
-%
-% TODO: Sampsa should document this.
+% Purpose:
+%   Zef volume scalar vector F.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
 %
 % Inputs:
-%
-% - nodes
-%
-%   TODO: explanation.
-%
-% - tetra
-%
-%   TODO: explanation.
-%
-% - scalar_field
-%
-%   TODO: explanation.
+%   nodes
+%   tetra
+%   scalar_field
 %
 % Outputs:
+%   v
 %
-% - v
+% Calls (project):
+%   zef_volume_barycentric
+%   zef_volume_scalar_vector_F
 %
-%   TODO: explanation.
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[v] = zef_volume_scalar_vector_F(nodes, tetra, scalar_field)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 N = size(nodes,1);
 

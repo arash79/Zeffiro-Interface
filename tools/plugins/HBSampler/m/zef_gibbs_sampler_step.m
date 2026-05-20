@@ -1,7 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [x, theta] = zef_gibbs_sampler_step(L, y, x, theta, theta0, beta, std_lhood, hypermodel, decay_val_hyperprior, nbins_hyperprior, source_direction_mode)
-%One-dimensional sampling resolution.
+% --- Zeffiro documentation header ---
+% zef_gibbs_sampler_step — Zef gibbs sampler step.
+%
+% Purpose:
+%   Zef gibbs sampler step.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   L
+%   y
+%   x
+%   theta
+%   theta0
+%   beta
+%   std_lhood
+%   hypermodel
+%   decay_val_hyperprior
+%   nbins_hyperprior
+%   source_direction_mode
+%
+% Outputs:
+%   x
+%   theta
+%
+% Calls (project):
+%   zef_gibbs_sampler_step
+%
+% Side effects:
+%   - creates/updates figures
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[x, theta]] = zef_gibbs_sampler_step(L, y, x, theta, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if nargin < 8
     hypermodel = 'InverseGamma';
@@ -181,5 +214,3 @@ elseif strcmp(hypermodel,'InverseGamma')
         %               pause(0.2);
     end
 end
-
-

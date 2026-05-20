@@ -1,3 +1,36 @@
+% --- Zeffiro documentation header ---
+% zef.h_ES_parameter_table — Zef.h ES parameter table.
+%
+% Purpose:
+%   Zef.h ES parameter table.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.ES_acceptable_threshold (read)
+%   zef.ES_alpha (read)
+%   zef.ES_alpha_max (read)
+%   zef.ES_boundary_color_limit (read)
+%   zef.ES_constraint_tolerance (read)
+%   zef.ES_display (read)
+%   zef.ES_epsilon (read)
+%   zef.ES_epsilon_min (read)
+%   zef.ES_max_current_channel (read)
+%   zef.ES_max_n_iterations (read)
+%   zef.ES_max_time (read)
+%   zef.ES_opt_algorithm_list (read)
+%   zef.ES_opt_method (read)
+%   zef.ES_opt_method_list (read)
+%   zef.ES_opt_solver (read)
+%   … (11 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.h_ES_parameter_table` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef.h_ES_parameter_table.Data = cell(0);
 
 if ismember(zef.ES_opt_solver, 1)

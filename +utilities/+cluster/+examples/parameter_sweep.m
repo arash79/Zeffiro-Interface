@@ -1,5 +1,34 @@
 function [submissions, bundles] = parameter_sweep(zef, cluster_profile, sweep, opts)
-%PARAMETER_SWEEP Submit one inverse job per parameter combination.
+% --- Zeffiro documentation header ---
+% utilities.cluster.examples.parameter_sweep — Example or study script demonstrating parameter_sweep.
+%
+% Purpose:
+%   Example or study script demonstrating parameter_sweep.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   zef
+%   cluster_profile
+%   sweep
+%   opts
+%
+% Outputs:
+%   submissions
+%   bundles
+%
+% Calls (project):
+%   utilities.cluster.examples.parameter_sweep
+%   utilities.cluster.submit_inverse_jobs
+%   zef_inverse_extract_bundle
+%
+% Side effects:
+%   - parallel/cluster
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[submissions, bundles]] = utilities.cluster.examples.parameter_sweep(zef, cluster_profile, sweep, opts)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     zef (1,1) struct

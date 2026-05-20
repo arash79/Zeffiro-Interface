@@ -1,5 +1,46 @@
 
 function zef = zef_nse_iteration(zef)
+% --- Zeffiro documentation header ---
+% zef_nse_iteration — Zef nse iteration.
+%
+% Purpose:
+%   Zef nse iteration.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.active_compartment_ind (read)
+%   zef.inv_synth_source (read)
+%   zef.nodes (read)
+%   zef.nse_field (read)
+%   zef.tetra (read)
+%
+% Calls (project):
+%   zef_QinvMQ
+%   zef_get_submesh
+%   zef_nse_iteration
+%   zef_nse_matrices
+%   zef_nse_signal_pulse
+%   zef_surface_mesh
+%   zef_volume_scalar_uFG
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_nse_iteration(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 [zef.nse_field.nodes, zef.nse_field.tetra] = zef_get_submesh(zef.nodes,zef.tetra,zef.active_compartment_ind);
 b_node_ind = zef_surface_mesh(zef.nse_field.tetra);
@@ -293,4 +334,3 @@ if ~isempty(h_waitbar) && isvalid(h_waitbar)
 end
 
 end
-

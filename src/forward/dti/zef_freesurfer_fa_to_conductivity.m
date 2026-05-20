@@ -39,6 +39,29 @@
 %   conductivity_tensor - [nx×ny×nz×6] symmetric tensor (11,22,33,12,13,23)
 
 function conductivity_tensor = zef_freesurfer_fa_to_conductivity(fa_data, model_type, varargin)
+% --- Zeffiro documentation header ---
+% zef_freesurfer_fa_to_conductivity — Zef freesurfer fa to conductivity.
+%
+% Purpose:
+%   Zef freesurfer fa to conductivity.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   fa_data
+%   model_type
+%   varargin
+%
+% Outputs:
+%   conductivity_tensor
+%
+% Calls (project):
+%   zef_freesurfer_fa_to_conductivity
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[conductivity_tensor] = zef_freesurfer_fa_to_conductivity(fa_data, model_type, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 p = inputParser;
 addRequired(p, 'fa_data', @isnumeric);

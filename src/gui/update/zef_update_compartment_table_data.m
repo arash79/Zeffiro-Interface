@@ -1,4 +1,36 @@
 function zef = zef_update_compartment_table_data(zef)
+% --- Zeffiro documentation header ---
+% zef_update_compartment_table_data — Syncs GUI control values into `zef` for compartment_table_data.
+%
+% Purpose:
+%   Syncs GUI control values into `zef` for compartment_table_data.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.aux_field_1 (read)
+%   zef.compartment_table_size (read)
+%   zef.compartment_tags (read, write)
+%   zef.h_compartment_table (read)
+%   zef.parameter_profile (read)
+%
+% Calls (project):
+%   zef_update_compartment_table_data
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_update_compartment_table_data(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

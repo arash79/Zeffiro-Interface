@@ -1,3 +1,34 @@
+% --- Zeffiro documentation header ---
+% zef = zef_update_transform(zef); — Zef = zef update transform(zef);.
+%
+% Purpose:
+%   Zef = zef update transform(zef);.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.apply_transform_compartment_tags (read, write)
+%   zef.apply_transform_reuna_p (read, write)
+%   zef.apply_transform_reuna_t (read, write)
+%   zef.apply_transform_sensors (read, write)
+%   zef.compartment_tags (read)
+%   zef.current_sensors (read)
+%   zef.imaging_method (read)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   zef.sensors (read)
+%
+% Calls (project):
+%   zef_process_meshes
+%   zef_update
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef = zef_update_transform(zef);` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef = zef_update_transform(zef);
 
 

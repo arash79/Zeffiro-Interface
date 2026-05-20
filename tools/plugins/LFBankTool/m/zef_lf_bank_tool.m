@@ -1,5 +1,43 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% zef_data = zeffiro_interface_lf_bank_tool; — Zef data = zeffiro interface lf bank tool;.
+%
+% Purpose:
+%   Zef data = zeffiro interface lf bank tool;.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.fieldnames (read, write)
+%   zef.h_add_lf_item (read)
+%   zef.h_delete_selected (read)
+%   zef.h_lf_bank_compute_lead_fields (read)
+%   zef.h_lf_bank_make_all (read)
+%   zef.h_lf_bank_scaling_factor (read)
+%   zef.h_lf_bank_tool (read)
+%   zef.h_lf_bank_update_measurements (read)
+%   zef.h_lf_bank_update_noise_data (read)
+%   zef.h_lf_item_list (read)
+%   zef.h_lf_normalization (read)
+%   zef.h_lf_tag (read)
+%   zef.h_merge_lead_fields (read)
+%   zef.h_source_interpolation_on (read)
+%   zef.lf_bank_scaling_factor (read, write)
+%   … (8 more)
+%
+% Calls (project):
+%   zef_change_size_function
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_data = zeffiro_interface_lf_bank_tool;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 zef_data = zeffiro_interface_lf_bank_tool;
 zef.fieldnames = fieldnames(zef_data);
 for zef_i = 1:length(zef.fieldnames)

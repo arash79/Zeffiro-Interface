@@ -1,3 +1,31 @@
+% --- Zeffiro documentation header ---
+% zef.h_compartment_table — Zef.h compartment table.
+%
+% Purpose:
+%   Zef.h compartment table.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.compartment_structure_aux (read, write)
+%   zef.compartment_tags (read, write)
+%   zef.compartment_tags_aux (read, write)
+%   zef.compartment_transform_name (read, write)
+%   zef.new_empty_project (read)
+%   zef.profile_name (read)
+%   zef.program_path (read)
+%   zef.segmentation_profile_aux (read, write)
+%
+% Calls (project):
+%   zef_create_compartment
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.h_compartment_table` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef.h_compartment_table.Data = [];
 
 zef.compartment_tags = cell(0);

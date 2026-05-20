@@ -1,4 +1,26 @@
 function [subdomain_ind] = zef_find_subdomain_ind(domain_labels, domain_labels_with_subdomains)
+% --- Zeffiro documentation header ---
+% zef_find_subdomain_ind — Zef find subdomain ind.
+%
+% Purpose:
+%   Zef find subdomain ind.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   domain_labels
+%   domain_labels_with_subdomains
+%
+% Outputs:
+%   subdomain_ind
+%
+% Calls (project):
+%   zef_find_subdomain_ind
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[subdomain_ind] = zef_find_subdomain_ind(domain_labels, domain_labels_with_subdomains)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 unique_domain_labels = unique(domain_labels);
 subdomain_ind = zeros(length(domain_labels),1);

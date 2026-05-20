@@ -1,36 +1,28 @@
 function lut = readSNLUT(folderPath)
+% --- Zeffiro documentation header ---
+% utilities.sn2zef.readSNLUT — Read SNLUT.
 %
-% readSNLUT
-%
-% Reads a SimNIBS label lookup table (LUT) from final_tissues_LUT.txt in
-% the specified folder. The LUT file contains label numbers, names, and
-% RGBA color values for each tissue type in the segmentation.
+% Purpose:
+%   Read SNLUT.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%
-% - folderPath (1,1) string { mustBeFolder }
-%
-%   The directory containing final_tissues_LUT.txt. The file should be a
-%   space-separated text file with columns: label_number, label_name,
-%   red, green, blue, alpha. Lines starting with '#' are treated as
-%   comments and ignored.
+%   folderPath
 %
 % Outputs:
+%   lut
 %
-% - lut (1,1) struct
+% Calls (project):
+%   utilities.sn2zef.readSNLUT
 %
-%   A structure containing the parsed LUT data with fields:
-%     • No   - Column vector of label ID numbers (integers)
-%     • Name - Cell array of label name strings
-%     • R    - Column vector of red color values (0-255)
-%     • G    - Column vector of green color values (0-255)
-%     • B    - Column vector of blue color values (0-255)
-%     • A    - Column vector of alpha color values (0-255)
+% Side effects:
+%   - filesystem I/O
 %
-% Throws an error if the file cannot be found or opened.
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[lut] = utilities.sn2zef.readSNLUT(folderPath)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-    % Construct full path to SimNIBS label lookup table file
     fname = fullfile(folderPath, 'final_tissues_LUT.txt');
 
     % Validate that the LUT file exists

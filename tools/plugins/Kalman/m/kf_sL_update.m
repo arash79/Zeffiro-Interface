@@ -1,5 +1,30 @@
 function [m, P, K, D] = kf_sL_update(m,P,y,H,R,standardization_exponent)
-    % Resolution matrix
+% --- Zeffiro documentation header ---
+% kf_sL_update — Kf s L update.
+%
+% Purpose:
+%   Kf s L update.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   m
+%   P
+%   y
+%   H
+%   R
+%   standardization_exponent
+%
+% Outputs:
+%   m
+%   P
+%   K
+%   D
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[m, P, K]] = kf_sL_update(m, P, y, H, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
     method = '1';
     if(method == '1')
     P_sqrtm = sqrtm(P);
@@ -31,4 +56,3 @@ function [m, P, K, D] = kf_sL_update(m,P,y,H,R,standardization_exponent)
     P = (P + P')/2; % Ensure P is symmetric positive definite for numerical stability
 
 end
-

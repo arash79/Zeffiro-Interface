@@ -1,26 +1,43 @@
-# Profile: Asteroid Radar
+# profile/asteroid_radar
 
-This profile configures Zeffiro Interface for **radar and electromagnetic (EM) applications** in an asteroid or similar context. It extends the asteroid setup with **wireframe** and **dielectric** options (permittivity, filling) while reusing the same gravity-oriented lead fields as the asteroid_gravity profile. Suitable for EM/radar forward modelling and inversion when combined with the appropriate solvers.
+## Purpose of this folder
 
-## Use Case
+Startup profiles and `zeffiro_plugins.ini` that attach plugin menus.
 
-- Radar or EM forward/inverse problems in a two-compartment geometry (Box, Asteroid).
-- Use of wireframe representations with interpolated permittivity and filling.
-- Dielectric permittivity and magnetic permeability are enabled in the parameter list (unlike the gravity-only profile, where some may be off by default).
+## Contents
 
-## Files in This Profile
+Other files:
+- `zeffiro_forward_simulation.ini`
+- `zeffiro_init.ini`
+- `zeffiro_parameters.ini`
+- `zeffiro_plugins.ini`
+- `zeffiro_segmentation.ini`
 
-| File | Purpose |
-|------|--------|
-| **zeffiro_init.ini** | Same structure as asteroid_gravity: default plot size and modalities `Scalar field`, `Vector field`, `Vector field gradient`. |
-| **zeffiro_parameters.ini** | Same base as asteroid_gravity plus: **Interpolated wireframe permittivity** (`wireframe_permittivity_vec`), **Interpolated wireframe filling** (`wireframe_filling_vec`). Dielectric permittivity and magnetic permeability are set **On** for segmentation. Electrode parameters use correct spelling (Electrode). |
-| **zeffiro_forward_simulation.ini** | Identical to asteroid_gravity: gravity (scalar/vector) and gravity gradient (scalar/vector) lead fields. Radar-specific lead fields would be added here if implemented. |
-| **zeffiro_plugins.ini** | Same tool set as asteroid_gravity: multi lead field, filter, topography, RAMUS/IAS/EXP, MNE, beamformer, dipole scan, data bank, reconstruction, SESAME, relaxation, synthetic source legacy, GitHub pusher, wireframe creator. |
-| **zeffiro_segmentation.ini** | Same two compartments as asteroid_gravity: **Box** and **Asteroid** with compartment tags `c1`, `c2` and parameter setting **rho** (mass density). |
+## How this folder fits into the overall workflow
 
-## Differences from Asteroid Gravity
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-- **Parameters:** Wireframe permittivity and filling are available; dielectric permittivity and magnetic permeability are turned on in the segmentation/parameter visibility.
-- **Forward simulation:** Currently the same gravity/gravity-gradient entries; radar-specific lead fields can be added to this file when available.
+## GUI usage
 
-For the overall profile system and INI format, see the parent [../README.md](../README.md).
+No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
+
+## Programmatic usage
+
+Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+
+## Examples
+
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+
+## Dependencies and assumptions
+
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+
+## Notes for developers
+
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

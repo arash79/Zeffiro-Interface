@@ -1,6 +1,42 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [meas_data] = zef_find_source(zef)
+% --- Zeffiro documentation header ---
+% zef_find_source — Zef find source.
+%
+% Purpose:
+%   Zef find source.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   meas_data
+%
+% Zef fields (observed):
+%   zef.L (read)
+%   zef.find_synth_source (read)
+%   zef.fss_bg_noise (read)
+%   zef.fss_time_val (read)
+%   zef.inv_synth_source (read)
+%   zef.source_positions (read)
+%   zef.time_sequence (read)
+%   zef.time_variable (read)
+%
+% Calls (project):
+%   zef_find_source
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[meas_data] = zef_find_source(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 if nargin == 0
     zef = evalin('base', 'zef');
 end

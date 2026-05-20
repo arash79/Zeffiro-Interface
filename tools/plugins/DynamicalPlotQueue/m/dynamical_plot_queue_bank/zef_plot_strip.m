@@ -1,4 +1,32 @@
 function zef_plot_strip(strip_struct)
+% --- Zeffiro documentation header ---
+% zef_plot_strip — Renders or updates a plot_strip figure from current `zef` state.
+%
+% Purpose:
+%   Renders or updates a plot_strip figure from current `zef` state.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   strip_struct
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.strip_struct (read)
+%
+% Calls (project):
+%   zef_plot_strip
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_plot_strip(strip_struct)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 hold on
 if nargin == 0;

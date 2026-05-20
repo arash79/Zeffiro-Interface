@@ -1,39 +1,24 @@
 function capability = method_capability(method_id)
-%METHOD_CAPABILITY Sensitivity-pipeline metadata for an inverse method id.
+% --- Zeffiro documentation header ---
+% utilities.sensitivity.method_capability — Method capability.
 %
-%   capability = utilities.sensitivity.method_capability(method_id)
+% Purpose:
+%   Method capability.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
-% Resolves whether a registry method id (see
-% utilities.cluster.inverse_method_registry) can be driven by the Monte-Carlo
-% sensitivity loop, and how. The sensitivity loop synthesises 3 * n_active
-% (source, direction) probes per realisation, reconstructs static methods in
-% bounded batches, and treats probes as independent time frames; not every
-% inverter is compatible with that semantic.
+% Inputs:
+%   method_id
 %
-% Output struct fields:
-%   strategy   - "linear_static"     : per-frame is T*f with T cached by
-%                                      precompute(); bounded batches avoid
-%                                      monolithic reconstruction output.
-%              - "iterative_static"  : per-frame is independent but iterative
-%                                      (no usable precompute()); bounded
-%                                      batches are correct, just slower.
-%              - "stateful_dynamic"  : per-frame mutates inverter state
-%                                      (Kalman family); requires the
-%                                      isolated-probe path so each (source,
-%                                      direction) starts from a fresh state.
-%              - "unsupported"       : legacy / GUI-coupled solvers that the
-%                                      sensitivity pipeline cannot drive
-%                                      reliably; rejected up front by
-%                                      zef_sensitivity_run.
-%   prep_hooks - String array of named pre-dispatch hooks the caller should
-%                run. Currently recognised: "ramus_decomposition",
-%                "halpr_decomposition", "grouplasso_decomposition".
-%   notes      - One-line student-facing note explaining the strategy choice
-%                and any caveats.
+% Outputs:
+%   capability
 %
-% Keeping this table outside utilities.cluster.inverse_method_registry keeps
-% the registry focused on dispatcher metadata. Add new entries here whenever
-% a new inverter class lands so the sensitivity pipeline can route it.
+% Calls (project):
+%   utilities.sensitivity.method_capability
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[capability] = utilities.sensitivity.method_capability(method_id)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     method_id (1,1) string {mustBeNonempty}

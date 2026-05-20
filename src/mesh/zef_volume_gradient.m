@@ -1,19 +1,26 @@
 function gradients = zef_volume_gradient(nodes, tetrahedra, node_index)
-% Calculates all of the ∇𝑉 of tetrahedra in the generated finite element mesh
-% as a triple product a ⋅ (b × c). See https://math.stackexchange.com/q/797845
-% for the general idea.
+% --- Zeffiro documentation header ---
+% zef_volume_gradient — Zef volume gradient.
 %
-% input:
+% Purpose:
+%   Zef volume gradient.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
 %
-% - nodes: a matrix that contains the 3D coordinates of each node in the
-%   finite element mesh as its rows.
-% - tetrahedra: a matrix that contains the 4 nodes of tetrahedra in the finite
-%   element mesh as its rows.
+% Inputs:
+%   nodes
+%   tetrahedra
+%   node_index
 %
-% output: a set of volume gradients ∇𝑉
-
-% Helper matrix with rows determining the indices of the nodes whose
-% differences will be taken.
+% Outputs:
+%   gradients
+%
+% Calls (project):
+%   zef_volume_gradient
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[gradients] = zef_volume_gradient(nodes, tetrahedra, node_index)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 ind_m = [
     2 3 4 ;

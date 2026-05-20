@@ -1,3 +1,21 @@
+% --- Zeffiro documentation header ---
+% figures'; — Figures';.
+%
+% Purpose:
+%   Figures';.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Calls (project):
+%   zef_import_figure
+%
+% Side effects:
+%   - creates/updates figures
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `figures';` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 folder = '/media/datadisk/paavo/zeffiro_interface/figures';
 
 sg_data = [];

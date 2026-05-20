@@ -1,4 +1,45 @@
 function zef = zef_downsample_surfaces(zef)
+% --- Zeffiro documentation header ---
+% zef_downsample_surfaces — Zef downsample surfaces.
+%
+% Purpose:
+%   Zef downsample surfaces.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.bypass_inflate (read)
+%   zef.compartment_tags (read)
+%   zef.h (read, write)
+%   zef.max_surface_face_count (read)
+%   zef.number_of_compartments (read, write)
+%   zef.temp_patch_data (read)
+%   zef.temp_patch_data_aux (read, write)
+%   zef.temp_time (read, write)
+%   zef.temp_var_0 (read, write)
+%
+% Calls (project):
+%   zef_downsample_surfaces
+%   zef_find_relative_resolution
+%   zef_inflate_surface
+%   zef_set_surface_resolution
+%   zef_smooth_surface
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_downsample_surfaces(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

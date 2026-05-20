@@ -1,6 +1,56 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_create_fem_mesh(zef)
+% --- Zeffiro documentation header ---
+% zef_create_fem_mesh — Zef create fem mesh.
+%
+% Purpose:
+%   Zef create fem mesh.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.adaptive_refinement_compartments (read)
+%   zef.adaptive_refinement_k_param (read)
+%   zef.adaptive_refinement_number (read)
+%   zef.adaptive_refinement_on (read)
+%   zef.adaptive_refinement_thresh_val (read)
+%   zef.domain_labels (read, write)
+%   zef.domain_labels_with_subdomains (read, write)
+%   zef.initial_mesh_mode (read)
+%   zef.mesh_labeling_approach (read)
+%   zef.mesh_relabeling (read)
+%   zef.name_tags (read, write)
+%   zef.nodes (read, write)
+%   zef.parallel_processes (read)
+%   zef.pml_max_size (read)
+%   zef.pml_max_size_unit (read)
+%   … (15 more)
+%
+% Calls (project):
+%   zef_compartment_to_subcompartment
+%   zef_create_fem_mesh
+%   zef_get_tetra_to_refine
+%   zef_mesh_refinement
+%   zef_pml_mesh
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - parallel/cluster
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_create_fem_mesh(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

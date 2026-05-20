@@ -1,9 +1,27 @@
 function [newtree, listOld, listNew] = zef_dataBank_reorderTree(tree)
-%reorders the tree nodes so that the numberings starts at 1 and continues
-%without jumping
-%this is needed to rebuild the tree when things were deleted
-
-%derive new hashList on this level
+% --- Zeffiro documentation header ---
+% zef_dataBank_reorderTree — Zef data Bank reorder Tree.
+%
+% Purpose:
+%   Zef data Bank reorder Tree.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   tree
+%
+% Outputs:
+%   newtree
+%   listOld
+%   listNew
+%
+% Calls (project):
+%   zef_dataBank_number2hash
+%   zef_dataBank_reorderTree
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[newtree, listOld, listNew]] = zef_dataBank_reorderTree(tree)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 array=[];
 arrayToGive=1;

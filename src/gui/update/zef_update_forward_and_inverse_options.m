@@ -1,5 +1,44 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% zef.preconditioner = get(zef — Zef.preconditioner = get(zef.
+%
+% Purpose:
+%   Zef.preconditioner = get(zef.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.adaptive_refinement_compartments (read, write)
+%   zef.adaptive_refinement_k_param (read, write)
+%   zef.adaptive_refinement_number (read, write)
+%   zef.adaptive_refinement_on (read, write)
+%   zef.adaptive_refinement_thresh_val (read, write)
+%   zef.distance_smoothing_exp (read, write)
+%   zef.distance_smoothing_on (read, write)
+%   zef.exclude_box (read, write)
+%   zef.extensive_relabeling (read, write)
+%   zef.fem_mesh_inflation_strength (read, write)
+%   zef.fix_outer_surface (read, write)
+%   zef.gpu_count (read)
+%   zef.gpu_num (read, write)
+%   zef.h_adaptive_refinement_compartments (read)
+%   zef.h_adaptive_refinement_k_param (read)
+%   … (90 more)
+%
+% Calls (project):
+%   core.types.ZefSourceModel.from
+%
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.preconditioner = get(zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 zef.preconditioner = get(zef.h_as_opt_1,'Value');
 zef.preconditioner_tolerance = str2num(get(zef.h_as_opt_2,'Value'));
 zef.smoothing_steps_surf = str2num(get(zef.h_as_opt_3,'Value'));
@@ -48,7 +87,7 @@ zef.fem_mesh_inflation_strength = str2num(get(zef.h_fem_mesh_inflation_strength,
 
 zef.surface_sources = get(zef.h_as_opt_6,'Value');
 zef.use_depth_electrodes = get(zef.h_use_depth_electrodes,'Value');
-zef.source_model = core.ZefSourceModel.from(get(zef.h_source_model,'Value'));
+zef.source_model = core.types.ZefSourceModel.from(get(zef.h_source_model,'Value'));
 zef.use_gpu = get(zef.h_use_gpu,'Value');
 zef.gpu_num = str2num(get(zef.h_gpu_num,'Value'));
 zef.smoothing_steps_ele = str2num(get(zef.h_smoothing_steps_ele,'Value'));

@@ -1,156 +1,87 @@
 # Zeffiro Interface
 
-© 2018- Sampsa Pursiainen & ZI Development Team
+Finite-element multiphysics brain modeling with EEG/MEG/EIT/TES forward solvers and a broad inverse toolbox (MNE, eLORETA, IAS, RAMUS, beamforming, Kalman, SESAME, etc.). The codebase mixes a **GUI runtime** (`src/`, `tools/plugins/`) with **refactored MATLAB packages** (`+core`, `+inverse`, `+utilities`, `+examples`, `+tests`).
 
-[![View Zeffiro Forward and Inverse Interface for Complex Geometries on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://se.mathworks.com/matlabcentral/fileexchange/68285-zeffiro-forward-and-inverse-interface-for-complex-geometries)
+## Folder purpose
 
-![Zeffiro Interface Logo](assets/fig/zeffiro_logo.png)
+Repository root: **startup**, path configuration, bundled data, profiles, and package namespaces. All user sessions begin at `zeffiro_interface.m`.
 
-## Introduction
+## Main contents
 
-Zeffiro Interface (ZI) is an open source code package constituting an accessible tool for multidisciplinary finite element (FE) based forward and inverse simulations in complex geometries. Developed for MATLAB, ZI aims to streamline the process of analyzing brain activity and make it accessible to researchers and clinicians alike. With ZI, one can generate a volumetric finite element mesh for a realistic multilayer geometry, such as human brain or an asteroid.
+| Path | Role |
+|------|------|
+| `zeffiro_interface.m` | Main entry: paths, `zef` struct, GUI or nodisplay, CLI import/save/export |
+| `zeffiro_setup.m` | Submodules, `zef_start_config.m` |
+| `src/` | Procedural `zef_*` runtime (~557 `.m`): GUI, mesh, forward, inverse orchestration |
+| `+core/` | Types, electrode I/O, menu callback, preconditioners |
+| `+inverse/` | Class-based inverters (`inverse.*Inverter`) |
+| `+utilities/` | Cluster dispatch, converters (BST/FS/Duneuro/SN), dev tools |
+| `+examples/` | Examples and study scripts |
+| `+plugins/` | ClassGMM, ClassKF for class inverters |
+| `+tests/` | `matlab.unittest` suite |
+| `tools/plugins/` | Legacy GUI plugins (39 packages) |
+| `profile/` | INI-driven profiles and plugin menus |
+| `data/` | Segmentations, example projects, electrodes, logs |
+| `assets/` | `.fig` and PNG GUI assets |
+| `documentation/` | LaTeX technical docs |
+| `external/` | Optional third-party git submodules (upstream docs) |
+| `scripts/` | Developer scripts (e.g. doc pass tooling) |
 
-A suitable surface segmentation can be produced, for example, using the FreeSurfer software suite (https://surfer.nmr.mgh.harvard.edu) or Brainstorm (https://neuroimage.usc.edu/brainstorm/). ZI allows importing an anatomy to create an FE mesh distinguishing multiple different brain regions and, thereby, analysing cortical and sub-cortical structures as well as connectivity of the brain function over a time series. In each compartment, the orientation of the activity can be either normally constrained or unconstrained. The main routines of ZI can be accelerated significantly in a computer equipped with a graphics computing unit (GPU). It is recommendable to perform the forward simulation process, i.e., to generate the FE mesh and the lead field matrix utilizing a GPU.
+## Code functionality
 
-## Requirements
+**Startup:** `addpath(src/core)` → `zef_close_all` → `addpath(projectRoot)` + `genpath(src)` + plugins + profile + assets → `zef_start` → tools → optional `zef_load(default_project.mat)`.
 
-- MATLAB >= r2019a
-- Toolboxes
-    - Signal Processing Toolbox
-    - Optimization toolbox
-    - Parallel Computing Toolbox
-    - Statistics and Machine Learning Toolbox
-- GPU (optional)
+**Forward:** mesh (`src/mesh`) → lead field (`src/forward`) → `zef.L`.
 
-## Installation
+**Inverse (two tracks):**
+- **GUI:** plugin `*_iteration` → `zef.reconstruction`
+- **Programmatic:** `zef_inverse_run` → `utilities.cluster.dispatch_inverse` → `+inverse`
 
-Zeffiro Interface relies on the external repositories, such as SDPT3, SeDuMi and others, that will
-be fetched automatically when cloning with `--recurse-submodules`. See the [installation wiki page][installation-wiki]
-for instructions on how to install Zeffiro Interface.
+**State:** `zef` struct in MATLAB base workspace; GUI handles as `zef.h_*`.
 
-[installation-wiki]: https://github.com/sampsapursiainen/zeffiro_interface/wiki/Downloading-and-Setting-Up-Zeffiro
+## Workflow context
 
-## Getting Started
-
-To start ZI, open Matlab, navigate to the project directory and run the following command:
-
-```matlab
-zeffiro_interface()
+```mermaid
+flowchart LR
+  ZI[zeffiro_interface] --> ST[zef_start / GUI tools]
+  ST --> MESH[mesh + forward]
+  MESH --> L[zef.L]
+  L --> INV[plugins or zef_inverse_run]
+  INV --> REC[zef.reconstruction]
+  REC --> FIG[figure tool]
 ```
 
-To learn more about startup options, run one of the following commands in Matlab:
+See `src/README.md`, `+inverse/README.md`, `tools/plugins/README.md` for depth.
+
+## Usage instructions
 
 ```matlab
-help zeffiro_interface
-% or
-doc zeffiro_interface
+% Interactive
+zef = zeffiro_interface;
+
+% Batch-friendly
+zef = zeffiro_interface('start_mode', 'nodisplay', ...
+    'import_to_new_project', fullfile(pwd,'data','segmentations',...
+    'multicompartment_head_project','import_segmentation.zef'));
+
+% Class inverse
+[zef, r] = zef_inverse_run(zef, 'eloreta', 'execution', 'local');
+
+% Tests
+runtests('+tests');
 ```
 
-Read the [wiki](/wiki) pages for more information.
+## Important notes
 
-[//]: # (Links to video tutorials, example projects, and other learning resources.)
+- **`src/core` ≠ `+core`** — lifecycle vs refactored package.
+- **`default_project.mat`** is configured but often missing in fresh clones.
+- Default profile: `multicompartment_head` (`profile/zeffiro_interface.ini`).
+- Class inverters are not yet wired to most inverse menu buttons — plugins remain legacy.
+- `external/` is third-party — do not rewrite vendor docs here.
 
-[//]: # (Main Features: An outline of the primary tools and functionalities available in the Zeffiro Interface, with links to more detailed documentation.)
+## Developer guidance
 
-[//]: # (Troubleshooting and Support: Guidance on how to address common issues, report bugs, and seek assistance from the community or developers.)
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to the project.
-
-## License
-
-Zeffiro Interface is licensed under the GNU GPLv3.
-See the [LICENSE](LICENSE) file for details.
-
-Submodules from [external](external) directory are licensed as follows:
-
-- CVX: GNU GPLv3
-- fieldtrip: GNU GPLv3
-- OSQP: Apache v2.0
-- SDPT3: GNU GPLv2
-- SeDuMi: GNU GPLv2
-- SESAME: unknown
-- spm12: GNU GPLv2
-
-## Related papers
-
-[//]: # (TODO: Add links to the papers.)
-
-The interface itself has been introduced in:
-
-- He, Q., Rezaei, A. & Pursiainen, S. (2019). Zeffiro User Interface for Electromagnetic Brain
-  Imaging: a GPU Accelerated FEM Tool for Forward and Inverse Computations in Matlab.
-  Neuroinformatics, https://doi.org/10.1007/s12021-019-09436-9
-
-Recent papers:
-
-- Pascual-Marqui, R. D. (2007). Discrete, 3D distributed, linear imaging
-  methods of electric neuronal activity. Part 1: exact, zero error
-  localization. arXiv:0710.3341
-  ([link](https://arxiv.org/abs/0710.3341)).
-
-- Pascual-Marqui, R. D. (2011). The solution space of the EEG inverse
-  problem for 3D distributed linear imaging methods. Philosophical
-  Transactions of the Royal Society A, 369(1952), 3768-3784.
-  https://doi.org/10.1098/rsta.2011.0081
-
-- Galaz Prieto, F., Rezaei, A., Samavaki, M., & Pursiainen, S. (2022). L1-norm vs. L2-norm fitting
-  in optimizing focal multi-channel tES stimulation: linear and semidefinite programming vs.
-  weighted least squares. Computer Methods and Programs in Biomedicine, 226,
-  107084, https://doi.org/10.1016/j.cmpb.2022.107084
-
-- Lahtinen, J., Koulouri, A., Rezaei, A., & Pursiainen, S. (2022). Conditionally Exponential Prior
-  in Focal Near-and Far-Field EEG Source Localization via Randomized Multiresolution Scanning (
-  RAMUS). Journal of Mathematical Imaging and Vision,
-  1-22. https://doi.org/10.1007/s10851-022-01081-3
-
-- Rezaei, A., Lahtinen, J., Neugebauer, F., Antonakakis, M., Piastra, M. C., Koulouri, A., Wolters,
-  C. H., & Pursiainen, S. (2021). Reconstructing subcortical and cortical somatosensory activity via
-  the RAMUS inverse source analysis technique using median nerve SEP data. NeuroImage, 245, 118726.
-  https://doi.org/10.1016/j.neuroimage.2021.118726
-
-- Rezaei, A., Koulouri, A., & Pursiainen, S. (2020). Randomized multiresolution scanning in focal
-  and fast E/MEG sensing of brain activity with a variable depth. Brain Topography, 33(2),
-  161-175. https://doi.org/10.1007/s10548-020-00755-8
-
-The essential mathematical techniques used in the interface have been reviewed and validated in:
-
-- Miinalainen, T., Rezaei, A., Us, D., Nüßing, A., Engwer, C., Wolters, C. H., & Pursiainen, S. (
-  2019). A realistic, accurate and fast source modeling approach for the EEG forward problem.
-  NeuroImage, 184, 56-67. https://doi.org/10.1016/j.neuroimage.2018.08.054
-
-- Pursiainen, S. (2012). Raviart–Thomas-type sources adapted to applied EEG and MEG: implementation
-  and results. Inverse Problems, 28(6), 065013. https://doi.org/10.1088/0266-5611/28/6/065013
-
-The IAS MAP (iterative alternating sequential maximum a posteriori) inversion method and the
-hierarchical Bayesian sampler are based on:
-
-- Calvetti, D., Hakula, H., Pursiainen, S., & Somersalo, E. (2009). Conditionally Gaussian
-  hypermodels for cerebral source localization. SIAM Journal on Imaging Sciences, 2(3),
-  879-909. https://doi.org/10.1137/080723995
-
-It has been applied for a realistic brain geometry, e.g., in:
-
-- Lucka, F., Pursiainen, S., Burger, M., & Wolters, C. H. (2012). Hierarchical Bayesian inference
-  for the EEG inverse problem using realistic FE head models: depth localization and source
-  separation for focal primary currents. Neuroimage, 61(4),
-  1364-1382. https://doi.org/10.1016/j.neuroimage.2012.04.017
-
-The current preserving source model combines linear (face-intersecting) and quadratic (edgewise)
-elements via the Position Based Optimization (PBO) method and the 10-source stencil in which 4 face
-sources and 6 edge sources are applied for each tetrahedral element containing a source:
-
-- Bauer, M., Pursiainen, S., Vorwerk, J., Köstler, H., & Wolters, C. H. (2015). Comparison study for
-  Whitney (Raviart–Thomas)-type source models in finite-element-method-based EEG forward modeling.
-  IEEE Transactions on Biomedical Engineering, 62(11),
-  2648-2656. https://doi.org/10.1109/TBME.2015.2439282
-
-- Pursiainen, S., Vorwerk, J., & Wolters, C. H. (2016). Electroencephalography (EEG) forward
-  modeling via H (div) finite element sources with focal interpolation. Physics in Medicine &
-  Biology, 61(24), 8502. https://doi.org/10.1088/0031-9155/61/24/8502
-
----
-
-Zeffiro Interface is not intended for use in clinical applications. The authors do not assume
-responsibility for the results obtained with ZI when using clinical data.
+- Every major folder has a **`README.md`** (7-section technical template) maintained from code inspection.
+- Extend solvers in `+inverse` + registry; avoid new per-frame loops in plugins.
+- Run `runtests('+tests')` before merging inverse or cluster changes.
+- Package calls: `core.*`, `inverse.*`, `utilities.*` with project root on path only.

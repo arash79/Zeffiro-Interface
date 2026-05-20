@@ -1,4 +1,31 @@
 function zef = zef_nse_tool_init(zef)
+% --- Zeffiro documentation header ---
+% zef_nse_tool_init — Zef nse tool init.
+%
+% Purpose:
+%   Zef nse tool init.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.nse_field (read, write)
+%
+% Calls (project):
+%   zef_nse_tool_init
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_nse_tool_init(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if not(isfield(zef,'nse_field'))
     zef.nse_field = struct;

@@ -1,6 +1,58 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_postprocess_fem_mesh(zef)
+% --- Zeffiro documentation header ---
+% zef_postprocess_fem_mesh — Zef postprocess fem mesh.
+%
+% Purpose:
+%   Zef postprocess fem mesh.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.active_compartment_ind (read, write)
+%   zef.brain_ind (read, write)
+%   zef.compartment_tags (read)
+%   zef.condition_number (read, write)
+%   zef.domain_labels (read, write)
+%   zef.domain_labels_with_subdomains (read, write)
+%   zef.exclude_box (read)
+%   zef.mesh_optimization_parameter (read)
+%   zef.nodes (read, write)
+%   zef.non_source_ind (read, write)
+%   zef.parameter_profile (read)
+%   zef.refinement_surface_number_2 (read)
+%   zef.refinement_surface_on_2 (read)
+%   zef.refinement_volume_compartments_2 (read)
+%   zef.refinement_volume_number_2 (read)
+%   … (7 more)
+%
+% Calls (project):
+%   zef_compartment_to_subcompartment
+%   zef_condition_number
+%   zef_find_active_compartment_ind
+%   zef_find_subdomain_ind
+%   zef_fix_negatives
+%   zef_mesh_refinement
+%   zef_postprocess_fem_mesh
+%   zef_surface_mesh
+%   zef_tetra_turn
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_postprocess_fem_mesh(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin==0
     zef = evalin('base','zef');
@@ -252,4 +304,3 @@ if nargout == 0
 end
 
 end
-

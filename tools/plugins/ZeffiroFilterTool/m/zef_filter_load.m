@@ -1,5 +1,30 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if not(isempty(zef.save_file_path)) & not(zef — If not(isempty(zef.save file path)) & not(zef.
+%
+% Purpose:
+%   If not(isempty(zef.save file path)) & not(zef.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.fieldnames (read, write)
+%   zef.file (read)
+%   zef.file_path (read)
+%   zef.filter_save_file (read, write)
+%   zef.filter_save_file_path (read, write)
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `if not(isempty(zef.save_file_path)) & not(zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 if not(isempty(zef.save_file_path)) & not(zef.save_file_path==0)
     [zef_data.file zef_data.file_path] = uigetfile('*.mat','Load filter',zef.filter_save_file_path);
 else

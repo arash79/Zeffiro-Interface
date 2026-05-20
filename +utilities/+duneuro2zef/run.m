@@ -29,8 +29,40 @@
 % See also: get_default_config.m, validate_config.m
 
 function results = run(config)
+% --- Zeffiro documentation header ---
+% utilities.duneuro2zef.run — Run.
+%
+% Purpose:
+%   Run.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   config
+%
+% Outputs:
+%   results
+%
+% Calls (project):
+%   utilities.duneuro2zef.convert_mesh
+%   utilities.duneuro2zef.get_default_config
+%   utilities.duneuro2zef.process_eeg_data
+%   utilities.duneuro2zef.process_meg_data
+%   utilities.duneuro2zef.process_resection_points
+%   utilities.duneuro2zef.process_source_space
+%   utilities.duneuro2zef.run
+%   utilities.duneuro2zef.validate_config
+%   zef_start_dataBank
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[results] = utilities.duneuro2zef.run(config)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-    % Initialize results structure
     results = struct();
     results.success = false;
     results.errors = {};

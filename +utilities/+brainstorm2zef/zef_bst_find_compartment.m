@@ -1,28 +1,29 @@
 function [compartment_file, compartment_type, found] = zef_bst_find_compartment(compartment_name, subject_struct, subject_folder)
-%ZEF_BST_FIND_COMPARTMENT Finds a compartment in Brainstorm subject structure.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst_find_compartment — Zef bst find compartment.
 %
-% This function searches for a compartment by name in various locations within
-% the Brainstorm subject structure, providing a flexible and robust way to
-% locate compartments regardless of how they are stored.
+% Purpose:
+%   Zef bst find compartment.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   compartment_name - String name of the compartment to find (e.g., 'Scalp', 'Cortex')
-%   subject_struct   - Brainstorm subject structure
-%   subject_folder   - Path to Brainstorm subject folder
+%   compartment_name
+%   subject_struct
+%   subject_folder
 %
 % Outputs:
-%   compartment_file - Full path to the compartment file (empty if not found)
-%   compartment_type - Type of compartment found: 'Surface', 'Anatomy', or ''
-%   found            - Logical indicating if compartment was found
+%   compartment_file
+%   compartment_type
+%   found
 %
-% Example:
-%   [file, type, found] = utilities.brainstorm2zef.zef_bst_find_compartment(...
-%       'Scalp', subject_struct, subject_folder);
-%   if found
-%       fprintf('Found %s compartment: %s\n', type, file);
-%   end
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_find_compartment
+%   utilities.brainstorm2zef.zef_bst_normalize_compartment_name
 %
-% See also: ZEF_BST_CREATE_COMPARTMENT_DATA
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[compartment_file, compartment_type, found]] = utilities.brainstorm2zef.zef_bst_find_compartment(compartment_name, subject_struct, subject_folder)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 compartment_file = '';
 compartment_type = '';

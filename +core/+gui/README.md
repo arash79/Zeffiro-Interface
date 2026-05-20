@@ -1,25 +1,41 @@
-# gui
+# +core/+gui
 
-The **+gui** package contains GUI-related callbacks and helpers used by the Zeffiro Interface menu and tool system. These routines are invoked when the user selects menu items or triggers actions from the main application; they operate on the central Zeffiro struct **zef** and may call core import or other core modules.
+## Purpose of this folder
 
-Callbacks are reached via the `core.gui` namespace (e.g. from menu registration or internal dispatch), not typically by direct user script calls.
+Thin GUI integration layer for package APIs (menu callbacks).
 
-## Package layout
+## Contents
 
-| Path | Description |
-|------|-------------|
-| **+menu_tool/** | Callbacks for the *Menu tool* submenu (e.g. Import electrodes). |
+Subfolders:
+- `+menu_tool/`
 
-Additional subpackages may be added for other menus or tool groups (e.g. visualization, segmentation) as the interface grows.
+## How this folder fits into the overall workflow
 
-## Integration
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-- Menu entries in the Zeffiro UI are wired to specific callback functions under **+gui** (e.g. *Menu tool > Import > Import electrodes* → **core.gui.menu_tool.import_electrodes_callback**).
-- Callbacks receive **zef** as input and return an updated **zef**; they may open file dialogs, show error or warning dialogs, and call **zef_update** to refresh the application state.
-- File-based imports delegate to **core.import** (e.g. **electrodes_from_dat**, **electrodes_from_csv**) for parsing; **+gui** handles user interaction and struct updates.
+## GUI usage
 
-## See also
+Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
 
-- [+menu_tool/README.md](+menu_tool/README.md) — Menu tool callbacks.
-- [core/README.md](../README.md) — Core package overview.
-- [core.import](../+import/README.md) — Import functions used by menu callbacks.
+## Programmatic usage
+
+Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+
+## Examples
+
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+
+## Dependencies and assumptions
+
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
+- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+
+## Notes for developers
+
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

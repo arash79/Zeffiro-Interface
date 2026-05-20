@@ -9,10 +9,46 @@
 %WHY THIS IS NEEDED:
 %Ensures all required fields exist with sensible defaults.
 %Prevents errors from missing fields and provides reasonable starting values.
+% --- Zeffiro documentation header ---
+% function zef_dti_conductivity_init — Function zef dti conductivity init.
+%
+% Purpose:
+%   Function zef dti conductivity init.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.dti_anisotropy_threshold (read, write)
+%   zef.dti_applied (read, write)
+%   zef.dti_applied_time (read, write)
+%   zef.dti_apply_to_compartments (read, write)
+%   zef.dti_conductivity_model (read, write)
+%   zef.dti_conductivity_scale (read, write)
+%   zef.dti_conductivity_tool_current_size (read, write)
+%   zef.dti_conductivity_tool_relative_size (read, write)
+%   zef.dti_dwi_vox2ras_tkr (read, write)
+%   zef.dti_extra_conductivity (read, write)
+%   zef.dti_fa_geometry (read, write)
+%   zef.dti_interpolation_mode (read, write)
+%   zef.dti_interpolation_radius (read, write)
+%   zef.dti_intra_conductivity (read, write)
+%   zef.dti_matrices_approved (read, write)
+%   … (17 more)
+%
+% Calls (project):
+%   zef_dti_conductivity_init
+%   zef_dti_empty_geometry_struct
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function zef_dti_conductivity_init` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 function zef_dti_conductivity_init
 
-% Safety check: Only initialize if zef exists and is a struct
 if ~evalin('base','exist(''zef'', ''var'')')
     return;  % zef doesn't exist yet, skip initialization
 end

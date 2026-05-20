@@ -4,8 +4,33 @@
 %ZEF_DTI_CONDUCTIVITY_BROWSE_V1
 %
 %Browse for FreeSurfer v1 file (principal eigenvector, optional).
+% --- Zeffiro documentation header ---
+% function zef_dti_conductivity_browse_v1 — Function zef dti conductivity browse v1.
+%
+% Purpose:
+%   Function zef dti conductivity browse v1.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.freesurfer_fa_file (read)
+%   zef.freesurfer_v1_file (read, write)
+%   zef.h_freesurfer_v1_file (read)
+%   zef.save_file_path (read)
+%
+% Calls (project):
+%   zef_dti_conductivity_browse_v1
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `function zef_dti_conductivity_browse_v1` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 function zef_dti_conductivity_browse_v1
+
 
 zef = evalin('base','zef');
 

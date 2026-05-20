@@ -1,6 +1,49 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% function [z,reconstruction_information] = zef_CSM_iteration — Function [z,reconstruction information] = zef CSM iteration.
+%
+% Purpose:
+%   Function [z,reconstruction information] = zef CSM iteration.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.csm_n_iter (read)
+%   zef.csm_type (read)
+%   zef.inv_amplitude_db (read)
+%   zef.inv_high_cut_frequency (read)
+%   zef.inv_low_cut_frequency (read)
+%   zef.inv_prior_over_measurement_db (read)
+%   zef.inv_sampling_frequency (read)
+%   zef.inv_snr (read)
+%   zef.inv_time_1 (read)
+%   zef.inv_time_2 (read)
+%   zef.inv_time_3 (read)
+%   zef.number_of_frames (read)
+%   zef.source_direction_mode (read)
+%   zef.source_directions (read)
+%   zef.source_interpolation_ind (read)
+%   … (1 more)
+%
+% Calls (project):
+%   zef_CSM_iteration
+%   zef_getTimeStep
+%   zef_normalizeInverseReconstruction
+%   zef_postProcessInverse
+%   zef_processLeadfields
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [z,reconstruction_information] = zef_CSM_iteration` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [z,reconstruction_information] = zef_CSM_iteration
+
 
 h = waitbar(0,['CSM MAP iteration.']);
 [s_ind_1] = unique(evalin('base','zef.source_interpolation_ind{1}'));

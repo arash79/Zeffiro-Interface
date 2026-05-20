@@ -1,3 +1,42 @@
+% --- Zeffiro documentation header ---
+% zef_init_forward_and_inverse_options; — Initializes GUI widgets and default `zef` fields for forward_and_inverse_options;.
+%
+% Purpose:
+%   Initializes GUI widgets and default `zef` fields for forward_and_inverse_options;.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.adaptive_refinement_compartments (read)
+%   zef.adaptive_refinement_k_param (read)
+%   zef.adaptive_refinement_number (read)
+%   zef.adaptive_refinement_on (read)
+%   zef.adaptive_refinement_thresh_val (read)
+%   zef.aux_field (read)
+%   zef.distance_smoothing_exp (read)
+%   zef.distance_smoothing_on (read)
+%   zef.exclude_box (read)
+%   zef.extensive_relabeling (read)
+%   zef.fem_mesh_inflation_strength (read)
+%   zef.fieldnames (read, write)
+%   zef.fix_outer_surface (read)
+%   zef.font_size (read)
+%   zef.forward_and_inverse_options_current_size (read, write)
+%   … (101 more)
+%
+% Calls (project):
+%   core.types.ZefSourceModel.from
+%   zef_change_size_function
+%   zef_get_active_compartments
+%   zef_update_labeling_priority
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_init_forward_and_inverse_options;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef_init_forward_and_inverse_options;
 
 zef_data = zef_forward_and_inverse_processing_options;
@@ -131,14 +170,14 @@ zef.h_adaptive_refinement_k_param.Value = num2str(zef.adaptive_refinement_k_para
 
 zef.h_as_opt_6.Value = zef.surface_sources;
 zef.h_use_depth_electrodes.Value = zef.use_depth_electrodes;
-zef.h_source_model.Items = arrayfun(@to_string, setdiff(core.ZefSourceModel.variants, core.ZefSourceModel.Error));
-zef.h_source_model.ItemsData = arrayfun(@core.ZefSourceModel.from, setdiff(core.ZefSourceModel.variants, core.ZefSourceModel.Error));
-zef.source_model = core.ZefSourceModel.from(zef.source_model);
-if eq(zef.source_model, core.ZefSourceModel.Error)
+zef.h_source_model.Items = arrayfun(@to_string, setdiff(core.types.ZefSourceModel.variants, core.types.ZefSourceModel.Error));
+zef.h_source_model.ItemsData = arrayfun(@core.types.ZefSourceModel.from, setdiff(core.types.ZefSourceModel.variants, core.types.ZefSourceModel.Error));
+zef.source_model = core.types.ZefSourceModel.from(zef.source_model);
+if eq(zef.source_model, core.types.ZefSourceModel.Error)
     warning("Invalid source model. Setting it as H(div)");
-    zef.source_model = core.ZefSourceModel.Hdiv;
+    zef.source_model = core.types.ZefSourceModel.Hdiv;
 end
-zef.h_source_model.Value = core.ZefSourceModel.from(zef.source_model);
+zef.h_source_model.Value = core.types.ZefSourceModel.from(zef.source_model);
 zef.h_use_gpu.Value = zef.use_gpu;
 zef.h_gpu_num.Value = num2str(zef.gpu_num);
 zef.h_mesh_labeling_approach.ItemsData = [1:length(zef.h_mesh_labeling_approach.Items)];

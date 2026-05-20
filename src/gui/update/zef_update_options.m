@@ -1,5 +1,44 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if zef — If zef.
+%
+% Purpose:
+%   If zef.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.brain_transparency (read, write)
+%   zef.colormap_size (read, write)
+%   zef.colortune_param (read, write)
+%   zef.cone_alpha (read, write)
+%   zef.cone_lattice_resolution (read, write)
+%   zef.cone_scale (read, write)
+%   zef.cp2_a (read, write)
+%   zef.cp2_b (read, write)
+%   zef.cp2_c (read, write)
+%   zef.cp2_d (read, write)
+%   zef.cp2_on (read, write)
+%   zef.cp3_a (read, write)
+%   zef.cp3_b (read, write)
+%   zef.cp3_c (read, write)
+%   zef.cp3_d (read, write)
+%   … (98 more)
+%
+% Calls (project):
+%   core.types.ZefSourceModel.from
+%
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 if zef.mlapp == 1
     zef.preconditioner = get(zef.h_as_opt_1,'Value');
     zef.preconditioner_tolerance = str2num(get(zef.h_as_opt_2,'Value'));
@@ -9,7 +48,7 @@ if zef.mlapp == 1
     zef.refinement_type = get(zef.h_as_opt_5,'Value');
     zef.surface_sources = get(zef.h_as_opt_6,'Value');
     zef.use_depth_electrodes = get(zef.h_use_depth_electrodes,'Value');
-    zef.source_model = core.ZefSourceModel.from(get(zef.h_source_model,'Value'));
+    zef.source_model = core.types.ZefSourceModel.from(get(zef.h_source_model,'Value'));
     zef.colortune_param = str2num(get(zef.h_colortune_param,'Value'));
     zef.inv_hyperprior_weight = get(zef.h_inv_hyperprior_weight,'Value');
     zef.use_gpu         = get(zef.h_use_gpu,'Value');
@@ -46,7 +85,7 @@ else
     zef.parcellation_type = get(zef.h_parcellation_type,'Value');
     zef.parcellation_quantile = str2num(get(zef.h_parcellation_quantile,'string'));
     zef.use_depth_electrodes = get(zef.h_use_depth_electrodes,'Value');
-    zef.source_model = core.ZefSourceModel.from(get(zef.h_source_model,'Value'));
+    zef.source_model = core.types.ZefSourceModel.from(get(zef.h_source_model,'Value'));
     zef.use_gpu         = get(zef.h_use_gpu,'value');
     zef.use_gpu_graphic = get(zef.h_use_gpu_graphic,'value');
     zef.gpu_num = str2num(get(zef.h_gpu_num,'string'));

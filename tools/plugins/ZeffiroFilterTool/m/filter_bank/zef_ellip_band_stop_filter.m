@@ -1,4 +1,33 @@
 function [processed_data] = zef_ellip_band_stop_filter(f, filter_order, ripple, attenuation, center_frequency, band_width, harmonic_filtering, sampling_frequency)
+% --- Zeffiro documentation header ---
+% zef_ellip_band_stop_filter — Zef ellip band stop filter.
+%
+% Purpose:
+%   Zef ellip band stop filter.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   f
+%   filter_order
+%   ripple
+%   attenuation
+%   center_frequency
+%   band_width
+%   harmonic_filtering
+%   sampling_frequency
+%
+% Outputs:
+%   processed_data
+%
+% Calls (project):
+%   zef_ellip_band_stop_filter
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[processed_data] = zef_ellip_band_stop_filter(f, filter_order, ripple, attenuation, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 %This function processes the N-by-M data array f for N channels and M time

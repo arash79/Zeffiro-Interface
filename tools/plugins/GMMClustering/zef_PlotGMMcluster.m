@@ -1,4 +1,41 @@
+% --- Zeffiro documentation header ---
+% function zef_PlotGMMcluster — Function zef Plot GMMcluster.
+%
+% Purpose:
+%   Function zef Plot GMMcluster.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.GMM_colors (read)
+%   zef.GMM_comp_ord (read)
+%   zef.GMM_dip_comp (read)
+%   zef.GMM_dip_num (read)
+%   zef.GMM_ellip_coloring (read)
+%   zef.GMM_ellip_comp (read)
+%   zef.GMM_ellip_num (read)
+%   zef.GMMcluster_alpha (read)
+%   zef.GMMcluster_clustnum (read)
+%   zef.GMMcluster_covident (read)
+%   zef.GMMcluster_covtype (read)
+%   zef.GMMcluster_elliptrans (read)
+%   zef.GMMcluster_headtrans (read)
+%   zef.GMMcluster_markercolor (read)
+%   zef.GMMcluster_markersize (read)
+%   … (12 more)
+%
+% Calls (project):
+%   zef_PlotGMMcluster
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function zef_PlotGMMcluster` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function zef_PlotGMMcluster
+
 
 m_size = evalin('base','zef.GMMcluster_markersize');
 m_width = evalin('base','zef.GMMcluster_markerwidth');

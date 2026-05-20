@@ -1,23 +1,25 @@
 function x = EM_Lasso(L,sigma,y,gamma,x0)
-
-%MAP estimate using EM algorithm
-%L1 norm minimization problem (LASSO):
-%0.5|1/sigma(Lx-y)\|_2^2+0.5*\sum_i [gamma_i |x_i|]
-
-% L : lead field matrix
-% sigma: noise variance
-% y: measurements
-%for gamma->0 we have less sparse solutions...
-
-%Output: x: dipole amplitude
-
-%This code is used when dipole orientation is fixed!
-
-%EM: is a ridge regression solution given by d^(k) =(A'A+ Q^(k))^-1 A'y
-
-%This code was created by A. Koulouri 29.2.2020
-%modified 28.4.2020
-%modified 27.4.2021 by J. Lahtinen: MAP routine fixed
+% --- Zeffiro documentation header ---
+% EM_Lasso — EM Lasso.
+%
+% Purpose:
+%   EM Lasso.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   L
+%   sigma
+%   y
+%   gamma
+%   x0
+%
+% Outputs:
+%   x
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[x] = EM_Lasso(L, sigma, y, gamma, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 [m,~]=size(L);
 A = 1/sigma*L;

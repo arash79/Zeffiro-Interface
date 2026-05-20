@@ -1,6 +1,35 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef_arrange_windows(varargin)
+% --- Zeffiro documentation header ---
+% zef_arrange_windows — Zef arrange windows.
+%
+% Purpose:
+%   Zef arrange windows.
+%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.h_zeffiro_window_main (read)
+%
+% Calls (project):
+%   zef_arrange_windows
+%
+% Side effects:
+%   - base/caller workspace
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_arrange_windows(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 arrange_function = 'tile';
 arrange_target = 'windows';

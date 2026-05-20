@@ -1,3 +1,36 @@
+% --- Zeffiro documentation header ---
+% zef — Zef.
+%
+% Purpose:
+%   Zef.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.ES_HPO_recursive_instances (read, write)
+%   zef.ES_HPO_search_method (read, write)
+%   zef.ES_HPO_search_method_list (read, write)
+%   zef.ES_absolute_tolerance (read, write)
+%   zef.ES_acceptable_threshold (read, write)
+%   zef.ES_active_electrodes (read, write)
+%   zef.ES_alpha (read, write)
+%   zef.ES_alpha_max (read, write)
+%   zef.ES_boundary_color_limit (read, write)
+%   zef.ES_constraint_tolerance (read, write)
+%   zef.ES_cortex_thickness (read, write)
+%   zef.ES_display (read, write)
+%   zef.ES_effective_nnz (read, write)
+%   zef.ES_epsilon (read, write)
+%   zef.ES_epsilon_min (read, write)
+%   … (30 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef.ES_opt_solver_list        = {'Matlab','SDPT3','SeDuMi','MOSEK','Gurobi'};
 zef.ES_opt_method_list        = {'L1L1 optimization','L1L2 optimization','Least squares optimization','Backpropagation','L2L2 optimization'};
 zef.ES_opt_algorithm_list     = {'interior-point','interior-point-legacy','dual-simplex','primal-simplex'};

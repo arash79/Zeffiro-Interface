@@ -3,6 +3,27 @@
 
 
 function [nodes,tetra,interp_vec] = refine_mesh(nodes,tetra)
+% --- Zeffiro documentation header ---
+% refine_mesh — Refine mesh.
+%
+% Purpose:
+%   Refine mesh.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   nodes
+%   tetra
+%
+% Outputs:
+%   nodes
+%   tetra
+%   interp_vec
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[nodes, tetra, interp_vec]] = refine_mesh(nodes, tetra)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 tetra_sort = [tetra(:,[1 2]);
     tetra(:,[2 3]);
@@ -30,16 +51,3 @@ tetra  = [tetra(:,1) edges_ind(:,1) edges_ind(:,3) edges_ind(:,4) tetra(:,5) ;
     edges_ind(:,4) edges_ind(:,1) edges_ind(:,6) edges_ind(:,5) tetra(:,5);
     edges_ind(:,3) edges_ind(:,1) edges_ind(:,2) edges_ind(:,6) tetra(:,5)
     ];
-
-
-
-
-
-
-
-
-
-
-
-
-

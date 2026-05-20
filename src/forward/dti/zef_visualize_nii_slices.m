@@ -65,6 +65,32 @@
 %See also: zef_nii_conductivity_to_sigma, zef_freesurfer_load_fa
 
 function h = zef_visualize_nii_slices(nii_file, varargin)
+% --- Zeffiro documentation header ---
+% zef_visualize_nii_slices — Renders or updates a visualize_nii_slices figure from current `zef` state.
+%
+% Purpose:
+%   Renders or updates a visualize_nii_slices figure from current `zef` state.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   nii_file
+%   varargin
+%
+% Outputs:
+%   h
+%
+% Calls (project):
+%   zef_visualize_nii_slices
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[h] = zef_visualize_nii_slices(nii_file, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 arguments
     nii_file (1,:) char

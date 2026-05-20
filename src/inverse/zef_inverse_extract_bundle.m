@@ -1,9 +1,40 @@
 function bundle = zef_inverse_extract_bundle(zef, method_id, opts)
-%ZEF_INVERSE_EXTRACT_BUNDLE Extract a minimal inverse-computation payload.
+% --- Zeffiro documentation header ---
+% zef_inverse_extract_bundle — Zef inverse extract bundle.
 %
-% The returned bundle contains the lead field and measurement tensors in a
-% format that can be sent to a cluster worker without shipping the entire
-% project structure.
+% Purpose:
+%   Zef inverse extract bundle.
+%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%
+% Inputs:
+%   zef
+%   method_id
+%   opts
+%
+% Outputs:
+%   bundle
+%
+% Zef fields (observed):
+%   zef.inverse_initialization_measurements (read)
+%   zef.source_direction_mode (read)
+%   zef.source_positions (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   inverse.CommonInverseParameters
+%   utilities.cluster.inverse_method_registry
+%   zef_getFilteredDataClassObj
+%   zef_getTimeStepClassObj
+%   zef_inverse_extract_bundle
+%   zef_processLeadfields
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[bundle] = zef_inverse_extract_bundle(zef, method_id, opts)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     zef (1,1) struct

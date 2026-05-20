@@ -1,4 +1,47 @@
 function relative_resolution_vec = zef_find_relative_resolution(zef)
+% --- Zeffiro documentation header ---
+% zef_find_relative_resolution — Zef find relative resolution.
+%
+% Purpose:
+%   Zef find relative resolution.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   relative_resolution_vec
+%
+% Zef fields (observed):
+%   zef.refinement_on (read)
+%   zef.refinement_surface_compartments (read)
+%   zef.refinement_surface_compartments_2 (read)
+%   zef.refinement_surface_compartments_3 (read)
+%   zef.refinement_surface_number (read)
+%   zef.refinement_surface_number_2 (read)
+%   zef.refinement_surface_number_3 (read)
+%   zef.refinement_surface_on (read)
+%   zef.refinement_surface_on_2 (read)
+%   zef.refinement_surface_on_3 (read)
+%   zef.refinement_volume_compartments (read)
+%   zef.refinement_volume_compartments_2 (read)
+%   zef.refinement_volume_compartments_3 (read)
+%   zef.refinement_volume_number (read)
+%   zef.refinement_volume_number_2 (read)
+%   … (4 more)
+%
+% Calls (project):
+%   zef_find_relative_resolution
+%   zef_get_active_compartments
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[relative_resolution_vec] = zef_find_relative_resolution(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 [active_compartments, source_compartments] = zef_get_active_compartments(zef);
 
@@ -131,6 +174,3 @@ end
 end
 
 end
-
-
-

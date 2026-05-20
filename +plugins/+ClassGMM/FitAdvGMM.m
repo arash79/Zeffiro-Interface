@@ -1,4 +1,28 @@
 function obj = FitAdvGMM(positions, weight, k, varargin)
+% --- Zeffiro documentation header ---
+% plugins.ClassGMM.FitAdvGMM — Fit Adv GMM.
+%
+% Purpose:
+%   Fit Adv GMM.
+%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
+%
+% Inputs:
+%   positions
+%   weight
+%   k
+%   varargin
+%
+% Outputs:
+%   obj
+%
+% Calls (project):
+%   plugins.ClassGMM.FitAdvGMM
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[obj] = plugins.ClassGMM.FitAdvGMM(positions, weight, k, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %FITADVGMM Fit a weighted Gaussian mixture distribution to data.
 %
 %   OBJ = FITADVGMM(POSITIONS, WEIGHT, K) fits a Gaussian mixture distribution

@@ -1,3 +1,25 @@
+% --- Zeffiro documentation header ---
+% function [ ... — Function [ .
+%
+% Purpose:
+%   Function [ ....
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   in_nodes
+%   in_tetra
+%   in_volume_inds
+%   in_acceptable_depth_mm
+%
+% Calls (project):
+%   zef_deep_nodes_and_tetra
+%   zef_nearest_points
+%   zef_surface_mesh
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `function [ ...(in_nodes, in_tetra, in_volume_inds, in_acceptable_depth_mm)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 function [ ...
     out_deep_nodes, ...
     out_deep_node_inds, ...
@@ -9,30 +31,6 @@ function [ ...
     in_volume_inds, ...
     in_acceptable_depth_mm ...
     )
-
-% Documentation
-%
-% Produces the nodes and tetra which are deep enough within a given
-% volume, and also their indices in the given global tetra and node data
-% structures.
-%
-% Input:
-%
-% - in_nodes: finite elements nodes.
-%
-% - in_tetra: finite element tetrahedra (quadruples of node indices)
-%   constructed from above nodes.
-%
-% - in_volume_inds: the indices of the tetrahedra that form the volume
-%   under observation.
-%
-% - in_acceptable_depth_mm: the depth in millimetres, within which the
-%   deep tetra are located.
-%
-% Output:
-%
-% - out_tetra_ind: the indices of the tetrahedra that are deep enough
-%   inside the given brain segment.
 
 arguments
     in_nodes (:,3) double

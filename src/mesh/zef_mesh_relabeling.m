@@ -1,4 +1,47 @@
 function   [domain_labels, distance_vec, label_vec] = zef_mesh_relabeling(zef, tetra, nodes, domain_labels, distance_vec, use_labeling_priority, h)
+% --- Zeffiro documentation header ---
+% zef_mesh_relabeling — Zef mesh relabeling.
+%
+% Purpose:
+%   Zef mesh relabeling.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   zef
+%   tetra
+%   nodes
+%   domain_labels
+%   distance_vec
+%   use_labeling_priority
+%   h
+%
+% Outputs:
+%   domain_labels
+%   distance_vec
+%   label_vec
+%
+% Zef fields (observed):
+%   zef.extensive_relabeling (read)
+%   zef.priority_mode (read)
+%   zef.reuna_p (read)
+%   zef.reuna_submesh_ind (read)
+%   zef.reuna_t (read)
+%
+% Calls (project):
+%   zef_choose_domain_labels
+%   zef_mesh_relabeling
+%   zef_point_in_compartment
+%   zef_surface_mesh
+%   zef_waitbar
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[domain_labels, distance_vec, label_vec]] = zef_mesh_relabeling(zef, tetra, nodes, domain_labels, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 5
     priority_mode = zef.priority_mode; 

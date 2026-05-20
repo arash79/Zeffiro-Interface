@@ -1,4 +1,39 @@
 function zef_store_cdata(varargin)
+% --- Zeffiro documentation header ---
+% zef_store_cdata — Zef store cdata.
+%
+% Purpose:
+%   Zef store cdata.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.frame_start (read)
+%   zef.frame_step (read)
+%   zef.frame_stop (read)
+%   zef.h_zeffiro (read)
+%   zef.inv_time_1 (read)
+%   zef.inv_time_2 (read)
+%   zef.inv_time_3 (read)
+%   zef.store_cdata (read)
+%
+% Calls (project):
+%   zef_store_cdata
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_store_cdata(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 data_status = 1;
 cdata_info.frame_start = evalin('base','zef.frame_start');

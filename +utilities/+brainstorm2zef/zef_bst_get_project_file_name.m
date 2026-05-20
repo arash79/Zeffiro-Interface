@@ -1,16 +1,24 @@
 function [file_name] = zef_bst_get_project_file_name(h_parent)
-%ZEF_BST_GET_PROJECT_FILE_NAME Constructs the project file path from GUI settings.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst_get_project_file_name — Zef bst get project file name.
 %
-% This function generates the full path to the Zeffiro project file based on
-% the settings file name and configured folder structure.
+% Purpose:
+%   Zef bst get project file name.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   h_parent - Handle to parent figure containing folder and file name properties
+%   h_parent
 %
 % Outputs:
-%   file_name - Full path to the project file (.mat)
+%   file_name
 %
-% See also: ZEF_BST_GET_SETTINGS_FILE_NAME
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_get_project_file_name
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[file_name] = utilities.brainstorm2zef.zef_bst_get_project_file_name(h_parent)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if nargin < 1
     h_parent = get(gcbo,'Parent');

@@ -1,4 +1,37 @@
 function zef = zef_axes_popup(zef)
+% --- Zeffiro documentation header ---
+% zef_axes_popup — Zef axes popup.
+%
+% Purpose:
+%   Zef axes popup.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.h_figure_aux (read, write)
+%   zef.h_object_aux_new (read, write)
+%   zef.h_zeffiro (read)
+%   zef.h_zeffiro_axes_popup (read, write)
+%   zef.use_display (read)
+%
+% Calls (project):
+%   zef_axes_popup
+%
+% Side effects:
+%   - base/caller workspace
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_axes_popup(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

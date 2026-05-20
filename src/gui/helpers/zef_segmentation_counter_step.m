@@ -1,3 +1,25 @@
+% --- Zeffiro documentation header ---
+% pml_ind_aux = []; — Pml ind aux = [];.
+%
+% Purpose:
+%   Pml ind aux = [];.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.mesh_resolution (read)
+%   zef.reuna_p (read)
+%   zef.reuna_submesh_ind (read)
+%   zef.reuna_type (read)
+%   zef.sensors (read)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `pml_ind_aux = [];` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 pml_ind_aux = [];
 pml_ind = [];

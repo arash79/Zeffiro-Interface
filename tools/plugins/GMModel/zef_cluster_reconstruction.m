@@ -1,4 +1,38 @@
 function [cluster_centres, dipole_moments, index_vec, GMModel, MahalanobisD] = zef_cluster_reconstruction(zef)
+% --- Zeffiro documentation header ---
+% zef_cluster_reconstruction — Zef cluster reconstruction.
+%
+% Purpose:
+%   Zef cluster reconstruction.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   cluster_centres
+%   dipole_moments
+%   index_vec
+%   GMModel
+%   MahalanobisD
+%
+% Zef fields (observed):
+%   zef.GMModel (read)
+%   zef.reconstruction (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_cluster_reconstruction
+%   zef_find_clusters
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[cluster_centres, dipole_moments, index_vec]] = zef_cluster_reconstruction(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 n_clusters = zef.GMModel.max_n_clusters;
 if iscell(zef.reconstruction)

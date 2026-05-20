@@ -1,4 +1,34 @@
 function zef = zef_DBS_strip_struct_window(zef)
+% --- Zeffiro documentation header ---
+% zef_DBS_strip_struct_window — Zef DBS strip struct window.
+%
+% Purpose:
+%   Zef DBS strip struct window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.strip_struct (read)
+%
+% Calls (project):
+%   zef_DBS_strip_struct_update
+%   zef_DBS_strip_struct_window
+%   zef_DBS_update_electrodes
+%
+% Side effects:
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_DBS_strip_struct_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h1 = figure(...
 'PaperUnits',get(0,'defaultfigurePaperUnits'),...

@@ -1,35 +1,29 @@
 function nearest_list = zef_nearest_points( ...
+% --- Zeffiro documentation header ---
+% nearest_list — Nearest list.
+%
+% Purpose:
+%   Nearest list.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   points
+%   neighbour_points
+%   quantity
+%   quantity_interpretation
+%
+% Calls (project):
+%   zef_nearest_points
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `nearest_list(points, neighbour_points, quantity, quantity_interpretation)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
     points, ...
     neighbour_points, ...
     quantity, ...
     quantity_interpretation ...
     )
-
-% Documentation
-%
-% Find the nearest neighbours either within a single set of points, or
-% between two point clouds. In the first case, simply pass in the same set
-% of points twice. The notion of "nearness" must be specified as a
-% quantity–interpretation pair.
-%
-% Input:
-%
-% - points: one set of points from which we are looking nearest neighbours
-%   from.
-%
-% - neighbour_points: the point cloud we are looking the neighbours of
-%   points from.
-%
-% - quantity: a real number whose interpretation is defined by the below
-%   argument. Might be restricted to integers, for example.
-%
-% - quantity_interpretation: an interpretation for the quantity parameter.
-%   Can be either 'single', 'count' or 'range'.
-%
-% Output
-%
-% - nearest_list: a list of indices of the nearest neighbours between the
-%   two given point clouds.
 
 arguments
     points (:, 3) double

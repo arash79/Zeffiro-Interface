@@ -1,4 +1,34 @@
 function [A, B, C] = zef_build_electrodes(nodes, electrode_model, impedance_vec, impedance_inf, ele_ind, A)
+% --- Zeffiro documentation header ---
+% zef_build_electrodes — Zef build electrodes.
+%
+% Purpose:
+%   Zef build electrodes.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   nodes
+%   electrode_model
+%   impedance_vec
+%   impedance_inf
+%   ele_ind
+%   A
+%
+% Outputs:
+%   A
+%   B
+%   C
+%
+% Calls (project):
+%   zef_build_elecrodes
+%   zef_build_electrodes
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[A, B, C]] = zef_build_electrodes(nodes, electrode_model, impedance_vec, impedance_inf, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 % zef_build_elecrodes: constructs the matrices B and C [*] from given nodes,
 % impedances, a stiffness matrix A and electrode indices. Notice that the

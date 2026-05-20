@@ -1,4 +1,25 @@
 function [relative_size] = zef_get_relative_size(object_handle)
+% --- Zeffiro documentation header ---
+% zef_get_relative_size — Zef get relative size.
+%
+% Purpose:
+%   Zef get relative size.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   object_handle
+%
+% Outputs:
+%   relative_size
+%
+% Calls (project):
+%   zef_get_relative_size
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[relative_size] = zef_get_relative_size(object_handle)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 set(object_handle,'units','pixels')
 object_size = get(object_handle,'position');

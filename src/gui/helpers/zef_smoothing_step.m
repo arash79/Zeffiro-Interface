@@ -1,3 +1,38 @@
+% --- Zeffiro documentation header ---
+% if zef — If zef.
+%
+% Purpose:
+%   If zef.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.fix_outer_surface (read)
+%   zef.mesh_optimization_repetitions (read)
+%   zef.mesh_relabeling (read)
+%   zef.mesh_smoothing_repetitions (read)
+%   zef.sensors (read)
+%   zef.smoothing_steps_ele (read)
+%   zef.smoothing_steps_surf (read)
+%   zef.smoothing_steps_vol (read)
+%   zef.smoothing_strength (read)
+%   zef.use_fem_mesh_inflation (read)
+%
+% Calls (project):
+%   zef_attach_sensors_volume
+%   zef_electrode_struct
+%   zef_fix_negatives
+%   zef_inflate_surfaces
+%   zef_surface_mesh
+%   zef_tetra_turn
+%   zef_waitbar
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 if zef.mesh_smoothing_on
 

@@ -1,12 +1,18 @@
-%ZEF_BST_INIT Initializes default settings for Zeffiro-Brainstorm plugin.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst — Zef bst.
 %
-% This script sets up default parameter values for the Brainstorm-to-Zeffiro
-% conversion pipeline. These defaults are used unless overridden by settings
-% files or user-provided parameters.
+% Purpose:
+%   Zef bst.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
-% See also: ZEF_BST_GET_SETTINGS
+% Side effects:
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `utilities.brainstorm2zef.zef_bst` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
-% Brainstorm subject configuration
 zef_bst.subject_struct = struct;      % Brainstorm subject structure (empty = use current)
 zef_bst.subject_folder = "";         % Path to Brainstorm subject folder (empty = use protocol default)
 

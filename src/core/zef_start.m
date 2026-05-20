@@ -1,4 +1,50 @@
 function zef = zef_start(zef)
+% --- Zeffiro documentation header ---
+% zef_start — Zef start.
+%
+% Purpose:
+%   Zef start.
+%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.font_size (read)
+%   zef.gpu_count (read, write)
+%   zef.gpu_num (read)
+%   zef.h_mesh_tool (read)
+%   zef.h_mesh_visualization_tool (read)
+%   zef.h_zeffiro (read)
+%   zef.h_zeffiro_window_main (read, write)
+%   zef.mlapp (read, write)
+%   zef.new_empty_project (read, write)
+%   zef.program_path (read)
+%   zef.start_mode (read)
+%   zef.use_display (read, write)
+%   zef.use_github (read)
+%   zef.use_gpu (read, write)
+%   zef.ver (read, write)
+%   … (1 more)
+%
+% Calls (project):
+%   zef_apply_system_settings
+%   zef_start
+%   zef_update
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_start(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

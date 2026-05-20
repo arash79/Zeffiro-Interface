@@ -1,49 +1,31 @@
 function [x,y,z,D] = zef_3by3_solver(a,b,c,d,D)
+% --- Zeffiro documentation header ---
+% zef_3by3_solver — Zef 3by3 solver.
 %
-% zef_3by3_solver
-%
-% TODO: Sampsa should document this.
+% Purpose:
+%   Zef 3by3 solver.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
 %
 % Inputs:
-%
-% - a
-%
-%   TODO: explanation.
-%
-% - b
-%
-%   TODO: explanation.
-%
-% - c
-%
-%   TODO: explanation.
-%
-% - d
-%
-%   TODO: explanation.
-%
-% - D
-%
-%   TODO: explanation.
+%   a
+%   b
+%   c
+%   d
+%   D
 %
 % Outputs:
+%   x
+%   y
+%   z
+%   D
 %
-% - x
+% Calls (project):
+%   zef_3by3_solver
 %
-%   TODO: explanation.
-%
-% - y
-%
-%   TODO: explanation.
-%
-% - z
-%
-%   TODO: explanation.
-%
-% - D
-%
-%   TODO: explanation.
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[x, y, z]] = zef_3by3_solver(a, b, c, d, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 x = [];
 y = [];

@@ -1,4 +1,36 @@
 function zef_set_size_change_function(h_window,type,scale_positions,exclude_cell)
+% --- Zeffiro documentation header ---
+% zef_set_size_change_function — Zef set size change function.
+%
+% Purpose:
+%   Zef set size change function.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   h_window
+%   type
+%   scale_positions
+%   exclude_cell
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.h_aux (read, write)
+%
+% Calls (project):
+%   zef_change_size_function
+%   zef_get_relative_size
+%   zef_set_size_change_function
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_set_size_change_function(h_window, type, scale_positions, exclude_cell)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 2
     type = 2;

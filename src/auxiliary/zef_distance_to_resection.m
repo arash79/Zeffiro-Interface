@@ -1,4 +1,28 @@
 function [d] = zef_distance_to_resection(points, mesh_points, mesh_triangles)
+% --- Zeffiro documentation header ---
+% zef_distance_to_resection — Zef distance to resection.
+%
+% Purpose:
+%   Zef distance to resection.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   points
+%   mesh_points
+%   mesh_triangles
+%
+% Outputs:
+%   d
+%
+% Calls (project):
+%   zef_distance_to_resection
+%   zef_tetra_in_compartment
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[d] = zef_distance_to_resection(points, mesh_points, mesh_triangles)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 2
     [~, d]=knnsearch(mesh_points, points);

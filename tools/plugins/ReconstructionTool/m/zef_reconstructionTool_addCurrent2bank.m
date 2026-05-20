@@ -1,3 +1,22 @@
+% --- Zeffiro documentation header ---
+% zef.reconstructionTool.bankSize=zef.reconstructionTool — Zef.reconstruction Tool.bank Size=zef.reconstruction Tool.
+%
+% Purpose:
+%   Zef.reconstruction Tool.bank Size=zef.reconstruction Tool.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.reconstruction (read)
+%   zef.reconstructionTool (read)
+%   zef.reconstruction_information (read)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.reconstructionTool.bankSize=zef.reconstructionTool` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 zef.reconstructionTool.bankSize=zef.reconstructionTool.bankSize+1;
 

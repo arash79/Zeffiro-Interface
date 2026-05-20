@@ -1,4 +1,40 @@
 function zef = zef_strip_tool_embed(zef)
+% --- Zeffiro documentation header ---
+% zef_strip_tool_embed — Zef strip tool embed.
+%
+% Purpose:
+%   Zef strip tool embed.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.current_sensors (read)
+%   zef.strip_tool (read)
+%
+% Calls (project):
+%   zef_add_compartment
+%   zef_create_strip
+%   zef_get_strip_parameters
+%   zef_strip_coordinate_transform
+%   zef_strip_tool_embed
+%   zef_strip_tool_init
+%   zef_strip_tool_update
+%   zef_update_compartment_table_data
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_strip_tool_embed(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 cell_aux = zef.([zef.current_sensors '_strip_cell']);
 

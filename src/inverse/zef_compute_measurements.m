@@ -1,73 +1,44 @@
 function zef = zef_compute_measurements(zef, opts)
-%ZEF_COMPUTE_MEASUREMENTS Build solver-agnostic synthetic EEG measurements.
+% --- Zeffiro documentation header ---
+% zef_compute_measurements — Zef compute measurements.
 %
-%   zef = zef_compute_measurements(zef, name, value, ...)
+% Purpose:
+%   Zef compute measurements.
+%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
 %
-% Populates zef.measurements (and the zef.inv_* configuration fields the
-% inverse pipeline reads) from an explicit list of dipolar sources. The
-% function is solver agnostic: it does not mutate zef.source_direction_mode,
-% it does not call evalin / assignin, and the lead-field column layout it
-% picks is correct for source_direction_mode in {1, 2, 3}.
+% Inputs:
+%   zef
+%   opts
 %
-% Required name-value arguments:
-%   sources               1xK struct array. Each element must define:
-%       .position         1x3 double, mm, in the project coordinate frame.
-%       .orientation      1x3 double; will be normalized to a unit vector.
-%       .amplitude        1x1 double. Combined with lead_field_unit_scale
-%                         (default 1e-6) this matches the µV/nAm-style
-%                         scaling used by the legacy compute_measurements
-%                         script and by zef_find_source_legacy.
-%       .time_series      Either a 1xT numeric row vector, a function
-%                         handle f(t) returning a 1xT row vector, or one
-%                         of the string presets:
-%                           "blackmanharris" (legacy default; pulse at the
-%                                             tail of the time vector)
-%                           "gaussian"       (Gaussian pulse centered in t)
-%                           "sinusoid"       (10 Hz sine, useful for tests)
-%                           "impulse"        (single-sample spike at t=0)
-%   sampling_frequency    Hz, > 0. Written to zef.inv_sampling_frequency.
+% Outputs:
+%   zef
 %
-% Optional name-value arguments:
-%   time                  1xT double, the time vector (s). If empty (the
-%                         default), a vector 0:1/fs:duration is built.
-%   duration              Pulse / window length (s) used when 'time' is
-%                         empty. Default 0.01.
-%   snr_db                Per-channel SNR in dB (higher => less noise).
-%                         inf disables noise. Default inf.
-%   noise_type            "gaussian" | "none". Default "gaussian".
-%   lead_field_unit_scale Scalar applied to zef.L when forming the
-%                         per-source forward operator. Default 1e-6, which
-%                         matches the legacy compute_measurements script
-%                         (lead field stored in V/Am, measurements in µV
-%                         when amplitudes are in nAm).
-%   inv_data_mode         'raw' | 'filtered_temporal'. Default 'raw'. The
-%                         char (not string) form is used because consumers
-%                         like zef_getFilteredDataClassObj compare with
-%                         isequal().
-%   inv_low_cut_frequency Hz. Default 0.
-%   inv_high_cut_frequency Hz. Default 0.
-%   inv_time_1            Time-window start (s). Default 0.
-%   inv_time_2            Time-window length (s). Default 0.
-%   inv_time_3            Time-step between frames (s). Default 1/fs.
-%   normalize_data        1..4, index into the inverse pipeline's
-%                         normalization options ("Maximum entry",
-%                         "Maximum column norm", "Average column norm",
-%                         "None"). Default 1.
-%   record_inv_synth_source
-%                         logical. Default true. When true, writes the
-%                         dipole table into zef.inv_synth_source in the
-%                         10-column legacy layout so that plotting plugins
-%                         such as zef_plot_synthetic_source keep working.
-%   rng_seed              Optional rng seed for reproducible noise. Empty
-%                         leaves the global rng untouched. When set, the
-%                         previous rng state is restored on return.
+% Zef fields (observed):
+%   zef.L (read)
+%   zef.inv_data_mode (read, write)
+%   zef.inv_high_cut_frequency (read, write)
+%   zef.inv_low_cut_frequency (read, write)
+%   zef.inv_sampling_frequency (read, write)
+%   zef.inv_synth_source (read, write)
+%   zef.inv_time_1 (read, write)
+%   zef.inv_time_2 (read, write)
+%   zef.inv_time_3 (read, write)
+%   zef.measurements (read, write)
+%   zef.normalize_data (read, write)
+%   zef.source_direction_mode (read, write)
+%   zef.source_positions (read)
 %
-% Output:
-%   zef                   The input zef with .measurements and the inv_*
-%                         fields above populated. zef.inv_snr and
-%                         zef.number_of_frames are intentionally NOT
-%                         touched - those are inverse-time concerns and
-%                         are owned by zef_inverse_pipeline_run.
+% Calls (project):
+%   zef_compute_measurements
+%   zef_processLeadfields
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_compute_measurements(zef, opts)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     zef (1,1) struct

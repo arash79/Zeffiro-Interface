@@ -1,26 +1,35 @@
 function [t_ind, coeff, f_ind] = zef_source_tetra(source_positions, tetra, nodes, K)
-
-% Finds the index of a tetrahedron containing a source position for K
-% tetrahedra nearest to that position.
-% INPUT: 
+% --- Zeffiro documentation header ---
+% zef_source_tetra — Zef source tetra.
 %
-% source_positions, Nx3 array (source positions)
+% Purpose:
+%   Zef source tetra.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
 %
-% tetra, Mx4 array (tetrahedra)
+% Inputs:
+%   source_positions
+%   tetra
+%   nodes
+%   K
 %
-% nodes, Lx3 array (nodes)
+% Outputs:
+%   t_ind
+%   coeff
+%   f_ind
 %
-% OUTPUT:
-% t_index, Nx1 array (indices of the tetrahedra found, if a container tetrahedron is not found, the index of the nearest one is given instead.)
+% Calls (project):
+%   zef_3by3_solver
+%   zef_source_tetra
+%   zef_waitbar
 %
-% coeff, Nx3 array (coefficients of the source position as a linear combination of edges
-% between vertex 1 and vertex 2, vertex 3, vertex 4, respectively.)
+% Side effects:
+%   - filesystem I/O
+%   - waitbar progress UI
 %
-% f_ind, Nx1 array (1 if a container tetrahedron was found, 0 if the
-% nearest point was used instead)
-%
-%K, positive integer (the number of nearest neighbors applied in the
-%search.)
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[t_ind, coeff, f_ind]] = zef_source_tetra(source_positions, tetra, nodes, K)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 if nargin < 4
     K = 25;

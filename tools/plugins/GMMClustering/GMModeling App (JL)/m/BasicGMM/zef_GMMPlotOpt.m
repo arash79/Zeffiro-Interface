@@ -1,7 +1,35 @@
 %Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if isfield(zef.GMM — If isfield(zef.GMM.
+%
+% Purpose:
+%   If isfield(zef.GMM.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.GMM (read)
+%   zef.GMM_colors (read)
+%   zef.font_size (read)
+%
+% Calls (project):
+%   zef_aux_mat
+%   zef_aux_str
+%   zef_temp_screen_size
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `if isfield(zef.GMM` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 %This is script for opening advanced GMM plot options.
+
+
+
 
 if isfield(zef.GMM.apps,'PlotOpt')
     if isvalid(zef.GMM.apps.PlotOpt)

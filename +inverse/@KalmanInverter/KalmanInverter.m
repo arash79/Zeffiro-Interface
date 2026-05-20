@@ -1,4 +1,25 @@
 classdef KalmanInverter < inverse.CommonInverseParameters
+% --- Zeffiro documentation header ---
+% inverse.KalmanInverter.KalmanInverter — Inverse solver class implementing Kalman reconstruction.
+%
+% Purpose:
+%   Inverse solver class implementing Kalman reconstruction.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   args
+%
+% Calls (project):
+%   inverse.CommonInverseParameters
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `inverse.KalmanInverter.KalmanInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
+% --- End Zeffiro documentation header
+
 
     %
     % KalmanInverter, Copyright © 2025- Joonas Lahtinen

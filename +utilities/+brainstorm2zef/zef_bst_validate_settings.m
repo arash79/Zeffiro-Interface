@@ -1,23 +1,25 @@
 function [is_valid, error_msg] = zef_bst_validate_settings(zef_bst)
-%ZEF_BST_VALIDATE_SETTINGS Validates settings structure for required fields and values.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst_validate_settings — Zef bst validate settings.
 %
-% This function checks that the settings structure contains all required fields
-% with valid values before attempting to use them in the conversion process.
+% Purpose:
+%   Zef bst validate settings.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   zef_bst - Structure containing Brainstorm-to-Zeffiro configuration
+%   zef_bst
 %
 % Outputs:
-%   is_valid  - Logical indicating if settings are valid (true/false)
-%   error_msg - String containing error message if validation fails (empty if valid)
+%   is_valid
+%   error_msg
 %
-% Example:
-%   [is_valid, error_msg] = utilities.brainstorm2zef.zef_bst_validate_settings(zef_bst);
-%   if ~is_valid
-%       error('Settings validation failed: %s', error_msg);
-%   end
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_validate_settings
 %
-% See also: ZEF_BST_VALIDATE_ENVIRONMENT, ZEF_BST_INIT
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[is_valid, error_msg]] = utilities.brainstorm2zef.zef_bst_validate_settings(zef_bst)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 is_valid = true;
 error_msg = '';

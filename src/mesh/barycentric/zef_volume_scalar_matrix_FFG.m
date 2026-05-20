@@ -1,36 +1,31 @@
 function M = zef_volume_scalar_matrix_FFG(nodes, tetra, g_i_ind, scalar_field)
+% --- Zeffiro documentation header ---
+% zef_volume_scalar_matrix_FFG — Zef volume scalar matrix FFG.
 %
-% zef_volume_scalar_matrix_FFG
-%
-% TODO: Sampsa should document this.
+% Purpose:
+%   Zef volume scalar matrix FFG.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
 %
 % Inputs:
-%
-% - nodes
-%
-%   TODO: explanation.
-%
-% - tetra
-%
-%   TODO: explanation.
-%
-% - g_i_ind
-%
-%   TODO: explanation.
-%
-% - scalar_field
-%
-%   TODO: explanation.
+%   nodes
+%   tetra
+%   g_i_ind
+%   scalar_field
 %
 % Outputs:
+%   M
 %
-% - M
+% Calls (project):
+%   zef_barycentric_weighting
+%   zef_volume_scalar_matrix_D
+%   zef_volume_scalar_matrix_FFG
 %
-%   TODO: explanation.
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[M] = zef_volume_scalar_matrix_FFG(nodes, tetra, g_i_ind, scalar_field)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 weighting = zef_barycentric_weighting('FF');
 M = zef_volume_scalar_matrix_D(nodes, tetra, g_i_ind, scalar_field, weighting);
 
 end
-

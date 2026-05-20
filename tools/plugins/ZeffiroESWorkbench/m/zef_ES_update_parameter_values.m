@@ -1,3 +1,36 @@
+% --- Zeffiro documentation header ---
+% if ismember(zef — If ismember(zef.
+%
+% Purpose:
+%   If ismember(zef.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.ES_acceptable_threshold (read, write)
+%   zef.ES_alpha (read, write)
+%   zef.ES_alpha_max (read, write)
+%   zef.ES_boundary_color_limit (read, write)
+%   zef.ES_constraint_tolerance (read, write)
+%   zef.ES_display (read, write)
+%   zef.ES_epsilon (read, write)
+%   zef.ES_epsilon_min (read, write)
+%   zef.ES_max_current_channel (read, write)
+%   zef.ES_max_n_iterations (read, write)
+%   zef.ES_max_time (read, write)
+%   zef.ES_opt_method (read)
+%   zef.ES_opt_solver (read)
+%   zef.ES_relative_weight_nnz (read, write)
+%   zef.ES_roi_range (read, write)
+%   … (7 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if ismember(zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 if ismember(zef.ES_opt_solver, 1)
     if zef.ES_opt_method ~= 4
         zef = assign_common_parameters(zef);

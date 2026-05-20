@@ -1,3 +1,24 @@
+% --- Zeffiro documentation header ---
+% L_1 = zef — L 1 = zef.
+%
+% Purpose:
+%   L 1 = zef.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Zef fields (observed):
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_decompose_soure_space
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `L_1 = zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 L_1 = zef.L;
 source_positions = zef.source_positions;
 

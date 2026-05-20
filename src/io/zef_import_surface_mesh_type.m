@@ -1,4 +1,19 @@
+% --- Zeffiro documentation header ---
+% function [file, file_path, mesh_type] = zef_import_surface_mesh_type — Function [file, file path, mesh type] = zef import surface mesh type.
+%
+% Purpose:
+%   Function [file, file path, mesh type] = zef import surface mesh type.
+%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%
+% Calls (project):
+%   zef_import_surface_mesh_type
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `function [file, file_path, mesh_type] = zef_import_surface_mesh_type` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [file, file_path, mesh_type] = zef_import_surface_mesh_type
+
 
 file = 0;
 file_path = 0;

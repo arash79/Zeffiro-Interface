@@ -1,4 +1,36 @@
 function zef = zef_strip_tool_add_contacts(zef)
+% --- Zeffiro documentation header ---
+% zef_strip_tool_add_contacts — Zef strip tool add contacts.
+%
+% Purpose:
+%   Zef strip tool add contacts.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.current_sensors (read)
+%   zef.strip_tool (read)
+%
+% Calls (project):
+%   zef_create_strip
+%   zef_get_strip_contacts
+%   zef_get_strip_parameters
+%   zef_init_sensors_name_table
+%   zef_strip_tool_add_contacts
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_strip_tool_add_contacts(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 points_1 = zef.([zef.current_sensors '_points']);
 impedance_1 = zef.([zef.current_sensors '_electrode_impedance']);

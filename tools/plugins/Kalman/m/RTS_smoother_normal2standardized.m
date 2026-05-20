@@ -1,4 +1,34 @@
 function [P_s_store, m_s_store, G_store] = RTS_smoother_normal2standardized(P_store, z_inverse, A, Q, H, R, standardization_exponent, number_of_frames)
+% --- Zeffiro documentation header ---
+% RTS_smoother_normal2standardized — RTS smoother normal2standardized.
+%
+% Purpose:
+%   RTS smoother normal2standardized.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   P_store
+%   z_inverse
+%   A
+%   Q
+%   H
+%   R
+%   standardization_exponent
+%   number_of_frames
+%
+% Outputs:
+%   P_s_store
+%   m_s_store
+%   G_store
+%
+% Calls (project):
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[P_s_store, m_s_store, G_store]] = RTS_smoother_normal2standardized(P_store, z_inverse, A, Q, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 P_s_store = cell(0);
 m_s_store = cell(0);
 G_store = cell(0);

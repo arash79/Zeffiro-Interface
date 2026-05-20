@@ -1,7 +1,28 @@
 function [info,columnNames, hashList] = zef_databank_showAll(tree, type)
-
-%get all hashes of type nodes
-% this will add a tiny bit of runtime, but makes the funtion more readable
+% --- Zeffiro documentation header ---
+% zef_databank_showAll — Zef databank show All.
+%
+% Purpose:
+%   Zef databank show All.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   tree
+%   type
+%
+% Outputs:
+%   info
+%   columnNames
+%   hashList
+%
+% Calls (project):
+%   zef_databank_showAll
+%   zef_size
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[info, columnNames, hashList]] = zef_databank_showAll(tree, type)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 info=cell(0,0);
 columnNames=cell(0,0);

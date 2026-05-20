@@ -1,5 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if zef — If zef.
+%
+% Purpose:
+%   If zef.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.cp_on (read)
+%   zef.downsample_surfaces (read, write)
+%   zef.enable_str (read, write)
+%   zef.forward_simulation_column_selected (read)
+%   zef.forward_simulation_script (read, write)
+%   zef.forward_simulation_selected (read)
+%   zef.forward_simulation_table (read, write)
+%   zef.h_checkbox_mesh_smoothing_on (read)
+%   zef.h_downsample_surfaces (read)
+%   zef.h_edit65 (read)
+%   zef.h_edit75 (read)
+%   zef.h_edit76 (read)
+%   zef.h_edit_cp_a (read)
+%   zef.h_edit_cp_b (read)
+%   zef.h_edit_cp_c (read)
+%   … (27 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 if zef.mlapp == 1
 

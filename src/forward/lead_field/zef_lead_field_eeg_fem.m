@@ -1,5 +1,34 @@
 %%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% function [L_eeg, dipole_locations, dipole_directions] = lead_field_eeg_fem( ... — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%
+% Purpose:
+%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Zef fields (observed):
+%   zef.lf_param (read)
+%   zef.sigma (read)
+%   zef.source_model (read)
+%   zef.use_gpu (read, write)
+%
+% Calls (project):
+%   core.types.ZefSourceModel.from
+%   zef_build_electrodes
+%   zef_lead_field_interpolation
+%   zef_pem2cem
+%   zef_stiffness_matrix
+%   zef_tetra_volume
+%   zef_transfer_matrix
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [L_eeg, dipole_locations, dipole_directions] = lead_field_eeg_fem( ...` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [L_eeg, dipole_locations, dipole_directions] = lead_field_eeg_fem( ...
     zef, ...
     nodes, ...
@@ -10,37 +39,6 @@ function [L_eeg, dipole_locations, dipole_directions] = lead_field_eeg_fem( ...
     optimization_system_type, ...
     varargin ...
     )
-% function [L_eeg, source_locations, source_directions] = lead_field_eeg_fem(nodes,elements,sigma,electrodes,brain_ind,source_ind,additional_options)
-%
-% Input:
-% ------
-% - nodes              = n_of_nodes x 3
-% - elements           = M x 4
-% - sigma              = M x 1 (or M x 6, one row: sigma_11 sigma_22 sigma_33 sigma_12 sigma_13 sigma_23)
-% - electrodes         = n_of_electrodes x 3
-% - brain_ind          = P x 1 (The set of elements that potentially contain source currents, by default contains all elements)
-% - source_ind         = R x 1 (The set of elements that are allowed to contain source currents, a subset of brain_ind, by default equal to brain_ind)
-% - additional_options = Struct, see below
-%
-% Fields of additional_options:
-% -----------------------------
-%
-% - additional_options.direction_mode: Source directions; Values: 'mesh based' (default) or 'Cartesian' (optional).
-%   Note: If Cartesian directions are used, the columns of the lead field matrix correspond
-%   to directions x y z x y z x y z ..., respectively.
-% - additional_options.precond: Preconditioner type; Values: 'cholinc' (Incomplete Cholesky, default) or 'ssor' (SSOR, optional)
-% - additional_options.cholinc_tol: Tolerance of the Incomplete Cholesky; Values: Numeric (default is 0.001) or '0' (complete Cholesky)
-% - additional_options.pcg_tol: Tolerance of the PCG iteration; Values: Numeric (default is 1e-6)
-% - additional_options.maxit: Maximum number of PCG iteration steps; Values: Numeric (default is 3*floor(sqrt(n_of_nodes)))
-% - additional_options.dipole_mode: Element-wise source direction mode; Values: '1' (direction of the dipole moment, default) or '2' (line segment between nodes 4 and 5 with the numbering given in Pursiainen et al 2011)
-% - additional_options.permutation: Permutation of the linear system; Values: 'symamd' (default), 'symmmd' (optional), 'symrcm' (optional), or 'none' (optional)
-%
-% Output:
-% -------
-% - L_eeg              = n_of_electrodes x K
-% - source_locations   = K x 3 (or K/3 x 3, if Cartesian are used)
-% - source_directions  = K x 3
-%
 
 n_of_nodes = size(nodes,1);
 source_model = eval('zef.source_model');
@@ -171,7 +169,7 @@ end
 
 % Convert source model to new format.
 
-source_model = core.ZefSourceModel.from(source_model);
+source_model = core.types.ZefSourceModel.from(source_model);
 
 % Volume
 

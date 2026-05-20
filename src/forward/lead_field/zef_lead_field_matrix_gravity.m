@@ -1,5 +1,46 @@
 %Copyright © 2018, Sampsa Pursiainen
 %[zef.rho,zef.brain_ind] = zef_rho([]);
+% --- Zeffiro documentation header ---
+% tic; — Tic;.
+%
+% Purpose:
+%   Tic;.
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Zef fields (observed):
+%   zef.L (read)
+%   zef.aux_vec (read, write)
+%   zef.brain_ind (read)
+%   zef.gravity_field_type (read)
+%   zef.imaging_method (read, write)
+%   zef.inv_bg_data (read)
+%   zef.lead_field_time (read, write)
+%   zef.lf_param (read)
+%   zef.location_unit (read, write)
+%   zef.location_unit_current (read, write)
+%   zef.n_sources (read, write)
+%   zef.n_sources_mod (read, write)
+%   zef.n_sources_old (read, write)
+%   zef.nodes (read)
+%   zef.nodes_aux (read, write)
+%   … (19 more)
+%
+% Calls (project):
+%   zef_lead_field_gravity
+%   zef_lead_field_gravity_grad
+%   zef_source_interpolation
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `tic;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 tic;
 
 if zef.source_direction_mode == 1

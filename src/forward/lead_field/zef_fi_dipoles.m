@@ -1,3 +1,22 @@
+% --- Zeffiro documentation header ---
+% function [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_tetra] = zef_fi_dipoles( ... — Function [stensil, signs, source moments, source directions, source locations, n of adj tetra] = zef fi dipoles( .
+%
+% Purpose:
+%   Function [stensil, signs, source moments, source directions, source locations, n of adj tetra] = zef fi dipoles( ....
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Inputs:
+%   node_ind
+%
+% Calls (project):
+%   zef_L2_norm
+%   zef_fi_dipoles
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `function [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_tetra] = zef_fi_dipoles( ...(node_ind)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 function [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_tetra] = zef_fi_dipoles( ...
     nodes      ...
     ,              ...
@@ -5,38 +24,6 @@ function [stensil, signs, source_moments, source_directions, source_locations, n
     ,              ...
     brain_ind  ...
     )
-
-% zef_fi_dipoles: generates the information related to face-intersecting
-% dipoles in the tetrahedral mesh.
-%
-% Input:
-%
-% - nodes: the nodes from which the tetrahedral elements are built from.
-%
-% - tetrahedra: node index quadruplets that tell which nodes form the
-% tetrahedra
-%
-% - brain_ind: a set of indices telling which tetrahedra are actually
-% within the brain.
-%
-% Output:
-%
-% - stensil: an adjacency matrix telling which tetrahedra are next to each
-% other
-%
-% - signs: an n_of_nodes × n_of_sources sparse matrix that maps rows (node
-% index) and columns (corresponding source index) to the signed moment
-% pairs.
-%
-% - source_moments: a vector of source moments.
-%
-% - source_directions: a row matrix of source directions.
-%
-% - source_locations: a row matrix of source locations.
-%
-% - n_of_adjacent tetra: the number of tetrahedral pairs that form
-% sources.
-
 
 wb = zef_waitbar(0,1,'Face intersecting dipoles.');
 

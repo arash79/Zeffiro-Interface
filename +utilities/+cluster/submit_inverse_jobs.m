@@ -1,5 +1,30 @@
 function submissions = submit_inverse_jobs(cluster_profile, bundles, opts)
-%SUBMIT_INVERSE_JOBS Submit inverse bundles as cluster batch jobs.
+% --- Zeffiro documentation header ---
+% utilities.cluster.submit_inverse_jobs — Submit inverse jobs.
+%
+% Purpose:
+%   Submit inverse jobs.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   cluster_profile
+%   bundles
+%   opts
+%
+% Outputs:
+%   submissions
+%
+% Calls (project):
+%   utilities.cluster.submit_inverse_jobs
+%
+% Side effects:
+%   - filesystem I/O
+%   - parallel/cluster
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[submissions] = utilities.cluster.submit_inverse_jobs(cluster_profile, bundles, opts)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     cluster_profile (1,1) parallel.Cluster

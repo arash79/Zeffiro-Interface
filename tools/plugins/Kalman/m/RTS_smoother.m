@@ -1,4 +1,31 @@
 function [P_s_store, m_s_store, G_store] = RTS_smoother(P_store, z_inverse, A, Q, number_of_frames)
+% --- Zeffiro documentation header ---
+% RTS_smoother — RTS smoother.
+%
+% Purpose:
+%   RTS smoother.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   P_store
+%   z_inverse
+%   A
+%   Q
+%   number_of_frames
+%
+% Outputs:
+%   P_s_store
+%   m_s_store
+%   G_store
+%
+% Calls (project):
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[P_s_store, m_s_store, G_store]] = RTS_smoother(P_store, z_inverse, A, Q, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 P_s_store = cell(0);
 m_s_store = cell(0);
 G_store = cell(0);

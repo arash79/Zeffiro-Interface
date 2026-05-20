@@ -1,4 +1,35 @@
 function zef = zef_import_mat_struct(zef,varargin)
+% --- Zeffiro documentation header ---
+% zef_import_mat_struct — Loads external data or a saved Zeffiro project into `zef`.
+%
+% Purpose:
+%   Loads external data or a saved Zeffiro project into `zef`.
+%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%
+% Inputs:
+%   zef
+%   varargin
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.save_file_path (read)
+%
+% Calls (project):
+%   zef_import_mat_struct
+%   zef_surface_mesh
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_import_mat_struct(zef, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 mat_struct = [];
 extension = [];

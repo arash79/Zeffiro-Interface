@@ -1,4 +1,26 @@
 function [dev] = zef_lattice_deviation(X,varargin)
+% --- Zeffiro documentation header ---
+% zef_lattice_deviation — Zef lattice deviation.
+%
+% Purpose:
+%   Zef lattice deviation.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   X
+%   varargin
+%
+% Outputs:
+%   dev
+%
+% Calls (project):
+%   zef_lattice_deviation
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[dev] = zef_lattice_deviation(X, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 dev_type = 'avg';
 r = 0.5;
@@ -82,4 +104,3 @@ for i = 1 : length(i_idx)
 end
 
 end
-

@@ -1,6 +1,46 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_import_parcellation_colortable(zef,varargin)
+% --- Zeffiro documentation header ---
+% zef_import_parcellation_colortable — Loads external data or a saved Zeffiro project into `zef`.
+%
+% Purpose:
+%   Loads external data or a saved Zeffiro project into `zef`.
+%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%
+% Inputs:
+%   zef
+%   varargin
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.file_path (read)
+%   zef.h_parcellation_list (read)
+%   zef.parcellation_colortable (read, write)
+%   zef.parcellation_interp_ind (read, write)
+%   zef.parcellation_merge (read)
+%   zef.parcellation_segment (read)
+%   zef.parcellation_selected (read, write)
+%   zef.save_file_path (read)
+%
+% Calls (project):
+%   zef_import_parcellation_colortable
+%   zef_is_absolute_path
+%   zef_resolve_import_file
+%   zef_update_parcellation
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_import_parcellation_colortable(zef, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin==0
 

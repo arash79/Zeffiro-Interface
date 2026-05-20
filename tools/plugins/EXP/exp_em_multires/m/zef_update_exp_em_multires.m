@@ -1,5 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% zef.exp_multires_n_levels = str2num(get(zef — Zef.exp multires n levels = str2num(get(zef.
+%
+% Purpose:
+%   Zef.exp multires n levels = str2num(get(zef.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.exp_em_multires_beta (read, write)
+%   zef.exp_em_multires_hyper_type (read, write)
+%   zef.exp_em_multires_q (read, write)
+%   zef.exp_em_multires_theta0 (read, write)
+%   zef.exp_multires_n_decompositions (read, write)
+%   zef.exp_multires_n_iter (read, write)
+%   zef.exp_multires_sparsity (read, write)
+%   zef.h_exp_em_multires_beta (read)
+%   zef.h_exp_em_multires_data_segment (read)
+%   zef.h_exp_em_multires_high_cut_frequency (read)
+%   zef.h_exp_em_multires_hyper_type (read)
+%   zef.h_exp_em_multires_low_cut_frequency (read)
+%   zef.h_exp_em_multires_n_L1_iterations (read)
+%   zef.h_exp_em_multires_n_decompositions (read)
+%   zef.h_exp_em_multires_n_iter (read)
+%   … (21 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.exp_multires_n_levels = str2num(get(zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 zef.exp_multires_n_levels = str2num(get(zef.h_exp_em_multires_n_levels,'string'));
 zef.exp_multires_sparsity = str2num(get(zef.h_exp_em_multires_sparsity,'string'));
 zef.exp_multires_n_decompositions = str2num(get(zef.h_exp_em_multires_n_decompositions,'string'));

@@ -36,12 +36,35 @@
 %   coefficients can be extracted.
 
 function out_coeff_sys = zef_pbo_system( ...
+% --- Zeffiro documentation header ---
+% out_coeff_sys — Out coeff sys.
+%
+% Purpose:
+%   Out coeff sys.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   arg_locs
+%   arg_dirs
+%   arg_interp_locs
+%   arg_interp_loc_row
+%   arg_n_of_coeffs
+%
+% Calls (project):
+%   zef_L2_norm
+%   zef_pbo_system
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `out_coeff_sys(arg_locs, arg_dirs, arg_interp_locs, arg_interp_loc_row, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
     arg_locs, ...
     arg_dirs, ...
     arg_interp_locs, ...
     arg_interp_loc_row, ...
     arg_n_of_coeffs ...
     )
+
 
 arguments
     arg_locs (:,3) double

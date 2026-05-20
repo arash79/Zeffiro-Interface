@@ -1,4 +1,23 @@
 function [neighbours,neighboursp] = SESAMEneighbours(V)
+% --- Zeffiro documentation header ---
+% SESAMEneighbours — SESAMEneighbours.
+%
+% Purpose:
+%   SESAMEneighbours.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   V
+%
+% Outputs:
+%   neighbours
+%   neighboursp
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[neighbours, neighboursp]] = SESAMEneighbours(V)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 radius = 1.5 * ((max(V(:,1))-min(V(:,1))) * (max(V(:,2))-min(V(:,2))) * (max(V(:,3))-min(V(:,3)))/ size(V,1) ) ^(1/3) ;
 neighbours = compute_neighbours(V, radius);
 neighboursp = compute_neigh_prob(V, neighbours, radius);

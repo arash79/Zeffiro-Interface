@@ -1,4 +1,28 @@
 function [tetra,labels_tetra] = zef_hexa_to_tetra(hexa,varargin)
+% --- Zeffiro documentation header ---
+% zef_hexa_to_tetra — Zef hexa to tetra.
+%
+% Purpose:
+%   Zef hexa to tetra.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   hexa
+%   varargin
+%
+% Outputs:
+%   tetra
+%   labels_tetra
+%
+% Calls (project):
+%   zef_hexa_to_tetra
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[tetra, labels_tetra]] = zef_hexa_to_tetra(hexa, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 labels_hexa = [];
 h = zef_waitbar(0,1,'Mesh conversion.');

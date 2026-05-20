@@ -1,5 +1,23 @@
 %Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
 %See: https://github.com/sampsapursiainen/GPU-Torre-3D
+% --- Zeffiro documentation header ---
+% signal_configuration — Signal configuration.
+%
+% Purpose:
+%   Signal configuration.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Side effects:
+%   - filesystem I/O
+%   - parallel/cluster
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `signal_configuration` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 
 load([torre_dir '/system_data/signal_configuration.mat']);
@@ -117,10 +135,3 @@ t_data_jacobian = t_data_resample;
 save([torre_dir '/system_data/born_approximation_qam.mat'], 'J_mat', 'jacobian_ind', 'path_data', 't_data_jacobian', '-v7.3');
 
 toc
-
-
-
-
-
-
-

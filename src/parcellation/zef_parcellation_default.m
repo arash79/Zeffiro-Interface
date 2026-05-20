@@ -1,6 +1,43 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [c_table,c_points] = zef_parcellation_default(zef)
+% --- Zeffiro documentation header ---
+% zef_parcellation_default — Zef parcellation default.
+%
+% Purpose:
+%   Zef parcellation default.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   c_table
+%   c_points
+%
+% Zef fields (observed):
+%   zef.active_compartment_ind (read)
+%   zef.compartment_tags (read)
+%   zef.domain_labels (read)
+%   zef.parcellation_colortable (read)
+%   zef.parcellation_merge (read)
+%   zef.parcellation_points (read)
+%   zef.parcellation_selected (read, write)
+%   zef.source_interpolation_ind (read)
+%   zef.source_positions (read)
+%   zef.submesh_ind (read)
+%
+% Calls (project):
+%   zef_parcellation_default
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[c_table, c_points]] = zef_parcellation_default(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 c_table = cell(0);
 c_points = cell(0);

@@ -1,6 +1,30 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [s_field_vec] = zef_smooth_field(triangulation, field_vec, n_nodes, n_iter)
+% --- Zeffiro documentation header ---
+% zef_smooth_field — Zef smooth field.
+%
+% Purpose:
+%   Zef smooth field.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   triangulation
+%   field_vec
+%   n_nodes
+%   n_iter
+%
+% Outputs:
+%   s_field_vec
+%
+% Calls (project):
+%   zef_smooth_field
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[s_field_vec] = zef_smooth_field(triangulation, field_vec, n_nodes, n_iter)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if or(isempty(n_nodes),isequal(n_nodes,0))
     n_nodes = max(triangulation,[],'all');

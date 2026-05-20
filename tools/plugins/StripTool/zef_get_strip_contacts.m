@@ -1,4 +1,46 @@
 function [contacts, sensor_info, triangle_ind] = zef_get_strip_contacts(contact_index,strip_struct,zef,domain_type,global_index)
+% --- Zeffiro documentation header ---
+% zef_get_strip_contacts — Zef get strip contacts.
+%
+% Purpose:
+%   Zef get strip contacts.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   contact_index
+%   strip_struct
+%   zef
+%   domain_type
+%   global_index
+%
+% Outputs:
+%   contacts
+%   sensor_info
+%   triangle_ind
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.domain_labels (read)
+%   zef.nodes (read)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   zef.surface_triangles (read)
+%
+% Calls (project):
+%   zef_get_strip_contacts
+%   zef_get_submesh
+%   zef_strip_coordinate_transform
+%   zef_surface_mesh
+%   zef_triangles_2_sensor_boundary
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[contacts, sensor_info, triangle_ind]] = zef_get_strip_contacts(contact_index, strip_struct, zef, domain_type, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 4
     domain_type = 'model_geometry';

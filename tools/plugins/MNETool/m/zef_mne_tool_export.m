@@ -1,20 +1,44 @@
 function h1 = zef_mne_tool_export()
-% This is the machine-generated representation of a Handle Graphics object
-% and its children.  Note that handle values may change when these objects
-% are re-created. This may cause problems with any callbacks written to
-% depend on the value of the handle at the time the object was saved.
-% This problem is solved by saving the output as a FIG-file.
+% --- Zeffiro documentation header ---
+% zef_mne_tool_export — Zef mne tool export.
 %
-% To reopen this object, just type the name of the MATLAB file at the MATLAB
-% prompt. The MATLAB code file and its associated MAT-file must be on your path.
+% Purpose:
+%   Zef mne tool export.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
 %
-% NOTE: certain newer features in MATLAB may not have been saved in this
-% file due to limitations of this format, which has been superseded by
-% FIG-files.  Figures which have been annotated using the plot editor tools
-% are incompatible with the MATLAB code file/MAT-file format, and should be saved as
-% FIG-files.
-
-
+% Outputs:
+%   h1
+%
+% Zef fields (observed):
+%   zef.h_mne_apply (read, write)
+%   zef.h_mne_cancel (read, write)
+%   zef.h_mne_high_cut_frequency (read, write)
+%   zef.h_mne_low_cut_frequency (read, write)
+%   zef.h_mne_map_estimation (read)
+%   zef.h_mne_normalize_data (read, write)
+%   zef.h_mne_number_of_frames (read, write)
+%   zef.h_mne_prior (read, write)
+%   zef.h_mne_sampling_frequency (read, write)
+%   zef.h_mne_start (read, write)
+%   zef.h_mne_time_1 (read, write)
+%   zef.h_mne_time_2 (read, write)
+%   zef.h_mne_time_3 (read, write)
+%   zef.h_mne_type (read, write)
+%   zef.mne_high_cut_frequency (read, write)
+%   … (11 more)
+%
+% Calls (project):
+%   zef_find_mne_reconstruction
+%   zef_mne_tool_export
+%
+% Side effects:
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_mne_tool_export` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 appdata = [];
 appdata.GUIDEOptions = struct(...

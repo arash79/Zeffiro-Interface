@@ -1,59 +1,28 @@
 function job = create_batch_job(cluster_profile, job_function, num_outputs, ...
-    input_arguments, varargin)
-%CREATE_BATCH_JOB Create and submit a batch job to the cluster.
+% --- Zeffiro documentation header ---
+% utilities.cluster.job — Job.
 %
-% This function creates a batch job on the specified cluster profile and
-% submits it for execution. The job will run the specified function with
-% the given input arguments on a remote worker.
+% Purpose:
+%   Job.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   cluster_profile (parallel.Cluster, required)
-%       Configured cluster profile object (e.g., from configure_cluster_profile).
+%   cluster_profile
+%   job_function
+%   num_outputs
+%   input_arguments
 %
-%   job_function (function_handle, required)
-%       Function handle to execute on the cluster worker.
+% Calls (project):
+%   utilities.cluster.create_batch_job
 %
-%   num_outputs (double, required)
-%       Number of output arguments expected from the job function.
+% Side effects:
+%   - parallel/cluster
 %
-%   input_arguments (cell array, required)
-%       Cell array of input arguments to pass to the job function.
-%
-% Optional Name-Value Pairs:
-%   'CurrentFolder' (string, default: pwd)
-%       Working directory for the job execution.
-%
-%   'AutoAddClientPath' (logical, default: false)
-%       Whether to automatically add the client MATLAB path to workers.
-%       Set to false for cluster environments to avoid path conflicts.
-%
-%   'Pool' (double, default: 0)
-%       Number of workers in a parallel pool for the job. Set to 0 for
-%       sequential execution, or a positive number for parallel execution.
-%
-%   'CaptureDiary' (logical, default: true)
-%       Whether to capture command window output (diary) from the job.
-%
-% Outputs:
-%   job (parallel.job.CJSIndependentJob)
-%       Batch job object that can be used to monitor and retrieve results.
-%
-% Example:
-%   % Configure cluster
-%   c = configure_cluster_profile('project_2002680');
-%
-%   % Create a batch job
-%   job = create_batch_job(c, @my_function, 1, ...
-%       {'input1', 'input2'}, ...
-%       'CurrentFolder', '/scratch/project_2002680/my_work/', ...
-%       'AutoAddClientPath', false);
-%
-%   % Wait for job to complete and fetch results
-%   wait(job);
-%   results = fetchOutputs(job);
-%
-% See also:
-%   batch, configure_cluster_profile, wait, fetchOutputs
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `utilities.cluster.job(cluster_profile, job_function, num_outputs, input_arguments)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+    input_arguments, varargin)
 
 arguments
     cluster_profile (1,1) parallel.Cluster

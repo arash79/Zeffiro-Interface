@@ -1,4 +1,36 @@
 function zef = zef_apply_system_settings(zef)
+% --- Zeffiro documentation header ---
+% zef_apply_system_settings — Zef apply system settings.
+%
+% Purpose:
+%   Zef apply system settings.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.ini_cell (read, write)
+%   zef.ini_cell_mod (read)
+%   zef.parallel_processes (read, write)
+%   zef.program_path (read)
+%   zef.segmentation_tool_default_position (read, write)
+%
+% Calls (project):
+%   zef_apply_system_settings
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_apply_system_settings(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

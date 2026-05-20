@@ -1,10 +1,36 @@
 %Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% function zef_plot_GMM_amplitudes — Function zef plot GMM amplitudes.
+%
+% Purpose:
+%   Function zef plot GMM amplitudes.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.GMM (read)
+%   zef.h_axes1 (read)
+%   zef.h_zeffiro (read)
+%   zef.inv_sampling_frequency (read)
+%   zef.inv_time_1 (read)
+%   zef.inv_time_2 (read)
+%   zef.inv_time_3 (read)
+%
+% Calls (project):
+%   zef_plot_GMM_amplitudes
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function zef_plot_GMM_amplitudes` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 %Plot estimated amplitudes as a bar plot
 function zef_plot_GMM_amplitudes
 
-%check if the amplitudes exists
 if ~evalin('base','isfield(zef.GMM,''amplitudes'')')
     error('Amplitudes are not saved to zef.GMM structure. Please recalculate Gaussian mixature model.');
 end

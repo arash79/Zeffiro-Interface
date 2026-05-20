@@ -1,4 +1,28 @@
 function [current_score_nnz, y] = zef_ES_rwnnz(y, rwnnz, varargin)
+% --- Zeffiro documentation header ---
+% zef_ES_rwnnz — Zef ES rwnnz.
+%
+% Purpose:
+%   Zef ES rwnnz.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   y
+%   rwnnz
+%   varargin
+%
+% Outputs:
+%   current_score_nnz
+%   y
+%
+% Calls (project):
+%   zef_ES_rwnnz
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[current_score_nnz, y]] = zef_ES_rwnnz(y, rwnnz, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if any(isnan(y)) || isempty(y)
     y = [];

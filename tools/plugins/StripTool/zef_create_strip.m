@@ -1,4 +1,27 @@
 function strip_struct = zef_create_strip(strip_struct)
+% --- Zeffiro documentation header ---
+% zef_create_strip — Zef create strip.
+%
+% Purpose:
+%   Zef create strip.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   strip_struct
+%
+% Outputs:
+%   strip_struct
+%
+% Calls (project):
+%   zef_create_strip
+%   zef_get_strip_parameters
+%   zef_simple_cylinder_generator
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[strip_struct] = zef_create_strip(strip_struct)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 strip_struct = zef_get_strip_parameters(strip_struct);
 [triangles{1}, points{1}] = zef_simple_cylinder_generator(strip_struct.strip_radius,strip_struct.strip_n_sectors,strip_struct.strip_length);
@@ -24,4 +47,3 @@ for i = 1 : 2
 end
 
 end
-

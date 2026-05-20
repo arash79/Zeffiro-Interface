@@ -1,20 +1,44 @@
 function [zef,MethodClassObj] = zef_process_inversion(zef,MethodClassObj)
-
-    %
-    % zef_process_inversion
-    %
-    % A function that processes a given inverter, calling its inverse method
-    % for a number of frames and producing a set of reconstructions. The
-    % inverse methods require the following inputs:
-    %
-    % - self
-    % - waitbar_handle
-    % - frame
-    % - L
-    % - procFile
-    % - source_direction_mode
-    % - source_positions
-    %
+% --- Zeffiro documentation header ---
+% zef_process_inversion — Zef process inversion.
+%
+% Purpose:
+%   Zef process inversion.
+%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%
+% Inputs:
+%   zef
+%   MethodClassObj
+%
+% Outputs:
+%   zef
+%   MethodClassObj
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.reconstruction (read, write)
+%   zef.reconstruction_information (read, write)
+%   zef.source_direction_mode (read)
+%   zef.source_directions (read)
+%   zef.source_positions (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   utilities.inverse.run_frame_loop
+%   zef_postProcessInverseClassObj
+%   zef_processLeadfields
+%   zef_process_inversion
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[zef, MethodClassObj]] = zef_process_inversion(zef, MethodClassObj)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
     arguments
 

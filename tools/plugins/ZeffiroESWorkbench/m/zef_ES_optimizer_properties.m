@@ -1,4 +1,38 @@
 function zef = zef_ES_optimizer_properties(zef)
+% --- Zeffiro documentation header ---
+% zef_ES_optimizer_properties — Zef ES optimizer properties.
+%
+% Purpose:
+%   Zef ES optimizer properties.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.ES_temp (read, write)
+%   zef.font_size (read)
+%   zef.h_ES_optimizer_properties (read, write)
+%   zef.h_ES_optimizer_properties_copy_all (read, write)
+%   zef.h_ES_optimizer_properties_current_size (read, write)
+%   zef.h_ES_optimizer_properties_table (read, write)
+%
+% Calls (project):
+%   zef_ES_optimizer_properties
+%   zef_change_size_function
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_ES_optimizer_properties(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 if nargin == 0
     zef = evalin('base','zef');
 end

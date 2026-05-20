@@ -1,4 +1,33 @@
 function [y, dy] = zef_nse_balloon_model_solver(time_vec, blood_flow_signal_decay_rate, flow_dependent_elimination_constant, neural_activity_impulse, relative_mollification,t_min, t_max)
+% --- Zeffiro documentation header ---
+% zef_nse_balloon_model_solver — Zef nse balloon model solver.
+%
+% Purpose:
+%   Zef nse balloon model solver.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   time_vec
+%   blood_flow_signal_decay_rate
+%   flow_dependent_elimination_constant
+%   neural_activity_impulse
+%   relative_mollification
+%   t_min
+%   t_max
+%
+% Outputs:
+%   y
+%   dy
+%
+% Calls (project):
+%   zef_nse_balloon_model_solver
+%   zef_nse_mollifier
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[y, dy]] = zef_nse_balloon_model_solver(time_vec, blood_flow_signal_decay_rate, flow_dependent_elimination_constant, neural_activity_impulse, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 5
 relative_mollification = 0;

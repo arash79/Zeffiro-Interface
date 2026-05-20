@@ -1,21 +1,24 @@
 function weighting = zef_barycentric_weighting(weighting_type)
+% --- Zeffiro documentation header ---
+% zef_barycentric_weighting — Zef barycentric weighting.
 %
-% zef_barycentric_weighting
-%
-% TODO: Sampsa should document this.
+% Purpose:
+%   Zef barycentric weighting.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
 %
 % Inputs:
-%
-% - weighting_type
-%
-%   TODO: explanation.
+%   weighting_type
 %
 % Outputs:
+%   weighting
 %
-% - weighting
+% Calls (project):
+%   zef_barycentric_weighting
 %
-%   TODO: explanation.
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[weighting] = zef_barycentric_weighting(weighting_type)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 switch weighting_type
 

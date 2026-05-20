@@ -1,4 +1,34 @@
 function zef_set_lights(lights_vec,varargin)
+% --- Zeffiro documentation header ---
+% zef_set_lights — Zef set lights.
+%
+% Purpose:
+%   Zef set lights.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   lights_vec
+%   varargin
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.h_axes1 (read)
+%
+% Calls (project):
+%   zef_set_lights
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_set_lights(lights_vec, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');

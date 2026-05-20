@@ -1,8 +1,32 @@
 function zef_plot_GMModel(varargin)
-%Plots a red sphere showing the maximizer of the reconstruction.
-%The optional argument is the scale of the radius. This
-%function can be either static or dynamical.
-
+% --- Zeffiro documentation header ---
+% zef_plot_GMModel — Renders or updates a plot_gmmodel figure from current `zef` state.
+%
+% Purpose:
+%   Renders or updates a plot_gmmodel figure from current `zef` state.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.GMModel (read)
+%
+% Calls (project):
+%   zef_plot_GMModel
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_plot_GMModel(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 [X_0,Y_0,Z_0] = sphere(50);
 h_axes = evalin('caller','h_axes_image');

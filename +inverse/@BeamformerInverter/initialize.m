@@ -1,22 +1,29 @@
 function self = initialize(self,L,f_data)
-    %
-    % initialization function
-    %
-    % Initialize recursively updated variables before the computation of
-    % the first time step.
-    %
-    % Inputs:
-    %
-    % - self
-    %
-    %   An instance of BeamformerInverter with the method-specific parameters.
-    %
-    % Outputs:
-    %
-    % - self
-    %
-    %   Recursive variables initialized
-    %
+% --- Zeffiro documentation header ---
+% inverse.BeamformerInverter.initialize — Estimates priors, noise covariance, or regularization from multi-frame data.
+%
+% Purpose:
+%   Estimates priors, noise covariance, or regularization from multi-frame data.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   self
+%   L
+%   f_data
+%
+% Outputs:
+%   self
+%
+% Calls (project):
+%   inverse.initialize
+%
+% Side effects:
+%   - GPU
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[self] = inverse.BeamformerInverter.initialize(self, L, f_data)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
     arguments
 

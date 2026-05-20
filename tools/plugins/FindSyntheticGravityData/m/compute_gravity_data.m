@@ -1,5 +1,44 @@
 %Copyright © 2018, Sampsa Pursiainen
 function [eit_data_vec] = zef_compute_gravity_data(nodes,elements,rho,electrodes,varargin)
+% --- Zeffiro documentation header ---
+% zef_compute_gravity_data — Zef compute gravity data.
+%
+% Purpose:
+%   Zef compute gravity data.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   nodes
+%   elements
+%   rho
+%   electrodes
+%   varargin
+%
+% Outputs:
+%   eit_data_vec
+%
+% Zef fields (observed):
+%   zef.imaging_method (read)
+%   zef.inv_bg_data (read)
+%   zef.inv_eit_noise (read)
+%   zef.inv_roi_perturbation (read)
+%   zef.inv_roi_sphere (read)
+%   zef.sensors (read)
+%
+% Calls (project):
+%   zef_compute_gravity_data
+%   zef_tetra_volume
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[eit_data_vec] = zef_compute_gravity_data(nodes, elements, rho, electrodes, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 N = size(nodes,1);
 L = size(electrodes,1);

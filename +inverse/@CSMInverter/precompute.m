@@ -1,5 +1,28 @@
 function self = precompute(self, L)
-%PRECOMPUTE Cache frame-invariant matrices for CSM variants.
+% --- Zeffiro documentation header ---
+% inverse.CSMInverter.precompute — Precomputes cached operators before the per-frame inversion loop.
+%
+% Purpose:
+%   Precomputes cached operators before the per-frame inversion loop.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   self
+%   L
+%
+% Outputs:
+%   self
+%
+% Calls (project):
+%   inverse.precompute
+%
+% Side effects:
+%   - GPU
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[self] = inverse.CSMInverter.precompute(self, L)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     self (1,1) inverse.CSMInverter

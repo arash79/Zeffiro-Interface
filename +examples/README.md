@@ -1,102 +1,69 @@
-# Examples — Getting Familiar with Zeffiro Interface
+# +examples
 
-This folder contains example scripts that demonstrate how to use Zeffiro Interface **from the MATLAB command line**—without relying on the graphical user interface (GUI). The examples are designed to help you understand the programmatic workflow: importing segmentations, building meshes, computing lead fields, and running inverse reconstructions.
+## Folder purpose
 
-## Why Use These Examples?
+**Runnable examples and published study scripts** demonstrating the refactored Zeffiro workflow: meshing, lead fields, importing, inverse solvers, and multi-method research pipelines. Invoked after `addpath(projectRoot)` using package-qualified names (`examples.meshing.*`) or `run('+examples/...')`.
 
-- **Learn the pipeline**: See the typical sequence of steps (import → mesh → lead field → inverse).
-- **Reproducibility**: Scripts can be run in batch, modified, and version-controlled.
-- **Customization**: Keyword arguments let you tune parameters without opening GUI dialogs.
-- **Integration**: Call Zeffiro functions from your own MATLAB scripts or pipelines.
+## Main contents
 
-## Before You Start
+| Subfolder | Scripts | Demonstrates |
+|-----------|---------|--------------|
+| `+meshing/` | `zef_meshing_example.m`, `zef_meshing_example_thalamus_refinement.m` | FEM mesh from default segmentation |
+| `+forward/` | `lead_field_example.m` | Mesh → sensors → `zef.L` → save |
+| `+importing/` | `zef_import_example.m` | Nodisplay segmentation import |
+| `+inverse/` | `zef_KalmanDemo.m` | Synthetic data + **legacy** `zef_KF` |
+| `+studies/+decision_making/` | Focal epilepsy multi-method + GMM clustering | Data Bank + legacy inverse GUIs |
+| `+studies/+santtus_peeling_article/` | `main.m` + sensitivity helpers | Monte Carlo localization metrics |
+| `+studies/+tES_hyperparameter_optimization/` | `zef_ES_recursive_search.m` | ES workbench grid search |
 
-1. **Install Zeffiro Interface** and ensure it is correctly configured.
-2. **Start MATLAB** with the Zeffiro project folder as the current directory (or on the path).
-3. **Required data**: Some examples expect segmentation or project files in standard locations (e.g. `data/segmentations/multicompartment_head_project/`). Check the default paths in each script.
+## Code functionality
 
-## Suggested Order for Beginners
-
-If you are new to Zeffiro, try the examples in this order:
-
-1. **`zef_import_example`** — Simplest: loads a segmentation and shows how to start Zeffiro in headless mode.
-2. **`zef_meshing_example`** — Builds a finite-element mesh; introduces mesh-related parameters.
-3. **`zef_meshing_example_thalamus_refinement`** — Same idea, with subcortical (thalamic) refinement.
-4. **`lead_field_example`** — Full pipeline: mesh + sensors + lead field; this is the foundation for inverse methods.
-5. **`zef_KalmanDemo`** — Simulates data and runs a Kalman filter inverse; good for understanding forward + inverse workflow.
-
-## Running Examples
-
-Run from the Zeffiro installation folder:
-
+**Typical pattern:**
 ```matlab
-project_struct = examples.zef_import_example;
+project_struct = examples.meshing.zef_meshing_example();
+project_struct = examples.forward.lead_field_example(project_struct);
 ```
 
-For examples that accept arguments:
+Uses `utilities.structs.copy_fields`, `zeffiro_interface('start_mode','nodisplay')`, and `zef_*` APIs from `src/`.
 
-```matlab
-project_struct = examples.lead_field_example('mesh_resolution', 5, 'n_sources', 5000);
+**Studies** often `eval` GUI plugin callbacks (`zef.h_mne_start.Callback`) — require plugins loaded for active profile.
+
+**Kalman demo** calls legacy `zef_KF` in `tools/plugins/Kalman`, not `inverse.KalmanInverter`.
+
+## Workflow context
+
+```
++examples → zeffiro_interface / zef_* → src/mesh, src/forward, src/inverse, tools/plugins
 ```
 
-Get help and see available options:
+Cluster examples live under `+utilities/+cluster/+examples`, not here.
+
+## Usage instructions
 
 ```matlab
-help examples.lead_field_example
+addpath(fileparts(which('zeffiro_interface')));
+addpath(genpath(fullfile(fileparts(which('zeffiro_interface')),'src')));
+
+% Function-style
+p = examples.forward.lead_field_example();
+
+% Script-style
+run('+examples/+inverse/zef_KalmanDemo.m');
+
+% Studies (fix data paths in zef_parameters_focal_epilepsy.m first)
+run('+examples/+studies/+decision_making/zef_decision_script_focal_epilepsy.m');
 ```
 
-## Root-Level Examples
+## Important notes
 
-### `zef_import_example.m`
+- Default segmentation: `data/segmentations/multicompartment_head_project/import_segmentation.zef`.
+- Decision-making study defaults reference `~/Dropbox/...` paths — **must be repointed** locally.
+- `zef_KalmanDemo` visualization cells may be marked maintenance — core inversion still runs.
+- Class inverse examples: prefer `zef_inverse_run` + `+utilities/+cluster/+examples` for eloreta/kalman class paths.
 
-**What you learn:** How to import a multi-compartment head segmentation and start Zeffiro without the GUI.
+## Developer guidance
 
-**Use when:** You want to load an existing project or segmentation from a script. The function returns a project struct for further processing.
-
----
-
-### `zef_meshing_example.m`
-
-**What you learn:** How to generate a finite-element mesh from a segmentation. You can control resolution, refinement, smoothing, and other meshing parameters via keyword arguments.
-
-**Use when:** You need a tetrahedral mesh for EEG/MEG forward modeling. The mesh is saved to a `.mat` file.
-
-**Reference:** Based on *Multi-compartment head modeling in EEG: unstructured boundary-fitted tetra meshing with subcortical structures* (see the script header for DOI).
-
----
-
-### `zef_meshing_example_thalamus_refinement.m`
-
-**What you learn:** How to refine specific compartments—here, the thalamus—for higher resolution where it matters.
-
-**Use when:** Your analysis focuses on subcortical structures and you need finer elements there.
-
----
-
-### `lead_field_example.m`
-
-**What you learn:** The complete forward pipeline: build mesh, attach sensors, and compute the lead field matrix. This is the core of any inverse method—the lead field maps source activity to sensor measurements.
-
-**Use when:** You need a lead field for EEG (or MEG, depending on settings). You can pass mesh and lead-field parameters; see `help examples.lead_field_example` for options.
-
-**Further reading:** [Lead field generation (wiki)](https://github.com/sampsapursiainen/zeffiro_interface/wiki/Lead-field-generation)
-
----
-
-### `zef_KalmanDemo.m`
-
-**What you learn:** How to simulate synthetic EEG data (here, somatosensory P20/N20 with cortical and thalamic sources), then run Kalman filter–based inverse reconstruction.
-
-**Use when:** You want to understand the full workflow: forward simulation + inverse method, without real data. Run section by section in the MATLAB editor.
-
----
-
-## Subfolder: `+studies`
-
-The `+studies` folder contains more advanced, research-oriented workflows used in published studies. They demonstrate specialized applications (sensitivity analysis, epilepsy localization, tES optimization) and require additional setup. See the `+studies` README for details and when to explore them.
-
-## More Help
-
-- **MATLAB help:** `help examples.function_name` or `doc examples.function_name`
-- **Wiki:** [zeffiro_interface wiki](https://github.com/sampsapursiainen/zeffiro_interface/wiki)
-- **Meshing:** [Finite-Element Mesh generation](https://github.com/sampsapursiainen/zeffiro_interface/wiki/Finite-Element-Mesh-generation)
+- New examples: add under `+topic/`, use `arguments` blocks, return `zef` or project struct, document data deps in subfolder README.
+- Prefer programmatic `zef_inverse_run` over `eval` of GUI callbacks for maintainability.
+- Keep outputs under `data/` with names documented in subfolder README.
+- Studies should not fork inverse math — call existing `zef_*` or class APIs.

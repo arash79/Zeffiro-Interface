@@ -1,6 +1,29 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [scale_param, snr_vec] = zef_find_gaussian_prior(snr_val, varargin)
+% --- Zeffiro documentation header ---
+% zef_find_gaussian_prior — Zef find gaussian prior.
+%
+% Purpose:
+%   Zef find gaussian prior.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   snr_val
+%   varargin
+%
+% Outputs:
+%   scale_param
+%   snr_vec
+%
+% Calls (project):
+%   zef_find_gaussian_prior
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[scale_param, snr_vec]] = zef_find_gaussian_prior(snr_val, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 L = [];
 

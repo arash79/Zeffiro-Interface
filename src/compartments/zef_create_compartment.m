@@ -1,4 +1,33 @@
 function zef = zef_create_compartment(zef,compartment_tag, varargin)
+% --- Zeffiro documentation header ---
+% zef_create_compartment — Zef create compartment.
+%
+% Purpose:
+%   Zef create compartment.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   zef
+%   compartment_tag
+%   varargin
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%
+% Calls (project):
+%   zef_create_compartment
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_create_compartment(zef, compartment_tag, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 n_compartments = eval('length(zef.compartment_tags)');
 color_default = [ 0.3984    0.7615    0.4435 ;

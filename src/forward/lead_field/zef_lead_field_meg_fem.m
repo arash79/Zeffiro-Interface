@@ -1,5 +1,37 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_fem( ... — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%
+% Purpose:
+%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.parallel_processes (read)
+%   zef.processes_per_core (read)
+%   zef.source_model (read)
+%   zef.surface_sources (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   core.types.ZefSourceModel.from
+%   zef_stiffness_matrix
+%   zef_tetra_volume
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - filesystem I/O
+%   - parallel/cluster
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_fem( ...` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_fem( ...
     zef, ...
     nodes, ...
@@ -9,6 +41,7 @@ function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_fem( ...
     p_nearest_neighbour_inds, ...
     varargin ...
     )
+
 
 N = size(nodes,1);
 source_model = eval('zef.source_model');
@@ -119,7 +152,7 @@ end
 
 % Convert source model to new format.
 
-source_model = core.ZefSourceModel.from(source_model);
+source_model = core.types.ZefSourceModel.from(source_model);
 
 % Calculate volume tilavuus
 
@@ -266,7 +299,7 @@ T_fi = sparse(repmat([1:M_fi]',2,1),[Ind_mat(:,1);Ind_mat(:,2)],ones(2*M_fi,1), 
 clear I tetrahedra_aux_ind_1 tetrahedra_aux_ind_2;
 
 %Form G_ew and T_ew
-if source_model == core.ZefSourceModel.Hdiv
+if source_model == core.types.ZefSourceModel.Hdiv
     %*******************************
     %*******************************
 
@@ -321,7 +354,7 @@ for j = 1 : L
     L_meg_fi(j,:) = dot(cross_mat,repmat(sensors(4:6,j),1,M_fi))./power_vec;
 end
 
-if source_model == core.ZefSourceModel.Hdiv
+if source_model == core.types.ZefSourceModel.Hdiv
     L_meg_ew = zeros(L,M_ew);
     for j = 1 : L
         cross_mat = cross(ew_source_directions', repmat(sensors(1:3,j),1,M_ew) - ew_source_locations');
@@ -372,7 +405,7 @@ if eval('zef.use_gpu')==1 && evalin('base','zef.gpu_count') > 0
         r = gather(x(iperm_vec));
         x = r;
         L_meg_fi(i,:) = L_meg_fi(i,:) + x'*G_fi;
-        if source_model == core.ZefSourceModel.Hdiv
+        if source_model == core.types.ZefSourceModel.Hdiv
             L_meg_ew(i,:) = L_meg_ew(i,:) + x'*G_ew;
         end
         if tol_val < relres_vec(i)
@@ -461,7 +494,7 @@ else
 
         %Substitute matrices
         L_meg_fi(block_ind,:) = L_meg_fi(block_ind,:) + x_block'*G_fi;
-        if source_model == core.ZefSourceModel.Hdiv
+        if source_model == core.types.ZefSourceModel.Hdiv
             L_meg_ew(block_ind,:) = L_meg_ew(block_ind,:) + x_block'*G_ew;
         end
 
@@ -491,7 +524,7 @@ waitbar_ind = 0;
 zef_waitbar(waitbar_ind,waitbar_length,h,'Interpolation.');
 Aux_mat_2 = eye(L,L) - (1/L)*ones(L,L);
 L_meg_fi = Aux_mat_2*L_meg_fi/(4*pi);
-if source_model == core.ZefSourceModel.Hdiv
+if source_model == core.types.ZefSourceModel.Hdiv
     L_meg_ew = Aux_mat_2*L_meg_ew/(4*pi);
 end
 
@@ -516,7 +549,7 @@ if isequal(lower(direction_mode),'cartesian') || isequal(lower(direction_mode),'
     dipole_directions = [];
     L_meg = zeros(L,3*M2);
 
-    if source_model == core.ZefSourceModel.Hdiv
+    if source_model == core.types.ZefSourceModel.Hdiv
 
         tic;
         for i = 1 : M2
@@ -540,7 +573,7 @@ if isequal(lower(direction_mode),'cartesian') || isequal(lower(direction_mode),'
         end
     end
 
-    if source_model == core.ZefSourceModel.Whitney
+    if source_model == core.types.ZefSourceModel.Whitney
         tic;
         for i = 1 : M2
 

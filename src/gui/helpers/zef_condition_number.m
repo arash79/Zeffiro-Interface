@@ -1,4 +1,28 @@
 function [condition_number, volume, longest_edge] = zef_condition_number(nodes, tetra)
+% --- Zeffiro documentation header ---
+% zef_condition_number — Zef condition number.
+%
+% Purpose:
+%   Zef condition number.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   nodes
+%   tetra
+%
+% Outputs:
+%   condition_number
+%   volume
+%   longest_edge
+%
+% Calls (project):
+%   zef_condition_number
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[condition_number, volume, longest_edge]] = zef_condition_number(nodes, tetra)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 ind_m = [1 4 7; 2 5 8 ; 3 6 9];
 Aux_mat = [nodes(tetra(:,1),:)'; nodes(tetra(:,2),:)'; nodes(tetra(:,3),:)'] - repmat(nodes(tetra(:,4),:)',3,1);

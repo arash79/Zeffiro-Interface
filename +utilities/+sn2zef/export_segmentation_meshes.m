@@ -1,4 +1,40 @@
 function [affine_matrix, vertex_transform] = export_segmentation_meshes(zef, inFolder, outFolder, inflation_parameter, freesurfer_subject_folder, options)
+% --- Zeffiro documentation header ---
+% utilities.sn2zef.export_segmentation_meshes — Export segmentation meshes.
+%
+% Purpose:
+%   Export segmentation meshes.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   zef
+%   inFolder
+%   outFolder
+%   inflation_parameter
+%   freesurfer_subject_folder
+%   options
+%
+% Outputs:
+%   affine_matrix
+%   vertex_transform
+%
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_get_atlas_surfaces
+%   utilities.sn2zef.export_segmentation_meshes
+%   utilities.sn2zef.readSNLUT
+%   utilities.sn2zef.run_and_print_command
+%   utilities.sn2zef.save_volume_atlas_points
+%   utilities.sn2zef.transforms.compute_simnibs_to_freesurfer_translation
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[affine_matrix, vertex_transform]] = utilities.sn2zef.export_segmentation_meshes(zef, inFolder, outFolder, inflation_parameter, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %
 % export_segmentation_meshes
 %

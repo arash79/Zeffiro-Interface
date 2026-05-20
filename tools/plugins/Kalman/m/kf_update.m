@@ -1,5 +1,28 @@
 function [m, P, K] = kf_update(m,P,y,H,R)
-% kf_update is the update step of kalman filter
+% --- Zeffiro documentation header ---
+% kf_update — Kf update.
+%
+% Purpose:
+%   Kf update.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   m
+%   P
+%   y
+%   H
+%   R
+%
+% Outputs:
+%   m
+%   P
+%   K
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[m, P, K]] = kf_update(m, P, y, H, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
     v = y - H*m;
     PHt = P * H';
     S = H * PHt + R; 

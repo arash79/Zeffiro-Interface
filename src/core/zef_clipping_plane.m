@@ -1,4 +1,27 @@
 function clipped_nodes_ind = zef_clipping_plane(nodes, clipping_plane, varargin)
+% --- Zeffiro documentation header ---
+% zef_clipping_plane — Zef clipping plane.
+%
+% Purpose:
+%   Zef clipping plane.
+%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%
+% Inputs:
+%   nodes
+%   clipping_plane
+%   varargin
+%
+% Outputs:
+%   clipped_nodes_ind
+%
+% Calls (project):
+%   zef_clipping_plane
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[clipped_nodes_ind] = zef_clipping_plane(nodes, clipping_plane, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 clipped = 0;
 if length(varargin) > 0

@@ -1,6 +1,49 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_process_meshes(zef,varargin)
+% --- Zeffiro documentation header ---
+% zef_process_meshes — Zef process meshes.
+%
+% Purpose:
+%   Zef process meshes.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   zef
+%   varargin
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartment_activity (read)
+%   zef.compartment_tags (read)
+%   zef.create_patch_sensor (read)
+%   zef.current_sensors (read)
+%   zef.imaging_method (read)
+%   zef.pml_outer_radius (read)
+%   zef.pml_outer_radius_unit (read)
+%   zef.reuna_mesh_ind (read, write)
+%   zef.reuna_p (read, write)
+%   zef.reuna_p_inf (read, write)
+%   zef.reuna_submesh_ind (read, write)
+%   zef.reuna_t (read, write)
+%   zef.reuna_type (read, write)
+%   zef.sensors (read, write)
+%   zef.use_pem (read)
+%
+% Calls (project):
+%   zef_process_meshes
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_process_meshes(zef, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 explode_param = 1;
 

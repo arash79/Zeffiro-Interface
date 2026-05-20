@@ -69,6 +69,35 @@
 %
 %   These can be used to index into the input brain_ind to determine which of
 %   them can be used as dipolar sources in a head model.
+% --- Zeffiro documentation header ---
+% function [ ... — Function [ .
+%
+% Purpose:
+%   Function [ ....
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   in_center_points
+%   in_lattice_res_x
+%   in_lattice_res_y
+%   in_lattice_res_z
+%
+% Zef fields (observed):
+%   zef.dof_decomposition_type (read)
+%   zef.n_sources (read)
+%
+% Calls (project):
+%   zef_decompose_dof_space
+%   zef_tetra_barycentra
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `function [ ...(in_center_points, in_lattice_res_x, in_lattice_res_y, in_lattice_res_z)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 function [ ...
     nearest_neighbour_inds, ...
@@ -76,6 +105,7 @@ function [ ...
     dof_positions, ...
     decomposition_source_inds ...
     ] = zef_decompose_dof_space(nodes,tetrahedra,brain_ind,varargin)
+
 
 
 if not(isempty(varargin))

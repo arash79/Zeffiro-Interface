@@ -1,8 +1,32 @@
 function [G1, G2, G3] = zef_tetra_gradient_field(nodes, tetrahedra, volume, tensor, eval_point_inds, K, N)
-
-% Calculates a gradient field [G1,G2,G3] for a given set of nodes, tetrahedra,
-% volume, volume current tensor, gradient field evaluation points and matrix
-% size K and N.
+% --- Zeffiro documentation header ---
+% zef_tetra_gradient_field — Zef tetra gradient field.
+%
+% Purpose:
+%   Zef tetra gradient field.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   nodes
+%   tetrahedra
+%   volume
+%   tensor
+%   eval_point_inds
+%   K
+%   N
+%
+% Outputs:
+%   G1
+%   G2
+%   G3
+%
+% Calls (project):
+%   zef_tetra_gradient_field
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[G1, G2, G3]] = zef_tetra_gradient_field(nodes, tetrahedra, volume, tensor, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 G1 = spalloc(K,N,0);
 G2 = spalloc(K,N,0);

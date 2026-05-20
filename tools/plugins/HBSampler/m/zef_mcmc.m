@@ -1,6 +1,61 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,reconstruction_information] = zef_mcmc(zef)
+% --- Zeffiro documentation header ---
+% zef_mcmc — Zef mcmc.
+%
+% Purpose:
+%   Zef mcmc.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   z
+%   reconstruction_information
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.inv_amplitude_db (read)
+%   zef.inv_high_cut_frequency (read)
+%   zef.inv_hyperprior (read, write)
+%   zef.inv_hyperprior_tail_length_db (read)
+%   zef.inv_hyperprior_weight (read)
+%   zef.inv_low_cut_frequency (read)
+%   zef.inv_n_burn_in (read)
+%   zef.inv_normalize_data (read)
+%   zef.inv_number_of_frames (read)
+%   zef.inv_prior_over_measurement_db (read)
+%   zef.inv_sample_size (read)
+%   zef.inv_sampling_frequency (read)
+%   zef.inv_snr (read)
+%   zef.inv_time_1 (read)
+%   … (7 more)
+%
+% Calls (project):
+%   zef_find_g_hyperprior
+%   zef_find_ig_hyperprior
+%   zef_getFilteredData
+%   zef_getTimeStep
+%   zef_gibbs_sampler_step
+%   zef_mcmc
+%   zef_normalizeInverseReconstruction
+%   zef_postProcessInverse
+%   zef_processLeadfields
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - filesystem I/O
+%   - parallel/cluster
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[z, reconstruction_information]] = zef_mcmc(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 inverse_gamma_ind = [1:4];
 gamma_ind = [5:10];

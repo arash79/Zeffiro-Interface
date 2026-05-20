@@ -1,4 +1,28 @@
 function [reconstruction, reconstruction_info] = zef_nse_reconstruction(nse_field,type)
+% --- Zeffiro documentation header ---
+% zef_nse_reconstruction — Zef nse reconstruction.
+%
+% Purpose:
+%   Zef nse reconstruction.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   nse_field
+%   type
+%
+% Outputs:
+%   reconstruction
+%   reconstruction_info
+%
+% Calls (project):
+%   zef_nse_reconstruction
+%   zef_nse_threshold_distribution
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[reconstruction, reconstruction_info]] = zef_nse_reconstruction(nse_field, type)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 reconstruction = cell(0);
 reconstruction_info = cell(0);

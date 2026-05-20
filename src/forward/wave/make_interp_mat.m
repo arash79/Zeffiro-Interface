@@ -1,5 +1,22 @@
 %Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
 %See: https://github.com/sampsapursiainen/GPU-Torre-3D
+% --- Zeffiro documentation header ---
+% parameters; — Parameters;.
+%
+% Purpose:
+%   Parameters;.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `parameters;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 parameters;
 

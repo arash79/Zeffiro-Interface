@@ -1,5 +1,30 @@
 function [m, P, K, D] = kf_sL_update_approx(m,P,y,H,R,standardization_exponent)
-    % Approximating the inverse of square root matrix
+% --- Zeffiro documentation header ---
+% kf_sL_update_approx — Kf s L update approx.
+%
+% Purpose:
+%   Kf s L update approx.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   m
+%   P
+%   y
+%   H
+%   R
+%   standardization_exponent
+%
+% Outputs:
+%   m
+%   P
+%   K
+%   D
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[m, P, K]] = kf_sL_update_approx(m, P, y, H, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
     N = 5; M = 1;
     Z = eye(length(m));
     Y = P;
@@ -30,4 +55,3 @@ function [m, P, K, D] = kf_sL_update_approx(m,P,y,H,R,standardization_exponent)
 
 
 end
-

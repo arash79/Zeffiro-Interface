@@ -1,4 +1,33 @@
+% --- Zeffiro documentation header ---
+% function [GMModel,GMModelDipoles,GMModelAmplitudes,GMModelTimeVariables] = zef_AdvGMModeling — Function [GMModel,GMModel Dipoles,GMModel Amplitudes,GMModel Time Variables] = zef Adv GMModeling.
+%
+% Purpose:
+%   Function [GMModel,GMModel Dipoles,GMModel Amplitudes,GMModel Time Variables] = zef Adv GMModeling.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.GMM (read)
+%   zef.parcellation_interp_ind (read)
+%   zef.parcellation_selected (read)
+%   zef.reconstruction (read)
+%   zef.reconstruction_information (read)
+%   zef.source_interpolation_ind (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_AdvGMModeling
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [GMModel,GMModelDipoles,GMModelAmplitudes,GMModelTimeVariables] = zef_AdvGMModeling` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [GMModel,GMModelDipoles,GMModelAmplitudes,GMModelTimeVariables] = zef_AdvGMModeling
+
 h = waitbar(0,['Gaussian mixature model.']);
 GMModelTimeVariables = [];
 if evalin('base','isfield(zef,''reconstruction_information'')')
@@ -346,4 +375,3 @@ end     %end of t loop
 
 close(h);
 end
-    

@@ -1,4 +1,31 @@
 function h_arrow_vec = zef_plot_3D_arrow(x,y,z,u,v,w,varargin)
+% --- Zeffiro documentation header ---
+% zef_plot_3D_arrow — Renders or updates a plot_3d_arrow figure from current `zef` state.
+%
+% Purpose:
+%   Renders or updates a plot_3d_arrow figure from current `zef` state.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   x
+%   y
+%   z
+%   u
+%   v
+%   w
+%   varargin
+%
+% Outputs:
+%   h_arrow_vec
+%
+% Calls (project):
+%   zef_plot_3D_arrow
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[h_arrow_vec] = zef_plot_3D_arrow(x, y, z, u, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h_axes = gca;
 hold_state = ishold(h_axes);

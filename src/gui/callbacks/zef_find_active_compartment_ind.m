@@ -1,4 +1,34 @@
 function [brain_ind, brain_compartments] = zef_find_active_compartment_ind(zef,domain_labels)
+% --- Zeffiro documentation header ---
+% zef_find_active_compartment_ind — Zef find active compartment ind.
+%
+% Purpose:
+%   Zef find active compartment ind.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   domain_labels
+%
+% Outputs:
+%   brain_ind
+%   brain_compartments
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.domain_labels (read)
+%
+% Calls (project):
+%   zef_find_active_compartment_ind
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[brain_ind, brain_compartments]] = zef_find_active_compartment_ind(zef, domain_labels)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin < 2
     domain_labels = zef.domain_labels;

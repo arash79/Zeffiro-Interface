@@ -1,3 +1,20 @@
+% --- Zeffiro documentation header ---
+% h_axes = gca; — H axes = gca;.
+%
+% Purpose:
+%   H axes = gca;.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.nse_field (read)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `h_axes = gca;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 h_axes = gca;
 if isempty(findobj(allchild(h_axes),'Type','DataTip'))~=1

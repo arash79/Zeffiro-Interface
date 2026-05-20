@@ -1,4 +1,32 @@
 function apply_affine_transform(mesh_file, affine_matrix, options)
+% --- Zeffiro documentation header ---
+% utilities.fs2zef.transforms.apply_affine_transform — Apply affine transform.
+%
+% Purpose:
+%   Apply affine transform.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   mesh_file
+%   affine_matrix
+%   options
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Calls (project):
+%   utilities.fs2zef.readers.read_ascii_segmentation_file
+%   utilities.fs2zef.transforms.apply_affine_transform
+%   utilities.fs2zef.transforms.compute_affine_transform
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `utilities.fs2zef.transforms.apply_affine_transform(mesh_file, affine_matrix, options)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %
 % apply_affine_transform - Apply affine transformation to mesh file
 %

@@ -1,6 +1,54 @@
 function [zef] = zef_KF(zef, q_value)
-% Optimal q_value as parameter
-%% Initial parameters
+% --- Zeffiro documentation header ---
+% zef_KF — Zef KF.
+%
+% Purpose:
+%   Zef KF.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%   q_value
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.KF (read)
+%   zef.filter_type (read)
+%   zef.inv_amplitude_db (read)
+%   zef.inv_evolution_prior (read)
+%   zef.inv_high_cut_frequency (read)
+%   zef.inv_low_cut_frequency (read)
+%   zef.inv_prior_over_measurement_db (read)
+%   zef.inv_sampling_frequency (read)
+%   zef.inv_snr (read)
+%   zef.inv_time_1 (read)
+%   zef.inv_time_2 (read)
+%   zef.inv_time_3 (read)
+%   zef.kf_burn_in (read)
+%   zef.kf_smoothing (read)
+%   zef.kf_structural_Q_type (read)
+%   … (8 more)
+%
+% Calls (project):
+%   zef_KF
+%   zef_dti_structural_Q
+%   zef_find_gaussian_prior
+%   zef_getFilteredData
+%   zef_getTimeStep
+%   zef_normalizeInverseReconstruction
+%   zef_postProcessInverse
+%   zef_processLeadfields
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_KF(zef, q_value)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 snr_val = zef.inv_snr;
 pm_val = zef.inv_prior_over_measurement_db;
 amplitude_db = zef.inv_amplitude_db;

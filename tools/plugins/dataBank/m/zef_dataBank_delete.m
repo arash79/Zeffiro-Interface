@@ -1,4 +1,33 @@
 function [tree] = zef_dataBank_delete(tree, parentHash, save2disk)
+% --- Zeffiro documentation header ---
+% zef_dataBank_delete — Zef data Bank delete.
+%
+% Purpose:
+%   Zef data Bank delete.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   tree
+%   parentHash
+%   save2disk
+%
+% Outputs:
+%   tree
+%
+% Calls (project):
+%   zef_dataBank_delete
+%   zef_dataBank_rebuildTree
+%   zef_dataBank_rebuildTreeSaveFile
+%   zef_dataBank_sortTree
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[tree] = zef_dataBank_delete(tree, parentHash, save2disk)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 hashNames=fieldnames(tree);
 

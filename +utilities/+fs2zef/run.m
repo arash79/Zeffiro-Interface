@@ -1,4 +1,35 @@
 function output_info = run(subject_id, segmentation_files, output_dir, options)
+% --- Zeffiro documentation header ---
+% utilities.fs2zef.run — Run.
+%
+% Purpose:
+%   Run.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   subject_id
+%   segmentation_files
+%   output_dir
+%   options
+%
+% Outputs:
+%   output_info
+%
+% Calls (project):
+%   utilities.fs2zef.environment.setup_freesurfer_env
+%   utilities.fs2zef.environment.validate_environment
+%   utilities.fs2zef.generators.generate_zef_import
+%   utilities.fs2zef.run
+%   zef_import
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[output_info] = utilities.fs2zef.run(subject_id, segmentation_files, output_dir, options)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %
 % run - Unified FreeSurfer to Zeffiro Pipeline
 %

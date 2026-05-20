@@ -1,4 +1,28 @@
 function [smoothed_nodes] = zef_smooth_surface(nodes,triangles,smoothing_parameter,n_smoothing)
+% --- Zeffiro documentation header ---
+% zef_smooth_surface — Zef smooth surface.
+%
+% Purpose:
+%   Zef smooth surface.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   nodes
+%   triangles
+%   smoothing_parameter
+%   n_smoothing
+%
+% Outputs:
+%   smoothed_nodes
+%
+% Calls (project):
+%   zef_smooth_surface
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[smoothed_nodes] = zef_smooth_surface(nodes, triangles, smoothing_parameter, n_smoothing)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 smoothing_param = smoothing_parameter;
 smoothing_steps_surf = n_smoothing;

@@ -1,4 +1,26 @@
 function strip_struct = zef_electrode_strip(position, orientation)
+% --- Zeffiro documentation header ---
+% zef_electrode_strip — Zef electrode strip.
+%
+% Purpose:
+%   Zef electrode strip.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   position
+%   orientation
+%
+% Outputs:
+%   strip_struct
+%
+% Calls (project):
+%   zef_electrode_strip
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[strip_struct] = zef_electrode_strip(position, orientation)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 orientation = 1/norm(orientation)*orientation;
 center_point = position + 4*orientation;

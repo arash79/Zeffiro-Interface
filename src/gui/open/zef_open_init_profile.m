@@ -1,3 +1,38 @@
+% --- Zeffiro documentation header ---
+% zef_data = zef_init_profile; — Zef data = zef init profile;.
+%
+% Purpose:
+%   Zef data = zef init profile;.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.font_size (read)
+%   zef.h_init_profile (read)
+%   zef.h_init_profile_apply (read)
+%   zef.h_init_profile_save (read)
+%   zef.h_init_profile_table (read)
+%   zef.h_init_profile_update_from_profile (read)
+%   zef.h_menu_init_profile_add (read)
+%   zef.h_menu_init_profile_delete (read)
+%   zef.init_profile (read, write)
+%   zef.init_profile_current_size (read, write)
+%   zef.init_profile_relative_size (read, write)
+%   zef.init_profile_selected (read)
+%   zef.profile_name (read)
+%   zef.program_path (read)
+%
+% Calls (project):
+%   zef_change_size_function
+%   zef_get_relative_size
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_data = zef_init_profile;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef_data = zef_init_profile;
 zef_assign_data;
 

@@ -1,4 +1,33 @@
 function [name_cell, variable_cell] = zef_get_profile_parameters(zef,varargin)
+% --- Zeffiro documentation header ---
+% zef_get_profile_parameters — Zef get profile parameters.
+%
+% Purpose:
+%   Zef get profile parameters.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   varargin
+%
+% Outputs:
+%   name_cell
+%   variable_cell
+%
+% Zef fields (observed):
+%   zef.parameter_profile (read)
+%
+% Calls (project):
+%   zef_get_profile_parameters
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[name_cell, variable_cell]] = zef_get_profile_parameters(zef, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 parameter_index = [];
 

@@ -1,5 +1,24 @@
-
-%reconstructionTool_start
+% --- Zeffiro documentation header ---
+% zef.reconstructionTool — Zef.reconstruction Tool.
+%
+% Purpose:
+%   Zef.reconstruction Tool.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.GMMclustering (read)
+%   zef.font_size (read)
+%   zef.reconstruction (read, write)
+%   zef.reconstructionTool (read)
+%   zef.reconstruction_information (read, write)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef.reconstructionTool` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 zef.reconstructionTool.app = zef_reconstructionTool_app;
 

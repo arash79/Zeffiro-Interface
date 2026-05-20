@@ -1,5 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if not(isfield(zef,'streamline_draw')) — If not(isfield(zef,'streamline draw')).
+%
+% Purpose:
+%   If not(isfield(zef,'streamline draw')).
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.brain_transparency (read, write)
+%   zef.colortune_param (read, write)
+%   zef.cone_alpha (read, write)
+%   zef.cone_field_lattice_resolution (read, write)
+%   zef.cone_scale (read, write)
+%   zef.cp2_a (read, write)
+%   zef.cp2_b (read, write)
+%   zef.cp2_c (read, write)
+%   zef.cp2_d (read, write)
+%   zef.cp2_on (read, write)
+%   zef.cp3_a (read, write)
+%   zef.cp3_b (read, write)
+%   zef.cp3_c (read, write)
+%   zef.cp3_d (read, write)
+%   zef.cp3_on (read, write)
+%   … (43 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if not(isfield(zef,'streamline_draw'))` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 if not(isfield(zef,'streamline_draw'))
     zef.streamline_draw = 0;
@@ -58,7 +93,7 @@ if not(isfield(zef,'use_depth_electrodes'));
     zef.use_depth_electrodes = 0;
 end;
 if not(isfield(zef,'source_model'));
-    zef.source_model = core.ZefSourceModel.Whitney;
+    zef.source_model = core.types.ZefSourceModel.Whitney;
 end;
 if not(isfield(zef,'preconditioner'));
     zef.preconditioner = 1;

@@ -1,6 +1,55 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,reconstruction_information] = zef_relax_iteration(void)
+% --- Zeffiro documentation header ---
+% zef_relax_iteration — Zef relax iteration.
+%
+% Purpose:
+%   Zef relax iteration.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   void
+%
+% Outputs:
+%   z
+%   reconstruction_information
+%
+% Zef fields (observed):
+%   zef.relax_db (read)
+%   zef.relax_high_cut_frequency (read)
+%   zef.relax_iteration_type (read)
+%   zef.relax_low_cut_frequency (read)
+%   zef.relax_multires_n_decompositions (read)
+%   zef.relax_multires_n_iter (read)
+%   zef.relax_multires_n_levels (read)
+%   zef.relax_multires_sparsity (read)
+%   zef.relax_number_of_frames (read)
+%   zef.relax_preconditioner (read)
+%   zef.relax_preconditioner_permutation (read)
+%   zef.relax_sampling_frequency (read)
+%   zef.relax_snr (read)
+%   zef.relax_time_1 (read)
+%   zef.relax_time_2 (read)
+%   … (4 more)
+%
+% Calls (project):
+%   zef_getTimeStep
+%   zef_normalizeInverseReconstruction
+%   zef_postProcessInverse
+%   zef_processLeadfields
+%   zef_relax_iteration
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[z, reconstruction_information]] = zef_relax_iteration(void)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h = zef_waitbar(0,1,['Relaxation iteration.']);
 n_multires = evalin('base','zef.relax_multires_n_levels');

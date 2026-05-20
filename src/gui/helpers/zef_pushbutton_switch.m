@@ -1,5 +1,30 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% zef_switch_color('s_on','pushbutton16','s_points'); — Zef switch color('s on','pushbutton16','s points');.
+%
+% Purpose:
+%   Zef switch color('s on','pushbutton16','s points');.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.imaging_method (read, write)
+%   zef.mlapp (read)
+%
+% Calls (project):
+%   zef_color_label
+%   zef_switch_color
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef_switch_color('s_on','pushbutton16','s_points');` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 zef_switch_color('s_on','pushbutton16','s_points');
 if zef.imaging_method==2
     zef_switch_color('s_on','pushbutton17','s_directions');

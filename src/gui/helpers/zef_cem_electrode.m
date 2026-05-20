@@ -1,4 +1,32 @@
 function s_points = zef_cem_electrode(zef,s_points)
+% --- Zeffiro documentation header ---
+% zef_cem_electrode — Zef cem electrode.
+%
+% Purpose:
+%   Zef cem electrode.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%   s_points
+%
+% Outputs:
+%   s_points
+%
+% Zef fields (observed):
+%   zef.current_sensors (read)
+%
+% Calls (project):
+%   zef_cem_electrode
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[s_points] = zef_cem_electrode(zef, s_points)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isempty(s_points)
     s_points = [];

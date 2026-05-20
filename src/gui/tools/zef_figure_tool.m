@@ -1,5 +1,55 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% relative_size = 1; — Relative size = 1;.
+%
+% Purpose:
+%   Relative size = 1;.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.clear_axes1 (read, write)
+%   zef.colormap_items (read)
+%   zef.colorscale_max_slider (read, write)
+%   zef.colorscale_min_slider (read, write)
+%   zef.font_size (read)
+%   zef.h (read, write)
+%   zef.h_aux (read, write)
+%   zef.h_axes1 (read, write)
+%   zef.h_colorbar (read, write)
+%   zef.h_colorscale_max_slider (read, write)
+%   zef.h_colorscale_min_slider (read, write)
+%   zef.h_compartment_visible_color (read, write)
+%   zef.h_logoplot (read, write)
+%   zef.h_loop_movie (read, write)
+%   zef.h_loop_movie_count (read, write)
+%   … (47 more)
+%
+% Calls (project):
+%   zef_colormap
+%   zef_logoplot
+%   zef_play_cdata
+%   zef_set_figure_tool_sliders
+%   zef_set_size_change_function
+%   zef_update_ambience
+%   zef_update_colorscale
+%   zef_update_colorscale_max
+%   zef_update_colorscale_min
+%   zef_update_contrast_and_brightness
+%   zef_update_diffusion
+%   zef_update_fig_details
+%   … (8 more)
+%
+% Side effects:
+%   - base/caller workspace
+%   - creates/updates figures
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `relative_size = 1;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 
 %if zef.h_segmentation_tool_toggle == 1
@@ -17,6 +67,9 @@
      %   0.6*zef.segmentation_tool_default_position(4)];
 
 %end
+
+
+
 
 relative_size = 1;
 if isfield(zef,'h_zeffiro_menu')
@@ -271,6 +324,3 @@ h_axes.DataAspectRatio = [1961 2592 1];
 h_axes.DataAspectRatioMode = 'auto';
 
 end
-
-
-

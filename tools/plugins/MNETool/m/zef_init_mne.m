@@ -1,5 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if not(isfield(zef,'mne_prior')); — If not(isfield(zef,'mne prior'));.
+%
+% Purpose:
+%   If not(isfield(zef,'mne prior'));.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.h_mne_high_cut_frequency (read)
+%   zef.h_mne_low_cut_frequency (read)
+%   zef.h_mne_normalize_data (read)
+%   zef.h_mne_number_of_frames (read)
+%   zef.h_mne_prior (read)
+%   zef.h_mne_sampling_frequency (read)
+%   zef.h_mne_time_1 (read)
+%   zef.h_mne_time_2 (read)
+%   zef.h_mne_time_3 (read)
+%   zef.h_mne_type (read)
+%   zef.inv_high_cut_frequency (read)
+%   zef.inv_low_cut_frequency (read)
+%   zef.inv_sampling_frequency (read)
+%   zef.inv_snr (read)
+%   zef.inv_time_1 (read)
+%   … (16 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if not(isfield(zef,'mne_prior'));` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 if not(isfield(zef,'mne_prior'));
     zef.mne_prior = 2;
 end;

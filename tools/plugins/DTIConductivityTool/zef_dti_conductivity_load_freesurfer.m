@@ -12,6 +12,53 @@
 %a reference file path is specified.
 
 function zef = zef_dti_conductivity_load_freesurfer(zef)
+% --- Zeffiro documentation header ---
+% zef_dti_conductivity_load_freesurfer — Zef dti conductivity load freesurfer.
+%
+% Purpose:
+%   Zef dti conductivity load freesurfer.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.dti_fa_geometry (read, write)
+%   zef.dti_ref_center (read, write)
+%   zef.dti_ref_geometry (read, write)
+%   zef.dti_ref_mri_file (read)
+%   zef.dti_ref_vox2ras (read, write)
+%   zef.dti_ref_vox2ras_tkr (read, write)
+%   zef.freesurfer_fa_data (read, write)
+%   zef.freesurfer_fa_file (read, write)
+%   zef.freesurfer_fa_info (read, write)
+%   zef.freesurfer_fa_loaded (read, write)
+%   zef.freesurfer_register_file (read)
+%   zef.freesurfer_register_transform (read, write)
+%   zef.freesurfer_v1_data (read, write)
+%   zef.freesurfer_v1_file (read)
+%   zef.freesurfer_v1_info (read, write)
+%   … (7 more)
+%
+% Calls (project):
+%   zef_dti_conductivity_load_freesurfer
+%   zef_dti_conductivity_update
+%   zef_freesurfer_read_register_dat
+%   zef_freesurfer_read_volume_geometry
+%   zef_freesurfer_transform_coordinates
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_dti_conductivity_load_freesurfer(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

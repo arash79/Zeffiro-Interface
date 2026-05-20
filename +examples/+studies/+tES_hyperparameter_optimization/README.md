@@ -1,48 +1,54 @@
-# tES Hyperparameter Optimization
+# +examples/+studies/+tES_hyperparameter_optimization
 
-This module implements a **recursive search** for the hyperparameters (alpha, epsilon) used in Zeffiro Interface’s **Electrical Stimulation (ES)** tool for transcranial electrical stimulation (tES). Instead of manually tuning these parameters, the algorithm performs an initial grid search and then iteratively narrows the parameter space around the best objective value.
+## Purpose of this folder
 
-## What Is tES in Zeffiro?
+Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
 
-Transcranial electrical stimulation (tES) applies weak currents to the scalp to modulate brain activity. Zeffiro’s ES tool helps optimize electrode currents to achieve desired electric fields in the brain. The parameters **alpha** and **epsilon** control the trade-off between target accuracy and current magnitude in this optimization.
+## Contents
 
-## What Will You Learn?
+Subfolders:
+- `+helpers/`
 
-- How the ES tool’s hyperparameters (alpha, epsilon) affect the optimization.
-- How to run an adaptive parameter search from a script instead of the GUI.
-- How to inspect `zef.adapted_y_ES`, which stores the current solution at each refinement step.
+MATLAB sources:
+- `zef_ES_recursive_search.m` — **examples.studies.tES_hyperparameter_optimization.zef_ES_recursive_search**: Example or study script demonstrating zef_ES_recursive_search.
 
-## When to Use This Module
+## How this folder fits into the overall workflow
 
-- You use transcranial electrical stimulation (tES) in Zeffiro.
-- You want to find good alpha/epsilon values programmatically rather than by trial and error.
-- You are familiar with the ES tool and its objective function.
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-## Prerequisites
+## GUI usage
 
-- The ES tool must be configured in your project struct (`zef`).
-- You should understand what alpha and epsilon represent in the ES optimization (see ES tool documentation).
+No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
 
-## How to Run
+## Programmatic usage
+
+From the project root:
 
 ```matlab
-zef = examples.studies.tES_hyperparameter_optimization.zef_ES_recursive_search(zef, num_lattice);
+projectRoot = fileparts(which('zeffiro_interface'));
+addpath(projectRoot);
+addpath(genpath(fullfile(projectRoot, 'src')));
+zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
 ```
 
-- `zef` — Project struct with ES tool configuration.
-- `num_lattice` — Grid size for the initial and adaptive search steps (e.g., 5 or 10).
+Representative entry points in this folder:
+- ``[zef] = examples.studies.tES_hyperparameter_optimization.zef_ES_recursive_search(zef, num_lattice)` with project root and `src` on the path.`
 
-The function updates `zef.adapted_y_ES`, a cell array where each element is the current solution for that refinement iteration.
+## Examples
 
-## How It Works
+Run scripts directly after startup, e.g. `run('+examples/+studies/+tES_hyperparameter_optimization/zef_ES_recursive_search.m')`.
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
 
-1. **Initial search**: A grid over (alpha, epsilon) is generated; the ES objective is evaluated; the best point (sr, sc) is identified.
-2. **Adaptive refinement**: The parameter range is narrowed around that point; a new grid is generated; the process repeats.
-3. **Output**: Each refinement step’s solution is stored in `zef.adapted_y_ES`.
+## Dependencies and assumptions
 
-## Files in This Module
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
 
-| File | Role |
-|------|------|
-| `zef_ES_recursive_search.m` | Main entry point: runs initial grid search and adaptive refinement, updates `zef.adapted_y_ES`. |
-| `zef_ES_centralize_recursive_search.m` | Helper: computes the new (alpha, epsilon) bounds centered on the best indices (sr, sc) from the objective. |
+## Notes for developers
+
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

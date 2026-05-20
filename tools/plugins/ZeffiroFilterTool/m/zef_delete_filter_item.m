@@ -1,5 +1,27 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% zef.filter_pipeline_selected = get(zef — Zef.filter pipeline selected = get(zef.
+%
+% Purpose:
+%   Zef.filter pipeline selected = get(zef.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.filter_pipeline (read, write)
+%   zef.filter_pipeline_list (read, write)
+%   zef.filter_pipeline_selected (read, write)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.filter_pipeline_selected = get(zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 zef.filter_pipeline_selected = get(zef.h_filter_pipeline_list,'value');
 

@@ -1,6 +1,56 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [johtavuus,brain_ind,non_source_ind,nodes,tetra,johtavuus_prisms,prisms,submesh_ind] = zef_sigma(void)
+% --- Zeffiro documentation header ---
+% zef_sigma — Zef sigma.
+%
+% Purpose:
+%   Zef sigma.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   void
+%
+% Outputs:
+%   johtavuus
+%   brain_ind
+%   non_source_ind
+%   nodes
+%   tetra
+%   johtavuus_prisms
+%   prisms
+%   submesh_ind
+%
+% Zef fields (observed):
+%   zef.brain_ind (read)
+%   zef.compartment_tags (read)
+%   zef.import_mode (read)
+%   zef.mesh_optimization_parameter (read)
+%   zef.nodes (read)
+%   zef.nodes_b (read)
+%   zef.non_source_ind (read)
+%   zef.prisms (read)
+%   zef.reuna_p (read)
+%   zef.sigma (read)
+%   zef.sigma_anisotropy (read)
+%   zef.sigma_bypass (read)
+%   zef.sigma_ind (read)
+%   zef.sigma_prisms (read)
+%   zef.submesh_ind (read)
+%   … (2 more)
+%
+% Calls (project):
+%   zef_sigma
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[johtavuus, brain_ind, non_source_ind]] = zef_sigma(void)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 tetra = [];
 prisms = [];

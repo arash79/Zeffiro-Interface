@@ -1,4 +1,33 @@
 function [nse_mat] = zef_nse_matrices(nodes,tetra,rho,mu)
+% --- Zeffiro documentation header ---
+% zef_nse_matrices — Zef nse matrices.
+%
+% Purpose:
+%   Zef nse matrices.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   nodes
+%   tetra
+%   rho
+%   mu
+%
+% Outputs:
+%   nse_mat
+%
+% Calls (project):
+%   zef_nse_matrices
+%   zef_surface_scalar_matrix_Dn
+%   zef_surface_scalar_matrix_n
+%   zef_volume_scalar_matrix_FF
+%   zef_volume_scalar_matrix_FG
+%   zef_volume_scalar_matrix_GG
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[nse_mat] = zef_nse_matrices(nodes, tetra, rho, mu)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 nse_mat.M = zef_volume_scalar_matrix_FF(nodes,tetra,rho);
 

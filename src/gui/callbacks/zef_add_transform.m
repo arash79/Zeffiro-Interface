@@ -1,4 +1,33 @@
 function zef = zef_add_transform(zef)
+% --- Zeffiro documentation header ---
+% zef_add_transform — Zef add transform.
+%
+% Purpose:
+%   Zef add transform.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.current_tag (read)
+%   zef.lock_transforms_on (read)
+%
+% Calls (project):
+%   zef_add_transform
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_add_transform(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 
 if nargin == 0

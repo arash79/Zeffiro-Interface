@@ -1,6 +1,44 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [I] = zef_tetra_in_compartment(reuna_p,reuna_t,nodes,varargin)
+% --- Zeffiro documentation header ---
+% zef_tetra_in_compartment — Zef tetra in compartment.
+%
+% Purpose:
+%   Zef tetra in compartment.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   reuna_p
+%   reuna_t
+%   nodes
+%   varargin
+%
+% Outputs:
+%   I
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.gpu_num (read)
+%   zef.meshing_accuracy (read)
+%   zef.meshing_threshold (read)
+%   zef.parallel_vectors (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   zef_tetra_in_compartment
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[I] = zef_tetra_in_compartment(reuna_p, reuna_t, nodes, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if evalin('base','exist(''zef'')')
     if evalin('base','isfield(zef,''meshing_threshold'')')

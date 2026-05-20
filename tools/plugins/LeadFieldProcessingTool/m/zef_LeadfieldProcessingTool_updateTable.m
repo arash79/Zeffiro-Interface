@@ -1,5 +1,20 @@
-
-%zef_LeadFieldProcessingTool_TableUpdate_index has to be set
+% --- Zeffiro documentation header ---
+% zef_LeadFieldProcessingTool_TableUpdate_index=zef.LeadFieldProcessingTool — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%
+% Purpose:
+%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.LeadFieldProcessingTool (read)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_LeadFieldProcessingTool_TableUpdate_index=zef.LeadFieldProcessingTool` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 zef_LeadFieldProcessingTool_TableUpdate_index=zef.LeadFieldProcessingTool.bankPosition;
 

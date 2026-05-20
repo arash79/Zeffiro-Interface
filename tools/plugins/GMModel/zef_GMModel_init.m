@@ -1,3 +1,20 @@
+% --- Zeffiro documentation header ---
+% if not(isfield(zef,'GMModel')) — If not(isfield(zef,'GMModel')).
+%
+% Purpose:
+%   If not(isfield(zef,'GMModel')).
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.GMModel (read, write)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if not(isfield(zef,'GMModel'))` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 if not(isfield(zef,'GMModel'))
     zef.GMModel = struct;
@@ -38,6 +55,3 @@ zef.GMModel.h_n_dynamic_levels.String = num2str(zef.GMModel.n_dynamic_levels);
 zef.GMModel.h_reg_param.String = num2str(zef.GMModel.reg_param);
 zef.GMModel.h_max_n_iter.String = num2str(zef.GMModel.max_n_iter);
 zef.GMModel.h_tol_val.String = num2str(zef.GMModel.tol_val);
-
-
-

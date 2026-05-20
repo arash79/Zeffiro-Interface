@@ -1,4 +1,23 @@
-%Script for updating edit field of GMM system.
+% --- Zeffiro documentation header ---
+% zef_n=0; — Zef n=0;.
+%
+% Purpose:
+%   Zef n=0;.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.GMM (read)
+%
+% Calls (project):
+%   zef_aux_str
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef_n=0;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 zef_n=0;
 if isfield(zef.GMM,'apps')

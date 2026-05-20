@@ -1,4 +1,35 @@
 function [triangles_out] = zef_triangles_2_sensor_boundary(zef,compartment_tag,triangles_in)
+% --- Zeffiro documentation header ---
+% zef_triangles_2_sensor_boundary — Zef triangles 2 sensor boundary.
+%
+% Purpose:
+%   Zef triangles 2 sensor boundary.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   zef
+%   compartment_tag
+%   triangles_in
+%
+% Outputs:
+%   triangles_out
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.current_sensors (read)
+%   zef.reuna_p (read)
+%
+% Calls (project):
+%   zef_triangles_2_sensor_boundary
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[triangles_out] = zef_triangles_2_sensor_boundary(zef, compartment_tag, triangles_in)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 triangles_out = [];
     points_ind = []; 

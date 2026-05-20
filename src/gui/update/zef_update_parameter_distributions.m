@@ -1,4 +1,33 @@
 function zef = zef_update_parameter_distributions(zef)
+% --- Zeffiro documentation header ---
+% zef_update_parameter_distributions — Syncs GUI control values into `zef` for parameter_distributions.
+%
+% Purpose:
+%   Syncs GUI control values into `zef` for parameter_distributions.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.domain_labels (read, write)
+%   zef.parameter_profile (read)
+%
+% Calls (project):
+%   zef_update_parameter_distributions
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_update_parameter_distributions(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 parameter_profile = eval('zef.parameter_profile');
 

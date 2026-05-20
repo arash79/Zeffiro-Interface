@@ -1,4 +1,28 @@
 function [p_vec_window,relative_size] = zef_change_size_function(object_handle, current_size, varargin)
+% --- Zeffiro documentation header ---
+% zef_change_size_function — Zef change size function.
+%
+% Purpose:
+%   Zef change size function.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   object_handle
+%   current_size
+%   varargin
+%
+% Outputs:
+%   p_vec_window
+%   relative_size
+%
+% Calls (project):
+%   zef_change_size_function
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[p_vec_window, relative_size]] = zef_change_size_function(object_handle, current_size, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 relative_size = [];
 exclude_type = cell(0);
@@ -81,4 +105,3 @@ if and(prod(p_vec_window)>0,prod(current_size)>0)
 
 end
 end
-

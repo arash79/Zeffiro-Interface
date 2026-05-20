@@ -1,36 +1,28 @@
 function pts_filename = save_volume_atlas_points(volume_data, voxel_to_ras, affine_matrix, out_folder, voxel_stride)
+% --- Zeffiro documentation header ---
+% utilities.sn2zef.save_volume_atlas_points — Save volume atlas points.
 %
-% save_volume_atlas_points - Write parcellation point samples from a labeled
-% volume.
-%
-% The output is an ASCII matrix consumed by the .dat branch of
-% zef_import_parcellation_points. Rows are
-% [voxel_index_0based, x, y, z].
+% Purpose:
+%   Save volume atlas points.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%
-% - volume_data
-%   Labeled volume. Non-zero voxels become candidate points.
-%
-% - voxel_to_ras (4,4) double
-%   Transform from voxel coordinates to RAS coordinates.
-%
-% - affine_matrix
-%   Optional 4-by-4 transform applied after voxel_to_ras. Pass [] to skip.
-%
-% - out_folder (1,1) string { mustBeFolder }
-%   Existing directory where sn_atlas_points.dat is written.
-%
-% - voxel_stride (1,1) double
-%   Sampling stride in each voxel dimension.
+%   volume_data
+%   voxel_to_ras
+%   affine_matrix
+%   out_folder
+%   voxel_stride
 %
 % Outputs:
+%   pts_filename
 %
-% - pts_filename (1,1) string
-%   Basename of the written point file.
+% Calls (project):
+%   utilities.sn2zef.save_volume_atlas_points
 %
-% See also: utilities.sn2zef.export_segmentation_meshes
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[pts_filename] = utilities.sn2zef.save_volume_atlas_points(volume_data, voxel_to_ras, affine_matrix, out_folder, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
     arguments
         volume_data { mustBeNumeric }

@@ -22,6 +22,28 @@
 %Note: This function uses MATLAB's niftiread and niftiinfo (R2017b+).
 
 function [fa_data, fa_info] = zef_freesurfer_load_fa(fa_file)
+% --- Zeffiro documentation header ---
+% zef_freesurfer_load_fa — Zef freesurfer load fa.
+%
+% Purpose:
+%   Zef freesurfer load fa.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   fa_file
+%
+% Outputs:
+%   fa_data
+%   fa_info
+%
+% Calls (project):
+%   zef_freesurfer_load_fa
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[fa_data, fa_info]] = zef_freesurfer_load_fa(fa_file)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 arguments
     fa_file (1,1) string

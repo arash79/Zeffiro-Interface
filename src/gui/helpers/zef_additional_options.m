@@ -1,3 +1,40 @@
+% --- Zeffiro documentation header ---
+% zef_data = zef_additional_options_app; — Zef data = zef additional options app;.
+%
+% Purpose:
+%   Zef data = zef additional options app;.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.additional_options_current_size (read, write)
+%   zef.colormap_size (read)
+%   zef.colortune_param (read)
+%   zef.cone_alpha (read)
+%   zef.cone_lattice_resolution (read)
+%   zef.cone_scale (read)
+%   zef.fieldnames (read, write)
+%   zef.font_size (read)
+%   zef.gpu_num (read)
+%   zef.h_additional_options (read)
+%   zef.h_as_opt_1 (read)
+%   zef.h_as_opt_2 (read)
+%   zef.h_as_opt_3 (read)
+%   zef.h_as_opt_4 (read)
+%   zef.h_as_opt_5 (read)
+%   … (56 more)
+%
+% Calls (project):
+%   core.types.ZefSourceModel.from
+%   zef_change_size_function
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_data = zef_additional_options_app;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef_data = zef_additional_options_app;
 
 zef.fieldnames = fieldnames(zef_data);
@@ -24,8 +61,8 @@ zef.h_as_opt_5.ItemsData = [1:length(zef.h_as_opt_5.Items)];
 zef.h_as_opt_5.Value = zef.refinement_type;
 zef.h_as_opt_6.Value = zef.surface_sources;
 zef.h_use_depth_electrodes.Value = zef.use_depth_electrodes;
-zef.h_source_model.ItemsData = arrayfun(@core.ZefSourceModel.from, 1:length(zef.h_source_model.Items));
-zef.h_source_model.Value = core.ZefSourceModel.from(zef.source_model);
+zef.h_source_model.ItemsData = arrayfun(@core.types.ZefSourceModel.from, 1:length(zef.h_source_model.Items));
+zef.h_source_model.Value = core.types.ZefSourceModel.from(zef.source_model);
 zef.h_colortune_param.Value = num2str(zef.colortune_param);
 zef.h_inv_hyperprior_weight.ItemsData = [1:length(zef.h_inv_hyperprior_weight.Items)];
 zef.h_inv_hyperprior_weight.Value = zef.inv_hyperprior_weight;

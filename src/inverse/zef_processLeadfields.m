@@ -1,8 +1,41 @@
 function [L,n_interp, procFile] = zef_processLeadfields(zef)
-%zef_processLeadfields processes the leadfield in zef and applies all
-%visibility options.
-%L is the leadfield, the procFile has all information needed for the
-%postProcessing step, but should not be needed in the inverse method
+% --- Zeffiro documentation header ---
+% zef_processLeadfields — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%
+% Purpose:
+%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   L
+%   n_interp
+%   procFile
+%
+% Zef fields (observed):
+%   zef.L (read)
+%   zef.compartment_tags (read)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   zef.source_direction_mode (read)
+%   zef.source_directions (read)
+%   zef.source_interpolation_ind (read)
+%
+% Calls (project):
+%   zef_processLeadfields
+%   zef_smooth_field
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[L, n_interp, procFile]] = zef_processLeadfields(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 source_direction_mode = [];
 if nargin == 0 || isnumeric(zef)
     if isnumeric(zef)

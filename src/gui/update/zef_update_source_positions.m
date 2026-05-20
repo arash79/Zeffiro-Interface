@@ -1,6 +1,36 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [source_positions] = zef_update_source_positions(void)
+% --- Zeffiro documentation header ---
+% zef_update_source_positions — Syncs GUI control values into `zef` for source_positions.
+%
+% Purpose:
+%   Syncs GUI control values into `zef` for source_positions.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   void
+%
+% Outputs:
+%   source_positions
+%
+% Zef fields (observed):
+%   zef.location_unit (read)
+%   zef.location_unit_current (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_update_source_positions
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[source_positions] = zef_update_source_positions(void)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 location_unit_current = evalin('base','zef.location_unit_current');
 location_unit = evalin('base','zef.location_unit');

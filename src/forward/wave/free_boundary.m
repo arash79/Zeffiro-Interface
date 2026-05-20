@@ -3,6 +3,25 @@
 
 
 function [boundary_triangles, boundary_tetra_ind] = free_boundary(tetra)
+% --- Zeffiro documentation header ---
+% free_boundary — Free boundary.
+%
+% Purpose:
+%   Free boundary.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   tetra
+%
+% Outputs:
+%   boundary_triangles
+%   boundary_tetra_ind
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[boundary_triangles, boundary_tetra_ind]] = free_boundary(tetra)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 ind_m = [ 2 4 3 ;
     1 3 4 ;

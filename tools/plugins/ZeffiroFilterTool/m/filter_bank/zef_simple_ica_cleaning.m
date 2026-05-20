@@ -1,4 +1,27 @@
 function [processed_data] = zef_simple_ica_cleaning(f, ica_reference_channels)
+% --- Zeffiro documentation header ---
+% zef_simple_ica_cleaning — Zef simple ica cleaning.
+%
+% Purpose:
+%   Zef simple ica cleaning.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   f
+%   ica_reference_channels
+%
+% Outputs:
+%   processed_data
+%
+% Calls (project):
+%   zef_simple_ica_cleaning
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[processed_data] = zef_simple_ica_cleaning(f, ica_reference_channels)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 %This function processes the N-by-M data array f for N channels and M time

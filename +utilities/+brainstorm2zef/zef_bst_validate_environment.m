@@ -1,20 +1,22 @@
 function [is_valid, error_msg] = zef_bst_validate_environment()
-%ZEF_BST_VALIDATE_ENVIRONMENT Validates that Brainstorm is available and properly configured.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst_validate_environment — Zef bst validate environment.
 %
-% This function checks if Brainstorm is installed, accessible, and properly
-% initialized before attempting to use Brainstorm functions.
+% Purpose:
+%   Zef bst validate environment.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Outputs:
-%   is_valid  - Logical indicating if Brainstorm environment is valid (true/false)
-%   error_msg - String containing error message if validation fails (empty if valid)
+%   is_valid
+%   error_msg
 %
-% Example:
-%   [is_valid, error_msg] = utilities.brainstorm2zef.zef_bst_validate_environment();
-%   if ~is_valid
-%       error('Brainstorm validation failed: %s', error_msg);
-%   end
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_validate_environment
 %
-% See also: ZEF_BST_VALIDATE_SETTINGS
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `utilities.brainstorm2zef.zef_bst_validate_environment` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 is_valid = true;
 error_msg = '';

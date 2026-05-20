@@ -1,5 +1,30 @@
+% --- Zeffiro documentation header ---
+% function zef_filter_plot_data — Function zef filter plot data.
+%
+% Purpose:
+%   Function zef filter plot data.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.filter_sampling_rate (read)
+%   zef.filter_zoom (read)
+%   zef.h_axes1 (read)
+%   zef.processed_data (read)
+%
+% Calls (project):
+%   zef_filter_plot_data
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function zef_filter_plot_data` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 function zef_filter_plot_data
+
 
 f = evalin('base','zef.processed_data');
 sampling_freq = evalin('base','zef.filter_sampling_rate');

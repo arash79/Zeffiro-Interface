@@ -1,3 +1,29 @@
+% --- Zeffiro documentation header ---
+% function [G, interpolation_positions] = zef_st_venant_interpolation( ... — Function [G, interpolation positions] = zef st venant interpolation( .
+%
+% Purpose:
+%   Function [G, interpolation positions] = zef st venant interpolation( ....
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   p_nodes
+%   p_tetrahedra
+%   p_brain_inds
+%   p_intended_source_inds
+%   p_nearest_neighbour_inds
+%   p_regparam
+%
+% Calls (project):
+%   zef_L2_norm
+%   zef_adjacency_matrix
+%   zef_st_venant_interpolation
+%   zef_tetra_barycentra
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `function [G, interpolation_positions] = zef_st_venant_interpolation( ...(p_nodes, p_tetrahedra, p_brain_inds, p_intended_source_inds, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 function [G, interpolation_positions] = zef_st_venant_interpolation( ...
     p_nodes, ...
     p_tetrahedra, ...
@@ -6,57 +32,6 @@ function [G, interpolation_positions] = zef_st_venant_interpolation( ...
     p_nearest_neighbour_inds, ...
     p_regparam ...
     )
-
-% Documentation
-%
-% Produces an interpolation matrix G in a tetrahedral finite element mesh
-% with the St. Venant method. Also produces the related interpolation
-% positions.
-%
-% Input:
-%
-% - p_nodes
-%
-%   The nodes that form the tetrahedral mesh.
-%
-% - p_tetrahedra
-%
-%   The tetrahedra (4-tuples of node indices) that are formed from
-%   p_nodes.
-%
-% - p_brain_inds
-%
-%   The indices of the tetrahedra where sources can be placed in the first
-%   place. In other words, these tetra form the gray matter.
-%
-% - p_intended_source_inds
-%
-%   These are the subset of the tetrahedral indices which indicate where
-%   dipolar sources are to be placed in, not just where they can be
-%   placed.
-%
-% - p_nearest_neighbour_inds
-%
-%   Used by the continuous source models to determine which neighbours of
-%   neighbours of each central source tetrahedron are to be included in
-%   the interpolation. If this is empty, the source model is interpreted
-%   as being discrete.
-%
-% - p_regparam
-%
-%   A regularization parameter used to scale a certain weight matrix in
-%   the formulation of the interpolation coeficient matrix.
-%
-% Output:
-%
-% - G
-%
-%   Interpolation matrix that is to be multiplied by the transpose of the
-%   transfer matrix in the lead field routines.
-%
-% - interpolation_positions
-%
-%   The positions at which sources are the be placed after interpolation.
 
 arguments
     p_nodes (:,3) double {mustBeNonNan}

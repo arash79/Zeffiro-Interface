@@ -1,4 +1,28 @@
 function [tetra_ind_out, face_ind_out] = zef_find_adjacent_tetra(tetra,tetra_ind,face_ind)
+% --- Zeffiro documentation header ---
+% zef_find_adjacent_tetra — Zef find adjacent tetra.
+%
+% Purpose:
+%   Zef find adjacent tetra.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   tetra
+%   tetra_ind
+%   face_ind
+%
+% Outputs:
+%   tetra_ind_out
+%   face_ind_out
+%
+% Calls (project):
+%   zef_find_adjacent_tetra
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[tetra_ind_out, face_ind_out]] = zef_find_adjacent_tetra(tetra, tetra_ind, face_ind)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 tetra_ind = tetra_ind(:);
 face_ind = face_ind(:);

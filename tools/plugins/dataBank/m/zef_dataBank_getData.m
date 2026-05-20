@@ -1,4 +1,45 @@
 function [data] = zef_dataBank_getData(zef, type)
+% --- Zeffiro documentation header ---
+% zef_dataBank_getData — Zef data Bank get Data.
+%
+% Purpose:
+%   Zef data Bank get Data.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%   type
+%
+% Outputs:
+%   data
+%
+% Zef fields (observed):
+%   zef.GMM (read)
+%   zef.L (read)
+%   zef.compartment_tags (read)
+%   zef.imaging_method (read)
+%   zef.lf_tag (read)
+%   zef.measurements (read)
+%   zef.noise_data (read)
+%   zef.parcellation_interp_ind (read)
+%   zef.reconstruction (read)
+%   zef.reconstruction_information (read)
+%   zef.sensors (read)
+%   zef.source_directions (read)
+%   zef.source_interpolation_ind (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_dataBank_getData
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[data] = zef_dataBank_getData(zef, type)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 data=[];
 data.type=type;

@@ -1,3 +1,23 @@
+% --- Zeffiro documentation header ---
+% trueDex=cell2mat( zef.reconstructionTool — True Dex=cell2mat( zef.reconstruction Tool.
+%
+% Purpose:
+%   True Dex=cell2mat( zef.reconstruction Tool.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.reconstructionTool (read)
+%
+% Calls (project):
+%   zef_reconstructionTool_function
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `trueDex=cell2mat( zef.reconstructionTool` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 trueDex=cell2mat( zef.reconstructionTool.bankInfo(:,7));
 

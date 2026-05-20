@@ -1,6 +1,34 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% function [inv_roi_sphere,h_roi_sphere] = zef_plot_roi — Function [inv roi sphere,h roi sphere] = zef plot roi.
+%
+% Purpose:
+%   Function [inv roi sphere,h roi sphere] = zef plot roi.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.h_axes1 (read)
+%   zef.h_inv_roi_sphere_1 (read)
+%   zef.h_inv_roi_sphere_2 (read)
+%   zef.h_inv_roi_sphere_3 (read)
+%   zef.h_inv_roi_sphere_4 (read)
+%   zef.h_roi_sphere (read)
+%
+% Calls (project):
+%   zef_plot_roi
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [inv_roi_sphere,h_roi_sphere] = zef_plot_roi` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [inv_roi_sphere,h_roi_sphere] = zef_plot_roi
+
 h_inv_roi_sphere_1 = evalin('base','zef.h_inv_roi_sphere_1');
 h_inv_roi_sphere_2 = evalin('base','zef.h_inv_roi_sphere_2');
 h_inv_roi_sphere_3 = evalin('base','zef.h_inv_roi_sphere_3');

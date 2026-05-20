@@ -1,72 +1,41 @@
 function results = run(config)
-%RUN Main orchestration function for Brainstorm-to-Zeffiro conversion pipeline.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.run — Run.
 %
-% This function provides a high-level interface for converting Brainstorm
-% projects into Zeffiro Interface finite element meshes. It orchestrates
-% the entire pipeline including environment validation, settings loading,
-% project creation, mesh generation, and optional project saving.
+% Purpose:
+%   Run.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   config - (Optional) Configuration structure with fields:
-%           .settings_file_name - Name of settings file (default: 'zef_bst_default')
-%           .project_file_name  - Path where project should be saved (default: empty, don't save)
-%           .run_type           - Execution mode:
-%                                 1 = Fresh start (load compartments from Brainstorm)
-%                                 2 = Import compartments (use existing compartment data)
-%                                 (default: 1)
-%                                 Note: run_type 3 (use existing project) is not supported in run()
-%                                       Use zef_bst_edit_project() or zeffiro_interface() directly
-%           .input_mode         - Input handling mode:
-%                                 1 = Use input files
-%                                 2 = Ignore input files
-%                                 (default: 1)
-%           .subject_struct     - Brainstorm subject structure (optional, uses current if empty)
-%           .subject_folder     - Path to Brainstorm subject folder (optional, uses protocol default)
-%           .save_project       - Logical, save project file (default: true if project_file_name provided)
-%           .verbose            - Logical, verbose output (default: true)
-%           .use_gpu            - Logical, use GPU if available (default: false)
-%           .parallel_processes  - Number of parallel processes (default: auto-detect)
-%           .zef_bst            - Additional zef_bst settings to override (optional)
+%   config
 %
 % Outputs:
-%   results - Structure containing:
-%            .success          - Logical indicating overall success
-%            .zef              - Zeffiro project structure (if successful)
-%            .mesh_data        - Structure with mesh data:
-%                               .nodes - Node coordinates (in meters)
-%                               .tetra - Tetrahedra with domain labels
-%                               .name_tags - Compartment name tags
-%            .errors           - Cell array of error messages
-%            .warnings         - Cell array of warning messages
-%            .config           - Configuration used (validated)
-%            .processing_time - Processing time in seconds
+%   results
 %
-% Usage:
-%   % Use default configuration (uses current Brainstorm subject)
-%   results = utilities.brainstorm2zef.run();
+% Zef fields (observed):
+%   zef.domain_labels (read)
+%   zef.name_tags (read)
+%   zef.nodes (read)
+%   zef.tetra (read)
 %
-%   % Customize configuration
-%   config = struct();
-%   config.settings_file_name = 'zef_bst_default';
-%   config.project_file_name = 'my_project.mat';
-%   config.run_type = 1;  % Fresh start
-%   results = utilities.brainstorm2zef.run(config);
+% Calls (project):
+%   utilities.brainstorm2zef.run
+%   utilities.brainstorm2zef.zef_bst_create_project
+%   utilities.brainstorm2zef.zef_bst_get_settings
+%   utilities.brainstorm2zef.zef_bst_validate_environment
+%   zef_bst_edit_project
+%   zef_close_all
+%   zef_create_finite_element_mesh
+%   zef_save
 %
-%   % Check results
-%   if results.success
-%       fprintf('Conversion successful!\n');
-%       fprintf('Mesh contains %d nodes and %d tetrahedra\n', ...
-%           size(results.mesh_data.nodes, 1), size(results.mesh_data.tetra, 1));
-%   else
-%       fprintf('Conversion failed:\n');
-%       for i = 1:length(results.errors)
-%           fprintf('  - %s\n', results.errors{i});
-%       end
-%   end
+% Side effects:
+%   - reads/updates `zef` struct fields
 %
-% See also: ZEF_BST_CREATE_PROJECT, ZEF_BST_DEFAULT_FEM_MESH_CREATE, ZEF_BST_GET_SETTINGS
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[results] = utilities.brainstorm2zef.run(config)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-% Initialize results structure
 results = struct();
 results.success = false;
 results.zef = [];

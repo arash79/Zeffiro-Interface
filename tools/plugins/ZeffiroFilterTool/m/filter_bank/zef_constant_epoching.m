@@ -1,4 +1,31 @@
 function [processed_data] = zef_constant_epoching(f, first_epoch_point, epoch_step, number_of_epochs, start_time, end_time, sampling_frequency)
+% --- Zeffiro documentation header ---
+% zef_constant_epoching — Zef constant epoching.
+%
+% Purpose:
+%   Zef constant epoching.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   f
+%   first_epoch_point
+%   epoch_step
+%   number_of_epochs
+%   start_time
+%   end_time
+%   sampling_frequency
+%
+% Outputs:
+%   processed_data
+%
+% Calls (project):
+%   zef_constant_epoching
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[processed_data] = zef_constant_epoching(f, first_epoch_point, epoch_step, number_of_epochs, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 %This function processes the N-by-M data array f for N channels and M time

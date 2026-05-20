@@ -1,21 +1,40 @@
 function varargout = zef_bst_plugin_start(folder_name, zef_bst, open_dialog)
-%ZEF_BST_PLUGIN_START Launches the Zeffiro-Brainstorm plugin graphical interface.
+% --- Zeffiro documentation header ---
+% utilities.brainstorm2zef.zef_bst_plugin_start — Zef bst plugin start.
 %
-% This function creates and displays the main GUI for the Brainstorm-to-Zeffiro
-% conversion plugin. It allows users to select settings files, choose run scripts,
-% and configure project creation options.
+% Purpose:
+%   Zef bst plugin start.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Inputs:
-%   folder_name - Path to the Zeffiro installation directory
-%   zef_bst     - Structure containing initial plugin settings (optional)
-%   open_dialog - Display GUI (1) or run silently (0), default = 1
+%   folder_name
+%   zef_bst
+%   open_dialog
 %
 % Outputs:
-%   varargout   - Cell array containing outputs from the selected run script
+%   varargout
 %
-% See also: ZEF_BST_CREATE_PROJECT, ZEF_BST_DEFAULT_FEM_MESH_CREATE
+% Zef fields (observed):
+%   zef.program_path (read, write)
+%   zef.segmentation_tool_default_position (read)
+%
+% Calls (project):
+%   utilities.brainstorm2zef.zef_bst_create_project
+%   utilities.brainstorm2zef.zef_bst_edit_project
+%   utilities.brainstorm2zef.zef_bst_get_project_file_name
+%   utilities.brainstorm2zef.zef_bst_get_settings_file_name
+%   utilities.brainstorm2zef.zef_bst_plugin_start
+%   zef_apply_system_settings
+%
+% Side effects:
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[varargout] = utilities.brainstorm2zef.zef_bst_plugin_start(folder_name, zef_bst, open_dialog)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-% Set default values for optional inputs
 if nargin < 2
     zef_bst = struct;
 end
@@ -158,4 +177,3 @@ end
 closereq;
 
 end
-

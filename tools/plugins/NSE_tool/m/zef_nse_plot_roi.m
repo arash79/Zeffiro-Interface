@@ -1,4 +1,37 @@
 function zef_nse_plot_roi(h_axes,zef,nse_field)
+% --- Zeffiro documentation header ---
+% zef_nse_plot_roi — Zef nse plot roi.
+%
+% Purpose:
+%   Zef nse plot roi.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   h_axes
+%   zef
+%   nse_field
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.nse_field (read)
+%
+% Calls (project):
+%   zef_nse_mean_velocity_roi
+%   zef_nse_plot_roi
+%   zef_plot_3D_arrow
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_nse_plot_roi(h_axes, zef, nse_field)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     h_axes = evalin('base','gca');

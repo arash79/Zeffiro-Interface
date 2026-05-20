@@ -1,5 +1,37 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if not(isempty(zef — If not(isempty(zef.
+%
+% Purpose:
+%   If not(isempty(zef.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.L (read)
+%   zef.imaging_method (read)
+%   zef.imaging_method_cell (read)
+%   zef.lf_bank_scaling_factor (read)
+%   zef.lf_bank_storage (read)
+%   zef.lf_tag (read)
+%   zef.measurements (read)
+%   zef.noise_data (read)
+%   zef.parcellation_interp_ind (read)
+%   zef.sensors (read)
+%   zef.source_directions (read)
+%   zef.source_interpolation_ind (read)
+%   zef.source_positions (read)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if not(isempty(zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 if not(isempty(zef.s_points))
     zef_process_meshes;

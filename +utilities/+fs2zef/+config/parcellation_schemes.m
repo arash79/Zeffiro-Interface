@@ -1,4 +1,22 @@
 function schemes = parcellation_schemes()
+% --- Zeffiro documentation header ---
+% utilities.fs2zef.config.parcellation_schemes — Parcellation schemes.
+%
+% Purpose:
+%   Parcellation schemes.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Outputs:
+%   schemes
+%
+% Calls (project):
+%   utilities.fs2zef.config.parcellation_schemes
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `utilities.fs2zef.config.parcellation_schemes` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 %
 % parcellation_schemes - Define available cortical parcellation schemes
 %

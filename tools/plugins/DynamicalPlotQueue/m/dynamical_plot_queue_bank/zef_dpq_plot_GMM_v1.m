@@ -1,5 +1,25 @@
+% --- Zeffiro documentation header ---
+% function zef_PlotGMModel — Function zef Plot GMModel.
+%
+% Purpose:
+%   Function zef Plot GMModel.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.GMM (read)
+%
+% Calls (project):
+%   zef_PlotGMModel
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function zef_PlotGMModel` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function zef_PlotGMModel
-%This function plots the point clouds created by the GMM tool.
 
 t = evalin('caller','f_ind');
 parameters = evalin('base','zef.GMM.parameters.Values');

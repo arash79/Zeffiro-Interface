@@ -67,6 +67,40 @@
 %          zef_dti_interpolate_to_sources
 
 function Q = zef_dti_structural_Q(zef, q_value, method, varargin)
+% --- Zeffiro documentation header ---
+% zef_dti_structural_Q — Zef dti structural Q.
+%
+% Purpose:
+%   Zef dti structural Q.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%   q_value
+%   method
+%   varargin
+%
+% Outputs:
+%   Q
+%
+% Zef fields (observed):
+%   zef.source_direction_mode (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_dti_fa_covariance
+%   zef_dti_interpolate_to_sources
+%   zef_dti_structural_Q
+%   zef_dti_tractography_covariance
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[Q] = zef_dti_structural_Q(zef, q_value, method, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 arguments
     zef (1,1) struct

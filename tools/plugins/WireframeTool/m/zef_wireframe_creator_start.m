@@ -1,3 +1,42 @@
+% --- Zeffiro documentation header ---
+% zef_data = zef_wireframe_creator_app; — Zef data = zef wireframe creator app;.
+%
+% Purpose:
+%   Zef data = zef wireframe creator app;.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.domain_labels (read)
+%   zef.epsilon (read)
+%   zef.font_size (read)
+%   zef.h_wireframe_create (read)
+%   zef.h_wireframe_creator (read)
+%   zef.h_wireframe_edge_threshold (read)
+%   zef.h_wireframe_n_iter (read)
+%   zef.h_wireframe_plot (read)
+%   zef.h_wireframe_printer_resolution (read)
+%   zef.h_wireframe_regularization_parameter (read)
+%   zef.h_wireframe_relative_permittivity (read)
+%   zef.h_wireframe_tolerance (read)
+%   zef.nodes (read)
+%   zef.tetra (read)
+%   zef.wireframe_creator_current_size (read, write)
+%   … (13 more)
+%
+% Calls (project):
+%   zef_change_size_function
+%   zef_wireframe_filling_vec
+%   zef_wireframe_permittivity_vec
+%   zef_wireframe_plot
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_data = zef_wireframe_creator_app;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef_data = zef_wireframe_creator_app;
 zef_assign_data;
 

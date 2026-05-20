@@ -1,4 +1,25 @@
 function  [ll, post, logpdf]=estep(log_lh,prob_th)
+% --- Zeffiro documentation header ---
+% estep — Estep.
+%
+% Purpose:
+%   Estep.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   log_lh
+%   prob_th
+%
+% Outputs:
+%   ll
+%   post
+%   logpdf
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[ll, post, logpdf]] = estep(log_lh, prob_th)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %ESTEP E-STEP for Gaussian mixture distribution
 %   LL = ESTEP(LOG_LH) returns the loglikelihood of data in LL.  LOG_LH
 %   is the log of component conditional density weighted by the component

@@ -1,6 +1,24 @@
 function [z] = zef_normalizeInverseReconstruction(z)
-%zef_normalizeInverseReconstruction normalized the postProcessed inverse
-%output z for the later plotting
+% --- Zeffiro documentation header ---
+% zef_normalizeInverseReconstruction — Zef normalize Inverse Reconstruction.
+%
+% Purpose:
+%   Zef normalize Inverse Reconstruction.
+%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%
+% Inputs:
+%   z
+%
+% Outputs:
+%   z
+%
+% Calls (project):
+%   zef_normalizeInverseReconstruction
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[z] = zef_normalizeInverseReconstruction(z)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
     aux_norm_vec = 0;
     for f_ind = 1 : length(z)

@@ -1,3 +1,32 @@
+% --- Zeffiro documentation header ---
+% zef_create_dipolar_pair_update_struct; — Zef create dipolar pair update struct;.
+%
+% Purpose:
+%   Zef create dipolar pair update struct;.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.aux_field (read, write)
+%   zef.create_dipolar_pair_color (read)
+%   zef.create_dipolar_pair_length (read)
+%   zef.create_dipolar_pair_ori_x (read, write)
+%   zef.create_dipolar_pair_ori_y (read, write)
+%   zef.create_dipolar_pair_ori_z (read, write)
+%   zef.create_dipolar_pair_x (read)
+%   zef.create_dipolar_pair_y (read)
+%   zef.create_dipolar_pair_z (read)
+%   zef.h_axes1 (read)
+%   zef.h_create_dipolar_pair_arrow (read, write)
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef_create_dipolar_pair_update_struct;` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef_create_dipolar_pair_update_struct;
 
 if isfield(zef,'h_create_dipolar_pair_arrow')

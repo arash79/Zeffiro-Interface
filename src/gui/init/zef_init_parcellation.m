@@ -1,5 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if not(isfield(zef,'parcellation_name')); — If not(isfield(zef,'parcellation name'));.
+%
+% Purpose:
+%   If not(isfield(zef,'parcellation name'));.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.aux_field (read, write)
+%   zef.parcellation_colortable (read, write)
+%   zef.parcellation_merge (read, write)
+%   zef.parcellation_name (read, write)
+%   zef.parcellation_plot_type (read, write)
+%   zef.parcellation_points (read, write)
+%   zef.parcellation_roi_center (read, write)
+%   zef.parcellation_roi_color (read, write)
+%   zef.parcellation_roi_name (read)
+%   zef.parcellation_roi_radius (read, write)
+%   zef.parcellation_roi_selected (read, write)
+%   zef.parcellation_segment (read, write)
+%   zef.parcellation_time_series_mode (read, write)
+%   zef.time_series_tools_dir (read, write)
+%   zef.time_series_tools_file_list (read, write)
+%   … (2 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if not(isfield(zef,'parcellation_name'));` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 if not(isfield(zef,'parcellation_name'));
     zef.parcellation_name = '';
 end;

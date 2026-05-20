@@ -1,5 +1,32 @@
 function [submissions, bundles] = eloreta_workflow(zef_inputs, cluster_profile, opts)
-%ELORETA_WORKFLOW Example bundle workflow for eLORETA jobs.
+% --- Zeffiro documentation header ---
+% utilities.cluster.examples.eloreta_workflow — Example or study script demonstrating eloreta_workflow.
+%
+% Purpose:
+%   Example or study script demonstrating eloreta_workflow.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   zef_inputs
+%   cluster_profile
+%   opts
+%
+% Outputs:
+%   submissions
+%   bundles
+%
+% Calls (project):
+%   utilities.cluster.examples.eloreta_workflow
+%   utilities.cluster.submit_inverse_jobs
+%   zef_inverse_extract_bundle
+%
+% Side effects:
+%   - parallel/cluster
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[submissions, bundles]] = utilities.cluster.examples.eloreta_workflow(zef_inputs, cluster_profile, opts)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
     zef_inputs

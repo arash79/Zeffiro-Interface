@@ -20,6 +20,27 @@
 %See also: zef_freesurfer_transform_coordinates
 
 function T = zef_freesurfer_read_register_dat(filepath)
+% --- Zeffiro documentation header ---
+% zef_freesurfer_read_register_dat — Zef freesurfer read register dat.
+%
+% Purpose:
+%   Zef freesurfer read register dat.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   filepath
+%
+% Outputs:
+%   T
+%
+% Calls (project):
+%   zef_freesurfer_read_register_dat
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[T] = zef_freesurfer_read_register_dat(filepath)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isstring(filepath)
     filepath = char(filepath);

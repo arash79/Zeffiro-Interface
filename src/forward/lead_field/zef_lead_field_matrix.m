@@ -3,6 +3,67 @@
 %
 %zef_lead_field_matrix is a function for creating a lead field matrix.
 function zef = zef_lead_field_matrix(zef)
+% --- Zeffiro documentation header ---
+% zef_lead_field_matrix — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%
+% Purpose:
+%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%
+% Inputs:
+%   zef
+%   nodes
+%   tetra
+%   restricted_brain_inds
+%   source_model
+%   wanted_n_of_sources
+%   source_space_creation_iterations
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.L (read)
+%   zef.S (read)
+%   zef.acceptable_source_depth (read, write)
+%   zef.active_compartment_ind (read, write)
+%   zef.aux_vec_sources (read, write)
+%   zef.brain_activity_inds (read, write)
+%   zef.brain_ind (read, write)
+%   zef.compartment_tags (read)
+%   zef.eit_count (read)
+%   zef.eit_ind (read)
+%   zef.inv_bg_data (read)
+%   zef.lead_field_id (read)
+%   zef.lead_field_id_max (read)
+%   zef.lead_field_time (read, write)
+%   zef.lead_field_type (read, write)
+%   … (29 more)
+%
+% Calls (project):
+%   core.types.ZefSourceModel.from
+%   zef_decompose_dof_space
+%   zef_deep_nodes_and_tetra
+%   zef_fi_dipoles
+%   zef_find_active_compartment_ind
+%   zef_lead_field_eeg_fem
+%   zef_lead_field_eit_fem
+%   zef_lead_field_matrix
+%   zef_lead_field_meg_fem
+%   zef_lead_field_meg_grad_fem
+%   zef_lead_field_tes_fem
+%   zef_source_interpolation
+%   … (1 more)
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_lead_field_matrix(zef, nodes, tetra, restricted_brain_inds, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');
@@ -463,16 +524,16 @@ end
 
 % Set empty decomposition indices, if source model is not continuous.
 
-switch core.ZefSourceModel.from(source_model)
+switch core.types.ZefSourceModel.from(source_model)
 
-    case core.ZefSourceModel.Error
+    case core.types.ZefSourceModel.Error
 
         error('Received and erraneous source model.')
 
     case { ...
-            core.ZefSourceModel.ContinuousWhitney, ...
-            core.ZefSourceModel.ContinuousHdiv, ...
-            core.ZefSourceModel.ContinuousStVenant ...
+            core.types.ZefSourceModel.ContinuousWhitney, ...
+            core.types.ZefSourceModel.ContinuousHdiv, ...
+            core.types.ZefSourceModel.ContinuousStVenant ...
             }
 
         % Do nothing

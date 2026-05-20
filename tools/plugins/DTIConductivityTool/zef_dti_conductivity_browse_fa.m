@@ -4,8 +4,33 @@
 %ZEF_DTI_CONDUCTIVITY_BROWSE_FA
 %
 %Browse for FreeSurfer FA file (fa.nii.gz from dt_recon).
+% --- Zeffiro documentation header ---
+% function zef_dti_conductivity_browse_fa — Function zef dti conductivity browse fa.
+%
+% Purpose:
+%   Function zef dti conductivity browse fa.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.dti_ref_mri_file (read)
+%   zef.freesurfer_fa_file (read, write)
+%   zef.h_freesurfer_fa_file (read)
+%   zef.save_file_path (read)
+%
+% Calls (project):
+%   zef_dti_conductivity_browse_fa
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `function zef_dti_conductivity_browse_fa` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 function zef_dti_conductivity_browse_fa
+
 
 zef = evalin('base','zef');
 

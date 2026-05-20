@@ -1,3 +1,33 @@
+% --- Zeffiro documentation header ---
+% function [G, dipole_locations] =  zef_lead_field_interpolation( ... — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%
+% Purpose:
+%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   p_nodes
+%   p_tetrahedra
+%   p_brain_inds
+%   p_source_model
+%   p_intended_source_inds
+%   p_nearest_neighbour_inds
+%   p_optimization_system_type
+%   mustBeText
+%   mustBeMember
+%   p_regparam
+%
+% Calls (project):
+%   core.types.ZefSourceModel.from
+%   zef_hdiv_interpolation
+%   zef_lead_field_interpolation
+%   zef_st_venant_interpolation
+%   zef_whitney_interpolation
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `function [G, dipole_locations] =  zef_lead_field_interpolation( ...(p_nodes, p_tetrahedra, p_brain_inds, p_source_model, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 function [G, dipole_locations] =  zef_lead_field_interpolation( ...
     p_nodes, ...
     p_tetrahedra, ...
@@ -8,27 +38,6 @@ function [G, dipole_locations] =  zef_lead_field_interpolation( ...
     p_optimization_system_type, ...
     p_regparam ...
     )
-
-% Chooses the interpolation method based on given source_model and
-% constructs the interpolation matrix G and interpolation (dipole)
-% positions. Errors in case of unknown source model.
-%
-% Input (must be given even if not used, 'cause nobody wants to spend time
-% parsing the varargin tuple):
-%
-% - p_nodes (common)
-% - p_tetrahedra (common)
-% - p_brain_inds (common)
-% - p_source_model (common).
-% - p_intended_source_inds (Whitney and Hdiv)
-% - p_nearest_neighbour_inds (all continuous variants of the source models)
-% - p_optimization_system_type
-% - p_regparam (St Venant)
-%
-% Output:
-%
-% - Interpolation matrix G
-% - source_positions
 
 arguments
     p_nodes (:,3) double {mustBeNonNan}
@@ -44,9 +53,9 @@ arguments
     p_regparam (1,1) double
 end
 
-switch core.ZefSourceModel.from(p_source_model)
+switch core.types.ZefSourceModel.from(p_source_model)
 
-    case { core.ZefSourceModel.Whitney, core.ZefSourceModel.ContinuousWhitney }
+    case { core.types.ZefSourceModel.Whitney, core.types.ZefSourceModel.ContinuousWhitney }
 
         [G, dipole_locations] = zef_whitney_interpolation( ...
             p_nodes, ...
@@ -57,7 +66,7 @@ switch core.ZefSourceModel.from(p_source_model)
             p_optimization_system_type ...
             );
 
-    case { core.ZefSourceModel.Hdiv, core.ZefSourceModel.ContinuousHdiv }
+    case { core.types.ZefSourceModel.Hdiv, core.types.ZefSourceModel.ContinuousHdiv }
 
         [G, dipole_locations] = zef_hdiv_interpolation( ...
             p_nodes, ...
@@ -68,7 +77,7 @@ switch core.ZefSourceModel.from(p_source_model)
             p_optimization_system_type ...
             );
 
-    case { core.ZefSourceModel.StVenant, core.ZefSourceModel.ContinuousStVenant }
+    case { core.types.ZefSourceModel.StVenant, core.types.ZefSourceModel.ContinuousStVenant }
 
         [G, dipole_locations] = zef_st_venant_interpolation( ...
             p_nodes, ...

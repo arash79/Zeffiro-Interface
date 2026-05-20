@@ -1,4 +1,38 @@
 function zef_play_cdata(varargin)
+% --- Zeffiro documentation header ---
+% zef_play_cdata — Zef play cdata.
+%
+% Purpose:
+%   Zef play cdata.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.h_slider (read)
+%   zef.movie_fps (read)
+%   zef.orbit_1 (read)
+%   zef.orbit_2 (read)
+%   zef.stop_movie (read)
+%
+% Calls (project):
+%   zef_play_cdata
+%   zef_plot_dpq
+%   zef_update_contour
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_play_cdata(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 warning('off');
 if evalin('base','exist(''zef'',''var'');')

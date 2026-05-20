@@ -1,4 +1,35 @@
 function zef = zef_exp_app_start(zef)
+% --- Zeffiro documentation header ---
+% zef_exp_app_start — Zef exp app start.
+%
+% Purpose:
+%   Zef exp app start.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.EXP (read, write)
+%   zef.font_size (read)
+%   zef.reconstruction (read)
+%   zef.reconstruction_information (read)
+%
+% Calls (project):
+%   zef_exp_app_start
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_exp_app_start(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 if isfield(zef,'EXP')
     if isfield(zef.EXP,'app')
         return;

@@ -1,45 +1,32 @@
 function M = zef_volume_scalar_matrix_Kx(nodes, tetra, h, x, u_field, volume, b_coord)
+% --- Zeffiro documentation header ---
+% zef_volume_scalar_matrix_Kx — Zef volume scalar matrix Kx.
 %
-% zef_volume_scalar_matrix_Kx
-%
-% TODO: Sampsa should document this.
+% Purpose:
+%   Zef volume scalar matrix Kx.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
 %
 % Inputs:
-%
-% - nodes
-%
-%   TODO: explanation.
-%
-% - tetra
-%
-%   TODO: explanation.
-%
-% - h
-%
-%   TODO: documentation.
-%
-% - x
-%
-%   TODO: documentation.
-%
-% - u_field
-%
-%   TODO: explanation.
-%
-% - volume
-%
-%   TODO: explanation.
-%
-% - b_coord
-%
-%   TODO: explanation.
+%   nodes
+%   tetra
+%   h
+%   x
+%   u_field
+%   volume
+%   b_coord
 %
 % Outputs:
+%   M
 %
-% - M
+% Calls (project):
+%   zef_barycentric_weighting
+%   zef_volume_barycentric
+%   zef_volume_scalar_matrix_Kx
 %
-%   TODO: explanation.
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[M] = zef_volume_scalar_matrix_Kx(nodes, tetra, h, x, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 det = [];
 

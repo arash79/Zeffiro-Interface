@@ -1,24 +1,34 @@
 function [p_c_table, p_points] = zef_bst_2_zef_atlas(subject,surface_ind_aux,surface_struct,atlas_compartment,atlas_type,varargin)
-%ZEF_BST_2_ZEF_ATLAS Legacy function for loading Brainstorm atlas data.
+% --- Zeffiro documentation header ---
+% zef_bst_2_zef_atlas — Zef bst 2 zef atlas.
 %
-% This is a legacy import function for Brainstorm atlases. For new projects,
-% consider using the orchestrated pipeline in +utilities/+brainstorm2zef/run()
-% which provides better error handling, validation, and flexibility.
+% Purpose:
+%   Zef bst 2 zef atlas.
+%   Folder: Project load/save, segmentation import, figure import, FEM export.
 %
 % Inputs:
-%   subject          - Subject index
-%   surface_ind_aux  - Surface index
-%   surface_struct  - Surface structure (optional, will load if empty)
-%   atlas_compartment - Compartment index for atlas
-%   atlas_type      - Type/name of atlas to extract
-%   varargin{1}     - Atlas tag (optional, defaults to atlas_type)
-%   varargin{2}     - Unit scale factor (optional, default: 1)
+%   subject
+%   surface_ind_aux
+%   surface_struct
+%   atlas_compartment
+%   atlas_type
+%   varargin
 %
 % Outputs:
-%   p_c_table - Cell array containing atlas parcellation table
-%   p_points  - Array containing atlas point coordinates
+%   p_c_table
+%   p_points
 %
-% See also: utilities.brainstorm2zef.run, utilities.brainstorm2zef.zef_bst_get_atlas_surfaces
+% Calls (project):
+%   zef_bst_2_zef_atlas
+%   zef_find_compartment
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[p_c_table, p_points]] = zef_bst_2_zef_atlas(subject, surface_ind_aux, surface_struct, atlas_compartment, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 atlas_tag = '';
 unit_scale = 1;

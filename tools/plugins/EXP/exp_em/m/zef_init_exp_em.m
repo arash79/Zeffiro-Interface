@@ -1,5 +1,40 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if not(isfield(zef,'exp_em_q')) — If not(isfield(zef,'exp em q')).
+%
+% Purpose:
+%   If not(isfield(zef,'exp em q')).
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.exp_em_beta (read, write)
+%   zef.exp_em_hyper_type (read, write)
+%   zef.exp_em_pcg_tol (read)
+%   zef.exp_em_q (read, write)
+%   zef.exp_em_theta0 (read, write)
+%   zef.h_exp_em_beta (read)
+%   zef.h_exp_em_data_segment (read)
+%   zef.h_exp_em_high_cut_frequency (read)
+%   zef.h_exp_em_hyper_type (read)
+%   zef.h_exp_em_low_cut_frequency (read)
+%   zef.h_exp_em_map_estimation (read)
+%   zef.h_exp_em_n_L1_iterations (read)
+%   zef.h_exp_em_n_map_iterations (read)
+%   zef.h_exp_em_normalize_data (read)
+%   zef.h_exp_em_number_of_frames (read)
+%   … (21 more)
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if not(isfield(zef,'exp_em_q'))` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 if not(isfield(zef,'exp_em_q'))
     zef.exp_em_q = 1;

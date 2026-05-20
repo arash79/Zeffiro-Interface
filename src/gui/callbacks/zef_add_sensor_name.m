@@ -1,3 +1,25 @@
+% --- Zeffiro documentation header ---
+% if not(evalin('base','zef — If not(evalin('base','zef.
+%
+% Purpose:
+%   If not(evalin('base','zef.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.current_sensors (read)
+%   zef.default_impedance_value (read)
+%   zef.imaging_method_cell (read)
+%   zef.parameter_profile (read)
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if not(evalin('base','zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 if not(evalin('base','zef.lock_sensor_names_on'))
 
     if ismember(evalin('base',['size(zef.' zef.current_sensors '_points,2)']),[6,0])

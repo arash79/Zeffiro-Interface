@@ -1,4 +1,30 @@
 function zef = zef_remove_object_handles(zef, node_name, h_list)
+% --- Zeffiro documentation header ---
+% zef_remove_object_handles — Zef remove object handles.
+%
+% Purpose:
+%   Zef remove object handles.
+%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%
+% Inputs:
+%   zef
+%   node_name
+%   h_list
+%
+% Outputs:
+%   zef
+%
+% Calls (project):
+%   zef_remove_object_handles
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_remove_object_handles(zef, node_name, h_list)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 skip_class_list = {'matlab.io.MatFile'};
 

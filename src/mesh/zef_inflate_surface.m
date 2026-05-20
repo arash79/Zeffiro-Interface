@@ -1,4 +1,38 @@
 function [nodes] = zef_inflate_surface(zef,nodes,surface_triangles,varargin)
+% --- Zeffiro documentation header ---
+% zef_inflate_surface — Zef inflate surface.
+%
+% Purpose:
+%   Zef inflate surface.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   zef
+%   nodes
+%   surface_triangles
+%   varargin
+%
+% Outputs:
+%   nodes
+%
+% Zef fields (observed):
+%   zef.gpu_count (read)
+%   zef.inflate_n_iterations (read)
+%   zef.inflate_strength (read)
+%   zef.use_gpu (read)
+%
+% Calls (project):
+%   zef_inflate_surface
+%
+% Side effects:
+%   - GPU
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[nodes] = zef_inflate_surface(zef, nodes, surface_triangles, varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 N = size(nodes,1);
 if not(isempty(varargin))

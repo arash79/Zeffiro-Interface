@@ -1,4 +1,37 @@
 function [index_vec,MahalanobisD,GMModel] = zef_find_clusters(n_clusters, rec_points,reg_val,cred_val,max_iter,tol_val)
+% --- Zeffiro documentation header ---
+% zef_find_clusters — Zef find clusters.
+%
+% Purpose:
+%   Zef find clusters.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   n_clusters
+%   rec_points
+%   reg_val
+%   cred_val
+%   max_iter
+%   tol_val
+%
+% Outputs:
+%   index_vec
+%   MahalanobisD
+%   GMModel
+%
+% Calls (project):
+%   zef_find_clusters
+%   zef_waitbar
+%
+% Side effects:
+%   - filesystem I/O
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[index_vec, MahalanobisD, GMModel]] = zef_find_clusters(n_clusters, rec_points, reg_val, cred_val, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 index_vec = ones(size(rec_points,1),1);
 if isequal(length(cred_val),1)

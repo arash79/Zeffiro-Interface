@@ -1,4 +1,28 @@
 function affine_matrix = compute_affine_transform(source_mgz, target_mgz, options)
+% --- Zeffiro documentation header ---
+% utilities.fs2zef.transforms.compute_affine_transform — Compute affine transform.
+%
+% Purpose:
+%   Compute affine transform.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   source_mgz
+%   target_mgz
+%   options
+%
+% Outputs:
+%   affine_matrix
+%
+% Calls (project):
+%   utilities.fs2zef.readers.get_volume_centers
+%   utilities.fs2zef.transforms.compute_affine_transform
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[affine_matrix] = utilities.fs2zef.transforms.compute_affine_transform(source_mgz, target_mgz, options)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %
 % compute_affine_transform - Compute affine transformation between two volumes
 %

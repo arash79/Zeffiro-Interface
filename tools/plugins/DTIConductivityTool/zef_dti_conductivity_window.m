@@ -15,6 +15,56 @@
 %  - Reference MRI (e.g. orig.mgz from recon-all)
 
 function zef = zef_dti_conductivity_window(zef)
+% --- Zeffiro documentation header ---
+% zef_dti_conductivity_window — Zef dti conductivity window.
+%
+% Purpose:
+%   Zef dti conductivity window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.dti_anisotropy_threshold (read, write)
+%   zef.dti_apply_to_compartments (read)
+%   zef.dti_conductivity_scale (read, write)
+%   zef.dti_conductivity_tool_current_size (read, write)
+%   zef.dti_conductivity_tool_relative_size (read, write)
+%   zef.dti_extra_conductivity (read, write)
+%   zef.dti_interpolation_mode (read, write)
+%   zef.dti_interpolation_radius (read, write)
+%   zef.dti_intra_conductivity (read, write)
+%   zef.dti_ref_geometry (read)
+%   zef.dti_ref_mri_file (read, write)
+%   zef.dti_volume_fraction (read, write)
+%   zef.freesurfer_fa_file (read, write)
+%   zef.freesurfer_register_file (read, write)
+%   … (27 more)
+%
+% Calls (project):
+%   zef_change_size_function
+%   zef_dti_conductivity_apply_button_callback
+%   zef_dti_conductivity_load_freesurfer
+%   zef_dti_conductivity_update_conversion_model
+%   zef_dti_conductivity_update_interpolation_model
+%   zef_dti_conductivity_window
+%   zef_get_relative_size
+%
+% Side effects:
+%   - base/caller workspace
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_dti_conductivity_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

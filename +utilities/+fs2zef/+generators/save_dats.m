@@ -1,4 +1,28 @@
 function save_dats(out_dir)
+% --- Zeffiro documentation header ---
+% utilities.fs2zef.generators.save_dats — Save dats.
+%
+% Purpose:
+%   Save dats.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   out_dir
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Calls (project):
+%   utilities.fs2zef.generators.save_dats
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `utilities.fs2zef.generators.save_dats(out_dir)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %
 % save_dats
 %

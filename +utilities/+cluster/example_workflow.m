@@ -1,13 +1,23 @@
-%EXAMPLE_WORKFLOW Bundle-based cluster inverse workflow.
+% --- Zeffiro documentation header ---
+% utilities.cluster.cluster = utilities.cluster.configure_cluster_profile( ... — Example or study script demonstrating cluster = utilities.cluster.configure_cluster_profile( .
 %
-% Prerequisites:
-% 1) Run CSC `configCluster` once.
-% 2) Load or build a `zef` struct in MATLAB workspace.
+% Purpose:
+%   Example or study script demonstrating cluster = utilities.cluster.configure_cluster_profile( ....
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
-% This script demonstrates the new workflow:
-%   configure profile -> extract bundle -> submit -> collect.
+% Calls (project):
+%   utilities.cluster.collect_inverse_results
+%   utilities.cluster.submit_inverse_jobs
+%   zef_inverse_extract_bundle
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `utilities.cluster.cluster = utilities.cluster.configure_cluster_profile( ...` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
-% Step 1: configure CSC profile
 cluster = utilities.cluster.configure_cluster_profile( ...
     "project_2002680", ...
     "MemPerCPU", "8g", ...

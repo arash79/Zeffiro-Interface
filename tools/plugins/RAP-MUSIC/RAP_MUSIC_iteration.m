@@ -1,8 +1,48 @@
+% --- Zeffiro documentation header ---
+% function [z,Var_loc,reconstruction_information] = RAP_MUSIC_iteration — Function [z,Var loc,reconstruction information] = RAP MUSIC iteration.
+%
+% Purpose:
+%   Function [z,Var loc,reconstruction information] = RAP MUSIC iteration.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.RAPMUSIC_leadfield_lambda (read)
+%   zef.RAPMUSIC_n_dipoles (read)
+%   zef.gpu_count (read)
+%   zef.inv_amplitude_db (read)
+%   zef.inv_high_cut_frequency (read)
+%   zef.inv_hyperprior (read)
+%   zef.inv_hyperprior_tail_length_db (read)
+%   zef.inv_low_cut_frequency (read)
+%   zef.inv_prior_over_measurement_db (read)
+%   zef.inv_sampling_frequency (read)
+%   zef.inv_snr (read)
+%   zef.inv_time_1 (read)
+%   zef.inv_time_2 (read)
+%   zef.inv_time_3 (read)
+%   zef.number_of_frames (read)
+%   … (4 more)
+%
+% Calls (project):
+%   zef_find_g_hyperprior
+%   zef_find_ig_hyperprior
+%   zef_getTimeStep
+%   zef_normalizeInverseReconstruction
+%   zef_postProcessInverse
+%   zef_processLeadfields
+%   zef_subspace_corr
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function [z,Var_loc,reconstruction_information] = RAP_MUSIC_iteration` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 function [z,Var_loc,reconstruction_information] = RAP_MUSIC_iteration
-%Based on
-%- "Source Localization Using Recursively Applied and Projected (RAP) MUSIC" (1999)
-%- "EEG and MEG Source Localization using Recursively Applied (RAP) MUSIC" (1997)
-%by John C. Mosher and Richard M. Leahy
 
 h = zef_waitbar(0,1,['RAP MUSIC.']);
 [s_ind_1] = unique(evalin('base','zef.source_interpolation_ind{1}'));

@@ -5,8 +5,45 @@
 %
 %Clears FreeSurfer DTI data from zef struct.
 %Useful for starting over or removing DTI-derived conductivity.
+% --- Zeffiro documentation header ---
+% function zef_dti_conductivity_clear — Function zef dti conductivity clear.
+%
+% Purpose:
+%   Function zef dti conductivity clear.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.dti_applied (read, write)
+%   zef.dti_applied_time (read, write)
+%   zef.dti_dwi_vox2ras_tkr (read, write)
+%   zef.dti_fa_geometry (read, write)
+%   zef.dti_matrices_approved (read, write)
+%   zef.dti_ref_center (read, write)
+%   zef.dti_ref_geometry (read, write)
+%   zef.dti_ref_vox2ras (read, write)
+%   zef.dti_ref_vox2ras_tkr (read, write)
+%   zef.freesurfer_fa_data (read, write)
+%   zef.freesurfer_fa_info (read, write)
+%   zef.freesurfer_fa_loaded (read, write)
+%   zef.freesurfer_register_transform (read, write)
+%   zef.freesurfer_subject_name (read, write)
+%   zef.h_dti_info_text (read)
+%   … (3 more)
+%
+% Calls (project):
+%   zef_dti_conductivity_clear
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `function zef_dti_conductivity_clear` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 function zef_dti_conductivity_clear
+
 
 zef = evalin('base','zef');
 

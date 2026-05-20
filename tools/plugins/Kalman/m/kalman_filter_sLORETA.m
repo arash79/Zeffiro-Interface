@@ -1,4 +1,35 @@
 function [P_store,z_inverse] = kalman_filter_sLORETA(m,P,A,Q,L,R, timeSteps ,number_of_frames, smoothing,standardization_exponent)
+% --- Zeffiro documentation header ---
+% kalman_filter_sLORETA — Kalman filter s LORETA.
+%
+% Purpose:
+%   Kalman filter s LORETA.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   m
+%   P
+%   A
+%   Q
+%   L
+%   R
+%   timeSteps
+%   number_of_frames
+%   smoothing
+%   standardization_exponent
+%
+% Outputs:
+%   P_store
+%   z_inverse
+%
+% Calls (project):
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[P_store, z_inverse]] = kalman_filter_sLORETA(m, P, A, Q, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 P_store = cell(0);
 z_inverse = cell(0);
 h = zef_waitbar(0,1, 'Filtering');

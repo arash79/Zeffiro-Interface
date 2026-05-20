@@ -1,70 +1,54 @@
-# Santtu's Peeling Article — Sensitivity of EEG Inverse Methods
+# +examples/+studies/+santtus_peeling_article
 
-This module evaluates how different EEG inverse methods perform when the head model is simplified by “peeling” (removing superficial layers such as scalp or skull). It was used to produce results for the article:
+## Purpose of this folder
 
-**The Effects of Peeling on Finite Element Method–based EEG Source Reconstruction**
+Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
 
-- [arXiv:2308.04908](https://doi.org/10.48550/arXiv.2308.04908)
+## Contents
 
-## What Is “Peeling”?
+Subfolders:
+- `+helpers/`
 
-In FEM-based EEG source reconstruction, the head is typically modeled with several compartments (e.g., scalp, skull, CSF, brain). *Peeling* means removing one or more outer layers from the model to reduce complexity. This module measures how that simplification affects reconstruction quality: position accuracy, orientation accuracy, magnitude, and spatial dispersion.
+MATLAB sources:
+- `main.m` — **examples.studies.santtus_peeling_article.function [ sensitivities_with_statistics, L ] = main ( ...**: Example or study script demonstrating function [ sensitivities_with_statistics, L ] = main ( ....
 
-## What Will You Learn?
+## How this folder fits into the overall workflow
 
-- How to load a project, build mesh and lead field, and run inverse methods from a script.
-- How Zeffiro’s MNE, sLORETA, dSPM, and Dipole Scan tools work when called programmatically.
-- How to quantify reconstruction quality (position error, direction error, dispersion) over many source positions and noise realizations.
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-## When to Use This Module
+## GUI usage
 
-- You want to compare inverse methods under controlled conditions (known sources, added noise).
-- You work with FEM head models and want to understand the impact of model simplification.
-- You have finished the root-level examples and understand lead fields and inverse methods.
+No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
 
-## How to Run
+## Programmatic usage
 
-The main entry point is `main`. You provide a project path, inverse method name, and various options:
+From the project root:
 
 ```matlab
-[sensitivities_with_statistics, L] = examples.studies.santtus_peeling_article.main( ...
-    project_path,           % Path to .zef or .mat project
-    inverse_method,         % "sLORETA", "dSPM", "MNE", or "Dipole Scan"
-    n_of_runs,             % Number of Monte Carlo runs for statistics
-    noise_level_db,        % Noise level in dB (e.g. -30)
-    diff_type,             % "L2" or "minabs" for position metric
-    dispersion_radius,     % Radius (mm) for dispersion computation
-    args                   % Struct: use_gpu, build_mesh, build_lead_field, etc.
-);
+projectRoot = fileparts(which('zeffiro_interface'));
+addpath(projectRoot);
+addpath(genpath(fullfile(projectRoot, 'src')));
+zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
 ```
 
-Get full argument descriptions:
+Representative entry points in this folder:
+- ``examples.studies.santtus_peeling_article.function [ sensitivities_with_statistics, L ] = main ( ...(project_path, inverse_method, n_of_runs, noise_level_db, …)` with project root and `src` on the path.`
 
-```matlab
-help examples.studies.santtus_peeling_article.main
-```
+## Examples
 
-## Output Metrics
+Run scripts directly after startup, e.g. `run('+examples/+studies/+santtus_peeling_article/main.m')`.
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
 
-For each source position and inverse method, the script computes:
+## Dependencies and assumptions
 
-- **Position error**: Distance between true and reconstructed source (L2 or minabs).
-- **Direction error**: Angular difference between true and reconstructed dipole orientation (degrees).
-- **Magnitude**: Reconstructed dipole strength.
-- **Dispersion**: Spatial spread of reconstructed activity within a region of interest (ROI).
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
 
-## Supported Inverse Methods
+## Notes for developers
 
-- **MNE** — Minimum Norm Estimate
-- **dSPM** — Dynamic Statistical Parametric Mapping
-- **sLORETA** — Standardized Low-Resolution Electromagnetic Tomography
-- **Dipole Scan** — Sequential dipole fitting
-
-## Files in This Module
-
-| File | Role |
-|------|------|
-| `main.m` | Entry point: loads project, builds mesh/lead field if requested, runs sensitivity analysis, returns results. |
-| `zef_rec_diff.m` | Core routine: generates synthetic measurements for each source and direction, runs the inverse method, computes position/direction/magnitude/dispersion differences. |
-| `zef_sensitivity_map_mne.m` | Sensitivity analysis for MNE, dSPM, sLORETA (Monte Carlo over noise). |
-| `zef_sensitivity_map_dipoleScan.m` | Sensitivity analysis for Dipole Scan (Monte Carlo over noise). |
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

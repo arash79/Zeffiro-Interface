@@ -1,4 +1,34 @@
 function [tri_ind, lambda_1, lambda_2, lambda_3] = zef_find_intersecting_triangle(p_1, p_2,sign_val,tri_ref,nodes_tri_ref,varargin)
+% --- Zeffiro documentation header ---
+% zef_find_intersecting_triangle — Zef find intersecting triangle.
+%
+% Purpose:
+%   Zef find intersecting triangle.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   p_1
+%   p_2
+%   sign_val
+%   tri_ref
+%   nodes_tri_ref
+%   varargin
+%
+% Outputs:
+%   tri_ind
+%   lambda_1
+%   lambda_2
+%   lambda_3
+%
+% Calls (project):
+%   zef_3by3_solver
+%   zef_find_intersecting_triangle
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[tri_ind, lambda_1, lambda_2]] = zef_find_intersecting_triangle(p_1, p_2, sign_val, tri_ref, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 search_type = 'convex';
 

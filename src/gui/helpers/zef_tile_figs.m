@@ -1,6 +1,30 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef_tile_figs(varargin)
+% --- Zeffiro documentation header ---
+% zef_tile_figs — Zef tile figs.
+%
+% Purpose:
+%   Zef tile figs.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Calls (project):
+%   zef_tile_figs
+%
+% Side effects:
+%   - base/caller workspace
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_tile_figs(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 n_tiles = 20;
 h_aux = evalin('base','findall(groot, ''Type'',''figure'',''Name'',''ZEFFIRO Interface: Figure tool'')');

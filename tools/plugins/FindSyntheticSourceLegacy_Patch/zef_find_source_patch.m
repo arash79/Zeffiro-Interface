@@ -2,6 +2,43 @@
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 
 function [meas_data,all_roi_sources,orientations,n_multiple_sources] = zef_find_source_patch(zef)
+% --- Zeffiro documentation header ---
+% zef_find_source_patch — Zef find source patch.
+%
+% Purpose:
+%   Zef find source patch.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   meas_data
+%   all_roi_sources
+%   orientations
+%   n_multiple_sources
+%
+% Zef fields (observed):
+%   zef.L (read)
+%   zef.inv_synth_source (read)
+%   zef.s2_points (read)
+%   zef.source_direction_mode (read, write)
+%   zef.source_interpolation_ind (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_find_source_patch
+%   zef_processLeadfields
+%   zef_project_L_in_roi
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[meas_data, all_roi_sources, orientations]] = zef_find_source_patch(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 source_positions = eval('zef.source_positions');
 noise_level = eval('zef.inv_synth_source(1,8)');
 s_p = eval('zef.inv_synth_source(:,1:3)');

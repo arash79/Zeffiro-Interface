@@ -1,14 +1,21 @@
 function mappings = compartment_mappings()
+% --- Zeffiro documentation header ---
+% utilities.fs2zef.config.compartment_mappings — Compartment mappings.
 %
-% compartment_mappings - Tissue-specific parameters and mappings
-%
-% Returns a struct with default parameters for different tissue/compartment types.
-% Used by generate_zef_import to assign appropriate sigma, activity, and other
-% parameters based on compartment names.
+% Purpose:
+%   Compartment mappings.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
 %
 % Outputs:
-%   mappings - Struct with compartment configurations
+%   mappings
 %
+% Calls (project):
+%   utilities.fs2zef.config.compartment_mappings
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `utilities.fs2zef.config.compartment_mappings` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
     mappings = struct();
     

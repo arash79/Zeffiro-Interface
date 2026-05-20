@@ -28,12 +28,46 @@
 %   3. Examine the figure with both covariance matrices
 %
 % Copyright © 2024- Sampsa Pursiainen & ZI Development Team
+% --- Zeffiro documentation header ---
+% fa.nii — Fa.nii.
+%
+% Purpose:
+%   Fa.nii.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.kf_structural_Q_type (read, write)
+%
+% Calls (project):
+%   zef_KF
+%   zef_dti_fa_covariance
+%   zef_dti_get_mesh2voxel
+%   zef_dti_interpolate_to_sources
+%   zef_dti_tractography_covariance
+%   zef_freesurfer_load_fa
+%   zef_freesurfer_load_v1
+%   zef_freesurfer_read_register_dat
+%   zef_freesurfer_read_volume_geometry
+%
+% Side effects:
+%   - base/caller workspace
+%   - creates/updates figures
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `fa.nii` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 %% ========================================================================
 %  SECTION 1: CONFIGURATION — Set your file paths here
 %  ========================================================================
 
 % --- FreeSurfer dt_recon output files ---
+
+
+
 fa_file       = '/Users/hsc476/freesurfer_subjects/Sub01FG/mri/dti/fa.nii.gz';  % e.g., '/path/to/dt_recon/fa.nii.gz'
 v1_file       = '/Users/hsc476/freesurfer_subjects/Sub01FG/mri/dti/eigvec1.nii.gz';  % e.g., '/path/to/dt_recon/v1.nii.gz'
 register_file = '/Users/hsc476/freesurfer_subjects/Sub01FG/mri/dti/register.dat';  % e.g., '/path/to/dt_recon/register.dat'

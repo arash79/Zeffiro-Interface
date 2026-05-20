@@ -1,17 +1,41 @@
-% ZEF_CREATE_TRAINING_DATA_FOCAL_EPILEPSY - Generate synthetic training dataset
+% --- Zeffiro documentation header ---
+% examples.studies.decision_making.examples.studies.decision_making — Example or study script demonstrating examples.studies.decision_making.
 %
-% Creates training data for the focal epilepsy decision workflow by:
-%   - Selecting random source positions and orientations
-%   - Simulating EEG, MEG, and MEEG measurements with noise
-%   - Running 11 inverse methods per modality (MNE, sLORETA, MNE-RAMUS, Dipole
-%     Scan, Beamformer, IAS variants, dSPM, EXP-L1, EXP-L1-sLORETA)
-%   - Storing reconstructions and ground-truth dipoles
+% Purpose:
+%   Example or study script demonstrating examples.studies.decision_making.
+%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
 %
-% Output: training_data struct saved to training_data_file_name (from params).
+% Zef fields (observed):
+%   zef.EXP (read)
+%   zef.L (read, write)
+%   zef.beamformer (read)
+%   zef.dataBank (read)
+%   zef.dipole_app (read)
+%   zef.h_ias_n_map_iterations (read)
+%   zef.h_ias_snr (read)
+%   zef.h_ias_start (read)
+%   zef.h_ias_type (read)
+%   zef.h_mne_prior (read)
+%   zef.h_mne_start (read)
+%   zef.h_mne_type (read)
+%   zef.h_ramus_hyperprior (read)
+%   zef.h_ramus_multires_n_decompositions (read)
+%   zef.h_ramus_snr (read)
+%   … (11 more)
 %
-% Prerequisites: DataBank project with lead fields for EEG, MEG, MEEG.
+% Calls (project):
+%   zef_dataBank_get_reconstructions
+%   zef_exp_app_start
+%   zef_waitbar
 %
-% See also: zef_parameters_focal_epilepsy, zef_process_training_data_focal_epilepsy
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 examples.studies.decision_making.zef_parameters_focal_epilepsy;
 
@@ -386,4 +410,3 @@ training_data.snr_vec = snr_vec;
 
 save(training_data_file_name,'training_data','-v7.3');
 %zef_close_all
-

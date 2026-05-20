@@ -1,28 +1,29 @@
 %% Copyright © 2025- Joonas Lahtinen
 function [reconstruction, self] = smoother(self, z_inverse, L)
-    %
-    % smoother
-    %
-    % Computes the desired smoother for Kalman filter solution
-    %
-    % Inputs:
-    %
-    % - self
-    %
-    %   An instance of KalmanInverter with the method-specific parameters.
-    %
-    % - z_inverse
-    %
-    %   The cell structure having all the reconstructions for each time
-    %   step
-    %
-    %
-    % Outputs:
-    %
-    % - reconstruction
-    %
-    %   The smoothed reconstrution of the dipoles.
-    %
+% --- Zeffiro documentation header ---
+% inverse.KalmanInverter.smoother — Smoother.
+%
+% Purpose:
+%   Smoother.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   self
+%   z_inverse
+%   L
+%
+% Outputs:
+%   reconstruction
+%   self
+%
+% Calls (project):
+%   inverse.smoother
+%   zef_waitbar
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[reconstruction, self]] = inverse.KalmanInverter.smoother(self, z_inverse, L)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
     arguments
 

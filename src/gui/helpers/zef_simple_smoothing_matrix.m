@@ -1,4 +1,26 @@
 function S_mat = zef_simple_smoothing_matrix(tetra, nodes)
+% --- Zeffiro documentation header ---
+% zef_simple_smoothing_matrix — Zef simple smoothing matrix.
+%
+% Purpose:
+%   Zef simple smoothing matrix.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   tetra
+%   nodes
+%
+% Outputs:
+%   S_mat
+%
+% Calls (project):
+%   zef_simple_smoothing_matrix
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[S_mat] = zef_simple_smoothing_matrix(tetra, nodes)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 n_nodes = size(nodes,1);
 c_ave = 1/size(tetra,2);

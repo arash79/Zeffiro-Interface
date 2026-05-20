@@ -1,18 +1,25 @@
 %% Copyright © 2025- Joonas Lahtinen
 classdef CSMInverter < inverse.CommonInverseParameters & handle
-
-    %
-    % CSMInverter
-    %
-    % A class which defines the properties needed by the Classical Sparse inversion methods (CSM),
-    % and the method itself.
-    % The inverter consist four inversion methods:
-    % - dSPM (Dynamic statistical parametric mapping)
-    % - sLORETA (Standardized low-resolution brain electromagnetic
-    % tomography with independent oriental basis directions)
-    % - sLORETA 3D (sLORETA with correlated directions per source location)
-    % - SBL (Sparse Bayesian Learning)
-    %
+% --- Zeffiro documentation header ---
+% inverse.CSMInverter.CSMInverter — Inverse solver class implementing CSM reconstruction.
+%
+% Purpose:
+%   Inverse solver class implementing CSM reconstruction.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   args
+%
+% Calls (project):
+%   inverse.CommonInverseParameters
+%
+% Side effects:
+%   - GPU
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `inverse.CSMInverter.CSMInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
+% --- End Zeffiro documentation header
 
     properties
 

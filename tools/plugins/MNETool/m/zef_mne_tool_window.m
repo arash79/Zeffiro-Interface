@@ -1,4 +1,48 @@
 function zef = zef_mne_tool_window(zef)
+% --- Zeffiro documentation header ---
+% zef_mne_tool_window — Zef mne tool window.
+%
+% Purpose:
+%   Zef mne tool window.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.h_mne_apply (read, write)
+%   zef.h_mne_cancel (read, write)
+%   zef.h_mne_high_cut_frequency (read, write)
+%   zef.h_mne_low_cut_frequency (read, write)
+%   zef.h_mne_map_estimation (read)
+%   zef.h_mne_normalize_data (read, write)
+%   zef.h_mne_number_of_frames (read, write)
+%   zef.h_mne_prior (read, write)
+%   zef.h_mne_sampling_frequency (read, write)
+%   zef.h_mne_start (read, write)
+%   zef.h_mne_time_1 (read, write)
+%   zef.h_mne_time_2 (read, write)
+%   zef.h_mne_time_3 (read, write)
+%   zef.h_mne_type (read, write)
+%   zef.h_zef_mne_tool (read, write)
+%   … (12 more)
+%
+% Calls (project):
+%   zef_find_mne_reconstruction
+%   zef_mne_tool_window
+%
+% Side effects:
+%   - creates/updates figures
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_mne_tool_window(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h1 = figure(...
     'PaperUnits',get(0,'defaultfigurePaperUnits'),...
@@ -447,7 +491,3 @@ h24 = uicontrol(...
     'FontSize',0.397787948131197);
 
 zef.h_mne_type = h24;
-
-
-
-

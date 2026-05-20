@@ -1,58 +1,33 @@
 function h_waitbar = zef_waitbar(varargin)
+% --- Zeffiro documentation header ---
+% zef_waitbar — Zef waitbar.
 %
-% zef_waitbar
+% Purpose:
+%   Zef waitbar.
+%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
 %
-% A function that either creates a new Zeffiro Interface waitbar with a
-% certain title, updates an existing waitbar while keeping the title the same,
-% or updates a waitbar while also updating the title.
+% Inputs:
+%   varargin
+%   float
 %
-% Inputs: a varargin cell array with either 3 or 4 elements:
+% Outputs:
+%   h_waitbar
 %
-% - varargin { 1 }
+% Calls (project):
+%   zef_eval_entry
+%   zef_waitbar
 %
-%   The current integer state of the progress, that the caller is keeping
-%   track of.
+% Side effects:
+%   - base/caller workspace
+%   - creates/updates figures
+%   - filesystem I/O
+%   - waitbar progress UI
 %
-% - varargin { 2 }
-%
-%   The ending integer progress state, that the caller is keeping track of. If
-%   varargin{1} reaches this, the computation whose progress is being tracked
-%   should terminate.
-%
-% - varargin { 3 }
-%
-%   If initializing a new waitbar, the textual title of the waitbar. If
-%   updating an existing waitbar, a handle to the waitbar that is being
-%   updated.
-%
-% - varargin { 4 }
-%
-%   If updating an existing waitbar with a new textual title, the title that
-%   is to be shown by the updated waitbar.
-%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[h_waitbar] = zef_waitbar(varargin, float)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
-
-% if nargin < 3 || nargin > 4
-% 
-%     error("zef_waitbar needs 3 or 4 arguments")
-% 
-% end
-
-% 
-% assert ( isequal ( size ( current_iter ), size ( max_iter ) ), "The first and second arguments need to be integer arrays of equal size." ) ;
-% 
-% if any ( isnan ( current_iter ) ) || not ( all ( is_integer ( current_iter ) ) ) || not ( all ( current_iter >= 0 ) )
-% 
-%     error ( "The first argument must be a positive integer." ) ;
-% 
-% end
-% 
-% if any ( isnan ( max_iter ) ) || not ( all ( is_integer ( max_iter ) ) ) || not ( all ( max_iter >= current_iter ) )
-% 
-%     error ( "The second argument must be a positive integer, greater than the first argument." ) ;
-% 
-% end
-% Always initialize output to avoid "output not assigned" on early returns.
 h_waitbar = [];
 
 if nargin < 2 || nargin > 4

@@ -1,6 +1,47 @@
 %Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z] = SESAME_inversion(void)
+% --- Zeffiro documentation header ---
+% SESAME_inversion — SESAME inversion.
+%
+% Purpose:
+%   SESAME inversion.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   void
+%
+% Outputs:
+%   z
+%
+% Zef fields (observed):
+%   zef.SESAME (read, write)
+%   zef.SESAME_n_sampler (read)
+%   zef.SESAME_snr (read)
+%   zef.SESAME_time_serie (read)
+%   zef.inv_sampling_frequency (read)
+%   zef.inv_time_1 (read)
+%   zef.inv_time_2 (read)
+%   zef.inv_time_3 (read)
+%   zef.number_of_frames (read)
+%   zef.source_direction_mode (read)
+%   zef.source_interpolation_ind (read)
+%   zef.source_positions (read)
+%
+% Calls (project):
+%   zef_postProcessInverse
+%   zef_processLeadfields
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[z] = SESAME_inversion(void)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 h = waitbar(0,['SESAME iteration.']);
 [s_ind_1] = unique(evalin('base','zef.source_interpolation_ind{1}'));

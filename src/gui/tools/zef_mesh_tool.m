@@ -1,3 +1,42 @@
+% --- Zeffiro documentation header ---
+% if isfield(zef,'h_mesh_tool') — If isfield(zef,'h mesh tool').
+%
+% Purpose:
+%   If isfield(zef,'h mesh tool').
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.downsample_surfaces (read, write)
+%   zef.font_size (read)
+%   zef.forward_simulation_column_selected (read)
+%   zef.forward_simulation_selected (read)
+%   zef.forward_simulation_table (read, write)
+%   zef.h_checkbox_mesh_smoothing_on (read)
+%   zef.h_downsample_surfaces (read)
+%   zef.h_edit65 (read)
+%   zef.h_edit75 (read)
+%   zef.h_edit76 (read)
+%   zef.h_edit_meshing_accuracy (read)
+%   zef.h_field_downsampling (read)
+%   zef.h_forward_simulation_script (read)
+%   zef.h_forward_simulation_table (read)
+%   zef.h_forward_simulation_update_from_profile (read)
+%   … (42 more)
+%
+% Calls (project):
+%   zef_assign_data
+%   zef_attach_sensors_volume
+%   zef_set_size_change_function
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `if isfield(zef,'h_mesh_tool')` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 if isfield(zef,'h_mesh_tool')
     if isvalid(zef.h_mesh_tool)
         delete(zef.h_mesh_tool)

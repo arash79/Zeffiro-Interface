@@ -1,4 +1,29 @@
 function save_color_tables(in_dir, out_dir)
+% --- Zeffiro documentation header ---
+% utilities.fs2zef.generators.save_color_tables — Save color tables.
+%
+% Purpose:
+%   Save color tables.
+%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%
+% Inputs:
+%   in_dir
+%   out_dir
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Calls (project):
+%   utilities.fs2zef.generators.save_color_tables
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `utilities.fs2zef.generators.save_color_tables(in_dir, out_dir)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 %
 % save_color_tables
 %

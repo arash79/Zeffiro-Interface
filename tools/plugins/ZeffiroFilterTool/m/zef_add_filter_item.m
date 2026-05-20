@@ -1,5 +1,33 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% zef_i = length(zef — Zef i = length(zef.
+%
+% Purpose:
+%   Zef i = length(zef.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.aux_field (read, write)
+%   zef.filter_file_list (read)
+%   zef.filter_list_selected (read)
+%   zef.filter_name_list (read)
+%   zef.filter_parameter_list (read, write)
+%   zef.filter_pipeline (read)
+%   zef.filter_pipeline_selected (read, write)
+%   zef.filter_tag (read)
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef_i = length(zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 zef_i = length(zef.filter_pipeline_list)+1;
 zef.filter_pipeline{zef_i}.name = zef.filter_name_list{zef.filter_list_selected};

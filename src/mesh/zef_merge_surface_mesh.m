@@ -1,4 +1,33 @@
 function zef = zef_merge_surface_mesh(zef,compartment_tag,triangles,points,varargin)
+% --- Zeffiro documentation header ---
+% zef_merge_surface_mesh — Zef merge surface mesh.
+%
+% Purpose:
+%   Zef merge surface mesh.
+%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%
+% Inputs:
+%   zef
+%   compartment_tag
+%   triangles
+%   points
+%   varargin
+%
+% Outputs:
+%   zef
+%
+% Calls (project):
+%   zef_merge_surface_mesh
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[zef] = zef_merge_surface_mesh(zef, compartment_tag, triangles, points, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isempty(zef)
     zef = evalin('base','zef',zef);

@@ -8,6 +8,35 @@
 %GUI on success or shows a clear error on failure.
 
 function zef_dti_conductivity_apply_button_callback()
+% --- Zeffiro documentation header ---
+% zef_dti_conductivity_apply_button_callback — GUI callback for dti_conductivity_apply_button actions.
+%
+% Purpose:
+%   GUI callback for dti_conductivity_apply_button actions.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.dti_conductivity_metadata (read)
+%   zef.h_dti_status_text (read)
+%   zef.use_waitbar (read, write)
+%
+% Calls (project):
+%   zef_dti_apply_to_sigma
+%   zef_dti_conductivity_apply_button_callback
+%   zef_dti_conductivity_update
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `zef_dti_conductivity_apply_button_callback` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 
 zef = evalin('base', 'zef');
 

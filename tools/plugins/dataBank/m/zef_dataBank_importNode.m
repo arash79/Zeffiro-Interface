@@ -1,4 +1,33 @@
 function [tree] = zef_dataBank_importNode(tree, savePath, saveFile, parentHash, dataBank)
+% --- Zeffiro documentation header ---
+% zef_dataBank_importNode — Zef data Bank import Node.
+%
+% Purpose:
+%   Zef data Bank import Node.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   tree
+%   savePath
+%   saveFile
+%   parentHash
+%   dataBank
+%
+% Outputs:
+%   tree
+%
+% Calls (project):
+%   zef_dataBank_add
+%   zef_dataBank_importNode
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[tree] = zef_dataBank_importNode(tree, savePath, saveFile, parentHash, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if ~iscell(saveFile)
     node=load(strcat(savePath, saveFile));

@@ -1,3 +1,34 @@
+% --- Zeffiro documentation header ---
+% if ismember(refinement_flag, [1, 3]) — If ismember(refinement flag, [1, 3]).
+%
+% Purpose:
+%   If ismember(refinement flag, [1, 3]).
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.refinement_on (read)
+%   zef.refinement_surface_compartments (read)
+%   zef.refinement_surface_compartments_2 (read)
+%   zef.refinement_surface_compartments_3 (read)
+%   zef.refinement_surface_mode (read)
+%   zef.refinement_surface_mode_2 (read)
+%   zef.refinement_surface_mode_3 (read)
+%   zef.refinement_surface_on (read)
+%   zef.refinement_surface_on_2 (read)
+%   zef.refinement_surface_on_3 (read)
+%
+% Calls (project):
+%   zef_compartment_to_subcompartment
+%   zef_find_active_compartment_ind
+%   zef_waitbar
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if ismember(refinement_flag, [1, 3])` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 if ismember(refinement_flag, [1, 3])
     tetra_aux = tetra;
@@ -321,4 +352,3 @@ if eval('zef.refinement_on')
     tetra_aux = tetra;
 
 end
-

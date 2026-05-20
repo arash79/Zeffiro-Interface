@@ -1,4 +1,36 @@
 function zef = zef_build_compartment_table(zef)
+% --- Zeffiro documentation header ---
+% zef_build_compartment_table — Zef build compartment table.
+%
+% Purpose:
+%   Zef build compartment table.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.aux_field_1 (read, write)
+%   zef.compartment_table_size (read)
+%   zef.compartment_tags (read, write)
+%   zef.h_compartment_table (read)
+%   zef.parameter_profile (read)
+%
+% Calls (project):
+%   zef_build_compartment_table
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_build_compartment_table(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');

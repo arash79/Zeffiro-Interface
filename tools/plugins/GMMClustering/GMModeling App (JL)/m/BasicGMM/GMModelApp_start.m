@@ -1,11 +1,27 @@
-%This is the startup script for GMModel app. One must add this as launch
-%script to zeffiro_plugins file:
-%GMMing, inverse_tools, GMModel_start
-
-%don't allow to open multiple app window because it cause ether App
-%Designer or app's functionalities to crash or both of them
-
-%9.7.2024 updation  - Joonas Lahtinen
+% --- Zeffiro documentation header ---
+% if isfield(zef,'GMM — If isfield(zef,'GMM.
+%
+% Purpose:
+%   If isfield(zef,'GMM.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Zef fields (observed):
+%   zef.GMM (read)
+%   zef.font_size (read)
+%   zef.reconstruction (read)
+%   zef.save_file_path (read, write)
+%
+% Calls (project):
+%   zef_load_GMM
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `if isfield(zef,'GMM` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 if isfield(zef,'GMM.apps')
 if isfield(zef.GMM.apps,'main')

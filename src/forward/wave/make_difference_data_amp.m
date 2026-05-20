@@ -1,5 +1,22 @@
 %Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
 %See: https://github.com/sampsapursiainen/GPU-Torre-3D
+% --- Zeffiro documentation header ---
+% signal_configuration — Signal configuration.
+%
+% Purpose:
+%   Signal configuration.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Side effects:
+%   - filesystem I/O
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `signal_configuration` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 
 
 load([torre_dir '/system_data/signal_configuration.mat']);
@@ -48,4 +65,3 @@ difference_data_mat = abs(complex(difference_data_mat,difference_data_mat_quad))
 
 
 save([torre_dir '/system_data/difference_data_amp.mat'], 'difference_data_mat', 't_data_difference', '-v7.3');
-

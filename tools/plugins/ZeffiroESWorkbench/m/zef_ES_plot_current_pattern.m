@@ -1,4 +1,49 @@
 function zef_ES_plot_current_pattern(varargin)
+% --- Zeffiro documentation header ---
+% zef_ES_plot_current_pattern — Zef ES plot current pattern.
+%
+% Purpose:
+%   Zef ES plot current pattern.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.ES_boundary_color_limit (read)
+%   zef.ES_inv_colormap (read, write)
+%   zef.attach_electrodes (read)
+%   zef.colortune_param (read)
+%   zef.explode_everything (read)
+%   zef.h_ES_2D_electrode_map (read)
+%   zef.h_ES_current (read, write)
+%   zef.h_ES_current_coords (read, write)
+%   zef.h_axes1 (read)
+%   zef.h_zeffiro (read)
+%   zef.parcellation_colormap (read)
+%   zef.sensors (read)
+%   zef.sensors_visual_size (read)
+%   zef.y_ES_interval (read)
+%
+% Calls (project):
+%   zef_ES_objective_function
+%   zef_ES_plot_current_pattern
+%   zef_attach_sensors_volume
+%   zef_process_meshes
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_ES_plot_current_pattern(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 switch nargin
     case {0,1}
         if nargin == 0

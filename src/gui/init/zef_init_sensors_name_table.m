@@ -1,4 +1,37 @@
 function zef = zef_init_sensors_name_table(zef)
+% --- Zeffiro documentation header ---
+% zef_init_sensors_name_table — Initializes GUI widgets and default `zef` fields for sensors_name_table.
+%
+% Purpose:
+%   Initializes GUI widgets and default `zef` fields for sensors_name_table.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   zef
+%
+% Zef fields (observed):
+%   zef.aux_data_1 (read, write)
+%   zef.aux_data_2 (read, write)
+%   zef.aux_data_3 (read, write)
+%   zef.aux_data_4 (read, write)
+%   zef.current_sensors (read)
+%   zef.h_sensors_name_table (read)
+%
+% Calls (project):
+%   zef_init_sensors_name_table
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[zef] = zef_init_sensors_name_table(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0
     zef = evalin('base','zef');
@@ -46,6 +79,3 @@ if nargout == 0
 end
 
 end
-
-
-

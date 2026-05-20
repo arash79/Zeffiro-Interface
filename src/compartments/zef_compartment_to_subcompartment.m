@@ -1,4 +1,33 @@
 function subcompartment_ind = zef_compartment_to_subcompartment(zef,compartment_ind)
+% --- Zeffiro documentation header ---
+% zef_compartment_to_subcompartment — Zef compartment to subcompartment.
+%
+% Purpose:
+%   Zef compartment to subcompartment.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   zef
+%   compartment_ind
+%
+% Outputs:
+%   subcompartment_ind
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%
+% Calls (project):
+%   zef_compartment_to_subcompartment
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[subcompartment_ind] = zef_compartment_to_subcompartment(zef, compartment_ind)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if isempty(zef)
     zef = evalin('base','zef');

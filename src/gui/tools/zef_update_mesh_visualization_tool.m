@@ -1,3 +1,39 @@
+% --- Zeffiro documentation header ---
+% zef.show_contour = zef.h_show_contour — Zef.show contour = zef.h show contour.
+%
+% Purpose:
+%   Zef.show contour = zef.h show contour.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.attach_electrodes (read, write)
+%   zef.axes_visible (read, write)
+%   zef.azimuth (read, write)
+%   zef.brain_transparency (read, write)
+%   zef.cam_va (read, write)
+%   zef.cone_draw (read, write)
+%   zef.contour_set (read, write)
+%   zef.contour_set_text (read, write)
+%   zef.cp2_a (read, write)
+%   zef.cp2_b (read, write)
+%   zef.cp2_c (read, write)
+%   zef.cp2_d (read, write)
+%   zef.cp2_on (read, write)
+%   zef.cp3_a (read, write)
+%   zef.cp3_b (read, write)
+%   … (73 more)
+%
+% Calls (project):
+%   zef_get_profile_parameters
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `zef.show_contour = zef.h_show_contour` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
 zef.show_contour = zef.h_show_contour.Value;
 zef.show_contour_text = zef.h_show_contour_text.Value;
 zef.contour_set_text = zef.h_contour_set_text.Value;

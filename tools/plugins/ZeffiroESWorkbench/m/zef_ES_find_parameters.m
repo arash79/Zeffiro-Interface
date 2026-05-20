@@ -1,4 +1,37 @@
 function [alpha, epsilon] = zef_ES_find_parameters(varargin)
+% --- Zeffiro documentation header ---
+% zef_ES_find_parameters — Zef ES find parameters.
+%
+% Purpose:
+%   Zef ES find parameters.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   alpha
+%   epsilon
+%
+% Zef fields (observed):
+%   zef.ES_alpha (read)
+%   zef.ES_alpha_max (read)
+%   zef.ES_epsilon (read)
+%   zef.ES_epsilon_min (read)
+%   zef.ES_step_size (read)
+%
+% Calls (project):
+%   zef_ES_find_parameters
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[alpha, epsilon]] = zef_ES_find_parameters(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 switch nargin
 case {0,1,2}

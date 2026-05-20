@@ -1,4 +1,34 @@
 function vec = zef_ES_error_criteria(zef) 
+% --- Zeffiro documentation header ---
+% zef_ES_error_criteria — Zef ES error criteria.
+%
+% Purpose:
+%   Zef ES error criteria.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   zef
+%
+% Outputs:
+%   vec
+%
+% Zef fields (observed):
+%   zef.ES_relative_weight_nnz (read)
+%   zef.y_ES_interval (read)
+%
+% Calls (project):
+%   zef_ES_error_criteria
+%   zef_ES_rwnnz
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[vec] = zef_ES_error_criteria(zef)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if nargin == 0 
     zef = evalin('base','zef');

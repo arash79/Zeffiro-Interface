@@ -1,178 +1,57 @@
 function zef = zeffiro_interface(args)
-
-% 
-% zeffiro_interface
+% --- Zeffiro documentation header ---
+% zeffiro_interface — Zeffiro interface.
 %
-% This fuction starts Zeffiro Interface. It can be run with a variable number
-% of key–value arguments, which can be called as a list of name-value pairs as
-% follows:
+% Purpose:
+%   Zeffiro interface.
+%   Folder: Repository root: startup (`zeffiro_interface`, `zeffiro_setup`), path configuration, and entry to `src/`, `+core`, `+inverse`, `+utilities`, `tools/plugins`, and bundled data.
 %
-%   zef = zeffiro_interface("name_1", value_1, "name_2", value_2, …);
+% Inputs:
+%   args
 %
-% Matlab versions newer or equal to r2021a may also use the syntax
+% Outputs:
+%   zef
 %
-%   zef = zeffiro_interface(name_1=value_1, name_2=value_2, …)
+% Zef fields (observed):
+%   zef.cluster_path (read, write)
+%   zef.code_path (read, write)
+%   zef.data_path (read, write)
+%   zef.external_path (read, write)
+%   zef.file (read, write)
+%   zef.file_path (read, write)
+%   zef.gpu_count (read, write)
+%   zef.gpu_num (read)
+%   zef.h_mesh_tool (read)
+%   zef.h_mesh_visualization_tool (read)
+%   zef.h_zeffiro (read)
+%   zef.h_zeffiro_menu (read)
+%   zef.h_zeffiro_window_main (read)
+%   zef.new_empty_project (read, write)
+%   zef.program_path (read, write)
+%   … (7 more)
 %
-% Either way, this enables running Zeffiro with or without a display and
-% performing different operations. The list of names and their values is given
-% below.
+% Calls (project):
+%   utilities.structs.copy_fields
+%   zef_build_compartment_table
+%   zef_close_all
+%   zef_export_fem_mesh_as
+%   zef_import_figure
+%   zef_import_segmentation
+%   zef_load
+%   zef_save
+%   zef_start
+%   zef_start_log
 %
-%   Name                            Value and explanation
-%   ------------------------------- ------------------------------------------
+% Side effects:
+%   - GPU
+%   - base/caller workspace
+%   - parallel/cluster
+%   - reads/updates `zef` struct fields
 %
-%   'zeffiro_restart'               true or false (default = false)
-%
-%                                   If this is set to true, the closing of
-%                                   Zeffiro Interface is forced before any
-%                                   other actions are attempted.
-%
-%   'start_mode'                    'display' or 'nodisplay' (default = "display")
-%
-%                                   This setting determines whether the GUI
-%                                   elements of Zeffiro Interface will be
-%                                   displayed during its operation. mainly
-%                                   useful when running the program from a
-%                                   terminal.
-%
-%                                   NOTE: this will not prevent them from
-%                                   opening up in the background. They are
-%                                   simply hidden from view.
-%
-%   'open_project'                  <project file name>, (default = "")
-%
-%                                   Loads a Zeffiro Interface project file
-%                                   into memory during start-up.
-%
-%   'import_to_new_project'         <file name> (default = "")
-%
-%                                   This will import a project with specs
-%                                   given in a .zef file to a new project.
-%
-%   'import_to_existing_project'    <file name> (default = "")
-%
-%                                   This will import a project with specs
-%                                   given in a .zef file to the currently
-%                                   active project.
-%
-%   'save_project'                  <file name> (default = "")
-%
-%                                   If this is given, the currently active
-%                                   project will be saved to this file in its
-%                                   entirety.
-%
-%   'export_fem_mesh'               <file name> (default = "")
-%
-%                                   A fem mesh contained in the active project
-%                                   will be saved to this given file.
-%
-%   'open_figure'                   <file name> (default = "")
-%
-%                                   The figure in this given path is opened by
-%                                   Zeffiro Interface.
-%
-%   'open_figure_folder'            <file name> (default = "")
-%
-%                                   The Matlab figures in this given path will
-%                                   be openend by Zeffiro Interface.
-%
-%   'run_script'                    <the script as a string>
-%
-%                                   This string will be passed through the
-%                                   Matlab function eval.
-%
-%                                   NOTE: this is a possible security hole.
-%                                   Make sure the given string only contains
-%                                   instructions from a trusted source.
-%
-%   'exit_zeffiro'                  true or false (default = false)
-%
-%                                   If this is set to true, Zeffiro Interface
-%                                   is closed immediately when this function
-%                                   returns.
-%
-%   'quit_matlab'                   true or false (default = false)
-%
-%                                   If this is set to true, Matlab itself will
-%                                   be closed when this function returns.
-%
-%   'use_github'                    true or false (default = false)
-%
-%                                   Determines whether the automatic Git
-%                                   integration of Zeffiro Interface is to be
-%                                   used.
-%
-%                                   NOTE: this feature is not very mature and
-%                                   should probably not be set to true under
-%                                   any circumstances. Use Git manually, if at
-%                                   all possible (which it is).
-%
-%   'use_gpu'                       true or false (default = false)
-%
-%                                   Determines whether Zeffiro Interface will
-%                                   use a GPU in its computations.
-%
-%   'use_gpu_graphic'               true or false (default = false)
-%
-%                                   Determines whether Zeffiro Interface will
-%                                   use GPU acceleration when drawing figures
-%                                   and the like.
-%
-%   'gpu_num'                       <gpu device number>
-%
-%                                   Allows one to choose which GPU device to
-%                                   use when `use_gpu` is set to true.
-%
-%   'use_display'                   true or false (default = false)
-%
-%                                   Determines whether dialogs like folder
-%                                   browsers are displayed, when .mat files
-%                                   are being saved.
-%
-%   'parallel_processes'            <parallel pool size>
-%
-%                                   How many workers Zeffiro Interface will
-%                                   use when runnin parallel computations.
-%
-%   'verbose_mode'                  true or false (default = false)
-%
-%                                   Determines whether the logger is to print
-%                                   terse or less terse output.
-%
-%   'use_waitbar'                   true or false (default = false)
-%
-%                                   Whether to display a waitbar during
-%                                   computations.
-%
-%   'use_log'                       true or false (default = false)
-%
-%                                   Whether to print output to a log file.
-%
-%   'log_file_name'                 <log file name>
-%
-%                                   A path to a file where Zeffiro Interface
-%                                   is to write its log messages.
-%
-%   'submodules'                    <strings> (default = empty array)
-%
-%                                   An array of strings that specifies which
-%                                   submodules listed in the .gitmodules file
-%                                   are installed. If "all" is given, they all
-%                                   will be.
-%
-%   'skip_submodules'               <logical> (default = true)
-%
-%                                   If this is true, the setup of submodules
-%                                   will be skipped.
-%
-%   'always_show_waitbar'           <logical> (default = true)
-%
-%                                   If this is true, the waitbar is shown
-%                                   also when other windows are suppressed.
-%
-%   NOTE: the value behind the name "run_script" is run using the Matlab
-%   function eval, meaning one should be absolutely sure that the script
-%   contents come from a trusted source.
-%
+% Workflow:
+%   GUI: Primary startup: paths, `zef` struct, optional CLI import/save/export.
+%   Programmatic: `[zef] = zeffiro_interface(args)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
 
 arguments
 
@@ -253,7 +132,7 @@ addpath([fileparts(mfilename('fullpath'))]);
 
 zef = struct;
 
-zef = utilities.copy_fields ( args, zef ) ;
+zef = utilities.structs.copy_fields ( args, zef ) ;
 
 %% Then do initial preparations like path building and additions.
 

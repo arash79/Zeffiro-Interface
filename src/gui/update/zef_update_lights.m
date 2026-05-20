@@ -1,4 +1,35 @@
 function lights_vec = zef_update_lights(varargin)
+% --- Zeffiro documentation header ---
+% zef_update_lights — Syncs GUI control values into `zef` for lights.
+%
+% Purpose:
+%   Syncs GUI control values into `zef` for lights.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   varargin
+%
+% Outputs:
+%   lights_vec
+%
+% Zef fields (observed):
+%   zef.h_axes1 (read)
+%   zef.h_zeffiro (read)
+%   zef.update_lights (read)
+%
+% Calls (project):
+%   zef_update_lights
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[lights_vec] = zef_update_lights(varargin)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if not(isempty(varargin))
     h_figure = varargin{1};

@@ -1,11 +1,26 @@
 classdef MNEInverter < inverse.CommonInverseParameters & handle
-
-    %
-    % MNEInverter
-    %
-    % A class which defines the properties needed by the Minumum Norm Estimate (MNE) 
-    % inversion method, and the method itself.
-    %
+% --- Zeffiro documentation header ---
+% inverse.MNEInverter.MNEInverter — Inverse solver class implementing MNE reconstruction.
+%
+% Purpose:
+%   Inverse solver class implementing MNE reconstruction.
+%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%
+% Inputs:
+%   args
+%
+% Calls (project):
+%   inverse.CommonInverseParameters
+%   zef_waitbar
+%
+% Side effects:
+%   - GPU
+%   - waitbar progress UI
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `inverse.MNEInverter.MNEInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
+% --- End Zeffiro documentation header
 
     properties
 

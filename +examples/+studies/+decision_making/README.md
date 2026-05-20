@@ -1,66 +1,63 @@
-# Decision Making — Focal Epilepsy Source Localization
+# +examples/+studies/+decision_making
 
-This module implements a workflow for focal epilepsy source localization that compares **11 inverse methods** and uses **credibility-based clustering** to select the most reliable reconstructions. It demonstrates how Zeffiro Interface can support a clinical-style pipeline: multiple modalities (EEG, MEG, MEEG), multiple methods, and automated combination of results.
+## Purpose of this folder
 
-## What Will You Learn?
+Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
 
-- How the **DataBank** organizes lead fields and reconstructions for different modalities (EEG, MEG, MEEG).
-- How to run many inverse methods (MNE, sLORETA, dSPM, MNE-RAMUS, Dipole Scan, Beamformer, IAS variants, EXP-L1) in sequence.
-- How to cluster reconstruction results and use credibility data to select the best subset.
-- How to produce a final reconstruction and compare methods in tables and plots.
+## Contents
 
-## When to Use This Module
+Subfolders:
+- `+helpers/`
 
-- You work with epilepsy or other focal source localization.
-- You want to compare multiple inverse methods and combine them programmatically.
-- You have (or can create) a DataBank project with lead fields and measurements.
+MATLAB sources:
+- `zef_create_training_data_focal_epilepsy.m` — **examples.studies.decision_making.examples.studies.decision_making**: Example or study script demonstrating examples.studies.decision_making.
+- `zef_decision_script_focal_epilepsy.m` — **examples.studies.decision_making.examples.studies.decision_making**: Example or study script demonstrating examples.studies.decision_making.
+- `zef_find_reconstructions_focal_epilepsy.m` — **examples.studies.decision_making.examples.studies.decision_making**: Example or study script demonstrating examples.studies.decision_making.
+- `zef_process_training_data_focal_epilepsy.m` — **examples.studies.decision_making.examples.studies.decision_making**: Example or study script demonstrating examples.studies.decision_making.
+- `zef_parameters_focal_epilepsy.m` — **examples.studies.decision_making.training_data_file_name = '';**: Example or study script demonstrating training_data_file_name = '';.
 
-## Prerequisites
+## How this folder fits into the overall workflow
 
-- **DataBank**: Zeffiro’s DataBank must be set up with lead fields for EEG, MEG, and/or MEEG.
-- **Patient project**: A `.mat` project file with precomputed lead fields and the expected DataBank structure.
-- **Scripts path**: The scripts under `zef.program_path/scripts` must be on the MATLAB path (for `zef_process_training_data_focal_epilepsy`).
+Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
 
-## Inverse Methods Used
+## GUI usage
 
-MNE, sLORETA, MNE-RAMUS, Dipole Scan, Beamformer, IAS (standard and two standardized variants), dSPM, EXP-L1, EXP-L1-sLORETA.
+- **examples.studies.decision_making.examples.studies.decision_making**: GUI callback or dialog (`examples.studies.decision_making`).
+- **examples.studies.decision_making.examples.studies.decision_making**: GUI callback or dialog (`examples.studies.decision_making`).
 
-## Workflow Overview
+## Programmatic usage
 
-The workflow is split into several scripts. Run them in order:
+From the project root:
 
-1. **`zef_parameters_focal_epilepsy`**  
-   Load configuration: paths to project and data files, SNR levels, clustering parameters. **Run this first**; it defines variables used by all other scripts.
+```matlab
+projectRoot = fileparts(which('zeffiro_interface'));
+addpath(projectRoot);
+addpath(genpath(fullfile(projectRoot, 'src')));
+zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+```
 
-2. **`zef_create_training_data_focal_epilepsy`**  
-   Generate synthetic training data: random dipole positions and orientations, add noise, run all inverse methods, save reconstructions. Produces `training_data_file_name`.
+Representative entry points in this folder:
+- `Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.`
+- `Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.`
+- `Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.`
+- `Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.`
+- `Call `examples.studies.decision_making.training_data_file_name = '';` from MATLAB with the project root on the path.`
 
-3. **`zef_process_training_data_focal_epilepsy`**  
-   Build the credibility dataset from training data. Used when `supervised_clustering = 'on'`. Produces `credibility_data_file_name`.
+## Examples
 
-4. **`zef_find_reconstructions_focal_epilepsy`**  
-   Run all inverse methods on the measurements stored in the DataBank and save reconstructions back into the DataBank.
+Run scripts directly after startup, e.g. `run('+examples/+studies/+decision_making/zef_create_training_data_focal_epilepsy.m')`.
+GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
 
-5. **`zef_decision_script_focal_epilepsy`**  
-   Main pipeline: retrieve reconstructions, cluster them, compute the final reconstruction, and display results.
+## Dependencies and assumptions
 
-## Auxiliary Scripts
+- MATLAB (release compatible with `arguments` blocks where used).
+- Project root on path; `src` on path for `zef_*` helpers.
+- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
+- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
 
-| Script | Description |
-|--------|-------------|
-| `zef_cluster_reconstructions_focal_epilepsy` | GMM clustering on max points and cluster centres; credibility-based selection of methods. |
-| `zef_final_reconstruction_focal_epilepsy` | Sums selected reconstructions and extracts the final max point and cluster statistics. |
-| `zef_show_results_focal_epilepsy` | Displays a comparison table and distance plots. |
-| `zef_rec_maximizer` | Returns the position of the maximum-magnitude dipole in a reconstruction. |
-| `zef_set_training_data` | Loads a single training trial into the DataBank for inspection. |
+## Notes for developers
 
-## Configuration
-
-Edit `zef_parameters_focal_epilepsy` to set:
-
-- `project_file_name` — Path to the patient project
-- `training_data_file_name` — Where to save training data (empty = do not save)
-- `credibility_data_file_name` — Where to save/load credibility data
-- `supervised_clustering` — `'on'` to use credibility data, `'off'` for uniform weighting
-- `training_data_size`, `snr_vec` — Number of trials and SNR levels for training
-- Other clustering and convergence parameters
+- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
+- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
+- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
+- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

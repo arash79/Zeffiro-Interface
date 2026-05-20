@@ -1,4 +1,27 @@
 function distance_vec = zef_distance_to_mesh(p,nodes,triangles)
+% --- Zeffiro documentation header ---
+% zef_distance_to_mesh — Zef distance to mesh.
+%
+% Purpose:
+%   Zef distance to mesh.
+%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%
+% Inputs:
+%   p
+%   nodes
+%   triangles
+%
+% Outputs:
+%   distance_vec
+%
+% Calls (project):
+%   zef_distance_to_mesh
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[distance_vec] = zef_distance_to_mesh(p, nodes, triangles)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 nodes = nodes';
 c = nodes(:,triangles(:,1));

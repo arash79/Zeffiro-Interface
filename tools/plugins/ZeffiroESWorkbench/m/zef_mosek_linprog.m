@@ -1,4 +1,34 @@
 function [x,fval,exitflag] = zef_mosek_linprog(f,A,b,Aeq,beq,lb,ub,options)
+% --- Zeffiro documentation header ---
+% zef_mosek_linprog — Zef mosek linprog.
+%
+% Purpose:
+%   Zef mosek linprog.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   f
+%   A
+%   b
+%   Aeq
+%   beq
+%   lb
+%   ub
+%   options
+%
+% Outputs:
+%   x
+%   fval
+%   exitflag
+%
+% Calls (project):
+%   zef_mosek_linprog
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[x, fval, exitflag]] = zef_mosek_linprog(f, A, b, Aeq, …)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 exitflag = -1;
 fval     = []; 

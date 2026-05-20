@@ -1,6 +1,53 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [void] = zef_plot_meshes(void);
+% --- Zeffiro documentation header ---
+% zef_plot_meshes — Renders or updates a plot_meshes figure from current `zef` state.
+%
+% Purpose:
+%   Renders or updates a plot_meshes figure from current `zef` state.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   void
+%
+% Outputs:
+%   void
+%
+% Zef fields (observed):
+%   zef.attach_electrodes (read)
+%   zef.axes_visible (read)
+%   zef.azimuth (read)
+%   zef.brain_transparency (read)
+%   zef.c_color (read)
+%   zef.c_on (read)
+%   zef.c_priority (read)
+%   zef.c_sigma (read)
+%   zef.c_sources (read)
+%   zef.c_submesh_ind (read)
+%   zef.c_visible (read)
+%   zef.cam_va (read)
+%   zef.colormap_cell (read)
+%   zef.colortune_param (read)
+%   zef.cp2_a (read)
+%   … (241 more)
+%
+% Calls (project):
+%   zef_3D_plot_specs
+%   zef_attach_sensors_volume
+%   zef_smooth_field
+%   zef_waitbar
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[void] = zef_plot_meshes(void)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 void = [];
 sensors_point_like = [];

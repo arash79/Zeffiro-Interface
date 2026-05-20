@@ -1,5 +1,44 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
+% --- Zeffiro documentation header ---
+% if zef — If zef.
+%
+% Purpose:
+%   If zef.
+%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%
+% Zef fields (observed):
+%   zef.brain_ind (read)
+%   zef.file (read)
+%   zef.file_index (read, write)
+%   zef.file_path (read)
+%   zef.h_fig_aux (read, write)
+%   zef.h_zeffiro (read)
+%   zef.imaging_method (read, write)
+%   zef.min_ind (read)
+%   zef.min_val (read)
+%   zef.reuna_p (read)
+%   zef.reuna_t (read)
+%   zef.save_file (read, write)
+%   zef.save_file_path (read, write)
+%   zef.save_switch (read, write)
+%   zef.sensors (read)
+%   … (8 more)
+%
+% Calls (project):
+%   zef_sigma
+%
+% Side effects:
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: Call `if zef` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
+
+
+
 if zef.save_switch == 1
     if not(isequal(zef.file,0));
         zef.save_file = zef.file;

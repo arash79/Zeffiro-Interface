@@ -1,3 +1,46 @@
+% --- Zeffiro documentation header ---
+% set(groot,'defaultFigureVisible','off') — Set(groot,'default Figure Visible','off').
+%
+% Purpose:
+%   Set(groot,'default Figure Visible','off').
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Zef fields (observed):
+%   zef.ImportelectrodesMenu (read, write)
+%   zef.L (read, write)
+%   zef.always_show_waitbar (read)
+%   zef.brain_ind (read, write)
+%   zef.current_version (read)
+%   zef.domain_labels_aux (read, write)
+%   zef.fieldnames (read, write)
+%   zef.file (read, write)
+%   zef.file_path (read)
+%   zef.font_size (read)
+%   zef.h_compartment_table (read)
+%   zef.h_menu_about (read)
+%   zef.h_menu_add_compartment (read)
+%   zef.h_menu_add_sensor_sets (read)
+%   zef.h_menu_add_sensors (read)
+%   … (133 more)
+%
+% Calls (project):
+%   core.gui.menu_tool.import_electrodes_callback
+%   zef_arrange_windows
+%   zef_eval_entry
+%   zef_import
+%   zef_import_figure
+%   zef_set_menu_size
+%   zef_set_size_change_function
+%   zef_update
+%   zef_window_visible
+%
+% Side effects:
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: Call `set(groot,'defaultFigureVisible','off')` from MATLAB with the project root on the path.
+% --- End Zeffiro documentation header
 
 set(groot,'defaultFigureVisible','off')
 zef_data = zef_menu_tool_app_exported;

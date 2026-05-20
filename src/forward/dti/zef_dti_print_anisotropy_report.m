@@ -24,6 +24,39 @@
 %   zef_dti_print_anisotropy_report(zef, struct('n_samples', 10));
 
 function zef_dti_print_anisotropy_report(zef, opts)
+% --- Zeffiro documentation header ---
+% zef_dti_print_anisotropy_report — Zef dti print anisotropy report.
+%
+% Purpose:
+%   Zef dti print anisotropy report.
+%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%
+% Inputs:
+%   zef
+%   opts
+%
+% Outputs:
+%   See function signature and code below.
+%
+% Zef fields (observed):
+%   zef.compartment_tags (read)
+%   zef.domain_labels (read, write)
+%   zef.dti_conductivity_metadata (read)
+%   zef.sigma_anisotropy (read)
+%
+% Calls (project):
+%   zef_dti_print_anisotropy_report
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `zef_dti_print_anisotropy_report(zef, opts)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 arguments
     zef (1,1) struct = struct()

@@ -1,6 +1,41 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [nodes,tetrahedra,sigma,brain_ind,surface_triangles] = zef_import(void)
+% --- Zeffiro documentation header ---
+% zef_import — Loads external data or a saved Zeffiro project into `zef`.
+%
+% Purpose:
+%   Loads external data or a saved Zeffiro project into `zef`.
+%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%
+% Inputs:
+%   void
+%
+% Outputs:
+%   nodes
+%   tetrahedra
+%   sigma
+%   brain_ind
+%   surface_triangles
+%
+% Zef fields (observed):
+%   zef.nodes (read)
+%   zef.save_file_path (read)
+%   zef.tetrahedra (read)
+%
+% Calls (project):
+%   zef_import
+%
+% Side effects:
+%   - base/caller workspace
+%   - filesystem I/O
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
+%   Programmatic: `[[nodes, tetrahedra, sigma]] = zef_import(void)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 if not(isempty(evalin('base','zef.save_file_path'))) & not(evalin('base','zef.save_file_path')==0)
     [file file_path] = uigetfile('*.mat','Import volume data',evalin('base','zef.save_file_path'));

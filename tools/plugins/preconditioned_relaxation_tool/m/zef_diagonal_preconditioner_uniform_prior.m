@@ -1,4 +1,39 @@
 function [M, multigrid_perm_output] = zef_diagonal_preconditioner_uniform_prior(L, multigrid_dec, multigrid_perm)
+% --- Zeffiro documentation header ---
+% zef_diagonal_preconditioner_uniform_prior — Zef diagonal preconditioner uniform prior.
+%
+% Purpose:
+%   Zef diagonal preconditioner uniform prior.
+%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%
+% Inputs:
+%   L
+%   multigrid_dec
+%   multigrid_perm
+%
+% Outputs:
+%   M
+%   multigrid_perm_output
+%
+% Zef fields (observed):
+%   zef.inv_amplitude_db (read)
+%   zef.inv_prior_over_measurement_db (read)
+%   zef.relax_normalize_data (read)
+%   zef.relax_snr (read)
+%
+% Calls (project):
+%   zef_diagonal_preconditioner_uniform_prior
+%   zef_find_gaussian_prior
+%
+% Side effects:
+%   - base/caller workspace
+%   - reads/updates `zef` struct fields
+%
+% Workflow:
+%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
+%   Programmatic: `[[M, multigrid_perm_output]] = zef_diagonal_preconditioner_uniform_prior(L, multigrid_dec, multigrid_perm)` with project root and `src` on the path.
+% --- End Zeffiro documentation header
+
 
 multigrid_perm_output = cell(0);
 
