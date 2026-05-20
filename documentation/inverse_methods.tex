@@ -1,0 +1,34 @@
+\section{Inverse methods}\label{sec:inverse_methods.tex}
+
+\subsection{eLORETA}
+
+Let $L \in \mathbb{R}^{n_e \times n_s}$ denote the lead field matrix. The
+eLORETA inverse operator is formed as
+\begin{equation}
+T = W^{-1} L^\top (L W^{-1} L^\top + \alpha H)^{-1},
+\end{equation}
+where $\alpha > 0$ is a regularization parameter and
+$H = I - \frac{1}{n_e}\mathbf{1}\mathbf{1}^\top$ is the average-reference
+centering matrix (or $I$ when average-reference is disabled).
+
+The source-space weight matrix $W$ is obtained by fixed-point iteration. For
+each source block $v$ (three orientation components per source location), with
+block lead field $L_v$, define
+\begin{equation}
+A_v = L_v^\top (L W^{-1} L^\top + \alpha H)^{-1} L_v.
+\end{equation}
+Then $W_v$ is updated as the positive square root of $A_v$, and $W_v^{-1}$ is
+used in the next iteration. In fixed-orientation blocks, the same update is
+applied in scalar form.
+
+The implementation uses the SNR-based default
+\begin{equation}
+\alpha = \frac{\mathrm{trace}(L L^\top)}{n_e \cdot 10^{\mathrm{SNR}/10}},
+\end{equation}
+unless a manual regularization parameter is provided.
+
+Once converged, each frame is reconstructed as $z = T f$.
+
+References: Pascual-Marqui (2007), \texttt{arXiv:0710.3341}; Pascual-Marqui
+(2011), \emph{Philosophical Transactions of the Royal Society A}, 369(1952),
+3768--3784.

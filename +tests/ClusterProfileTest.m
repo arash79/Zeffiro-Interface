@@ -1,0 +1,23 @@
+classdef ClusterProfileTest < matlab.unittest.TestCase
+
+    methods (Test)
+        function testConfigureClusterProfileSetsCscFields(testCase)
+            c = parcluster;
+            testCase.assumeTrue(isprop(c.AdditionalProperties, 'ComputingProject'), ...
+                'CSC Generic profile is not active in this environment.');
+
+            c = utilities.cluster.configure_cluster_profile( ...
+                "project_test", ...
+                "MemPerCPU", "8g", ...
+                "WallTime", "00:10:00", ...
+                "Partition", "test", ...
+                "NumThreads", 1 ...
+            );
+
+            testCase.verifyEqual(string(c.AdditionalProperties.ComputingProject), "project_test");
+            testCase.verifyEqual(string(c.AdditionalProperties.MemPerCPU), "8g");
+            testCase.verifyEqual(string(c.AdditionalProperties.WallTime), "00:10:00");
+        end
+    end
+
+end

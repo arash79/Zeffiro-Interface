@@ -1,0 +1,8 @@
+**************************************************************************
+ZEFFIRO Interface 6, Date: 08-May-2026 17:03:34
+**************************************************************************
+Path: /Users/hsc476/Projects/MainZeffiroProject
+**************************************************************************
+Task ID; 1; Progress; 0; File; zef_load.m; Message; Loading fields.; Workspace size; 0; Task time; 0; CPU usage; 400; Ready; ; Total CPU time; 9.3;
+Task ID; 1; Progress; 95; File; zef_load.m; Message; Loading <=100 MB fields: 712 / 752.; Workspace size; 0; Task time; 5; CPU usage; 208; Ready; 08-May-2026 17:03:39; Total CPU time; 19.81;
+Task ID; 1; Progress; 0; File; dispatch_inverse.m; Message; Cluster inverse: sloreta; Workspace size; 0; Task time; 0; CPU usage; 440; Ready; ; Total CPU time; -11359;

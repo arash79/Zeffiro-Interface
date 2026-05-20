@@ -1,0 +1,10 @@
+**************************************************************************
+ZEFFIRO Interface 6, Date: 19-May-2026 14:39:50
+**************************************************************************
+Path: /Users/hsc476/Projects/MainZeffiroProject
+**************************************************************************
+Task ID; 1; Progress; 0; File; zef_import_segmentation.m; Message; Importing.; Workspace size; 0; Task time; 0; CPU usage; 396; Ready; ; Total CPU time; 52.82;
+Task ID; 1; Progress; 16; File; zef_import_segmentation.m; Message; Importing 28/180.; Workspace size; 0; Task time; 6; CPU usage; 363; Ready; 19-May-2026 14:51:31; Total CPU time; 72.76;
+Task ID; 1; Progress; 44; File; zef_import_segmentation.m; Message; Importing 80/180.; Workspace size; 0; Task time; 11; CPU usage; 374; Ready; 19-May-2026 14:51:19; Total CPU time; 91.43;
+Task ID; 1; Progress; 63; File; zef_import_segmentation.m; Message; Importing 114/180.; Workspace size; 0; Task time; 16; CPU usage; 349; Ready; 19-May-2026 14:51:20; Total CPU time; 108.97;
+Task ID; 1; Progress; 94; File; zef_import_segmentation.m; Message; Importing 170/180.; Workspace size; 0; Task time; 21; CPU usage; 336; Ready; 19-May-2026 14:51:17; Total CPU time; 126.28;
