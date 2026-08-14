@@ -1,17 +1,3 @@
-% --- Zeffiro documentation header ---
-% function [S,NlogL,optimInfo]... — Function [S,Nlog L,optim Info].
-%
-% Purpose:
-%   Function [S,Nlog L,optim Info]....
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [S,NlogL,optimInfo]...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [S,NlogL,optimInfo]...
     =AdvGMModeling4Rec(X,weight,k,start,reps, CovType,SharedCov, RegV, options,probtol)
 

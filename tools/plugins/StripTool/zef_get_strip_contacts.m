@@ -1,46 +1,20 @@
 function [contacts, sensor_info, triangle_ind] = zef_get_strip_contacts(contact_index,strip_struct,zef,domain_type,global_index)
-% --- Zeffiro documentation header ---
-% zef_get_strip_contacts — Zef get strip contacts.
+%ZEF_GET_STRIP_CONTACTS  Contact triangles or points for one strip_model index.
 %
-% Purpose:
-%   Zef get strip contacts.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   contact_index
-%   strip_struct
-%   zef
-%   domain_type
-%   global_index
+%   [contacts, sensor_info, triangle_ind] = zef_get_strip_contacts(...)
+%       contact_index, strip_struct, zef, domain_type, global_index)
 %
-% Outputs:
-%   contacts
-%   sensor_info
-%   triangle_ind
+%   domain_type default 'model_geometry'. 'points'/'model_points': xyz;
+%   'sensor_info': empty contacts plus strip_id. Models 1/2/3 differ
+%   in contact count and angular layout. Called from plot, add_contacts,
+%   and sensor get_functions. Does not write zef.
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.domain_labels (read)
-%   zef.nodes (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.surface_triangles (read)
-%
-% Calls (project):
-%   zef_get_strip_contacts
-%   zef_get_submesh
-%   zef_strip_coordinate_transform
-%   zef_surface_mesh
-%   zef_triangles_2_sensor_boundary
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[contacts, sensor_info, triangle_ind]] = zef_get_strip_contacts(contact_index, strip_struct, zef, domain_type, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_get_strip_parameters.
 
 if nargin < 4
     domain_type = 'model_geometry';

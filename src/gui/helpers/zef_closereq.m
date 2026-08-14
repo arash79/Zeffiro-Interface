@@ -1,36 +1,23 @@
 function zef_closereq(tool_name)
-% --- Zeffiro documentation header ---
-% zef_closereq — Zef closereq.
+%ZEF_CLOSEREQ  DeleteFcn helper for Zeffiro tools.
 %
-% Purpose:
-%   Zef closereq.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tool_name
+%   zef_closereq()
+%   zef_closereq(tool_name)
 %
-% Outputs:
-%   See function signature and code below.
+%   With a nonempty tool_name (zef_tool_start sets DeleteFcn to
+%   zef_closereq('script_name')), findall(groot,'ZefTool',tool_name)
+%   and delete those figures. With no argument (Mesh tool, Mesh
+%   visualization, Settings windows), call MATLAB closereq on gcbo.
+%   This does not hide-and-keep a singleton; it deletes (or the
+%   default close). A commented block used to offload fields to
+%   zef.matfile_object — that path is inactive.
 %
-% Zef fields (observed):
-%   zef.matfile_object (read)
-%   zef.zeffiro_variable_data (read)
-%
-% Calls (project):
-%   zef_closereq
-%   zef_remove_object_handles
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_closereq(tool_name)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_tool_start, closereq.
 if nargin==0
     tool_name ='';
 end

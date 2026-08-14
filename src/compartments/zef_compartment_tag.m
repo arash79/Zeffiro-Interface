@@ -1,31 +1,23 @@
 function compartment_tag = zef_compartment_tag(zef)
-% --- Zeffiro documentation header ---
-% zef_compartment_tag — Zef compartment tag.
+%ZEF_COMPARTMENT_TAG  Generate an unused compartment tag name.
 %
-% Purpose:
-%   Zef compartment tag.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Increments c1, c2, ... until the tag is not already in
+%   zef.compartment_tags.
 %
-% Outputs:
-%   compartment_tag
+%   compartment_tag = zef_compartment_tag(zef)
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
+%   Input
+%     zef - session struct with compartment_tags cell array.
 %
-% Calls (project):
-%   zef_compartment_tag
+%   Output
+%     compartment_tag - new tag string of the form 'cN'.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[compartment_tag] = zef_compartment_tag(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_create_compartment.
 
 ismember_tag = 1;
 compartment_counter = 0;

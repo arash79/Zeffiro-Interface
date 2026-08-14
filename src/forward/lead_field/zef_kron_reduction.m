@@ -1,29 +1,33 @@
 function out_reduced_interpolation_matrix = zef_kron_reduction( ...
-% --- Zeffiro documentation header ---
-% out_reduced_interpolation_matrix — Out reduced interpolation matrix.
-%
-% Purpose:
-%   Out reduced interpolation matrix.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Inputs:
-%   in_interpolation_matrix
-%   in_schur_complement
-%   in_electrode_model
-%   in_source_model
-%
-% Calls (project):
-%   zef_kron_reduction
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `out_reduced_interpolation_matrix(in_interpolation_matrix, in_schur_complement, in_electrode_model, in_source_model)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
     in_interpolation_matrix, ...
     in_schur_complement, ...
     in_electrode_model, ...
     in_source_model ...
     )
+
+%ZEF_KRON_REDUCTION  Apply Schur complement to interpolation G for CEM Whitney/H(div).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   If the electrode model is CEM and the source model is Whitney or Hdiv,
+%   returns inv(Schur)*G. PEM is a no-op. St. Venant is left unchanged
+%   (TODO in source). Used when forming a reduced interpolation for
+%   multiresolution / CEM lead fields.
+%
+%   out = zef_kron_reduction(in_interpolation_matrix, in_schur_complement, ...
+%       in_electrode_model, in_source_model)
+%
+%   Input
+%     in_interpolation_matrix - G
+%     in_schur_complement     - square Schur block from zef_transfer_matrix
+%     in_electrode_model      - 'CEM' or 'PEM'
+%     in_source_model         - core.types.ZefSourceModel
+%
+%   See also zef_lead_field_eeg_fem, core.types.ZefSourceModel.
+
 
 arguments
     in_interpolation_matrix

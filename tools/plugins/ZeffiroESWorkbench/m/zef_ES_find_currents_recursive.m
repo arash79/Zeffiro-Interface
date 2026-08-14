@@ -1,40 +1,22 @@
 function zef = zef_ES_find_currents_recursive(varargin)
-% --- Zeffiro documentation header ---
-% zef_ES_find_currents_recursive — Zef ES find currents recursive.
+%ZEF_ES_FIND_CURRENTS_RECURSIVE  Find currents when HPO search method == 2 (two-stage recursive + fix electrodes).
 %
-% Purpose:
-%   Zef ES find currents recursive.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Find currents button when h_ES_HPO_search_method.Value == 2. Stage 1:
+%   uncheck fixed electrodes, zef_ES_recursive_search →
+%   adapted_y_ES_interval_1. Stage 2: take the last adapted lattice, check
+%   the fixed-electrodes box, zef_ES_fix_active_electrodes, search again →
+%   adapted_y_ES_interval_2. Temporary adapted_y_ES is removed.
 %
-% Outputs:
-%   zef
+%   zef = zef_ES_find_currents_recursive()
+%   zef = zef_ES_find_currents_recursive(zef)
 %
-% Zef fields (observed):
-%   zef.ES_HPO_recursive_instances (read)
-%   zef.ES_active_electrodes (read, write)
-%   zef.ES_step_size (read)
-%   zef.adapted_y_ES (read)
-%   zef.adapted_y_ES_interval_1 (read, write)
-%   zef.adapted_y_ES_interval_2 (read, write)
-%   zef.h_ES_fixed_active_electrodes (read)
-%   zef.y_ES_interval (read, write)
+%   See also zef_ES_recursive_search, zef_ES_fix_active_electrodes.
 %
-% Calls (project):
-%   zef_ES_find_currents_recursive
-%   zef_ES_fix_active_electrodes
-%   zef_ES_recursive_search
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_ES_find_currents_recursive(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 switch nargin
 case {0,1}

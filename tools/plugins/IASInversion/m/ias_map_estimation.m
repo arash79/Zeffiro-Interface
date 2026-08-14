@@ -1,29 +1,21 @@
 function zef = ias_map_estimation(zef)
-% --- Zeffiro documentation header ---
-% ias_map_estimation — Ias map estimation.
+%IAS_MAP_ESTIMATION  IAS (iterative alternating sequential) inverse plugin.
 %
-% Purpose:
-%   Ias map estimation.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = ias_map_estimation
+%   zef = ias_map_estimation(zef)
 %
-% Outputs:
-%   zef
+%   INI callback (Inverse tools → IAS Inversion). Opens the IAS window via
+%   zef_init_ias. Start (set in zef_init_ias) runs zef_ias_iteration(zef)
+%   into zef.reconstruction and reconstruction_information. Needs zef.L
+%   and zef.measurements. Does not call inverse.IASInverter.
 %
-% Calls (project):
-%   zef_tool_start
+%   See also zef_init_ias, zef_ias_iteration.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = ias_map_estimation(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     zef = evalin('base','zef');

@@ -1,21 +1,13 @@
-% --- Zeffiro documentation header ---
-% z_inverse_results = cell(0); — Z inverse results = cell(0);.
+%MEAN_REC  Script: average all dataBank reconstructions frame-wise onto zef.reconstruction.
 %
-% Purpose:
-%   Z inverse results = cell(0);.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
-%   zef.reconstruction (read, write)
+%   Reads zef.dataBank.tree; writes zef.reconstruction as cell of means. Not
+%   a Kalman-window callback.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `z_inverse_results = cell(0);` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 z_inverse_results = cell(0);
 

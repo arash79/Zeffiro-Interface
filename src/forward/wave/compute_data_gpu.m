@@ -1,26 +1,16 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
-% --- Zeffiro documentation header ---
-% parameters; — Parameters;.
+%COMPUTE_DATA_GPU  GPU leap-frog wave simulation driver.
 %
-% Purpose:
-%   Parameters;.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Side effects:
-%   - GPU
-%   - creates/updates figures
-%   - filesystem I/O
-%   - waitbar progress UI
+%   Script. parameters.m must define torre_dir, t_vec, process_id, near_field,
+%   fade_out_param, source_points, source_orientations, make_video, data_param.
+%   Promotes C,R,A to gpuArray; M = 1./sum(C,2) lumped mass. Each leap-frog
+%   step: B_prod (curl E → H), B_T_prod (div H + boundary source → E),
+%   mat_vec(R,·) damping. Records receiver time series under torre_dir.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `parameters;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
-
+%   See also B_prod, B_T_prod, compute_data, create_system.
 
 parameters;
 t_0 = 0;
@@ -117,6 +107,9 @@ for k = process_id
     update_waitbar_ind = floor(length(t_vec)/5000);
 
     start_time = now;
+    % Leap-frog: pulse on orbit nodes → PCG mass solve for ∂u/∂t → update E
+    % (u), then B_prod curl for H components p_1,p_2,p_3. PML damping on
+    % I_u / I_p_*. Sample every data_param steps into *_data arrays.
     for i = current_iterate + 1 : current_iterate + length(t_vec)
 
         t = t_0 + (i-1)*d_t;

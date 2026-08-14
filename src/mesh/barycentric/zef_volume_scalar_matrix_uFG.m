@@ -1,43 +1,30 @@
 function [y_1, y_2, y_3, b_coord, volume] = zef_volume_scalar_matrix_uFG(nodes, tetra, h, x_1, x_2, x_3, u_field, scalar_field, i_node_ind, b_coord, volume)
-% --- Zeffiro documentation header ---
-% zef_volume_scalar_matrix_uFG — Zef volume scalar matrix u FG.
+%ZEF_VOLUME_SCALAR_MATRIX_UFG  Matrix-free y = ∫ u ψ_k (∇ψ_j)_h x_j φ dV.
 %
-% Purpose:
-%   Zef volume scalar matrix u FG.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   h
-%   x_1
-%   x_2
-%   x_3
-%   u_field
-%   scalar_field
-%   i_node_ind
-%   b_coord
-%   volume
+%   Does not build a sparse matrix. Triple loop over local vertices (i,j,k)
+%   accumulates three N×1 vectors with accumarray(tetra(:,i), ...).
+%   Weights [1/10 1/20] (uFG). Optional i_node_ind scatters/gathers a
+%   subset of DOFs; GPU arrays are preserved. b_coord and volume can be
+%   reused across calls (nargin>=10).
 %
-% Outputs:
-%   y_1
-%   y_2
-%   y_3
-%   b_coord
-%   volume
+%   No first-party caller in this tree.
 %
-% Calls (project):
-%   zef_barycentric_weighting
-%   zef_volume_barycentric
-%   zef_volume_scalar_matrix_uFG
+%   [y_1, y_2, y_3, b_coord, volume] = zef_volume_scalar_matrix_uFG( ...
+%       nodes, tetra, h, x_1, x_2, x_3, u_field, scalar_field, i_node_ind, b_coord, volume)
 %
-% Side effects:
-%   - GPU
+%   Inputs
+%     h           - 1..3, which gradient component of the j-hat.
+%     x_1,x_2,x_3 - N×1 nodal vector field (the "x" in uFG).
+%     u_field     - N×1 nodal scalar u.
+%     scalar_field- T×1 per-tet φ.
+%     i_node_ind  - optional subset of node indices; empty = all.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[y_1, y_2, y_3]] = zef_volume_scalar_matrix_uFG(nodes, tetra, h, x_1, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_volume_barycentric, zef_barycentric_weighting.
 
 if nargin < 10
     b_coord = zeros(size(tetra,1),size(tetra,2),4);

@@ -1,28 +1,22 @@
 function [current_score_nnz, y] = zef_ES_rwnnz(y, rwnnz, varargin)
-% --- Zeffiro documentation header ---
-% zef_ES_rwnnz — Zef ES rwnnz.
+%ZEF_ES_RWNNZ  Zero small |y| entries until relative weighted nnz reaches 1-rwnnz.
 %
-% Purpose:
-%   Zef ES rwnnz.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   y
-%   rwnnz
-%   varargin
+%   Sparsity post-process on electrode currents (optimize_current and
+%   y_ES_interval.nnz). Sort |y| descending; keep the smallest k such that
+%   cumsum(|y|)/sum(|y|) >= 1-rwnnz, then zero the rest. Optional third
+%   argument is a hard cap on k (ES_score_dose). Cap == 2 keeps only the
+%   most positive and most negative entries.
 %
-% Outputs:
-%   current_score_nnz
-%   y
+%   [k, y] = zef_ES_rwnnz(y, rwnnz)
+%   [k, y] = zef_ES_rwnnz(y, rwnnz, score_dose)
 %
-% Calls (project):
-%   zef_ES_rwnnz
+%   See also zef_ES_optimize_current.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[current_score_nnz, y]] = zef_ES_rwnnz(y, rwnnz, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if any(isnan(y)) || isempty(y)
     y = [];
@@ -46,6 +40,7 @@ if not(isequal(current_score_nnz_lim, 2))
         current_score_ind = 1:length(y);
         current_score_nnz = 0;
     else
+        % Keep the leading mass of |y| until the cumulative fraction hits rwnnz.
         sorted_y_normalized = cumsum(sorted_y)/(sorted_sum_y);
         current_score_nnz = find(sorted_y_normalized >= rwnnz,1);
         current_score_nnz = min(current_score_nnz, current_score_nnz_lim);

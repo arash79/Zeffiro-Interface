@@ -1,22 +1,15 @@
 classdef ClusterProfileTest < matlab.unittest.TestCase
-% --- Zeffiro documentation header ---
-% tests.ClusterProfileTest — Automated test: ClusterProfileTest.
+%CLUSTERPROFILETEST  configure_cluster_profile writes CSC AdditionalProperties.
 %
-% Purpose:
-%   Automated test: ClusterProfileTest.
-%   Folder: MATLAB unit and integration tests for refactored inverse dispatch, lead fields, cluster jobs, and legacy/class parity.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
+%   Skips unless parcluster has AdditionalProperties.ComputingProject
+%   (CSC generic profile). Then asserts configure_cluster_profile sets
+%   the project name (and related fields in this file).
 %
-% Calls (project):
-%   utilities.cluster.configure_cluster_profile
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `tests.ClusterProfileTest(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
 
     methods (Test)
         function testConfigureClusterProfileSetsCscFields(testCase)

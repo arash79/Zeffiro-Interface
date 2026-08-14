@@ -1,33 +1,25 @@
 function zef_plot_3D_arrow_reconstructed_source(varargin)
-% --- Zeffiro documentation header ---
-% zef_plot_3D_arrow_reconstructed_source — Renders or updates a plot_3d_arrow_reconstructed_source figure from current `zef` state.
+%ZEF_PLOT_3D_ARROW_RECONSTRUCTED_SOURCE  Queue renderer: cone arrows at inv_rec_source.
 %
-% Purpose:
-%   Renders or updates a plot_3d_arrow_reconstructed_source figure from current `zef` state.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Reads caller zef.inv_rec_source (xyz, orientation, amplitude, visual
+%   size, color). Deletes any previous Tag 'additional: reconstructed
+%   source' on caller h_axes_image, then zef_plot_3D_arrow per row.
+%   Default arrow_type is 2 (cone). Scale inside the loop is
+%   3*|ori|*zef.inv_rec_source(1,8). Color index is column 10.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.inv_rec_source (read)
-%
-% Calls (project):
-%   zef_plot_3D_arrow
 %   zef_plot_3D_arrow_reconstructed_source
+%   zef_plot_3D_arrow_reconstructed_source(scale, type, color, shape, length, head, npoly)
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
+%   varargin is accepted (same slots as zef_plot_3D_arrow) but the loop
+%   overwrites scale. SESAME typically has nine columns; column 10 is
+%   the synthetic-source color slot.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_plot_3D_arrow_reconstructed_source(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_plot_3D_stem_reconstructed_source, zef_plot_3D_arrow.
 
 arrow_scale = 1;
 arrow_type = 2;

@@ -1,31 +1,18 @@
-% --- Zeffiro documentation header ---
-% warning('off'); — Warning('off');.
+%ZEF_EIT_LEAD_FIELD_ANISOTROPIC  EIT anisotropic lead field (type 9).
 %
-% Purpose:
-%   Warning('off');.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.imaging_method (read, write)
-%   zef.lead_field_filter_quantile (read)
-%   zef.lead_field_type (read, write)
-%   zef.sensors (read)
-%   zef.source_directions (read)
-%   zef.source_interpolation_on (read)
-%   zef.source_positions (read)
+%   Script. Mesh-tool **Run script** row for anisotropic EIT. Sets
+%   lead_field_type=9, imaging_method=1 (EEG-style electrodes), deletes the
+%   cached original field, process_meshes, attach_sensors_volume,
+%   zef_lead_field_matrix (uses zef.sigma(:,3:8)), quantile filter, optional
+%   source interpolation. Fill the tensor columns first (DTI tool). Does not
+%   create a volume mesh.
 %
-% Calls (project):
-%   zef_attach_sensors_volume
-%   zef_lead_field_filter
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `warning('off');` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_eit_lead_field_isotropic, zef_dti_apply_to_sigma.
 
 warning('off');
 zef.lead_field_type = 9;

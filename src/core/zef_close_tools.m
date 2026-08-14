@@ -1,24 +1,17 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef — Zef.
+%ZEF_CLOSE_TOOLS  Close plugin/tool windows, keeping segmentation, figure, and menu.
 %
-% Purpose:
-%   Zef.
-%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_tools_aux (read, write)
+%   Script. Selects figures named "ZEFFIRO Interface:*" then setdiff's out
+%   Segmentation tool, Figure tool, and Menu tool windows before delete.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
+%   Workspace
+%     zef  - session struct; temporary h_tools_aux is removed.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_close_figs, zef_close_all.
 
 
 zef.h_tools_aux = findall(groot, 'Type','figure','-regexp','Name','ZEFFIRO Interface:*');

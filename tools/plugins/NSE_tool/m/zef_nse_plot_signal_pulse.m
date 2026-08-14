@@ -1,35 +1,20 @@
 
 function  zef_nse_plot_signal_pulse(zef, nse_field)
-% --- Zeffiro documentation header ---
-% zef_nse_plot_signal_pulse — Zef nse plot signal pulse.
+%ZEF_NSE_PLOT_SIGNAL_PULSE  One cardiac-cycle pressure pulse from zef_nse_signal_pulse.
 %
-% Purpose:
-%   Zef nse plot signal pulse.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nse_field
+%   Called from zef_nse_plot_graph graph_type 19. zef_nse_signal_pulse lives
+%   in src/forward/nse; values are divided by 101325/760 to plot mmHg on
+%   h_axes1 over one cycle_length.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_nse_plot_signal_pulse(zef, nse_field)
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_axes1 (read)
+%   See also zef_nse_signal_pulse, zef_nse_plot_graph.
 %
-% Calls (project):
-%   zef_nse_plot_signal_pulse
-%   zef_nse_signal_pulse
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_nse_plot_signal_pulse(zef, nse_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 h_axes = zef.h_axes1;
 axes(h_axes);

@@ -1,49 +1,21 @@
-% validate_config.m
-%
-% Validates the configuration structure and ensures all required fields are
-% present with valid values. Creates missing directories if needed.
-%
-% Input:
-%   config - Configuration structure to validate
-%
-% Output:
-%   config - Validated configuration structure (with defaults filled in)
-%   is_valid - Logical indicating if configuration is valid
-%   errors - Cell array of error messages (empty if valid)
-%
-% Usage:
-%   [config, is_valid, errors] = utilities.duneuro2zef.validate_config(config);
-%
-% See also: get_default_config.m, run.m
-
 function [config, is_valid, errors] = validate_config(config)
-% --- Zeffiro documentation header ---
-% utilities.duneuro2zef.validate_config — Validate config.
+%VALIDATE_CONFIG  Fill Duneuro converter defaults; mkdir output; require input.
 %
-% Purpose:
-%   Validate config.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   config
+%   Copies missing fields from get_default_config (paths, files.*, process_*
+%   flags, invert_domain_labels, verbose, continue_on_error, eeg/meg
+%   channel settings). input_folder must exist; output_folder is created.
+%   Paths go through fullfile (still relative to pwd). Nested files/output
+%   structs get per-field defaults.
 %
-% Outputs:
-%   config
-%   is_valid
-%   errors
+%   [config, is_valid, errors] = validate_config(config)
+%   errors is a cellstr; is_valid is false if input missing or mkdir fails.
 %
-% Calls (project):
-%   utilities.duneuro2zef.get_default_config
-%   utilities.duneuro2zef.validate_config
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[config, is_valid, errors]] = utilities.duneuro2zef.validate_config(config)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also get_default_config, run.
 
     errors = {};
     is_valid = true;

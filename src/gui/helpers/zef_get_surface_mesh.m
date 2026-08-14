@@ -1,29 +1,17 @@
-% --- Zeffiro documentation header ---
-% if not(isequal(zef — If not(isequal(zef.
+%ZEF_GET_SURFACE_MESH  Load STL/DAT into the selected compartment surface.
 %
-% Purpose:
-%   If not(isequal(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_points (read)
-%   zef.aux_submesh_ind (read)
-%   zef.aux_triangles (read)
-%   zef.current_compartment (read)
-%   zef.file (read)
-%   zef.file_path (read)
-%   zef.surface_mesh_type (read)
+%   Script. Compartment-table context **Import surface mesh**:
+%     Full mesh (STL file) / Points (DAT file) / Triangles (DAT file)
+%   The menu sets zef.surface_mesh_type then uigetfile then this script.
+%   Writes <current_compartment>_points/_triangles/_submesh_ind and the
+%   matching *_original_surface_mesh copies (downsample cache).
 %
-% Calls (project):
-%   zef_get_mesh
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isequal(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_get_mesh, zef_add_compartment.
 
 if not(isequal(zef.file,0))
     [zef.aux_points,zef.aux_triangles,zef.aux_submesh_ind] = zef_get_mesh(zef,[zef.file_path zef.file],zef.current_compartment,zef.surface_mesh_type,'full');

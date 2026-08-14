@@ -1,20 +1,16 @@
-% --- Zeffiro documentation header ---
-% h_axes = gca; — H axes = gca;.
+%ZEF_NSE_APPLY_SOURCE  Apply source coordinates: DataTips → nse_field.sphere_x/y/z.
 %
-% Purpose:
-%   H axes = gca;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.nse_field (read)
+%   ButtonPushedFcn of h_apply_source_coordinates. Script. DataTips on gca
+%   become the grey-sphere centres used by solver_type 3 (pressure source
+%   on the artery surface).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   See also zef_nse_plot_sphere, zef_nse_haemodynamic_response_solver.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `h_axes = gca;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 h_axes = gca;
 if isempty(findobj(allchild(h_axes),'Type','DataTip'))~=1

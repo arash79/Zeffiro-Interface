@@ -1,34 +1,59 @@
 function [A, B, C] = zef_build_electrodes(nodes, electrode_model, impedance_vec, impedance_inf, ele_ind, A)
-% --- Zeffiro documentation header ---
-% zef_build_electrodes — Zef build electrodes.
+%ZEF_BUILD_ELECTRODES  Couple PEM/CEM electrodes into the stiffness system.
 %
-% Purpose:
-%   Zef build electrodes.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   electrode_model
-%   impedance_vec
-%   impedance_inf
-%   ele_ind
-%   A
+%   Completes the FEM system used by EEG/EIT/TES lead fields after
+%   zef_stiffness_matrix. The P1 stiffness A (N×N) is augmented with
+%   electrode contact terms; B (N×E) and C (E×E) are the blocks in the
+%   Somersalo–Cheney–Isaacson complete-electrode-model form
+%   https://iopscience.iop.org/article/10.1088/0031-9155/57/4/999
 %
-% Outputs:
-%   A
-%   B
-%   C
+%   Callers: zef_lead_field_eeg_fem, zef_lead_field_tes_fem (and EIT FEM).
+%   ele_ind is produced in those files: PEM snaps each electrode xyz to the
+%   nearest node; CEM uses the 4-column attachment table, then zef_pem2cem
+%   turns interior hits into boundary triangles.
 %
-% Calls (project):
-%   zef_build_elecrodes
-%   zef_build_electrodes
-%   zef_waitbar
+%   [A, B, C] = zef_build_electrodes(nodes, electrode_model, impedance_vec, impedance_inf, ele_ind, A)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[A, B, C]] = zef_build_electrodes(nodes, electrode_model, impedance_vec, impedance_inf, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Inputs
+%     nodes           - N×3 vertex coordinates (metres in the lead-field
+%                       path). Only used for CEM triangle areas.
+%     electrode_model - 'CEM' or 'PEM'. Anything else returns B=[], C=[]
+%                       and leaves A unchanged (warning issued).
+%     impedance_vec   - E×1 contact impedances (ohm). If impedance_inf is
+%                       true this is overwritten with ones.
+%     impedance_inf   - scalar 0/1. True: PEM uses a Dirichlet node and
+%                       C = I; CEM currently prints a message and returns
+%                       without finishing C (stimulation path).
+%     ele_ind         - PEM: E×1 1-based node indices (one node per electrode).
+%                       CEM: R×4 rows [electrode_id, n1, n2, n3]. Rows with
+%                       n3>0 are surface triangles. Rows with n3==0 fall
+%                       back to a point-contact using n1 as the node and
+%                       n2 as a scalar weight.
+%     A               - N×N sparse stiffness. Must be returned as an output
+%                       so MATLAB can update it in place (copy-on-write).
+%
+%   Outputs
+%     A  - N×N, plus CEM triangle mass / Z or PEM 1/Z on the contact node.
+%          Infinite-impedance PEM also zeros row/column 1 of the first
+%          electrode node and sets A(n1,n1)=1.
+%     B  - N×E. CEM: (area/(3Z)) at each triangle vertex. PEM: 1/Z or 1
+%          at the contact node.
+%     C  - E×E. CEM: diagonal of total area/Z (plus 1/Z for point fallback).
+%          PEM finite Z: diagonal 1/Z at electrode indices; infinite Z: I.
+%
+%   CEM triangle integrals (linear hats on a triangle of area ala)
+%     B_i  += ala/(3Z),  A_ii += ala/(6Z),  A_ij += ala/(12Z) for i≠j,
+%     C_ee += ala/Z, with Z scaled by the electrode's total triangle area
+%     when that area is positive.
+%
+%   Side effects: waitbar (closed by onCleanup).
+%
+%   See also zef_stiffness_matrix, zef_pem2cem, zef_lead_field_eeg_fem.
 
 % zef_build_elecrodes: constructs the matrices B and C [*] from given nodes,
 % impedances, a stiffness matrix A and electrode indices. Notice that the
@@ -80,9 +105,11 @@ if isequal(electrode_model, 'CEM')
 
     zef_waitbar(0,1, wb, strcat(cemtitle, ': current triangles'));
 
+    % Triangle rows: column 4 is the third vertex (0 means point fallback).
     I_triangles = find(ele_ind(:,4)>0);
     ala = zeros(1,size(ele_ind,1));
 
+    % Triangle area = ½ ||(n3-n2)×(n4-n2)||.
     ala(I_triangles) = 1/2 * sqrt(               ...
         sum(                                     ...
         cross(                               ...
@@ -107,6 +134,7 @@ if isequal(electrode_model, 'CEM')
 
         if sum_ala > 0
 
+            % Absorb electrode area into Z so later ala/Z has the right scale.
             impedance_vec(ele_loop_ind) = impedance_vec(ele_loop_ind) * sum_ala;
 
         else
@@ -156,6 +184,7 @@ if isequal(electrode_model, 'CEM')
 
     entry_vec = (1./impedance_vec(ele_ind(I_triangles,1))) .* ala(I_triangles)';
 
+    % P1 load on a triangle: each vertex gets ala/(3Z).
     for i = 1 : 3
 
         B = B + sparse(              ...
@@ -186,6 +215,7 @@ if isequal(electrode_model, 'CEM')
 
                 if i == j
 
+                    % Diagonal of the linear-triangle mass matrix: ala/(6Z).
                     A_part = sparse(                ...
                         ele_ind(I_triangles,i+1)    ...
                         ,                               ...
@@ -202,6 +232,7 @@ if isequal(electrode_model, 'CEM')
 
                 else
 
+                    % Off-diagonal mass: ala/(12Z), then add the transpose.
                     A_part = sparse(                ...
                         ele_ind(I_triangles,i+1)    ...
                         ,                               ...
@@ -273,6 +304,7 @@ elseif isequal(electrode_model, 'PEM')
 
         % Dirichlet boundary condition for a single node.
 
+        % Dirichlet at the first electrode node (reference potential).
         A(ele_ind(1),:) = 0;
         A(:,ele_ind(1)) = 0;
         A(ele_ind(1),ele_ind(1)) = 1;

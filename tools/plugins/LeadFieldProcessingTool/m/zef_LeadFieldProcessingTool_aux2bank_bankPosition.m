@@ -1,20 +1,15 @@
-% --- Zeffiro documentation header ---
-% zef.LeadFieldProcessingTool.bank{zef.LeadFieldProcessingTool.bankPosition}=zef.LeadFieldProcessingTool — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%ZEF_LEADFIELDPROCESSINGTOOL_AUX2BANK_BANKPOSITION  Write auxData into bank{bankPosition}.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.LeadFieldProcessingTool (read)
+%   Script. Called from aux2bank_new after bankPosition is set to the
+%   new last slot. Overwrites that cell with auxData, then
+%   zef_LeadfieldProcessingTool_updateTable. Does not grow the bank.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.LeadFieldProcessingTool.bank{zef.LeadFieldProcessingTool.bankPosition}=zef.LeadFieldProcessingTool` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_LeadFieldProcessingTool_aux2bank_new.
 
 zef.LeadFieldProcessingTool.bank{zef.LeadFieldProcessingTool.bankPosition}=zef.LeadFieldProcessingTool.auxData;
 

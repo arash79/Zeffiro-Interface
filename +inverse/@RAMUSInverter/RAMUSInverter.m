@@ -1,25 +1,20 @@
 classdef RAMUSInverter < inverse.CommonInverseParameters & dynamicprops
-% --- Zeffiro documentation header ---
-% inverse.RAMUSInverter.RAMUSInverter — Inverse solver class implementing RAMUS reconstruction.
+%RAMUSInverter  Randomized multiresolution scanning (RAMUS) IAS-style inversion.
 %
-% Purpose:
-%   Inverse solver class implementing RAMUS reconstruction.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   args
+%   Averages IAS MAP reconstructions over random sparse source subsets at multiple
+%   resolution levels (multiresolution_dec from make_multires_dec or zef_sensitivity_run).
+%   Hyperprior and optional sLORETA/dSPM weighting match IASInverter per sub-grid.
 %
-% Calls (project):
-%   inverse.CommonInverseParameters
-%   zef_make_multires_dec
+%   Reference: Rezaei, Koulouri & Pursiainen, Brain Topography 33 (2020),
+%   DOI 10.1007/s10548-020-00755-8.
 %
-% Side effects:
-%   - filesystem I/O
+%   See also inverse.IASInverter, zef_make_multires_dec.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `inverse.RAMUSInverter.RAMUSInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
 
     properties
 
@@ -125,12 +120,12 @@ classdef RAMUSInverter < inverse.CommonInverseParameters & dynamicprops
     methods
 
         function self = RAMUSInverter(args)
-
+            %RAMUSInverter  Construct a RAMUS multiresolution IAS inverter.
             %
-            % RAMUSInverter
-            %
-            % The constructor for this class.
-            %
+            %   Name-value: multiresolution_dec/ind/count (or build later with
+            %   make_multires_dec), number_of_multiresolution_levels,
+            %   sparsity_factor, number_of_decompositions, n_map_iterations,
+            %   hyperprior fields, method_type, plus CommonInverseParameters.
 
             arguments
 
@@ -221,8 +216,11 @@ classdef RAMUSInverter < inverse.CommonInverseParameters & dynamicprops
         %multiresolution decompositions as it would by pressing the make
         %decomposition button
         function self = make_multires_dec(self)
-            %Function to make multiresolution decomposition that
-            %multiresolution computation uses.
+            %make_multires_dec  Fill multiresolution_dec/ind/count via zef_make_multires_dec.
+            %
+            %   Uses number_of_decompositions, number_of_multiresolution_levels,
+            %   and sparsity_factor. Required before invert unless those cells
+            %   were passed in.
             arguments
                 self (1,1)
             end
@@ -231,13 +229,12 @@ classdef RAMUSInverter < inverse.CommonInverseParameters & dynamicprops
 
         % Declare the initialize and inverse method defined in the files invert and initialize in this same
         % folder.
-        self = initialize(self)
+        self = initialize(self, L, f_data)
 
-        [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode)
+        [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
 
         function self = terminateComputation(self)
-            % Function to reset the values that are changed during
-            %inverse computations
+            %terminateComputation  Delete dynamic noise_cov.
             noise_cov = findprop(self,'noise_cov');
             delete(noise_cov);
         end
@@ -245,6 +242,7 @@ classdef RAMUSInverter < inverse.CommonInverseParameters & dynamicprops
 
     methods (Static)
         function InitialStatement 
+            %InitialStatement  Print the RAMUS citation banner once per construction. 
             txt = strcat('This class object is for computing inversion with the Randomized Milti-\n'...
                 , 'resolution Scanning (RAMUS) method.\n'...
                 , 'If You find this method useful for Your thesis, or research or refer to\n'...

@@ -1,35 +1,20 @@
 function perfusion_estimate = zef_nse_calculate_perfusion(nse_field,nodes,tetra,domain_labels,mvd_length)
-% --- Zeffiro documentation header ---
-% zef_nse_calculate_perfusion — Zef nse calculate perfusion.
+%ZEF_NSE_CALCULATE_PERFUSION  Perfusion estimate from artery surface flux and mvd_length.
 %
-% Purpose:
-%   Zef nse calculate perfusion.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nse_field
-%   nodes
-%   tetra
-%   domain_labels
-%   mvd_length
+%   Called from zef_nse_plot_graph for perfusion graph_types 16–18. Artery
+%   submesh, hydrostatic correction from gravity, then
+%   mean((bp - p_hydrostatic) * w_3) * total_flow / pressure per frame.
+%   Nodes mm→m; mvd_length first column ×1e6.
 %
-% Outputs:
-%   perfusion_estimate
+%   perfusion_estimate = zef_nse_calculate_perfusion(nse_field, nodes, tetra, domain_labels, mvd_length)
 %
-% Calls (project):
-%   zef_find_adjacent_tetra
-%   zef_get_submesh
-%   zef_nse_calculate_perfusion
-%   zef_surface_mesh
-%   zef_surface_scalar_vector_F
-%   zef_surface_scalar_vector_Fn
-%   zef_volume_barycentric
+%   See also zef_nse_plot_graph.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[perfusion_estimate] = zef_nse_calculate_perfusion(nse_field, nodes, tetra, domain_labels, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 mm_conversion = 0.001;
 ml_min_conversion = 1e-6/60;

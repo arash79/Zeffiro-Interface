@@ -1,46 +1,34 @@
 function [I,dist_vec] = zef_point_in_compartment(zef,reuna_p,reuna_t,nodes,varargin)
-% --- Zeffiro documentation header ---
-% zef_point_in_compartment — Zef point in compartment.
+%ZEF_POINT_IN_COMPARTMENT  Test which mesh nodes lie inside a closed surface.
 %
-% Purpose:
-%   Zef point in compartment.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   reuna_p
-%   reuna_t
-%   nodes
-%   varargin
+%   Bounding-box prefilter, optional reducepatch controlled by
+%   zef.meshing_accuracy, then solid-angle summation (GPU or CPU parallel
+%   blocks). Returns nodes whose summed solid angle exceeds
+%   zef.meshing_threshold (or varargin override) and their min triangle
+%   distances in dist_vec.
 %
-% Outputs:
-%   I
-%   dist_vec
+%   [I, dist_vec] = zef_point_in_compartment(zef, reuna_p, reuna_t, nodes)
+%   [I, dist_vec] = zef_point_in_compartment(zef, reuna_p, reuna_t, nodes, compartment_info)
+%   [I, dist_vec] = zef_point_in_compartment(zef, reuna_p, reuna_t, nodes, compartment_info, meshing_threshold)
 %
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.gpu_num (read)
-%   zef.meshing_accuracy (read)
-%   zef.meshing_threshold (read)
-%   zef.parallel_processes (read)
-%   zef.parallel_vectors (read)
-%   zef.use_gpu (read)
+%   Inputs
+%     zef              - session struct (meshing and GPU settings).
+%     reuna_p          - surface vertices.
+%     reuna_t          - surface triangles (1-based indices).
+%     nodes            - candidate node coordinates to test.
+%     compartment_info - optional [compartment_idx, n_compartments] for waitbar text.
+%     meshing_threshold - optional override of zef.meshing_threshold.
 %
-% Calls (project):
-%   zef_point_in_compartment
-%   zef_waitbar
+%   Outputs
+%     I        - indices into nodes of interior points.
+%     dist_vec - min distance to surface triangles for accepted nodes.
 %
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - parallel/cluster
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[I, dist_vec]] = zef_point_in_compartment(zef, reuna_p, reuna_t, nodes, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_tetra_in_compartment, zef_waitbar.
 
 if isempty(zef)
     zef = evalin('base','zef');
@@ -217,7 +205,6 @@ else
     end
 
 end
-
 
 J = find(gather(ind_vec_aux) > eval('zef.meshing_threshold'));
 I = I(J);

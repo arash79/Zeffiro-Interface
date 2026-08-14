@@ -1,41 +1,19 @@
-# +core/+gui
+# `+core/+gui` — package-tree menu callbacks
 
-## Purpose of this folder
+Almost all GUI code is still under `src/gui`. This package exists so electrode import can call `core.io.electrodes.*` without duplicating parsers on the `src` path.
 
-Thin GUI integration layer for package APIs (menu callbacks).
+Today that is only **`+menu_tool/import_electrodes_callback.m`**.
 
-## Contents
+## GUI path
 
-Subfolders:
-- `+menu_tool/`
+Menu bar (window from `zef_menu_tool`): **Import → Import electrodes** (not Edit). That `MenuSelectedFcn` calls `core.gui.menu_tool.import_electrodes_callback`.
 
-## How this folder fits into the overall workflow
+The callback opens `uigetfile` for `*.dat` / `*.csv`, parses, writes `zef.sensors` / `zef.<prefix>_points` / `zef.<prefix>_name_list`, then `zef_update`. It does **not** attach electrodes to the FEM mesh; that happens later in `zef_process_meshes` / `zef_build_electrodes`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+## Scripting
 
-## GUI usage
+```matlab
+zef = core.gui.menu_tool.import_electrodes_callback(zef);
+```
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
-
-## Programmatic usage
-
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Formats: [../+io/+electrodes/README.md](../+io/+electrodes/README.md). Callback details: [+menu_tool/README.md](+menu_tool/README.md).

@@ -1,41 +1,20 @@
-% --- Zeffiro documentation header ---
-% function zef_PlotGMMcluster — Function zef Plot GMMcluster.
+function zef_PlotGMMcluster
+%ZEF_PLOTGMMCLUSTER  Ellipsoids and dipoles of zef.GMModel on h_axes1.
 %
-% Purpose:
-%   Function zef Plot GMMcluster.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMM_colors (read)
-%   zef.GMM_comp_ord (read)
-%   zef.GMM_dip_comp (read)
-%   zef.GMM_dip_num (read)
-%   zef.GMM_ellip_coloring (read)
-%   zef.GMM_ellip_comp (read)
-%   zef.GMM_ellip_num (read)
-%   zef.GMMcluster_alpha (read)
-%   zef.GMMcluster_clustnum (read)
-%   zef.GMMcluster_covident (read)
-%   zef.GMMcluster_covtype (read)
-%   zef.GMMcluster_elliptrans (read)
-%   zef.GMMcluster_headtrans (read)
-%   zef.GMMcluster_markercolor (read)
-%   zef.GMMcluster_markersize (read)
-%   … (12 more)
-%
-% Calls (project):
 %   zef_PlotGMMcluster
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Reads GMMcluster_* and GMM_* fields from base zef, plus GMModel and
+%   GMModelDipoles. Temporarily sets layer/brain transparency and
+%   frame_start/stop, calls zef_visualize_surfaces, then surf ellipsoids
+%   (chi2inv alpha) and quiver3 of mu(:,4:6). Cell GMModel loops frames
+%   start_t:stop_t with pause(1.5). Restores transparencies.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_PlotGMMcluster` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-function zef_PlotGMMcluster
-
+%   See also zef_GMMcluster, zef_PlotGMModel.
 
 m_size = evalin('base','zef.GMMcluster_markersize');
 m_width = evalin('base','zef.GMMcluster_markerwidth');

@@ -1,30 +1,26 @@
-% --- Zeffiro documentation header ---
-% if zef.nse_field — If zef.nse field.
+%ZEF_NSE_RUN_SOLVER  NSE-tool "Solve system": dispatch by nse_field.solver_type.
 %
-% Purpose:
-%   If zef.nse field.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.domain_labels (read)
-%   zef.mvd_length (read)
-%   zef.nodes (read)
-%   zef.nse_field (read, write)
-%   zef.tetra (read)
+%   Script. Bound to zef.nse_field.h_solve_system in the NSE tool plugin
+%   (zef_nse_tool_start). Always calls zef_nse_tool_update first. Does not
+%   write zef.L.
 %
-% Calls (project):
-%   zef_nse_haemodynamic_response_solver
-%   zef_nse_poisson
-%   zef_nse_poisson_dynamic
-%   zef_nse_tool_update
+%   solver_type
+%     1  zef_nse_poisson, microcirculation_model=0
+%     2  zef_nse_poisson, microcirculation_model=1
+%     3  zef_nse_haemodynamic_response_solver, nse_type=2, microcirculation=1
+%     4  zef_nse_poisson_dynamic, nse_type=1, microcirculation=0
+%     5  dynamic, nse_type=1, microcirculation=1
+%     6  dynamic, nse_type=2, microcirculation=0
+%     7  dynamic, nse_type=2, microcirculation=1
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Requires zef.nodes, zef.tetra, zef.domain_labels, zef.mvd_length.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if zef.nse_field` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_nse_poisson, zef_nse_poisson_dynamic, zef_nse_iteration.
 
 if zef.nse_field.solver_type == 1
     zef = zef_nse_tool_update(zef);

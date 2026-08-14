@@ -1,50 +1,18 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_init_ias(zef)
-% --- Zeffiro documentation header ---
-% zef_init_ias — Initializes GUI widgets and default `zef` fields for ias.
+%ZEF_INIT_IAS  Open IAS MAP window, default ias_* fields, wire Start.
 %
-% Purpose:
-%   Initializes GUI widgets and default `zef` fields for ias.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_init_ias(zef)
 %
-% Outputs:
-%   zef
+%   Called via zef_tool_start from ias_map_estimation. Names
+%   'ZEFFIRO Interface: IAS MAP estimation'. Start → zef_update_ias;
+%   zef_ias_iteration(zef). Does not invert by itself.
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_ias_apply (read)
-%   zef.h_ias_cancel (read)
-%   zef.h_ias_high_cut_frequency (read)
-%   zef.h_ias_hyperprior (read)
-%   zef.h_ias_low_cut_frequency (read)
-%   zef.h_ias_map_estimation (read)
-%   zef.h_ias_n_map_iterations (read)
-%   zef.h_ias_normalize_data (read)
-%   zef.h_ias_number_of_frames (read)
-%   zef.h_ias_sampling_frequency (read)
-%   zef.h_ias_snr (read)
-%   zef.h_ias_start (read)
-%   zef.h_ias_time_1 (read)
-%   zef.h_ias_time_2 (read)
-%   … (26 more)
-%
-% Calls (project):
-%   zef_ias_iteration
-%   zef_ias_map_estimation_window
-%   zef_init_ias
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_init_ias(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_update_ias, zef_ias_iteration.
 
 zef = zef_ias_map_estimation_window(zef);
 

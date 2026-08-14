@@ -1,42 +1,21 @@
-% --- Zeffiro documentation header ---
-% zef_init_forward_and_inverse_options; — Initializes GUI widgets and default `zef` fields for forward_and_inverse_options;.
+%ZEF_OPEN_FORWARD_AND_INVERSE_OPTIONS  Settings → **Forward and inverse processing options**.
 %
-% Purpose:
-%   Initializes GUI widgets and default `zef` fields for forward_and_inverse_options;.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.adaptive_refinement_compartments (read)
-%   zef.adaptive_refinement_k_param (read)
-%   zef.adaptive_refinement_number (read)
-%   zef.adaptive_refinement_on (read)
-%   zef.adaptive_refinement_thresh_val (read)
-%   zef.aux_field (read)
-%   zef.distance_smoothing_exp (read)
-%   zef.distance_smoothing_on (read)
-%   zef.exclude_box (read)
-%   zef.extensive_relabeling (read)
-%   zef.fem_mesh_inflation_strength (read)
-%   zef.fieldnames (read, write)
-%   zef.fix_outer_surface (read)
-%   zef.font_size (read)
-%   zef.forward_and_inverse_options_current_size (read, write)
-%   … (101 more)
+%   Script. MenuSelectedFcn of h_menu_options in zef_menu_tool (then
+%   zef_update). zef_init_forward_and_inverse_options, instantiates
+%   zef_forward_and_inverse_processing_options, copies h_* onto zef,
+%   ValueChangedFcn → zef_update_forward_and_inverse_options. Fills
+%   compartment dropdowns via zef_get_active_compartments ('Active
+%   compartments' plus tissue names). Wires labeling-priority menus to
+%   zef_update_labeling_priority. Window name 'ZEFFIRO Interface:
+%   Forward and inverse processing options'. DeleteFcn zef_closereq.
+%   Closing does not write an INI.
 %
-% Calls (project):
-%   core.types.ZefSourceModel.from
-%   zef_change_size_function
-%   zef_get_active_compartments
-%   zef_update_labeling_priority
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_init_forward_and_inverse_options;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_update_forward_and_inverse_options, zef_menu_tool.
 zef_init_forward_and_inverse_options;
 
 zef_data = zef_forward_and_inverse_processing_options;

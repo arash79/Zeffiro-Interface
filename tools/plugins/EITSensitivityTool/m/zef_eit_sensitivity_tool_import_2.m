@@ -1,25 +1,15 @@
-% --- Zeffiro documentation header ---
-% [zef.file zef.file_path] = uigetfile({'*.mat'},'Import interpolation',zef — [zef.file zef.file path] = uigetfile({'*.mat'},'Import interpolation',zef.
+%ZEF_EIT_SENSITIVITY_TOOL_IMPORT_2  uigetfile *.mat → zef.eit_sensitivity_tool_data_2.
 %
-% Purpose:
-%   [zef.file zef.file path] = uigetfile({'*.mat'},'Import interpolation',zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.eit_sensitivity_tool_data_2 (read)
-%   zef.eit_sensitivity_tool_file_2 (read, write)
-%   zef.file (read)
-%   zef.file_path (read)
-%   zef.h_eit_sensitivity_tool_file_2 (read)
+%   Script. Second interpolation file (comparison / dual map). Same
+%   load path as import 1 onto eit_sensitivity_tool_data_2 / _file_2.
+%   Does not write reconstruction.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `[zef.file zef.file_path] = uigetfile({'*.mat'},'Import interpolation',zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_eit_sensitivity_tool_import.
 
 [zef.file zef.file_path] = uigetfile({'*.mat'},'Import interpolation',zef.save_file_path);
 if not(isequal(zef.file,0));

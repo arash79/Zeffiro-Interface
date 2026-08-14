@@ -1,39 +1,20 @@
 function zef_wireframe_plot(w_t,w_n)
-% --- Zeffiro documentation header ---
-% zef_wireframe_plot — Zef wireframe plot.
+%ZEF_WIREFRAME_PLOT  Phong-lit gray surface for a wireframe patch.
 %
-% Purpose:
-%   Zef wireframe plot.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2019- Sampsa Pursiainen, Liisa-Ida Sorsa, Christelle Eyraud, Jean-Michel Geffrin.
+%   GPU-ToRRe-3D wireframe modeling package.
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   w_t
-%   w_n
+%   zef_wireframe_plot(w_t, w_n)
 %
-% Outputs:
-%   See function signature and code below.
+%   Arguments w_t / w_n are unused. Sets FaceColor, two lights, axis
+%   equal, Tag 'surface' on h_t and hides h_a — both must already exist
+%   in the caller workspace. Called from the wireframe creator. No zef
+%   I/O.
 %
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%
-% Calls (project):
-%   zef_wireframe_plot
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_wireframe_plot(w_t, w_n)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also wireframe.
 
-
-h_a = evalin('base','zef.h_axes1');
-axes(h_a);
-
-h_t = trimesh(w_t,w_n(:,1),w_n(:,2),w_n(:,3));
-h_t.EdgeColor = 'none';
 h_t.FaceColor  = 0.5*[1 1 1];
 h_l = light;
 h_l.Position = [1 0 0];

@@ -1,27 +1,15 @@
-% --- Zeffiro documentation header ---
-% if ~isfield(zef,'GMM_comp_ord') — If ~isfield(zef,'GMM comp ord').
+%ZEF_INIT_GMMPLOTOPTS  Default GMM_comp_ord / dip_num / ellip_* if missing.
 %
-% Purpose:
-%   If ~isfield(zef,'GMM comp ord').
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMM_colors (read, write)
-%   zef.GMM_comp_ord (read, write)
-%   zef.GMM_dip_comp (read, write)
-%   zef.GMM_dip_num (read, write)
-%   zef.GMM_ellip_coloring (read, write)
-%   zef.GMM_ellip_comp (read, write)
-%   zef.GMM_ellip_num (read, write)
-%   zef.GMModel (read)
+%   Script. dip_num/ellip_num from zef.GMModel.NumComponents when
+%   present (SP GMModel tool), else empty. Used by the older plot-
+%   options path, not the JL app's zef_update_GMMPlotOpts.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if ~isfield(zef,'GMM_comp_ord')` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_update_GMMPlotOpts.
 
 if ~isfield(zef,'GMM_comp_ord')
     zef.GMM_comp_ord = 1;

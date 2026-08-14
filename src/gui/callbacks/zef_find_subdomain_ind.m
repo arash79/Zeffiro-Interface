@@ -1,26 +1,26 @@
 function [subdomain_ind] = zef_find_subdomain_ind(domain_labels, domain_labels_with_subdomains)
-% --- Zeffiro documentation header ---
-% zef_find_subdomain_ind — Zef find subdomain ind.
+%ZEF_FIND_SUBDOMAIN_IND  Local 1..K subdomain index within each domain label.
 %
-% Purpose:
-%   Zef find subdomain ind.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   domain_labels
-%   domain_labels_with_subdomains
+%   Unused from menus. Caller: zef_postprocess_fem_mesh (after labeling,
+%   to split a tissue into submeshes). Pure array helper; no zef, no GUI.
 %
-% Outputs:
-%   subdomain_ind
+%   subdomain_ind = zef_find_subdomain_ind(domain_labels, domain_labels_with_subdomains)
 %
-% Calls (project):
-%   zef_find_subdomain_ind
+%   Inputs
+%     domain_labels                 - N×1 coarse domain ID per tetra.
+%     domain_labels_with_subdomains - N×1 finer labels (submesh IDs).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[subdomain_ind] = zef_find_subdomain_ind(domain_labels, domain_labels_with_subdomains)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output
+%     subdomain_ind  - N×1. For each unique domain_labels value, the
+%                      matching finer labels are uniqued and rewritten as
+%                      1..K in uniqueness order.
+%
+%   See also zef_find_active_compartment_ind, zef_postprocess_fem_mesh.
 
 unique_domain_labels = unique(domain_labels);
 subdomain_ind = zeros(length(domain_labels),1);

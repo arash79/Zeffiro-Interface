@@ -1,35 +1,26 @@
 function [f, df] = zef_nse_mollifier(r,t,t_min,t_max)
-% --- Zeffiro documentation header ---
-% zef_nse_mollifier — Zef nse mollifier.
+%ZEF_NSE_MOLLIFIER  C∞ bump that ramps 0→1→0 on [t_min, t_max] with relative width r.
 %
-% Purpose:
-%   Zef nse mollifier.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   r
-%   t
-%   t_min
-%   t_max
+%   Used by zef_nse_balloon_model_solver when relative_mollification > 0.
+%   I1: rising edge, I2: plateau f=1, I3: falling edge. Standard exp(1-1/(1-x^2)) bump.
 %
-% Outputs:
-%   f
-%   df
+%   [f, df] = zef_nse_mollifier(r, t)
+%   [f, df] = zef_nse_mollifier(r, t, t_min, t_max)
 %
-% Calls (project):
-%   zef_nse_mollifier
+%   See also zef_nse_balloon_model_solver.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[f, df]] = zef_nse_mollifier(r, t, t_min, t_max)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin < 3
 t_min = t(1);
 t_max = t(end);
 end
 
+% Rising / plateau / falling partitions of [t_min, t_max].
 I1 = find(t < t_min + 0.5*r*(t_max - t_min));
 I2 = find(t < t_max - 0.5*r*(t_max - t_min));
 I3 = find(t >= t_max - 0.5*r*(t_max - t_min));

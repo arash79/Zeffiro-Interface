@@ -1,20 +1,14 @@
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'GMModel')) — If not(isfield(zef,'GMModel')).
+%ZEF_GMMODEL_INIT  Default GMModel.max_n_clusters / credibility / iter onto edits.
 %
-% Purpose:
-%   If not(isfield(zef,'GMModel')).
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMModel (read, write)
+%   Script. Called from zef_GMModel_open. Defaults max_n_clusters=20,
+%   credibility=0.90, frame_number=1. Does not cluster.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'GMModel'))` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_GMModel_update.
 
 if not(isfield(zef,'GMModel'))
     zef.GMModel = struct;

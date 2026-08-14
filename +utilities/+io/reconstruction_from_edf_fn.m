@@ -1,27 +1,18 @@
 function [reconstruction, sample_rate, time_step, column_title_vec] = reconstruction_from_edf_fn(path_to_file)
-% --- Zeffiro documentation header ---
-% utilities.io.reconstruction_from_edf_fn — Reconstruction from edf fn.
+%RECONSTRUCTION_FROM_EDF_FN  Load multichannel EDF into a reconstruction matrix.
 %
-% Purpose:
-%   Reconstruction from edf fn.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   path_to_file
+%   [reconstruction, sample_rate, time_step, column_title_vec] = ...
+%       reconstruction_from_edf_fn(path_to_file)
 %
-% Outputs:
-%   reconstruction
-%   sample_rate
-%   time_step
-%   column_title_vec
-%
-% Calls (project):
-%   utilities.io.reconstruction_from_edf_fn
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[reconstruction, sample_rate, time_step]] = utilities.io.reconstruction_from_edf_fn(path_to_file)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Uses edfread (Signal Processing Toolbox). Each timetable column is one
+%   channel; cells are concatenated horizontally into reconstruction rows.
+%   sample_rate = samples_per_cell / time_step; column_title_vec holds
+%   VariableNames from the timetable.
 
 arguments
 

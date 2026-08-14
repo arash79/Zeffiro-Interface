@@ -1,54 +1,22 @@
 function [z,Var_loc,reconstruction_information] = zef_beamformer(zef)
-% --- Zeffiro documentation header ---
-% zef_beamformer — Zef beamformer.
+%ZEF_BEAMFORMER  LCMV / UNG / UG / scalar beamformer scan.
 %
-% Purpose:
-%   Zef beamformer.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   [z, Var_loc, reconstruction_information] = zef_beamformer(zef)
 %
-% Outputs:
-%   z
-%   Var_loc
-%   reconstruction_information
+%   Called from Beamformer StartButton (not inverse.BeamformerInverter).
+%   Needs zef.L and zef.measurements. Frames: zef.number_of_frames.
+%   SNR: zef.inv_snr → 10^(-inv_snr/20). Covariance from f_data and
+%   zef.cov_type / inv_cov_lambda. Type zef.bf_type 1–4 (LCMV, UNG, UG,
+%   UNGsc). The button chooses which of z / Var_loc is stored as
+%   zef.reconstruction (estimation_attr 1 / 2 / else).
 %
-% Zef fields (observed):
-%   zef.L_reg_type (read)
-%   zef.beamformer (read)
-%   zef.bf_type (read)
-%   zef.cov_type (read)
-%   zef.inv_cov_lambda (read)
-%   zef.inv_high_cut_frequency (read)
-%   zef.inv_leadfield_lambda (read)
-%   zef.inv_low_cut_frequency (read)
-%   zef.inv_sampling_frequency (read)
-%   zef.inv_snr (read)
-%   zef.inv_time_1 (read)
-%   zef.inv_time_2 (read)
-%   zef.inv_time_3 (read)
-%   zef.number_of_frames (read)
-%   zef.source_direction_mode (read)
-%   … (2 more)
+%   See also zef_beamformer_start, zef_beamformer_window.
 %
-% Calls (project):
-%   zef_beamformer
-%   zef_getFilteredData
-%   zef_getTimeStep
-%   zef_normalizeInverseReconstruction
-%   zef_postProcessInverse
-%   zef_processLeadfields
-%   zef_waitbar
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z, Var_loc, reconstruction_information]] = zef_beamformer(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 h = zef_waitbar(0,1,['Beamformer.']);
 [procFile.s_ind_1] = unique(eval('zef.source_interpolation_ind{1}'));
@@ -102,9 +70,11 @@ end
 f_data = zef_getFilteredData(zef);
 
 if eval('zef.cov_type') == 1
+    % Full-data C once: measurement-based ridge λ·trace(C)/n I.
     C = (f_data-mean(f_data,2))*(f_data-mean(f_data,2))'/size(f_data,2);
     C = C+lambda_cov*trace(C)*eye(size(C))/size(f_data,1);
 elseif eval('zef.cov_type') == 2
+    % Full-data C once: basic ridge λ I.
     C = (f_data-mean(f_data,2))*(f_data-mean(f_data,2))'/size(f_data,2);
     C = C + lambda_cov*eye(size(C));
 end
@@ -132,6 +102,7 @@ for f_ind = 1 : number_of_frames
     size_f = size(f,2);
 
     if eval('zef.cov_type') == 3
+        % Pointwise (this frame only), measurement-based ridge.
         if size_f > 1
             C = (f-mean(f,2))*(f-mean(f,2))'/size(f,2);
         else
@@ -139,6 +110,7 @@ for f_ind = 1 : number_of_frames
         end
         C = C+lambda_cov*trace(C)*eye(size(C))/size(f,1);
     elseif eval('zef.cov_type') == 4
+        % Pointwise, basic ridge λ I.
         if size_f > 1
             C = (f-mean(f,2))*(f-mean(f,2))'/size(f,2);
         else

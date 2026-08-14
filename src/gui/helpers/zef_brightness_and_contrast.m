@@ -1,28 +1,19 @@
 function colormap_vec = zef_brighness_and_contrast(colormap_vec, brightness_val, contrast_val)
-% --- Zeffiro documentation header ---
-% zef_brighness_and_contrast — Zef brighness and contrast.
+%ZEF_BRIGHTNESS_AND_CONTRAST  Pointwise LUT reshape: ((x+b)/(1+b))^(1+c).
 %
-% Purpose:
-%   Zef brighness and contrast.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   colormap_vec
-%   brightness_val
-%   contrast_val
+%   colormap_vec = zef_brighness_and_contrast(colormap_vec, brightness, contrast)
 %
-% Outputs:
-%   colormap_vec
+%   Filename is zef_brightness_and_contrast.m; the function name is the
+%   historical misspelling zef_brighness_and_contrast (callers must use
+%   that). Applied after zef_colormap when figure-tool brightness/contrast
+%   sliders move. b=0,c=0 is identity. Does not clip to [0,1].
 %
-% Calls (project):
-%   zef_brighness_and_contrast
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[colormap_vec] = zef_brighness_and_contrast(colormap_vec, brightness_val, contrast_val)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_colormap.
 colormap_vec = (((colormap_vec + brightness_val)/(1+brightness_val)).^(1+contrast_val));
 
 end

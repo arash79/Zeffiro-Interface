@@ -1,44 +1,36 @@
 function [zef,MethodClassObj] = zef_process_inversion(zef,MethodClassObj)
-% --- Zeffiro documentation header ---
-% zef_process_inversion — Zef process inversion.
+%ZEF_PROCESS_INVERSION  Run a class-based inverter over all frames and store results on zef.
 %
-% Purpose:
-%   Zef process inversion.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   MethodClassObj
+%   GUI-oriented inversion driver: processes the lead field via
+%   zef_processLeadfields, runs utilities.inverse.run_frame_loop with the
+%   supplied inverter object, optionally applies a method-specific smoother,
+%   normalizes when requested, and writes zef.reconstruction plus
+%   zef.reconstruction_information.
 %
-% Outputs:
-%   zef
-%   MethodClassObj
+%   [zef, MethodClassObj] = zef_process_inversion(zef, MethodClassObj)
 %
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.reconstruction (read, write)
-%   zef.reconstruction_information (read, write)
-%   zef.source_direction_mode (read)
-%   zef.source_directions (read)
-%   zef.source_positions (read)
-%   zef.use_gpu (read)
+%   Inputs
+%     zef            - session struct with lead field, measurements, and source
+%                      grid fields required by zef_processLeadfields.
+%     MethodClassObj - inverter instance (must satisfy
+%                      inverse.CommonInverseParameters.isAnInverter).
 %
-% Calls (project):
-%   utilities.inverse.run_frame_loop
-%   zef_postProcessInverseClassObj
-%   zef_processLeadfields
-%   zef_process_inversion
-%   zef_waitbar
+%   Outputs
+%     zef            - updated with reconstruction, reconstruction_information,
+%                      and scalar inverter properties copied from MethodClassObj.
+%     MethodClassObj - same object, possibly updated by smoother/terminate hooks.
 %
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
+%   For source_direction_mode 1 or 2, reorders L columns to node-wise (x,y,z)
+%   triplets before inversion. Uploads L to GPU when zef.use_gpu and
+%   zef.gpu_count > 0. Shows a zef_waitbar for the duration of the run.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[zef, MethodClassObj]] = zef_process_inversion(zef, MethodClassObj)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_processLeadfields, zef_postProcessInverseClassObj,
+%            utilities.inverse.run_frame_loop, zef_inverse_run.
 
     arguments
 

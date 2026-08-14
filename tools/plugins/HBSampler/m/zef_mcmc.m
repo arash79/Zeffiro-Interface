@@ -1,61 +1,21 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,reconstruction_information] = zef_mcmc(zef)
-% --- Zeffiro documentation header ---
-% zef_mcmc — Zef mcmc.
+%ZEF_MCMC  Hierarchical Bayes MCMC/Gibbs sampling (IAS-style hyperpriors).
 %
-% Purpose:
-%   Zef mcmc.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   [z, reconstruction_information] = zef_mcmc(zef)
 %
-% Outputs:
-%   z
-%   reconstruction_information
+%   Called from HBSampler Start (legacy_hb / legacy_mcmc). Needs zef.L
+%   and zef.measurements. Frames: zef.inv_number_of_frames (not
+%   number_of_frames). SNR: zef.inv_snr (dB) → 10^(-inv_snr/20).
+%   Sample size / burn-in: inv_sample_size, inv_n_burn_in. Each sample
+%   is zef_gibbs_sampler_step. Returns post-processed z and
+%   reconstruction_information (tag MCMC). No inverse.*Inverter.
 %
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.inv_amplitude_db (read)
-%   zef.inv_high_cut_frequency (read)
-%   zef.inv_hyperprior (read, write)
-%   zef.inv_hyperprior_tail_length_db (read)
-%   zef.inv_hyperprior_weight (read)
-%   zef.inv_low_cut_frequency (read)
-%   zef.inv_n_burn_in (read)
-%   zef.inv_normalize_data (read)
-%   zef.inv_number_of_frames (read)
-%   zef.inv_prior_over_measurement_db (read)
-%   zef.inv_sample_size (read)
-%   zef.inv_sampling_frequency (read)
-%   zef.inv_snr (read)
-%   zef.inv_time_1 (read)
-%   … (7 more)
-%
-% Calls (project):
-%   zef_find_g_hyperprior
-%   zef_find_ig_hyperprior
-%   zef_getFilteredData
-%   zef_getTimeStep
-%   zef_gibbs_sampler_step
-%   zef_mcmc
-%   zef_normalizeInverseReconstruction
-%   zef_postProcessInverse
-%   zef_processLeadfields
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - filesystem I/O
-%   - parallel/cluster
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z, reconstruction_information]] = zef_mcmc(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_gibbs_sampler_step, zef_open_mcmc.
 
 inverse_gamma_ind = [1:4];
 gamma_ind = [5:10];
@@ -208,6 +168,8 @@ for f_ind = 1 : number_of_frames
             zef_waitbar(i,n_iter_process,h,['Gibbs sampler: ' num2str(parallel_processes) ' parallel chains.']);
         end
         parfor j = 1 : parallel_processes
+            % One Gibbs step per chain: sample x | theta then theta | x
+            % (zef_gibbs_sampler_step). Average x after n_burn_in.
             [x{j}, theta{j}] = zef_gibbs_sampler_step(L, f, x{j}, theta{j}, theta0, beta, std_lhood, hypermodel, decay_val_hyperprior, nbins_hyperprior, source_direction_mode);
         end
 
@@ -218,6 +180,9 @@ for f_ind = 1 : number_of_frames
         end
     end
 
+    % Burn-in is the outer index i, not a per-chain sample count. This
+    % divisor is n_iter_process*n_chains − n_burn_in, not the number of
+    % additions (n_iter_process − n_burn_in)*n_chains.
     z_vec = z_vec/(n_iter_process*parallel_processes - n_burn_in);
 
     close(h)

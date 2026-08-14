@@ -1,40 +1,28 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'top_regularization_parameter')); — If not(isfield(zef,'top regularization parameter'));.
+%ZEF_INIT_TOPOGRAPHY  Script: default top_* fields and push them onto widgets.
 %
-% Purpose:
-%   If not(isfield(zef,'top regularization parameter'));.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_top_data_segment (read)
-%   zef.h_top_high_cut_frequency (read)
-%   zef.h_top_low_cut_frequency (read)
-%   zef.h_top_normalize_data (read)
-%   zef.h_top_number_of_frames (read)
-%   zef.h_top_pcg_tol (read)
-%   zef.h_top_regularization_parameter (read)
-%   zef.h_top_sampling_frequency (read)
-%   zef.h_top_time_1 (read)
-%   zef.h_top_time_2 (read)
-%   zef.h_top_time_3 (read)
-%   zef.inv_data_segment (read)
-%   zef.inv_high_cut_frequency (read)
-%   zef.inv_low_cut_frequency (read)
-%   zef.inv_sampling_frequency (read)
-%   … (15 more)
+%   Called from zef_topography after the window exists. Not a function:
+%   it reads/writes caller zef and zef.h_top_* handles.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Copies inverse timing/band into topography fields so Start uses the
+%   same window as Inverse tools unless the user edits the widgets:
+%     top_sampling_frequency, top_low_cut_frequency, top_high_cut_frequency
+%       ← inv_sampling_frequency, inv_low_cut_frequency, inv_high_cut_frequency
+%     top_time_1/2/3 ← inv_time_1/2/3
+%     top_number_of_frames ← number_of_frames
+%   Defaults if missing: top_regularization_parameter = 5 (added in the
+%   inverse-distance denominator in zef_evaluate_topography),
+%   top_data_segment ← inv_data_segment, top_normalize_data = 1.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'top_regularization_parameter'));` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   Then writes those values into the string/value widgets. Does not
+%   compute top_reconstruction.
+%
+%   See also zef_topography, zef_update_topography, zef_evaluate_topography.
+%
 
 if not(isfield(zef,'top_regularization_parameter'));
     zef.top_regularization_parameter = 5;
@@ -58,7 +46,8 @@ zef.top_number_of_frames = zef.number_of_frames;
 
 
 % set(zef.h_top_pcg_tol ,'string',num2str(zef.top_pcg_tol));
-set(zef.h_top_regularization_parameter ,'string',num2str(zef.top_regularization_parameter));
+set(zef.h_top_regularization_parameter ,'string',num2str(zef.top_regularization_parameter)
+);
 set(zef.h_top_sampling_frequency ,'string',num2str(zef.top_sampling_frequency));
 set(zef.h_top_low_cut_frequency ,'string',num2str(zef.top_low_cut_frequency));
 set(zef.h_top_high_cut_frequency ,'string',num2str(zef.top_high_cut_frequency));

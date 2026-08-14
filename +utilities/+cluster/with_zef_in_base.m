@@ -1,30 +1,17 @@
 function varargout = with_zef_in_base(zef_struct, callback)
-% --- Zeffiro documentation header ---
-% utilities.cluster.with_zef_in_base — With zef in base.
+%WITH_ZEF_IN_BASE  Temporarily assign zef in base workspace for legacy inverters.
 %
-% Purpose:
-%   With zef in base.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef_struct
-%   callback
+%   varargout = with_zef_in_base(zef_struct, callback)
 %
-% Outputs:
-%   varargout
-%
-% Calls (project):
-%   utilities.cluster.with_zef_in_base
-%   zef_struct
-%
-% Side effects:
-%   - base/caller workspace
-%   - parallel/cluster
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[varargout] = utilities.cluster.with_zef_in_base(zef_struct, callback)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Saves any existing base-workspace zef, assigns zef_struct as zef, invokes
+%   callback (typically a legacy inverse feval), then restores or clears zef.
+%   Used by dispatch_inverse for legacy methods that read global zef instead of
+%   accepting a struct argument.
 
 arguments
     zef_struct (1,1) struct

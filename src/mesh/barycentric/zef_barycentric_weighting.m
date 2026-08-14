@@ -1,24 +1,29 @@
 function weighting = zef_barycentric_weighting(weighting_type)
-% --- Zeffiro documentation header ---
-% zef_barycentric_weighting — Zef barycentric weighting.
+%ZEF_BARYCENTRIC_WEIGHTING  Quadrature weights for P1 products on tets/triangles.
 %
-% Purpose:
-%   Zef barycentric weighting.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   weighting_type
+%   Exact integrals of products of linear hats on a reference tet/triangle,
+%   factored so assemblers only multiply by volume or area.
 %
-% Outputs:
-%   weighting
+%     FF  - ∫ ψ_i ψ_j dV: 1/10 on the diagonal (i=j), 1/20 off (i≠j).
+%           (Reference tet volume 1; times |V| in the assembler.)
+%     GG  - ∫ ∇ψ_i·∇ψ_j is constant per tet, weight 1 (gradients already
+%           include 1/V scaling from zef_volume_barycentric).
+%     FG  - ∫ ψ ∇ψ, weight 1/4 (mean of ψ is 1/4).
+%     uFG - same pair as FF, used by the matrix-free u·F·G kernel.
+%     surface_FF - ∫_Δ ψ_i ψ_j dS: 1/6 diagonal, 1/12 off (area=1 triangle).
+%     surface_FG - ∫_Δ ψ ∇ψ dS, weight 1/3.
 %
-% Calls (project):
-%   zef_barycentric_weighting
+%   weighting = zef_barycentric_weighting(weighting_type)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[weighting] = zef_barycentric_weighting(weighting_type)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output: scalar or 1×2 [same_vertex, cross_vertex]. Unmatched types
+%   leave weighting undefined (MATLAB error on use).
+%
+%   See also zef_volume_scalar_matrix, zef_surface_scalar_matrix.
 
 switch weighting_type
 

@@ -1,34 +1,26 @@
 function tetra_ind = zef_get_tetra_to_refine(domain_ind, thresh_val, k_param, nodes, tetra, domain_labels, reuna_p,reuna_t)
-% --- Zeffiro documentation header ---
-% zef_get_tetra_to_refine — Zef get tetra to refine.
+%ZEF_GET_TETRA_TO_REFINE  Adaptive volume-refinement candidates near a surface.
 %
-% Purpose:
-%   Zef get tetra to refine.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   domain_ind
-%   thresh_val
-%   k_param
-%   nodes
-%   tetra
-%   domain_labels
-%   reuna_p
-%   reuna_t
+%   tetra_ind = zef_get_tetra_to_refine(domain_ind, thresh_val, k_param, ...
+%       nodes, tetra, domain_labels, reuna_p, reuna_t)
 %
-% Outputs:
-%   tetra_ind
+%   Called from zef_create_fem_mesh when adaptive refinement is on
+%   (not from zef_refinement_step). For each domain_ind(i):
+%     1. Surface vertices of compartment i (reuna_p{i}(unique faces)).
+%     2. Volume-mesh surface nodes of tets with that domain label.
+%     3. For each surface vertex, distance to nearest volume-surface
+%        node. Vertices farther than thresh_val * median(dist) are
+%        "far" (zef.adaptive_refinement_thresh_val).
+%     4. Volume-surface nodes whose k_param nearest surface vertices
+%        include a far vertex mark tets that contain those nodes.
 %
-% Calls (project):
-%   zef_get_tetra_to_refine
-%   zef_surface_mesh
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[tetra_ind] = zef_get_tetra_to_refine(domain_ind, thresh_val, k_param, nodes, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   Output indices are into the domain-filtered tetra, then mapped back
+%   to the full mesh. See also zef_mesh_refinement.
 tetra_ind = [];
 I_aux = find(sum(ismember(domain_labels,domain_ind),2));
 tetra = tetra(I_aux,:);

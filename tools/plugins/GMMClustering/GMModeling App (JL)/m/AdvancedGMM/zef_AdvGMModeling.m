@@ -1,32 +1,21 @@
-% --- Zeffiro documentation header ---
-% function [GMModel,GMModelDipoles,GMModelAmplitudes,GMModelTimeVariables] = zef_AdvGMModeling — Function [GMModel,GMModel Dipoles,GMModel Amplitudes,GMModel Time Variables] = zef Adv GMModeling.
-%
-% Purpose:
-%   Function [GMModel,GMModel Dipoles,GMModel Amplitudes,GMModel Time Variables] = zef Adv GMModeling.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.parcellation_interp_ind (read)
-%   zef.parcellation_selected (read)
-%   zef.reconstruction (read)
-%   zef.reconstruction_information (read)
-%   zef.source_interpolation_ind (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   zef_AdvGMModeling
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [GMModel,GMModelDipoles,GMModelAmplitudes,GMModelTimeVariables] = zef_AdvGMModeling` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [GMModel,GMModelDipoles,GMModelAmplitudes,GMModelTimeVariables] = zef_AdvGMModeling
+%ZEF_ADVGMMODELING  Advanced GMM fit on an existing reconstruction (JL app).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   [GMModel, GMModelDipoles, GMModelAmplitudes, GMModelTimeVariables]
+%       = zef_AdvGMModeling
+%
+%   Called from GMModelApp StartButton when advanced options are on.
+%   Needs zef.reconstruction and zef.source_positions. Uses vendor
+%   helpers in AdvancedGMM (FitAdvGMM, estep, …) — those files are not
+%   Zeffiro APIs. Waitbar is MATLAB waitbar (not zef_waitbar). Does
+%   not invert L.
+%
+%   See also zef_GMModeling_K, zef_GMM_AdvModelingOpt.
 
 h = waitbar(0,['Gaussian mixature model.']);
 GMModelTimeVariables = [];
@@ -80,6 +69,8 @@ tag_ind = evalin('base','find(strcmp(zef.GMM.parameters.Tags,''domain''))');
 
 
 if strcmp(parameters{tag_ind},'2')
+% Domain parameter 2: restrict source_positions to selected parcels
+% (parcellation_interp_ind volume indices), then triplet columns of L.
 source_ind_aux = evalin('base','zef.source_interpolation_ind{1}');
 p_ind_aux_1 = [];
 p_selected = evalin('base','zef.parcellation_selected');
@@ -120,7 +111,8 @@ if length(K) < T
     K = [K,K(end)*ones(1,T-length(K))];
 end
 
-waitbar(0,h,['Step 1 of ',num2str(T),'. Please wait.']);
+waitbar(0,h,['Step 1 of ',num2str(T)
+,'. Please wait.']);
 tic;
 for t=t_start:T
     best_fit = Inf;
@@ -204,7 +196,8 @@ for t=t_start:T
     end
 
     if strcmp(initial_mode,'1')
-        %calculate Gaussian mixature models:
+        % k-means++ start (Start='plus') through vendor FitAdvGMM.
+        % Retry with RegularizationValue if the unregularized fit throws.
         try
             GMModel_aux = FitAdvGMM(activity_space,weight,k,'CovarianceType',Sigma, ...
                 'SharedCovariance',SharedCovariance,'Start','plus','Replicates',replicates,'Options',options);

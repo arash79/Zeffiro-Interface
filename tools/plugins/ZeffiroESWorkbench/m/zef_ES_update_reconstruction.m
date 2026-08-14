@@ -1,36 +1,21 @@
 function zef = zef_ES_update_reconstruction(zef, varargin)
-% --- Zeffiro documentation header ---
-% zef_ES_update_reconstruction — Zef ES update reconstruction.
+%ZEF_ES_UPDATE_RECONSTRUCTION  Update reconstruction button: zef.reconstruction = volumetric_current_density{sr,sc}.
 %
-% Purpose:
-%   Zef ES update reconstruction.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   varargin
+%   ButtonPushedFcn of h_ES_update_reconstruction (then zef_plot_meshes)
+%   and right-click menu item 1. sr,sc from zef_ES_objective_function unless
+%   nargin==3 supplies the indices. Deletes an existing ES_colorbar.
 %
-% Outputs:
-%   zef
+%   zef = zef_ES_update_reconstruction()
+%   zef = zef_ES_update_reconstruction(zef)
+%   zef = zef_ES_update_reconstruction(zef, sr, sc)
 %
-% Zef fields (observed):
-%   zef.h_zeffiro (read)
-%   zef.reconstruction (read, write)
-%   zef.y_ES_interval (read)
+%   See also zef_ES_objective_function, zef_plot_meshes.
 %
-% Calls (project):
-%   zef_ES_objective_function
-%   zef_ES_update_reconstruction
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_ES_update_reconstruction(zef, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 switch nargin
     case 0

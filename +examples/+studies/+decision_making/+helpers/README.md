@@ -1,59 +1,15 @@
-# +examples/+studies/+decision_making/+helpers
+# Decision-making helpers
 
-## Purpose of this folder
+Scripts (except `zef_rec_maximizer`) assume workspace variables from `zef_parameters_focal_epilepsy` and a populated `zef` (mesh, `source_positions`, Data Bank reconstructions already inverted). They sit **after** `zef_find_reconstructions_focal_epilepsy`. Parent study README: [../README.md](../README.md).
 
-Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+They drive the **legacy GMM (SP)** plugin (`zef_cluster_reconstruction` / `zef.GMModel`), not `plugins.ClassGMM` and not the JL app.
 
-## Contents
+| File | Kind | Role |
+|------|------|------|
+| `zef_cluster_reconstructions_focal_epilepsy.m` | script | For each method in `z_inverse_results`: peak location (`zef_rec_maximizer`), then `zef_cluster_reconstruction`. Stacks max-points and centres; optional `load(credibility_data_file_name)`. `zef_find_clusters` → `I_aux` / `J_aux` of the largest cluster. |
+| `zef_final_reconstruction_focal_epilepsy.m` | script | Combines those max-points and cluster centres into `z_inverse_info` for the decision script. |
+| `zef_show_results_focal_epilepsy.m` | script | Overlays reconstructions / clusters on the Figure tool. |
+| `zef_set_training_data.m` | script | Copies `data_ind` into the training struct used by process/create. |
+| `zef_rec_maximizer(rec_arr, s_pos)` | function | Reshape reconstruction to 3-by-N, return `s_pos` of max \(\\|q\\|\) |
 
-MATLAB sources:
-- `zef_set_training_data.m` — **examples.studies.decision_making.helpers.data_ind = 1;**: Example or study script demonstrating data_ind = 1;.
-- `zef_show_results_focal_epilepsy.m` — **examples.studies.decision_making.helpers.if size(zef**: Example or study script demonstrating if size(zef.
-- `zef_final_reconstruction_focal_epilepsy.m` — **examples.studies.decision_making.helpers.z_inverse_info = [z_inverse_info repmat({'Maximum point'}, size(z_inverse_info, 1), 1); z_inverse_info repmat({'Cluster centre'}, size(z_inverse_info, 1), 1)];**: Example or study script demonstrating z_inverse_info = [z_inverse_info repmat({'Maximum point'}, size(z_inverse_info, 1), 1); z_inverse_info repmat({'Cluster centre'}, size(z_inverse_info, 1), 1)];.
-- `zef_cluster_reconstructions_focal_epilepsy.m` — **examples.studies.decision_making.helpers.zef**: Example or study script demonstrating zef.
-- `zef_rec_maximizer.m` — **examples.studies.decision_making.helpers.zef_rec_maximizer**: Example or study script demonstrating zef_rec_maximizer.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
-
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
-```
-
-Representative entry points in this folder:
-- `Call `examples.studies.decision_making.helpers.data_ind = 1;` from MATLAB with the project root on the path.`
-- `Call `examples.studies.decision_making.helpers.if size(zef` from MATLAB with the project root on the path.`
-- `Call `examples.studies.decision_making.helpers.z_inverse_info = [z_inverse_info repmat({'Maximum point'}, size(z_inverse_info, 1), 1); z_inverse_info repmat({'Cluster centre'}, size(z_inverse_info, 1), 1)];` from MATLAB with the project root on the path.`
-- `Call `examples.studies.decision_making.helpers.zef` from MATLAB with the project root on the path.`
-- ``[max_point] = examples.studies.decision_making.helpers.zef_rec_maximizer(rec_arr, s_pos)` with project root and `src` on the path.`
-
-## Examples
-
-Run scripts directly after startup, e.g. `run('+examples/+studies/+decision_making/+helpers/zef_cluster_reconstructions_focal_epilepsy.m')`.
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Do not `run` these in isolation unless those workspace names already exist.

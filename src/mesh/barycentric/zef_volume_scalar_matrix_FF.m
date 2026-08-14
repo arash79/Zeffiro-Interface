@@ -1,28 +1,17 @@
 function M = zef_volume_scalar_matrix_FF(nodes, tetra, scalar_field)
-% --- Zeffiro documentation header ---
-% zef_volume_scalar_matrix_FF — Zef volume scalar matrix FF.
+%ZEF_VOLUME_SCALAR_MATRIX_FF  P1 mass ∫ φ ψ_i ψ_j dV with weights [1/10 1/20].
 %
-% Purpose:
-%   Zef volume scalar matrix FF.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   scalar_field
+%   Wrapper → zef_volume_scalar_matrix. NSE mass C, I_μ, M_2. scalar_field
+%   default ones(T,1).
 %
-% Outputs:
-%   M
+%   M = zef_volume_scalar_matrix_FF(nodes, tetra, scalar_field)
 %
-% Calls (project):
-%   zef_barycentric_weighting
-%   zef_volume_scalar_matrix
-%   zef_volume_scalar_matrix_FF
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_volume_scalar_matrix_FF(nodes, tetra, scalar_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_volume_scalar_matrix, zef_nse_poisson.
 
 if nargin < 3
     scalar_field = ones(size(tetra,1),1);

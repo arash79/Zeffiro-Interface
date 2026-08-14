@@ -1,28 +1,33 @@
 function [tetra,labels_tetra] = zef_hexa_to_tetra(hexa,varargin)
-% --- Zeffiro documentation header ---
-% zef_hexa_to_tetra — Zef hexa to tetra.
+%ZEF_HEXA_TO_TETRA  Split each 8-node hexahedron into six tetrahedra.
 %
-% Purpose:
-%   Zef hexa to tetra.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   hexa
-%   varargin
+%   Same local stencil as the mode-2 lattice in zef_create_fem_mesh /
+%   zef_fem_mesh (no parity flip). Used by utilities.duneuro2zef.convert_mesh
+%   when DUNEuro supplies hexahedral elements.
 %
-% Outputs:
-%   tetra
-%   labels_tetra
+%   [tetra, labels_tetra] = zef_hexa_to_tetra(hexa)
+%   [tetra, labels_tetra] = zef_hexa_to_tetra(hexa, labels_hexa)
 %
-% Calls (project):
-%   zef_hexa_to_tetra
-%   zef_waitbar
+%   Inputs
+%     hexa         - H×8 1-based node indices. Column order must match the
+%                    stencil (corners 1–4 bottom, 5–8 top in the usual
+%                    structured numbering).
+%     labels_hexa  - optional H×1, copied to all six children of that cube.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[tetra, labels_tetra]] = zef_hexa_to_tetra(hexa, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Outputs
+%     tetra         - (6H)×4.
+%     labels_tetra  - (6H)×1 if labels were given, otherwise unset.
+%
+%   Notes
+%     The loop body contains `i = i + 6`, which MATLAB's for-loop then
+%     overwrites on the next iteration; it does not skip cubes.
+%
+%   See also zef_create_fem_mesh, zef_fem_mesh.
 
 labels_hexa = [];
 h = zef_waitbar(0,1,'Mesh conversion.');
@@ -54,6 +59,7 @@ for i = 1 : n_cubes
     if not(isempty(labels_hexa))
         labels_tetra(6*(i-1)+1:6*i) = labels_hexa(i)*ones(6,1);
     end
+    % No-op: the for-loop counter is reset to i+1 on the next iteration.
     i = i + 6;
 
 end

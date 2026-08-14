@@ -1,34 +1,19 @@
 function ES_active_electrodes = zef_ES_fix_active_electrodes(zef)
-% --- Zeffiro documentation header ---
-% zef_ES_fix_active_electrodes — Zef ES fix active electrodes.
+%ZEF_ES_FIX_ACTIVE_ELECTRODES  Active-electrode mask from score-dose / y_ES when the checkbox is on.
 %
-% Purpose:
-%   Zef ES fix active electrodes.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   ValueChangedFcn of h_ES_fixed_active_electrodes and the constructor.
+%   If the box is off, returns []. If on, takes y_ES{sr,sc} from
+%   zef_ES_objective_function and the ES_score_dose largest-|y| indices.
 %
-% Outputs:
-%   ES_active_electrodes
+%   ES_active_electrodes = zef_ES_fix_active_electrodes(zef)
 %
-% Zef fields (observed):
-%   zef.ES_score_dose (read)
-%   zef.h_ES_fixed_active_electrodes (read)
-%   zef.y_ES_interval (read)
+%   See also zef_ES_objective_function, zef_ES_find_currents_recursive.
 %
-% Calls (project):
-%   zef_ES_fix_active_electrodes
-%   zef_ES_objective_function
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[ES_active_electrodes] = zef_ES_fix_active_electrodes(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if not(zef.h_ES_fixed_active_electrodes.Value)
     ES_active_electrodes = [];

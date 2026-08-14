@@ -1,43 +1,14 @@
-# profile/multicompartment_head_legacy
+# `multicompartment_head_legacy`
 
-## Purpose of this folder
+Head profile whose segmentation INI is **pre-seeded** with a 25-compartment table (skin, skull, CSF, grey/white matter, plus Detail 1–22). Use this when you want default tissue names and σ values without importing a segmentation first.
 
-Startup profiles and `zeffiro_plugins.ini` that attach plugin menus.
+Switch: segmentation tool **Profile:** dropdown, then apply INIs (dropdown alone does not reload files). Parent: [`profile/README.md`](../README.md).
 
-## Contents
+## How it differs from `multicompartment_head`
 
-Other files:
-- `zeffiro_forward_simulation.ini`
-- `zeffiro_init.ini`
-- `zeffiro_parameters.ini`
-- `zeffiro_plugins.ini`
-- `zeffiro_segmentation.ini`
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+| File | Difference |
+|------|------------|
+| `zeffiro_segmentation.ini` | Populated tags `sc,sk,c,g,w,d1…d22` with colours, activity (`g` unconstrained field, `w` active surface), and σ (skin 0.43, skull 0.0064, CSF 1.79, grey 0.33, white 0.14). |
+| `zeffiro_plugins.ini` | Adds **EXP IAS RAMUS** (`exp_ias_map_estimation_multires`). Drops SL1, EXP Lasso, DTI, synthetic source patch. Keeps dual GMM, Kalman, NSE. |
+| `zeffiro_parameters.ini` | Same σ-on / ρ-off layout as the default head profile. |
+| `zeffiro_forward_simulation.ini` | Same EEG/MEG/EIT/tES isotropic+anisotropic table as the default head. |

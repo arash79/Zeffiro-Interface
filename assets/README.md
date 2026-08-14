@@ -1,59 +1,39 @@
-# assets
+# GUI assets (`assets/`)
 
-## Folder purpose
+Logos, toolbar PNGs, and legacy MATLAB `.fig` layouts. This folder is not on the scientific path: it does not mesh, invert, or import anatomy. `zeffiro_interface` adds `genpath(assets/fig)` so `imread` and `openfig` can find files by name.
 
-**Static GUI resources** for Zeffiro Interface: legacy MATLAB `.fig` layouts, toolbar PNG icons, and logos. Not executable code. Loaded via `addpath(genpath(fullfile(program_path, 'assets', 'fig')))` in `zeffiro_interface.m`.
+## What you actually see at startup
 
-## Main contents
+By default `zef.mlapp` is 1 (`zef_init`). The windows you click are App Designer exports under `src/gui/apps/` (`zef_segmentation_tool_app_exported`, `zef_mesh_tool_app_exported`, …). The `.fig` files here are the **legacy** layouts used only when `zef.mlapp == 0`.
 
-```
-assets/fig/
-├── *.png              # Compass, mesh symbols, branding
-└── tools/
-    ├── zeffiro_interface_segmentation_tool.fig
-    ├── zeffiro_interface_mesh_tool.fig
-    ├── zeffiro_interface_figure_tool.fig
-    ├── zeffiro_interface_butterfly_plot.fig
-    ├── zeffiro_interface_parcellation_tool.fig
-    ├── zeffiro_interface_ramus_inversion_tool.fig
-    ├── zef_find_synthetic_source.fig
-    ├── zef_find_synthetic_eit_data.fig
-    └── logos/*.png
-```
+Plugin windows are **not** here. Each plugin keeps its own `mlapp/` or `fig/` (for example EXP GUIDE `.fig` files under `tools/plugins/EXP/`).
 
-## Code functionality
+## Icons
 
-**Default UI path:** `zef.mlapp == 1` (default in `zef_init`) uses **App Designer** exports in `src/gui/apps/*.mlapp` — not these `.fig` files.
+Keep these filenames stable; waitbars and menus load them by name:
 
-**Legacy path:** when `zef.mlapp == 0`, `zef_segmentation_tool` opens `zeffiro_interface_segmentation_tool.fig` from here.
+`zeffiro_logo.png`, `zeffiro_small_logo.png`, `zeffiro_interface_compass.png`, `zeffiro_logo_compass.png`, `zeffiro_mesh_symbol.png`, `zeffiro_symbol_compass.png`, `zeffiro_symbol_mesh.png`.
 
-**CLI:** `zeffiro_interface('open_figure', 'name.fig')` resolves relative paths under `assets/fig/`.
-
-**Waitbar:** `zef_waitbar` may `imread` icons from this tree.
-
-## Workflow context
-
-| Consumer | Usage |
-|----------|--------|
-| `zeffiro_interface` | `addpath` at startup |
-| `src/core/zef_start` | Legacy fig tools if mlapp off |
-| `tools/plugins` | Some plugins still use local `fig/` (not under `assets/`) |
-
-## Usage instructions
+## Opening a `.fig` from MATLAB
 
 ```matlab
 zeffiro_interface('open_figure', 'zeffiro_interface_figure_tool.fig');
-% Opens from assets/fig when path is relative
 ```
 
-## Important notes
+A relative path is resolved under `assets/fig/`. `open_figure_folder` opens every `.fig` in a directory (see `help zeffiro_interface`).
 
-- Prefer App Designer (`.mlapp`) for new tools — `.fig` is maintenance mode.
-- Plugin-specific figures live under `tools/plugins/<name>/fig/`, not necessarily here.
-- Binary `.fig` files are not diff-friendly — edit in MATLAB Figure/App Designer only.
+## Layout files under `fig/tools/`
 
-## Developer guidance
+| File | Legacy window |
+|------|----------------|
+| `zeffiro_interface_segmentation_tool.fig` | Segmentation tool when `mlapp==0` |
+| `zeffiro_interface_mesh_tool.fig` | Mesh tool |
+| `zeffiro_interface_figure_tool.fig` | Figure tool (the live Figure tool is still built in `zef_figure_tool.m`, not App Designer) |
+| `zeffiro_interface_butterfly_plot.fig` | Butterfly plot |
+| `zeffiro_interface_parcellation_tool.fig` | Parcellation |
+| `zeffiro_interface_ramus_inversion_tool.fig` | RAMUS |
+| `zef_find_synthetic_source.fig` / `zef_find_synthetic_eit_data.fig` | Synthetic source / EIT data |
 
-- New core tool: export to `src/gui/apps/`, not `assets/fig/`, unless supporting legacy mode explicitly.
-- Keep PNG names stable — `zef_waitbar` and menus may reference them by filename.
-- Document legacy-only assets in tool README if mlapp path diverges.
+New core tools belong in `src/gui/apps/`, not here. Binary `.fig` files do not diff well; edit them in MATLAB GUIDE/Figure tools only.
+
+Child notes: [`fig/README.md`](fig/README.md). Live GUI wiring: [`src/gui/README.md`](../src/gui/README.md).

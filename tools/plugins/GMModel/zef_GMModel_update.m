@@ -1,31 +1,18 @@
 function zef = zef_GMModel_update(zef)
-% --- Zeffiro documentation header ---
-% zef_GMModel_update — Zef GMModel update.
+%ZEF_GMMODEL_UPDATE  GMM widgets → zef.GMModel clustering parameters.
 %
-% Purpose:
-%   Zef GMModel update.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_GMModel_update(zef)
 %
-% Outputs:
-%   zef
+%   Called from Run before zef_cluster_reconstruction. Copies
+%   max_n_clusters, credibility, n_dynamic_levels, reg_param,
+%   max_n_iter, tol_val, frame_number. Does not write reconstruction.
 %
-% Zef fields (observed):
-%   zef.GMModel (read)
-%
-% Calls (project):
-%   zef_GMModel_update
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_GMModel_update(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_cluster_reconstruction.
 
 zef.GMModel.max_n_clusters = str2num(zef.GMModel.h_max_n_clusters.String);
 zef.GMModel.credibility = str2num(zef.GMModel.h_credibility.String);

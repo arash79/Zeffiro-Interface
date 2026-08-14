@@ -1,51 +1,23 @@
-# +inverse/@MNEInverter
+# inverse.MNEInverter
 
-## Purpose of this folder
+Weighted minimum-norm: `z = (θ .* L)' ((θ .* L) L' + C) \ f`, or `z = W f` when `precompute` has cached `W`. Registry ids `mne` and `wmne` both select this class; there is no separate unweighted switch — `theta` always weights columns.
 
-Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+GUI MNE tool still calls `zef_find_mne_reconstruction` (`legacy_mne`), not this class.
 
-## Contents
+## Files
 
-MATLAB sources:
-- `MNEInverter.m` — **inverse.MNEInverter.MNEInverter**: Inverse solver class implementing MNE reconstruction.
+| File | Role |
+|------|------|
+| `MNEInverter.m` | `theta`, `noise_cov`, `initial_prior_steering_db`, listeners, `terminateComputation` |
+| initialize (in classdef) | If `noise_cov` empty: sample `cov(f')` or SNR-scaled identity. `theta` from data power, SNR, and per-triplet `‖L‖²`, steered by `initial_prior_steering_db` |
+| precompute (in classdef) | `W = L_mod' / (L_mod L' + C)` with `L_mod = L .* theta` |
+| invert (in classdef) | `W*f` or the direct solve; GPU gather |
 
-## How this folder fits into the overall workflow
+SetObservable `theta` / `noise_cov`: user-set values are kept across runs; auto-estimated ones are cleared in `terminateComputation`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+## Call
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+[zef, r] = zef_inverse_run(zef, "mne", "execution", "local", ...
+    "MethodParams", struct("initial_prior_steering_db", 0));
 ```
-
-Representative entry points in this folder:
-- ``inverse.MNEInverter.MNEInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-Programmatic: `zef_inverse_run(zef, 'eloreta')` or `inverse.ELORETAInverter().computeInversionWithZI(zef)`.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

@@ -1,53 +1,36 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_update(zef)
-% --- Zeffiro documentation header ---
-% zef_update — Syncs GUI control values into `zef` for zef_update.
+%ZEF_UPDATE  Copy GUI table/control values into zef and refresh dependent widgets.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for zef_update.
-%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Central GUI-to-state sync. Reads the segmentation-tool compartment table
+%   (rows map to zef.compartment_tags in reverse order), writes
+%   <tag>_priority and parameter_profile scalars/strings, drops inactive
+%   compartment fields, then similarly syncs sensors, transforms, and
+%   figure-tool sliders. CellEditCallback is cleared while table Data is
+%   rewritten to avoid recursive callbacks. Returns immediately if the
+%   compartment table handle is missing (project load before GUI init).
 %
-% Outputs:
-%   zef
+%   zef = zef_update(zef)
+%   zef_update          % reads and writes zef in the base workspace
 %
-% Zef fields (observed):
-%   zef.aux_field_1 (read, write)
-%   zef.aux_field_2 (read, write)
-%   zef.aux_field_3 (read, write)
-%   zef.aux_field_4 (read, write)
-%   zef.compartment_table_size (read)
-%   zef.compartment_tags (read, write)
-%   zef.current_sensors (read, write)
-%   zef.h_aux (read, write)
-%   zef.h_axes1 (read, write)
-%   zef.h_compartment_table (read)
-%   zef.h_menu_window (read)
-%   zef.h_mesh_tool (read)
-%   zef.h_mesh_visualization_tool (read)
-%   zef.h_parameters_table (read)
-%   zef.h_profile_name (read)
-%   … (19 more)
+%   Input
+%     zef  - session struct. If omitted, evalin('base','zef').
 %
-% Calls (project):
-%   zef_init_sensors_name_table
-%   zef_update
-%   zef_update_compartment_table_data
-%   zef_update_fig_details
+%   Output
+%     zef  - updated session. If nargout is 0, assigned into the base workspace.
 %
-% Side effects:
-%   - base/caller workspace
-%   - creates/updates figures
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
+%   Notes
+%     Compartment table column 1 is priority; NaN with column 2 true assigns
+%     priority from the row index. Inactive rows have all <tag>_* fields
+%     removed. Table rows are then sorted by priority.
 %
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_update(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_start, zef_update_compartment_table_data, zef_get_data_compartment_table.
 
 
 if nargin == 0

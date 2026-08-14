@@ -1,59 +1,49 @@
-# +utilities/+sensitivity
+# `utilities.sensitivity` — Monte Carlo localization metrics
 
-## Purpose of this folder
+Synthesizes dipole-probe measurements from `zef.L`, runs `zef_inverse_run`, and scores peak location / angle / magnitude / dispersion. Used by studies that need method-comparison statistics without a GUI.
 
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
-
-## Contents
-
-MATLAB sources:
-- `aggregate_statistics.m` — **utilities.sensitivity.aggregate_statistics**: Aggregate statistics.
-- `compute_metrics.m` — **utilities.sensitivity.compute_metrics**: Compute metrics.
-- `method_capability.m` — **utilities.sensitivity.method_capability**: Method capability.
-- `run_monte_carlo.m` — **utilities.sensitivity.run_monte_carlo**: Run monte carlo.
-- `synthesize_measurements.m` — **utilities.sensitivity.synthesize_measurements**: Synthesize measurements.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+Requires a session that already has `zef.L` (and source geometry). Does not mesh or assemble a lead field.
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+cap = utilities.sensitivity.method_capability("eloreta");
+results = utilities.sensitivity.run_monte_carlo(zef, "eloreta", ...
+    "NumberOfRuns", 10, ...
+    "NoiseLevelDb", -30, ...
+    "DiffType", "L2", ...
+    "DispersionRadius", 30, ...
+    "SourceAmplitude", 10, ...
+    "execution", "local");
+stats = utilities.sensitivity.aggregate_statistics(results.runs);
 ```
 
-Representative entry points in this folder:
-- ``[stats] = utilities.sensitivity.aggregate_statistics(runs)` with project root and `src` on the path.`
-- ``[metrics] = utilities.sensitivity.compute_metrics(z, source_positions, source_indices, diff_type, …)` with project root and `src` on the path.`
-- ``[capability] = utilities.sensitivity.method_capability(method_id)` with project root and `src` on the path.`
-- ``[results] = utilities.sensitivity.run_monte_carlo(zef, method_id, opts)` with project root and `src` on the path.`
-- ``[F] = utilities.sensitivity.synthesize_measurements(L, source_indices, amp, noise_db, …)` with project root and `src` on the path.`
+## `run_monte_carlo`
 
-## Examples
+| Option | Default | Meaning |
+|--------|---------|---------|
+| `NumberOfRuns` | 1 | Independent noise realizations |
+| `NoiseLevelDb` | -30 | SNR for AWGN (`mustBeNonpositive`) |
+| `DiffType` | `"L2"` | `"L2"` or `"minabs"` peak picking |
+| `DispersionRadius` | 30 | Same units as `zef.source_positions` (typically mm) |
+| `SourceAmplitude` | 10 | Probe scale |
+| `IsolatedFramesPerProbe` | 4 | Stateful (Kalman) path |
+| `MaxProbesPerBatch` | 1000 | Linear/static batching |
+| `MethodParams` | `struct` | Forwarded to `zef_inverse_run` |
+| `execution` | `"local"` | `"cluster"` needs `ClusterProfile` |
+| `SourceIndices` | `procFile.s_ind_0` | Subset of sources |
+| `Capability` / `ProcFile` | auto | Skip recompute if you already have them |
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+Errors `MissingLeadField` if `zef.L` is empty. Sets `zef_local.inv_data_mode = 'raw'` so each realization is a measurement matrix, not filtered EEG.
 
-## Dependencies and assumptions
+`method_capability` chooses strategy: `linear_static` (CSM/MNE/eLORETA), `iterative_static` (dipole scan, beamformer, IAS, RAMUS, HALpR), `stateful_dynamic` (Kalman), or `unsupported`.
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## `synthesize_measurements`
 
-## Notes for developers
+`F = synthesize_measurements(L, source_indices, amp, noise_db, ...)`. `L` must have **3 columns per source**. `SourceDirectionMode` 1 = three unit axes, 2 = normal (still 3 cols in `L`), 3 = one probe along `SourceDirections` (n_sources × 3).
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## `compute_metrics`
+
+Per-probe `distance`, `angle`, `magnitude`, `dispersion`, `max_ind`. Reconstruction cells must match probe count (3 per source unless mode 3).
+
+## `aggregate_statistics`
+
+Mean/std across `runs` cells produced by `run_monte_carlo`.

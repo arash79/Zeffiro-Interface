@@ -1,30 +1,26 @@
-% --- Zeffiro documentation header ---
-% examples.studies.decision_making.examples.studies.decision_making — Example or study script demonstrating examples.studies.decision_making.
+%ZEF_PROCESS_TRAINING_DATA_FOCAL_EPILEPSY  Score methods on saved training_data.
 %
-% Purpose:
-%   Example or study script demonstrating examples.studies.decision_making.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.program_path (read)
-%   zef.resection_points (read, write)
+%   Script. zef_parameters_focal_epilepsy then load(training_data_file_name)
+%   (expects variable training_data). Opens project_file_name if zef missing.
+%   addpath(genpath(zef.program_path/scripts)). For each trial:
+%   zef_dataBank_set_reconstructions, then helper
+%   zef_cluster_reconstructions_focal_epilepsy (needs supervised clustering
+%   off or an existing credibility .mat — first pass typically uses
+%   cred_val_points). Increments credibility_data_aux(J_aux,snr_ind).
+%   save(credibility_data_file_name,'credibility_data','-v7.3') as fractions.
 %
-% Calls (project):
-%   zef_dataBank_set_reconstructions
-%   zef_waitbar
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_create_training_data_focal_epilepsy,
+%   zef_cluster_reconstructions_focal_epilepsy.
 
 examples.studies.decision_making.zef_parameters_focal_epilepsy;
 
-load(training_data_file_name);
+load(training_data_file_name)
+;
 
 if not(exist('zef', 'var'))
     zef = zeffiro_interface('start_mode','nodisplay','open_project',project_file_name);

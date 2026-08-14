@@ -1,33 +1,26 @@
 function zef_plot_dpq(type,zef)
-% --- Zeffiro documentation header ---
-% zef_plot_dpq — Renders or updates a plot_dpq figure from current `zef` state.
+%ZEF_PLOT_DPQ  Eval enabled queue rows of type 'static' or 'dynamical'.
 %
-% Purpose:
-%   Renders or updates a plot_dpq figure from current `zef` state.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   type
-%   zef
+%   Walks zef.dynamical_plot_queue_table. For each row whose column 2
+%   passes str2num and whose column 3 equals type, evalin('caller',
+%   column 1). That is how bank overlays (zef_plot_synthetic_source, …)
+%   run on the current mesh axes. Called from zef_plot_meshes /
+%   zef_plot_volume / zef_print_meshes / zef_play_cdata, not from the
+%   queue window.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_plot_dpq(type)
+%   zef_plot_dpq(type, zef)
 %
-% Zef fields (observed):
-%   zef.dynamical_plot_queue_table (read)
+%   type is 'static' or 'dynamical'. With one argument, zef is taken from
+%   the caller if present. Empty zef is a no-op. Visualization wraps the
+%   call in try/catch and warns on failure.
 %
-% Calls (project):
-%   zef_plot_dpq
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_plot_dpq(type, zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dpq_window, zeffiro_interface_dynamical_plot_queue.
 
 if nargin == 1
     if evalin('base','exist(''zef'',''var'');')

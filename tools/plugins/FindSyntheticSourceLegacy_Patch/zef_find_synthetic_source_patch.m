@@ -1,30 +1,18 @@
 function zef = zef_find_synthetic_source_patch(zef)
-% --- Zeffiro documentation header ---
-% zef_find_synthetic_source_patch — Zef find synthetic source patch.
+%ZEF_FIND_SYNTHETIC_SOURCE_PATCH  Open Forward tools → Synthetic extended source patch.
 %
-% Purpose:
-%   Zef find synthetic source patch.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Default-profile menu callback. Create data:
+%   zef.measurements = zef_find_source_patch(zef) after zef_update_fss_patch.
 %
-% Outputs:
-%   zef
+%   zef = zef_find_synthetic_source_patch(zef)
 %
-% Calls (project):
-%   zef_find_synthetic_source_patch
-%   zef_tool_start
+%   See also zef_find_source_patch.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_find_synthetic_source_patch(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     zef = evalin('base','zef');

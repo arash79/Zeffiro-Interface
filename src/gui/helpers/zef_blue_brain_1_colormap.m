@@ -1,28 +1,15 @@
 function [colormap_vec] = zef_blue_brain_1_colormap(colortune_param, colormap_size)
-% --- Zeffiro documentation header ---
-% zef_blue_brain_1_colormap — Zef blue brain 1 colormap.
+%ZEF_BLUE_BRAIN_1_COLORMAP  colormap_cell{10} "Blue brain I".
 %
-% Purpose:
-%   Zef blue brain 1 colormap.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   colortune_param
-%   colormap_size
+%   colormap_vec = zef_blue_brain_1_colormap(colortune_param, colormap_size)
 %
-% Outputs:
-%   colormap_vec
-%
-% Calls (project):
-%   zef_blue_brain_1_colormap
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[colormap_vec] = zef_blue_brain_1_colormap(colortune_param, colormap_size)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   Piecewise RGB split at floor(size/2), then log(2*x/param^4+1),
+%   max-normalize, flipud.
 c_aux_1 = floor(colormap_size/2);
 colormap_vec = [[c_aux_1:-1:1]/c_aux_1 zeros(1,colormap_size-c_aux_1); ...
     [1:c_aux_1]/c_aux_1 [colormap_size-c_aux_1:-1:1]/(colormap_size-c_aux_1); ...

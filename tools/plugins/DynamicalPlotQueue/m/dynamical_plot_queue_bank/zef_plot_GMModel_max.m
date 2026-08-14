@@ -1,32 +1,20 @@
 function zef_plot_GMModel_max(varargin)
-% --- Zeffiro documentation header ---
-% zef_plot_GMModel_max — Renders or updates a plot_gmmodel_max figure from current `zef` state.
+%ZEF_PLOT_GMMODEL_MAX  Queue renderer: ellipsoid at the strongest GMModel dipole.
 %
-% Purpose:
-%   Renders or updates a plot_gmmodel_max figure from current `zef` state.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Same zef.GMModel fields as zef_plot_GMModel (SP tool), but only the
+%   component with max |dipole_moments|. Optional varargin{1} is the
+%   facecolor (default 0.7*[0 1 1]). Caller f_ind is read and unused.
+%   Tag: 'additional: Gaussian mixture model'.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.GMModel (read)
-%
-% Calls (project):
 %   zef_plot_GMModel_max
+%   zef_plot_GMModel_max(color)
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_plot_GMModel_max(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_plot_GMModel.
 
 if not(isempty(varargin))
     color_val = varargin{1};
@@ -39,7 +27,8 @@ end
 h_axes = evalin('caller','h_axes_image');
 
 f_ind = evalin('caller','f_ind');
-delete(findobj(h_axes,'Tag','additional: Gaussian mixture model'));
+delete(findobj(h_axes,'Tag','additional: Gaussian mixture model')
+);
 GMModel = evalin('base','zef.GMModel');
 c_map = lines(size(GMModel.Param.mu,1));
 

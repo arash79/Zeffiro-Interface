@@ -1,70 +1,18 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_DTI_CONDUCTIVITY_WINDOW
-%
-%Creates the GUI window for DTI Conductivity Tool.
-%Uses MATLAB uifigure for modern UI (compatible with R2019a+).
-%
-%Coordinate transformation matrices (vox2ras, vox2ras-tkr, center) are
-%automatically extracted from the input files — no manual matrix entry needed.
-%The user only needs to provide:
-%  - FA file (fa.nii.gz from dt_recon)
-%  - v1 file (v1.nii.gz, optional principal eigenvector)
-%  - register.dat (from dt_recon)
-%  - Reference MRI (e.g. orig.mgz from recon-all)
-
 function zef = zef_dti_conductivity_window(zef)
-% --- Zeffiro documentation header ---
-% zef_dti_conductivity_window — Zef dti conductivity window.
+%ZEF_DTI_CONDUCTIVITY_WINDOW  Build the DTI Conductivity Tool uifigure.
 %
-% Purpose:
-%   Zef dti conductivity window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Called from zef_dti_conductivity_open. Title
+%   "ZEFFIRO Interface: DTI Conductivity Tool". Browse/Load for FA, v1,
+%   register.dat, reference MRI; **Apply to Mesh** runs
+%   zef_dti_conductivity_apply_button_callback. vox2ras is read from the
+%   files. If the window already exists, figure() it and return.
 %
-% Outputs:
-%   zef
-%
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.dti_anisotropy_threshold (read, write)
-%   zef.dti_apply_to_compartments (read)
-%   zef.dti_conductivity_scale (read, write)
-%   zef.dti_conductivity_tool_current_size (read, write)
-%   zef.dti_conductivity_tool_relative_size (read, write)
-%   zef.dti_extra_conductivity (read, write)
-%   zef.dti_interpolation_mode (read, write)
-%   zef.dti_interpolation_radius (read, write)
-%   zef.dti_intra_conductivity (read, write)
-%   zef.dti_ref_geometry (read)
-%   zef.dti_ref_mri_file (read, write)
-%   zef.dti_volume_fraction (read, write)
-%   zef.freesurfer_fa_file (read, write)
-%   zef.freesurfer_register_file (read, write)
-%   … (27 more)
-%
-% Calls (project):
-%   zef_change_size_function
-%   zef_dti_conductivity_apply_button_callback
-%   zef_dti_conductivity_load_freesurfer
-%   zef_dti_conductivity_update_conversion_model
-%   zef_dti_conductivity_update_interpolation_model
-%   zef_dti_conductivity_window
-%   zef_get_relative_size
-%
-% Side effects:
-%   - base/caller workspace
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_dti_conductivity_window(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dti_conductivity_open, zef_dti_apply_to_sigma.
 
 if nargin == 0
     zef = evalin('base','zef');

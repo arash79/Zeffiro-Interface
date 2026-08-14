@@ -1,28 +1,32 @@
 function [tree, hash] = zef_dataBank_add(tree, parentHash, data)
-% --- Zeffiro documentation header ---
-% zef_dataBank_add — Zef data Bank add.
+%ZEF_DATABANK_ADD  Insert a typed node under parentHash; return the new hash.
 %
-% Purpose:
-%   Zef data Bank add.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tree
-%   parentHash
-%   data
+%   Core tree insert for Data Bank. Does not touch widgets or disk; the
+%   Add path (zef_dataBank_addButtonPress) and importNode call this after
+%   assembling a payload with zef_dataBank_getData. node.name is data.type,
+%   or rec-<tag> when type is reconstruction and reconstruction_information.tag
+%   exists. Hash is the first free sibling parentHash_i (i = 1,2,…).
 %
-% Outputs:
-%   tree
-%   hash
+%   [tree, hash] = zef_dataBank_add(tree, parentHash, data)
 %
-% Calls (project):
-%   zef_dataBank_add
+%   Inputs
+%     tree        - zef.dataBank.tree struct (may be empty struct).
+%     parentHash  - char, typically 'node' at the root or a child's NodeData.
+%     data        - payload struct with at least .type (see getData).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[tree, hash]] = zef_dataBank_add(tree, parentHash, data)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     tree  - same struct plus tree.(hash) with .data, .type, .name, .hash.
+%     hash  - char field name of the new node.
+%
+%   See also zef_dataBank_addButtonPress, zef_dataBank_getData.
 
+% Payload is already assembled (getData / import). Build the node, then
+% take the first free sibling hash under parentHash (parentHash_1, _2, …).
 node=[];
 node.data=data;
 node.type=data.type;

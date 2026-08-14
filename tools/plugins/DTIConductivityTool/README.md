@@ -1,77 +1,53 @@
-# tools/plugins/DTIConductivityTool
+# DTI Conductivity Tool
 
-## Purpose of this folder
+White-matter conductivity in a FEM head model is usually a single scalar per tissue. DTI measures a preferred diffusion direction; this plugin lets you load FreeSurfer `dt_recon` volumes and **Apply to Mesh** so each tetrahedron in selected compartments gets a 6-component σ tensor. Anisotropic EEG/MEG lead fields (types 6–10) then use `zef.sigma(:,3:8)`.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+The interpolation and conversion math is in `src/forward/dti/` (`zef_dti_apply_to_sigma`). This folder is only the window and its callbacks.
 
-## Contents
+## How to open it
 
-MATLAB sources:
-- `zef_dti_conductivity_browse_fa.m` — **function zef_dti_conductivity_browse_fa**: Function zef dti conductivity browse fa.
-- `zef_dti_conductivity_browse_ref.m` — **function zef_dti_conductivity_browse_ref**: Function zef dti conductivity browse ref.
-- `zef_dti_conductivity_browse_register.m` — **function zef_dti_conductivity_browse_register**: Function zef dti conductivity browse register.
-- `zef_dti_conductivity_browse_v1.m` — **function zef_dti_conductivity_browse_v1**: Function zef dti conductivity browse v1.
-- `zef_dti_conductivity_clear.m` — **function zef_dti_conductivity_clear**: Function zef dti conductivity clear.
-- `zef_dti_conductivity_init.m` — **function zef_dti_conductivity_init**: Function zef dti conductivity init.
-- `zef_dti_conductivity_update_compartments.m` — **function zef_dti_conductivity_update_compartments**: Function zef dti conductivity update compartments.
-- `zef_dti_conductivity_update_model.m` — **function zef_dti_conductivity_update_model**: Function zef dti conductivity update model.
-- `zef_dti_conductivity_apply_button_callback.m` — **zef_dti_conductivity_apply_button_callback**: GUI callback for dti_conductivity_apply_button actions.
-- `zef_dti_conductivity_load_freesurfer.m` — **zef_dti_conductivity_load_freesurfer**: Zef dti conductivity load freesurfer.
-- `zef_dti_conductivity_open.m` — **zef_dti_conductivity_open**: Zef dti conductivity open.
-- `zef_dti_conductivity_update.m` — **zef_dti_conductivity_update**: Zef dti conductivity update.
-- `zef_dti_conductivity_update_conversion_model.m` — **zef_dti_conductivity_update_conversion_model**: Zef dti conductivity update conversion model.
-- `zef_dti_conductivity_update_interpolation_model.m` — **zef_dti_conductivity_update_interpolation_model**: Zef dti conductivity update interpolation model.
-- `zef_dti_conductivity_window.m` — **zef_dti_conductivity_window**: Zef dti conductivity window.
-- `zef_dti_empty_geometry_struct.m` — **zef_dti_empty_geometry_struct**: Zef dti empty geometry struct.
+**Forward tools → DTI Conductivity Tool** (default `multicompartment_head` profile). Callback: `zef_dti_conductivity_open`. Window title: **ZEFFIRO Interface: DTI Conductivity Tool**.
 
-## How this folder fits into the overall workflow
+You need a FEM mesh first (Mesh tool **Create FEM mesh**).
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+## What to load
 
-## GUI usage
+Panel **FreeSurfer Input Files** (browse buttons + Load):
 
-- **zef_dti_conductivity_apply_button_callback**: GUI callback or dialog (`zef_dti_conductivity_apply_button_callback`).
-- **function zef_dti_conductivity_browse_fa**: GUI callback or dialog (`function zef_dti_conductivity_browse_fa`).
-- **function zef_dti_conductivity_browse_ref**: GUI callback or dialog (`function zef_dti_conductivity_browse_ref`).
-- **function zef_dti_conductivity_browse_register**: GUI callback or dialog (`function zef_dti_conductivity_browse_register`).
-- **function zef_dti_conductivity_browse_v1**: GUI callback or dialog (`function zef_dti_conductivity_browse_v1`).
-- **zef_dti_conductivity_window**: GUI callback or dialog (`zef_dti_conductivity_window`).
+| File | Role |
+|------|------|
+| FA (`fa.nii.gz`) | Fractional anisotropy volume from `dt_recon` |
+| v1 (`v1.nii.gz`) | Optional principal eigenvector |
+| `register.dat` | FA voxel ↔ reference MRI; required by Apply |
+| Reference MRI (`orig.mgz`) | Geometry for vox2ras / streamlines |
 
-## Programmatic usage
+Coordinate matrices are read from those files; you do not type a 4×4 by hand. **Load** runs `zef_dti_conductivity_load_freesurfer`. **Clear** drops the loaded volumes.
 
-From the project root:
+## Apply
+
+1. Choose conversion model. The dropdown `Items` / `ItemsData` in `zef_dti_conductivity_window` are:
+
+| ItemsData | Label on the tool | What `zef_freesurfer_fa_to_conductivity` does |
+|-----------|-------------------|-----------------------------------------------|
+| 1 | Volume Fraction (Tuch et al.) | Mix extra-/intra-cellular σ, then σ_par = σ_iso(1+2 FA), σ_perp = σ_iso(1−FA) |
+| 2 | Effective Medium Theory | Tuch linear map σ = 0.844 (d − 0.124) with d_par = MD(1+2 FA) |
+| 3 | Direct Scaling | σ_par = scale(1+2 FA), σ_perp = scale(1−FA) |
+
+   Interpolation: **Nearest Neighbor** / **Radius Average** (`'nearest'` / `'radius_average'`). Fields map to `zef.dti_*` (see `help zef_dti_apply_to_sigma`).
+2. Select compartments under **Apply to compartments**.
+3. Click **Apply to Mesh** → `zef_dti_conductivity_apply_button_callback` → `zef_dti_apply_to_sigma`.
+4. Recompute the lead field with an anisotropic `lead_field_type` (6–10). Apply does not rebuild `zef.L`.
+
+Streamlines: Mesh visualization tool **Visualize DTI streamlines**, not this Apply button.
+
+## Scripting without the window
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+zef.freesurfer_fa_data = zef_freesurfer_load_fa('fa.nii.gz');
+zef.freesurfer_register_transform = zef_freesurfer_read_register_dat('register.dat');
+zef = zef_dti_apply_to_sigma(zef);
 ```
 
-Representative entry points in this folder:
-- `Call `function zef_dti_conductivity_browse_fa` from MATLAB with the project root on the path.`
-- `Call `function zef_dti_conductivity_browse_ref` from MATLAB with the project root on the path.`
-- `Call `function zef_dti_conductivity_browse_register` from MATLAB with the project root on the path.`
-- `Call `function zef_dti_conductivity_browse_v1` from MATLAB with the project root on the path.`
-- `Call `function zef_dti_conductivity_clear` from MATLAB with the project root on the path.`
-- `Call `function zef_dti_conductivity_init` from MATLAB with the project root on the path.`
-- `Call `function zef_dti_conductivity_update_compartments` from MATLAB with the project root on the path.`
-- `Call `function zef_dti_conductivity_update_model` from MATLAB with the project root on the path.`
+## Files here
 
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Start `zef_dti_conductivity_open.m`, window `zef_dti_conductivity_window.m`, browse/load/clear/update/apply callbacks, `zef_dti_empty_geometry_struct.m`. Algorithm: `src/forward/dti/README.md`.

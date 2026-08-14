@@ -1,25 +1,13 @@
 function [y_vals, plot_mode] = zef_parcellation_boxplot_amplitude(time_series)
-% --- Zeffiro documentation header ---
-% zef_parcellation_boxplot_amplitude — Zef parcellation boxplot amplitude.
+%ZEF_PARCELLATION_BOXPLOT_AMPLITUDE  |samples| per ROI across frames (boxplot).
 %
-% Purpose:
-%   Zef parcellation boxplot amplitude.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   time_series
-%
-% Outputs:
-%   y_vals
-%   plot_mode
-%
-% Calls (project):
-%   zef_parcellation_boxplot_amplitude
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[y_vals, plot_mode]] = zef_parcellation_boxplot_amplitude(time_series)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Description: Boxplot amplitude (cell time_series)
+%   Function. Requires cell time_series {ROI x frame}. plot_mode=4.
 
 plot_mode = 4; % custom mode for boxplot rendering
 

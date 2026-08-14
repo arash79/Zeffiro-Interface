@@ -1,46 +1,16 @@
 function lint_mfiles(folder, kwargs)
-% --- Zeffiro documentation header ---
-% utilities.dev.lint_mfiles — Lint mfiles.
+%LINT_MFILES  Run code analyzer on all .m files under folder; error on violations.
 %
-% Purpose:
-%   Lint mfiles.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   folder
-%   kwargs
+%   lint_mfiles(folder, kwargs)
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Calls (project):
-%   utilities.dev.get_mfile_paths
-%   utilities.dev.lint_mfiles
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `utilities.dev.lint_mfiles(folder, kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%LINT_MFILES Run code analyzer on all .m files under a folder; error if violations found.
-%
-% lint_mfiles(FOLDER, kwargs) runs the chosen MATLAB linter on every .m file
-% in FOLDER and its subdirectories. If any message ID in UNACCEPTABLE_MESSAGES
-% is found, or (with codeIssues) any issue has severity "error", they are
-% reported and the function throws an error at the end.
-%
-% Inputs:
-%   folder - (1,1) string, mustBeFolder
-%             Root directory to search for .m files.
-%   kwargs.UNACCEPTABLE_MESSAGES - (:,1) string, default ["NODEF"; "EVLDOT"]
-%             Code analyzer message IDs that trigger a failure. See:
-%             https://www.mathworks.com/help/matlab/matlab_env/index-of-code-analyzer-checks.html
-%   kwargs.linter_fn_name - (1,1) string, mustBeMember(["mlint","checkcode","codeIssues"]), default "codeIssues"
-%             Linter to use. "codeIssues" is preferred for MATLAB >= R2022b.
-%
-% Outputs:
-%   None. Throws an error if any unacceptable issues are found.
-%
+%   kwargs.UNACCEPTABLE_MESSAGES (default NODEF, EVLDOT) and kwargs.linter_fn_name
+%   ("codeIssues", "checkcode", or "mlint"). Uses codeIssues on R2022b+.
+%   Throws if any unacceptable message or severity "error" is found.
 
 arguments
 

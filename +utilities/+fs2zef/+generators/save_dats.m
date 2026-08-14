@@ -1,30 +1,12 @@
 function save_dats(out_dir)
-% --- Zeffiro documentation header ---
-% utilities.fs2zef.generators.save_dats — Save dats.
+%SAVE_DATS  Convert merged lh/rh label .asc files to Zeffiro .dat atlas points.
 %
-% Purpose:
-%   Save dats.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   out_dir
-%
-% Outputs:
-%   See function signature and code below.
-%
-% Calls (project):
-%   utilities.fs2zef.generators.save_dats
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `utilities.fs2zef.generators.save_dats(out_dir)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%
-% save_dats
+%   save_dats(out_dir)
 %
 % Converts FreeSurfer ASCII label files (.asc) to DAT format for Zeffiro
 % Interface. Extracts point coordinates from merged label files and saves them

@@ -1,33 +1,21 @@
 function zef_ES_optimization(zef)
-% --- Zeffiro documentation header ---
-% zef_ES_optimization — Zef ES optimization.
+%ZEF_ES_OPTIMIZATION  Open Inverse tools → ES Workbench.
 %
-% Purpose:
-%   Zef ES optimization.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Menu callback from profile/*/zeffiro_plugins.ini (label "ES Workbench",
+%   parent inverse_tools). Temporarily sets font_size to 14, then
+%   zef_tool_start(..., 'zef_ES_optimization_window', ...). tES electrode
+%   currents (not MEG/EEG inverse). Needs zef.L and zef.inv_synth_source.
+%   With no input, reads base-workspace zef; with no output, writes it back.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_ES_optimization(zef)
 %
-% Zef fields (observed):
-%   zef.font_size (read, write)
+%   See also zef_ES_optimization_window, zef_ES_find_currents.
 %
-% Calls (project):
-%   zef_ES_optimization
-%   zef_tool_start
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_ES_optimization(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     zef = evalin('base','zef');

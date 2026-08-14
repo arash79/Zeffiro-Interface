@@ -1,29 +1,18 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isempty(zef.save_file_path)) & not(zef — If not(isempty(zef.save file path)) & not(zef.
+%ZEF_FILTER_LOAD  Load button: .mat of filter_* fields (after reset).
 %
-% Purpose:
-%   If not(isempty(zef.save file path)) & not(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.fieldnames (read, write)
-%   zef.file (read)
-%   zef.file_path (read)
-%   zef.filter_save_file (read, write)
-%   zef.filter_save_file_path (read, write)
+%   Script. ButtonPushedFcn of h_filter_load. uigetfile '*.mat' starting
+%   at filter_save_file_path (or default). As written, the pick is stored
+%   on zef_data.file / .file_path, then zef_filter_reset runs, then
+%   load([zef.file_path zef.file]) uses the project zef.file, not the
+%   dialog pick. Expects the mat to define zef_data; copies its fields
+%   onto zef and zef_update_filter_tool. Cancel (file==0) is a no-op.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `if not(isempty(zef.save_file_path)) & not(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_filter_save_as, zef_filter_reset.
 
 if not(isempty(zef.save_file_path)) & not(zef.save_file_path==0)
     [zef_data.file zef_data.file_path] = uigetfile('*.mat','Load filter',zef.filter_save_file_path);

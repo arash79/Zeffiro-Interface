@@ -1,36 +1,25 @@
 function sigma_out = zef_nse_sigma(nse_field, nodes, tetra, domain_labels, sigma_in, s_interp_ind, singular_threshold)
-% --- Zeffiro documentation header ---
-% zef_nse_sigma — Zef nse sigma.
+
+
+%ZEF_NSE_SIGMA  Map NSE capillary/vessel state onto tetrahedral conductivity.
 %
-% Purpose:
-%   Zef nse sigma.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nse_field
-%   nodes
-%   tetra
-%   domain_labels
-%   sigma_in
-%   s_interp_ind
-%   singular_threshold
+%   Optional coupling from hemodynamics back to zef.sigma: one column per
+%   time frame of nse_field.bf_capillaries. nse_field.conductivity_statistic
+%   selects mean vs other reductions. Nodes converted mm→m. sigma_in is
+%   [n_tet × 2] (value, domain) like zef.sigma(:,1:2). s_interp_ind is the
+%   4-node interpolation index from source interpolation.
 %
-% Outputs:
-%   sigma_out
+%   sigma_out = zef_nse_sigma(nse_field, nodes, tetra, domain_labels, ...
+%       sigma_in, s_interp_ind, singular_threshold)
 %
-% Calls (project):
-%   zef_get_submesh
-%   zef_nse_sigma
-%   zef_volume_barycentric
-%   zef_waitbar
+%   singular_threshold default eps, must be < 1e-2.
 %
-% Side effects:
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[sigma_out] = zef_nse_sigma(nse_field, nodes, tetra, domain_labels, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_nse_poisson, zef_source_interpolation.
 
     arguments
 

@@ -1,30 +1,21 @@
 function zef = zef_beamformer_start(zef)
-% --- Zeffiro documentation header ---
-% zef_beamformer_start — Zef beamformer start.
+%ZEF_BEAMFORMER_START  Entry point that opens the Beamformer plugin.
 %
-% Purpose:
-%   Zef beamformer start.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_beamformer_start
+%   zef = zef_beamformer_start(zef)
 %
-% Outputs:
-%   zef
+%   INI callback (Inverse tools → Beamformer). Opens the beamformer app via
+%   zef_beamformer_window. StartButton runs zef_beamformer(zef); which
+%   output is stored as reconstruction depends on estimation_attr.
+%   Needs zef.L and zef.measurements. Does not call inverse.BeamformerInverter.
 %
-% Calls (project):
-%   zef_beamformer_start
-%   zef_tool_start
+%   See also zef_beamformer_window, zef_beamformer.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_beamformer_start(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     zef = evalin('base','zef');

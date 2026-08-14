@@ -1,40 +1,20 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef — Zef.
+%ZEF_INIT_FILTER_TOOL  Build filter_file_list from m/filter_bank and parse each help() Description:.
 %
-% Purpose:
-%   Zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field (read, write)
-%   zef.filter_data_segment (read, write)
-%   zef.filter_dir (read, write)
-%   zef.filter_epoch_points (read, write)
-%   zef.filter_file_list (read, write)
-%   zef.filter_list_selected (read, write)
-%   zef.filter_name_list (read)
-%   zef.filter_parameter_list (read, write)
-%   zef.filter_pipeline (read, write)
-%   zef.filter_pipeline_list (read, write)
-%   zef.filter_pipeline_selected (read, write)
-%   zef.filter_sampling_rate (read, write)
-%   zef.filter_save_file (read, write)
-%   zef.filter_save_file_path (read, write)
-%   zef.filter_tag (read, write)
-%   … (9 more)
+%   Script. Called from zef_filter_tool after widgets exist, and after
+%   Reset. Defaults missing filter_zoom (1), epoch_points ([]), save
+%   path './data', sampling_rate from inv_sampling_frequency, tag
+%   'Default tag', data_segment '0', empty pipeline. dir() of
+%   filter_bank/*.m fills filter_file_list; help() slice from
+%   'Description:' to 'Input:' becomes filter_name_list (sorted).
+%   Do not drop those Description:/Input:/Output: lines in filter_bank
+%   (Add and this init parse help()). Then zef_update_filter_tool.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_add_filter_item, zef_filter_tool.
 
 zef.filter_name_list = cell(0);
 zef.filter_file_list = cell(0);
@@ -84,7 +64,7 @@ if not(isfield(zef,'filter_pipeline_selected'));
     zef.filter_pipeline_selected = cell(0);
 end;
 
-set(zef.h_filter_tag,'Value',zef.filter_tag);
+set(zef.h_filter_tag,'Value',zef.filter_tag)
 set(zef.h_filter_data_segment,'Value',num2str(zef.filter_data_segment));
 set(zef.h_filter_sampling_rate,'Value',num2str(zef.filter_sampling_rate));
 set(zef.h_filter_zoom,'Value',num2str(round(100/zef.filter_zoom)));

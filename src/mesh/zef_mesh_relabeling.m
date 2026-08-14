@@ -1,47 +1,51 @@
 function   [domain_labels, distance_vec, label_vec] = zef_mesh_relabeling(zef, tetra, nodes, domain_labels, distance_vec, use_labeling_priority, h)
-% --- Zeffiro documentation header ---
-% zef_mesh_relabeling — Zef mesh relabeling.
+%ZEF_MESH_RELABELING  Re-test tet membership after refinement or smoothing.
 %
-% Purpose:
-%   Zef mesh relabeling.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   tetra
-%   nodes
-%   domain_labels
-%   distance_vec
-%   use_labeling_priority
-%   h
+%   Walks compartments from inside to outside. For each submesh, finds tets
+%   on the current interior/exterior interface (zef_surface_mesh) and asks
+%   zef_point_in_compartment whether their nodes sit inside that surface.
+%   Tets that should move in or out get a new domain_labels value.
+%   distance_vec is updated at nodes that test inside. Called only from
+%   the script zef_mesh_labeling_step (flags 2 and 3).
 %
-% Outputs:
-%   domain_labels
-%   distance_vec
-%   label_vec
+%   [domain_labels, distance_vec, label_vec] = zef_mesh_relabeling( ...
+%       zef, tetra, nodes, domain_labels, distance_vec, use_labeling_priority, h)
 %
-% Zef fields (observed):
-%   zef.extensive_relabeling (read)
-%   zef.priority_mode (read)
-%   zef.reuna_p (read)
-%   zef.reuna_submesh_ind (read)
-%   zef.reuna_t (read)
+%   Inputs
+%     zef                    - session with reuna_p, reuna_t, reuna_submesh_ind,
+%                              extensive_relabeling.
+%     tetra                  - T×4 1-based indices.
+%     nodes                  - V×3, same frame as reuna_p.
+%     domain_labels          - T×1 subdomain IDs (1 = innermost).
+%     distance_vec           - V×1 nodal distances; written at inside hits.
+%     use_labeling_priority  - if true, accumulate per-vertex tetra_labels and
+%                              finish each compartment with zef_choose_domain_labels.
+%                              If false, apply flood-fill rules: tets on the
+%                              interior surface with >1 exposed face are pushed
+%                              outward; tets of the exterior that share ≥3
+%                              faces with the interior are pulled inward.
+%     h                      - optional waitbar. If omitted a new one is
+%                              opened and closed here. nargin < 5 is treated
+%                              as "no h" even though distance_vec is the 5th
+%                              argument (the nargin < 5 branch is unused by
+%                              current callers).
 %
-% Calls (project):
-%   zef_choose_domain_labels
-%   zef_mesh_relabeling
-%   zef_point_in_compartment
-%   zef_surface_mesh
-%   zef_waitbar
+%   Outputs
+%     domain_labels  - T×1, clamped to n_compartments. Without priority,
+%                      tets that were pushed to the outer domain more than
+%                      once are restored to their original label.
+%     distance_vec   - V×1 updated at nodes classified inside a surface.
+%     label_vec      - 1:n_compartments (not otherwise used by callers).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   zef.extensive_relabeling: extra inward sweep that demotes tets on the
+%   interior surface whose four vertices are not all inside.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[domain_labels, distance_vec, label_vec]] = zef_mesh_relabeling(zef, tetra, nodes, domain_labels, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_mesh_labeling_step, zef_point_in_compartment, zef_surface_mesh.
 
 if nargin < 5
     priority_mode = zef.priority_mode; 
@@ -71,6 +75,7 @@ end
 
     test_ind = -ones(size(nodes,1),1);
 
+% One pass per submesh of each reuna surface (innermost first).
 for i_labeling =  1 : length(zef.reuna_p)
     for k_labeling =  1 : length(zef.reuna_submesh_ind{i_labeling})
 
@@ -92,6 +97,7 @@ if zef.extensive_relabeling
                 tetra_ind_aux = 0;
                 test_ind(test_ind==0) = -1;
 
+ % Demote interior-surface tets that are not fully inside this compartment.
  while not(isempty(tetra_ind_aux))
      
                     I_1 = find(domain_labels <= compartment_counter);
@@ -121,6 +127,7 @@ end
   tetra_ind_aux = 0;
  test_ind(test_ind==0) = -1;
 
+                % Promote exterior tets whose four vertices all test inside.
                 while not(isempty(tetra_ind_aux))
                     I_1 = find(domain_labels <= compartment_counter);
                     [I_2] = zef_surface_mesh(tetra(I_1,:));

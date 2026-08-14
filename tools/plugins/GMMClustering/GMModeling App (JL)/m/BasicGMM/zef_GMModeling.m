@@ -1,32 +1,20 @@
-% --- Zeffiro documentation header ---
-% function [GMModel,GMModelDipoles,GMModelAmplitudes,GMModelTimeVariables] = zef_GMModeling — Function [GMModel,GMModel Dipoles,GMModel Amplitudes,GMModel Time Variables] = zef GMModeling.
-%
-% Purpose:
-%   Function [GMModel,GMModel Dipoles,GMModel Amplitudes,GMModel Time Variables] = zef GMModeling.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.parcellation_interp_ind (read)
-%   zef.parcellation_selected (read)
-%   zef.reconstruction (read)
-%   zef.reconstruction_information (read)
-%   zef.source_interpolation_ind (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   zef_GMModeling
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [GMModel,GMModelDipoles,GMModelAmplitudes,GMModelTimeVariables] = zef_GMModeling` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [GMModel,GMModelDipoles,GMModelAmplitudes,GMModelTimeVariables] = zef_GMModeling
+%ZEF_GMMODELING  Fit a Gaussian mixture to a reconstruction (fitgmdist).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   [GMModel, GMModelDipoles, GMModelAmplitudes, GMModelTimeVariables]
+%       = zef_GMModeling
+%
+%   Reads zef.reconstruction, source_positions, GMM.parameters from
+%   base. Optional parcellation domain. Amplitudes via GMM2amplitude.
+%   Main app Start usually calls zef_GMModeling_K instead. Does not
+%   invert L.
+%
+%   See also zef_GMModeling_K, zef_PlotGMModel.
 
 h = zef_waitbar(0,1,['Gaussian mixature model.']);
 GMModelTimeVariables = [];
@@ -119,7 +107,8 @@ if length(K) < T
     K = [K,K(end)*ones(1,T-length(K))];
 end
 
-zef_waitbar(0,1,h,['Step 1 of ',num2str(T),'. Please wait.']);
+zef_waitbar(0,1,h,['Step 1 of ',num2str(T)
+,'. Please wait.']);
 tic;
 for t=t_start:T
     best_fit = Inf;
@@ -137,6 +126,9 @@ for t=t_start:T
         else
             date_str = [];
         end
+        % Threshold |J|, keep surviving source positions as 3-D points,
+        % then fitgmdist. K(t) is the component-count sweep for this frame;
+        % the best BIC/AIC (model_criterion) is kept.
         %calculuate squares of current densities
         if iscell(z_vec)
             if strcmp(parameters{tag_ind},'1')
@@ -161,7 +153,8 @@ for t=t_start:T
         end
         J = sqrt(z);      %current density
         z = z./max(z);
-        %Gaussian moothing step
+        % Optional spatial Gaussian blur of the normalized |J| map
+        % (smooth_std in source-space millimetres) before thresholding.
         if smooth_std > 0
             ind = find(z>=threshold);
             for i = 1:length(ind)
@@ -172,6 +165,8 @@ for t=t_start:T
         end
 
         %Maximally expected sampling step:
+        % Replicate each surviving source round(c*|J|) times so fitgmdist
+        % sees a point cloud weighted by amplitude (not one point per voxel).
         ind = z<threshold;
         z(ind) = 0;
         normalization_const = 16*size(source_positions,1)/sum(z);

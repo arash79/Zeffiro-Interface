@@ -1,51 +1,25 @@
-% process_sensors.m
-%
-% Processes sensor configurations for EEG or MEG.
-%
-% Input:
-%   config - Configuration structure
-%   modality - 'EEG' or 'MEG'
-%   channel_indices - For EEG: indices into sensor array for used channels.
-%                     For MEG: number of channels to use (scalar) or empty for all.
-%
-% Output:
-%   success - Logical indicating success
-%   error_msg - Error message if failed (empty if successful)
-%
-% Usage:
-%   [success, error_msg] = utilities.duneuro2zef.process_sensors(config, 'EEG', channel_indices);
-%   [success, error_msg] = utilities.duneuro2zef.process_sensors(config, 'MEG', max_channels);
-%
-% See also: run.m, process_eeg_data.m, process_meg_data.m
-
 function [success, error_msg] = process_sensors(config, modality, channel_indices)
-% --- Zeffiro documentation header ---
-% utilities.duneuro2zef.process_sensors — Process sensors.
+%PROCESS_SENSORS  FieldTrip-like sensors.mat → Zeffiro points/directions .mat.
 %
-% Purpose:
-%   Process sensors.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   config
-%   modality
-%   channel_indices
+%   Called from process_eeg_data / process_meg_data after channel matching.
+%   Loads config.files.sensors (field sensors, else the sole variable).
 %
-% Outputs:
-%   success
-%   error_msg
+%   EEG: sensors.elec.chanpos(channel_indices,:) (or all rows). Optional
+%        sensors.rot / transl → affine {[R' -t; 0 0 0 1]}, else identity.
+%        Saves points, affine_transform, imaging_method_name='EEG'.
+%   MEG: sensors.grad.chanpos and optional chanori. If channel_indices is a
+%        scalar it means "use the first N channels"; otherwise all or the
+%        index vector. Saves points, directions, imaging_method_name.
 %
-% Calls (project):
-%   utilities.duneuro2zef.process_sensors
+%   [success, error_msg] = process_sensors(config, modality, channel_indices)
+%   modality is 'EEG' or 'MEG'.
 %
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[success, error_msg]] = utilities.duneuro2zef.process_sensors(config, modality, channel_indices)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also process_eeg_data, process_meg_data.
 
     success = false;
     error_msg = '';

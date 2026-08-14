@@ -1,33 +1,20 @@
 function [y, dy] = zef_nse_balloon_model_solver(time_vec, blood_flow_signal_decay_rate, flow_dependent_elimination_constant, neural_activity_impulse, relative_mollification,t_min, t_max)
-% --- Zeffiro documentation header ---
-% zef_nse_balloon_model_solver — Zef nse balloon model solver.
+%ZEF_NSE_BALLOON_MODEL_SOLVER  Closed-form balloon / NVC ODE (two real roots) with optional mollifier.
 %
-% Purpose:
-%   Zef nse balloon model solver.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   time_vec
-%   blood_flow_signal_decay_rate
-%   flow_dependent_elimination_constant
-%   neural_activity_impulse
-%   relative_mollification
-%   t_min
-%   t_max
+%   Helper for solver_type 3 (zef_nse_haemodynamic_response_solver), not a
+%   button. y'' + a y' + b y = g with roots r1,r2 of r^2 + a r + b = 0.
+%   Optional relative_mollification > 0 multiplies y by zef_nse_mollifier.
 %
-% Outputs:
-%   y
-%   dy
+%   [y, dy] = zef_nse_balloon_model_solver(t, a, b, g)
+%   [y, dy] = zef_nse_balloon_model_solver(t, a, b, g, r, t_min, t_max)
 %
-% Calls (project):
-%   zef_nse_balloon_model_solver
-%   zef_nse_mollifier
+%   See also zef_nse_mollifier, zef_nse_haemodynamic_response_solver.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[y, dy]] = zef_nse_balloon_model_solver(time_vec, blood_flow_signal_decay_rate, flow_dependent_elimination_constant, neural_activity_impulse, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin < 5
 relative_mollification = 0;
@@ -50,6 +37,7 @@ b = flow_dependent_elimination_constant;
 g = neural_activity_impulse;
 t = time_vec;
 
+% Characteristic roots of y'' + a y' + b y = g (assumes a^2 > 4b).
 r1 = (-a + sqrt(a^2 - 4*b)) / 2;
 r2 = (-a - sqrt(a^2 - 4*b)) / 2;
 

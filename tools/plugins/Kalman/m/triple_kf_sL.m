@@ -1,41 +1,24 @@
 function [P_store, z_inverse] = triple_kf_sL(m,P,A,Q,L,R,timeSteps, number_of_frames, smoothing, sL,standardization_exponent,burn_in)
-% --- Zeffiro documentation header ---
-% triple_kf_sL — Triple kf s L.
+%TRIPLE_KF_SL  Three-block Kalman (state, first and second derivative) with sLORETA.
 %
-% Purpose:
-%   Triple kf s L.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   m
-%   P
-%   A
-%   Q
-%   L
-%   R
-%   timeSteps
-%   number_of_frames
-%   smoothing
-%   sL
-%   standardization_exponent
-%   burn_in
+%   [P_store, z_inverse] = triple_kf_sL(m, P, A, Q, L, R, timeSteps, number_of_frames, smoothing, sL, standardization_exponent, burn_in)
 %
-% Outputs:
-%   P_store
-%   z_inverse
+%   zef_KF filter_type 7–9 (sL = 1, 2, 3). Same burn_in / smoothing
+%   contract as double_kf_sL. L3 observes the position block only.
 %
-% Calls (project):
-%   zef_waitbar
+%   See also double_kf_sL, zef_KF, Block_RTS_smoother.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[P_store, z_inverse]] = triple_kf_sL(m, P, A, Q, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 P_store = cell(0);
 z_inverse = cell(0);
 h = zef_waitbar(0,1, 'Filtering');
 
+% Three-block state [position; velocity; acceleration]. L3 observes position.
 zero_m=zeros(size(A,1));
 
 A=cell2mat({A,(1/number_of_frames)*A,(1/2)*((1/number_of_frames)^2)*A;zero_m,A,(1/number_of_frames)*A;zero_m,zero_m,A});

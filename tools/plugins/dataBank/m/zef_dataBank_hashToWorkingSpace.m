@@ -1,26 +1,25 @@
 function [workingHashes] = zef_dataBank_hashToWorkingSpace(newHash, workingHashes)
-% --- Zeffiro documentation header ---
-% zef_dataBank_hashToWorkingSpace — Zef data Bank hash To Working Space.
+%ZEF_DATABANK_HASHTOWORKINGSPACE  Append unique hashes to workingHashes.
 %
-% Purpose:
-%   Zef data Bank hash To Working Space.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   newHash
-%   workingHashes
+%   modifyMenu / modifyMenuData in zef_open_dataBank: after getHashForMenu,
+%   workingHashes = zef_dataBank_hashToWorkingSpace(hash, workingHashes).
+%   Those hashes are the Combine input. Duplicates are skipped. No widget I/O.
 %
-% Outputs:
-%   workingHashes
+%   workingHashes = zef_dataBank_hashToWorkingSpace(newHash, workingHashes)
 %
-% Calls (project):
-%   zef_dataBank_hashToWorkingSpace
+%   Inputs
+%     newHash        - char or cellstr of hashes to add.
+%     workingHashes  - existing cell (or a char, wrapped to a cell).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[workingHashes] = zef_dataBank_hashToWorkingSpace(newHash, workingHashes)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output
+%     workingHashes  - cellstr, unique, order preserved, new hashes at the end.
+%
+%   See also zef_dataBank_WorkingSpaceInfo, zef_dataBank_combineLeadFields.
 
 if ~iscell(newHash)
     newHash={newHash};

@@ -1,43 +1,17 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef.lf_item_selected = get(zef — Zef.lf item selected = get(zef.
+%ZEF_LF_BANK_COMPUTE_LEAD_FIELDS  Recompute L for selected bank items.
 %
-% Purpose:
-%   Zef.lf item selected = get(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.aux_field (read, write)
-%   zef.h_mesh_tool (read)
-%   zef.h_source_interpolation_on (read)
-%   zef.imaging_method (read, write)
-%   zef.imaging_method_cell (read)
-%   zef.lf_bank_storage (read)
-%   zef.lf_item_list (read)
-%   zef.lf_item_selected (read)
-%   zef.parcellation_interp_ind (read)
-%   zef.s_affine_transform (read, write)
-%   zef.s_directions (read, write)
-%   zef.s_points (read, write)
-%   zef.s_scaling (read, write)
-%   zef.s_x_correction (read, write)
-%   … (10 more)
+%   Script. Re-calculate button. For each selected item: restore
+%   sensors/imaging_method, zef_process_meshes, zef_attach_sensors_volume,
+%   zef_lead_field_matrix; write L and interpolation back into the cell.
+%   Temporarily turns source interpolation off after the first item.
+%   Restores source_interpolation_on. Side effect: live zef.L/sensors.
 %
-% Calls (project):
-%   zef_attach_sensors_volume
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.lf_item_selected = get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_combine_lead_fields.
 
 zef.lf_item_selected = get(zef.h_lf_item_list,'value');
 zef.aux_field = get(zef.h_source_interpolation_on,'value');

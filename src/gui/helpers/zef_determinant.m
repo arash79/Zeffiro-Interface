@@ -1,35 +1,35 @@
 function [d] = zef_determinant(a,b,c,varargin)
-% --- Zeffiro documentation header ---
-% zef_determinant — Zef determinant.
+%ZEF_DETERMINANT  Vectorized 3-by-3 determinant of columns a, b, c.
 %
-% Purpose:
-%   Zef determinant.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   a
-%   b
-%   c
-%   varargin
+%   Scalar triple product det([a b c]) for many rows at once. Used by
+%   zef_attach_sensors_volume to form barycentric coordinates of a point
+%   sensor inside a tet (lambda_i = det of the three opposite edges /
+%   det of the tet edges). No other first-party callers.
 %
-% Outputs:
-%   d
+%   d = zef_determinant(a, b, c)
+%   d = zef_determinant(a, b, c, det_dir)
 %
-% Calls (project):
-%   zef_determinant
+%   Inputs
+%     a, b, c  - 3-vectors stacked as n-by-3 (default) or 3-by-n.
+%     det_dir  - optional; 1 means 3-by-n (index as a(1,:), a(2,:), a(3,:));
+%                any other value, including the default 2, means n-by-3.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[d] = zef_determinant(a, b, c, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   Output
+%     d  - n-by-1 (or 1-by-n if det_dir==1) signed triple products.
+%
+%   See also zef_attach_sensors_volume.
 det_dir = 2;
 if not(isempty(varargin))
     det_dir = varargin{1};
 end
 
 if det_dir == 1;
+    % 3-by-n: each column is one vector.
     d = a(1,:).*(b(2,:).*c(3,:) - c(2,:).*b(3,:)) - b(1,:).*(a(2,:).*c(3,:) - c(2,:).*a(3,:)) +  c(1,:).*(a(2,:).*b(3,:) - b(2,:).*a(3,:));
 else
     d = a(:,1).*(b(:,2).*c(:,3) - c(:,2).*b(:,3)) - b(:,1).*(a(:,2).*c(:,3) - c(:,2).*a(:,3)) +  c(:,1).*(a(:,2).*b(:,3) - b(:,2).*a(:,3));

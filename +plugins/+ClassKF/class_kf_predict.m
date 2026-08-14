@@ -1,25 +1,21 @@
 function [m, P] = class_kf_predict(KFclassObj)
-% --- Zeffiro documentation header ---
-% plugins.ClassKF.class_kf_predict — Class kf predict.
+%CLASS_KF_PREDICT  Kalman predict: m = A x, P = A P A' + Q.
 %
-% Purpose:
-%   Class kf predict.
-%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   KFclassObj
+%   [m, P] = class_kf_predict(KFclassObj)
 %
-% Outputs:
-%   m
-%   P
+%   Reads KFclassObj.state_transition_model_A, prev_step_reconstruction,
+%   prev_step_posterior_cov, and evolution_cov (Q). If A is numerically the
+%   identity, skips the multiplies: m unchanged, P = P + Q.
 %
-% Calls (project):
-%   plugins.ClassKF.class_kf_predict
+%   Called from inverse.KalmanInverter.invert for Basic / standardized /
+%   approximated standardized filters. EnKF predicts inline instead.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[m, P]] = plugins.ClassKF.class_kf_predict(KFclassObj)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also plugins.ClassKF.kf_update, inverse.KalmanInverter.
 
 if (isdiag(KFclassObj.state_transition_model_A) && all(diag(KFclassObj.state_transition_model_A) - 1) < eps)
     % Identity transition: m unchanged, P = P + Q

@@ -1,58 +1,46 @@
-# tools/plugins/RAP-MUSIC
+# RAP-MUSIC
 
-## Purpose of this folder
+Recursively applied MUSIC: peel successive dipoles from the signal subspace (`zef.RAPMUSIC_n_dipoles`, default 8). Use it for a few discrete sources when plain MUSIC’s single scan is not enough.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+There is **no** `inverse.*Inverter`. Registry id `legacy_rap_music` dispatches `RAP_MUSIC_iteration`. This folder is **not** in any profile `zeffiro_plugins.ini`.
 
-## Contents
+## Menu
 
-MATLAB sources:
-- `RAP_MUSIC_iteration.m` — **function [z,Var_loc,reconstruction_information] = RAP_MUSIC_iteration**: Function [z,Var loc,reconstruction information] = RAP MUSIC iteration.
-- `RAPMUSIC_start.m` — **zef**: Zef.
-- `zef_subspace_corr.m` — **zef_subspace_corr**: Zef subspace corr.
-
-Other files:
-- `RAPMUSIC_app.mlapp`
-- `README`
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-- **zef**: GUI callback or dialog (`zef`).
-
-## Programmatic usage
-
-From the project root:
+Not in default INI (`multicompartment_head`) and not in asteroid / `_legacy` / `_nse` INIs. From MATLAB, with plugins on the path:
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+RAPMUSIC_start
 ```
 
-Representative entry points in this folder:
-- `Call `function [z,Var_loc,reconstruction_information] = RAP_MUSIC_iteration` from MATLAB with the project root on the path.`
-- `Call `zef` from MATLAB with the project root on the path.`
-- ``[[S_C, orj]] = zef_subspace_corr(A, B, chararcter)` with project root and `src` on the path.`
+Window title: `ZEFFIRO Interface: RAP-MUSIC`.
 
-## Examples
+## Run the solver
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+**StartButton** `ButtonPushedFcn`:
 
-## Dependencies and assumptions
+```matlab
+zef.reconstruction = RAP_MUSIC_iteration;
+```
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+`Var_loc` and `reconstruction_information` (extra outputs of `RAP_MUSIC_iteration`) are discarded by this button.
 
-## Notes for developers
+Each peel overwrites `orj` instead of concatenating it (the concatenate line is commented). `A_mat` therefore applies the **last** orientation to every found column. Documented as written.
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## Needs
+
+- `zef.L`, interpolation, `zef.source_direction_mode`
+- `zef.measurements`
+- SNR: `zef.inv_snr` → `10^(-inv_snr/20)`; also `inv_prior_over_measurement_db` for `theta0`
+- `zef.RAPMUSIC_n_dipoles`, `zef.RAPMUSIC_leadfield_lambda`
+- Frames: `zef.number_of_frames`, `inv_time_*`, band edges
+- Reads `zef` from the base workspace
+
+## Writes
+
+- `zef.reconstruction` only (from the Start button)
+
+## Files
+
+- Start: `RAPMUSIC_start.m` constructs `RAPMUSIC_app`
+- Solver: `RAP_MUSIC_iteration.m` (uses `zef_subspace_corr`)
+- Layout: `RAPMUSIC_app.mlapp`

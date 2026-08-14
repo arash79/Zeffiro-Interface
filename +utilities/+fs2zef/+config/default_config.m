@@ -1,21 +1,20 @@
 function config = default_config()
-% --- Zeffiro documentation header ---
-% utilities.fs2zef.config.default_config — Default config.
+%DEFAULT_CONFIG  Option struct for fs2zef tests / older pipeline entry.
 %
-% Purpose:
-%   Default config.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Outputs:
-%   config
+%   utilities.fs2zef.run uses its own arguments block; this struct is what
+%   test_unified_pipeline and generate_zef_import-style options expect:
+%   output_format 'both', parcellation_schemes {'36','76'}, compute_transforms
+%   'auto', reference_volume orig.mgz, include_electrodes/box true,
+%   import_file_name import_segmentation.zef, sort_order alphabetical.
 %
-% Calls (project):
-%   utilities.fs2zef.config.default_config
+%   config = default_config()
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `utilities.fs2zef.config.default_config` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also utilities.fs2zef.run.
 
     config = struct();
     

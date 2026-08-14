@@ -1,60 +1,22 @@
-%Asteroid wireframe modeling package for complex microwave analogue object generation.
-%Copyright © 2019- Sampsa Pursiainen, Liisa-Ida Sorsa, Christelle Eyraud, Jean-Michel Geffrin.
-%This function generates a wireframe corresponding to a given tetrahedral mesh.
-%given as argument.
-%INPUT: tetra (M-by-4), points (K-by-3), shape_param (1-by-N), overlap_param
-%(1-by-1, auxiliary argument), n_mesh_refinement (1-by-1). Here, K points and M tetrahedra
-%describe the tetrahedral mesh and shape_param the tetrahedron width. As an additional
-%argument, one can give the relative overlap between the edges associated with a given
-%point. The number of uniform mesh refinements is given by n_mesh_refinement (default = 0).
-%OUTPUT: m_triangles (m-by-3), m_nodes (k-by-3). A triangular mesh with m triangles and k
-%nodes, describing the surface of the wireframe.
-
 function [m_triangles,m_nodes,filling_vec,w_vec,shape_vec] = wireframe(tetra,nodes,domain_labels,filling_vec,varargin)
-% --- Zeffiro documentation header ---
-% wireframe — Wireframe.
+%WIREFRAME  Build a surface wireframe mesh from a tetrahedral volume (GPU-ToRRe-3D).
 %
-% Purpose:
-%   Wireframe.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2019- Sampsa Pursiainen, Liisa-Ida Sorsa, Christelle Eyraud, Jean-Michel Geffrin.
+%   GPU-ToRRe-3D wireframe modeling package.
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tetra
-%   nodes
-%   domain_labels
-%   filling_vec
-%   varargin
+%   [m_triangles, m_nodes, filling_vec, w_vec, shape_vec] = ...
+%       wireframe(tetra, nodes, domain_labels, filling_vec, varargin)
 %
-% Outputs:
-%   m_triangles
-%   m_nodes
-%   filling_vec
-%   w_vec
-%   shape_vec
+%   tetra M-by-4, nodes K-by-3, domain_labels, filling_vec. Optional
+%   shape/overlap parameters and n_mesh_refinement. n_iter from
+%   zef.wireframe_n_iter in base. Scalar filling_vec is expanded to
+%   all tetra. When length(filling_vec) < size(tetra,1) the per-domain
+%   branch indexes tetrahedra(:,5) (tetrahedra is not assigned from
+%   tetra in this file). Called from zef_wireframe_creator_start.
 %
-% Zef fields (observed):
-%   zef.wireframe_n_iter (read)
-%   zef.wireframe_regularization_parameter (read)
-%   zef.wireframe_tolerance (read)
-%
-% Calls (project):
-%   zef_tetra_volume
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[m_triangles, m_nodes, filling_vec]] = wireframe(tetra, nodes, domain_labels, filling_vec, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
-h_w = zef_waitbar(0,1,'Wireframe optimization');
-
-R = 4/3*pi*(0.5)^3;
-overlap_param = R^(1/3)/2;
+%   See also zef_wireframe_creator_start, zef_wireframe_filling_vec.
 printer_buffer = sqrt(3);
 printer_resolution = 0;
 n_mesh_refinement = 0;
@@ -63,6 +25,9 @@ scaling_constant = 1;
 n_iter = evalin('base','zef.wireframe_n_iter');
 filling_vec = filling_vec(:);
 
+% One value per domain: expand using tetrahedra(:,5). That name is not
+% assigned from tetra in this file — only the length==1 branch is safe
+% unless the caller already has tetrahedra in the workspace.
 if length(filling_vec) == 1
     filling_vec = filling_vec*ones(size(tetra,1),1);
 elseif length(filling_vec) < size(tetra,1)
@@ -99,6 +64,9 @@ if n_mesh_refinement > 0
     tetra = [tetra domain_ind];
 end
 
+% Tet volumes (true = abs). p_triangles / tetra_sort enumerate the
+% six edges and the eight corner-adjacent faces used to extract a
+% printable wireframe at printer_resolution.
 n_nodes = size(nodes,1);
 n_tetra = size(tetra,1);
 

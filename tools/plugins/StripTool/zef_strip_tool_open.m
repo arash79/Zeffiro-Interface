@@ -1,34 +1,18 @@
 function zef = zef_strip_tool_open(zef)
-% --- Zeffiro documentation header ---
-% zef_strip_tool_open — Zef strip tool open.
+%ZEF_STRIP_TOOL_OPEN  Construct the Strip tool window and init the first strip.
 %
-% Purpose:
-%   Zef strip tool open.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_strip_tool_open(zef)
 %
-% Outputs:
-%   zef
+%   Called via zef_tool_start from zef_strip_tool_start. Creates
+%   zef.strip_tool if missing (strip_current_id=1), then window,
+%   init, update. Does not embed.
 %
-% Zef fields (observed):
-%   zef.strip_tool (read, write)
-%
-% Calls (project):
-%   zef_strip_tool_init
-%   zef_strip_tool_open
-%   zef_strip_tool_update
-%   zef_strip_tool_window
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_strip_tool_open(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_strip_tool_window, zef_strip_tool_start.
 
 if not(isfield(zef,'strip_tool'))
 zef.strip_tool = struct; 

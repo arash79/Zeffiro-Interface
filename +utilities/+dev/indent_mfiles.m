@@ -1,26 +1,14 @@
 function indent_mfiles(folder)
-% --- Zeffiro documentation header ---
-% utilities.dev.indent_mfiles — Indent mfiles.
+%INDENT_MFILES  Smart-indent every .m file under folder recursively.
 %
-% Purpose:
-%   Indent mfiles.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   folder
+%   indent_mfiles(folder)
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Calls (project):
-%   utilities.dev.get_mfile_paths
-%   utilities.dev.indent_mfile
-%   utilities.dev.indent_mfiles
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `utilities.dev.indent_mfiles(folder)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Discovers paths via get_mfile_paths and applies indent_mfile to each.
 
     arguments
 

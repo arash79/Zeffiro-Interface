@@ -1,26 +1,16 @@
-% --- Zeffiro documentation header ---
-% for gmm_opt=1:3 — For gmm opt=1:3.
+%MAKEGMM  Lab script: zef_GMModeling on every reconstruction databank node.
 %
-% Purpose:
-%   For gmm opt=1:3.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.dataBank (read)
+%   Script. gmm_opt 1:3 → kmeans / maxProb / maxComp via
+%   zef.GMM.parameters{23,2}; credibility {5,2} in {0.25,0.5,0.75}.
+%   For each node_* of type reconstruction: zef_dataBank_setData,
+%   zef_GMModeling, zef_dataBank_add as type 'gmm'. Needs GMMClustering
+%   on the path and a populated dataBank.
 %
-% Calls (project):
-%   zef_dataBank_add
-%   zef_dataBank_getData
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `for gmm_opt=1:3` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 for gmm_opt=1:3
 

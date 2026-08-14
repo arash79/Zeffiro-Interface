@@ -1,33 +1,27 @@
 function compartment_tag = zef_find_compartment(property_name,property_value)
-% --- Zeffiro documentation header ---
-% zef_find_compartment — Zef find compartment.
+%ZEF_FIND_COMPARTMENT  First compartment tag whose <tag>_<property> matches.
 %
-% Purpose:
-%   Zef find compartment.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   property_name
-%   property_value
+%   Unused from menus. Caller: zef_bst_2_zef_atlas (match atlas name).
+%   Function; evalin('base','zef.compartment_tags') and zef.<tag>_*.
 %
-% Outputs:
-%   compartment_tag
+%   compartment_tag = zef_find_compartment(property_name, property_value)
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
+%   Inputs
+%     property_name   - field suffix, e.g. 'name'.
+%     property_value  - char (quoted for eval) or numeric (string()).
 %
-% Calls (project):
-%   zef_find_compartment
+%   Output
+%     compartment_tag  - matching tag, or '' if none.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Walks tags from the end (table row 1) toward the start so the
+%   outermost / last-listed tissue wins when names collide.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[compartment_tag] = zef_find_compartment(property_name, property_value)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_compartment_table_selection.
 
 compartment_tags = evalin('base','zef.compartment_tags');
 
@@ -43,6 +37,7 @@ end
 
 while not(compartment_found) && compartment_counter < length(compartment_tags)
 
+    % tags{end} is table row 1 (reversed compartment_tags).
     if evalin('base',['isequal(zef.' compartment_tags{end-compartment_counter} '_' property_name ',' property_value ')'])
         compartment_tag = compartment_tags{end-compartment_counter};
         compartment_found = 1;

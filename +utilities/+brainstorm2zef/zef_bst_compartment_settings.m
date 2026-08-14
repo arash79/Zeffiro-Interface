@@ -1,26 +1,21 @@
 function compartment_settings = zef_bst_compartment_settings(zef_bst, surface_meshes)
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst_compartment_settings — Zef bst compartment settings.
+%ZEF_BST_COMPARTMENT_SETTINGS  N-by-12 cell table: name, type, refine, sigma, DOF.
 %
-% Purpose:
-%   Zef bst compartment settings.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef_bst
-%   surface_meshes
+%   compartment_settings = zef_bst_compartment_settings(zef_bst, surface_meshes)
 %
-% Outputs:
-%   compartment_settings
+%   One row per surface_meshes(i). Odd columns are labels; even columns:
+%     2 Name, 4 Type, 6 refine-surface 0/1, 8 refine-volume 0/1,
+%     10 conductivity (default 1), 12 DOF/activity (default 0).
+%   Refine flags are 1 if Type or Name is in zef_bst.refine_surface /
+%   refine_volume. Conductivity and DOF via zef_bst_get_compartment_property
+%   on Type then Name against electrical_conductivity / dof_space.
 %
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_compartment_settings
-%   utilities.brainstorm2zef.zef_bst_get_compartment_property
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[compartment_settings] = utilities.brainstorm2zef.zef_bst_compartment_settings(zef_bst, surface_meshes)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_create_compartment_data, zef_bst_get_compartment_property.
 
 n_compartments = length(surface_meshes);
 

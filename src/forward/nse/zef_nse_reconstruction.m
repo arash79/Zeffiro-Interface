@@ -1,28 +1,31 @@
 function [reconstruction, reconstruction_info] = zef_nse_reconstruction(nse_field,type)
-% --- Zeffiro documentation header ---
-% zef_nse_reconstruction — Zef nse reconstruction.
+%ZEF_NSE_RECONSTRUCTION  Pack NSE vessel fields into inverse-style reconstruction cells.
 %
-% Purpose:
-%   Zef nse reconstruction.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nse_field
-%   type
+%   type matches NSE tool h_reconstruction_type.ItemsData (1…17):
+%     1  Pressure (Arteries) — bp_vessels, one cell per frame
+%     2  Velocity (Arteries) — bv_vessels_1/2/3
+%     3  Viscosity (Arteries) — mu_vessels
+%     4  Concentration (Microcirculation) — bf_capillaries
+%     5  Deoxygenized hemoglobin concentration — dh_capillaries
+%     6–8   Mean / max / STD pressure (collapsed to reconstruction{1})
+%     9–11  Mean / max / STD velocity
+%    12–14  Mean / max / STD viscosity
+%    15–17  Mean / max / STD concentration (values clamped to [0,1])
+%   Types 1–5 keep one reconstruction cell per NSE frame. 6–17 collapse time.
+%   Each scalar is stored as an xyz triplet /√3 for the Figure-tool colormap.
+%   Quantile clip: nse_field.min/max_reconstruction_quantile.
+%   Type 8 (STD pressure) assigns aux_vec with a comma expression that does
+%   not call zef_nse_threshold_distribution (as written). Type 17 divides
+%   the running mean by size(bp_vessels,2) rather than bf_capillaries.
 %
-% Outputs:
-%   reconstruction
-%   reconstruction_info
+%   [reconstruction, reconstruction_info] = zef_nse_reconstruction(nse_field, type)
 %
-% Calls (project):
-%   zef_nse_reconstruction
-%   zef_nse_threshold_distribution
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[reconstruction, reconstruction_info]] = zef_nse_reconstruction(nse_field, type)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_nse_threshold_distribution, zef_nse_poisson.
 
 reconstruction = cell(0);
 reconstruction_info = cell(0);
@@ -117,6 +120,8 @@ elseif isequal(type,8)
 
     for i = 1 : size(nse_field.bp_vessels,2)
 
+        % Comma expression: aux_vec is the last operand (the quantile
+        % scalar), not thresholded pressure. Documented as written.
         aux_vec = nse_field.bp_vessels{i}(:),nse_field.min_reconstruction_quantile,nse_field.max_reconstruction_quantile;
         mean_data = mean_data + (1/sqrt(3))*aux_vec(:,[1 1 1])';
 
@@ -305,6 +310,8 @@ elseif isequal(type,17)
 
     end
 
+    % Type 17 STD concentration: mean is divided by size(bp_vessels,2),
+    % not bf_capillaries, even though the loop is over capillary frames.
     mean_data = mean_data/size(nse_field.bp_vessels,2);
 
     reconstruction{1} = zeros(3,size(nse_field.bf_capillaries{1}(:),1));

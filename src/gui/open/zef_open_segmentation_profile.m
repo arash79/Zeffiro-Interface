@@ -1,38 +1,16 @@
-% --- Zeffiro documentation header ---
-% zef_data = zef_segmentation_profile; — Zef data = zef segmentation profile;.
+%ZEF_OPEN_SEGMENTATION_PROFILE  Settings → **Segmentation profile**.
 %
-% Purpose:
-%   Zef data = zef segmentation profile;.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_menu_segmentation_profile_table_add_column (read)
-%   zef.h_menu_segmentation_profile_table_add_row (read)
-%   zef.h_menu_segmentation_profile_table_delete_columns (read)
-%   zef.h_menu_segmentation_profile_table_delete_rows (read)
-%   zef.h_segmentation_profile (read)
-%   zef.h_segmentation_profile_save (read)
-%   zef.h_segmentation_profile_table (read)
-%   zef.profile_name (read)
-%   zef.program_path (read)
-%   zef.segmentation_profile_column_selected (read)
-%   zef.segmentation_profile_current_size (read, write)
-%   zef.segmentation_profile_relative_size (read, write)
-%   zef.segmentation_profile_row_selected (read)
+%   Script. MenuSelectedFcn of h_menu_segmentation_profile. Instantiates
+%   zef_segmentation_profile, loads profile/<name>/zeffiro_segmentation.ini.
+%   **Save** writecell. Add/delete row and column menus. This INI is what
+%   zef_init_compartments reads at project start. Closing does not save.
 %
-% Calls (project):
-%   zef_change_size_function
-%   zef_get_relative_size
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_data = zef_segmentation_profile;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_init_compartments, zef_menu_tool.
 zef_data = zef_segmentation_profile;
 zef_assign_data;
 

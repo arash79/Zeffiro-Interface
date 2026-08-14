@@ -1,38 +1,31 @@
-# src/sensitivity
+# Inverse sensitivity (`src/sensitivity`)
 
-## Folder purpose
+One function: run a Monte-Carlo probe of an inverse method on an existing `zef` (lead field + sources + measurements), without replacing `zef.reconstruction` on the main path.
 
-**Bridge function** from interactive `zef` projects to Monte Carlo sensitivity analysis in `+utilities/+sensitivity` — probe stability of inverse solutions under noise and optional multires preflight.
+This is **not** the EIT Sensitivity plugin (`tools/plugins/EITSensitivityTool`). Study scripts under `+examples/+studies/+santtus_peeling_article` use older `zef_sensitivity_map_*` helpers instead of this file.
 
-## Main contents
+## When to call it
 
-| File | Role |
-|------|------|
-| `zef_sensitivity_run.m` | `[stats, run_result] = zef_sensitivity_run(zef, method_id, opts)` |
+After a forward run (`zef.L`, `zef.source_positions`) and with a registered inverse id (`'mne'`, `'eloreta'`, …). Optional from `zef_inverse_pipeline_run` when sensitivity is enabled.
 
-## Code functionality
+There is **no menu item** in `zef_menu_tool` for this file.
 
-Validates `zef.L` and `zef.source_positions`, may call `zef_make_multires_dec` for RAMUS/HALpR/GroupLasso capability checks, delegates to `utilities.sensitivity.run_monte_carlo` which repeatedly calls `zef_inverse_run`.
+## What it does
 
-Returns aggregated statistics via `utilities.sensitivity.aggregate_statistics` — does not mutate `zef.reconstruction` in the main path.
-
-## Workflow context
-
-Called from `zef_inverse_pipeline_run` when sensitivity enabled. Study scripts (`+examples/+studies/+santtus_peeling_article`) use **legacy** `zef_sensitivity_map_*` helpers instead of this package.
-
-## Usage instructions
+1. Checks `zef.L` and `zef.source_positions`.
+2. Resolves active sources with `zef_processLeadfields`.
+3. For RAMUS / HALpR / GroupLasso, may call `zef_make_multires_dec` (capability check in `utilities.sensitivity.method_capability`).
+4. Delegates to `utilities.sensitivity.run_monte_carlo`, which repeatedly calls `zef_inverse_run` (local or cluster).
+5. Aggregates with `utilities.sensitivity.aggregate_statistics`.
 
 ```matlab
-[stats, run] = zef_sensitivity_run(zef, 'mne', struct('n_mc', 50, 'execution', 'local'));
+[stats, run] = zef_sensitivity_run(zef, "mne", ...
+    "NumberOfRuns", 50, "execution", "local", "NoiseLevelDb", -30);
 ```
 
-## Important notes
+Name-value options (from the `arguments` block): `MethodParams`, `execution` (`"local"`/`"cluster"`), `ClusterProfile`, `NumberOfRuns`, `NoiseLevelDb`, `DiffType` (`"L2"`/`"minabs"`), `DispersionRadius`, `SourceAmplitude`, `SourceMask`, `IsolatedFramesPerProbe`, `MaxProbesPerBatch`.
 
-- Requires completed forward + inverse setup (L, sources, measurements).
-- Cluster execution passes through opts to `zef_inverse_run`.
-- Distinct from EIT sensitivity **plugin** (`tools/plugins/EITSensitivityTool`).
+## Developer notes
 
-## Developer guidance
-
-- Extend capability checks in `utilities.sensitivity.method_capability` when adding inverters.
-- Keep opts schema aligned with `run_monte_carlo.m`.
+- New inverter: extend `utilities.sensitivity.method_capability` and the inverse registry, not this wrapper.
+- Keep option names aligned with `+utilities/+sensitivity/run_monte_carlo.m`.

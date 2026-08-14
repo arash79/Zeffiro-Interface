@@ -1,29 +1,16 @@
 function h_surf = zef_plot_sphere(position,radius,color)
-% --- Zeffiro documentation header ---
-% zef_plot_sphere — Renders or updates a plot_sphere figure from current `zef` state.
+%ZEF_PLOT_SPHERE  surf a sphere at position with given radius and color.
 %
-% Purpose:
-%   Renders or updates a plot_sphere figure from current `zef` state.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   position
-%   radius
-%   color
+%   h_surf = zef_plot_sphere(position, radius, color)
 %
-% Outputs:
-%   h_surf
+%   Called from zef_plot_source_patch for ball ROIs. Uses gca. No zef I/O.
 %
-% Calls (project):
-%   zef_plot_sphere
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[h_surf] = zef_plot_sphere(position, radius, color)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_plot_ellipsoid.
 
 h_axes = gca;
 hold_state = ishold(h_axes);

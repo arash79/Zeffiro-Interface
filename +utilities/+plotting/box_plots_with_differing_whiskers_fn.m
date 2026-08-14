@@ -1,34 +1,27 @@
-% --- Zeffiro documentation header ---
-% utilities.plotting.function [fig, ax] = box_plots_with_differing_whiskers_fn( ... — Function [fig, ax] = box plots with differing whiskers fn( .
-%
-% Purpose:
-%   Function [fig, ax] = box plots with differing whiskers fn( ....
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
-%
-% Inputs:
-%   data_cells
-%   outlier_limits
-%   x_tick_labels
-%   x_label
-%   y_label
-%
-% Calls (project):
-%   utilities.plotting.box_plots_with_differing_whiskers_fn
-%
-% Side effects:
-%   - creates/updates figures
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `utilities.plotting.function [fig, ax] = box_plots_with_differing_whiskers_fn( ...(data_cells, outlier_limits, x_tick_labels, x_label, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 function [fig, ax] = box_plots_with_differing_whiskers_fn( ...
     data_cells, ...
     outlier_limits, ...
     x_tick_labels, ...
     x_label, ...
     y_label ...
-)
+    )
+%BOX_PLOTS_WITH_DIFFERING_WHISKERS_FN  Side-by-side box plots with custom whisker caps.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   [fig, ax] = box_plots_with_differing_whiskers_fn(data_cells, ...
+%       outlier_limits, x_tick_labels, x_label, y_label)
+%
+%   Each cell in data_cells is one group plotted at x=1..N. outlier_limits(ii)
+%   sets the upper whisker end via w = (ol - q75)/(q75 - q25) so outliers above
+%   ol are shown individually. x/y labels use LaTeX interpreter.
+%
+%   Used by example/study scripts, not the Figure tool.
+%
+%   See also utilities.plotting.colorbar_from_figtool_fn.
 
     arguments
 

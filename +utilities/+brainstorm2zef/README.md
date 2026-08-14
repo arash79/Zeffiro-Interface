@@ -1,84 +1,82 @@
-# +utilities/+brainstorm2zef
+# `utilities.brainstorm2zef` — Brainstorm protocol → Zeffiro project
 
-## Purpose of this folder
+Builds a Zeffiro session from an **open Brainstorm protocol**: surfaces become compartments, then `zef_create_finite_element_mesh` runs. Unlike fs2zef/sn2zef, this converter does **not** write a folder of STL/ASC + `import_segmentation.zef` as its main product. It starts `zeffiro_interface('start_mode','nodisplay')` itself and optionally `zef_save`s a `.mat`.
 
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+GUI entry: `zef_bst_plugin_start` (figure named `ZEFFIRO-Brainstorm plugin`). Programmatic entry: `utilities.brainstorm2zef.run(config)`.
 
-## Contents
+## What must exist
 
-Subfolders:
-- `projects/`
-- `settings/`
+- Brainstorm on the MATLAB path (`exist('bst_get','file')`).
+- An initialized protocol: `bst_get('ProtocolInfo')` must return a struct with `SUBJECTS`. `zef_bst_validate_environment` fails otherwise.
+- Subject anatomy in that protocol matching `zef_bst.compartment_list` (default: Scalp, OuterSkull, InnerSkull, Cortex, Other, white, subcortical).
+- Settings script under `settings/` (default `zef_bst_default.m`), loaded by `zef_bst_get_settings`.
 
-MATLAB sources:
-- `zef_bst_settings_file.m` — **utilities.brainstorm2zef.function zef_bst_settings_file**: Function zef bst settings file.
-- `run.m` — **utilities.brainstorm2zef.run**: Run.
-- `zef_bst_init.m` — **utilities.brainstorm2zef.zef_bst**: Zef bst.
-- `zef_bst_compartment_settings.m` — **utilities.brainstorm2zef.zef_bst_compartment_settings**: Zef bst compartment settings.
-- `zef_bst_create_compartment_data.m` — **utilities.brainstorm2zef.zef_bst_create_compartment_data**: Zef bst create compartment data.
-- `zef_bst_create_project.m` — **utilities.brainstorm2zef.zef_bst_create_project**: Zef bst create project.
-- `zef_bst_default_fem_mesh_create.m` — **utilities.brainstorm2zef.zef_bst_default_fem_mesh_create**: Zef bst default fem mesh create.
-- `zef_bst_edit_project.m` — **utilities.brainstorm2zef.zef_bst_edit_project**: Zef bst edit project.
-- `zef_bst_find_compartment.m` — **utilities.brainstorm2zef.zef_bst_find_compartment**: Zef bst find compartment.
-- `zef_bst_get_atlas_surfaces.m` — **utilities.brainstorm2zef.zef_bst_get_atlas_surfaces**: Zef bst get atlas surfaces.
-- `zef_bst_get_compartment_property.m` — **utilities.brainstorm2zef.zef_bst_get_compartment_property**: Zef bst get compartment property.
-- `zef_bst_get_input_mode.m` — **utilities.brainstorm2zef.zef_bst_get_input_mode**: Zef bst get input mode.
-- `zef_bst_get_project_file_name.m` — **utilities.brainstorm2zef.zef_bst_get_project_file_name**: Zef bst get project file name.
-- `zef_bst_get_run_type.m` — **utilities.brainstorm2zef.zef_bst_get_run_type**: Zef bst get run type.
-- `zef_bst_get_settings.m` — **utilities.brainstorm2zef.zef_bst_get_settings**: Zef bst get settings.
-- `zef_bst_get_settings_file_name.m` — **utilities.brainstorm2zef.zef_bst_get_settings_file_name**: Zef bst get settings file name.
-- `zef_bst_normalize_compartment_name.m` — **utilities.brainstorm2zef.zef_bst_normalize_compartment_name**: Zef bst normalize compartment name.
-- `zef_bst_plugin_start.m` — **utilities.brainstorm2zef.zef_bst_plugin_start**: Zef bst plugin start.
-- `zef_bst_validate_environment.m` — **utilities.brainstorm2zef.zef_bst_validate_environment**: Zef bst validate environment.
-- `zef_bst_validate_settings.m` — **utilities.brainstorm2zef.zef_bst_validate_settings**: Zef bst validate settings.
+No FreeSurfer/`SUBJECTS_DIR` requirement for `run` itself; Brainstorm already holds the surfaces.
 
-Other files:
-- `README.txt`
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-- **utilities.brainstorm2zef.function zef_bst_settings_file**: GUI callback or dialog (`function zef_bst_settings_file`).
-
-## Programmatic usage
-
-From the project root:
+## Public entry
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+config = struct();
+config.settings_file_name = 'zef_bst_default';  % basename in settings/
+config.project_file_name = fullfile(pwd, 'data', 'bst_project');  % optional save
+config.run_type = 1;      % 1 = fresh from Brainstorm; 2 = reload saved compartment dumps
+config.input_mode = 1;    % 1 = use input files; 2 = ignore compartment_files
+config.verbose = true;
+% optional: subject_struct, subject_folder, use_gpu, parallel_processes, zef_bst overrides
+
+results = utilities.brainstorm2zef.run(config);
+% results.success, .zef, .mesh_data, .errors, .warnings, .processing_time
+% Caller should zef_close_all(results.zef) when done — run does not close.
 ```
 
-Representative entry points in this folder:
-- `Call `utilities.brainstorm2zef.function zef_bst_settings_file` from MATLAB with the project root on the path.`
-- ``[results] = utilities.brainstorm2zef.run(config)` with project root and `src` on the path.`
-- `Call `utilities.brainstorm2zef.zef_bst` from MATLAB with the project root on the path.`
-- ``[compartment_settings] = utilities.brainstorm2zef.zef_bst_compartment_settings(zef_bst, surface_meshes)` with project root and `src` on the path.`
-- ``[[compartment_settings, surface_meshes, zef]] = utilities.brainstorm2zef.zef_bst_create_compartment_data(settings_file_name, zef_bst, zef)` with project root and `src` on the path.`
-- ``[zef] = utilities.brainstorm2zef.zef_bst_create_project(settings_file_name, project_file_name, run_type, input_mode, …)` with project root and `src` on the path.`
-- ``[out_cell] = utilities.brainstorm2zef.zef_bst_default_fem_mesh_create(run_type, input_mode, settings_file_name, project_file_name, …)` with project root and `src` on the path.`
-- ``utilities.brainstorm2zef.zef_bst_edit_project(project_file_name)` with project root and `src` on the path.`
+### `config` fields (`run` / `validate_and_set_defaults`)
 
-## Examples
+| Field | Default | Meaning |
+|-------|---------|---------|
+| `settings_file_name` | `'zef_bst_default'` | Script in `settings/` (no `.m` needed) |
+| `project_file_name` | `''` | If non-empty, `zef_save` to `[file_name].mat` |
+| `run_type` | `1` | `1` fresh; `2` import previously written `*_compartment_settings.dat` + `*_surface_meshes.mat`. **3 is rejected** here — use `zef_bst_edit_project` or `zeffiro_interface('open_project',...)` |
+| `input_mode` | `1` | `2` clears `zef_bst.compartment_files` |
+| `verbose` | `true` | Also copied onto `zef_bst.verbose_mode` |
+| `save_project` | true iff `project_file_name` non-empty | |
+| `subject_struct` / `subject_folder` | empty | Overrides inside `zef_bst` |
+| `use_gpu` / `parallel_processes` | `[]` | Passed into `zeffiro_interface` when set |
+| `zef_bst` | `struct()` | Merged over the settings script |
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+## Pipeline (`run`)
 
-## Dependencies and assumptions
+1. `zef_bst_validate_environment`
+2. `zef_bst_get_settings` (runs `zef_bst_init` then the settings `.m`)
+3. `zeffiro_interface('start_mode','nodisplay', ...)`
+4. `zef_bst_create_project` — `zef_add_bounding_box`, pull surfaces, `zef_add_compartment` per row
+5. `zef_create_finite_element_mesh(zef)`
+6. Copy mesh to `results.mesh_data`: **nodes divided by `zef_bst.unit_conversion`** (Zeffiro millimetres → metres for Brainstorm-side consumers). Tetra is `[zef.tetra zef.domain_labels]`. `name_tags` drops the last tag (bounding box).
+7. Optional `zef_save`
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## Coordinate frame
 
-## Notes for developers
+Compartment points/triangles come from Brainstorm surface files (`zef_bst_find_compartment` / `zef_bst_get_atlas_surfaces`). Triangle winding is flipped `(:,[1 3 2])` when stored on `zef`. Zeffiro mesh coordinates stay in the session length unit (typically mm). Only `results.mesh_data.nodes` is converted to metres.
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## How the result is used
+
+Keep `results.zef` and continue (lead field, inverse) in the same MATLAB session, or load the saved `.mat` later:
+
+```matlab
+zef = zeffiro_interface('start_mode', 'nodisplay', 'open_project', [file_name '.mat']);
+```
+
+There is no `import_to_new_project` `.zef` from this path unless you add one yourself.
+
+## Plugin GUI
+
+`zef_bst_plugin_start(folder_name, zef_bst, open_dialog)` builds figure `zeffiro_bst_plugin`, lists `zef_bst_*_fem_mesh_create.m` in this package (currently `zef_bst_default_fem_mesh_create`), and settings/project subfolders. `zef_bst_settings_file` is a dialog script for picking the settings `.m`.
+
+## Settings / projects folders
+
+- `settings/zef_bst_default.m` — factory `zef_bst` (mesh_resolution 3, compartment_list, GPU, inflation, …). It is a **script** that assigns `zef_bst.*`.
+- `projects/` — intended dump location for plugin-created projects (`README.txt` only in-tree).
+
+## Gaps
+
+- `run_type` 3 is documented in some comments as “existing project” but `run` and `zef_bst_create_project` error if it is passed.
+- Intermediate `*_compartment_settings.dat` / `*_surface_meshes.mat` are written next to the **settings file path**, not necessarily under `projects/`.

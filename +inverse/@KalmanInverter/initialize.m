@@ -1,30 +1,23 @@
-%% Copyright © 2025- Joonas Lahtinen
 function self = initialize(self,L,f_data)
-% --- Zeffiro documentation header ---
-% inverse.KalmanInverter.initialize — Estimates priors, noise covariance, or regularization from multi-frame data.
+%initialize  Set Kalman noise covariance, initial prior theta0, and process noise Q.
 %
-% Purpose:
-%   Estimates priors, noise covariance, or regularization from multi-frame data.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   L
-%   f_data
+%   Called once from utilities.inverse.run_frame_loop before the per-frame
+%   invert loop. Inverse tools → Kalman uses zef_KF (DTI Q lives there).
+%   Resets prev_step_reconstruction / prev_step_posterior_cov so a new run
+%   does not reuse the last filter state. noise_cov defaults to SNR-scaled
+%   identity (or is trace-normalized if the user already set a matrix).
+%   theta0 from early-frame data variance and lead-field sensitivity. Q (evolution_cov
+%   or evolution_var) depends on evolution_prior_model — sensitivity scaling uses
+%   temporal differences of f_data; "User supplied Q" requires evolution_cov to match
+%   size(L,2).
 %
-% Outputs:
-%   self
-%
-% Calls (project):
-%   inverse.initialize
-%
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[self] = inverse.KalmanInverter.initialize(self, L, f_data)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Inputs:  L — lead field; f_data — m×T measurements.
+%   Output:  self with priors and transition model A (identity if unset).
 
     arguments
 
@@ -49,6 +42,7 @@ function self = initialize(self,L,f_data)
     end
     self.evolution_var = [];
 
+    % SNR → noise power p² = 10^(-SNR/10). Signal fraction (1-p²) scales priors.
     noise_p2 = 10^(-self.signal_to_noise_ratio/10);
 
     if isempty(self.noise_cov)
@@ -57,6 +51,8 @@ function self = initialize(self,L,f_data)
         self.noise_cov = size(L,1)*self.noise_cov/trace(self.noise_cov);
     end
     
+    % Initial prior θ₀: data variance on the first noise-only frames, depth-weighted
+    % by per-triplet lead-field energy, steered in dB.
     self.theta0 = (1-noise_p2)*10.^(self.initial_prior_steering_db/10)*mean(var(f_data(:,1:self.number_of_noise_steps),0,2))./repelem(sum(reshape(sum(L.^2),3,[])),3);
 
     switch self.evolution_prior_model

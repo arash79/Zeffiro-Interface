@@ -1,30 +1,16 @@
 function zef = zef_GMModel_start(zef)
-% --- Zeffiro documentation header ---
-% zef_GMModel_start — Zef GMModel start.
+%ZEF_GMMODEL_START  Entry point that opens the Gmmodel plugin.
 %
-% Purpose:
-%   Zef GMModel start.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   INI callback (Inverse tools → Gaussian Mixture Model (SP)). Opens the
+%   GMM window via zef_GMModel_open. Run button calls zef_cluster_reconstruction
+%   on an existing zef.reconstruction (not L/measurements). Not an inverse
+%   solver and not plugins.ClassGMM.
 %
-% Outputs:
-%   zef
-%
-% Calls (project):
-%   zef_GMModel_start
-%   zef_tool_start
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_GMModel_start(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     zef = evalin('base','zef');

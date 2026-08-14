@@ -1,37 +1,18 @@
-% --- Zeffiro documentation header ---
-% zef_data = zef_system_settings; — Zef data = zef system settings;.
+%ZEF_OPEN_SYSTEM_SETTINGS  Settings → **System settings (zeffiro_interface.ini)**.
 %
-% Purpose:
-%   Zef data = zef system settings;.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.fieldnames (read, write)
-%   zef.font_size (read)
-%   zef.h_menu_system_settings_table_add (read)
-%   zef.h_menu_system_settings_table_delete (read)
-%   zef.h_system_settings (read)
-%   zef.h_system_settings_apply (read)
-%   zef.h_system_settings_save (read)
-%   zef.h_system_settings_table (read)
-%   zef.ini_cell (read, write)
-%   zef.program_path (read)
-%   zef.system_settings_current_size (read, write)
-%   zef.system_settings_relative_size (read, write)
-%   zef.system_settings_selected (read)
+%   Script. MenuSelectedFcn of h_menu_system_settings (no zef_update).
+%   Instantiates zef_system_settings, loads profile/zeffiro_interface.ini
+%   into h_system_settings_table. **Save** → zef_save_system_settings;
+%   **Apply** → save then zef_apply_system_settings. Add/delete row
+%   menus use zef.system_settings_selected from
+%   zef_system_settings_table_selection. Closing does not save.
 %
-% Calls (project):
-%   zef_change_size_function
-%   zef_get_relative_size
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_data = zef_system_settings;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_save_system_settings, zef_menu_tool.
 zef_data = zef_system_settings;
 zef.fieldnames = fieldnames(zef_data);
 for zef_i = 1:length(zef.fieldnames)

@@ -1,49 +1,97 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_process_meshes(zef,varargin)
-% --- Zeffiro documentation header ---
-% zef_process_meshes — Zef process meshes.
+%ZEF_PROCESS_MESHES  Gather active surfaces and sensors into zef.reuna_* / zef.sensors.
 %
-% Purpose:
-%   Zef process meshes.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   varargin
+%   This is the surface-registration step before a volume mesh exists. For
+%   every compartment with <tag>_on true it copies <tag>_points / _triangles
+%   / _points_inf / _submesh_ind into cell arrays, then applies that
+%   compartment's affine, scale, Euler rotations (degrees), and translation.
+%   Sensors named by zef.current_sensors get the same class of transform.
+%   A compartment with <tag>_sources == -1 is a PML bounding box: its
+%   surface is replaced by a cube of side 2*box_outer_radius.
 %
-% Outputs:
-%   zef
+%   Always run this (or the Mesh-tool wrapper that already does) before
+%   zef_create_fem_mesh. Visualization also calls it so exploded/transformed
+%   surfaces match the session.
 %
-% Zef fields (observed):
-%   zef.compartment_activity (read)
-%   zef.compartment_tags (read)
-%   zef.create_patch_sensor (read)
-%   zef.current_sensors (read)
-%   zef.imaging_method (read)
-%   zef.pml_outer_radius (read)
-%   zef.pml_outer_radius_unit (read)
-%   zef.reuna_mesh_ind (read, write)
-%   zef.reuna_p (read, write)
-%   zef.reuna_p_inf (read, write)
-%   zef.reuna_submesh_ind (read, write)
-%   zef.reuna_t (read, write)
-%   zef.reuna_type (read, write)
-%   zef.sensors (read, write)
-%   zef.use_pem (read)
+%   Callers (first-party)
+%     zef_create_finite_element_mesh (Mesh tool **Create FEM mesh**)
+%     EEG/MEG/EIT/TES lead-field wrappers in src/forward/lead_field
+%     zef_apply_transform (Mesh tool **Apply transform**)
+%     zef_visualize_surfaces / zef_snapshot_movie (explode_param)
+%     zef_save, utilities.brainstorm2zef, utilities.duneuro2zef
 %
-% Calls (project):
-%   zef_process_meshes
+%   GUI: Mesh tool **Create FEM mesh** → zef_create_finite_element_mesh
+%   (verified ButtonPushedFcn on zef.h_pushbutton21). **Apply transform**
+%   → zef_apply_transform (zef.h_pushbutton23). Visualization tool
+%   **Visualize surfaces** → zef_visualize_surfaces.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   zef = zef_process_meshes(zef)
+%   zef = zef_process_meshes(zef, explode_param)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_process_meshes(zef, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Inputs
+%     zef            - session struct. If nargin==0, read from base.
+%     explode_param  - optional scalar, default 1. Visualization only:
+%                      vertices of each submesh are pushed away from that
+%                      submesh centroid by (explode_param-1)*centroid.
+%                      1 = no explosion. zef.explode_everything is the
+%                      usual second argument from the plot tools.
+%
+%   Fields read (per active compartment tag)
+%     <tag>_on, _points (V×3), _triangles (F×3, 1-based), _points_inf,
+%     _submesh_ind (cumulative last-face index per patch), _sources,
+%     _scaling, _x/y/z_correction, _xy/yz/zx_rotation (deg),
+%     _affine_transform (cell of 4×4 matrices, applied as rows*A').
+%     Transforms run only when isfield(zef, '<tag>_affine_transform') is
+%     true; missing cells fall back to eye(4). Length of _scaling sets
+%     how many transform "layers" are applied in sequence.
+%     Sensors: zef.current_sensors, zef.imaging_method, <sensor>_points,
+%     _directions, _scaling, corrections, rotations, _affine_transform,
+%     zef.use_pem, zef.create_patch_sensor, zef.pml_outer_radius(_unit).
+%
+%   imaging_method (this file)
+%     1  - scalar (EEG/EIT-style): optional patch-sensor handle; PEM may
+%          drop extra columns. If points are N×6, columns 4–6 are kept as
+%          auxiliary data and concatenated back after the transform.
+%     2  - vector (MEG magnetometer): sensors = [xyz, unit direction].
+%     3  - vector gradient (MEG gradiometer): 9 columns if directions
+%          are N×6 (two unit direction triples).
+%     1 or 5 - zef.use_pem trims sensors to xyz only.
+%     Affine rotation of direction columns is applied only for methods 2/3.
+%
+%   Fields written
+%     zef.sensors          - N×3, N×6, or N×9 in the same Cartesian frame
+%                            and length unit as the surfaces. Empty input
+%                            becomes a single NaN row.
+%     zef.reuna_p          - 1×C cell, V×3 vertices of active compartments.
+%     zef.reuna_t          - 1×C cell, F×3 triangles.
+%     zef.reuna_p_inf      - inflated copies (may be empty per cell).
+%     zef.reuna_submesh_ind
+%     zef.reuna_type       - C×4 cell: {_sources, activity string from
+%                            zef.compartment_activity{_sources+2}, original
+%                            tag index k, tag name}.
+%     zef.reuna_mesh_ind   - 1×C original indices into compartment_tags.
+%
+%   Side effects
+%     If nargout==0, assignin('base','zef',zef). PML box vertices are also
+%     written back onto that compartment's _points/_triangles/_submesh_ind.
+%
+%   Notes
+%     The sensor transform sits inside the compartment loop, so it is
+%     re-run once per compartment tag (active or not). The last pass wins.
+%     Rotation of surfaces is about the centroid computed before the affine
+%     (mean of the untransformed points). Coordinates are not converted
+%     between mm/cm/m here.
+%
+%   Example (same sequence as Create FEM mesh, without the wrapper)
+%     zef = zef_process_meshes(zef);
+%     zef = zef_create_fem_mesh(zef);
+%
+%   See also zef_create_fem_mesh, zef_downsample_surfaces, zef_create_finite_element_mesh.
 
 explode_param = 1;
 
@@ -52,7 +100,7 @@ if nargin == 0
 end
 
 reuna_p_inf = [];
-output_mode = 'compact'; 
+output_mode = 'compact';
 
 if not(isempty(varargin))
     explode_param = varargin{1};
@@ -67,6 +115,7 @@ reuna_submesh_ind = cell(0);
 reuna_type = cell(0);
 reuna_mesh_ind = [];
 
+% Walk every compartment tag; only _on compartments are packed into reuna_*.
 compartment_tags = eval('zef.compartment_tags');
 for k = 1 : length(compartment_tags)
 
@@ -93,14 +142,18 @@ for k = 1 : length(compartment_tags)
         reuna_p_inf{i} = eval(var_8);
         reuna_p{i} = eval(var_9);
         reuna_t{i} = eval(var_10);
+        % Column 1: _sources (−1 PML, 0 inactive, 1/2 source-capable).
+        % Column 2: string from zef.compartment_activity{_sources+2}.
         reuna_type{i,1} = eval(var_12);
         reuna_type{i,2} = eval(['zef.compartment_activity{' var_12 '+2' '}']);
         reuna_type{i,3} = k;
         reuna_type{i,4} = compartment_tags{k};
         reuna_submesh_ind{i} = eval(var_11);
+        % Centroid used as the rotation origin (computed before affine).
         mean_vec = repmat(mean(reuna_p{i},1),size(reuna_p{i},1),1);
 reuna_mesh_ind(i) = k;
 
+        % One pass per stored scale/rotation/translation "layer".
         for t_ind = 1 : length(eval(var_1))
 
             scaling_val = eval([var_1 '(' num2str(t_ind) ')']);
@@ -110,6 +163,7 @@ reuna_mesh_ind(i) = k;
             theta_angle_vec(1) =  eval([var_5 '(' num2str(t_ind) ')']);
             theta_angle_vec(2) =  eval([var_6 '(' num2str(t_ind) ')']);
             theta_angle_vec(3) =  eval([var_7 '(' num2str(t_ind) ')']);
+            % Scale/rotate/translate run only when <tag>_affine_transform exists.
             if eval(['isfield(zef,''' var_14 ''')'])
                 if eval(['length(' var_13 ')']) >= t_ind
                     affine_transform =  cell2mat(eval([var_13 '(' num2str(t_ind) ')']));
@@ -117,6 +171,7 @@ reuna_mesh_ind(i) = k;
                     affine_transform = eye(4);
                 end
 
+                % Homogeneous rows times A': translation lives in A(1:3,4).
                 reuna_aux = [reuna_p{i} ones(size(reuna_p{i},1),1)];
                 if not(isempty(reuna_aux)) && not(isempty(affine_transform))
                     reuna_aux = reuna_aux*affine_transform';
@@ -132,6 +187,7 @@ reuna_mesh_ind(i) = k;
                         reuna_p_inf{i} = scaling_val*reuna_p_inf{i};
                     end
                 end
+                % Euler sequence in degrees: xy, then yz, then zx, about mean_vec.
                 for j = 1 : 3
                     switch j
                         case 1
@@ -163,6 +219,7 @@ reuna_mesh_ind(i) = k;
 
             end
 
+            % Visualization: push each submesh away from its own centroid.
             if explode_param ~= 1
                 for s_ind = 1 : length(reuna_submesh_ind{i})
                     if s_ind == 1
@@ -183,11 +240,13 @@ reuna_mesh_ind(i) = k;
         end
     end
 
+    % Sensor path runs inside the compartment loop; last iteration overwrites.
     sensor_tag = eval('zef.current_sensors');
 
     s_points = eval(['zef.' sensor_tag '_points']);
     s_data_aux = [];
 
+    % imaging_method 1 (scalar): optional patch-electrode generator.
     if ismember(eval('zef.imaging_method'),1)
         f_handle = zef.create_patch_sensor;
         if not(isempty(f_handle))
@@ -195,6 +254,7 @@ reuna_mesh_ind(i) = k;
         end
     end
 
+    % MEG: method 2 uses one direction triple; method 3 may use two (N×6).
     if ismember(eval('zef.imaging_method'),[2 3])
         s_directions = eval(['zef.' sensor_tag '_directions(:,1:3)']);
         s_directions_g = [];
@@ -317,6 +377,7 @@ reuna_mesh_ind(i) = k;
         sensors = sensors(:,1:3);
     end
 
+    % PML compartment (_sources == -1): replace its surface with a cube.
     max_val = 0;
     box_ind = 0;
     for i_aux = 1 : length(reuna_p)
@@ -329,6 +390,8 @@ reuna_mesh_ind(i) = k;
 
     if not(isequal(box_ind,0))
 
+        % Unit 1: radius relative to max |coordinate| of non-PML surfaces.
+        % Unit 2: absolute radius in the project length unit.
         pml_outer_radius_unit = eval('zef.pml_outer_radius_unit');
         pml_outer_radius = eval('zef.pml_outer_radius');
         if pml_outer_radius_unit == 1

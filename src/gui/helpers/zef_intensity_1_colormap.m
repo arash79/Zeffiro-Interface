@@ -1,27 +1,17 @@
 function [colormap_vec] = zef_intensity_1_colormap(colortune_param, colormap_size)
-% --- Zeffiro documentation header ---
-% zef_intensity_1_colormap — Zef intensity 1 colormap.
+%ZEF_INTENSITY_1_COLORMAP  colormap_cell{2} "Intensity I" (red-led ramps).
 %
-% Purpose:
-%   Zef intensity 1 colormap.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   colortune_param
-%   colormap_size
+%   colormap_vec = zef_intensity_1_colormap(colortune_param, colormap_size)
 %
-% Outputs:
-%   colormap_vec
-%
-% Calls (project):
-%   zef_intensity_1_colormap
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[colormap_vec] = zef_intensity_1_colormap(colortune_param, colormap_size)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   Channel 1 is a full-length ramp; 2 and 3 cut at the usual
+%   colortune_param band edges. flipud, then add 0.2*(size:-1:1)/size to
+%   all channels and re-normalize. Intensity II/III swap which channel
+%   gets the long ramp (green / blue).
 c_aux_1 = floor(colortune_param*colormap_size/3);
 c_aux_2 = floor(colormap_size  - colortune_param*colormap_size/3);
 colormap_vec = zeros(3,colormap_size);

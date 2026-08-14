@@ -1,31 +1,18 @@
 function zef = zef_Abbott_infinity_strip_multiple_probe(zef)
-% --- Zeffiro documentation header ---
-% zef_Abbott_infinity_strip_multiple_probe — Zef Abbott infinity strip multiple probe.
+%ZEF_ABBOTT_INFINITY_STRIP_MULTIPLE_PROBE  strip_type 2: 8-contact Abbott Infinity layout.
 %
-% Purpose:
-%   Zef Abbott infinity strip multiple probe.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_Abbott_infinity_strip_multiple_probe(zef)
 %
-% Outputs:
-%   zef
+%   Called from zef_DBS_strip_struct_update when strip_type==2.
+%   120° rings, ele_dist 2, 8 contacts per probe. Writes
+%   strip_struct.electrode_data. Does not attach to sensors.
 %
-% Zef fields (observed):
-%   zef.strip_struct (read, write)
-%
-% Calls (project):
-%   zef_Abbott_infinity_strip_multiple_probe
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_Abbott_infinity_strip_multiple_probe(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_electrode_strip_multiple_probe.
 
 zef.strip_struct.dir_vec(1,:) = 1/norm(zef.strip_struct.dir_vec(1,:))*zef.strip_struct.dir_vec(1,:);
 zef.strip_struct.dir_vec(2,:) = 1/norm(zef.strip_struct.dir_vec(2,:))*zef.strip_struct.dir_vec(2,:);

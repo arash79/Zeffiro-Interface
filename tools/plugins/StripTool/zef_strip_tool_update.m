@@ -1,33 +1,19 @@
 function zef = zef_strip_tool_update(zef)
-% --- Zeffiro documentation header ---
-% zef_strip_tool_update — Zef strip tool update.
+%ZEF_STRIP_TOOL_UPDATE  Widgets → current strip_cell; rebuild the HTML strip list.
 %
-% Purpose:
-%   Zef strip tool update.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_strip_tool_update(zef)
 %
-% Outputs:
-%   zef
+%   Reads tip, orientation, model, impedance, lengths, encapsulation
+%   into <current_sensors>_strip_cell{current_strip}. List colors
+%   Tentative orange / Embedded green. Called from almost every edit
+%   Callback. Does not write compartments.
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.current_sensors (read)
-%   zef.strip_tool (read)
-%
-% Calls (project):
-%   zef_strip_tool_update
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_strip_tool_update(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_strip_tool_init.
 
 struct_aux = zef.([zef.current_sensors '_strip_cell']){zef.strip_tool.current_strip};
 
@@ -68,27 +54,40 @@ zef.([zef.current_sensors '_strip_cell']){zef.strip_tool.current_strip} = struct
 
 cell_aux = zef.([zef.current_sensors '_strip_cell']);
 
-zef.strip_tool.h_strip_list.String = cell(0);
+names_aux = cell(0);
+colors_aux = zeros(0, 3);
 
 for i = 1 : length(cell_aux)
 
 if isequal(cell_aux{i}.strip_status,'Tentative')
-color_str_aux_1 = 'orange';
+color_aux = [1 0.55 0];
 elseif isequal(cell_aux{i}.strip_status,'Embedded')
-    color_str_aux_1 = 'green';
+    color_aux = [0.15 0.7 0.2];
+else
+    color_aux = [0.6 0.6 0.6];
 end
 
 if isequal(cell_aux{i}.encapsulation_on, 1)
-    color_str_aux_2 = 'red';
     str_aux = 'On';
 else
-    color_str_aux_2 = 'black';
     str_aux = 'Off';
 end
 
-string_aux = ['<HTML><BODY>' 'ID: ' num2str(cell_aux{i}.strip_id) ', Tag: ' cell_aux{i}.strip_tag ', Model: ' zef.strip_tool.h_strip_model.String{cell_aux{i}.strip_model} ', Status: <SPAN style="color:' color_str_aux_1 '">' cell_aux{i}.strip_status '</SPAN>' ', Encapsulation: <SPAN style="color:' color_str_aux_2 '">' str_aux '</SPAN> </BODY></HTML>']; 
-zef.strip_tool.h_strip_list.String{i} = string_aux;
+model_str = '';
+try
+    model_str = zef.strip_tool.h_strip_model.String{cell_aux{i}.strip_model};
+catch
+end
+names_aux{i} = sprintf('ID: %s, Tag: %s, Model: %s, Status: %s, Encapsulation: %s', ...
+    num2str(cell_aux{i}.strip_id), char(string(cell_aux{i}.strip_tag)), ...
+    char(string(model_str)), char(string(cell_aux{i}.strip_status)), str_aux);
+colors_aux(i, :) = color_aux;
 
+end
+
+zef_colored_list('set', zef.strip_tool.h_strip_list, names_aux, colors_aux);
+if isfield(zef.strip_tool, 'current_strip') && ~isempty(zef.strip_tool.current_strip)
+    zef_colored_list('value', zef.strip_tool.h_strip_list, zef.strip_tool.current_strip);
 end
 
 %zef.strip_tool.h_strip_compartment_list.String = cell(0);

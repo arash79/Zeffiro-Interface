@@ -1,27 +1,21 @@
-% --- Zeffiro documentation header ---
-% function zef_plot_SESAME_dipoles — Function zef plot SESAME dipoles.
+function zef_plot_SESAME_dipoles
+%ZEF_PLOT_SESAME_DIPOLES  Queue renderer: SESAME dipoles for caller f_ind.
 %
-% Purpose:
-%   Function zef plot SESAME dipoles.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.SESAME_App (read)
-%   zef.SESAME_time_serie (read)
-%   zef.inv_rec_source (read, write)
+%   Builds a local zef.inv_rec_source from
+%   SESAME_time_serie{f_ind}.dipole_positions, QV_estimated / Q_estimated,
+%   and SESAME_App h_inv_rec_source_8/9 (visual size / color), then calls
+%   zef_plot_3D_stem_reconstructed_source. That stem call reads
+%   inv_rec_source from the caller, so this local zef is what it sees.
+%   Does not assignin the packed sources to base.
 %
-% Calls (project):
 %   zef_plot_SESAME_dipoles
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_plot_SESAME_dipoles` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-function zef_plot_SESAME_dipoles
+%   See also zef_plot_3D_stem_reconstructed_source, zef_plot_dpq.
 
 zef = evalin('base','zef');
 h_axes_image = evalin('caller','h_axes_image');

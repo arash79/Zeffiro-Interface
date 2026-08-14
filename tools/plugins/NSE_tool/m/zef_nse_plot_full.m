@@ -1,38 +1,21 @@
 
 function  zef_nse_plot_full(zef, nse_field, plot_vec, y_label, legend_text)
-% --- Zeffiro documentation header ---
-% zef_nse_plot_full — Zef nse plot full.
+%ZEF_NSE_PLOT_FULL  Time series of plot_vec on h_axes1 from start_time to time_length.
 %
-% Purpose:
-%   Zef nse plot full.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nse_field
-%   plot_vec
-%   y_label
-%   legend_text
+%   Called from zef_nse_plot_graph for non-epoched graph_types. Time axis
+%   is linspace(start_time, time_length, n_time); not the solver dt.
+%   Optional legend_text for multi-column plot_vec.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_nse_plot_full(zef, nse_field, plot_vec, y_label)
+%   zef_nse_plot_full(zef, nse_field, plot_vec, y_label, legend_text)
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_axes1 (read)
+%   See also zef_nse_plot_epoched, zef_nse_plot_graph.
 %
-% Calls (project):
-%   zef_nse_plot_full
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_nse_plot_full(zef, nse_field, plot_vec, y_label, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 h_axes = zef.h_axes1;
 axes(h_axes);

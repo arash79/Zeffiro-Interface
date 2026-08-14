@@ -1,35 +1,34 @@
 function [t_ind, coeff, f_ind] = zef_source_tetra(source_positions, tetra, nodes, K)
-% --- Zeffiro documentation header ---
-% zef_source_tetra — Zef source tetra.
+%ZEF_SOURCE_TETRA  Barycentric locate of points in a tetrahedral mesh.
 %
-% Purpose:
-%   Zef source tetra.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   source_positions
-%   tetra
-%   nodes
-%   K
+%   For each source xyz, knnsearch's K nearest tet centroids, then solves
+%   (v2-v1, v3-v1, v4-v1) λ = p-v1 with zef_3by3_solver. The first neighbour
+%   with λ in [0,1]^3 is kept (f_ind=1). If none hit, the nearest centroid's
+%   tet is stored but coeff may be empty because aux_val is empty.
 %
-% Outputs:
-%   t_ind
-%   coeff
-%   f_ind
+%   No first-party caller in this tree; source interpolation uses other
+%   helpers (zef_source_interpolation, zef_decompose_dof_space).
 %
-% Calls (project):
-%   zef_3by3_solver
-%   zef_source_tetra
-%   zef_waitbar
+%   [t_ind, coeff, f_ind] = zef_source_tetra(source_positions, tetra, nodes)
+%   [t_ind, coeff, f_ind] = zef_source_tetra(source_positions, tetra, nodes, K)
 %
-% Side effects:
-%   - filesystem I/O
-%   - waitbar progress UI
+%   Inputs
+%     source_positions - P×3 query points, same frame/unit as nodes.
+%     tetra            - T×4 1-based indices.
+%     nodes            - N×3.
+%     K                - number of centroid neighbours, default 25.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[t_ind, coeff, f_ind]] = zef_source_tetra(source_positions, tetra, nodes, K)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Outputs
+%     t_ind  - P×1 tet index (1-based into tetra).
+%     coeff  - P×3 barycentric (λ2,λ3,λ4) relative to vertex 1. λ1 = 1-sum.
+%     f_ind  - P×1, 1 if a neighbour contained the point, else 0.
+%
+%   See also zef_3by3_solver, zef_tetra_barycentra.
 
 if nargin < 4
     K = 25;
@@ -49,6 +48,7 @@ v_4 = nodes(tetra(:,4),:);
 
 t_c_p = 0.25 * (v_1 + v_2 + v_3 + v_4);
 
+% Edge matrix from vertex 1 (same layout zef_3by3_solver expects).
 v_2 = v_2 - v_1;
 v_3 = v_3 - v_1;
 v_4 = v_4 - v_1; 

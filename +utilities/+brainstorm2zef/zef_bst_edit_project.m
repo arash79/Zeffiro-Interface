@@ -1,24 +1,18 @@
 function zef_bst_edit_project(project_file_name)
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst_edit_project — Zef bst edit project.
+%ZEF_BST_EDIT_PROJECT  Open an existing .mat in a display Zeffiro session.
 %
-% Purpose:
-%   Zef bst edit project.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   project_file_name
+%   zef_bst_edit_project(project_file_name)
 %
-% Outputs:
-%   See function signature and code below.
+%   If exist(project_file_name,'file'), calls
+%   zeffiro_interface('start_mode','display','open_project',project_file_name).
+%   Silent no-op if the file is missing. Plugin "Edit project" button.
 %
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_edit_project
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `utilities.brainstorm2zef.zef_bst_edit_project(project_file_name)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_get_project_file_name, zef_bst_plugin_start.
 
 if exist(project_file_name,'file')
     zeffiro_interface('start_mode','display','open_project',project_file_name);

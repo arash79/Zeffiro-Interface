@@ -1,23 +1,16 @@
-% --- Zeffiro documentation header ---
-% set(gcf,'AutoResizeChildren','off'); — Set(gcf,'Auto Resize Children','off');.
+%ZEF_SIZE_CHANGE  Figure-tool SizeChangedFcn installer (script).
 %
-% Purpose:
-%   Set(gcf,'Auto Resize Children','off');.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.zeffiro_current_size (read)
+%   Turns AutoResizeChildren off, stores Position in
+%   zef.zeffiro_current_size{zef_fig_num}, Tags the figure with that index,
+%   and sets SizeChangedFcn to zef_change_size_function excluding Colorbar
+%   and image_details. Called when a Figure-tool window is created.
 %
-% Calls (project):
-%   zef_change_size_function
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `set(gcf,'AutoResizeChildren','off');` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_change_size_function, zef_fig_num.
 
 set(gcf,'AutoResizeChildren','off');
 zef.zeffiro_current_size{zef_fig_num} = get(gcf,'Position');

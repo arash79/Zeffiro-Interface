@@ -1,56 +1,17 @@
-# tools/plugins/EXP/exp_em_multires/m
+# EXP EM RAMUS solver files
 
-## Purpose of this folder
-
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-
-## Contents
-
-MATLAB sources:
-- `exp_em_iteration_multires.m` — **exp_em_iteration_multires**: Exp em iteration multires.
-- `exp_em_map_estimation_multires.m` — **if  ismac**: If  ismac.
-- `zef_init_exp_em_multires.m` — **if not(isfield(zef,'exp_multires_dec'));**: If not(isfield(zef,'exp multires dec'));.
-- `zef_update_exp_em_multires.m` — **zef.exp_multires_n_levels = str2num(get(zef**: Zef.exp multires n levels = str2num(get(zef.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
-
-## Programmatic usage
-
-From the project root:
+GUIDE **EM MAP multiresolution (RAMUS) for EP**. EM on a coarsened source space: Create decomposition first (`exp_make_multires_dec` / `zef.exp_multires_*`), then Start. This is **not** the Inverse-tools entry on asteroid / `_legacy` profiles — those open the **IAS** RAMUS window (`exp_ias_map_estimation_multires`). Open this EM variant from MATLAB:
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+exp_em_map_estimation_multires;   % script; opens the GUIDE fig
 ```
 
-Representative entry points in this folder:
-- ``[[z, reconstruction_information]] = exp_em_iteration_multires(void)` with project root and `src` on the path.`
-- `Call `if  ismac` from MATLAB with the project root on the path.`
-- `Call `if not(isfield(zef,'exp_multires_dec'));` from MATLAB with the project root on the path.`
-- `Call `zef.exp_multires_n_levels = str2num(get(zef` from MATLAB with the project root on the path.`
+Fig Start runs `exp_em_iteration_multires([])`. Same `zef.L` / SNR / frame needs as other EXP solvers. Writes `zef.reconstruction` / `reconstruction_information`.
 
-## Examples
+| File | Role |
+|------|------|
+| `exp_em_map_estimation_multires.m` | **script** that `open`s the fig |
+| `exp_em_iteration_multires.m` | Solver (`[]` from fig Start) |
+| `zef_init_exp_em_multires.m` / `zef_update_exp_em_multires.m` | Widget ↔ `zef` |
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Folder overview: [../README.md](../README.md). Unified app: [../../README.md](../../README.md). IAS RAMUS GUIDE: [../../exp_ias_multires/m/README.md](../../exp_ias_multires/m/README.md).

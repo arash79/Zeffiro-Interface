@@ -1,22 +1,15 @@
-% --- Zeffiro documentation header ---
-% [zef — [zef.
+%ZEF_FILTER_SUBSTITUTE_NOISE_DATA  Copy processed_data onto zef.noise_data.
 %
-% Purpose:
-%   [zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.noise_data (read, write)
-%   zef.processed_data (read)
-%   zef.yesno (read)
+%   Script. ButtonPushedFcn of h_filter_substitute_noise_data. Dialog:
+%   'Substitute noise data with processed data?'. On Yes,
+%   zef_filter_raw_data then noise_data = processed_data.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `[zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_filter_raw_data, zef_filter_substitute_raw_data.
 
 [zef.yesno] = questdlg('Substitute noise data with processed data?','Yes','No');
 if isequal(zef.yesno,'Yes');

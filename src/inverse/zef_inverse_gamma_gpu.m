@@ -1,29 +1,25 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [p_val] = zef_inverse_gamma_gpu(x, shape,scale)
-% --- Zeffiro documentation header ---
-% zef_inverse_gamma_gpu — Zef inverse gamma gpu.
+%ZEF_INVERSE_GAMMA_GPU  Inverse-gamma PDF evaluated on GPU via zef_gamma_gpu.
 %
-% Purpose:
-%   Zef inverse gamma gpu.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   x
-%   shape
-%   scale
+%   Computes the inverse-gamma density at x using the gamma function identity
+%   IG(x; shape, scale) = Gamma(1/x; shape, 1/scale) / x^2. All arguments are
+%   forwarded to zef_gamma_gpu on the reciprocal scale.
 %
-% Outputs:
-%   p_val
+%   p_val = zef_inverse_gamma_gpu(x, shape, scale)
 %
-% Calls (project):
-%   zef_gamma_gpu
-%   zef_inverse_gamma_gpu
+%   Inputs
+%     x, shape, scale - same types/shapes accepted by zef_gamma_gpu (typically
+%                       gpuArray-compatible numerics).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[p_val] = zef_inverse_gamma_gpu(x, shape, scale)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     p_val - inverse-gamma PDF values, same size as x.
+%
+%   See also zef_gamma_gpu.
 
 
 p_val = zef_gamma_gpu(1./x,shape,1./scale)./(x.^2);

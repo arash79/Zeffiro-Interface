@@ -1,41 +1,24 @@
-% --- Zeffiro documentation header ---
-% examples.studies.decision_making.examples.studies.decision_making — Example or study script demonstrating examples.studies.decision_making.
+%ZEF_CREATE_TRAINING_DATA_FOCAL_EPILEPSY  Synthetic dipoles → inverse GUIs → .mat.
 %
-% Purpose:
-%   Example or study script demonstrating examples.studies.decision_making.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.EXP (read)
-%   zef.L (read, write)
-%   zef.beamformer (read)
-%   zef.dataBank (read)
-%   zef.dipole_app (read)
-%   zef.h_ias_n_map_iterations (read)
-%   zef.h_ias_snr (read)
-%   zef.h_ias_start (read)
-%   zef.h_ias_type (read)
-%   zef.h_mne_prior (read)
-%   zef.h_mne_start (read)
-%   zef.h_mne_type (read)
-%   zef.h_ramus_hyperprior (read)
-%   zef.h_ramus_multires_n_decompositions (read)
-%   zef.h_ramus_snr (read)
-%   … (11 more)
+%   Script. Runs zef_parameters_focal_epilepsy. If zef is missing, opens
+%   project_file_name nodisplay. Needs zef_start_dataBank and a tree with
+%   node_1_1 (EEG), node_2_1 (MEG), node_3_1 (MEEG) each holding .data.L,
+%   source_positions, sensors, imaging_method, source_interpolation_ind,
+%   plus reconstruction slots node_*_2_1 … node_*_2_11.
+%   training_data_size × snr_vec random source columns through L plus
+%   10^(-snr/20) noise and a Blackman–Harris window of length
+%   zef.inv_sampling_frequency. eval's MNE / RAMUS / dipole / beamformer /
+%   IAS / EXP Start callbacks (those plugin windows must open).
+%   save(training_data_file_name,'training_data','-v7.3') with
+%   z_inverse_results, z_inverse_info, dipole_positions, dipole_moments,
+%   snr_vec. Does not ship data/; point training_data_file_name at a file.
 %
-% Calls (project):
-%   zef_dataBank_get_reconstructions
-%   zef_exp_app_start
-%   zef_waitbar
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_process_training_data_focal_epilepsy, zef_parameters_focal_epilepsy.
 
 examples.studies.decision_making.zef_parameters_focal_epilepsy;
 
@@ -408,5 +391,6 @@ end
 
 training_data.snr_vec = snr_vec;
 
-save(training_data_file_name,'training_data','-v7.3');
+save(training_data_file_name,'training_data','-v7.3')
+;
 %zef_close_all

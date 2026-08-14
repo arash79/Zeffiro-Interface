@@ -1,48 +1,23 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_FREESURFER_LOAD_FA
-%
-%Loads FreeSurfer dt_recon output FA (Fractional Anisotropy) map.
-%This function loads the fa.nii.gz file directly from FreeSurfer's dt_recon output.
-%
-%FreeSurfer dt_recon outputs:
-%  - fa.nii.gz: Fractional anisotropy map
-%  - adc.nii.gz: Apparent diffusion coefficient
-%  - lowb.nii.gz: Low b-value image
-%  - register.dat: Registration matrix (use zef_freesurfer_read_register_dat)
-%
-%Inputs:
-%   fa_file - Path to fa.nii.gz file (FreeSurfer dt_recon output)
-%
-%Outputs:
-%   fa_data - [nx×ny×nz] FA values (0-1 range)
-%   fa_info - NIfTI info structure (contains voxel-to-RAS transformation)
-%
-%Note: This function uses MATLAB's niftiread and niftiinfo (R2017b+).
-
 function [fa_data, fa_info] = zef_freesurfer_load_fa(fa_file)
-% --- Zeffiro documentation header ---
-% zef_freesurfer_load_fa — Zef freesurfer load fa.
+%ZEF_FREESURFER_LOAD_FA  Load FreeSurfer fa.nii.gz fractional anisotropy volume.
 %
-% Purpose:
-%   Zef freesurfer load fa.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2024- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   fa_file
+%   niftiread + niftiinfo. Converts to single. Clamps slightly negative FA
+%   to 0 and warns if values exceed ~1. Called from DTI Conductivity Tool
+%   Load (zef_dti_conductivity_load_freesurfer).
 %
-% Outputs:
-%   fa_data
-%   fa_info
+%   [fa_data, fa_info] = zef_freesurfer_load_fa(fa_file)
 %
-% Calls (project):
-%   zef_freesurfer_load_fa
+%   Input  fa_file - path to fa.nii.gz
+%   Output fa_data - [nx ny nz] single; fa_info - niftiinfo struct (affine)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[fa_data, fa_info]] = zef_freesurfer_load_fa(fa_file)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_freesurfer_load_v1, zef_dti_apply_to_sigma.
+
+
 
 
 arguments

@@ -1,41 +1,27 @@
-# tools/plugins/WireframeTool
+# Wireframe creator tool
 
-## Purpose of this folder
+Builds a **printable wireframe surface** from the FEM tetrahedral mesh and a filling vector derived from permittivity `zef.epsilon(:,1)`. GPU-ToRRe-3D microwave geometry, not an EEG tool. Writes `zef.wireframe_triangles`, `zef.wireframe_nodes`, interpolated filling / shape / permittivity vectors.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+**Not in the default profile.** Asteroid profiles register **Multi tools → Wireframe creator tool**. Otherwise call `zef_wireframe_creator_start` from MATLAB.
 
-## Contents
+## How to open it
 
-Subfolders:
-- `m/`
-- `mlapp/`
+Asteroid profiles: **Multi tools → Wireframe creator tool**, callback `zef_wireframe_creator_start`. Default profile: call that start script. Title: **ZEFFIRO Interface: Wireframe creator tool**.
 
-## How this folder fits into the overall workflow
+Need `zef.tetra`, `zef.nodes`, `zef.domain_labels`, `zef.epsilon`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+## Buttons (`ButtonPushedFcn` in `m/zef_wireframe_creator_start.m`)
 
-## GUI usage
+| Handle | Action |
+|--------|--------|
+| **Create** | `filling_vec = zef_wireframe_filling_vec(epsilon, relative_permittivity)` then `wireframe(tetra, nodes, domain_labels, filling_vec, printer_resolution, 0, 1, edge_threshold)`; then `zef_wireframe_permittivity_vec` |
+| **Plot** | `zef_wireframe_plot(zef.wireframe_triangles, zef.wireframe_nodes)` |
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+Widgets (ValueChangedFcn → `zef.wireframe_*`): edge threshold (default 1.2), printer resolution (0.15), relative permittivity (6.5), tolerance (0.05), regularization (0.05), n_iter (1000). `wireframe.m` reads `zef.wireframe_n_iter` from base.
 
-## Programmatic usage
+## Scripting
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+```matlab
+zef.wireframe_filling_vec = zef_wireframe_filling_vec(zef.epsilon(:,1), zef.wireframe_relative_permittivity);
+[zef.wireframe_triangles, zef.wireframe_nodes] = wireframe(zef.tetra, zef.nodes, zef.domain_labels, zef.wireframe_filling_vec, zef.wireframe_printer_resolution, 0, 1, zef.wireframe_edge_threshold);
+```

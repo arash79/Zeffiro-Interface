@@ -1,55 +1,28 @@
-# +inverse/@RAMUSInverter
+# inverse.RAMUSInverter
 
-## Purpose of this folder
+Randomized multiresolution scanning: average IAS MAP reconstructions over random sparse source subsets at several densities (Rezaei, Koulouri & Pursiainen 2020). Registry id: `ramus`. GUI: `legacy_ramus` → `zef_ramus_iteration`.
 
-Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+`invert` errors with `inverse:RAMUSInverter:NoMultiresDec` if `multiresolution_dec` is empty. Build it with `self.make_multires_dec()` (`zef_make_multires_dec`) or via `zef_sensitivity_run` preflight.
 
-## Contents
+## Parameters
 
-MATLAB sources:
-- `RAMUSInverter.m` — **inverse.RAMUSInverter.RAMUSInverter**: Inverse solver class implementing RAMUS reconstruction.
-- `initialize.m` — **inverse.RAMUSInverter.initialize**: Estimates priors, noise covariance, or regularization from multi-frame data.
-- `invert.m` — **inverse.RAMUSInverter.invert**: Runs one inverse reconstruction step for a single measurement frame.
+- `number_of_multiresolution_levels` (3), `sparsity_factor` (10), `number_of_decompositions` (20)
+- `n_map_iterations` — scalar or one value per level (padded with last entry)
+- Hyperprior fields: same idea as IAS (`hyperprior`, `hyperprior_mode`, `amplitude_db`, `prior_over_measurement_db`, `hyperprior_tail_length_db`, `hyperprior_weight`)
+- `method_type`: `"None"` \| `"sLORETA each step"` \| `"sLORETA last step"` \| `"dSPM each step"` \| `"dSPM last step"` (last-step uses the same `n_n_map_iterations` typo as IAS)
 
-## How this folder fits into the overall workflow
+`initialize` only sets `noise_cov = 10^(-SNR/10) I`. Hyperpriors are computed per decomposition inside `invert`. Output is averaged and divided by `n_dec * n_levels * sum(sparsity_factor.^[0:n_levels-1])`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+## Call
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+inv = inverse.RAMUSInverter();
+inv = inv.withPropertiesFromZef(zef);
+inv = inv.make_multires_dec();
+[zef, inv] = inv.computeInversionWithZI(zef);
+
+% or, if MethodParams includes the three cell arrays from a prior make_multires_dec:
+[zef, r] = zef_inverse_run(zef, "ramus", "MethodParams", struct( ...
+    "multiresolution_dec", dec, "multiresolution_ind", ind, ...
+    "multiresolution_count", cnt));
 ```
-
-Representative entry points in this folder:
-- ``inverse.RAMUSInverter.RAMUSInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.`
-- ``[self] = inverse.RAMUSInverter.initialize(self, L, f_data)` with project root and `src` on the path.`
-- ``[[z_vec, self]] = inverse.RAMUSInverter.invert(self, f, L, procFile, …)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-Programmatic: `zef_inverse_run(zef, 'eloreta')` or `inverse.ELORETAInverter().computeInversionWithZI(zef)`.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

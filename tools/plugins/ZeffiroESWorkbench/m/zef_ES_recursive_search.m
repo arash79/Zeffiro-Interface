@@ -1,41 +1,21 @@
 function zef = zef_ES_recursive_search(zef, num_lattice, recursive_instances, varargin)
-% --- Zeffiro documentation header ---
-% zef_ES_recursive_search — Zef ES recursive search.
+%ZEF_ES_RECURSIVE_SEARCH  Repeated zef_ES_find_currents on a shrinking α/ε window.
 %
-% Purpose:
-%   Zef ES recursive search.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   num_lattice
-%   recursive_instances
-%   varargin
+%   Used by zef_ES_find_currents_recursive (not a button). First full-grid
+%   find_currents, then recursive_instances-1 refinements: pick (sr,sc)
+%   with zef_ES_objective_function, recentre α/ε with
+%   zef_ES_centralize_recursive_search, solve again. Stores
+%   zef.adapted_y_ES{k} = y_ES_interval after each instance.
 %
-% Outputs:
-%   zef
+%   zef = zef_ES_recursive_search(zef, num_lattice, recursive_instances)
 %
-% Zef fields (observed):
-%   zef.ES_step_size (read)
-%   zef.adapted_y_ES (read, write)
-%   zef.y_ES_interval (read)
+%   See also zef_ES_centralize_recursive_search, zef_ES_find_currents.
 %
-% Calls (project):
-%   zef_ES_centralize_recursive_search
-%   zef_ES_find_currents
-%   zef_ES_find_parameters
-%   zef_ES_objective_function
-%   zef_ES_recursive_search
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_ES_recursive_search(zef, num_lattice, recursive_instances, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 zef             = zef_ES_find_currents(zef);
 adapted_y_ES{1} = zef.y_ES_interval;

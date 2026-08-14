@@ -1,26 +1,18 @@
 function zef = zef_DBS_strip_struct_open(zef)
-% --- Zeffiro documentation header ---
-% zef_DBS_strip_struct_open — Zef DBS strip struct open.
+%ZEF_DBS_STRIP_STRUCT_OPEN  Build the DBS probe window and run init.
 %
-% Purpose:
-%   Zef DBS strip struct open.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_DBS_strip_struct_open(zef)
 %
-% Outputs:
-%   zef
+%   Called via zef_tool_start from zef_DBS_strip_struct_start.
+%   Window then zef_DBS_strip_struct_init (script). Does not attach
+%   electrodes.
 %
-% Calls (project):
-%   zef_DBS_strip_struct_open
-%   zef_DBS_strip_struct_window
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_DBS_strip_struct_open(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_DBS_strip_struct_window.
 
 zef = zef_DBS_strip_struct_window(zef);
 zef_DBS_strip_struct_init; 

@@ -1,41 +1,54 @@
-# tools/plugins/SESAME
+# SESAME
 
-## Purpose of this folder
+Stochastic sampling of discrete dipole configurations (SESAME). Use it when you want a small number of equivalent dipoles with posterior samples rather than a dense grid map.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+There is **no** `inverse.*Inverter`. Registry id `legacy_sesame` dispatches `SESAME_inversion`. The Start button does not call `+inverse`.
 
-## Contents
+## Menu
 
-Subfolders:
-- `m/`
-- `mlapp/`
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | **not in this INI** |
+| `_legacy`, `_nse` | **not in those INIs** |
+| asteroid_radar | Inverse tools → **SESAME** |
+| asteroid_gravity | Inverse tools → **SESAME** (INI row has a space after the comma: `SESAME, inverse_tools, SESAME_App_run`) |
 
-## How this folder fits into the overall workflow
+INI callback: `SESAME_App_run` (script).
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Window title: `ZEFFIRO Interface: SESAME App`.
 
-## GUI usage
+`SESAME_App_run` calls `SESAME_core_check`, which `webread`s `inverse_SESAME.m` from `i-am-sorri/SESAME_core` **only if that file is missing** under `m/`. This tree already ships `m/inverse_SESAME.m`, so the download is a no-op unless you delete it. The sampler does not read `zef`; `SESAME_inversion` builds `cfg` and `leadfield` from the session.
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+## Run the solver
 
-## Programmatic usage
+**h_start** `ButtonPushedFcn`:
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+```matlab
+zef_update_SESAME; zef.reconstruction = SESAME_inversion([]);
+```
 
-## Examples
+**h_apply** only runs `zef_update_SESAME`. **h_plot_dipoles** runs `SESAME_plot_movie` (not the solver).
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+## Needs
 
-## Dependencies and assumptions
+- `zef.L`, `zef.source_positions`, interpolation
+- `zef.measurements`
+- SNR: `zef.SESAME_snr` → `cfg.noise_std = 10^(-SESAME_snr/20)`
+- Sampler count: `zef.SESAME_n_sampler`
+- Frames: `zef.number_of_frames`, `inv_time_*` (each frame can pass a time window of columns into `inverse_SESAME`)
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+`SESAME_inversion` indexes `source_positions(s_ind_1,:)` **before** `s_ind_1` is assigned (that name is not set in this file). The waitbar call uses MATLAB `waitbar(..., h, ...)` on a handle `h` that this file never creates (not `zef_waitbar`). Documented as written; do not treat Start as a working run until those lines are fixed.
 
-## Notes for developers
+Lead-field columns are reordered **node-wise** (`xyz` of source 1 adjacent) for `inverse_SESAME`, then the reconstruction is scattered back to Zeffiro’s Cartesian stacking (`s_back_ind`) before `zef_postProcessInverse`. Each estimated dipole’s moment is the **time-mean** of `QV_estimated` for that dipole.
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## Writes
+
+- `zef.reconstruction` (cell of 3-component source vectors; dipoles placed at sampled indices)
+- Side effect: `zef.SESAME` and `zef.SESAME_time_serie{frame}` via `assignin('base',…)`
+- Clears `zef.SESAME_time_serie` at the start of a run if it already exists
+
+## Files
+
+- Start: `m/SESAME_App_run.m`
+- Solver: `m/SESAME_inversion.m`
+- Layout: `mlapp/SESAME_App.mlapp`

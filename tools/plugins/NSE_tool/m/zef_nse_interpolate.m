@@ -1,39 +1,20 @@
 function zef = zef_nse_interpolate(zef,type)
-% --- Zeffiro documentation header ---
-% zef_nse_interpolate — Zef nse interpolate.
+%ZEF_NSE_INTERPOLATE  Interpolate button: source flags from reconstruction_type then zef_source_interpolation.
 %
-% Purpose:
-%   Zef nse interpolate.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   type
+%   ButtonPushedFcn of h_interpolate. reconstruction_type_list{1} (artery
+%   types) turns on artery-domain _sources and sets source_positions to
+%   bp_vessel nodes; list{2} (microcirculation types) uses capillary
+%   domains / bf_capillary nodes. Then zef_source_interpolation.
 %
-% Outputs:
-%   zef
+%   zef = zef_nse_interpolate(zef, type)
 %
-% Zef fields (observed):
-%   zef.active_compartment_ind (read, write)
-%   zef.compartment_tags (read)
-%   zef.domain_labels (read)
-%   zef.nodes (read)
-%   zef.nse_field (read)
-%   zef.source_positions (read, write)
+%   See also zef_source_interpolation, zef_nse_reconstruction.
 %
-% Calls (project):
-%   zef_build_compartment_table
-%   zef_nse_interpolate
-%   zef_source_interpolation
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_nse_interpolate(zef, type)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if ismember(type,zef.nse_field.reconstruction_type_list{1})
 

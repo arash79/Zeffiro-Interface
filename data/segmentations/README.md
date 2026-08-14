@@ -1,39 +1,22 @@
-# data/segmentations
+# `data/segmentations`
 
-## Purpose of this folder
+These folders are **import assets**: closed tissue surfaces plus an `import_segmentation.zef` manifest. Zeffiro does not load them at startup. You import them (GUI or CLI), then mesh and compute a lead field as usual.
 
-Bundled sample projects, segmentations, and runtime data roots referenced by examples and default startup.
+The only bundled tree is `multicompartment_head_project/`: FreeSurfer-style `.asc` surfaces (scalp, skull, CSF, brain, …), sample `electrodes.dat`, parcellation colortables, and the `.zef` that names those files. That subfolder’s README lists each surface and the offline regenerators (`create_colortable.m`, `fs2zef.sh`).
 
-## Contents
+## How to import
 
-Subfolders:
-- `multicompartment_head_project/`
+**GUI:** **Import → Import data to a new project** (label assigned in `zef_menu_tool.m`), pick `import_segmentation.zef`. That resets the session (`zef_start_new_project` with `new_empty_project=1`), runs `zef_import_segmentation`, then `zef_build_compartment_table`.
 
-## How this folder fits into the overall workflow
+**MATLAB:**
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+```matlab
+zef = zeffiro_interface('import_to_new_project', ...
+    fullfile(projectRoot,'data','segmentations','multicompartment_head_project','import_segmentation.zef'));
+```
 
-## GUI usage
+Coordinates are millimetres. The importer (`src/io/zef_import_segmentation`) resolves `filename` / `foldername` relative to the folder that contains the `.zef`. After import, Mesh tool **Create FEM mesh**.
 
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
+To *produce* a new `.zef` from FreeSurfer, use `utilities.fs2zef.run` (writes `ascii/import_segmentation.zef` and/or `mesh/`). Do not confuse that with the tetrahedral importer `zef_import` under **Import → Import volume data**.
 
-## Programmatic usage
-
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Parent data root: [`data/README.md`](../README.md). Manifest `type=` rows: [`src/io/README.md`](../../src/io/README.md).

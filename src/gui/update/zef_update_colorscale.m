@@ -1,33 +1,25 @@
 function  colorscale_val = zef_update_colorscale(varargin)
-% --- Zeffiro documentation header ---
-% zef_update_colorscale — Syncs GUI control values into `zef` for colorscale.
+%ZEF_UPDATE_COLORSCALE  Figure-tool Linear/Logarithmic popup (no String= label).
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for colorscale.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Finds the popup Tag='colorscaleselection' on the Figure tool
+%   (string={'Linear','Logarithmic'}, next to **Colormap:**) and sets
+%   axes1 ColorScale to 'linear' (Value 1) or 'log' (Value 2). This is
+%   MATLAB's axes ColorScale, not zef.inv_scale: reconstruction log/sqrt
+%   scaling is applied in zef_plot_volume as 20*log10 or sqrt of the
+%   field before CData is written.
 %
-% Outputs:
-%   colorscale_val
+%   The Figure-tool Callback writes the returned Value to
+%   zef.update_colorscale when gca is parented to h_zeffiro.
 %
-% Zef fields (observed):
-%   zef.h_zeffiro (read)
+%   colorscale_val = zef_update_colorscale
+%   colorscale_val = zef_update_colorscale(h_figure)
 %
-% Calls (project):
-%   zef_update_colorscale
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[colorscale_val] = zef_update_colorscale(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_colorscale_min, zef_plot_volume, zef_figure_tool.
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');
 else

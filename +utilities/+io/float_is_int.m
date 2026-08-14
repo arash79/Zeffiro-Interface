@@ -1,24 +1,15 @@
 function is_int = float_is_int ( float )
-% --- Zeffiro documentation header ---
-% utilities.io.float_is_int — Float is int.
+%FLOAT_IS_INT  True iff every finite element equals floor(element).
 %
-% Purpose:
-%   Float is int.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   float
+%   Any NaN or Inf → false. Used by fs2zef ASCII readers to check node/face
+%   counts and integer connectivity before casting.
 %
-% Outputs:
-%   is_int
-%
-% Calls (project):
-%   utilities.io.float_is_int
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[is_int] = utilities.io.float_is_int(float)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   is_int = float_is_int(float)   % 2-D double
 
     arguments
 

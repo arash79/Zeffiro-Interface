@@ -1,25 +1,21 @@
 function [is_valid, error_msg] = zef_bst_validate_settings(zef_bst)
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst_validate_settings — Zef bst validate settings.
+%ZEF_BST_VALIDATE_SETTINGS  Required fields and numeric/cell ranges on zef_bst.
 %
-% Purpose:
-%   Zef bst validate settings.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef_bst
+%   [is_valid, error_msg] = zef_bst_validate_settings(zef_bst)
 %
-% Outputs:
-%   is_valid
-%   error_msg
+%   Required: compartment_list, mesh_resolution (1–5), unit_conversion (>0),
+%   refine_surface, refine_volume, electrical_conductivity (even cell),
+%   dof_space (even cell), use_gpu, parallel_processes (>=1). Optional
+%   logicals if present: use_gpu, refine_surface_on, refine_volume_on,
+%   inflation_on, mesh_smoothing_on, distance_smoothing_on (0/1 or logical).
+%   First failure sets is_valid=false and error_msg; does not throw.
 %
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_validate_settings
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[is_valid, error_msg]] = utilities.brainstorm2zef.zef_bst_validate_settings(zef_bst)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_get_settings, zef_bst_init.
 
 is_valid = true;
 error_msg = '';

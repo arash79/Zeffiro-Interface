@@ -1,30 +1,26 @@
 function zef_data = zef_get_fields(fieldnames_aux, zef)
-% --- Zeffiro documentation header ---
-% zef_get_fields — Zef get fields.
+%ZEF_GET_FIELDS  Intended to copy named fields of zef into a struct.
 %
-% Purpose:
-%   Zef get fields.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   fieldnames_aux
-%   zef
+%   Starts from an empty struct and, for each name in fieldnames_aux,
+%   assigns zef_data.(name) = zef_data.(name). That does not read zef
+%   (the second argument, or base-workspace zef when nargin==1) and
+%   errors on the first missing field. No first-party callers in this
+%   tree.
 %
-% Outputs:
-%   zef_data
+%   zef_data = zef_get_fields(fieldnames_aux)
+%   zef_data = zef_get_fields(fieldnames_aux, zef)
 %
-% Calls (project):
-%   zef_get_fields
+%   Inputs
+%     fieldnames_aux - cellstr of field names.
+%     zef            - optional session (unused by the loop as written).
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef_data] = zef_get_fields(fieldnames_aux, zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output
+%     zef_data - struct; would be empty if the loop never ran.
 if nargin == 1
     zef = evalin('base','zef');
 end

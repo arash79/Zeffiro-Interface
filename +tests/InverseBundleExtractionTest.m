@@ -1,28 +1,15 @@
 classdef InverseBundleExtractionTest < matlab.unittest.TestCase
-% --- Zeffiro documentation header ---
-% tests.InverseBundleExtractionTest — Automated test: InverseBundleExtractionTest.
+%INVERSEBUNDLEEXTRACTIONTEST  zef_inverse_extract_bundle(..., "dspm") has L, F, procFile.
 %
-% Purpose:
-%   Automated test: InverseBundleExtractionTest.
-%   Folder: MATLAB unit and integration tests for refactored inverse dispatch, lead fields, cluster jobs, and legacy/class parity.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
+%   Synthetic session. The bundle is what utilities.cluster.dispatch_inverse
+%   consumes. Asserts fields L, F, procFile, source_positions, and
+%   size(F,2) == zef.number_of_frames.
 %
-% Zef fields (observed):
-%   zef.number_of_frames (read)
-%
-% Calls (project):
-%   zef_inverse_extract_bundle
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `tests.InverseBundleExtractionTest(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
 
     methods (Test)
         function testBundleContainsCoreFields(testCase)

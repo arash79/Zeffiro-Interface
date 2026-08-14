@@ -1,39 +1,14 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef.ramus_multires_n_levels = str2num(get(zef — Zef.ramus multires n levels = str2num(get(zef.
+%ZEF_UPDATE_RAMUS_INVERSION_TOOL  RAMUS widgets → zef.ramus_* and inv_time_*/frames.
 %
-% Purpose:
-%   Zef.ramus multires n levels = str2num(get(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_ramus_high_cut_frequency (read)
-%   zef.h_ramus_hyperprior (read)
-%   zef.h_ramus_init_guess_mode (read)
-%   zef.h_ramus_low_cut_frequency (read)
-%   zef.h_ramus_multires_n_decompositions (read)
-%   zef.h_ramus_multires_n_iter (read)
-%   zef.h_ramus_multires_sparsity (read)
-%   zef.h_ramus_normalize_data (read)
-%   zef.h_ramus_number_of_frames (read)
-%   zef.h_ramus_sampling_frequency (read)
-%   zef.h_ramus_snr (read)
-%   zef.h_ramus_time_1 (read)
-%   zef.h_ramus_time_2 (read)
-%   zef.h_ramus_time_3 (read)
-%   zef.inv_high_cut_frequency (read, write)
-%   … (22 more)
+%   Script. Apply/Start. Copies n_levels, sparsity, n_iter, snr, band.
+%   Does not invert.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.ramus_multires_n_levels = str2num(get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_ramus_iteration.
 
 zef.ramus_multires_n_levels = str2num(get(zef.h_ramus_multires_n_levels,'string'));
 zef.ramus_multires_sparsity = str2num(get(zef.h_ramus_multires_sparsity,'string'));

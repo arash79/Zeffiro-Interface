@@ -1,33 +1,29 @@
 function zef = zef_dataBank_exportButtonPress(zef)
-% --- Zeffiro documentation header ---
-% zef_dataBank_exportButtonPress — Zef data Bank export Button Press.
+%ZEF_DATABANK_EXPORTBUTTONPRESS  Save the selected node or the whole tree to a .mat.
 %
-% Purpose:
-%   Zef data Bank export Button Press.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   exportButton.ButtonPushedFcn in zef_open_dataBank. Calls
+%   zef_dataBank_getHashForMenu, then uiputfile('Select a file').
+%   typeDropDown.Value 'Node' saves that node struct (if .data is an
+%   object, tries load(data.Properties.Source) — the Source lives on
+%   data.data for a matfile payload). Otherwise save(..., '-struct',
+%   'tree') of zef.dataBank.tree. Tree exportMenu is a separate stub
+%   ('sorry, this is not implemented,yet') and does not call this.
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_exportButtonPress(zef)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef  - session with a selected tree node. nargin==0 → base.
 %
-% Calls (project):
-%   zef_dataBank_exportButtonPress
+%   Output
+%     zef  - unchanged except hash from getHashForMenu. Writes a .mat.
+%            nargout==0 → assignin base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_dataBank_exportButtonPress(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_importNodeButtonPress.
 
 if nargin == 0
     zef = evalin('base','zef');

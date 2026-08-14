@@ -1,38 +1,14 @@
-% --- Zeffiro documentation header ---
-% tic; — Tic;.
+%ZEF_SYNTHETIC_GRAVITY_DATA  Gravity/EIT-style forward into zef.measurements.
 %
-% Purpose:
-%   Tic;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_vec (read, write)
-%   zef.brain_ind (read)
-%   zef.imaging_method (read)
-%   zef.lf_param (read)
-%   zef.measurements (read)
-%   zef.n_sources (read, write)
-%   zef.n_sources_mod (read, write)
-%   zef.n_sources_old (read, write)
-%   zef.nodes (read)
-%   zef.nodes_aux (read, write)
-%   zef.non_source_ind (read)
-%   zef.preconditioner (read, write)
-%   zef.preconditioner_tolerance (read)
-%   zef.rho (read)
-%   zef.sensors (read)
-%   … (7 more)
+%   Script. Sets lf_param from direction/preconditioner, then
+%   zef.measurements = zef_compute_gravity_data(nodes, tetra, rho(:,1),
+%   sensors, brain_ind, source_ind, lf_param) when imaging_method is 1–4.
 %
-% Calls (project):
-%   zef_compute_gravity_data
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `tic;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 tic;
 

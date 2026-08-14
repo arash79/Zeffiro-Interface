@@ -1,35 +1,18 @@
 function zef = zef_parcellation_roi_pick_center(zef)
-% --- Zeffiro documentation header ---
-% zef_parcellation_roi_pick_center — Zef parcellation roi pick center.
+%ZEF_PARCELLATION_ROI_PICK_CENTER  Copy figure datatip position into ROI center field.
 %
-% Purpose:
-%   Zef parcellation roi pick center.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   When a DataTip exists on zef.h_axes1, writes its X/Y/Z into
+%   zef.parcellation_roi_center for parcellation_roi_selected and updates
+%   the ROI center edit box string.
 %
-% Outputs:
-%   zef
+%   zef = zef_parcellation_roi_pick_center(zef)
 %
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%   zef.h_datatip (read, write)
-%   zef.h_parcellation_roi_center (read)
-%   zef.parcellation_roi_center (read)
-%   zef.parcellation_roi_selected (read)
-%
-% Calls (project):
-%   zef_parcellation_roi_pick_center
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_parcellation_roi_pick_center(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_parcellation_roi_pick_color, zef_parcellation_roi_plot.
 
 if isempty(findobj(allchild(zef.h_axes1),'Type','DataTip'))~=1
     zef.h_datatip = findobj(allchild(zef.h_axes1),'Type','DataTip');

@@ -1,39 +1,15 @@
-% --- Zeffiro documentation header ---
-% meg_max=0 — Meg max=0.
+%P_SNR_MAKEALL  Lab script: synthetic sources at several SNR into dataBank.
 %
-% Purpose:
-%   Meg max=0.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.L (read, write)
-%   zef.beamformer (read)
-%   zef.bf_var_loc (read)
-%   zef.dataBank (read)
-%   zef.dipole_app (read)
-%   zef.fss_bg_noise (read, write)
-%   zef.h_ramus_snr (read)
-%   zef.inv_snr (read, write)
-%   zef.measurements (read, write)
-%   zef.mne_snr (read, write)
-%   zef.reconstruction (read)
-%   zef.reconstruction_information (read)
+%   Script. Keeps node_1 / node_1_1, clears the rest of the tree. Uses
+%   undeclared eegnode.data.L. SNR [-30 -20 -10], 10 trials of
+%   zef_find_source with zef.fss_bg_noise. Hard-coded meg_max/eeg_max.
+%   One-off PerEpi-style generator; expects FindSyntheticSource on path.
 %
-% Calls (project):
-%   zef_dataBank_add
-%   zef_dataBank_getData
-%   zef_ramus_iteration
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `meg_max=0` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 meg_max=0.0078; %%%%%%%%%%%%%%%%%%%%
 eeg_max=0.6928; %%%%%%%%%%%

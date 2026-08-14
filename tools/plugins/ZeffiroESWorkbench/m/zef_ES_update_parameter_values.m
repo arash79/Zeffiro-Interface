@@ -1,35 +1,17 @@
-% --- Zeffiro documentation header ---
-% if ismember(zef — If ismember(zef.
+%ZEF_ES_UPDATE_PARAMETER_VALUES  Read edited parameter-table cells back into zef.ES_*.
 %
-% Purpose:
-%   If ismember(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.ES_acceptable_threshold (read, write)
-%   zef.ES_alpha (read, write)
-%   zef.ES_alpha_max (read, write)
-%   zef.ES_boundary_color_limit (read, write)
-%   zef.ES_constraint_tolerance (read, write)
-%   zef.ES_display (read, write)
-%   zef.ES_epsilon (read, write)
-%   zef.ES_epsilon_min (read, write)
-%   zef.ES_max_current_channel (read, write)
-%   zef.ES_max_n_iterations (read, write)
-%   zef.ES_max_time (read, write)
-%   zef.ES_opt_method (read)
-%   zef.ES_opt_solver (read)
-%   zef.ES_relative_weight_nnz (read, write)
-%   zef.ES_roi_range (read, write)
-%   … (7 more)
+%   Script (local function assign_common_parameters). First step of
+%   zef_ES_optimization_update. α/ε cells are dB → linear (10^(dB/20)).
+%   Solver 1 with method 4 maps the 6-row backpropagation table; others
+%   map rows 1–17 (plus 18–19 step/constraint tolerance for Matlab LP).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   See also zef_ES_init_parameter_table.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if ismember(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 if ismember(zef.ES_opt_solver, 1)
     if zef.ES_opt_method ~= 4
@@ -52,6 +34,7 @@ if ismember(zef.ES_opt_solver, 2:5)
 end
 
 function zef = assign_common_parameters(zef)
+%ASSIGN_COMMON_PARAMETERS  Map table rows 1–17 onto zef.ES_* (α/ε from dB).
 zef.ES_alpha             = 10^(str2double(zef.h_ES_parameter_table.Data{1,2})/20);
 zef.ES_alpha_max         = 10^(str2double(zef.h_ES_parameter_table.Data{2,2})/20);
 zef.ES_epsilon_min          = 10^(str2double(zef.h_ES_parameter_table.Data{3,2})/20);

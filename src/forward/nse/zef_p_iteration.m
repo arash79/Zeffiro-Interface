@@ -1,44 +1,22 @@
 
 function zef = zef_nse_iteration(zef)
-% --- Zeffiro documentation header ---
-% zef_nse_iteration — Zef nse iteration.
+%ZEF_P_ITERATION  Pressure-iteration NSE path (filename zef_p_iteration).
 %
-% Purpose:
-%   Zef nse iteration.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   MATLAB callable name is zef_p_iteration (this filename). The function
+%   line still says zef_nse_iteration. Unlike zef_nse_iteration.m, source
+%   nodes are nearest among all mesh nodes (not restricted to the free
+%   surface), and flux is not removed from the boundary index set.
 %
-% Outputs:
-%   zef
+%   zef = zef_p_iteration(zef)
 %
-% Zef fields (observed):
-%   zef.active_compartment_ind (read)
-%   zef.inv_synth_source (read)
-%   zef.nodes (read)
-%   zef.nse_field (read)
-%   zef.tetra (read)
-%
-% Calls (project):
-%   zef_QinvMQ
-%   zef_get_submesh
-%   zef_nse_iteration
-%   zef_nse_matrices
-%   zef_nse_signal_pulse
-%   zef_volume_scalar_uFG
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_nse_iteration(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_nse_iteration, zef_nse_matrices.
+
+
 
 
 [zef.nse_field.nodes, zef.nse_field.tetra] = zef_get_submesh(zef.nodes,zef.tetra,zef.active_compartment_ind);

@@ -2,7 +2,7 @@
 
 ## Folder purpose
 
-**Bundled and runtime data root** for Zeffiro Interface. `zeffiro_interface.m` sets `zef.data_path = fullfile(program_path, 'data')` and uses it as the default directory for CLI project open/import/save/export and session logs.
+**Bundled and runtime data root** for Zeffiro. `zeffiro_interface` sets `zef.data_path = fullfile(program_path, 'data')` and uses it as the default directory when a CLI path has no folder (project open/import/save) and for session logs.
 
 ## Main contents
 
@@ -34,8 +34,8 @@ zef = zef_load(zef, 'default_project.mat', zef.data_path);
 
 | Consumer | Path used |
 |----------|-----------|
-| `zeffiro_interface` CLI args | Relative paths → `data/` |
-| `+examples/+importing` | `data/segmentations/.../import_segmentation.zef` |
+| `zeffiro_interface` CLI args | Relative paths with no directory → `data/` (not `data/example_projects/` or `data/segmentations/`) |
+| `+examples/+importing` | Hard-coded `scripts/scripts_for_importing/...`; if missing, pass `data/segmentations/.../import_segmentation.zef` |
 | `+core` electrode import | User-selected files; sample caps in `electrodes/` |
 | `profile/zeffiro_interface.ini` | `save_file_path = ./data/` |
 
@@ -44,13 +44,13 @@ Not on MATLAB path as code — data only.
 ## Usage instructions
 
 ```matlab
-% Import bundled head segmentation
+% Import bundled head segmentation (full path; relative would look under data/)
 zef = zeffiro_interface('import_to_new_project', ...
     fullfile(projectRoot,'data','segmentations','multicompartment_head_project','import_segmentation.zef'));
 
-% Open example project
-zef = zeffiro_interface('open_project', 'multicompartment_head_project.mat', ...
-    'open_project', fullfile(projectRoot,'data','example_projects'));
+% Open example project (open_project is a single path; no directory → data/)
+zef = zeffiro_interface('open_project', ...
+    fullfile(projectRoot,'data','example_projects','multicompartment_head_project.mat'));
 ```
 
 ## Important notes

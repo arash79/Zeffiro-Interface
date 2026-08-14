@@ -1,60 +1,38 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_DTI_TENSOR_INTERPOLATE_MESH_SPACE
-%
-%Interpolates conductivity tensor values from FA voxel grid to mesh
-%tetrahedron centroids. Uses the inverse of the combined transformation
-%(T_register * T_nifti) to map mesh centroids into FA voxel space, then
-%performs fast regular-grid interpolation using griddedInterpolant.
-%
-%This avoids the need to build a KD-tree over millions of voxel centers;
-%instead, only the M mesh centroids are transformed and looked up on
-%the regular voxel grid, giving O(M) time complexity.
-%
-%Transformation (same eigenvectors, Tuch et al. PNAS 2002):
-%  Forward:  mesh_tkRAS = T_register * T_nifti * FA_voxel
-%  Inverse:  FA_voxel   = inv(T_register * T_nifti) * mesh_tkRAS
-%
-%Interpolation modes:
-%  'nearest'        — Nearest voxel lookup (fastest).
-%  'radius_average' — Trilinear interpolation of the 8 enclosing voxels
-%                     (smooth, standard in neuroimaging pipelines).
-%
-%After interpolation, a vectorized Sylvester-criterion check enforces
-%positive-definiteness of the resulting symmetric conductivity tensors.
-%
-%Inputs:
-%   mesh_centroids     - [M×3] Mesh tetrahedron centroids in mesh space (mm)
-%   dti_tensor         - [nx×ny×nz×6] Tensor array in FA voxel space
-%   fa_nifti_info      - NIfTI info structure (contains Transform.T)
-%   register_transform - [4×4] FreeSurfer register.dat transformation matrix
-%   scale_value        - Default isotropic conductivity for out-of-range points
-%   roi_radius         - (Unused; kept for API compatibility)
-%   mode               - 'nearest' or 'radius_average'
-%   h_waitbar          - (Optional) Waitbar handle for progress updates
-%
-%Outputs:
-%   tensor_array - [M×6] Interpolated conductivity tensors (sym. pos. def.)
-
 function tensor_array = zef_dti_tensor_interpolate_mesh_space( ...
-% --- Zeffiro documentation header ---
-% tensor_array — Tensor array.
-%
-% Purpose:
-%   Tensor array.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
-%
-% Calls (project):
-%   zef_dti_tensor_interpolate_mesh_space
-%   zef_waitbar
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `tensor_array` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
         mesh_centroids, dti_tensor, fa_nifti_info, register_transform, ...
         scale_value, roi_radius, mode, h_waitbar)
+
+%ZEF_DTI_TENSOR_INTERPOLATE_MESH_SPACE  Interpolate DTI conductivity to mesh centroids.
+%
+%   Zeffiro Interface.
+%   Copyright © 2024- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Maps mesh tetra centroids (mm) into FA voxel space via inv(T_register *
+%   T_nifti), then samples dti_tensor [nx×ny×nz×6] on the regular grid.
+%   Modes: 'nearest' (voxel rounding) or 'radius_average'/'kdtree' (trilinear
+%   via griddedInterpolant). Enforces positive-definite symmetric tensors with
+%   Sylvester check; out-of-range voxels get scale_value isotropic fallback.
+%
+%   tensor_array = zef_dti_tensor_interpolate_mesh_space( ...
+%       mesh_centroids, dti_tensor, fa_nifti_info, register_transform, ...
+%       scale_value, roi_radius, mode, h_waitbar)
+%
+%   Input
+%     mesh_centroids     - [M × 3] tetra centroids, millimetres (mesh / tkRAS)
+%     dti_tensor         - [nx ny nz 6] single/double, voxel FA space
+%     fa_nifti_info      - niftiinfo struct (Transform.T, row-vector affine)
+%     register_transform - 4×4 FreeSurfer register.dat (FA voxel → mesh)
+%     scale_value        - isotropic fallback σ for out-of-FOV tetra
+%     roi_radius         - unused in nearest/trilinear paths (kept for API)
+%     mode               - 'nearest' or 'radius_average'/'kdtree' (trilinear)
+%     h_waitbar          - optional waitbar handle
+%
+%   Output tensor_array is [M × 6], SPD-enforced (Sylvester), millimetres
+%   of conductivity per tetra centroid.
+%
+%   See also zef_dti_apply_to_sigma, zef_freesurfer_fa_to_conductivity.
 
 
 if nargin < 8, h_waitbar = []; end

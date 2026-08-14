@@ -1,36 +1,25 @@
 function [m, P, K] = kf_update(m, P, y, H, R)
-% --- Zeffiro documentation header ---
-% plugins.ClassKF.kf_update — Kf update.
+%KF_UPDATE  Kalman measurement update (Joseph-form covariance).
 %
-% Purpose:
-%   Kf update.
-%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   m
-%   P
-%   y
-%   H
-%   R
+%   [m, P, K] = kf_update(m, P, y, H, R)
 %
-% Outputs:
-%   m
-%   P
-%   K
+%   Innovation v = y - H m, gain K = P H' / (H P H' + R), then
+%   m ← m + K v and P ← P - K (P H')' with explicit symmetrization of S and P.
+%   H is the processed lead field L; R is measurement noise_cov.
 %
-% Calls (project):
-%   plugins.ClassKF.kf_update
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[m, P, K]] = plugins.ClassKF.kf_update(m, P, y, H, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also plugins.ClassKF.class_kf_predict, plugins.ClassKF.kf_sL_update.
 
 v = y - H*m;
 PHt = P * H';
 S = H * PHt + R;
 S = (S + S')/2;  % Ensure S is symmetric positive definite for numerical stability
 K = PHt / S;
+% m ← m + K (y - H m);  P ← P - K (P H')'
 m = m + K*v;
 P = P - K * PHt';
 P = (P + P')/2; % Ensure P remains symmetric positive definite

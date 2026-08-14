@@ -1,37 +1,28 @@
 function [y_ES, ES_optimized_current_density, residual, flag_val, source_magnitude, source_position_index, source_directions] = zef_ES_optimize_current(zef_data, varargin)
-% --- Zeffiro documentation header ---
-% zef_ES_optimize_current — Zef ES optimize current.
+%ZEF_ES_OPTIMIZE_CURRENT  One tES LP/QP/SDP/LS solve for given α, ε.
 %
-% Purpose:
-%   Zef ES optimize current.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef_data
-%   varargin
+%   Called from zef_ES_find_currents (not a button). Maps inv_synth_source
+%   positions onto source_positions_aux, projects L_aux onto the requested
+%   orientations, applies the electrode-centering matrix M, then
+%   search_method:
+%     1  L1L1 LP   (linprog / Gurobi / MOSEK / CVX)
+%     2  L1L2 SDP  (zef_cvx_semidefprog; SDPT3/SeDuMi)
+%     3  least squares closed form
+%     4  backpropagation L'*x
+%     5  L2L2 QP   (quadprog / CVX / OSQP)
+%   Post-process: re-center, zef_ES_rwnnz sparsity, scale to total_max_current
+%   and max_current_channel. Volumetric density is reshape(L_aux*y_ES, 3, []).
 %
-% Outputs:
-%   y_ES
-%   ES_optimized_current_density
-%   residual
-%   flag_val
-%   source_magnitude
-%   source_position_index
-%   source_directions
+%   [y_ES, J, residual, flag, mag, pos_ind, dir] = ...
+%       zef_ES_optimize_current(zef_data, alpha, epsilon)
 %
-% Calls (project):
-%   zef_ES_optimize_current
-%   zef_ES_rwnnz
-%   zef_cvx_linprog
-%   zef_cvx_quadprog
-%   zef_cvx_semidefprog
-%   zef_gurobi_linprog
-%   zef_mosek_linprog
+%   See also zef_ES_find_currents, zef_cvx_linprog, zef_gurobi_linprog.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[y_ES, ES_optimized_current_density, residual]] = zef_ES_optimize_current(zef_data, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 if nargin >= 2
 alpha = varargin{1};
@@ -40,6 +31,8 @@ if nargin >= 3
 eps_val = varargin{2};
 end
 %% Source properties
+% Nearest source_positions_aux node for each inv_synth_source; L rows for
+% that node are dotted with the unit orientation (L_ES_projection).
 source_position_index = zeros(size(zef_data.source_positions,1),1);
 
 for i = 1:size(zef_data.source_positions, 1)
@@ -83,6 +76,7 @@ end
 M_mat = eye(size(L_ES_projection, 2)) - ones(size(L_ES_projection, 2))/size(L_ES_projection, 2);
 L_ES_projection = L_ES_projection*M_mat;
 %% Search
+% M_mat enforces zero-sum currents (no net injected charge).
 addpath(genpath('external'))
 
 switch zef_data.search_method
@@ -245,6 +239,8 @@ y_ES = zeros(size(L_ES_projection,2),1);
 end
 end
 %% Postprocess
+% Re-apply M_mat, zero small |y| via rwnnz, re-center nonzero channels,
+% scale to total_max_current then clip per-channel cap.
 y_ES = M_mat*y_ES;
 
 [~, y_ES] = zef_ES_rwnnz(y_ES, zef_data.relative_weight_nnz, zef_data.score_dose);

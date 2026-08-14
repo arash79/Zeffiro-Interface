@@ -1,43 +1,19 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 
 function [meas_data,all_roi_sources,orientations,n_multiple_sources] = zef_find_source_patch(zef)
-% --- Zeffiro documentation header ---
-% zef_find_source_patch — Zef find source patch.
+%ZEF_FIND_SOURCE_PATCH  Extended-source patch through L → measurements.
 %
-% Purpose:
-%   Zef find source patch.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Uses interpolated sources (source_interpolation_ind{1}). Volume flag:
+%   ball of radius or VEP ellipsoid. Optional cortical-normal L projection
+%   (zef_project_L_in_roi). Noise: linear fraction of max(abs(meas)).
 %
-% Outputs:
-%   meas_data
-%   all_roi_sources
-%   orientations
-%   n_multiple_sources
+%   [meas_data, all_roi_sources, orientations, n_multiple_sources] = ...
+%       zef_find_source_patch(zef)
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.inv_synth_source (read)
-%   zef.s2_points (read)
-%   zef.source_direction_mode (read, write)
-%   zef.source_interpolation_ind (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   zef_find_source_patch
-%   zef_processLeadfields
-%   zef_project_L_in_roi
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[meas_data, all_roi_sources, orientations]] = zef_find_source_patch(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 source_positions = eval('zef.source_positions');
 noise_level = eval('zef.inv_synth_source(1,8)');

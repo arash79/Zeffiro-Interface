@@ -1,29 +1,18 @@
-% --- Zeffiro documentation header ---
-% warning('off'); — Warning('off');.
+%ZEF_GRAVITY_GRADIENT_LEAD_FIELD_VECTOR  Asteroid INI script: vector gravity gradient.
 %
-% Purpose:
-%   Warning('off');.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018, Sampsa Pursiainen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.active_compartment_ind (read)
-%   zef.bg_data (read)
-%   zef.gravity_field_type (read, write)
-%   zef.nodes (read)
-%   zef.rho (read)
-%   zef.sensors (read)
-%   zef.source_directions (read)
-%   zef.source_positions (read)
-%   zef.tetra (read)
+%   Script (not a function). Mesh-tool row "Gravity gradient (vector)" in
+%   profile/asteroid_gravity and profile/asteroid_radar. Same sequence as
+%   zef_gravity_gradient_lead_field_scalar with gravity_field_type = 2.
+%   Still calls lead_field_gravity_grad; the scalar vs vector split is that
+%   flag, not a second FEM file. Type 2 writes zef.L with 3 rows per
+%   station (3*n_stations × n_sources) from two 1/r^3–1/r^5 terms along
+%   sensors(:,4:6). Density is zef.rho. Does not call zef_lead_field_matrix.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `warning('off');` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_lead_field_gravity_grad, zef_gravity_gradient_lead_field_scalar.
 
 warning('off');
 zef.gravity_field_type = 2;

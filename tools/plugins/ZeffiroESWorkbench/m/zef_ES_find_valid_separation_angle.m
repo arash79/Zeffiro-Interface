@@ -1,19 +1,19 @@
 function angles_list = zef_ES_find_valid_separation_angle
-% --- Zeffiro documentation header ---
-% angles_list — Angles list.
+%ZEF_ES_FIND_VALID_SEPARATION_ANGLE  List separation angles that still yield five distinct 4×1 sensors.
 %
-% Purpose:
-%   Angles list.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Calls (project):
-%   zef_ES_4x1_sensors
-%   zef_ES_find_valid_separation_angle
+%   Not bound in zef_ES_optimization_window. Loops 0:359° through
+%   zef_ES_4x1_sensors and keeps angles whose five indices are unique.
+%   Returns a table (Separation Angle, O, P1–P4).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `angles_list` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   angles_list = zef_ES_find_valid_separation_angle
+%
+%   See also zef_ES_4x1_sensors.
+%
 
 ell = zeros(360,6);
 for i = 0:359;

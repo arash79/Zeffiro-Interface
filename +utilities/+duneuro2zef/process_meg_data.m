@@ -1,46 +1,21 @@
-% process_meg_data.m
-%
-% Processes MEG lead fields, measurements, and sensor configurations.
-%
-% Input:
-%   config - Configuration structure
-%
-% Output:
-%   success - Logical indicating success
-%   error_msg - Error message if failed (empty if successful)
-%
-% Usage:
-%   [success, error_msg] = utilities.duneuro2zef.process_meg_data(config);
-%
-% See also: run.m, get_default_config.m, process_sensors.m
-
 function [success, error_msg] = process_meg_data(config)
-% --- Zeffiro documentation header ---
-% utilities.duneuro2zef.process_meg_data — Process meg data.
+%PROCESS_MEG_DATA  Duneuro MEG L + measurements → converted .mat + sensors.
 %
-% Purpose:
-%   Process meg data.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   config
+%   Same layout as process_eeg_data with MEG filenames (LF_MEG / spikeAvg_MEG
+%   / meg_data). If spikeAvg.grad.tra exists it left-multiplies the lead field
+%   (L = T_mat * LF_MEG), not the measurements. Then the first
+%   min(config.meg.max_channels, n_rows) channels of L (and measurements if
+%   taller) are kept. process_sensors(config,'MEG', max_channels) gets that
+%   scalar count. Skipped when ~config.process_meg.
 %
-% Outputs:
-%   success
-%   error_msg
+%   [success, error_msg] = process_meg_data(config)
 %
-% Calls (project):
-%   utilities.duneuro2zef.process_meg_data
-%   utilities.duneuro2zef.process_sensors
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[success, error_msg]] = utilities.duneuro2zef.process_meg_data(config)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also process_eeg_data, process_sensors.
 
     success = false;
     error_msg = '';

@@ -1,23 +1,14 @@
-% --- Zeffiro documentation header ---
-% loop_indx = 1; — Loop indx = 1;.
+%PLOT_CORTEX_COMPONENT  Script: mesh visualization of one frame, export left/right/top cortex views.
 %
-% Purpose:
-%   Loop indx = 1;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_frame_start (read)
-%   zef.h_frame_stop (read)
-%   zef.h_reconstruction_type (read)
+%   Sets zef.h_reconstruction_type, h_frame_start/stop, then
+%   zef_visualize_surfaces. Writes PNG under exportImage/. Not a plugin
+%   button.
 %
-% Side effects:
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `loop_indx = 1;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 loop_indx = 1;
 ms_after_stimulus = [120];

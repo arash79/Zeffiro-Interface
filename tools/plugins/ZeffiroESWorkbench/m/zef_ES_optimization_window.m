@@ -1,54 +1,30 @@
 function zef = zef_ES_optimization_window(zef)
-% --- Zeffiro documentation header ---
-% zef_ES_optimization_window — Zef ES optimization window.
+%ZEF_ES_OPTIMIZATION_WINDOW  Create the ES Workbench uifigure and bind Find currents / Plot / Update.
 %
-% Purpose:
-%   Zef ES optimization window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Called from zef_ES_optimization (INI: Inverse tools → ES Workbench).
+%   Instantiates zef_ES_optimization_app (mlapp/), copies widgets onto
+%   zef.h_ES_*, sets callbacks. Does not run the optimizer.
 %
-% Outputs:
-%   zef
+%   ButtonPushedFcn
+%     h_ES_find_currents_button  confirm; HPO 1 → find_currents, 2 → _recursive
+%     h_ES_update_reconstruction zef_ES_update_reconstruction; zef_plot_meshes
+%     h_ES_plot_data             zef_ES_plot_data
+%   MenuSelectedFcn (right-click)
+%     item 1 current pattern (after update reconstruction)
+%     item 2 barplot, 3 error chart, 4 properties, 5 distance curves
+%   ValueChangedFcn of dropdowns / CellEditCallback of the table →
+%   zef_ES_optimization_update. Fixed-electrodes checkbox →
+%   zef.ES_active_electrodes = zef_ES_fix_active_electrodes(zef).
 %
-% Zef fields (observed):
-%   zef.ES_HPO_recursive_instances (read, write)
-%   zef.ES_HPO_search_method (read)
-%   zef.ES_HPO_search_method_list (read)
-%   zef.ES_active_electrodes (read, write)
-%   zef.ES_inv_colormap (read)
-%   zef.ES_obj_fun (read)
-%   zef.ES_obj_fun_2 (read)
-%   zef.ES_opt_algorithm (read)
-%   zef.ES_opt_algorithm_list (read)
-%   zef.ES_opt_method (read)
-%   zef.ES_opt_method_list (read)
-%   zef.ES_opt_solver (read)
-%   zef.ES_opt_solver_list (read)
-%   zef.ES_plot_type (read)
-%   zef.ES_threshold_condition (read)
-%   … (25 more)
+%   zef = zef_ES_optimization_window(zef)
 %
-% Calls (project):
-%   zef_ES_find_currents
-%   zef_ES_find_currents_recursive
-%   zef_ES_fix_active_electrodes
-%   zef_ES_optimization_window
-%   zef_ES_plot_barplot
-%   zef_ES_plot_current_pattern
-%   zef_ES_plot_error_chart
-%   zef_change_size_function
-%   zef_get_relative_size
+%   See also zef_ES_optimization_init, zef_ES_find_currents.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_ES_optimization_window(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 zef_ES_optimization_init;
 zef_data = zef_ES_optimization_app;

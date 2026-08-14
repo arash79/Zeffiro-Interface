@@ -1,31 +1,20 @@
-% --- Zeffiro documentation header ---
-% function zef_PlotGMModel — Function zef Plot GMModel.
+function zef_PlotGMModel
+%ZEF_PLOTGMMODEL  Draw GMM dipoles and confidence ellipsoids on h_axes1.
 %
-% Purpose:
-%   Function zef Plot GMModel.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.brain_transparency (read, write)
-%   zef.frame_start (read, write)
-%   zef.frame_stop (read, write)
-%   zef.h_axes1 (read)
-%   zef.layer_transparency (read, write)
-%
-% Calls (project):
-%   zef_GMM_subs_time_vars
 %   zef_PlotGMModel
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   PlotModelButton after zef_update_GMMPlotOpts. Reads zef.GMM.model
+%   and .dipoles from base plus plot parameters (marker, ellipsoid
+%   count, frames, coloring) via GMM.parameters.Values and meta{2}.
+%   Temporarily sets transparencies and calls zef_visualize_surfaces.
+%   Does not refit the mixture.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_PlotGMModel` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-function zef_PlotGMModel
+%   See also zef_plot_GMM_amplitudes, zef_GMMPlotOpt.
 
 parameters = evalin('base','zef.GMM.parameters.Values');
 m_size = str2num(parameters{8});
@@ -126,7 +115,8 @@ end
 h = evalin('base','zef.h_axes1');
 %set temporarly transparencies stated in mesh visualization to temporary
 %variables:
-evalin('base','zef_layer_transparency_temp=zef.layer_transparency; zef.layer_transparency=str2num(zef.GMM.parameters.Values{10});')
+evalin('base','zef_layer_transparency_temp=zef.layer_transparency; zef.layer_transparency=str2num(zef.GMM.parameters.Values{10})
+;')
 evalin('base','zef_brain_transparency_temp=zef.brain_transparency; zef.brain_transparency=str2num(zef.GMM.parameters.Values{10});')
 %If there is no time serie:
 if ~iscell(GMModel)

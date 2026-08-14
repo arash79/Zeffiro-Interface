@@ -1,26 +1,17 @@
 function zef = zef_GMModel_open(zef)
-% --- Zeffiro documentation header ---
-% zef_GMModel_open — Zef GMModel open.
+%ZEF_GMMODEL_OPEN  Construct the SP GMM window and run init.
 %
-% Purpose:
-%   Zef GMModel open.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_GMModel_open(zef)
 %
-% Outputs:
-%   zef
+%   Called via zef_tool_start from zef_GMModel_start. Window then
+%   zef_GMModel_init (script). Does not cluster.
 %
-% Calls (project):
-%   zef_GMModel_open
-%   zef_GMModel_window
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_GMModel_open(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_GMModel_window, zef_GMModel_start.
 
 zef = zef_GMModel_window(zef);
 zef_GMModel_init;

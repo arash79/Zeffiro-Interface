@@ -1,43 +1,33 @@
 function [stats, run_result] = zef_sensitivity_run(zef, method_id, opts)
-% --- Zeffiro documentation header ---
-% zef_sensitivity_run — Zef sensitivity run.
+%ZEF_SENSITIVITY_RUN  Monte-Carlo sensitivity study for a registered inverse method.
 %
-% Purpose:
-%   Zef sensitivity run.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   method_id
-%   opts
+%   Validates lead field and source_positions, resolves active sources via
+%   zef_processLeadfields, runs method-specific prep hooks (RAMUS/HALpR/
+%   GroupLasso multires decomposition when needed), executes
+%   utilities.sensitivity.run_monte_carlo locally or on a cluster, and
+%   returns aggregated statistics plus per-run results.
 %
-% Outputs:
-%   stats
-%   run_result
+%   [stats, run_result] = zef_sensitivity_run(zef, method_id)
+%   [stats, run_result] = zef_sensitivity_run(zef, method_id, Name, Value, ...)
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.source_interpolation_ind (read)
-%   zef.source_positions (read)
+%   Inputs
+%     zef        - session with L and source_positions.
+%     method_id  - inverse registry id (e.g. "eloreta", "mne").
+%     MethodParams, execution, ClusterProfile, NumberOfRuns, NoiseLevelDb,
+%     DiffType, DispersionRadius, SourceAmplitude, SourceMask,
+%     IsolatedFramesPerProbe, MaxProbesPerBatch - see arguments block.
 %
-% Calls (project):
-%   utilities.cluster.with_zef_in_base
-%   utilities.sensitivity.aggregate_statistics
-%   utilities.sensitivity.method_capability
-%   utilities.sensitivity.run_monte_carlo
-%   zef_make_multires_dec
-%   zef_processLeadfields
-%   zef_sensitivity_run
+%   Outputs
+%     stats      - aggregated sensitivity statistics struct.
+%     run_result - struct with L, method_id, procFile, runs, run_results.
 %
-% Side effects:
-%   - filesystem I/O
-%   - parallel/cluster
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[stats, run_result]] = zef_sensitivity_run(zef, method_id, opts)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_processLeadfields, utilities.sensitivity.run_monte_carlo,
+%            zef_inverse_run.
 
 arguments
     zef (1,1) struct

@@ -1,42 +1,42 @@
-function [I, distance_vec, label_vec] = zef_solid_angle_labeling(zef, tetra, nodes, h)  
-% --- Zeffiro documentation header ---
-% zef_solid_angle_labeling — Zef solid angle labeling.
+function [I, distance_vec, label_vec] = zef_solid_angle_labeling(zef, tetra, nodes, h)
+%ZEF_SOLID_ANGLE_LABELING  Assign each mesh node to a compartment by inside tests.
 %
-% Purpose:
-%   Zef solid angle labeling.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   tetra
-%   nodes
-%   h
+%   Walks zef.reuna_p / reuna_t (and submesh ranges in reuna_submesh_ind)
+%   from the first surface to the last. For nodes not yet labeled, calls
+%   zef_point_in_compartment (solid-angle sum vs zef.meshing_threshold).
+%   The first surface that claims a node wins; remaining unlabeled nodes
+%   get the last compartment index. That node labeling is what
+%   zef_mesh_labeling_step uses to keep or drop tetrahedra.
 %
-% Outputs:
-%   I
-%   distance_vec
-%   label_vec
+%   The second argument is named tetra for historical reasons; this
+%   function labels **nodes**, not tetra rows. Callers pass label_ind
+%   (node indices of candidate tets) as that argument from
+%   zef_mesh_labeling_step, which then uses the returned I as node_labels.
 %
-% Zef fields (observed):
-%   zef.reuna_p (read)
-%   zef.reuna_submesh_ind (read)
-%   zef.reuna_t (read)
+%   [I, distance_vec, label_vec] = zef_solid_angle_labeling(zef, tetra, nodes)
+%   [I, distance_vec, label_vec] = zef_solid_angle_labeling(zef, tetra, nodes, h)
 %
-% Calls (project):
-%   zef_point_in_compartment
-%   zef_solid_angle_labeling
-%   zef_waitbar
+%   Inputs
+%     zef           - session with reuna_p, reuna_t, reuna_submesh_ind,
+%                     meshing_threshold, GPU flags.
+%     tetra         - unused as connectivity here; kept for the caller
+%                     signature (see above).
+%     nodes         - N-by-3 candidate coordinates (typically all mesh nodes).
+%     h             - optional waitbar handle. If omitted, this function
+%                     creates and closes its own.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Outputs
+%     I             - N-by-1 compartment counter (1 … n_submeshes).
+%     distance_vec  - N-by-1 min distance to the winning surface (0 if none).
+%     label_vec     - (n_submeshes)-by-1 [1:n] used to fill unlabeled nodes
+%                     with the last index.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[I, distance_vec, label_vec]] = zef_solid_angle_labeling(zef, tetra, nodes, h)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_point_in_compartment, zef_mesh_labeling_step.
 if nargin < 4
 h = zef_waitbar(0,'Mesh labeling.')
 close_waitbar = true;

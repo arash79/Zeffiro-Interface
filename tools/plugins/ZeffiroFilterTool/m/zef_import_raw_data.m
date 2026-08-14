@@ -1,29 +1,17 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isempty(zef.save_file_path)) & not(zef — If not(isempty(zef.save file path)) & not(zef.
+%ZEF_IMPORT_RAW_DATA  Import button: load .mat/.dat into zef.raw_data.
 %
-% Purpose:
-%   If not(isempty(zef.save file path)) & not(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.file (read)
-%   zef.file_path (read)
-%   zef.file_type (read, write)
-%   zef.raw_data (read, write)
-%   zef.save_file_path (read)
+%   Script. ButtonPushedFcn of h_filter_import_data. uigetfile
+%   {'*.mat','*.dat'} from save_file_path when that path is set.
+%   file_type==1 (.mat): struct2cell(load(...)) then first cell.
+%   Otherwise load() as numeric. Cancel (file==0) is a no-op. Does
+%   not run the pipeline or write measurements.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `if not(isempty(zef.save_file_path)) & not(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_filter_raw_data, zef_filter_substitute_raw_data_with_measurement_data.
 
 if not(isempty(zef.save_file_path)) & not(zef.save_file_path==0)
     [zef.file zef.file_path zef.file_type] = uigetfile({'*.mat','*.dat'},'Import',zef.save_file_path);

@@ -1,59 +1,35 @@
-%Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z] = SESAME_inversion(void)
-% --- Zeffiro documentation header ---
-% SESAME_inversion — SESAME inversion.
+%SESAME_INVERSION  SESAME sequential Monte Carlo dipole sampler wrapper.
 %
-% Purpose:
-%   SESAME inversion.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   void
+%   z = SESAME_inversion(void)
 %
-% Outputs:
-%   z
+%   Called from SESAME h_start (legacy_sesame; no inverse.*Inverter).
+%   Argument void is unused. Needs zef.L, source_positions, measurements,
+%   and inverse_SESAME. Frames: zef.number_of_frames; each frame may pass
+%   a time window of columns. SNR: zef.SESAME_snr → cfg.noise_std =
+%   10^(-SESAME_snr/20). Neighbours from SESAMEneighbours. Side effects:
+%   writes zef.SESAME and zef.SESAME_time_serie{frame} in base; clears
+%   SESAME_time_serie at the start of a run. Returns cell z.
+%   As written, source_positions(s_ind_1,:) runs before s_ind_1 is
+%   assigned (s_ind_1 is not set in this file).
 %
-% Zef fields (observed):
-%   zef.SESAME (read, write)
-%   zef.SESAME_n_sampler (read)
-%   zef.SESAME_snr (read)
-%   zef.SESAME_time_serie (read)
-%   zef.inv_sampling_frequency (read)
-%   zef.inv_time_1 (read)
-%   zef.inv_time_2 (read)
-%   zef.inv_time_3 (read)
-%   zef.number_of_frames (read)
-%   zef.source_direction_mode (read)
-%   zef.source_interpolation_ind (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   zef_postProcessInverse
-%   zef_processLeadfields
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[z] = SESAME_inversion(void)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also inverse_SESAME, SESAMEneighbours, SESAME_App_run.
 
-
-h = waitbar(0,['SESAME iteration.']);
-[s_ind_1] = unique(evalin('base','zef.source_interpolation_ind{1}'));
 sampling_freq = evalin('base','zef.inv_sampling_frequency');
 number_of_frames = evalin('base','zef.number_of_frames');
 source_direction_mode = evalin('base','zef.source_direction_mode');
 source_positions = evalin('base','zef.source_positions');
 
+% s_ind_1 is not assigned in this file (would subset source_positions).
 source_positions = source_positions(s_ind_1,:);
 
 [L,n_interp, procFile] = zef_processLeadfields(source_direction_mode);
-%indices to order components node-wise:
+% Zeffiro stores xyz stacked (all x, then y, then z). SESAME wants
+% per-source triplets, so permute columns; s_back_ind undoes this after.
 s_reorder_ind = reshape((1:n_interp)+(0:n_interp:(2*n_interp))',[],1);
 %indices to order cartesian direction-wise:
 s_back_ind = reshape((1:3:(3*n_interp))'+(0:2),[],1);
@@ -92,6 +68,7 @@ for f_ind = 1 : number_of_frames
     end
 
     if f_ind >= 1
+        % MATLAB waitbar, not zef_waitbar. Handle h is never created here.
         waitbar(f_ind/number_of_frames,h,['SESAME iteration. Time step ' int2str(f_ind) ' of ' int2str(number_of_frames) '.']);
     end
 
@@ -109,6 +86,7 @@ for f_ind = 1 : number_of_frames
     assignin('base','zef_temp_ind',f_ind)
     evalin('base','zef.SESAME=zef_temp; zef.SESAME_time_serie{zef_temp_ind}=zef_temp; clear zef_temp; clear zef_temp_ind;')
     for d_ind = 1 : length(d_est)
+        % Place the time-mean moment on the three node-wise columns of that source.
         qv_data = mean(p_data.QV_estimated(3*(d_ind-1)+1:3*d_ind,:),2);
         z_vec([-2 -1 0]'+3*d_est(d_ind)) = qv_data;
     end

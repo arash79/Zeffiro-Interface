@@ -1,13 +1,16 @@
-% --- Zeffiro documentation header ---
-% [zef]=zef_postprocess_fem_mesh(zef);zef=zef_update_fig_details(zef); — [zef]=zef postprocess fem mesh(zef);zef=zef update fig details(zef);.
+%ZEF_POSTPROCESS_FINITE_ELEMENT_MESH  Mesh-tool "Postprocess FEM mesh" wrapper.
 %
-% Purpose:
-%   [zef]=zef postprocess fem mesh(zef);zef=zef update fig details(zef);.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `[zef]=zef_postprocess_fem_mesh(zef);zef=zef_update_fig_details(zef);` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   Script. Bound to h_pushbutton34. Calls zef_postprocess_fem_mesh then
+%   zef_update_fig_details. The Create FEM mesh button already postprocesses
+%   once; this button re-runs smoothing/relabeling on the existing volume.
+%
+%   Side effects: updates zef.nodes, zef.tetra, zef.sigma (via postprocess).
+%
+%   See also zef_postprocess_fem_mesh, zef_create_finite_element_mesh.
 
 [zef]=zef_postprocess_fem_mesh(zef);zef=zef_update_fig_details(zef);

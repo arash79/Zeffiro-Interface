@@ -1,39 +1,17 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'mne_prior')); — If not(isfield(zef,'mne prior'));.
+%ZEF_INIT_MNE  Default mne_* fields and copy them onto the MNE widgets.
 %
-% Purpose:
-%   If not(isfield(zef,'mne prior'));.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_mne_high_cut_frequency (read)
-%   zef.h_mne_low_cut_frequency (read)
-%   zef.h_mne_normalize_data (read)
-%   zef.h_mne_number_of_frames (read)
-%   zef.h_mne_prior (read)
-%   zef.h_mne_sampling_frequency (read)
-%   zef.h_mne_time_1 (read)
-%   zef.h_mne_time_2 (read)
-%   zef.h_mne_time_3 (read)
-%   zef.h_mne_type (read)
-%   zef.inv_high_cut_frequency (read)
-%   zef.inv_low_cut_frequency (read)
-%   zef.inv_sampling_frequency (read)
-%   zef.inv_snr (read)
-%   zef.inv_time_1 (read)
-%   … (16 more)
+%   Script. Needs workspace zef with h_mne_* handles from
+%   zef_mne_tool_window. Defaults: mne_prior=2, mne_type=1 (MNE),
+%   mne_pcg_tol=1e-8, mne_normalize_data=1, mne_data_segment=1. Copies
+%   inv_snr / sampling / band / inv_time_* / number_of_frames into mne_*.
+%   Does not invert (Start → zef_find_mne_reconstruction).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'mne_prior'));` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_mne, zef_mne_tool_start, zef_find_mne_reconstruction.
 
 if not(isfield(zef,'mne_prior'));
     zef.mne_prior = 2;
@@ -63,7 +41,7 @@ if not(isfield(zef,'mne_data_segment'));
     zef.mne_data_segment = 1;
 end;
 
-set(zef.h_mne_prior ,'value',zef.mne_prior);
+set(zef.h_mne_prior ,'value',zef.mne_prior)
 set(zef.h_mne_type ,'value',zef.mne_type);
 set(zef.h_mne_sampling_frequency ,'string',num2str(zef.mne_sampling_frequency));
 set(zef.h_mne_low_cut_frequency ,'string',num2str(zef.mne_low_cut_frequency));

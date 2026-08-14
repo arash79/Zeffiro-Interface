@@ -1,24 +1,22 @@
 function vec = zef_ES_table(data_aux)
-% --- Zeffiro documentation header ---
-% zef_ES_table — Zef ES table.
+%ZEF_ES_TABLE  Convert y_ES_interval struct fields to a table for the objective function.
 %
-% Purpose:
-%   Zef ES table.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   data_aux
+%   Called from zef_ES_objective_function and plot_error_chart. No nargin
+%   (used by the window to list objective-function names) returns empty
+%   columns with VariableNames / VariableDescriptions. With y_ES_interval,
+%   fills residual, max |y|, sparsity, focused/nuisance J, angle, RDM, nnz,
+%   dose, runtime, α/ε (dB), flags, and raw y_ES cells.
 %
-% Outputs:
-%   vec
+%   vec = zef_ES_table()
+%   vec = zef_ES_table(y_ES_interval)
 %
-% Calls (project):
-%   zef_ES_table
+%   See also zef_ES_objective_function.
 %
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[vec] = zef_ES_table(data_aux)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
     var_names = {...
         'Residual', ...

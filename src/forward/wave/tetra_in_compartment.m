@@ -1,32 +1,19 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 function [I] = tetra_in_compartment(reuna_p,reuna_t,nodes,compartment_info)
-% --- Zeffiro documentation header ---
-% tetra_in_compartment — Tetra in compartment.
+%TETRA_IN_COMPARTMENT  Interior tetra indices vs a closed surface (reuna_p/t).
 %
-% Purpose:
-%   Tetra in compartment.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Inputs:
-%   reuna_p
-%   reuna_t
-%   nodes
-%   compartment_info
+%   Bounding-box reject then GPU-assisted winding/solid-angle style test
+%   using compartment_info. Used when labelling wave-mesh subdomains.
 %
-% Outputs:
-%   I
+%   I = tetra_in_compartment(reuna_p, reuna_t, nodes, compartment_info)
 %
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[I] = tetra_in_compartment(reuna_p, reuna_t, nodes, compartment_info)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also create_system, free_boundary.
+
+
 
 
 max_x = max(reuna_p(:,1));

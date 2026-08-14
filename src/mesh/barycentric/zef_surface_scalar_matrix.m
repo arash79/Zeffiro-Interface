@@ -1,29 +1,22 @@
 function M = zef_surface_scalar_matrix(nodes, tetra, scalar_field, weighting)
-% --- Zeffiro documentation header ---
-% zef_surface_scalar_matrix — Zef surface scalar matrix.
+%ZEF_SURFACE_SCALAR_MATRIX  Boundary mass ∫_∂Ω φ ψ_i ψ_j dS (surface F·F).
 %
-% Purpose:
-%   Zef surface scalar matrix.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   scalar_field
-%   weighting
+%   Skin faces from zef_surface_mesh. Face area is
+%   (abs(det)/2)*||∇ψ_f|| where ψ_f is the hat of the vertex opposite the
+%   face (zef_volume_barycentric on those tets with p_ind = f_ind).
+%   NSE uses the surface_FF wrapper ([1/6 1/12]) for Robin/mass terms.
 %
-% Outputs:
-%   M
+%   M = zef_surface_scalar_matrix(nodes, tetra, scalar_field, weighting)
 %
-% Calls (project):
-%   zef_surface_mesh
-%   zef_surface_scalar_matrix
-%   zef_volume_barycentric
+%   Inputs: nodes N×3, tetra T×4, scalar_field T×1 (indexed by tet, default 1),
+%   weighting scalar or 1×2 default 1. N×N sparse, symmetrized for i≠j.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_surface_scalar_matrix(nodes, tetra, scalar_field, weighting)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_surface_scalar_matrix_FF, zef_surface_mesh.
 
 ind_m = [ 2 4 3 ;
     1 3 4 ;
@@ -49,6 +42,7 @@ else
 end
 
 [b_vec,det] = zef_volume_barycentric(nodes,tetra(t_ind,:),f_ind);
+% |∇ψ_opposite| * |det|/2 = triangle area (ψ drops from 1 to 0 across height).
 area = (abs(det)/2).*sqrt(sum(b_vec(:,1:3).^2,2));
 
 M = spalloc(N,N,0);

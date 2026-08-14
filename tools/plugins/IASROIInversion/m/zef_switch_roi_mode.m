@@ -1,29 +1,15 @@
-% --- Zeffiro documentation header ---
-% if get(zef — If get(zef.
+%ZEF_SWITCH_ROI_MODE  Enable sphere vs threshold ROI widgets from roi_mode.
 %
-% Purpose:
-%   If get(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_iasroi_plot_roi (read)
-%   zef.h_iasroi_plot_source (read)
-%   zef.h_iasroi_rec_source_8 (read)
-%   zef.h_iasroi_rec_source_9 (read)
-%   zef.h_iasroi_roi_mode (read)
-%   zef.h_iasroi_roi_sphere_1 (read)
-%   zef.h_iasroi_roi_sphere_2 (read)
-%   zef.h_iasroi_roi_sphere_3 (read)
-%   zef.h_iasroi_roi_sphere_4 (read)
-%   zef.h_iasroi_roi_threshold (read)
+%   Script. roi_mode dropdown. Value 1: sphere edits + plot ROI/source
+%   on, threshold off. Else the reverse. Does not write iasroi_roi_mode
+%   (the dropdown Callback does).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_iasroi_plot_roi.
 
 if get(zef.h_iasroi_roi_mode,'value')==1;
     set(zef.h_iasroi_plot_roi,'enable','on');

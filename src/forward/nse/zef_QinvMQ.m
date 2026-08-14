@@ -1,36 +1,23 @@
 function x = zef_QinvMQ(x,Q_1,Q_2,Q_3,M,tol,maxit,DM,use_gpu)
-% --- Zeffiro documentation header ---
-% zef_QinvMQ — Zef Qinv MQ.
-%
-% Purpose:
-%   Zef Qinv MQ.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
-%
-% Inputs:
-%   x
-%   Q_1
-%   Q_2
-%   Q_3
-%   M
-%   tol
-%   maxit
-%   DM
-%   use_gpu
-%
-% Outputs:
-%   x
-%
-% Calls (project):
-%   zef_QinvMQ
-%
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[x] = zef_QinvMQ(x, Q_1, Q_2, Q_3, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%ZEF_QINVMQ  Apply Q^{-1} M Q^{-1} to a 3-block vector (NSE pressure projection).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Computes Q_i x, solves M y_i = Q_i x with pcg_iteration(_gpu) using
+%   diagonal preconditioner DM, then returns sum_i Q_i' y_i. Called from
+%   zef_nse_iteration for the divergence-free projection.
+%
+%   x = zef_QinvMQ(x, Q_1, Q_2, Q_3, M, tol, maxit, DM, use_gpu)
+%
+%   Input: sparse Q_i, mass M, vector x (n_nodes), logical use_gpu.
+%
+%   See also pcg_iteration, zef_nse_iteration.
 
 if use_gpu
     x = gpuArray(x);
@@ -44,6 +31,8 @@ end
 x_1 = Q_1*x;
 x_2 = Q_2*x;
 x_3 = Q_3*x;
+
+% Solve M y_i = Q_i x (lumped/consistent mass) then assemble ∑ Q_i' y_i.
 
 if use_gpu
     [x_1] = pcg_iteration_gpu(M,x_1,tol,maxit,DM,x_1);

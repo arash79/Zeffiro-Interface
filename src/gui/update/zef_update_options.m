@@ -1,44 +1,20 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if zef — If zef.
+%ZEF_UPDATE_OPTIONS  Bulk-read a legacy/mlapp options panel into zef (script).
 %
-% Purpose:
-%   If zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.brain_transparency (read, write)
-%   zef.colormap_size (read, write)
-%   zef.colortune_param (read, write)
-%   zef.cone_alpha (read, write)
-%   zef.cone_lattice_resolution (read, write)
-%   zef.cone_scale (read, write)
-%   zef.cp2_a (read, write)
-%   zef.cp2_b (read, write)
-%   zef.cp2_c (read, write)
-%   zef.cp2_d (read, write)
-%   zef.cp2_on (read, write)
-%   zef.cp3_a (read, write)
-%   zef.cp3_b (read, write)
-%   zef.cp3_c (read, write)
-%   zef.cp3_d (read, write)
-%   … (98 more)
+%   Script. Historical catch-all; Settings → Forward and inverse /
+%   Graphics now use zef_update_forward_and_inverse_options and
+%   zef_update_graphics_options. When zef.mlapp==1, reads App Designer
+%   Value; else reads uicontrol String. Copies preconditioner, meshing,
+%   GPU (gpuDevice if use_gpu), hyperprior, reconstruction_type, clipping
+%   planes cp2/cp3 (and Enable on/off of a,b,c,d edits), inv_scale,
+%   transparency (stored as 1 minus widget), frame/orbit, streamlines,
+%   colormap_size, cone_alpha. Does not replot.
 %
-% Calls (project):
-%   core.types.ZefSourceModel.from
-%
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_update_forward_and_inverse_options, zef_update_graphics_options.
 if zef.mlapp == 1
     zef.preconditioner = get(zef.h_as_opt_1,'Value');
     zef.preconditioner_tolerance = str2num(get(zef.h_as_opt_2,'Value'));

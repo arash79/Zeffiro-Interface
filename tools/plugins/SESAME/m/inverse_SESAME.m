@@ -1,112 +1,17 @@
 function [result] = inverse_SESAME(full_data, leadfield, sourcespace, cfg)
-% --- Zeffiro documentation header ---
-% inverse_SESAME — Inverse SESAME.
+%INVERSE_SESAME  SESAME sequential Monte Carlo dipole sampler (upstream core).
 %
-% Purpose:
-%   Inverse SESAME.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   full_data
-%   leadfield
-%   sourcespace
-%   cfg
+%   result = inverse_SESAME(full_data, leadfield, sourcespace, cfg)
 %
-% Outputs:
-%   result
+%   Third-party core (SESAME_core). cfg: noise_std, dipmom_std,
+%   n_samples, neighbours, t_start/t_stop. Called from
+%   SESAME_inversion. Does not read zef itself.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[result] = inverse_SESAME(full_data, leadfield, sourcespace, cfg)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
-% inverse_SESAME samples the posterior distribution of a
-% multi-dipole Bayesian model and provides an estimate of the number of
-% dipoles and of the dipole locations and time courses; in addition, it
-% provides uncertainty quantification in terms of a posterior probability
-% map. Dipoles are assumed to have fixed location during the analyzed time 
-% window.
-% 
-%
-% Use as
-%  posterior = inverse_SESAME(data, leadfield, sourcespace, cfg)
-% 
-% where
-%  data        = data matrix, 
-%                 number of sensors X number of time points
-%  leadfield   = leadfield matrix, 
-%                  number of sensors X ncomp*number of points in the source space                 
-%                   where ncomp is 3 for free orientation, 1 for strictly
-%                   constrained orientation
-%  sourcespace = coordinates of points in source space, 
-%                 number of points in the source space X 3             
-% and
-%  posterior   = structure containing the estimated source parameters, a 
-%                 posterior probability map and all the Monte Carlo samples
-%
-%  relevant fields of posterior:
-%
-%         mod_sel = model selection function (in fact, a collection of)
-%                   a 2D array
-%                   max number of dipoles X number of iterations;
-%                   at a selected iteration, it provides the posterior distribution over 	
-%                     the number of dipoles
-%                   default use:
-%                   - fix the second index to the last iteration (posterior.final_it)
-%                   - take the argmax of the resulting array as an estimate of the 
-%                       number of dipoles
-% 
-% 
-%         pmap	= posterior probability map (in fact, a collection of) 
-%                 a 3D array 
-%                 number of source points  X number of iterations X max number of dipoles;
-%                 default use:
-%                 - set the second index to the last iteration (posterior.final_it)
-%                 - set the third index to the estimated number of dipoles
-%                 - plot the resulting array as a color-coded posterior map
-%                   on the set of vertices
-% 
-%         estimated_dipoles = vertex indices of estimated dipoles in the source space
-% 
-%         est_dip = all estimated dipoles *across all iterations*
-%                   a 2D array
-%                   number of ALL estimated dipoles X 5
-%                   in every line we have one estimated dipole as follows:
-%                   x location, y location, z location, iteration number, vertex index
-% 
-% 
-%         Q_estimated = source amplitudes (positive scalar) of estimated dipoles
-%                       a 2D array
-%                       number of estimated dipoles X number of time points
-% 
-%         QV_estimated = estimated vector dipole moments across time
-%                        a 2D array
-%                        ncomp*number of estimated dipoles X number of time points
-% 
-%         MCsamples = all Monte Carlo samples, at all iterations 
-%                     stored for any other type of inference
-%
-%         AllWeights = all weights of the corresponding Monte Carlo samples
-
-%
-% optional input, passed as field inside cfg:
-%
-%  noise_std  = noise standard deviation
-%  dipmom_std = expected strength of dipole moment (formally: standard
-%               deviation of Gaussian prior on dipole moment components)
-%  n_samples  = number of Monte Carlo samples (default: 100)
-%  t_start  = first time point of analyzed window
-%  t_stop   = last time point of analyzed window
-%
-%
-%  The algorithm contained in this file is described in 
-%  Sommariva S and Sorrentino A 
-%  Sequential Monte Carlo samplers for semi-linear inverse problems and 
-%  application to Magnetoencephalography 
-%  Inverse Problems (2014)
-
-% Copyright (C) 2019 Gianvittorio Luria, Sara Sommariva, Alberto Sorrentino
+%   See also SESAMEneighbours, SESAME_inversion.
 
 noise_std = [];
 dipmom_std = [];
@@ -199,6 +104,9 @@ cov_Qin = dipmom_std^2 * eye(3); % covariance of Gaussian prior on the dipole mo
 cov_noise = noise_std^2 * eye(nsens); % covariance of the likelihood function
 delta_min = 1/100000; delta_max = 1/10; % min/max increment of the exponent in a single iteration
 gamma_high = 0.99; gamma_low = 0.9; % acceptable interval for the drop in the Effective Sample Size
+% Sequential Monte Carlo with a Poisson prior on dipole count (λ=0.25,
+% max NDIP=8). Likelihood exponent is annealed (gamma_high/low keep ESS
+% in range). Birth/death RJ moves then neighbour-graph location moves.
 Q_birth = 1/3; Q_death = 1/20; % probability of proposing a birth/death
 
 exponent_likelihood(1) = 0;
@@ -289,6 +197,9 @@ while exponent_likelihood(n) <= 1
     disp('Got a NaN in the effective sample size: try setting a larger ''noise_std'' or a smaller ''dipmom_std''');
   end
   % Resample particles if ESS too low
+  % Systematic resampling (ESS < n_samples/2): copy particles according
+  % to a single uniform offset through the cumulative weights, then
+  % reset all weights to 1/n_samples.
   if ESS(n) < n_samples/2
     disp(' ---------- ');
     disp('Resampling');
@@ -327,6 +238,8 @@ while exponent_likelihood(n) <= 1
     particle_proposed = particle(i);    
     
     % Add/Remove dipole (RJ step)    
+    % Reversible-jump: propose birth (new dipole) with Q_birth, else
+    % death with Q_death, else a neighbour-graph location move.
     BirthOrDeath = rand;
     if BirthOrDeath < Q_birth && particle_proposed.nu < NDIP
       particle_proposed = add_dipole_location(particle_proposed, C);
@@ -412,6 +325,8 @@ while exponent_likelihood(n) <= 1
   MCsamples{n}.all_particles = particle;
 
   % Adaptive choice of the next exponent
+  % Bisection on Δ so the ESS drop stays between gamma_low and gamma_high
+  % (0.9–0.99). Loop until exponent_likelihood exceeds 1 (full likelihood).
   is_last_operation_increment = 0;  
   if exponent_likelihood(n) == 1
     exponent_likelihood(n+1) = 1.01;
@@ -624,6 +539,9 @@ end
 end
 
 function [particle] = prior_and_like(particle, leadfield, data, lambda_prior, dipmom_std, nsens, ncomp, fact, noise_std, n_ist)
+  % Poisson prior on dipole count. Likelihood after integrating a Gaussian
+  % moment prior: (σ_q/σ_n)² G G' + I, then sum_t y' Σ⁻¹ y (stored as
+  % log_like; the SMC exponent later scales this).
   particle.prior = 1/fact(particle.nu+1) * exp(-lambda_prior) * lambda_prior^particle.nu;
   G_r = zeros(nsens,ncomp*particle.nu);
   for kk = 1:particle.nu

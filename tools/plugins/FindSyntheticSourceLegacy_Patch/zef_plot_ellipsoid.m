@@ -1,32 +1,17 @@
 function h_surf = zef_plot_ellipsoid(position,a,b,c,z,color)
-% --- Zeffiro documentation header ---
-% zef_plot_ellipsoid — Renders or updates a plot_ellipsoid figure from current `zef` state.
+%ZEF_PLOT_ELLIPSOID  surf an axis-aligned ellipsoid along direction z.
 %
-% Purpose:
-%   Renders or updates a plot_ellipsoid figure from current `zef` state.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   position
-%   a
-%   b
-%   c
-%   z
-%   color
+%   h_surf = zef_plot_ellipsoid(position, a, b, c, z, color)
 %
-% Outputs:
-%   h_surf
+%   Called from zef_plot_source_patch for VEP-style volumes. Uses gca.
+%   No zef I/O.
 %
-% Calls (project):
-%   zef_plot_ellipsoid
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[h_surf] = zef_plot_ellipsoid(position, a, b, c, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_plot_sphere, zef_plot_source_patch.
 
 h_axes = gca;
 hold_state = ishold(h_axes);

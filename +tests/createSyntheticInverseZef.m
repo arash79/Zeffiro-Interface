@@ -1,40 +1,17 @@
 function zef = createSyntheticInverseZef()
-% --- Zeffiro documentation header ---
-% tests.createSyntheticInverseZef — Automated test: createSyntheticInverseZef.
+%CREATESYNTHETICINVERSEZEF  Minimal zef struct for inverse unit tests.
 %
-% Purpose:
-%   Automated test: createSyntheticInverseZef.
-%   Folder: MATLAB unit and integration tests for refactored inverse dispatch, lead fields, cluster jobs, and legacy/class parity.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Outputs:
-%   zef
+%   zef = createSyntheticInverseZef()
 %
-% Zef fields (observed):
-%   zef.L (read, write)
-%   zef.csm_type (read, write)
-%   zef.filter_type (read, write)
-%   zef.gpu_count (read, write)
-%   zef.inv_amplitude_db (read, write)
-%   zef.inv_data_mode (read, write)
-%   zef.inv_evolution_prior (read, write)
-%   zef.inv_high_cut_frequency (read, write)
-%   zef.inv_low_cut_frequency (read, write)
-%   zef.inv_prior_over_measurement_db (read, write)
-%   zef.inv_sampling_frequency (read, write)
-%   zef.inv_snr (read, write)
-%   zef.inv_time_1 (read, write)
-%   zef.inv_time_2 (read, write)
-%   zef.inv_time_3 (read, write)
-%   … (23 more)
+%   Not a test. 4 sensors, 2 sources, L randn(4,6), 3 measurement frames,
+%   inv_data_mode 'raw', use_gpu false, plus CSM/MNE/Kalman scalar fields
+%   used by legacy dispatch. No mesh. Called by tests.* inverse classes.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `tests.createSyntheticInverseZef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
 n_sensors = 4;
 n_interp = 2;
 n_frames = 3;

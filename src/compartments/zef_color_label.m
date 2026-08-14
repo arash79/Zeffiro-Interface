@@ -1,35 +1,20 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [void] = zef_color_label(tag_str)
-% --- Zeffiro documentation header ---
-% zef_color_label — Zef color label.
+%ZEF_COLOR_LABEL  Toggle compartment name label visibility in the figure tool.
 %
-% Purpose:
-%   Zef color label.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tag_str
+%   Reads zef.<tag_str>_on and _visible from the base workspace and sets
+%   zef.h_<tag_str>_label visibility and string when zef.h_zeffiro is valid.
 %
-% Outputs:
-%   void
+%   zef_color_label(tag_str)
 %
-% Zef fields (observed):
-%   zef.h_ (read)
-%   zef.h_zeffiro (read)
+%   Input
+%     tag_str - compartment tag without prefix (e.g. 'c1').
 %
-% Calls (project):
-%   zef_color_label
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[void] = zef_color_label(tag_str)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_update_fig_details.
 
 void = [];
 

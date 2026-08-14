@@ -1,53 +1,20 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_DTI_CONDUCTIVITY_INIT
-%
-%Initializes DTI conductivity plugin fields in zef struct.
-%Sets default values for all parameters if they don't exist.
-%
-%WHY THIS IS NEEDED:
-%Ensures all required fields exist with sensible defaults.
-%Prevents errors from missing fields and provides reasonable starting values.
-% --- Zeffiro documentation header ---
-% function zef_dti_conductivity_init — Function zef dti conductivity init.
-%
-% Purpose:
-%   Function zef dti conductivity init.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Zef fields (observed):
-%   zef.dti_anisotropy_threshold (read, write)
-%   zef.dti_applied (read, write)
-%   zef.dti_applied_time (read, write)
-%   zef.dti_apply_to_compartments (read, write)
-%   zef.dti_conductivity_model (read, write)
-%   zef.dti_conductivity_scale (read, write)
-%   zef.dti_conductivity_tool_current_size (read, write)
-%   zef.dti_conductivity_tool_relative_size (read, write)
-%   zef.dti_dwi_vox2ras_tkr (read, write)
-%   zef.dti_extra_conductivity (read, write)
-%   zef.dti_fa_geometry (read, write)
-%   zef.dti_interpolation_mode (read, write)
-%   zef.dti_interpolation_radius (read, write)
-%   zef.dti_intra_conductivity (read, write)
-%   zef.dti_matrices_approved (read, write)
-%   … (17 more)
-%
-% Calls (project):
-%   zef_dti_conductivity_init
-%   zef_dti_empty_geometry_struct
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_dti_conductivity_init` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
 function zef_dti_conductivity_init
+%ZEF_DTI_CONDUCTIVITY_INIT  Default DTI fields on base zef if missing.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   zef_dti_conductivity_init
+%
+%   No-op if base zef is missing or not a struct. Sets empty FA/v1/
+%   register paths, dti_conductivity_model=1, volume_fraction=0.7,
+%   apply_to_compartments {'g','w'}, interpolation radius 2 mm, identity
+%   vox2ras, zef_dti_empty_geometry_struct. Clears FA volumes estimated
+%   >1 GB. assignin('base','zef',zef).
+%
+%   See also zef_dti_conductivity_open, zef_dti_empty_geometry_struct.
 
 if ~evalin('base','exist(''zef'', ''var'')')
     return;  % zef doesn't exist yet, skip initialization

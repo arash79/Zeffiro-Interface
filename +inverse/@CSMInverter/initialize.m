@@ -1,30 +1,25 @@
-%% Copyright © 2025- Joonas Lahtinen
 function self = initialize(self,L,f_data)
-% --- Zeffiro documentation header ---
-% inverse.CSMInverter.initialize — Estimates priors, noise covariance, or regularization from multi-frame data.
+%initialize  Set CSM prior scale theta0 from SNR and lead-field / data power.
 %
-% Purpose:
-%   Estimates priors, noise covariance, or regularization from multi-frame data.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   L
-%   f_data
+%   Called once from utilities.inverse.run_frame_loop before precompute /
+%   invert. Inverse tools → Classical Sparse Methods uses zef_CSM_iteration.
 %
-% Outputs:
-%   self
+%   noise_p2 = 10^(-SNR/10)
+%   theta0   = (1-noise_p2) * ||f_data||_F^2 / ||L||_F^2
+%   invert and precompute then use S = (10^(-SNR/20)^2 / theta0) I.
+%   Does not set noise_cov.
 %
-% Calls (project):
-%   inverse.initialize
+%   Inputs
+%     L      - n_sensors × n_dof processed lead field (Frobenius in the ratio).
+%     f_data - n_sensors × n_frames filtered measurements.
 %
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[self] = inverse.CSMInverter.initialize(self, L, f_data)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     self.theta0  scalar (gathered from gpuArray if needed).
 
     arguments
 

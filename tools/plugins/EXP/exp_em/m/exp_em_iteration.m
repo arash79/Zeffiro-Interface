@@ -1,56 +1,20 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,reconstruction_information] = exp_em_iteration(void)
-% --- Zeffiro documentation header ---
-% exp_em_iteration — Exp em iteration.
+%EXP_EM_ITERATION  EXP EM MAP (Laplace-weighted) on the GUIDE EM window.
 %
-% Purpose:
-%   Exp em iteration.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   void
+%   [z, reconstruction_information] = exp_em_iteration(void)
 %
-% Outputs:
-%   z
-%   reconstruction_information
+%   Called from EXP EM GUIDE Start (not on the default menu). Argument
+%   void is unused; reads base zef: L, measurements, number_of_frames,
+%   exp_em_q / hyper_type / beta / theta0, inv_n_map_iterations,
+%   inv_n_L1_iterations. SNR: zef.inv_snr → 10^(-inv_snr/20). Tag
+%   'EXP EM'. Uses EM_Lasso / L1_optimization. No inverse.*Inverter.
 %
-% Zef fields (observed):
-%   zef.exp_em_beta (read)
-%   zef.exp_em_hyper_type (read)
-%   zef.exp_em_q (read)
-%   zef.exp_em_theta0 (read)
-%   zef.gpu_count (read)
-%   zef.inv_amplitude_db (read)
-%   zef.inv_high_cut_frequency (read)
-%   zef.inv_hyperprior (read)
-%   zef.inv_hyperprior_tail_length_db (read)
-%   zef.inv_hyperprior_weight (read)
-%   zef.inv_low_cut_frequency (read)
-%   zef.inv_n_L1_iterations (read)
-%   zef.inv_n_map_iterations (read)
-%   zef.inv_prior_over_measurement_db (read)
-%   zef.inv_sampling_frequency (read)
-%   … (9 more)
-%
-% Calls (project):
-%   zef_find_g_hyperprior
-%   zef_find_ig_hyperprior
-%   zef_getTimeStep
-%   zef_normalizeInverseReconstruction
-%   zef_postProcessInverse
-%   zef_processLeadfields
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z, reconstruction_information]] = exp_em_iteration(void)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also exp_em_map_estimation, EM_Lasso.
 
 h = zef_waitbar(0,1,['EM MAP iteration.']);
 

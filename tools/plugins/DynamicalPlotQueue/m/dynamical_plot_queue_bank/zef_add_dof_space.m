@@ -1,26 +1,18 @@
-% --- Zeffiro documentation header ---
-% function zef_add_dof_space — Function zef add dof space.
+function zef_add_dof_space
+%ZEF_ADD_DOF_SPACE  Queue renderer: scatter3 of zef.source_positions.
 %
-% Purpose:
-%   Function zef add dof space.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%   zef.source_positions (read)
+%   Draws the source DOF cloud (not a reconstruction) on base zef.h_axes1.
+%   Bank List item; zef_plot_dpq evalin-calls this name. Uses h_axes1,
+%   not the caller h_axes_image most other overlays use.
 %
-% Calls (project):
 %   zef_add_dof_space
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_add_dof_space` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-function zef_add_dof_space
+%   See also zef_plot_dpq, zef_simple_plot_sphere_max.
 
 h_axes = evalin('base','zef.h_axes1');
 %axes(h_axes);

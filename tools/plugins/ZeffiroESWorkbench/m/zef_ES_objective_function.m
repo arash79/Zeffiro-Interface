@@ -1,37 +1,25 @@
 function [sr, sc] = zef_ES_objective_function(varargin)
-% --- Zeffiro documentation header ---
-% zef_ES_objective_function — Zef ES objective function.
+%ZEF_ES_OBJECTIVE_FUNCTION  Pick (sr,sc) in y_ES_interval from ES_obj_fun / obj_fun_2 and threshold.
 %
-% Purpose:
-%   Zef ES objective function.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Used by Update reconstruction, plotters, and fix-active-electrodes.
+%   Builds a table via zef_ES_table; VariableDescriptions are 'minimum' /
+%   'maximum' / 'none'. If obj_fun == obj_fun_2, take the global min or max
+%   of that column. Else keep cells that pass ES_acceptable_threshold
+%   (relative if ES_threshold_condition==1, else absolute) on obj_fun, then
+%   min/max obj_fun_2 among those. sr indexes ε, sc indexes α.
 %
-% Outputs:
-%   sr
-%   sc
+%   [sr, sc] = zef_ES_objective_function()
+%   [sr, sc] = zef_ES_objective_function(zef)
+%   [sr, sc] = zef_ES_objective_function(zef, table_or_interval)
+%   [sr, sc] = zef_ES_objective_function(zef, obj1, obj2, AT, TT)
 %
-% Zef fields (observed):
-%   zef.ES_acceptable_threshold (read)
-%   zef.ES_obj_fun (read)
-%   zef.ES_obj_fun_2 (read)
-%   zef.ES_threshold_condition (read)
-%   zef.y_ES_interval (read)
+%   See also zef_ES_table, zef_ES_update_reconstruction.
 %
-% Calls (project):
-%   zef_ES_objective_function
-%   zef_ES_table
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[sr, sc]] = zef_ES_objective_function(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 switch nargin
     case {0, 1, 2}
@@ -76,6 +64,8 @@ if isempty(obj_fun_1) || isempty(obj_fun_2)
     error('ZI error: No data has been calculated yet.')
 end
 %% 'sweet spot' indexing based on objective
+% Same criterion twice: global argmin/argmax. Two criteria: threshold
+% obj_fun_1 then argmin/argmax of obj_fun_2 on the surviving cells.
 if isequal(obj1, obj2)
     if     strcmpi(metacriteria_minmax(obj1), 'minimum')
         [~, Idx] = min(abs(obj_fun_1),[],'all','linear');

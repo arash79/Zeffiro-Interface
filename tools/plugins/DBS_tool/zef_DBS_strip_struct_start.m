@@ -1,30 +1,18 @@
 function zef = zef_DBS_strip_struct_start(zef)
-% --- Zeffiro documentation header ---
-% zef_DBS_strip_struct_start — Zef DBS strip struct start.
+%ZEF_DBS_STRIP_STRUCT_START  Open DBS probe tool (no default menu).
 %
-% Purpose:
-%   Zef DBS strip struct start.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Not in the default profile INI. Attach electrodes copies
+%   strip_struct.electrode_data onto zef.<current_sensors>_points.
 %
-% Outputs:
-%   zef
+%   zef = zef_DBS_strip_struct_start(zef)
 %
-% Calls (project):
-%   zef_DBS_strip_struct_start
-%   zef_tool_start
+%   See also zef_DBS_attach_electrodes.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_DBS_strip_struct_start(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
 zef = evalin('base','zef');

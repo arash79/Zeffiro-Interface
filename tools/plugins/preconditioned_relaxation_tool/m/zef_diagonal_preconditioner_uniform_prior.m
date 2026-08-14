@@ -1,39 +1,17 @@
 function [M, multigrid_perm_output] = zef_diagonal_preconditioner_uniform_prior(L, multigrid_dec, multigrid_perm)
-% --- Zeffiro documentation header ---
-% zef_diagonal_preconditioner_uniform_prior — Zef diagonal preconditioner uniform prior.
+%ZEF_DIAGONAL_PRECONDITIONER_UNIFORM_PRIOR  Diagonal MG preconditioner with SNR prior scale.
 %
-% Purpose:
-%   Zef diagonal preconditioner uniform prior.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   L
-%   multigrid_dec
-%   multigrid_perm
+%   [M, multigrid_perm_output] = zef_diagonal_preconditioner_uniform_prior(
+%       L, multigrid_dec, multigrid_perm)
 %
-% Outputs:
-%   M
-%   multigrid_perm_output
+%   Reads zef.relax_snr / inv_prior_over_measurement_db from base.
 %
-% Zef fields (observed):
-%   zef.inv_amplitude_db (read)
-%   zef.inv_prior_over_measurement_db (read)
-%   zef.relax_normalize_data (read)
-%   zef.relax_snr (read)
-%
-% Calls (project):
-%   zef_diagonal_preconditioner_uniform_prior
-%   zef_find_gaussian_prior
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[M, multigrid_perm_output]] = zef_diagonal_preconditioner_uniform_prior(L, multigrid_dec, multigrid_perm)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_block_diagonal_preconditioner_uniform_prior.
 
 multigrid_perm_output = cell(0);
 

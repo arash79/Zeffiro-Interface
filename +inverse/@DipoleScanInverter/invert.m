@@ -1,36 +1,29 @@
 function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
-% --- Zeffiro documentation header ---
-% inverse.DipoleScanInverter.invert — Runs one inverse reconstruction step for a single measurement frame.
+%invert  Dipole-scan GoF map for one frame (cached or legacy per-source path).
 %
-% Purpose:
-%   Runs one inverse reconstruction step for a single measurement frame.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   f
-%   L
-%   procFile
-%   source_direction_mode
-%   source_positions
-%   opts
+%   Called from utilities.inverse.run_frame_loop. Inverse tools → Dipole
+%   Scan uses zef_dipoleScan, not this method.
 %
-% Outputs:
-%   z_vec
-%   self
+%   If precompute stored SVD pages, i_invert_cached applies them to the
+%   whitened frame. Otherwise this file whitens f and L with noise_cov
+%   (sqrtm) and scans procFile.s_ind_4 (fixed) then free sources. Free
+%   orientation goodness-of-fit is scaled by the unit dipole direction
+%   over sqrt(3).
 %
-% Calls (project):
-%   inverse.invert
-%   zef_waitbar
+%   Inputs
+%     f, L - frame and processed lead field (columns a multiple of 3).
+%     procFile.s_ind_0, .s_ind_4 - source index maps.
+%     source_direction_mode, source_positions - unused here.
+%     opts.use_gpu / normalize_data - gather at end; normalize unused.
 %
-% Side effects:
-%   - GPU
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z_vec, self]] = inverse.DipoleScanInverter.invert(self, f, L, procFile, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Outputs
+%     z_vec - n_dof×1 scan statistic (GoF) for this frame.
+%     self  - unchanged caches.
 
     arguments
 

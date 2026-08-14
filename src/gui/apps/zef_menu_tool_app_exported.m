@@ -1,40 +1,14 @@
-%ZEF_MENU_TOOL_APP_EXPORTED ZEFFIRO Interface main menu tool (exported App Designer).
-%
-%   This class implements the primary menu bar for the ZEFFIRO Interface
-%   application. It provides access to project management, import/export,
-%   editing, forward and inverse tools, multi-tools (segmentation, mesh,
-%   visualization, figure, parcellation), settings, window management, and
-%   help. The UI is built with MATLAB App Designer and exported to this
-%   standalone class for version control and deployment.
-%
-%   The app follows a singleton pattern: only one instance runs at a time;
-%   reopening focuses the existing window.
-%
-%   Source: Exported from zef_menu_tool_app.mlapp (MATLAB App Designer).
-%
-%   See also matlab.apps.AppBase, zef_menu_tool_app.
-
 classdef zef_menu_tool_app_exported < matlab.apps.AppBase
-% --- Zeffiro documentation header ---
-% zef_menu_tool_app_exported — Zef menu tool app exported.
+%ZEF_MENU_TOOL_APP_EXPORTED  App Designer export: main menu UIFigure and uimenu handles.
 %
-% Purpose:
-%   Zef menu tool app exported.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
-%
-% Side effects:
-%   - creates/updates figures
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_menu_tool_app_exported(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
-    properties (Access = public)
+%   Generated from the matching .mlapp; layout only—wire callbacks in src/gui/tools.
+%   Tool scripts copy h_* properties into zef and attach MenuSelectedFcn/ButtonPushedFcn.
+properties (Access = public)
         h_zeffiro_menu                  matlab.ui.Figure
         h_menu_project                  matlab.ui.container.Menu
         h_menu_new                      matlab.ui.container.Menu

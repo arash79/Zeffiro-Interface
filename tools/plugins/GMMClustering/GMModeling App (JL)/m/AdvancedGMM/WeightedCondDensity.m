@@ -1,29 +1,4 @@
 function   [log_lh,mahalaD]=WeightedCondDensity(positions, mu, weight, Sigma, p, sharedCov, CovType)
-% --- Zeffiro documentation header ---
-% WeightedCondDensity — Weighted Cond Density.
-%
-% Purpose:
-%   Weighted Cond Density.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Inputs:
-%   positions
-%   mu
-%   weight
-%   Sigma
-%   p
-%   sharedCov
-%   CovType
-%
-% Outputs:
-%   log_lh
-%   mahalaD
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[log_lh, mahalaD]] = WeightedCondDensity(positions, mu, weight, Sigma, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 %WDENSITY Weighted conditional density and mahalanobis distance.
 %   LOG_LH = WDENSITY(...) returns log of component conditional density
 %   (weighted by the component probability) of X. LOG_LH is a N-by-K matrix

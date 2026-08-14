@@ -1,27 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_EXCLUDE_LOAD_FIELDS
-%
-%Returns list of field names that should be excluded from automatic loading
-%during project load. This prevents loading of very large or problematic
-%fields that could cause memory issues or crashes.
-
 function exclude_fields = zef_exclude_load_fields
-% --- Zeffiro documentation header ---
-% exclude_fields — Exclude fields.
+%ZEF_EXCLUDE_LOAD_FIELDS  Cellstr of zef fields not to restore from a .mat.
 %
-% Purpose:
-%   Exclude fields.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Calls (project):
-%   zef_exclude_load_fields
+%   Currently only 'dti_tensor' (can be gigabytes). No first-party caller:
+%   zef_load does not invoke this list. Keep in sync if load-time skipping
+%   is wired later.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `exclude_fields` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   exclude_fields = zef_exclude_load_fields()
 
 exclude_fields = {
     'dti_tensor'  % DTI tensors can be very large (GB), load only when needed

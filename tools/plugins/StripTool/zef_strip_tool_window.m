@@ -1,39 +1,22 @@
 function zef = zef_strip_tool_window(zef)
-% --- Zeffiro documentation header ---
-% zef_strip_tool_window — Zef strip tool window.
+%ZEF_STRIP_TOOL_WINDOW  GUIDE figure: ZEFFIRO Interface: Strip tool.
 %
-% Purpose:
-%   Zef strip tool window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_strip_tool_window(zef)
 %
-% Outputs:
-%   zef
+%   Layout only. Title 'ZEFFIRO Interface: Strip tool'. Stores
+%   zef.strip_tool.h_window and edit handles. Buttons:
+%   Add → zef_strip_tool_add; Embed → zef_strip_tool_embed (questdlg);
+%   Add contacts → zef_strip_tool_add_contacts; Delete →
+%   zef_strip_tool_delete; Plot → zef_strip_tool_plot. Edits and the
+%   strip list call zef_strip_tool_update / init. Opened from
+%   zef_strip_tool_open (via zef_strip_tool_start).
 %
-% Zef fields (observed):
-%   zef.strip_tool (read)
-%
-% Calls (project):
-%   zef_strip_tool_add
-%   zef_strip_tool_add_contacts
-%   zef_strip_tool_delete
-%   zef_strip_tool_embed
-%   zef_strip_tool_init
-%   zef_strip_tool_plot
-%   zef_strip_tool_update
-%   zef_strip_tool_window
-%
-% Side effects:
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_strip_tool_window(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_strip_tool_open, zef_strip_tool_start.
 
 h1 = figure(...
 'PaperUnits',get(0,'defaultfigurePaperUnits'),...
@@ -374,7 +357,13 @@ h18 = uicontrol(...
 
 zef.strip_tool.h_strip_length = h18;
 
-zef.strip_tool.h_strip_list = uicontrol('Style','ListBox','Parent',zef.strip_tool.h_window,'visible','on','Units','normalized','Position',[0.05 0.10 0.9 0.25],'Tag','strip_list','Callback','zef.strip_tool.current_strip = gcbo().Value; zef = zef_strip_tool_init(zef); zef = zef_strip_tool_update(zef);');
+zef.strip_tool.h_strip_list = zef_colored_list('create', zef.strip_tool.h_window, ...
+    [0.05 0.10 0.9 0.25], 'strip_list', ...
+    'Callback', ['zef.strip_tool.current_strip = zef_colored_list(''value'', zef.strip_tool.h_strip_list);', ...
+    ' if isempty(zef.strip_tool.current_strip); zef.strip_tool.current_strip = 1;', ...
+    ' else; zef.strip_tool.current_strip = zef.strip_tool.current_strip(1); end;', ...
+    ' zef = zef_strip_tool_init(zef); zef = zef_strip_tool_update(zef);'], ...
+    'Multiselect', false);
 %zef.strip_tool.h_strip_compartment_list = uicontrol('Style','ListBox','Parent',zef.strip_tool.h_window,'visible','on','Units','normalized','Position',[0.55 0.15 0.4 0.4],'Tag','strip_list');
 
 %*******************************************

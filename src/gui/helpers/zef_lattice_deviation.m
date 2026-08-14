@@ -1,27 +1,35 @@
 function [dev] = zef_lattice_deviation(X,varargin)
-% --- Zeffiro documentation header ---
-% zef_lattice_deviation — Zef lattice deviation.
+%ZEF_LATTICE_DEVIATION  Local 2-D Taylor deviation of a lattice field.
 %
-% Purpose:
-%   Zef lattice deviation.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   X
-%   varargin
+%   Finite-difference gradient and Hessian of the 2-D array X, then the
+%   absolute second-order Taylor increment along ±e1, ±e2, and
+%   ±(e1+e2)/sqrt(2) at step r (default 0.5). 'avg' (default) means the
+%   mean of those six values; 'max' the maximum. Optional i_idx and j_idx
+%   restrict the output to a subset of rows/columns (still indexing into
+%   the full difference arrays).
 %
-% Outputs:
-%   dev
+%   Only first-party caller is the tES plugin
+%   zef_ES_optimizer_properties_show, which scores optimizer-table fields
+%   at (sr, sc) with both 'avg' and 'max'.
 %
-% Calls (project):
-%   zef_lattice_deviation
+%   dev = zef_lattice_deviation(X)
+%   dev = zef_lattice_deviation(X, dev_type, r, i_idx, j_idx)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[dev] = zef_lattice_deviation(X, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   Inputs
+%     X         - 2-D real array.
+%     dev_type  - 'avg' or 'max' (default 'avg').
+%     r         - step length (default 0.5).
+%     i_idx, j_idx - row/column indices (default 1:size(X,1/2)).
+%
+%   Output
+%     dev - numel(i_idx)-by-numel(j_idx) deviation map.
+%
+%   See also zef_ES_optimizer_properties_show.
 dev_type = 'avg';
 r = 0.5;
 i_idx = [1 : size(X,1)];
@@ -75,6 +83,7 @@ for i = 1 : length(i_idx)
     for j = 1 : length(j_idx)
 
         g = [dFdx(i_idx(i),j_idx(j));dFdy(i_idx(i),j_idx(j))];
+        % Both Hessian rows are [d2F/dx2, d2F/dxdy]; dFdy2 and dFdydx are unused.
         H = [dFdx2(i_idx(i),j_idx(j)) dFdxdy(i_idx(i),j_idx(j)); dFdx2(i_idx(i),j_idx(j)) dFdxdy(i_idx(i),j_idx(j))];
         v_1 = [1 ; 0];
         v_2 = [0 ; 1];

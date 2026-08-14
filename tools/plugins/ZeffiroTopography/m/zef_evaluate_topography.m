@@ -1,47 +1,18 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z] = zef_evaluate_topography(zef)
-% --- Zeffiro documentation header ---
-% zef_evaluate_topography — Zef evaluate topography.
+%ZEF_EVALUATE_TOPOGRAPHY  Sensor map on the outer surface (top_reconstruction).
 %
-% Purpose:
-%   Zef evaluate topography.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Uses zef_getFilteredData / zef_getTimeStep with zef.top_* times/band.
+%   For each sensor, adds f(i)/(top_regularization_parameter + dist/min_dist)
+%   at reuna_p{end-1} vertices. L-inf normalizes. One vector or a cell of
+%   frames. Needs zef.sensors and surface meshes.
 %
-% Outputs:
-%   z
+%   z = zef_evaluate_topography(zef)
 %
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.sensors (read)
-%   zef.top_high_cut_frequency (read)
-%   zef.top_low_cut_frequency (read)
-%   zef.top_number_of_frames (read)
-%   zef.top_regularization_parameter (read)
-%   zef.top_sampling_frequency (read)
-%   zef.top_time_3 (read)
-%   zef.use_gpu (read)
-%
-% Calls (project):
-%   zef_evaluate_topography
-%   zef_getFilteredData
-%   zef_getTimeStep
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[z] = zef_evaluate_topography(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 h = zef_waitbar(0,1,['Topography.']);
 sampling_freq = eval('zef.top_sampling_frequency');
@@ -49,6 +20,8 @@ high_pass = eval('zef.top_low_cut_frequency');
 low_pass = eval('zef.top_high_cut_frequency');
 number_of_frames = eval('zef.top_number_of_frames');
 time_step = eval('zef.top_time_3');
+% Outer active surface: last reuna_* entry is usually the bounding box;
+% end-1 is the scalp (or equivalent outer tissue) that topography paints.
 triangles = eval('zef.reuna_t{end-1}');
 triangle_points = eval('zef.reuna_p{end-1}');
 sensor_points = eval('zef.sensors(:,1:3)');
@@ -78,6 +51,9 @@ for f_ind = 1 : number_of_frames
     end
 
     z_aux = zeros(size(triangle_points,1),1);
+    % Inverse-distance: each sensor adds f_i / (λ + d/d_min) at every vertex.
+    % λ = top_regularization_parameter (default 5). Distances are scaled so
+    % the nearest vertex to that sensor has d/d_min = 1.
     for sensor_ind = 1 : size(sensor_points,1)
         dist_vec = sqrt(sum((triangle_points-sensor_points(sensor_ind*ones(size(triangle_points,1),1),:)).^2,2));
         dist_vec = dist_vec/min(dist_vec);
@@ -93,6 +69,7 @@ for f_ind = 1 : number_of_frames
 end
 
 if number_of_frames > 1;
+    % L∞ normalize across all frames so a movie uses one colour scale.
     aux_norm_vec = 0;
     for f_ind = 1 : number_of_frames;
         aux_norm_vec = max(abs(z{f_ind}),aux_norm_vec);

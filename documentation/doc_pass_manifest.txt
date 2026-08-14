@@ -609,7 +609,7 @@ src/gui/callbacks/zef_delete_original_surface_meshes.m
 src/gui/callbacks/zef_delete_sensor_sets.m
 src/gui/callbacks/zef_delete_sensors.m
 src/gui/callbacks/zef_delete_transform.m
-src/gui/callbacks/zef_delete_waitbar.m
+src/core/zef_delete_waitbar.m
 src/gui/callbacks/zef_find_active_compartment_ind.m
 src/gui/callbacks/zef_find_adjacent_tetra.m
 src/gui/callbacks/zef_find_compartment.m

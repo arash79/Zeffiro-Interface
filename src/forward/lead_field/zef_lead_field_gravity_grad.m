@@ -1,44 +1,37 @@
-%Copyright © 2018, Sampsa Pursiainen
 function [L_eit,  bg_data, source_locations, source_directions] = lead_field_gravity_grad(nodes,elements,rho,sensors,varargin)
-% --- Zeffiro documentation header ---
-% lead_field_gravity_grad — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%LEAD_FIELD_GRAVITY_GRAD  Gravity-gradient lead field from density rho (types 1–2).
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018, Sampsa Pursiainen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
 %
-% Inputs:
-%   nodes
-%   elements
-%   rho
-%   sensors
-%   varargin
+%   Called as zef_lead_field_gravity_grad from the asteroid INI scripts
+%   zef_gravity_gradient_lead_field_scalar / _vector and from
+%   zef_lead_field_matrix_gravity when gravity_field_type is 1 or 2.
+%   The first function name in this file is the historical
+%   lead_field_gravity_grad. Reads zef.source_model, zef.sensors, and
+%   zef.gravity_field_type from the base workspace (the sensors argument
+%   is overwritten). Density rho: 1-col isotropic (replicated onto the
+%   first three tensor slots) or 6-col, optional {tetra, prism} cell.
+%   Nodes are used as given (no mm→m conversion).
 %
-% Outputs:
-%   L_eit
-%   bg_data
-%   source_locations
-%   source_directions
+%   Type 1 (scalar): L is n_stations × n_sources. Kernel
+%     V * (dir · (c − s)) / ||c−s||^4
+%   on tet barycentres c, station xyz s, unit dir = sensors(:,4:6).
+%   Type 2 (vector): L is 3*n_stations × n_sources with two terms
+%     −V (dir·r) r / ||r||^5  and  −V (dir − (dir·r) dir) / ||r||^3.
+%   Both multiply L and bg_data by G = 6.67408e-11. Background bg_data
+%   sums the same kernels weighted by rho on every tet. Source grouping
+%   uses zef_make_gravity_dec. source_directions is ones(size(locations)).
 %
-% Zef fields (observed):
-%   zef.gravity_field_type (read)
-%   zef.sensors (read)
-%   zef.source_model (read)
+%   [L_eit, bg_data, source_locations, source_directions] = ...
+%       zef_lead_field_gravity_grad(nodes, elements, rho, sensors, varargin)
 %
-% Calls (project):
-%   core.types.ZefSourceModel.from
-%   zef_make_gravity_dec
-%   zef_tetra_volume
-%   zef_waitbar
+%   varargin: gravity_ind, source_ind, then optional lf_param struct
+%   (pcg_tol, maxit, precond, direction_mode, source_mode, cholinc_tol,
+%   permutation) — parsed like EEG FEM; PCG fields are unused here.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[L_eit, bg_data, source_locations]] = lead_field_gravity_grad(nodes, elements, rho, sensors, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_gravity_gradient_lead_field_scalar, zef_lead_field_gravity.
 
 N = size(nodes,1);
 source_model = evalin('base','zef.source_model');
@@ -152,6 +145,7 @@ c_tet = 0.25*(nodes(tetrahedra(:,1),:) + nodes(tetrahedra(:,2),:) + nodes(tetrah
 
 h = zef_waitbar(0,1,'Lead field.');
 
+% Vector gradient: 3 rows per station, two geometric terms (type 2).
 if evalin('base','zef.gravity_field_type') == 2
 
     L_eit = zeros(3*L, K3);
@@ -197,6 +191,7 @@ if evalin('base','zef.gravity_field_type') == 2
         end
     end
 
+% Scalar gradient: one row per station, 1/r^4 kernel (type 1).
 elseif evalin('base','zef.gravity_field_type') == 1
 
     L_eit = zeros(L, K3);

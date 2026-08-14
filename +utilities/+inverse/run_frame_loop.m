@@ -1,41 +1,3 @@
-% --- Zeffiro documentation header ---
-% utilities.inverse.function [z_inverse, MethodClassObj] = run_frame_loop( ... — Function [z inverse, Method Class Obj] = run frame loop( .
-%
-% Purpose:
-%   Function [z inverse, Method Class Obj] = run frame loop( ....
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
-%
-% Inputs:
-%   zef
-%   MethodClassObj
-%   L
-%   procFile
-%   source_direction_mode
-%   source_positions
-%   waitbar_handle
-%   waitbar_title
-%
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.inv_data_mode (read)
-%   zef.inverse_initialization_measurements (read)
-%   zef.normalize_data (read)
-%   zef.use_gpu (read)
-%
-% Calls (project):
-%   utilities.inverse.run_frame_loop
-%   zef_getFilteredDataClassObj
-%   zef_getTimeStepClassObj
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `utilities.inverse.function [z_inverse, MethodClassObj] = run_frame_loop( ...(zef, MethodClassObj, L, procFile, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 function [z_inverse, MethodClassObj] = run_frame_loop( ...
     zef, ...
     MethodClassObj, ...
@@ -45,7 +7,30 @@ function [z_inverse, MethodClassObj] = run_frame_loop( ...
     source_positions, ...
     waitbar_handle, ...
     waitbar_title ...
-)
+    )
+%RUN_FRAME_LOOP  Time-step loop for class-based inverse methods.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   [z_inverse, MethodClassObj] = run_frame_loop(zef, MethodClassObj, L, ...
+%       procFile, source_direction_mode, source_positions, waitbar_handle, ...
+%       waitbar_title)
+%
+%   Called from utilities.cluster.dispatch_inverse / run_inverse_job after
+%   the inverter object exists. Pulls filtered measurements via
+%   zef_getFilteredDataClassObj, optionally initialize/precompute on
+%   MethodClassObj, then inverts each frame with zef_getTimeStepClassObj.
+%   z_inverse is a cell array of per-frame source vectors. Honors
+%   zef.use_gpu, zef.gpu_count, zef.normalize_data, and
+%   zef.inverse_initialization_measurements when present.
+%
+%   Updates waitbar_handle with frame progress and ETA. Errors if no data or
+%   if number_of_frames exceeds available measurement columns.
+%
+%   See also inverse.CommonInverseParameters, zef_inverse_run.
 
 arguments
     zef (1,1) struct

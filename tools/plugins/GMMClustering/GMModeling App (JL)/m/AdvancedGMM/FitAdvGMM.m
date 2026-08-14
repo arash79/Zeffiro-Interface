@@ -1,25 +1,4 @@
 function obj = FitAdvGMM(positions, weight, k, varargin)
-% --- Zeffiro documentation header ---
-% FitAdvGMM — Fit Adv GMM.
-%
-% Purpose:
-%   Fit Adv GMM.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Inputs:
-%   positions
-%   weight
-%   k
-%   varargin
-%
-% Outputs:
-%   obj
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[obj] = FitAdvGMM(positions, weight, k, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 %FITGMDIST Fit a Gaussian mixture distribution to data.
 %   GM = FITGMDIST(X,K) fits a Gaussian mixture distribution with K
 %   components to the data in X.  X is an N-by-D matrix.  Rows of X

@@ -1,50 +1,21 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef_plot_parcellation_time_series(void)
-% --- Zeffiro documentation header ---
-% zef_plot_parcellation_time_series — Renders or updates a plot_parcellation_time_series figure from current `zef` state.
+%ZEF_PLOT_PARCELLATION_TIME_SERIES  Parcellation tool → **Plot**.
 %
-% Purpose:
-%   Renders or updates a plot_parcellation_time_series figure from current `zef` state.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   void
+%   Function. evalin base. feval
+%   time_series_tools_file_list{h_time_series_tools_list.Value} on
+%   zef.parcellation_time_series. plot_mode 1 bar, 2 imagesc matrix,
+%   3 curves, 4 boxplot. Draws on zef.h_axes1 (cla first). Colors from
+%   parcellation_colormap for selected parcels. Unused argument is
+%   historical.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.colormap_cell (read)
-%   zef.colortune_param (read)
-%   zef.frame_start (read)
-%   zef.frame_step (read)
-%   zef.frame_stop (read)
-%   zef.h_axes1 (read)
-%   zef.h_parcellation_plot_type (read)
-%   zef.h_time_series_tools_list (read)
-%   zef.h_zeffiro (read)
-%   zef.inv_colormap (read)
-%   zef.inv_time_1 (read)
-%   zef.inv_time_2 (read)
-%   zef.inv_time_3 (read)
-%   zef.parcellation_colormap (read)
-%   zef.parcellation_colortable (read)
-%   … (5 more)
-%
-% Calls (project):
-%   zef_plot_parcellation_time_series
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_plot_parcellation_time_series(void)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_parcellation, zef_update_parcellation.
 void = [];
 
 time_series = evalin('base','zef.parcellation_time_series');

@@ -1,46 +1,23 @@
 function nse_field = zef_nse_poisson_dynamic(nse_field,nodes,tetra,domain_labels,mvd_length)
-% --- Zeffiro documentation header ---
-% zef_nse_poisson_dynamic — Zef nse poisson dynamic.
+%ZEF_NSE_POISSON_DYNAMIC  Time-dependent Poisson hemodynamic solver.
 %
-% Purpose:
-%   Zef nse poisson dynamic.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nse_field
-%   nodes
-%   tetra
-%   domain_labels
-%   mvd_length
+%   Dynamic extension of zef_nse_poisson with time stepping over
+%   nse_field.time_length. Supports microcirculation and nse_type variants
+%   selected by zef_nse_run_solver solver_type 4–7.
 %
-% Outputs:
-%   nse_field
+%   nse_field = zef_nse_poisson_dynamic(nse_field, nodes, tetra, domain_labels, mvd_length)
 %
-% Calls (project):
-%   zef_KDMD
-%   zef_find_adjacent_tetra
-%   zef_get_submesh
-%   zef_nse_poisson_dynamic
-%   zef_nse_signal_pulse
-%   zef_surface_mesh
-%   zef_surface_scalar_matrix_FF
-%   zef_surface_scalar_matrix_FGn
-%   zef_surface_scalar_vector_F
-%   zef_volume_barycentric
-%   zef_volume_scalar_matrix_FF
-%   zef_volume_scalar_matrix_FG
-%   … (3 more)
+%   Input as zef_nse_poisson plus nse_field.time_length, time_step_length,
+%   n_frames, start_time, time_integration (widget 1/2/3 → 1/2/4
+%   quadrature steps), nse_type.
+%   Stores time-series in the same vessel cell arrays, indexed by frame.
 %
-% Side effects:
-%   - GPU
-%   - filesystem I/O
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[nse_field] = zef_nse_poisson_dynamic(nse_field, nodes, tetra, domain_labels, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_nse_poisson, zef_nse_iteration.
 
 h_waitbar = zef_waitbar(0,1,'NSE solver: pressure');
 
@@ -48,6 +25,8 @@ if not(isfield(nse_field,'nse_type'))
     nse_field.nse_type = 1;
 end
 
+nse_field.time_integration: 1 → 1 quadrature step, 2 → 2, 3 → 4
+% (the widget is not a 1:1 step count).
 if nse_field.time_integration == 1
     n_q_steps = 1;
 elseif nse_field.time_integration == 2
@@ -63,6 +42,8 @@ start_ind = find(time_vec>nse_field.start_time,1,'first');
 time_frame_ind = [start_ind:ceil((n_time-start_ind)/n_frames):n_time];
 nse_field.inv_time_1 = time_vec(time_frame_ind(1));
 nse_field.inv_time_3 = time_vec(time_frame_ind(2)) - time_vec(time_frame_ind(1));
+% Cardiac-like boundary pulse y(t), artery (and optional capillary) tet
+% indices, then SI conversions: mm→m, mmHg→Pa, µL-scale mvd_length×1e6.
 y = zef_nse_signal_pulse(time_vec,nse_field);
 source_radius = nse_field.sphere_radius;
 c_ind_1_domain = find(ismember(domain_labels,nse_field.artery_domain_ind));
@@ -83,6 +64,10 @@ arteriole_scale = 1./( arteriole_fraction*nse_field.arteriole_diameter.^2./(arte
 capillary_scale = 1./( arteriole_fraction*nse_field.capillary_diameter.^2./(capillary_fraction*nse_field.arteriole_diameter.^2) + capillary_fraction*nse_field.capillary_diameter.^2./(capillary_fraction*nse_field.capillary_diameter.^2) + venule_fraction.*nse_field.capillary_diameter.^2./(capillary_fraction.*nse_field.venule_diameter.^2));
 venule_scale = 1./( arteriole_fraction*nse_field.venule_diameter.^2./(venule_fraction*nse_field.arteriole_diameter.^2) + capillary_fraction*nse_field.venule_diameter.^2./(venule_fraction*nse_field.capillary_diameter.^2) + venule_fraction.*nse_field.venule_diameter.^2./(venule_fraction.*nse_field.venule_diameter.^2));
 
+% Artery submesh in metres. Interior nodes i_node_ind vs surface b_node_ind.
+% Spheres (sphere_x/y/z, sphere_radius) mark pressure-source nodes on the
+% vessel surface. Hydrostatic p from gravity·x; K_1 is the vector-Laplace
+% GG block used in both the Poisson solve and viscosity/velocity smoothing.
 [v_1_nodes, v_1_tetra, nse_field.bp_vessel_node_ind] = zef_get_submesh(nodes, tetra, c_ind_1_domain);
 v_1_nodes = mm_conversion*v_1_nodes;
 [~, det] = zef_volume_barycentric(v_1_nodes,v_1_tetra);
@@ -320,6 +305,10 @@ end
 
 KDMD = @(x) zef_KDMD(x,K_1,M_1,D_1,nse_field.use_gpu);
  
+% Time loop: at each t_i, n_q_steps inner stages (time_integration 1/2/3 →
+% 1/2/4 quadrature steps). nse_type==2 updates smoothed velocity with PCG
+% on S_u before the pressure/viscosity step. Snapshots at time_frame_ind
+% are stored into bp_vessels / bv_vessels_* cells (see end of loop).
 for i = 1 : n_time
 
     pressure_aux = (p + pressure_reference + p_hydrostatic)/hgmm_conversion;

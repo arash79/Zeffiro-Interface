@@ -1,23 +1,17 @@
-% --- Zeffiro documentation header ---
-% [zef — [zef.
+%ZEF_FILTER_SUBSTITUTE_RAW_DATA_WITH_MEASUREMENT_DATA  Copy zef.measurements (or segment) onto zef.raw_data.
 %
-% Purpose:
-%   [zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.filter_data_segment (read)
-%   zef.measurements (read, write)
-%   zef.raw_data (read, write)
-%   zef.yesno (read)
+%   Script. ButtonPushedFcn of h_filter_substitute_raw_data_with_measurement_data.
+%   Dialog: 'Substitute raw data with measurement data?'. On Yes, if
+%   filter_data_segment > 0 copies measurements{segment} (promotes a
+%   non-cell measurements to cell(0) first), else raw_data = measurements.
+%   Does not run the pipeline.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `[zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_filter_substitute_raw_data, zef_import_raw_data.
 
 [zef.yesno] = questdlg('Substitute raw data with measurement data?','Yes','No');
 if isequal(zef.yesno,'Yes');

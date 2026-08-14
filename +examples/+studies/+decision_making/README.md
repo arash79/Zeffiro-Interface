@@ -1,63 +1,36 @@
-# +examples/+studies/+decision_making
+# Focal-epilepsy decision-making study
 
-## Purpose of this folder
+Scripts expect a loaded `zef` with Data Bank nodes already populated (EEG/MEG lead fields under `zef.dataBank.tree.node_1_*`). They drive **legacy plugin GUIs** via `eval(zef.h_mne_start.Callback)` and similar — plugins for the active profile must be loaded.
 
-Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+## Paths (`zef_parameters_focal_epilepsy.m`)
 
-## Contents
+Edit before any run. The script sets:
 
-Subfolders:
-- `+helpers/`
+- `project_file_name = '~/Dropbox/ResearchData/PerEpi_material/Patients/p0803.mat'` then **overwrites** it to `[this_folder/data]/~/Dropbox/...` (concatenated). That default will not resolve. Point `project_file_name` at a real `.mat` **after** the `folder_name` assignment, or put files in `+decision_making/data/`.
+- `credibility_data_file_name` → `.../data/credibility_dataset_p0857_10dB`
+- `training_data_file_name` starts empty then becomes `.../data/` (trailing folder only)
 
-MATLAB sources:
-- `zef_create_training_data_focal_epilepsy.m` — **examples.studies.decision_making.examples.studies.decision_making**: Example or study script demonstrating examples.studies.decision_making.
-- `zef_decision_script_focal_epilepsy.m` — **examples.studies.decision_making.examples.studies.decision_making**: Example or study script demonstrating examples.studies.decision_making.
-- `zef_find_reconstructions_focal_epilepsy.m` — **examples.studies.decision_making.examples.studies.decision_making**: Example or study script demonstrating examples.studies.decision_making.
-- `zef_process_training_data_focal_epilepsy.m` — **examples.studies.decision_making.examples.studies.decision_making**: Example or study script demonstrating examples.studies.decision_making.
-- `zef_parameters_focal_epilepsy.m` — **examples.studies.decision_making.training_data_file_name = '';**: Example or study script demonstrating training_data_file_name = '';.
+Also sets `snr_vec = 10`, `training_data_size = 50`, `frame_number = 1`, clustering tolerances, etc. These become workspace variables for the other scripts.
 
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-- **examples.studies.decision_making.examples.studies.decision_making**: GUI callback or dialog (`examples.studies.decision_making`).
-- **examples.studies.decision_making.examples.studies.decision_making**: GUI callback or dialog (`examples.studies.decision_making`).
-
-## Programmatic usage
-
-From the project root:
+## How to run (order)
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+addpath(fileparts(which('zeffiro_interface')));
+
+% 1. Parameters (workspace vars)
+run('+examples/+studies/+decision_making/zef_parameters_focal_epilepsy.m');
+
+% 2. Synthetic training set (opens project if zef missing; zef_start_dataBank)
+run('+examples/+studies/+decision_making/zef_create_training_data_focal_epilepsy.m');
+
+% 3. Process / find reconstructions as needed
+run('+examples/+studies/+decision_making/zef_process_training_data_focal_epilepsy.m');
+run('+examples/+studies/+decision_making/zef_find_reconstructions_focal_epilepsy.m');
+
+% 4. Cluster + show (uses zef_dataBank_get_reconstructions)
+run('+examples/+studies/+decision_making/zef_decision_script_focal_epilepsy.m');
 ```
 
-Representative entry points in this folder:
-- `Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.`
-- `Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.`
-- `Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.`
-- `Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.`
-- `Call `examples.studies.decision_making.training_data_file_name = '';` from MATLAB with the project root on the path.`
+`zef_decision_script_focal_epilepsy` is a script: parameters → `zef_dataBank_get_reconstructions(zef, frame_number)` → helpers `zef_cluster_reconstructions_focal_epilepsy`, `zef_final_reconstruction_focal_epilepsy`, `zef_show_results_focal_epilepsy`.
 
-## Examples
-
-Run scripts directly after startup, e.g. `run('+examples/+studies/+decision_making/zef_create_training_data_focal_epilepsy.m')`.
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Helpers live in `+helpers/` (`zef_rec_maximizer` is the only function; the rest are scripts that read workspace `zef` / `z_inverse_*`).

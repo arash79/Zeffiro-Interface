@@ -1,24 +1,20 @@
-% --- Zeffiro documentation header ---
-% zef — Zef.
+%ZEF_REMOVE_SYSTEM_FIELDS  Strip machine/session fields from zef_data before save.
 %
-% Purpose:
-%   Zef.
-%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.fields_to_be_removed (read)
-%   zef.ini_cell (read, write)
-%   zef.program_path (read)
-%   zef.system_fields (read, write)
+%   Script used by project save. Reads profile/zeffiro_interface.ini column 3
+%   as system field names, unions a hard-coded list (gpu_count, start_mode,
+%   path_cell, …), and rmfield's those keys from zef_data. save_file and
+%   save_file_path are kept. Temporary zef.fields_to_be_removed is removed.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Workspace
+%     zef       - session; program_path required.
+%     zef_data  - struct that will be written to the .mat project.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_save.
 zef.fields_to_be_removed = {'gpu_count','compartment_activity','start_mode','colormap_cell','path_cell','use_display','current_version','matfile_object','zeffiro_restart','verbose_mode','use_waitbar','zeffiro_task_id'};
 
 zef.ini_cell = readcell([zef.program_path '/profile/zeffiro_interface.ini'],'FileType','text');

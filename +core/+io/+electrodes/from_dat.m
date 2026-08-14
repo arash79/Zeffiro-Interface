@@ -1,26 +1,44 @@
 function [ electrode_data, electrode_labels ] = from_dat(file, kwargs)
-% --- Zeffiro documentation header ---
-% core.io.electrodes.from_dat — Parses electrode file format and returns positions, optional CEM columns, and labels.
+%FROM_DAT  Read electrode positions from a whitespace-separated .dat file.
 %
-% Purpose:
-%   Parses electrode file format and returns positions, optional CEM columns, and labels.
-%   Folder: Parses electrode positions (and optional CEM columns) from `.csv` and `.dat` files; returns numeric data and label strings.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   file
-%   kwargs
+%   Parser used by Import → Import electrodes when the chosen file has
+%   extension .dat. Bundled examples such as ProneFreeSurfer/ascii/electrodes.dat
+%   and data/electrodes use this layout. Same numeric contract as
+%   core.io.electrodes.from_csv: N-by-3 point electrodes or N-by-6 CEM.
 %
-% Outputs:
-%   electrode_data
-%   electrode_labels
+%   Each non-empty line must have 3, 4, 6, or 7 whitespace-separated fields:
+%     x y z
+%     x y z label
+%     x y z inner_radius outer_radius impedance
+%     x y z label inner_radius outer_radius impedance
+%   There is no header row. Empty lines are skipped. Coordinates and
+%   radii are not converted (typically millimetres). Impedance is ohms.
 %
-% Calls (project):
-%   core.io.electrodes.from_dat
+%   Mixed files: if any row has CEM columns, the output is N-by-6 and
+%   point-only rows keep zeros in columns 4–6. If every CEM column is
+%   zero after parsing, those three columns are dropped so the result
+%   is N-by-3. Unlike from_csv, a 6-column line cannot carry a label
+%   (use 7 columns for label + CEM). Impedance must be strictly positive
+%   on CEM rows (from_csv allows 0).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[electrode_data, electrode_labels]] = core.io.electrodes.from_dat(file, kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   [data, labels] = core.io.electrodes.from_dat(file)
+%   [data, labels] = core.io.electrodes.from_dat(file, "MISSING_LABEL", "S")
+%
+%   Inputs
+%     file           - existing file path (mustBeFile).
+%     MISSING_LABEL  - prefix for default labels S1, S2, … Default "S".
+%
+%   Outputs
+%     electrode_data    - N-by-3 or N-by-6 double.
+%     electrode_labels  - N-by-1 string. Column 4 of a 4- or 7-column
+%                         line, otherwise MISSING_LABEL + row index.
+%
+%   See also core.io.electrodes.from_csv, core.gui.menu_tool.import_electrodes_callback.
 
     arguments
 

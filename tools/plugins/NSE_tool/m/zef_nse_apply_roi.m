@@ -1,23 +1,18 @@
-% --- Zeffiro documentation header ---
-% if isempty(findobj(allchild(zef — If isempty(findobj(allchild(zef.
+%ZEF_NSE_APPLY_ROI  Apply ROI button: DataTips on h_axes1 → nse_field.roi_x/y/z and the ROI fields.
 %
-% Purpose:
-%   If isempty(findobj(allchild(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%   zef.h_datatip (read, write)
-%   zef.nse_field (read)
+%   ButtonPushedFcn of h_apply_roi. Script (base-workspace zef). Copies
+%   DataTip X/Y/Z into roi_* and the matching edit boxes. No-op if there
+%   are no DataTips.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   See also zef_nse_plot_roi, zef_nse_roi_ind.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if isempty(findobj(allchild(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
+% DataTips on h_axes1; loop uses h_datatip (not zef.h_datatip) as implemented.
 if isempty(findobj(allchild(zef.h_axes1),'Type','DataTip'))~=1
     zef.h_datatip = findobj(allchild(zef.h_axes1),'Type','DataTip');
     zef.nse_field.roi_x = [];

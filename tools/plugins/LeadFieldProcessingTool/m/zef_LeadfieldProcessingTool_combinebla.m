@@ -1,20 +1,15 @@
-% --- Zeffiro documentation header ---
-% zef.LeadFieldProcessingTool — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%ZEF_LEADFIELDPROCESSINGTOOL_COMBINEBLA  Combine variant that checks BankTable column 5.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.LeadFieldProcessingTool (read)
+%   Script. Same noise-weighted vertcat as zef_LeadfieldProcessingTool_combine
+%   but the selection flag is column 5 (id), not column 6 (checkbox).
+%   Not wired in LeadFieldProcessingTool_start (CombineButton uses combine).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.LeadFieldProcessingTool` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_LeadfieldProcessingTool_combine.
 
 zef.LeadFieldProcessingTool.combineNew=true;
 zef.LeadFieldProcessingTool.combinePoints=zef.LeadFieldProcessingTool.app.NoisestartSpinner.Value:zef.LeadFieldProcessingTool.app.NoiseendSpinner.Value;

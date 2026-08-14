@@ -1,36 +1,25 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 
 function [x,conv_val,n_iter] = pcg_iteration_gpu(A,b,tol_val,max_it,M,x,gpu_extended_memory)
-% --- Zeffiro documentation header ---
-% pcg_iteration_gpu — Pcg iteration gpu.
+%PCG_ITERATION_GPU  GPU-array preconditioned conjugate gradient.
 %
-% Purpose:
-%   Pcg iteration gpu.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Inputs:
-%   A
-%   b
-%   tol_val
-%   max_it
-%   M
-%   x
-%   gpu_extended_memory
+%   GPU variant of pcg_iteration. Promotes A, b, x to gpuArray unless A is a
+%   function_handle. Diagonal preconditioner uses element-wise M.*r. Optional
+%   gpu_extended_memory controls gather(x) when in [0 2].
 %
-% Outputs:
-%   x
-%   conv_val
-%   n_iter
+%   [x, conv_val, n_iter] = pcg_iteration_gpu(A, b, tol_val, max_it, M, x, gpu_extended_memory)
 %
-% Side effects:
-%   - GPU
+%   Input as pcg_iteration plus gpu_extended_memory (default 3). When that
+%   value is in [0 2], x is gathered to the host after the loop. Diagonal
+%   preconditioner is element-wise M.*r, not M\r.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[x, conv_val, n_iter]] = pcg_iteration_gpu(A, b, tol_val, max_it, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also pcg_iteration.
+
+
 
 
 if nargin < 5

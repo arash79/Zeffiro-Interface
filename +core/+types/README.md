@@ -1,50 +1,32 @@
-# +core/+types
+# `+core/+types` — `ZefSourceModel`
 
-## Purpose of this folder
+Canonical enumeration for how a current dipole is discretized inside each tetrahedron when `zef_lead_field_matrix` assembles `zef.L`. The Mesh tool / Forward & inverse options dropdown stores an integer 1–6 on `zef.source_model`; this class is the typed form of that integer.
 
-Canonical enumeration for forward/inverse source discretizations (Whitney, H(div), St. Venant and continuous variants). Used across `src/forward` and GUI option dialogs.
+There are no other types in this folder. `core.ZefSourceModel` at `+core/` (not here) is the original enumeration name stored in older `.mat` files. It must remain an enumeration so MATLAB can load those projects; `from()` then maps members onto this class.
 
-## Contents
+## Members and legacy codes
 
-MATLAB sources:
-- `ZefSourceModel.m` — **core.types.ZefSourceModel**: Zef Source Model.
+`from()` maps integers (and the strings `"1"`–`"6"`) to members. Invalid input returns `Error`.
 
-## How this folder fits into the overall workflow
+| Code | Member | `to_string` |
+|------|--------|-------------|
+| 1 | `Whitney` | Whitney |
+| 2 | `Hdiv` | H(div) |
+| 3 | `StVenant` | St.Venant |
+| 4 | `ContinuousWhitney` | Continuous Whitney |
+| 5 | `ContinuousHdiv` | Continuous H(div) |
+| 6 | `ContinuousStVenant` | Continuous St.Venant |
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Whitney / H(div) / St.Venant are the three FEM source models implemented under `src/forward/lead_field`. The **Continuous** variants use the same element type with a continuous (nodal) interpolation of the moment. `Error` is a sentinel, not a solver.
 
-## GUI usage
+`variants()` lists every member including `Error`. `loadobj` maps a saved value through `from()`; if that yields `Error` it becomes **`Hdiv`** (not `Error`), so a corrupt `.mat` still loads a valid source model.
 
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+`from()` also accepts member names (`"Hdiv"`), display names (`"H(div)"`), cells, structs with `ValueNames`, and the shim class `core.ZefSourceModel`.
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+m = core.types.ZefSourceModel.from(zef.source_model);  % enum, 1–6, or "1"–"6"
+zef.source_model = core.types.ZefSourceModel.Whitney;
+core.types.ZefSourceModel.to_string(m);   % e.g. "H(div)"
 ```
 
-Representative entry points in this folder:
-- ``core.types.ZefSourceModel(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Consumed by `src/forward/lead_field` and the Forward & inverse options dropdown. Parent: [`../README.md`](../README.md).

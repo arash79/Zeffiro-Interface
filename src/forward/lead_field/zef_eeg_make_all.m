@@ -1,24 +1,19 @@
-% --- Zeffiro documentation header ---
-% warning('off'); — Warning('off');.
+%ZEF_EEG_MAKE_ALL  One-shot script: Create FEM mesh, EEG type 1 lead field, interpolate.
 %
-% Purpose:
-%   Warning('off');.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_source_interpolation_on (read)
-%   zef.lead_field_type (read, write)
-%   zef.n_sources_mod (read, write)
-%   zef.source_ind (read, write)
-%   zef.source_interpolation_on (read, write)
+%   Script (base-workspace zef). Not a Mesh-tool button — the make_all
+%   callback in zef_mesh_tool is commented out. Default INI Script cells call
+%   zef_eeg_lead_field_isotropic instead, which assumes the mesh already exists.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Steps: lead_field_type=1; force source_interpolation_on and the Mesh-tool
+%   checkbox; zef_create_finite_element_mesh; zef_postprocess_finite_element_mesh;
+%   clear source_ind; zef_eeg_lead_field; zef_source_interpolation.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `warning('off');` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_create_finite_element_mesh, zef_eeg_lead_field, zef_run_forward_simulation.
 
 warning('off');
 zef.lead_field_type = 1;

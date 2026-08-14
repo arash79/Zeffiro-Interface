@@ -1,29 +1,18 @@
 function [interp_ind, L_projected] = zef_project_L_in_roi(s_roi,s_o,L,n_interp,procFile)
-% --- Zeffiro documentation header ---
-% zef_project_L_in_roi — Zef project L in roi.
+%ZEF_PROJECT_L_IN_ROI  Restrict L columns in an ROI to orientation s_o (cortical normal).
 %
-% Purpose:
-%   Zef project L in roi.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   s_roi
-%   s_o
-%   L
-%   n_interp
-%   procFile
+%   [interp_ind, L_projected] = zef_project_L_in_roi(s_roi, s_o, L, n_interp, procFile)
 %
-% Outputs:
-%   interp_ind
-%   L_projected
+%   Called from zef_find_source_patch in normal-orientation mode after
+%   zef_processLeadfields. Maps ROI indices through procFile.s_ind_0.
+%   Does not write zef.
 %
-% Calls (project):
-%   zef_project_L_in_roi
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[interp_ind, L_projected]] = zef_project_L_in_roi(s_roi, s_o, L, n_interp, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_find_source_patch.
 
 L_1 = L(:,1:n_interp);
 L_2 = L(:,n_interp+1:2*n_interp);

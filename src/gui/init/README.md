@@ -1,77 +1,39 @@
-# src/gui/init
+# Table and dialog init (`src/gui/init`)
 
-## Purpose of this folder
+**Scripts** (mostly) that write defaults onto `zef` and/or UITable column metadata when a tool or options window opens. They do not open figures (`src/gui/open` does that). `zef_init` in `src/core` is the session-wide dump; this folder is per-widget.
 
-Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+Scripts mutate caller `zef`. Converting one to a function requires updating every `zef_open_*` and `zef_update` call site.
 
-## Contents
+## Segmentation tool
 
-MATLAB sources:
-- `zef_init_init_profile.m` — **for zef_i = 1 : size(zef**: For zef i = 1 : size(zef.
-- `zef_init_parameter_profile.m` — **for zef_i = 1 : size(zef**: For zef i = 1 : size(zef.
-- `zef_init_sensors_parameter_profile.m` — **for zef_j = 1 : size(zef**: For zef j = 1 : size(zef.
-- `zef_init_butterfly_plot.m` — **if not(isfield(zef,'bf_sampling_frequency'))**: If not(isfield(zef,'bf sampling frequency')).
-- `zef_init_gaussian_prior_options.m` — **if not(isfield(zef,'inv_hyperprior_tail_length_db'));**: If not(isfield(zef,'inv hyperprior tail length db'));.
-- `zef_init_parcellation.m` — **if not(isfield(zef,'parcellation_name'));**: If not(isfield(zef,'parcellation name'));.
-- `zef_init_forward_and_inverse_options.m` — **if not(isfield(zef,'smoothing_steps_ele'));**: If not(isfield(zef,'smoothing steps ele'));.
-- `zef_init_graphics_options.m` — **if not(isfield(zef,'streamline_draw'))**: If not(isfield(zef,'streamline draw')).
-- `zef_init_options.m` — **if not(isfield(zef,'streamline_draw'))**: If not(isfield(zef,'streamline draw')).
-- `zef_init_find_synthetic_eit_data.m` — **set(zef.h_inv_roi_sphere_1 ,'string',num2str(zef**: Set(zef.h inv roi sphere 1 ,'string',num2str(zef.
-- `zef_init_sensor_parameters.m` — **zef**: Zef.
-- `zef_init_sensors.m` — **zef**: Zef.
-- `zef_init_sensors_table.m` — **zef**: Zef.
-- `zef_init_transform.m` — **zef**: Zef.
-- `zef_init_transform_parameters.m` — **zef**: Zef.
-- `zef_init_compartments.m` — **zef.h_compartment_table**: Zef.h compartment table.
-- `zef_init_fields_compartment_table.m` — **zef.h_compartment_table.ColumnName(1:zef**: Zef.h compartment table.Column Name(1:zef.
-- `zef_init_profile_table_selection.m` — **zef_init_profile_table_selection**: Initializes GUI widgets and default `zef` fields for profile_table_selection.
-- `zef_init_sensors_name_table.m` — **zef_init_sensors_name_table**: Initializes GUI widgets and default `zef` fields for sensors_name_table.
-- `zef_init_fields_compartment_table_profile.m` — **zef_n = 0;**: Zef n = 0;.
+Called from `zef_update` / `zef_build_compartment_table` / sensor builders.
 
-## How this folder fits into the overall workflow
+| File | Kind | Required workspace | What it fills |
+|------|------|--------------------|---------------|
+| `zef_init_fields_compartment_table` | script | `zef_i` (row), `zef_j` (tag index), `zef.aux_field_1` | Columns **Index, On, Name, Visible, Surface nodes, Surface triangles, Merge, Invert normal, Activity**. Activity is `compartment_activity{*_sources+2}`: Bounding box, Inactive, Constrained field, Unconstrained field, Active surface (`*_sources` = that index minus 2) |
+| `zef_init_fields_compartment_table_profile` | script | same | Extra columns from enabled Segmentation `parameter_profile` rows |
+| `zef_init_compartments` | script | `zef` | Empty table, then compartments from `zeffiro_segmentation.ini` unless `new_empty_project` |
+| `zef_init_sensors` | script | `zef` | Reset tags; create default set `'s'` |
+| `zef_init_sensors_table` | script | `current_tag` | Filename is historical: writes **Index, Name** on `h_transform_table`, not the sensors table |
+| `zef_init_sensors_name_table` | **function** | — | **Index, Name, Visible** on `h_sensors_name_table` |
+| `zef_init_sensors_parameter_profile` | script | `current_sensors` | Pad per-sensor profile arrays to point count (`evalin` base) |
+| `zef_init_sensor_parameters` | script | `current_sensor_name` | Parameters table: X/Y/Z (and directions / gradients by imaging method) plus Sensors profile rows. Sets `current_parameters='sensor'` |
+| `zef_init_transform` | script | `current_tag` | Transform table **Index, Name** |
+| `zef_init_transform_parameters` | script | `current_transform` | Scaling, X/Y/Z-shift, Xy/Yz/Zx-rotation, Affine transform. Sets `current_parameters='transform'` |
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+## Option dialogs (before `zef_open_*` copies handles)
 
-## GUI usage
+isfield-guarded defaults only — they do not copy widgets.
 
-- **zef_init_profile_table_selection**: GUI callback or dialog (`zef_init_profile_table_selection`).
-- **zef_init_sensors_name_table**: GUI callback or dialog (`zef_init_sensors_name_table`).
-
-## Programmatic usage
-
-From the project root:
-
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
-```
-
-Representative entry points in this folder:
-- `Call `for zef_i = 1 : size(zef` from MATLAB with the project root on the path.`
-- `Call `for zef_i = 1 : size(zef` from MATLAB with the project root on the path.`
-- `Call `for zef_j = 1 : size(zef` from MATLAB with the project root on the path.`
-- `Call `if not(isfield(zef,'bf_sampling_frequency'))` from MATLAB with the project root on the path.`
-- `Call `if not(isfield(zef,'inv_hyperprior_tail_length_db'));` from MATLAB with the project root on the path.`
-- `Call `if not(isfield(zef,'parcellation_name'));` from MATLAB with the project root on the path.`
-- `Call `if not(isfield(zef,'smoothing_steps_ele'));` from MATLAB with the project root on the path.`
-- `Call `if not(isfield(zef,'streamline_draw'))` from MATLAB with the project root on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+| File | Settings menu item |
+|------|-------------------|
+| `zef_init_forward_and_inverse_options` | **Forward and inverse processing options** |
+| `zef_init_graphics_options` | **Graphics processing options** (the `cone_lattice_resolution` guard writes `cone_field_lattice_resolution`) |
+| `zef_init_gaussian_prior_options` | **Hierarchical prior options** |
+| `zef_init_options` | shared / historical catch-all. If `reconstruction_type` is missing it writes **1**; a normal session already has **7** from `zef_init`. |
+| `zef_init_parameter_profile` | creates missing `zef.<tag>_<param>` from the profile (does not open the editor) |
+| `zef_init_init_profile` | applies `init_profile` rows (`string` / `number` / `evaluate`) |
+| `zef_init_profile_table_selection` | **function**; Pre-settings table click → `init_profile_selected` |
+| `zef_init_parcellation` | Parcellation defaults + scan `time_series_tools` for `Description:` |
+| `zef_init_butterfly_plot` | Butterfly `bf_*` from inverse defaults, then widget String |
+| `zef_init_find_synthetic_eit_data` | ROI widget strings from `inv_roi_sphere` |

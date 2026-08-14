@@ -1,38 +1,18 @@
-% --- Zeffiro documentation header ---
-% examples.studies.decision_making.examples.studies.decision_making — Example or study script demonstrating examples.studies.decision_making.
+%ZEF_FIND_RECONSTRUCTIONS_FOCAL_EPILEPSY  Inverse GUIs on databank measurements.
 %
-% Purpose:
-%   Example or study script demonstrating examples.studies.decision_making.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.EXP (read)
-%   zef.L (read, write)
-%   zef.beamformer (read)
-%   zef.dataBank (read)
-%   zef.dipole_app (read)
-%   zef.h_ias_n_map_iterations (read)
-%   zef.h_ias_snr (read)
-%   zef.h_ias_start (read)
-%   zef.h_ias_type (read)
-%   zef.h_mne_prior (read)
-%   zef.h_mne_start (read)
-%   zef.h_mne_type (read)
-%   zef.h_ramus_hyperprior (read)
-%   zef.h_ramus_multires_n_decompositions (read)
-%   zef.h_ramus_snr (read)
-%   … (9 more)
+%   Script. zef_parameters_focal_epilepsy then zef_start_dataBank. Needs
+%   workspace zef and tree nodes node_1_1 / node_2_1 / node_3_1 (L, …)
+%   plus node_1_2 / node_2_2 / node_3_2 .data.measurements (not synthetic).
+%   Same plugin Start callbacks as zef_create_training_data_focal_epilepsy
+%   into node_*_2_1 … node_*_2_11. Uses snr_vec(1). Does not save a file.
 %
-% Calls (project):
-%   zef_exp_app_start
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_create_training_data_focal_epilepsy,
+%   zef_decision_script_focal_epilepsy.
 
 examples.studies.decision_making.zef_parameters_focal_epilepsy;
 
@@ -53,7 +33,8 @@ zef.inv_snr = snr_vec(1);
 zef_minimum_norm_estimation;
 zef.h_mne_prior.Value = 2;
 zef.h_mne_type.Value = 1;
-eval(zef.h_mne_start.Callback);
+eval(zef.h_mne_start.Callback)
+;
 zef.dataBank.tree.node_1_2_1.data.reconstruction = zef.reconstruction;
 zef.dataBank.tree.node_1_2_1.data.reconstruction_information = zef.reconstruction_information;
 

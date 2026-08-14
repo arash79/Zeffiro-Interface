@@ -1,39 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'inv_synth_source')); — If not(isfield(zef,'inv synth source'));.
+%ZEF_INIT_FSS_PATCH  Default 16-column inv_synth_source onto the patch widgets.
 %
-% Purpose:
-%   If not(isfield(zef,'inv synth source'));.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_inv_synth_source_1 (read)
-%   zef.h_inv_synth_source_10 (read)
-%   zef.h_inv_synth_source_2 (read)
-%   zef.h_inv_synth_source_3 (read)
-%   zef.h_inv_synth_source_4 (read)
-%   zef.h_inv_synth_source_5 (read)
-%   zef.h_inv_synth_source_6 (read)
-%   zef.h_inv_synth_source_7 (read)
-%   zef.h_inv_synth_source_8 (read)
-%   zef.h_inv_synth_source_9 (read)
-%   zef.h_inv_synth_source_VEP_config (read)
-%   zef.h_inv_synth_source_fix_amp (read)
-%   zef.h_inv_synth_source_norm_ori (read)
-%   zef.h_inv_synth_source_plot_cones (read)
-%   zef.h_inv_synth_source_radius (read)
-%   … (2 more)
+%   Script. Called from zef_find_synthetic_source_patch_window.
+%   Extra columns vs legacy: use_volume, radius, norm_ori, plot_cones,
+%   fix_amp, VEP_config. Default row length 16. Does not write
+%   measurements.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'inv_synth_source'));` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_fss_patch.
 
 if not(isfield(zef,'inv_synth_source'));
     zef.inv_synth_source = [0 0 0 1 0 0 10 0 3 1 1 1 0 0 0 0];

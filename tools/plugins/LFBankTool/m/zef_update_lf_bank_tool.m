@@ -1,32 +1,15 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if isfield(zef,'h_lf_bank_tool') — If isfield(zef,'h lf bank tool').
+%ZEF_UPDATE_LF_BANK_TOOL  Rebuild the lead-field item list from lf_bank_storage.
 %
-% Purpose:
-%   If isfield(zef,'h lf bank tool').
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_lf_bank_scaling_factor (read)
-%   zef.h_lf_bank_tool (read)
-%   zef.h_lf_item_list (read)
-%   zef.h_lf_tag (read)
-%   zef.lf_bank_scaling_factor (read, write)
-%   zef.lf_bank_storage (read)
-%   zef.lf_item_list (read, write)
-%   zef.lf_item_selected (read)
-%   zef.lf_tag (read, write)
+%   Script. Each row is Tag / n_sensors / n_sources / Method.
+%   Also reads lf_tag and lf_bank_scaling_factor from the widgets.
+%   Called after add/delete/compute/update measurements.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if isfield(zef,'h_lf_bank_tool')` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_lf_bank_tool.
 
 if isfield(zef,'h_lf_bank_tool')
     if isvalid(zef.h_lf_bank_tool)

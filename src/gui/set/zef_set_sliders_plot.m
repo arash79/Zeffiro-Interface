@@ -1,57 +1,20 @@
 function zef_set_sliders_plot(mode)
-% --- Zeffiro documentation header ---
-% zef_set_sliders_plot — Zef set sliders plot.
+%ZEF_SET_SLIDERS_PLOT  Re-apply Figure-tool sliders after a redraw of h_axes1.
 %
-% Purpose:
-%   Zef set sliders plot.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   mode
+%   Function. Called from zef_plot_volume / zef_plot_meshes after patches
+%   are created (new objects would otherwise ignore slider state).
+%   Mode 1: colormap, ColorScale, ambience/diffusion/specular,
+%   contrast/brightness if nonzero, each transparency_* if nonzero,
+%   zoom if ≠ cam_va, colorscale min/max if nonzero, then zef_set_lights.
+%   Mode 2: reconstruction transparency only, and only if
+%   brain_transparency<1 or use_parcellation. All calls evalin base.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.brain_transparency (read)
-%   zef.cam_va (read)
-%   zef.colorscale_max_slider (read)
-%   zef.colorscale_min_slider (read)
-%   zef.h_axes1 (read)
-%   zef.h_update_colormap (read)
-%   zef.h_zeffiro (read)
-%   zef.update_brightness (read)
-%   zef.update_contrast (read)
-%   zef.update_lights (read)
-%   zef.update_transparency_additional (read)
-%   zef.update_transparency_cones (read)
-%   zef.update_transparency_reconstruction (read)
-%   zef.update_transparency_sensor (read)
-%   zef.update_transparency_surface (read)
-%   … (2 more)
-%
-% Calls (project):
-%   zef_colormap
-%   zef_set_lights
-%   zef_set_sliders_plot
-%   zef_update_colorscale_max
-%   zef_update_colorscale_min
-%   zef_update_transparency_additional
-%   zef_update_transparency_cones
-%   zef_update_transparency_reconstruction
-%   zef_update_transparency_sensor
-%   zef_update_transparency_surface
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_set_sliders_plot(mode)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_set_sliders_print, zef_plot_volume.
 if mode == 1
 
     evalin('base','zef.h_axes1.Colormap = zef_colormap(zef.h_update_colormap.Value);');

@@ -1,25 +1,24 @@
 function [struct_out] = zef_dataBank_text2struct(text)
-% --- Zeffiro documentation header ---
-% zef_dataBank_text2struct — Zef data Bank text2struct.
+%ZEF_DATABANK_TEXT2STRUCT  Build a struct with empty fields named by a cellstr.
 %
-% Purpose:
-%   Zef data Bank text2struct.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   text
+%   Tiny helper: for each cell, struct_out.(text{i}) = []. No zef fields.
+%   Not called from zef_open_dataBank or other first-party files in this
+%   repository (kept for local/plugin use).
 %
-% Outputs:
-%   struct_out
+%   struct_out = zef_dataBank_text2struct(text)
 %
-% Calls (project):
-%   zef_dataBank_text2struct
+%   Inputs
+%     text  - cellstr of valid MATLAB field names.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[struct_out] = zef_dataBank_text2struct(text)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output
+%     struct_out  - struct with those fields, each [].
+%
+%   See also zef_dataBank_sortTree.
 
 struct_out=[];
 for i=1:length(text)

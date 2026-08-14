@@ -1,20 +1,15 @@
-% --- Zeffiro documentation header ---
-% zef.reconstructionTool.bankReconstruction = zef.reconstructionTool.bankReconstruction(~cell2mat( zef.reconstructionTool — Zef.reconstruction Tool.bank Reconstruction = zef.reconstruction Tool.bank Reconstruction(~cell2mat( zef.reconstruction Tool.
+%ZEF_RECONSTRUCTIONTOOL_DELETE  Drop bank rows whose column-7 checkbox is true.
 %
-% Purpose:
-%   Zef.reconstruction Tool.bank Reconstruction = zef.reconstruction Tool.bank Reconstruction(~cell2mat( zef.reconstruction Tool.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.reconstructionTool (read)
+%   Script. deleteButton. Keeps bankReconstruction and bankInfo rows
+%   where column 7 is false; sets bankSize and BankTable.Data. Does not
+%   change live zef.reconstruction.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.reconstructionTool.bankReconstruction = zef.reconstructionTool.bankReconstruction(~cell2mat( zef.reconstructionTool` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_reconstructionTool_addCurrent2bank.
 
 zef.reconstructionTool.bankReconstruction = zef.reconstructionTool.bankReconstruction(~cell2mat( zef.reconstructionTool.bankInfo(:,7)), :);
 zef.reconstructionTool.bankInfo=zef.reconstructionTool.bankInfo(~cell2mat( zef.reconstructionTool.bankInfo(:,7)),:);

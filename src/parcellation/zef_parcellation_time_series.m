@@ -1,53 +1,27 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [time_series] = zef_parcellation_time_series(zef)
-% --- Zeffiro documentation header ---
-% zef_parcellation_time_series — Zef parcellation time series.
+%ZEF_PARCELLATION_TIME_SERIES  Extract parcellation time courses from reconstruction.
 %
-% Purpose:
-%   Zef parcellation time series.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Loops frames from zef.reconstruction (cell or single array), maps source
+%   amplitudes to surface triangles via zef.parcellation_interp_ind according
+%   to zef.reconstruction_type, applies optional zef_smooth_field, and
+%   aggregates per selected parcel using zef.parcellation_type (quantile or
+%   mean). Mode 1 returns a parcels-by-frames matrix; mode 2 returns cell
+%   arrays of triangle-level values.
 %
-% Outputs:
-%   time_series
+%   time_series = zef_parcellation_time_series(zef)
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.frame_start (read)
-%   zef.frame_step (read)
-%   zef.frame_stop (read)
-%   zef.nodes (read)
-%   zef.number_of_frames (read)
-%   zef.parcellation_interp_ind (read)
-%   zef.parcellation_quantile (read)
-%   zef.parcellation_selected (read)
-%   zef.parcellation_time_series_mode (read, write)
-%   zef.parcellation_type (read)
-%   zef.reconstruction (read)
-%   zef.reconstruction_type (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   … (3 more)
+%   Input
+%     zef - session with reconstruction, parcellation_selected, frame range.
 %
-% Calls (project):
-%   zef_parcellation_time_series
-%   zef_smooth_field
-%   zef_waitbar
+%   Output
+%     time_series - numeric matrix or cell array per parcellation_time_series_mode.
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[time_series] = zef_parcellation_time_series(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_parcellation_interpolation, zef_smooth_field.
 
 if nargin == 0
     zef = evalin('base','zef');
@@ -189,6 +163,7 @@ for k = 1 : length(compartment_tags)
                 reconstruction = reconstruction(:);
                 reconstruction = reshape(reconstruction,3,length(reconstruction)/3);
 
+                % Same Component mapping as zef_plot_meshes (surface /3).
                 if ismember(eval('zef.reconstruction_type'),[1 7])
                     reconstruction = sqrt(sum(reconstruction.^2))';
                 elseif eval('zef.reconstruction_type') == 6
@@ -241,6 +216,11 @@ for k = 1 : length(compartment_tags)
                 p_counter = 0;
                 for p_ind = selected_list
                     p_counter = p_counter + 1;
+                    % p_i_ind{parcel}{2}{compartment} = surface-triangle
+                    % indices for this ROI. Mode 1 stores one scalar per
+                    % frame; mode 2 stores the raw triangle samples (boxplot).
+                    % parcellation_type: 1 max (quantile 1), 2 quantile,
+                    % 3 quantile of sqrt, 4 of cube root, 5 mean.
                     if not(isempty(reconstruction(p_i_ind{p_ind}{2}{ab_ind})))
                         if zef.parcellation_time_series_mode == 1
                         if eval('zef.parcellation_type') == 1
@@ -282,6 +262,8 @@ for f_ind = frame_start + frame_step : frame_step : frame_stop
         reconstruction = reconstruction(:);
         reconstruction = reshape(reconstruction,3,length(reconstruction)/3);
 
+        % Remaining frames: same Component / parcel aggregation as the
+        % first-frame block above.
         if ismember(eval('zef.reconstruction_type'),[1 7])
             reconstruction = sqrt(sum(reconstruction.^2))';
         elseif eval('zef.reconstruction_type') == 6

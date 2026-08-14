@@ -1,73 +1,85 @@
-# src/forward/nse
+# Hemodynamic NSE solvers (`src/forward/nse`)
 
-## Purpose of this folder
+This folder solves simplified Navier–Stokes / Poisson problems for blood pressure and flow on vessel-like submeshes of a Zeffiro FEM head. It is **not** an EEG lead-field assembler: it does not write `zef.L`. Results live on `zef.nse_field` (pressure, velocity, viscosity, capillary flow) and can later couple into conductivity via `zef_nse_sigma`.
 
-Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+The GUI is **Multi tools → NSE tool** (`zef_nse_tool_start` in the default profile). **Solve system** in that window runs the script `zef_nse_run_solver`, which dispatches on `zef.nse_field.solver_type`.
 
-## Contents
+## Why it exists
 
-MATLAB sources:
-- `zef_nse_run_solver.m` — **if zef.nse_field**: If zef.nse field.
-- `zef_KDMD.m` — **zef_KDMD**: Zef KDMD.
-- `zef_QinvMQ.m` — **zef_QinvMQ**: Zef Qinv MQ.
-- `zef_averaging_matrix.m` — **zef_averaging_matrix**: Zef averaging matrix.
-- `zef_get_submesh.m` — **zef_get_submesh**: Zef get submesh.
-- `zef_nse_iteration.m` — **zef_nse_iteration**: Zef nse iteration.
-- `zef_p_iteration.m` — **zef_nse_iteration**: Zef nse iteration.
-- `zef_nse_matrices.m` — **zef_nse_matrices**: Zef nse matrices.
-- `zef_nse_plot_pulse.m` — **zef_nse_plot_pulse**: Zef nse plot pulse.
-- `zef_nse_poisson.m` — **zef_nse_poisson**: Zef nse poisson.
-- `zef_nse_poisson_dynamic.m` — **zef_nse_poisson_dynamic**: Zef nse poisson dynamic.
-- `zef_nse_reconstruction.m` — **zef_nse_reconstruction**: Zef nse reconstruction.
-- `zef_nse_sigma.m` — **zef_nse_sigma**: Zef nse sigma.
-- `zef_nse_signal_pulse.m` — **zef_nse_signal_pulse**: Zef nse signal pulse.
-- `zef_nse_threshold_distribution.m` — **zef_nse_threshold_distribution**: Zef nse threshold distribution.
-- `zef_set_nse_source_space.m` — **zef_set_nse_source_space**: Zef set nse source space.
-- `zef_smooth_nse_field.m` — **zef_smooth_nse_field**: Zef smooth nse field.
+EEG/MEG usually treat conductivity as static. Neurovascular coupling and some EIT/hemodynamic studies need a pressure-driven flow field on arteries/capillaries that were labeled as compartments in the segmentation. This folder builds those submeshes, assembles barycentric FEM matrices from `src/mesh/barycentric`, and time-steps or solves a Poisson problem for pressure.
 
-## How this folder fits into the overall workflow
+## How a user runs it
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+1. Import a segmentation that includes vessel (or equivalent) compartments and build a FEM mesh.
+2. Open **Multi tools → NSE tool**.
+3. Set solver type, pulse amplitude, viscosity, which domain labels are arteries vs capillaries (`nse_field` fields; the tool window copies widgets into `zef.nse_field` via `zef_nse_tool_update`).
+4. Click the tool’s **Solve system** control (bound to `zef_nse_run_solver`).
+5. Inspect `zef.nse_field.bp_vessels`, `bv_vessels_*`, `bf_capillaries`. Optional: `zef_nse_sigma` to push flow-dependent conductivity back onto `zef.sigma`.
 
-## GUI usage
+Requires `zef.nodes`, `zef.tetra`, `zef.domain_labels`, and `zef.mvd_length` (microvessel density per tet; first column used, scaled ×1e6 in the Poisson solver).
 
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
+## Solver types (`zef_nse_run_solver`)
 
-## Programmatic usage
+| `solver_type` | Call |
+|---------------|------|
+| 1 | `zef_nse_poisson`, `microcirculation_model = 0` |
+| 2 | `zef_nse_poisson`, `microcirculation_model = 1` |
+| 3 | `zef_nse_haemodynamic_response_solver` (lives in `tools/plugins/NSE_tool`, not this folder), `nse_type = 2`, microcirculation on |
+| 4–7 | `zef_nse_poisson_dynamic` with combinations of `nse_type` 1/2 and microcirculation 0/1 |
 
-From the project root:
+Always calls `zef_nse_tool_update` first so widget values are on `nse_field`.
+
+## Scripting
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+zef = zef_nse_tool_update(zef);   % or set nse_field fields yourself
+zef.nse_field.solver_type = 1;
+zef.nse_field.microcirculation_model = 0;
+zef.nse_field = zef_nse_poisson(zef.nse_field, zef.nodes, zef.tetra, ...
+    zef.domain_labels, zef.mvd_length);
 ```
 
-Representative entry points in this folder:
-- `Call `if zef.nse_field` from MATLAB with the project root on the path.`
-- ``[x] = zef_KDMD(x, K, M, D, …)` with project root and `src` on the path.`
-- ``[x] = zef_QinvMQ(x, Q_1, Q_2, Q_3, …)` with project root and `src` on the path.`
-- ``[M] = zef_averaging_matrix(nodes, tetra, I)` with project root and `src` on the path.`
-- ``[[nodes, simplexes, J]] = zef_get_submesh(nodes, simplexes, I)` with project root and `src` on the path.`
-- ``[zef] = zef_nse_iteration(zef)` with project root and `src` on the path.`
-- ``[zef] = zef_nse_iteration(zef)` with project root and `src` on the path.`
-- ``[nse_mat] = zef_nse_matrices(nodes, tetra, rho, mu)` with project root and `src` on the path.`
+Coordinates: `zef_nse_poisson` converts `nodes` millimetres → metres (`×0.001`) internally. Pulse amplitude is millimetres of mercury on `nse_field`.
 
-## Examples
+## Main files
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+| File | Role |
+|------|------|
+| `zef_nse_run_solver.m` | Script: GUI dispatch |
+| `zef_nse_poisson.m` | Steady pressure on artery/capillary submeshes |
+| `zef_nse_poisson_dynamic.m` | Time-dependent Poisson |
+| `zef_nse_iteration.m` / `zef_p_iteration.m` | Iterative pressure/velocity updates |
+| `zef_nse_matrices.m` | Assemble barycentric FF/FG/GG operators |
+| `zef_nse_signal_pulse.m` | Cardiac-like boundary pulse |
+| `zef_nse_plot_pulse.m` | Plot that pulse |
+| `zef_nse_reconstruction.m` | Map NSE fields onto `zef.reconstruction` (see types below) |
+| `zef_nse_sigma.m` | Couple flow to conductivity |
+| `zef_set_nse_source_space.m` | Restrict sources to NSE domains |
+| `zef_get_submesh.m` | Extract a labeled tet subset |
+| `zef_QinvMQ.m`, `zef_KDMD.m`, `zef_averaging_matrix.m` | Linear-algebra helpers for the dynamic schemes |
+| `zef_smooth_nse_field.m`, `zef_nse_threshold_distribution.m` | Post-smooth / threshold |
 
-## Dependencies and assumptions
+Barycentric matrices: `src/mesh/barycentric/README.md`. Plugin window: `tools/plugins/NSE_tool/`.
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## Parse reconstruction (NSE tool)
 
-## Notes for developers
+The tool dropdown **reconstruction type** (`h_reconstruction_type.Items` in `zef_nse_tool_window.m`) is 1-based and is passed to `zef_nse_reconstruction`. **Parse reconstruction** also copies `nse_field.inv_time_*` onto `zef.inv_time_*` so the Figure tool’s time sliders match the NSE frames.
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+| Value | Label in the tool | Source fields |
+|-------|-------------------|---------------|
+| 1–5 | Pressure / velocity / viscosity (arteries); concentration / deoxygenized Hb (microcirculation) | one cell per time frame |
+| 6–8 | Mean / max / STD pressure (arteries) | collapsed to `reconstruction{1}` |
+| 9–11 | Mean / max / STD velocity | `bv_vessels_1/2/3` |
+| 12–14 | Mean / max / STD viscosity | `mu_vessels` |
+| 15–17 | Mean / max / STD concentration (microcirculation) | `bf_capillaries`, values clamped to `[0,1]` |
+
+Types 1–3, 6–14 are the artery list (`reconstruction_type_list{1}`); 4–5, 15–17 are microcirculation (`list{2}`). **Interpolate** (`zef_nse_interpolate`) uses that split to set source flags before `zef_source_interpolation`.
+
+Each vector is stored as an xyz triplet scaled by \(1/\sqrt{3}\) so the Figure tool’s magnitude colormap matches a scalar field. Frames are quantile-clipped with `nse_field.min/max_reconstruction_quantile`.
+
+Type 8 (STD pressure) assigns `aux_vec` with a comma expression that does **not** call `zef_nse_threshold_distribution` (as written). Type 17 divides the running mean by `size(bp_vessels,2)` rather than `bf_capillaries`. Both are documented from the implementation; they are not patched here.
+
+## See also
+
+- `src/forward/README.md` — NSE is a sibling of lead-field FEM, not a substitute
+- Profile `multicompartment_head_nse` if you need NSE-oriented defaults

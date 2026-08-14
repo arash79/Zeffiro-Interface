@@ -1,33 +1,18 @@
 function zef_load_GMM(struct)
-% --- Zeffiro documentation header ---
-% zef_load_GMM — Loads external data or a saved Zeffiro project into `zef`.
+%ZEF_LOAD_GMM  Copy a saved GMM struct onto zef.GMM (and optionally reconstruction).
 %
-% Purpose:
-%   Loads external data or a saved Zeffiro project into `zef`.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   struct
+%   zef_load_GMM(struct)
 %
-% Outputs:
-%   See function signature and code below.
+%   Fields: model, dipoles, amplitudes, time_variables, parameters,
+%   reconstruction (assignin zef.reconstruction). Completes parameter
+%   Tags if missing. Does not open the app.
 %
-% Zef fields (observed):
-%   zef.GMM (read, write)
-%   zef.reconstruction (read, write)
-%
-% Calls (project):
-%   zef_load_GMM
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_load_GMM(struct)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_GMM_export.
 
 if evalin('base','isfield(zef,''GMM'')')
     GMM = evalin('base','zef.GMM');
@@ -93,6 +78,7 @@ if isfield(struct,'parameters')
     end
 
 end
-assignin('base','zef_GMM',GMM);
+assignin('base','zef_GMM',GMM)
+;
 evalin('base','zef.GMM = zef_GMM; clear zef_GMM;')
 end

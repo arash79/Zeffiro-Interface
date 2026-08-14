@@ -1,19 +1,15 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef.filter_pipeline =  zef.filter_pipeline([setdiff([1:length(zef.filter_pipeline)],zef.filter_pipeline_selected) zef — Zef.filter pipeline =  zef.filter pipeline([setdiff([1:length(zef.filter pipeline)],zef.filter pipeline selected) zef.
+%ZEF_MOVE_DOWN_FILTER_ITEM  Move selected pipeline items to the end of the list.
 %
-% Purpose:
-%   Zef.filter pipeline =  zef.filter pipeline([setdiff([1:length(zef.filter pipeline)],zef.filter pipeline selected) zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.filter_pipeline =  zef.filter_pipeline([setdiff([1:length(zef.filter_pipeline)],zef.filter_pipeline_selected) zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   Script. ButtonPushedFcn of h_move_down_filter. Reorders
+%   filter_pipeline as [setdiff(1:N, selected), selected] then
+%   zef_update_filter_tool. Does not change processed_data.
+%
+%   See also zef_move_up_filter_item, zef_update_filter_tool.
 
 zef.filter_pipeline =  zef.filter_pipeline([setdiff([1:length(zef.filter_pipeline)],zef.filter_pipeline_selected) zef.filter_pipeline_selected]);
 

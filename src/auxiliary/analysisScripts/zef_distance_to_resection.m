@@ -1,28 +1,18 @@
 function [d] = zef_distance_to_resection(points, mesh_points, mesh_edges)
-% --- Zeffiro documentation header ---
-% zef_distance_to_resection — Zef distance to resection.
+%ZEF_DISTANCE_TO_RESECTION  0 inside a triangle mesh, else knnsearch (duplicate).
 %
-% Purpose:
-%   Zef distance to resection.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   points
-%   mesh_points
-%   mesh_edges
+%   d = zef_distance_to_resection(points, mesh_points, mesh_edges)
 %
-% Outputs:
-%   d
+%   Always three arguments (no two-arg knnsearch-only form). Same as
+%   src/auxiliary/zef_distance_to_resection three-arg path. Prefer that
+%   copy for new code.
 %
-% Calls (project):
-%   zef_distance_to_resection
-%   zef_tetra_in_compartment
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[d] = zef_distance_to_resection(points, mesh_points, mesh_edges)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_insideGMM.
 
 d=nan(size(points,1),1);
 inside_index=zef_tetra_in_compartment(mesh_points, mesh_edges, points);

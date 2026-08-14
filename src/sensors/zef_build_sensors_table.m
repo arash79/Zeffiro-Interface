@@ -1,22 +1,15 @@
-% --- Zeffiro documentation header ---
-% for zef_i = 1 : length(zef — For zef i = 1 : length(zef.
+%ZEF_BUILD_SENSORS_TABLE  Populate segmentation-tool sensor table rows from zef.
 %
-% Purpose:
-%   For zef i = 1 : length(zef.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field_1 (read)
-%   zef.h_sensors_table (read)
-%   zef.sensor_tags (read)
+%   Builds zef.aux_field_1 with index, name, imaging method, on/visible
+%   flags, and non-empty points/directions indicators for each
+%   zef.sensor_tags entry, then assigns zef.h_sensors_table.Data.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `for zef_i = 1 : length(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_create_sensors, zef_update.
 
 for zef_i = 1 : length(zef.sensor_tags)
     zef.aux_field_1{zef_i,1} = zef_i;

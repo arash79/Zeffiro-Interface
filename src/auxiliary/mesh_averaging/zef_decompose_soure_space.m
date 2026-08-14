@@ -1,28 +1,19 @@
 function [decomposition_ind, decomposition_count, dof_positions] = zef_decompose_soure_space(source_count, center_points)
-% --- Zeffiro documentation header ---
-% zef_decompose_soure_space — Zef decompose soure space.
+%ZEF_DECOMPOSE_SOURE_SPACE  Bin source positions onto a 3-D lattice (typo: soure).
 %
-% Purpose:
-%   Zef decompose soure space.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   source_count
-%   center_points
+%   [ind, count, dof_positions] = zef_decompose_soure_space(source_count, center_points)
 %
-% Outputs:
-%   decomposition_ind
-%   decomposition_count
-%   dof_positions
+%   Lattice spacing so that n_cells ≈ source_count inside the bounding box
+%   of center_points (N-by-3). ind(i) is the linear lattice index of
+%   source i; count is occupancy per unique index; dof_positions are
+%   meshgrid centres. Filename spelling is soure.
 %
-% Calls (project):
-%   zef_decompose_soure_space
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[decomposition_ind, decomposition_count, dof_positions]] = zef_decompose_soure_space(source_count, center_points)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_average_lead_field.
 
 min_x = min(center_points(:,1));
 max_x = max(center_points(:,1));

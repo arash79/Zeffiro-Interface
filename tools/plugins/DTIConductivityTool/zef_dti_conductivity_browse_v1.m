@@ -1,36 +1,17 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
+function zef_dti_conductivity_browse_v1
+%ZEF_DTI_CONDUCTIVITY_BROWSE_V1  uigetfile NIfTI → zef.freesurfer_v1_file.
 %
-%ZEF_DTI_CONDUCTIVITY_BROWSE_V1
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%Browse for FreeSurfer v1 file (principal eigenvector, optional).
-% --- Zeffiro documentation header ---
-% function zef_dti_conductivity_browse_v1 — Function zef dti conductivity browse v1.
-%
-% Purpose:
-%   Function zef dti conductivity browse v1.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Zef fields (observed):
-%   zef.freesurfer_fa_file (read)
-%   zef.freesurfer_v1_file (read, write)
-%   zef.h_freesurfer_v1_file (read)
-%   zef.save_file_path (read)
-%
-% Calls (project):
 %   zef_dti_conductivity_browse_v1
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Optional principal-eigenvector volume. Default folder: existing v1,
+%   else FA, else save_file_path, else pwd. Cancel is a no-op.
 %
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `function zef_dti_conductivity_browse_v1` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-function zef_dti_conductivity_browse_v1
-
+%   See also zef_dti_conductivity_browse_fa, zef_dti_conductivity_browse_register.
 
 zef = evalin('base','zef');
 

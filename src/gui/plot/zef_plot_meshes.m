@@ -1,63 +1,25 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [void] = zef_plot_meshes(~)
-% --- Zeffiro documentation header ---
-% zef_plot_meshes — Renders or updates a plot_meshes figure from current `zef` state.
+%ZEF_PLOT_MESHES  Draw compartment surfaces (and optional rec) on Figure-tool axes1.
 %
-% Purpose:
-%   Renders or updates a plot_meshes figure from current `zef` state.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   ~
+%   Function. evalin('base','zef'). Called from zef_visualize_surfaces.
+%   Uses zef.reuna_p / reuna_t (from zef_process_meshes). Patches:
+%   Tag='surface' (visible compartments), Tag='sensor', and when
+%   visualization_type is 3 (Distribution surface) or 4 (Parcellation)
+%   also Tag='reconstruction' on active surfaces. Type 5 is topography
+%   (zef.top_reconstruction). volumetric_distribution_mode 1 = reconstruction, 2 =
+%   zef.sigma(:,1) as xyz/√3, 3 = workspace y_ES left-multiplied by
+%   zef.L (ES currents → sensor-space field on the surfaces). This
+%   mode-3 path is not the imag(parameter) path used by zef_plot_volume.
+%   Then zef_set_sliders_plot. Unused argument is historical (callers pass []).
 %
-% Outputs:
-%   void
-%
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.active_compartment_ind (read)
-%   zef.attach_electrodes (read)
-%   zef.axes_visible (read)
-%   zef.azimuth (read)
-%   zef.brain_transparency (read)
-%   zef.cam_va (read)
-%   zef.colormap_cell (read)
-%   zef.colormap_size (read)
-%   zef.colortune_param (read)
-%   zef.compartment_tags (read)
-%   zef.contour_set (read)
-%   zef.cp2_a (read)
-%   zef.cp2_b (read)
-%   zef.cp2_c (read)
-%   … (64 more)
-%
-% Calls (project):
-%   zef_attach_sensors_volume
-%   zef_clipping_plane
-%   zef_fix_sensors_get_functions_array_size
-%   zef_minimal_mesh
-%   zef_plot_cone_field
-%   zef_plot_contour
-%   zef_plot_dpq
-%   zef_plot_meshes
-%   zef_sensor_get_function_eval
-%   zef_set_sliders_plot
-%   zef_smooth_field
-%   zef_store_cdata
-%   … (2 more)
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[void] = zef_plot_meshes(~)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_visualize_surfaces, zef_plot_volume.
 zef = evalin('base','zef');
 
 f_ind = 1;
@@ -74,6 +36,8 @@ cdata_info.frame_start = eval('zef.frame_start');
 cdata_info.frame_stop = eval('zef.frame_stop');
 cdata_info.frame_step = eval('zef.frame_step');
 
+% Mesh-vis volumetric_distribution_mode: 1 = reconstruction; 2 = σ as
+% xyz/√3 (not imag(parameter)); 3 = L * y_ES in the base workspace.
 if isequal(eval('zef.volumetric_distribution_mode'),1)
     volumetric_distribution = eval('zef.reconstruction');
 elseif isequal(eval('zef.volumetric_distribution_mode'),2)
@@ -726,6 +690,9 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                             reconstruction = reconstruction(:);
                             reconstruction = reshape(reconstruction,3,length(reconstruction)/3);
 
+                            % Surface CData: 1/7 amplitude; 6 mean xyz/√3.
+                            % Interpolation onto this compartment is /3
+                            % (triangle vertices), not /4 as in the volume plotter.
                             if ismember(eval('zef.reconstruction_type'),[1 7])
                                 reconstruction = sqrt(sum(reconstruction.^2))';
                             elseif eval('zef.reconstruction_type') == 6
@@ -747,6 +714,8 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                                 n_vec_aux = n_vec_aux./repmat(sqrt(sum(n_vec_aux.^2,2)),1,3);
                             end
 
+                            % Same Component mapping as zef_plot_volume:
+                            % 2 |· n|, 3 per-axis remainder, 4/5 signed-normal mask.
                             if ismember(eval('zef.reconstruction_type'), [2 3 4 5])
                                 reconstruction = sqrt((rec_x.*n_vec_aux(:,1)).^2 + (rec_y.*n_vec_aux(:,2)).^2 + (rec_z.*n_vec_aux(:,3)).^2);
                             end
@@ -788,6 +757,9 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                             if eval('zef.use_parcellation')
                                 reconstruction_aux = zeros(size(reconstruction));
                                 p_rec_aux =  ones(size(reuna_p{i},1),1).*eval('zef.layer_transparency');
+                                % Type 1 copies the original CData onto selected
+                                % parcel faces (zeros elsewhere). 2–5 collapse
+                                % each parcel to quantile/mean as in plot_volume.
                                 for p_ind = selected_list
                                     if eval('zef.parcellation_type') == 1
                                         reconstruction_aux(p_i_ind{p_ind}{2}{ab_ind}) = reconstruction(p_i_ind{p_ind}{2}{ab_ind});
@@ -1030,6 +1002,8 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                 %zef_waitbar(f_ind_aux,number_of_frames,h_waitbar,['Frame ' int2str(f_ind_aux) ' of ' int2str(number_of_frames) '.'])
 
                 if ismember(eval('zef.visualization_type'),[3])
+                    % Movie frames: same Component mapping as the static
+                    % surface branch above (amplitude / value / normal).
                     for i = intersect(aux_active_compartment_ind,aux_brain_visible_ind)
                         ab_ind = find(aux_active_compartment_ind == i);
                         reconstruction = (volumetric_distribution{f_ind});
@@ -1139,6 +1113,9 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                             end
                             r_alpha_aux= max(0,r_alpha_aux-min(r_alpha_aux));
                             r_alpha_aux = r_alpha_aux/max(r_alpha_aux);
+                            % Surface interpolation of reconstruction onto
+                            % triangle vertices: each face contributes /3
+                            % (volume plots use /4 on tet nodes).
                             f_alpha_aux(reuna_t{i}(:,1)) = f_alpha_aux(reuna_t{i}(:,1)) + r_alpha_aux/3;
                             f_alpha_aux(reuna_t{i}(:,2)) = f_alpha_aux(reuna_t{i}(:,2)) + r_alpha_aux/3;
                             f_alpha_aux(reuna_t{i}(:,3)) = f_alpha_aux(reuna_t{i}(:,3)) + r_alpha_aux/3;
@@ -1218,6 +1195,8 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                     warning('Contour plot not successful.')
                 end
                 zef_set_sliders_plot(2);
+                % Movie camera: Mesh-vis orbit_1 / orbit_2 (deg per second)
+                % scaled by frame_step / movie_fps.
                 camorbit(zef.h_axes1,frame_step*eval('zef.orbit_1')/movie_fps,frame_step*eval('zef.orbit_2')/movie_fps);
 
                 %delete(h_text);
@@ -1246,6 +1225,8 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
 
     else
 
+        % Type 1 (Domain labels) or no reconstruction movie: colour each
+        % visible compartment by its stored colour, no CData from zef.reconstruction.
         i = 0;
 
         for k = 1 : length(compartment_tags)

@@ -1,37 +1,3 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_fem( ... — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.parallel_processes (read)
-%   zef.processes_per_core (read)
-%   zef.source_model (read)
-%   zef.surface_sources (read)
-%   zef.use_gpu (read)
-%
-% Calls (project):
-%   core.types.ZefSourceModel.from
-%   zef_stiffness_matrix
-%   zef_tetra_volume
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - filesystem I/O
-%   - parallel/cluster
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_fem( ...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_fem( ...
     zef, ...
     nodes, ...
@@ -41,6 +7,31 @@ function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_fem( ...
     p_nearest_neighbour_inds, ...
     varargin ...
     )
+
+%LEAD_FIELD_MEG_FEM  FEM MEG magnetometer lead field (types 2, 7).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Called as zef_lead_field_meg_fem from zef_lead_field_matrix. Assembles the
+%   conductivity stiffness, interpolates dipoles with G (Whitney / H(div) /
+%   St. Venant), and forms B-field columns at magnetometer locations.
+%   Sensor rows: positions(:,1:3) metres, orientations(:,4:6). Isotropic
+%   sigma(:,1) or anisotropic sigma(:,3:8).
+%
+%   [L_meg, dipole_locations, dipole_directions] = zef_lead_field_meg_fem( ...
+%       zef, nodes, elements, sigma, sensors, p_nearest_neighbour_inds, ...
+%       brain_ind, source_ind, lf_param)
+%
+%   Output
+%     L_meg              - [n_sensors × n_source_columns]
+%     dipole_locations   - [n × 3] metres
+%     dipole_directions  - [n × 3] or empty depending on direction_mode
+%
+%   See also zef_lead_field_matrix, zef_lead_field_meg_grad_fem.
+
 
 
 N = size(nodes,1);
@@ -172,6 +163,10 @@ ind_m = [ 2 3 4 ;
 h=zef_waitbar(0,1,'MEG load vectors.');
 waitbar_ind = 0;
 
+% Biot–Savart-style MEG load B: for each tet node i and magnetometer j,
+% (σ ∇ψ_i) × (r_sensor − r_centroid) / |r|^3, dotted with the coil
+% orientation. tetra_c is the tet centroid. sensors rows 1:3 position
+% (metres), 4:6 unit orientation (normalized above).
 B = zeros(N,L);
 tetra_c = (1/4)*(nodes(tetrahedra(:,1),:)+nodes(tetrahedra(:,2),:)+nodes(tetrahedra(:,3),:)+nodes(tetrahedra(:,4),:))';
 
@@ -234,6 +229,8 @@ A = A_aux;
 clear A_aux;
 
 
+% Face-interior stencil (same construction as zef_fi_dipoles): G_fi maps
+% nodal potentials to FI dipole strengths; T_fi marks the two adjacent tets.
 %Form G_fi and T_fi
 %*******************************
 %*******************************
@@ -346,6 +343,9 @@ if not(isequal(lower(direction_mode),'cartesian') || isequal(lower(direction_mod
 end
 %%
 
+% Primary dipole field at the coils (cross(q, r_coil-r_src)/|r|^3 · n),
+% Whitney (fi) and optional H(div) edge (ew) bases. Secondary field from
+% PCG potentials is added into L_meg_fi/ew below (x'*G).
 L_meg_fi = zeros(L,M_fi);
 for j = 1 : L
     cross_mat = cross(fi_source_directions', repmat(sensors(1:3,j),1,M_fi) - fi_source_locations');
@@ -522,6 +522,9 @@ clear S r p x aux_vec inv_M_r a b;
 waitbar_ind = 0;
 
 zef_waitbar(waitbar_ind,waitbar_length,h,'Interpolation.');
+% Mean-zero coils (I − 11'/L) and μ0/4π scale. Cartesian/normal mode then
+% maps Whitney/H(div) columns onto the 3-column-per-source layout via T_fi
+% occupancy (surface_sources: sum(T_fi)>=0, else >=4).
 Aux_mat_2 = eye(L,L) - (1/L)*ones(L,L);
 L_meg_fi = Aux_mat_2*L_meg_fi/(4*pi);
 if source_model == core.types.ZefSourceModel.Hdiv

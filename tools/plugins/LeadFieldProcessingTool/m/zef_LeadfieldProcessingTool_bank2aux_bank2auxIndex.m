@@ -1,13 +1,15 @@
-% --- Zeffiro documentation header ---
-% zef.LeadFieldProcessingTool.auxData=zef.LeadFieldProcessingTool.bank{zef.LeadFieldProcessingTool — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%ZEF_LEADFIELDPROCESSINGTOOL_BANK2AUX_BANK2AUXINDEX  bank{bank2auxIndex} → auxData.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.LeadFieldProcessingTool.auxData=zef.LeadFieldProcessingTool.bank{zef.LeadFieldProcessingTool` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   Script. Copies one bank cell into zef.LeadFieldProcessingTool.auxData.
+%   Replace, Mag2Grad, Combine, and combinebla set bank2auxIndex first.
+%   Single assignment; no table refresh and no copy onto live zef.L.
+%
+%   See also zef_LeadfieldProcessingTool_aux2current,
+%   zef_LeadFieldProcessingTool_aux2bank_new.
 
 zef.LeadFieldProcessingTool.auxData=zef.LeadFieldProcessingTool.bank{zef.LeadFieldProcessingTool.bank2auxIndex};

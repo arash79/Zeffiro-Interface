@@ -1,43 +1,49 @@
-# +inverse/@KalmanInverter
+# inverse.KalmanInverter
 
-## Folder purpose
+Sequential filter for `L x_t ≈ y_t` with state `x_t = A x_{t-1} + w`, `w ~ N(0, Q)`. Registry ids: `kalman`, `kf`. Default `method_type` is `"Basic Kalman filter"`. GUI Kalman still calls `zef_KF` (`legacy_kalman`). `+examples/+inverse/zef_KalmanDemo.m` also still calls `zef_KF`.
 
-**Dynamical Kalman filtering** over time series: Basic KF, standardized sLORETA-style KF, approximate standardized update, and EnKF branch. Uses **`plugins.ClassKF`** (`class_kf_predict`, `kf_update`, `kf_sL_update`, …). Optional **RTS smoother** after frame loop.
+Not a handle class (unlike the other inverters). Predict/update kernels: `plugins.ClassKF`. Optional RTS smoother after the frame loop when `use_smoothing` is true (`dispatch_inverse` / `zef_process_inversion` call `smoother(z_inverse, L)`).
 
-## Main contents
+## Files
 
 | File | Role |
 |------|------|
-| `KalmanInverter.m` | `method_type`, structural Q, evolution priors, smoothing flags |
-| `initialize.m` | State/covariance from data |
-| `invert.m` | Predict/update per frame; carries `prev_step_reconstruction` across frames |
-| `smoother.m` | RTS backward pass when enabled |
+| `KalmanInverter.m` | Filter type, Q model, ensembles, smoothing flags, state |
+| `initialize.m` | Reset recursion; `noise_cov`; `theta0` from first `number_of_noise_steps` frames; build Q |
+| `invert.m` | One predict-update; EnKF is inline (not ClassKF) |
+| `smoother.m` | RTS / Sample RTS over stored `posterior_covs` |
 
-## Code functionality
+## `method_type`
 
-Unlike static inverters, state persists across frames in `invert.m`. Selects update kernel by `method_type` string.
+`"Basic Kalman filter"` \| `"Standardized Kalman filter"` \| `"Approximated Standardized Kalman filter"` \| `"Ensembled Kalman filter"`
 
-**Registry:** `kalman`, `kf` (class); `legacy_kalman` → `zef_KF` in `tools/plugins/Kalman`.
+Standardized types return `z = D x` with sLORETA-style `D` from `kf_sL_update` / `_approx`. EnKF uses `number_of_ensembles` (default 100).
 
-**GUI/demo gap:** `+examples/+inverse/zef_KalmanDemo.m` still calls legacy `zef_KF`, not this class.
+## Process noise Q (not DTI inside this class)
 
-## Workflow context
+`evolution_prior_model`:
 
-`+utilities/+cluster/+examples/kalman_workflow.m` demonstrates class path.
+| Value | What `initialize` stores |
+|-------|--------------------------|
+| `"Sensitivity scaling"` | Diagonal `evolution_var` from `diff(f_data)` / column norms of `L`, scaled by `evolution_prior_db` |
+| `"Avg. sensit. scaling"` | Same with spatially averaged sensitivity |
+| `"SVD-based"` | Dense `evolution_cov` from `svd(L)` |
+| `"Avg. SVD-based"` | Scaled identity |
+| `"Reworked original"` | Identity times `time_step * (σ_max(L)² / ‖L‖_F²) * 10^(db/20)` |
+| `"User supplied Q"` | Requires `evolution_cov` of size `n_state × n_state` |
 
-## Usage instructions
+DTI / tractography Q (`zef_dti_structural_Q`, `zef.kf_structural_Q_type`) is **legacy `zef_KF` only**. On this class, precompute Q yourself and pass `"User supplied Q"`.
+
+Other parameters: `state_transition_model_A` (default `I`), `initial_prior_steering_db`, `number_of_noise_steps` (4), `smoother_type` `"None"` \| `"RTS"` \| `"Sample RTS"`. The `smoother_type` setter currently only toggles `use_smoothing` and does not store `val` (see gaps).
+
+## Call
 
 ```matlab
-[zef, r] = zef_inverse_run(zef, 'kalman', 'execution', 'local');
+[zef, r] = zef_inverse_run(zef, "kalman", "execution", "local");
+[zef, r] = zef_inverse_run(zef, "kf", "MethodParams", struct( ...
+    "method_type", "Standardized Kalman filter", ...
+    "evolution_prior_model", "Sensitivity scaling", ...
+    "evolution_prior_db", -34));
 ```
 
-## Important notes
-
-- DTI structural Q optional via plugin helpers (`zef_dti_structural_Q`).
-- EnKF branch has separate code path from standard KF updates.
-- Smoothing replaces `z_inverse` cell when `use_smoothing` enabled.
-
-## Developer guidance
-
-- Changes to `plugins.ClassKF` must stay compatible with `invert.m` method_type strings.
-- When deprecating `zef_KF`, update Kalman demo and menu callbacks to `zef_inverse_run`.
+Cluster example: `+utilities/+cluster/+examples/kalman_workflow.m`.

@@ -1,26 +1,14 @@
 function result = run_cluster_job(bundle_path, result_path, profiler_on)
-% --- Zeffiro documentation header ---
-% run_cluster_job — Run cluster job.
+%RUN_CLUSTER_JOB  Deprecated wrapper around utilities.cluster.run_inverse_job.
 %
-% Purpose:
-%   Run cluster job.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   bundle_path
-%   result_path
-%   profiler_on
+%   Forwards bundle_path, result_path, EnableProfiler. Not the GUI
+%   StartButton.
 %
-% Outputs:
-%   result
-%
-% Calls (project):
-%   utilities.cluster.run_inverse_job
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[result] = run_cluster_job(bundle_path, result_path, profiler_on)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 if nargin < 3
     profiler_on = false;

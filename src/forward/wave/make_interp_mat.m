@@ -1,22 +1,14 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
-% --- Zeffiro documentation header ---
-% parameters; — Parameters;.
+%MAKE_INTERP_MAT  Lattice interpolation matrix between wave-mesh resolutions.
 %
-% Purpose:
-%   Parameters;.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Side effects:
-%   - filesystem I/O
+%   Script. parameters.m / torre_dir. Loads mesh_{system_setting_index}.mat,
+%   builds a Cartesian lattice at lattice_oversampling_rate * signal_highest_frequency,
+%   saves interp_mat_*.mat with Interp_mat and xyz lattice vectors.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `parameters;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also array_min, create_system.
 
 parameters;
 

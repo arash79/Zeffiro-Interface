@@ -1,24 +1,15 @@
-% --- Zeffiro documentation header ---
-% zef_segmentation_tool; — Zef segmentation tool;.
+%ZEF_RESET_WINDOWS  Recreate the five default tools (Window → Reset windows).
 %
-% Purpose:
-%   Zef segmentation tool;.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_zeffiro (read)
-%
-% Calls (project):
-%   zef_update
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef_segmentation_tool;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   Script. MenuSelectedFcn of **Window → Reset windows**. Re-runs
+%   zef_segmentation_tool, zef_reopen_menu_tool, deletes the Figure tool
+%   (clears DeleteFcn first so it does not auto-reopen), then zef_figure_tool,
+%   zef_mesh_tool, zef_mesh_visualization_tool, zef_update. Positions come
+%   from those constructors / zef_window_manager, not from a saved layout.
 
 zef_segmentation_tool;
 zef_reopen_menu_tool;

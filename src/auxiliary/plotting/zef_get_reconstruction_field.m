@@ -1,39 +1,20 @@
-function zef_get_reconstruction_field(reconstruction, s_i_ind, intersect_ind);
-% --- Zeffiro documentation header ---
-% zef_get_reconstruction_field — Zef get reconstruction field.
+function zef_get_reconstruction_field(reconstruction, s_i_ind, intersect_ind)
+%ZEF_GET_RECONSTRUCTION_FIELD  Unfinished snippet: scale a reconstruction vector.
 %
-% Purpose:
-%   Zef get reconstruction field.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   reconstruction
-%   s_i_ind
-%   intersect_ind
+%   zef_get_reconstruction_field(reconstruction, s_i_ind, intersect_ind)
 %
-% Outputs:
-%   See function signature and code below.
+%   Reshapes reconstruction to 3-by-N then branches on workspace type
+%   (1–7): amplitude, mean, or normal-projected components, using
+%   undeclared s_i_ind indexing plus I_1_rec / I_2_rec / n_vec_aux /
+%   zef.inv_scale / parcellation fields. intersect_ind is unused. Extra
+%   end statements follow the function. Not called from the plot path
+%   (src/gui/plot). Do not use; leftover from a plot-tool extract.
 %
-% Zef fields (observed):
-%   zef.inv_dynamic_range (read)
-%   zef.inv_scale (read)
-%   zef.parcellation_quantile (read)
-%   zef.parcellation_type (read)
-%   zef.use_parcellation (read)
-%
-% Calls (project):
-%   zef_get_reconstruction_field
-%   zef_smooth_field
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_get_reconstruction_field(reconstruction, s_i_ind, intersect_ind)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
 
 reconstruction = reconstruction(:);
 reconstruction = reshape(reconstruction,3,length(reconstruction)/3);

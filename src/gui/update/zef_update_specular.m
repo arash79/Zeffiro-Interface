@@ -1,33 +1,23 @@
 function  specular_val = zef_update_specular(varargin)
-% --- Zeffiro documentation header ---
-% zef_update_specular — Syncs GUI control values into `zef` for specular.
+%ZEF_UPDATE_SPECULAR  Figure-tool **Specular exp.:** slider.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for specular.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Finds the slider Tag='update_specular_slider' on the Figure tool
+%   (or on varargin{1}) and sets SpecularStrength on every axes1 child
+%   that has that property. Range 0–1. The label says "exp." but the
+%   property written is SpecularStrength, not SpecularExponent.
 %
-% Outputs:
-%   specular_val
+%   The Figure-tool Callback writes the returned value to
+%   zef.update_specular when gca is parented to h_zeffiro.
 %
-% Zef fields (observed):
-%   zef.h_zeffiro (read)
+%   specular_val = zef_update_specular
+%   specular_val = zef_update_specular(h_figure)
 %
-% Calls (project):
-%   zef_update_specular
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[specular_val] = zef_update_specular(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_ambience, zef_update_diffusion, zef_figure_tool.
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');
 else

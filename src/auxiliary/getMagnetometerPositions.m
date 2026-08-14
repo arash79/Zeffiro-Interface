@@ -1,27 +1,21 @@
 function [posOri, magnetometerLabel, gradiometerLabel, tra] = getMagnetometerPositions(MEGdata, OptionalName, OptionalPlace, OptionalSave1or0)
-% --- Zeffiro documentation header ---
-% getMagnetometerPositions — Get Magnetometer Positions.
+%GETMAGNETOMETERPOSITIONS  CTF-style MEG coils from MEGdata.grad (FieldTrip).
 %
-% Purpose:
-%   Get Magnetometer Positions.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   MEGdata
-%   OptionalName
-%   OptionalPlace
-%   OptionalSave1or0
+%   [posOri, magLabel, gradLabel, tra] = getMagnetometerPositions(MEGdata)
+%   [posOri, magLabel, gradLabel, tra] = getMagnetometerPositions(..., name, place, saveFlag)
 %
-% Outputs:
-%   posOri
-%   magnetometerLabel
-%   gradiometerLabel
-%   tra
+%   posOri = [coilpos coilori]. Assumes 271 measurement gradiometers plus
+%   refmag/refgrad in chantype 272:298. Keeps first 542 coils plus extra
+%   columns used by tra(1,:). Default save writes
+%   <place><name>_magnetometerLabel.dat, _gradiometerLabel.dat, _tra.dat,
+%   _posOri.dat. Not on the Import menu. Lab helper for one MEG layout.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[posOri, magnetometerLabel, gradiometerLabel]] = getMagnetometerPositions(MEGdata, OptionalName, OptionalPlace, OptionalSave1or0)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also getElectrodePositions.
 
 if nargin==1
     OptionalSaveToFile0or1=1;

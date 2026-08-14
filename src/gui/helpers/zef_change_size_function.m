@@ -1,28 +1,23 @@
 function [p_vec_window,relative_size] = zef_change_size_function(object_handle, current_size, varargin)
-% --- Zeffiro documentation header ---
-% zef_change_size_function — Zef change size function.
+%ZEF_CHANGE_SIZE_FUNCTION  Scale child Positions and FontSize with the figure.
 %
-% Purpose:
-%   Zef change size function.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   object_handle
-%   current_size
-%   varargin
+%   Figure-tool resize. Children with public Position are scaled by the
+%   ratio of the new Position to current_size. FontSize scales with height.
+%   exclude_type (cell of Type or Tag, e.g. {'Colorbar','image_details'})
+%   is skipped. If relative_size is supplied, those fractions of the new
+%   window size are applied instead. scale_positions (default 1) can disable
+%   Position updates while still scaling fonts.
 %
-% Outputs:
-%   p_vec_window
-%   relative_size
+%   [p_vec_window, relative_size] = zef_change_size_function(h, current_size)
+%   [p_vec_window, relative_size] = zef_change_size_function(h, current_size, ...
+%       relative_size, exclude_type, scale_positions)
 %
-% Calls (project):
-%   zef_change_size_function
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[p_vec_window, relative_size]] = zef_change_size_function(object_handle, current_size, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_size_change.
 
 relative_size = [];
 exclude_type = cell(0);

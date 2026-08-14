@@ -1,42 +1,18 @@
 function results = run_monte_carlo(zef, method_id, opts)
-% --- Zeffiro documentation header ---
-% utilities.sensitivity.run_monte_carlo — Run monte carlo.
+%RUN_MONTE_CARLO  Monte Carlo sensitivity study over source probes and noise.
 %
-% Purpose:
-%   Run monte carlo.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   method_id
-%   opts
+%   results = run_monte_carlo(zef, method_id, opts)
 %
-% Outputs:
-%   results
-%
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.source_directions (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   utilities.sensitivity.compute_metrics
-%   utilities.sensitivity.method_capability
-%   utilities.sensitivity.run_monte_carlo
-%   utilities.sensitivity.synthesize_measurements
-%   zef_inverse_run
-%   zef_processLeadfields
-%
-% Side effects:
-%   - GPU
-%   - filesystem I/O
-%   - parallel/cluster
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[results] = utilities.sensitivity.run_monte_carlo(zef, method_id, opts)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Requires zef.L and uses method_capability to choose batching strategy.
+%   Synthesizes measurements per probe, runs zef_inverse_run (local or cluster),
+%   and compute_metrics on each realization. Key opts: NumberOfRuns, NoiseLevelDb,
+%   DiffType, DispersionRadius, SourceAmplitude, IsolatedFramesPerProbe,
+%   MaxProbesPerBatch, MethodParams, execution ("local"|"cluster").
 
 arguments
     zef (1,1) struct

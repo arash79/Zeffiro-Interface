@@ -1,53 +1,47 @@
-# src/io/import
+# Brainstorm geometry adapters (`src/io/import`)
 
-## Purpose of this folder
+These three functions turn a **live Brainstorm MATLAB session** (subject surfaces, channel file, scouts) into millimetre arrays Zeffiro already understands. They are **not** on the Zeffiro menu bar and they do **not** open a `.zef` project by themselves.
 
-Project load/save, segmentation import, figure import, FEM export.
+The full converter a user actually runs is `utilities.brainstorm2zef.run` (`+utilities/+brainstorm2zef`). That pipeline calls these adapters after Brainstorm has a subject loaded, then writes a Zeffiro project / import script. If you only need one surface or one channel set while debugging, you can call the adapters directly from MATLAB **while Brainstorm is on the path**.
 
-## Contents
+Project **Import → Import data to a new project** (`.zef` folders) is `src/io/zef_import_segmentation`, not this folder. Electrode CSV/DAT is `+core/+io/+electrodes`.
 
-MATLAB sources:
-- `zef_bst_2_zef_atlas.m` — **zef_bst_2_zef_atlas**: Zef bst 2 zef atlas.
-- `zef_bst_2_zef_sensors.m` — **zef_bst_2_zef_sensors**: Zef bst 2 zef sensors.
-- `zef_bst_2_zef_surface.m` — **zef_bst_2_zef_surface**: Zef bst 2 zef surface.
+## Where this sits
 
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
-
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+```
+Brainstorm subject (bst_get, Channel MAT, Surface MAT)
+        │
+        ▼
+zef_bst_2_zef_surface / _sensors / _atlas     this folder
+        │
+        ▼
+utilities.brainstorm2zef  (compartments, .zef, project .mat)
+        │
+        ▼
+Zeffiro session: <tag>_points/_triangles, zef.sensors, parcellation_*
 ```
 
-Representative entry points in this folder:
-- ``[[p_c_table, p_points]] = zef_bst_2_zef_atlas(subject, surface_ind_aux, surface_struct, atlas_compartment, …)` with project root and `src` on the path.`
-- ``[[sensor_positions, sensor_orientations, sensor_ind]] = zef_bst_2_zef_sensors(varargin)` with project root and `src` on the path.`
-- ``[[vertices, faces, surface_data]] = zef_bst_2_zef_surface(varargin)` with project root and `src` on the path.`
+Coordinates: Brainstorm stores metres; these adapters multiply by **1000** so Zeffiro sees millimetres, matching typical segmentation surfaces.
 
-## Examples
+## Functions
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+| File | Returns | Needs |
+|------|---------|--------|
+| `zef_bst_2_zef_surface` | `vertices`, `faces` (mm), optional surface metadata | Brainstorm `bst_get`; subject index; optional surface index and property names |
+| `zef_bst_2_zef_sensors` | positions (mm), orientations, group index, Type tags | current or given study Channel MAT; optional Type filter (`'EEG'`, …) |
+| `zef_bst_2_zef_atlas` | parcellation colortable cell + `p_points` (scout vertices, column 4 = scout index) | subject, surface index, atlas Name; `atlas_compartment > 0` enables export |
 
-## Dependencies and assumptions
+Without a surface index, `zef_bst_2_zef_surface` returns only the Surface struct array so you can browse names before loading a mesh.
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## Scripting
 
-## Notes for developers
+```matlab
+% Brainstorm already started and a subject selected:
+[v, f] = zef_bst_2_zef_surface(iSubject, iSurf);
+[pos, ori, ind, tags] = zef_bst_2_zef_sensors('EEG');
+[ctable, pts] = zef_bst_2_zef_atlas(iSubject, iSurf, [], iCompartment, 'Desikan-Killiany');
+```
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+For a complete import including FEM defaults, use `utilities.brainstorm2zef.run` and that package’s settings files instead of assembling `zef` by hand.
+
+Parent I/O menus: [`../README.md`](../README.md). Converter options: [`../../../+utilities/+brainstorm2zef/README.md`](../../../+utilities/+brainstorm2zef/README.md).

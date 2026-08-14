@@ -1,22 +1,12 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
-% --- Zeffiro documentation header ---
-% parameters; — Parameters;.
+%COMBINE_DATA_SINCOS  Merge sin/cos point files into complex Jacobian matrices.
 %
-% Purpose:
-%   Parameters;.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Side effects:
-%   - filesystem I/O
+%   Script. Amplitude/sincos counterpart of combine_data_complex.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `parameters;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also combine_data_complex, load_jacobian_data.
 
 parameters;
 

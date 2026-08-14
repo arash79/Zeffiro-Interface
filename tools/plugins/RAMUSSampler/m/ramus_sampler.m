@@ -1,39 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if  ismac — If  ismac.
+%RAMUS_SAMPLER  RAMUS posterior sampling helper plugin.
 %
-% Purpose:
-%   If  ismac.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_ias_map_estimation (read, write)
-%   zef.h_inv_apply (read)
-%   zef.h_inv_beta (read)
-%   zef.h_inv_cancel (read)
-%   zef.h_inv_data_segment (read)
-%   zef.h_inv_high_cut_frequency (read)
-%   zef.h_inv_hyperprior (read)
-%   zef.h_inv_likelihood_std (read)
-%   zef.h_inv_low_cut_frequency (read)
-%   zef.h_inv_multires_n_iter (read)
-%   zef.h_inv_multires_n_levels (read)
-%   zef.h_inv_multires_sparsity (read)
-%   zef.h_inv_n_burn_in (read)
-%   zef.h_inv_n_sampler (read)
-%   … (8 more)
+%   Script (no function signature). Not in any zeffiro_plugins.ini. Opens
+%   ramus_sampler.fig (title ZEFFIRO Interface: Metropolized RAMUS Sampler).
+%   Start Callback in the fig is zef_update_ramus_sampler; zef.reconstruction =
+%   ramus_sampling_process([]). Needs zef.L, measurements, inv_likelihood_std.
+%   No inverse.*Inverter.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if  ismac` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
 
 if  ismac
     zef.h_ias_map_estimation = open('ramus_sampler.fig');
@@ -42,7 +19,7 @@ elseif ispc
 else
     zef.h_ias_map_estimation = open('ramus_sampler.fig');
 end
-set(zef.h_ias_map_estimation,'Name','ZEFFIRO Interface: Metropolized RAMUS Sampler');
+set(zef.h_ias_map_estimation,'Name','ZEFFIRO Interface: Metropolized RAMUS Sampler')
 set(findobj(zef.h_ias_map_estimation.Children,'-property','FontUnits'),'FontUnits','pixels')
 set(findobj(zef.h_ias_map_estimation.Children,'-property','FontSize'),'FontSize',zef.font_size);
 zef_init_ramus_sampler;

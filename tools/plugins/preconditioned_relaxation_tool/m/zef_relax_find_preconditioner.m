@@ -1,43 +1,24 @@
-% --- Zeffiro documentation header ---
-% function [relax_preconditioner, relax_preconditioner_permutation] = zef_relax_find_preconditioner — Function [relax preconditioner, relax preconditioner permutation] = zef relax find preconditioner.
-%
-% Purpose:
-%   Function [relax preconditioner, relax preconditioner permutation] = zef relax find preconditioner.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.relax_multires_n_decompositions (read)
-%   zef.relax_multires_n_levels (read)
-%   zef.relax_multires_sparsity (read)
-%   zef.relax_preconditioner_type (read)
-%   zef.source_direction_mode (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   zef_block_diagonal_preconditioner_uniform_prior
-%   zef_diagonal_preconditioner_uniform_prior
-%   zef_make_multigrid_dec
-%   zef_processLeadfields
-%   zef_relax_find_preconditioner
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [relax_preconditioner, relax_preconditioner_permutation] = zef_relax_find_preconditioner` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [relax_preconditioner, relax_preconditioner_permutation] = zef_relax_find_preconditioner
-
+%ZEF_RELAX_FIND_PRECONDITIONER  Build relaxation preconditioner (does not invert).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Called from Find preconditioner. Reads relax_multires_* and
+%   relax_preconditioner_type from base zef. Writes the two outputs that
+%   zef_relax_iteration expects. Does not write zef.reconstruction.
+%
 
 relax_multires_sparsity = evalin('base','zef.relax_multires_sparsity');
 relax_multires_n_decompositions = evalin('base','zef.relax_multires_n_decompositions');
 relax_multires_n_levels = evalin('base','zef.relax_multires_n_levels');
 relax_preconditioner_type = evalin('base','zef.relax_preconditioner_type');
 
+% Dropdown (zef_relax.mlapp): 1 Block diagonal RAMUS, 2 Diagonal RAMUS,
+% 3 Identity. Types 1–2 loop relax_multires_n_decompositions coarsenings
+% of source_positions; type 3 skips RAMUS and stores speye(3*n_interp).
 if relax_preconditioner_type == 1
     relax_preconditioner = cell(0);
     relax_preconditioner_permutation = cell(0);

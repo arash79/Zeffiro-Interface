@@ -1,21 +1,17 @@
-% --- Zeffiro documentation header ---
-% for zef_i = 1 : size(zef — For zef i = 1 : size(zef.
+%ZEF_INIT_INIT_PROFILE  Apply zef.init_profile rows into zef (script).
 %
-% Purpose:
-%   For zef i = 1 : size(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.init_profile (read)
+%   Script. Each init_profile row: column 3 is the zef field name,
+%   column 2 the value, column 4 the type — 'string' (quoted assign),
+%   'number' (eval assign), or 'evaluate' (eval the value as MATLAB).
+%   Called from zef_apply_init_profile after Settings → Pre-settings
+%   profile Apply. Does not open the dialog.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `for zef_i = 1 : size(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_open_init_profile, zef_apply_init_profile.
 for zef_i = 1 : size(zef.init_profile,1)
 
     if not(isstring(zef.init_profile{zef_i,2}))

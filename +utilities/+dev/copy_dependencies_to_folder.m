@@ -1,29 +1,16 @@
 function messages = copy_dependencies_to_folder ( file, target_folder, kwargs )
-% --- Zeffiro documentation header ---
-% utilities.dev.copy_dependencies_to_folder — Copy dependencies to folder.
+%COPY_DEPENDENCIES_TO_FOLDER  Copy MATLAB dependency closure into target folder.
 %
-% Purpose:
-%   Copy dependencies to folder.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   file
-%   target_folder
-%   kwargs
+%   messages = copy_dependencies_to_folder(file, target_folder, kwargs)
 %
-% Outputs:
-%   messages
-%
-% Calls (project):
-%   utilities.dev.copy_dependencies_to_folder
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[messages] = utilities.dev.copy_dependencies_to_folder(file, target_folder, kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Uses matlab.codetools.requiredFilesAndProducts on file. Copies each required
+%   path to target_folder unless kwargs.folder_whitelist restricts parent dirs.
+%   Returns copyfile error messages (empty when all succeed).
 
     arguments
 

@@ -1,41 +1,46 @@
-# tools/plugins/RAMUSSampler
+# RAMUSSampler
 
-## Purpose of this folder
+Metropolized RAMUS: MCMC on the same multiresolution source space as RAMUS inversion. Use it when you want posterior samples of a RAMUS-style model rather than the RAMUS MAP iteration.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+There is **no** `inverse.*Inverter` and no registry id for this plugin. The folder is **not** in any profile `zeffiro_plugins.ini`.
 
-## Contents
+## Menu
 
-Subfolders:
-- `fig/`
-- `m/`
+Not in default INI and not in asteroid / `_legacy` / `_nse` INIs. From MATLAB:
 
-## How this folder fits into the overall workflow
+```matlab
+ramus_sampler
+```
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Window title: `ZEFFIRO Interface: Metropolized RAMUS Sampler`.
 
-## GUI usage
+## Run the sampler
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+**Start** Callback stored in `fig/ramus_sampler.fig` (not reassigned in `m/`):
 
-## Programmatic usage
+```matlab
+zef_update_ramus_sampler; zef.reconstruction = ramus_sampling_process([]);
+```
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+**Create multiresolution decomposition** in the same fig calls `make_multires_dec` (not `zef_make_multires_dec`). **Apply** only runs `zef_update_ramus_sampler`.
 
-## Examples
+Likelihood uses `zef.inv_likelihood_std` (a standard deviation), not `inv_snr`. Each draw picks a random RAMUS decomposition and level, proposes `z`/`theta`, and accepts with Metropolis–Hastings (`Δ log-posterior ≥ log U`). Samples after `inv_n_burn_in` are averaged.
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+## Needs
 
-## Dependencies and assumptions
+- `zef.L`, interpolation, `zef.source_direction_mode`
+- `zef.measurements`
+- `zef.inv_likelihood_std`, `inv_beta`, `inv_theta0`, `inv_hyperprior`
+- Sampler: `zef.inv_n_sampler`, `zef.inv_n_burn_in`
+- Multires: `inv_multires_n_levels`, `inv_multires_sparsity`, `inv_multires_n_decompositions`, `inv_multires_n_iter`
+- Frames: `zef.number_of_frames`, `inv_time_*`, band edges
+- Reads `zef` from the base workspace
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## Writes
 
-## Notes for developers
+- `zef.reconstruction` only (Start does not assign `reconstruction_information`)
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## Files
+
+- Start: `m/ramus_sampler.m` opens `fig/ramus_sampler.fig`
+- Solver: `m/ramus_sampling_process.m`

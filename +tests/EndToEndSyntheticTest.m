@@ -1,25 +1,16 @@
 classdef EndToEndSyntheticTest < matlab.unittest.TestCase
-% --- Zeffiro documentation header ---
-% tests.EndToEndSyntheticTest — Automated test: EndToEndSyntheticTest.
+%ENDTOENDSYNTHETICTEST  zef_inverse_run(..., "dspm", "execution", "local") writes zef.reconstruction.
 %
-% Purpose:
-%   Automated test: EndToEndSyntheticTest.
-%   Folder: MATLAB unit and integration tests for refactored inverse dispatch, lead fields, cluster jobs, and legacy/class parity.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
+%   Full class-track entry (not Inverse-tools). Synthetic L from
+%   tests.createSyntheticInverseZef. Asserts zef_out.reconstruction and
+%   reconstruction_information are nonempty, and run_result.success or a
+%   nonempty run_result.reconstruction.
 %
-% Calls (project):
-%   zef_inverse_run
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `tests.EndToEndSyntheticTest(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
 
     methods (Test)
         function testLocalInverseRunPopulatesZef(testCase)

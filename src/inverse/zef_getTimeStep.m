@@ -1,39 +1,39 @@
 function [f,t] = zef_getTimeStep(f_data, f_ind, zef)
-% --- Zeffiro documentation header ---
-% zef_getTimeStep — Zef get Time Step.
+%ZEF_GETTIMESTEP  Extract one inversion frame from filtered or raw measurements.
 %
-% Purpose:
-%   Zef get Time Step.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   f_data
-%   f_ind
-%   zef
+%   Selects the column(s) of f_data that correspond to inversion frame f_ind.
+%   In filtered_temporal mode, uses zef.inv_time_1/2/3 and inv_sampling_frequency
+%   to map frame index to sample indices; optionally averages over the window
+%   when zef.inv_time_interval_averaging is true. In raw mode, returns
+%   f_data(:, f_ind) directly.
 %
-% Outputs:
-%   f
-%   t
+%   [f, t] = zef_getTimeStep(f_data, f_ind)
+%   [f, t] = zef_getTimeStep(f_data, f_ind, zef)
 %
-% Zef fields (observed):
-%   zef.inv_data_mode (read)
-%   zef.inv_sampling_frequency (read)
-%   zef.inv_time_1 (read)
-%   zef.inv_time_2 (read, write)
-%   zef.inv_time_3 (read)
-%   zef.inv_time_interval_averaging (read)
+%   Inputs
+%     f_data  - measurements (n_channels x n_samples), typically from
+%               zef_getFilteredData.
+%     f_ind   - 1-based frame index.
+%     zef     - session struct; if omitted, read from base workspace.
 %
-% Calls (project):
-%   zef_getTimeStep
+%   Outputs
+%     f       - n_channels x n_window_samples (or n_channels x 1 after
+%               interval averaging). Unassigned if temporal window is invalid.
+%     t       - sample times in seconds (double row); empty when f_data has
+%               one column or mode is raw.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Reads zef.inv_data_mode, inv_sampling_frequency, inv_time_1/2/3,
+%   inv_time_interval_averaging. May set zef.inv_time_2 to 0 if missing.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[f, t]] = zef_getTimeStep(f_data, f_ind, zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Errors when zef.inv_data_mode is not "filtered_temporal" or "raw".
+%
+%   See also zef_getFilteredData, zef_getTimeStepClassObj,
+%            zef_process_inversion.
 
 if nargin < 3
 zef = evalin('base','zef');

@@ -1,22 +1,17 @@
-% --- Zeffiro documentation header ---
-% [zef — [zef.
+%ZEF_FILTER_SUBSTITUTE_MEASUREMENT_DATA  Copy processed_data onto zef.raw_data.
 %
-% Purpose:
-%   [zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.processed_data (read)
-%   zef.raw_data (read, write)
-%   zef.yesno (read)
+%   Script. Despite the filename, this writes raw_data. Wired to
+%   h_filter_substitute_raw_data in zef_filter_tool (names are swapped
+%   with zef_filter_substitute_raw_data). Dialog: 'Substitute raw data
+%   with processed data?'. On Yes, zef_filter_raw_data then
+%   raw_data = processed_data. Does not touch measurements.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `[zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_filter_substitute_raw_data, zef_filter_raw_data.
 
 [zef.yesno] = questdlg('Substitute raw data with processed data?','Yes','No');
 if isequal(zef.yesno,'Yes');

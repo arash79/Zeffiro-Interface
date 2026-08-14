@@ -1,25 +1,17 @@
-% --- Zeffiro documentation header ---
-% zef_n = 0; — Zef n = 0;.
+%ZEF_INIT_FIELDS_COMPARTMENT_TABLE_PROFILE  Extra Segmentation-profile columns for one row (script).
 %
-% Purpose:
-%   Zef n = 0;.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field_1 (read)
-%   zef.compartment_table_size (read)
-%   zef.compartment_tags (read)
-%   zef.h_compartment_table (read)
-%   zef.parameter_profile (read)
+%   Script. Required workspace: zef, zef_i, zef_j, zef.aux_field_1.
+%   For each parameter_profile row with Segmentation + On + On (columns
+%   8, 6, 7), appends ColumnName from profile column 1 and writes
+%   aux_field_1{zef_i, compartment_table_size+n} from
+%   zef.<tag>_<profile{k,2}> (Scalar → num2str, String → as-is).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef_n = 0;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_init_fields_compartment_table, zef_init_parameter_profile.
 zef_n = 0;
 for zef_k =  1  : size(zef.parameter_profile,1)
     if isequal(zef.parameter_profile{zef_k,8},'Segmentation') && isequal(zef.parameter_profile{zef_k,6},'On') && isequal(zef.parameter_profile{zef_k,7},'On')

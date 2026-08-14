@@ -1,32 +1,30 @@
 function zef_add_package(package_path, package_folder, file_folder, file_folder_dir)
-% --- Zeffiro documentation header ---
-% zef_add_package — Zef add package.
+%ZEF_ADD_PACKAGE  Recursively wrap .m files into a MATLAB +package tree.
 %
-% Purpose:
-%   Zef add package.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   package_path
-%   package_folder
-%   file_folder
-%   file_folder_dir
+%   Unused from menus. No first-party caller except this function itself
+%   (subfolder recursion). Helper zef_read_function_call parses each .m.
 %
-% Outputs:
-%   See function signature and code below.
+%   Creates package_path/+package_folder if package_folder is non-empty.
+%   For each .m in file_folder_dir, writes a wrapper that is the parsed
+%   function header plus the original call. Recurses into subfolders that
+%   are not already +packages. Prints each wrapped file name. nargin==3
+%   sets file_folder_dir = dir(file_folder).
 %
-% Calls (project):
-%   zef_add_package
-%   zef_read_function_call
+%   zef_add_package(package_path, package_folder, file_folder)
+%   zef_add_package(package_path, package_folder, file_folder, file_folder_dir)
 %
-% Side effects:
-%   - filesystem I/O
+%   Inputs
+%     package_path     - destination parent for +package folders.
+%     package_folder   - package name without '+'; empty → use package_path.
+%     file_folder      - source directory of .m files.
+%     file_folder_dir  - dir() struct; default dir(file_folder).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_add_package(package_path, package_folder, file_folder, file_folder_dir)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_read_function_call.
 
 if not(isempty(package_folder))
     mkdir([package_path filesep '+' package_folder]);

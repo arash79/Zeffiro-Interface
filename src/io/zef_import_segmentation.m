@@ -1,62 +1,31 @@
 function zef = zef_import_segmentation(zef, file_name, folder_name)
-% --- Zeffiro documentation header ---
-% zef_import_segmentation — Loads external data or a saved Zeffiro project into `zef`.
+%ZEF_IMPORT_SEGMENTATION  Import compartments and sensors from a .zef or .mat file.
 %
-% Purpose:
-%   Loads external data or a saved Zeffiro project into `zef`.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   file_name
-%   folder_name
+%   Parses a comma-separated import manifest row by row. Supported types
+%   include box, segmentation (surface meshes, Brainstorm database,
+%   parcellation sidecars), sensors, embedded MAT structs, and scripts.
+%   .mat manifests delegate to zef_import_mat_struct. Creates or reuses
+%   compartment and sensor tags, applies affine transforms and merge flags,
+%   and refreshes GUI tables when import completes.
 %
-% Outputs:
-%   zef
+%   zef = zef_import_segmentation(zef)
+%   zef = zef_import_segmentation(zef, file_name, folder_name)
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.compartments_selected (read, write)
-%   zef.current_compartment (read, write)
-%   zef.current_sensors (read, write)
-%   zef.domain_labels (read)
-%   zef.file (read, write)
-%   zef.file_path (read, write)
-%   zef.h_compartment_table (read)
-%   zef.h_sensors_table (read)
-%   zef.imaging_method_cell (read)
-%   zef.nodes (read)
-%   zef.parcellation_colortable (read, write)
-%   zef.parcellation_compartment (read)
-%   zef.parcellation_points (read, write)
-%   zef.save_file_path (read)
-%   … (4 more)
+%   Inputs
+%     zef        - session struct.
+%     file_name  - *.zef or *.mat manifest; uigetfile when omitted.
+%     folder_name - directory for relative filenames in the manifest.
 %
-% Calls (project):
-%   zef_add_bounding_box
-%   zef_add_compartment
-%   zef_apply_parameter_profile
-%   zef_bst_2_zef_atlas
-%   zef_bst_2_zef_sensors
-%   zef_bst_2_zef_surface
-%   zef_build_compartment_table
-%   zef_get_mesh
-%   zef_import_mat_struct
-%   zef_import_parcellation_colortable
-%   zef_import_parcellation_points
-%   zef_import_segmentation
-%   … (4 more)
+%   Output
+%     zef - session with imported geometry and metadata.
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_import_segmentation(zef, file_name, folder_name)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_get_mesh, zef_import_parcellation_colortable,
+%            zef_import_parcellation_points, zef_bst_2_zef_surface.
 
 if nargin == 0
     zef = evalin('base','zef');
@@ -118,6 +87,8 @@ if not(isequal(file_name,0))
                 name = (ini_cell{i,find(ismember(ini_cell(i,:),'name'),1)+1});
             end
 
+            % Dispatch on the CSV type= value. box / segmentation / sensors /
+            % struct / script. Unknown types are skipped (no otherwise).
             new_compartment = 0;
             if isequal(type,'box')
                 if isempty(name)
@@ -126,6 +97,8 @@ if not(isequal(file_name,0))
                     zef = zef_add_bounding_box(zef,name);
                 end
             elseif isequal(type,'segmentation')
+                % Reuse an existing compartment by name, else zef_add_compartment
+                % (new tags are prepended, so the new tag is compartment_tags{1}).
                 if not(isempty(compartment_data))
                     if ismember(name,compartment_data(:,3))
                         compartment_ind = find(ismember(compartment_data(:,3),name));
@@ -473,6 +446,8 @@ if not(isequal(file_name,0))
                 zef = zef_apply_parameter_profile(zef);
                 zef = zef_build_compartment_table(zef);
 
+            % Sensor set: reuse by name or zef_add_sensors. modality defaults
+            % to imaging_method_cell{1}. Then electrode file + affine.
             elseif isequal(type,'sensors')
 
                 name = (ini_cell{i,find(ismember(ini_cell(i,:),'name'),1)+1});
@@ -629,13 +604,13 @@ if not(isequal(file_name,0))
                         eval(['zef.' sensor_tag '_points = sensor_positions;']);
                     end
 
-
                 end
 
                 % eval('zef_init_sensors_parameter_profile;');
                 eval('zef = zef_apply_parameter_profile(zef);');
                 eval('zef_build_sensors_table;');
 
+            % Merge an arbitrary .mat into zef (zef_import_mat_struct).
             elseif isequal(type,'struct')
                 filename = '';
                 if ismember('filename',ini_cell(i,:))
@@ -653,6 +628,7 @@ if not(isequal(file_name,0))
                     zef = zef_import_mat_struct(zef,filename);
                 end
 
+            % evalc the named .m in this workspace (trusted manifest only).
             elseif isequal(type,'script')
                 filename = '';
                 if ismember('filename',ini_cell(i,:))
@@ -671,8 +647,6 @@ if not(isequal(file_name,0))
                 end
 
             end
-
-
 
         end
 

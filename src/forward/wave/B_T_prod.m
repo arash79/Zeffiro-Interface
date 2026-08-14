@@ -1,34 +1,21 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 
 function [div_u] = B_T_prod(p_1, p_2, p_3, div_vec, n, t, gpu_extended_memory)
-% --- Zeffiro documentation header ---
-% B_T_prod — B T prod.
+%B_T_PROD  Discrete divergence B' of (p1,p2,p3) plus boundary injection div_vec.
 %
-% Purpose:
-%   B T prod.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Inputs:
-%   p_1
-%   p_2
-%   p_3
-%   div_vec
-%   n
-%   t
-%   gpu_extended_memory
+%   Adjoint of B_prod in the leap-frog pair: updates the E-like unknown
+%   from the three H components. div_vec carries the orbit/AST boundary
+%   source. gpu_extended_memory as in B_prod.
 %
-% Outputs:
-%   div_u
+%   div_u = B_T_prod(p_1, p_2, p_3, div_vec, n, t, gpu_extended_memory)
 %
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[div_u] = B_T_prod(p_1, p_2, p_3, div_vec, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also B_prod, compute_data_gpu.
+
+
 
 
 n = gpuArray(n);

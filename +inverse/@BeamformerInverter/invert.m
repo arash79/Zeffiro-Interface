@@ -1,36 +1,38 @@
 function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
-% --- Zeffiro documentation header ---
-% inverse.BeamformerInverter.invert — Runs one inverse reconstruction step for a single measurement frame.
+%invert  Source-wise beamforming: loop fixed then free-orientation locations.
 %
-% Purpose:
-%   Runs one inverse reconstruction step for a single measurement frame.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   f
-%   L
-%   procFile
-%   source_direction_mode
-%   source_positions
-%   opts
+%   Called from utilities.inverse.run_frame_loop. Inverse tools → Beamformer
+%   uses zef_beamformer, not this method.
 %
-% Outputs:
-%   z_vec
-%   self
+%   If error_cov is set, columns are Mahalanobis-whitened (C \ L) with
+%   Tikhonov on C from cov_reg_parameter. initialize fills error_cov from
+%   the measurement frames when it was empty; invert does not. Calling
+%   invert without error_cov leaves L_modified undefined. Then each source:
+%   fixed orientation (procFile.s_ind_4) then free (the rest of s_ind_0).
+%   Weights depend on method_type:
+%     "Linearly constrained minimum variance (LCMV) beamformer"
+%     "Unit noise gain (UNG) beamformer"
+%     "Unit-gain constrained beamformer"
+%   plus leadfield_reg_type ("Basic"|"Pseudoinverse") and
+%   leadfield_normalization.
 %
-% Calls (project):
-%   inverse.invert
-%   zef_waitbar
+%   Inputs
+%     f     - n_sensors×1 frame.
+%     L     - n_sensors×n_dof processed lead field (3 columns per source
+%             in Cartesian layout).
+%     procFile.s_ind_0, .s_ind_4 - interpolated sources and constrained
+%             subset (from zef_processLeadfields).
+%     source_direction_mode, source_positions - unused here.
+%     opts.use_gpu / normalize_data - GPU gather at the end; normalize unused.
 %
-% Side effects:
-%   - GPU
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z_vec, self]] = inverse.BeamformerInverter.invert(self, f, L, procFile, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Outputs
+%     z_vec - n_dof×1 beamformer map for this frame.
+%     self  - computing_parameters set false.
 
     arguments
 
@@ -67,8 +69,9 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
     date_str = NaN;
     LF_normalization = 1;
 
-    %Modify to compensate Mahlanobis distance used instead of L2-norm when
-   %noise covariance exists
+    % invert assumes initialize already filled error_cov (run_frame_loop).
+    % Without C, L_modified is never assigned and the loops below error.
+    % C ← C + λ_cov tr(C)/m I; L_modified = C\L  (Mahalanobis / whitened L).
     if not(isempty(self.error_cov))
         C = self.error_cov;
         C = C + lambda_cov*trace(C)*eye(size(C))/size(f,1);
@@ -89,8 +92,12 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
     z_vec = zeros(size(L,2),1);
     
     % Then start inverting.
+    % Per source: invLF ≈ (L' C^{-1} L + λ I)^{-1}; z = Weights * invLF * L_mod' f.
 
-    %Compute fixed orientation cases first
+    % Fixed orientation (procFile.s_ind_4): one lead-field column per source
+    % (the first of the 3-column Cartesian block). UNG and unit-gain constrained
+    % share the scalar weight (LF'*LF_mod)/||LF_mod||; LCMV uses Weights = 1.
+    % z(3-block) = Weights * inv(LF'*LF_mod + λ) * (LF_mod .* scale)' * f
     for i = 1:length(fixed_orientation_source_inds)
         ind3D = 3*fixed_orientation_source_inds(i) - [2,1,0];
         LF = L(:,3*fixed_orientation_source_inds(i));
@@ -124,7 +131,11 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
 
     end
 
-    %Free orientation case
+    % Free orientation: 3-column blocks. Unit-gain constrained first collapses
+    % the block onto the dominant eigenvector of LF'*LF (Rayleigh–Ritz), then
+    % uses the same scalar weight as the fixed-orientation UNG branch and
+    % writes z back along that orientation / sqrt(3). Free UNG uses
+    % sqrtm(LF_mod'*LF_mod) \ (LF'*LF_mod) (matrix weights).
     for i = 1:length(free_orientation_source_inds)
         %------- Waitbar computations -------
         if self.number_of_frames <=1

@@ -1,34 +1,23 @@
 function [alpha_psi, epsilon_psi] = zef_ES_centralize_recursive_search(alpha, epsilon, sr, sc, original_window, s_alpha, s_epsilon, varargin)
-% --- Zeffiro documentation header ---
-% zef_ES_centralize_recursive_search — Zef ES centralize recursive search.
+%ZEF_ES_CENTRALIZE_RECURSIVE_SEARCH  Shift α and ε lattices so the current (sr,sc) optimum is centered.
 %
-% Purpose:
-%   Zef ES centralize recursive search.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   alpha
-%   epsilon
-%   sr
-%   sc
-%   original_window
-%   s_alpha
-%   s_epsilon
-%   varargin
+%   Called from zef_ES_recursive_search. Builds a new log-spaced lattice
+%   around alpha(sc) and epsilon(sr) with geometric half-width B, then
+%   zef_ES_find_parameters(..., original_window). Does not call
+%   zef_ES_centralize_recursive_search_window (that helper is unused).
+%   varargin{1}==1 (or omitted via ismember) clamps the window to the
+%   original α/ε range.
 %
-% Outputs:
-%   alpha_psi
-%   epsilon_psi
+%   [alpha_psi, epsilon_psi] = zef_ES_centralize_recursive_search(alpha, ...
+%       epsilon, sr, sc, original_window, s_alpha, s_epsilon, flag)
 %
-% Calls (project):
-%   zef_ES_centralize_recursive_search
-%   zef_ES_find_parameters
+%   See also zef_ES_find_parameters, zef_ES_recursive_search.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[alpha_psi, epsilon_psi]] = zef_ES_centralize_recursive_search(alpha, epsilon, sr, sc, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if ismember(varargin{1}, 1)
    non_floating_flag = varargin{1};

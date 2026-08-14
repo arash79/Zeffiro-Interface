@@ -1,40 +1,38 @@
 function [tetra, flag_val, nodes_ind] = zef_tetra_turn(zef, nodes, tetra, thresh_val)
-% --- Zeffiro documentation header ---
-% zef_tetra_turn — Zef tetra turn.
+%ZEF_TETRA_TURN  Face-swap poorly shaped tets with a neighbour.
 %
-% Purpose:
-%   Zef tetra turn.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nodes
-%   tetra
-%   thresh_val
+%   Quality pass used by zef_postprocess_fem_mesh (and zef_smoothing_step).
+%   Tets whose zef_condition_number is below thresh_val * max(condition)
+%   are candidates. For each candidate the code looks at neighbours that
+%   share exactly three vertices (a face), tries the three possible 2–2
+%   reconnections of the two-tet polyhedron, and keeps the reconnection
+%   with the smallest |1 − V1/V2| among those that produce two negative
+%   volumes (the stored orientation convention). Loops up to
+%   zef.mesh_optimization_repetitions times.
 %
-% Outputs:
-%   tetra
-%   flag_val
-%   nodes_ind
+%   zef_optimize_mesh is a thin unused wrapper around this function.
 %
-% Zef fields (observed):
-%   zef.mesh_optimization_repetitions (read)
+%   [tetra, flag_val, nodes_ind] = zef_tetra_turn(zef, nodes, tetra, thresh_val)
 %
-% Calls (project):
-%   zef_condition_number
-%   zef_fix_inverted_pair
-%   zef_tetra_turn
-%   zef_waitbar
+%   Inputs
+%     zef         - session. Empty → evalin('base','zef'). Uses
+%                   mesh_optimization_repetitions.
+%     nodes       - V×3 (unchanged).
+%     tetra       - T×4 1-based indices.
+%     thresh_val  - fraction of max(condition_number). Postprocess passes
+%                   zef.mesh_optimization_parameter.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Outputs
+%     tetra      - T×4, possibly with swapped faces (same T).
+%     flag_val   - 1 if every tet now meets the threshold, -1 otherwise.
+%     nodes_ind  - unique vertices of tets that still fail the threshold.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[tetra, flag_val, nodes_ind]] = zef_tetra_turn(zef, nodes, tetra, thresh_val)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_condition_number, zef_postprocess_fem_mesh, zef_fix_negatives.
 
 if isempty(zef)
     zef = evalin('base','zef');
@@ -68,6 +66,7 @@ while not(isempty(tetra_ind)) & iter_ind_aux_0 < eval('zef.mesh_optimization_rep
 
         for i = 1 : length(tetra_ind)
 
+            % Already-positive volume: only accept a flip that also improves the ratio.
             flipped_tetra = 0;
 
             if tilavuus(tetra_ind(i)) > 0
@@ -97,6 +96,7 @@ while not(isempty(tetra_ind)) & iter_ind_aux_0 < eval('zef.mesh_optimization_rep
 
                 tilavuus_ratio_old(j) = abs(1 - tilavuus(tetra_ind(i))/tilavuus(tetra_aux_ind(j)));
 
+                % Three ways to pair the two unique vertices with the shared face.
                 for k = 1 : 3
 
                     tetra_aux_3(:,:,k,j) = [node_ind_1 node_ind_3(mod(k,3)+1) node_ind_2 node_ind_3(mod(k+1,3)+1); ...

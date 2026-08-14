@@ -1,32 +1,21 @@
 function zef_plot_3D_stem_synthetic_source(varargin)
-% --- Zeffiro documentation header ---
-% zef_plot_3D_stem_synthetic_source — Renders or updates a plot_3d_stem_synthetic_source figure from current `zef` state.
+%ZEF_PLOT_3D_STEM_SYNTHETIC_SOURCE  Queue renderer: stem arrows at inv_synth_source.
 %
-% Purpose:
-%   Renders or updates a plot_3d_stem_synthetic_source figure from current `zef` state.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Same base zef.inv_synth_source fields as the cone-arrow renderer.
+%   Default arrow_type is 1 (stem). Scale 5*sqrt(column 9); color column
+%   10. Draws on caller h_axes_image. Tag: 'additional: synthetic source'.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.inv_synth_source (read)
-%
-% Calls (project):
-%   zef_plot_3D_arrow
 %   zef_plot_3D_stem_synthetic_source
+%   zef_plot_3D_stem_synthetic_source(scale, type, color, shape, length, head, npoly)
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   varargin matches zef_plot_3D_arrow; the loop overwrites scale.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_plot_3D_stem_synthetic_source(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_plot_3D_arrow_synthetic_source, zef_plot_synthetic_source.
 
 arrow_scale = 1;
 arrow_type = 1;

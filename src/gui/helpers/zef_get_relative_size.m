@@ -1,26 +1,31 @@
 function [relative_size] = zef_get_relative_size(object_handle)
-% --- Zeffiro documentation header ---
-% zef_get_relative_size — Zef get relative size.
+%ZEF_GET_RELATIVE_SIZE  Child Position vectors scaled by parent width/height.
 %
-% Purpose:
-%   Zef get relative size.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   object_handle
+%   Sets the figure's Units to pixels, reads Position, and for every
+%   descendant with a Position property (except the figure itself)
+%   divides [x y w h] by [W H W H] of the parent. Always returns a
+%   column cell, even for a single child.
 %
-% Outputs:
-%   relative_size
+%   Callers store the cell on zef.*_relative_size and pass it to
+%   zef_change_size_function. Used by zef_set_size_change_function
+%   (type 2) and the open scripts for parameter / segmentation / init
+%   profile, system settings, and plugin settings, plus several plugin
+%   windows (DTI, ES workbench, synthetic source/gravity, dipolar pair).
 %
-% Calls (project):
-%   zef_get_relative_size
+%   relative_size = zef_get_relative_size(object_handle)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[relative_size] = zef_get_relative_size(object_handle)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   Input
+%     object_handle - figure or UIFigure.
+%
+%   Output
+%     relative_size - cell column of 1-by-4 relative positions.
+%
+%   See also zef_change_size_function, zef_set_size_change_function.
 set(object_handle,'units','pixels')
 object_size = get(object_handle,'position');
 object_children = findall(object_handle,'-property','Position');

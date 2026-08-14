@@ -1,50 +1,46 @@
 function relative_resolution_vec = zef_find_relative_resolution(zef)
-% --- Zeffiro documentation header ---
-% zef_find_relative_resolution — Zef find relative resolution.
+%ZEF_FIND_RELATIVE_RESOLUTION  Per-active-compartment 4^n face-count multiplier.
 %
-% Purpose:
-%   Zef find relative resolution.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Unused from menus. Caller: zef_downsample_surfaces (Mesh tool
+%   **Resample surfaces** / **Create FEM mesh** when Resample surf. is
+%   on). Target triangle count is max_surface_face_count times this
+%   vector. Each surface split multiplies faces by 4, so n refinement
+%   passes contribute 4^n.
 %
-% Outputs:
-%   relative_resolution_vec
+%   relative_resolution_vec = zef_find_relative_resolution(zef)
 %
-% Zef fields (observed):
-%   zef.refinement_on (read)
-%   zef.refinement_surface_compartments (read)
-%   zef.refinement_surface_compartments_2 (read)
-%   zef.refinement_surface_compartments_3 (read)
-%   zef.refinement_surface_number (read)
-%   zef.refinement_surface_number_2 (read)
-%   zef.refinement_surface_number_3 (read)
-%   zef.refinement_surface_on (read)
-%   zef.refinement_surface_on_2 (read)
-%   zef.refinement_surface_on_3 (read)
-%   zef.refinement_volume_compartments (read)
-%   zef.refinement_volume_compartments_2 (read)
-%   zef.refinement_volume_compartments_3 (read)
-%   zef.refinement_volume_number (read)
-%   zef.refinement_volume_number_2 (read)
-%   … (4 more)
+%   Input
+%     zef  - session. Uses zef_get_active_compartments for On tags and
+%            source compartments (*_sources in {1,2}).
 %
-% Calls (project):
-%   zef_find_relative_resolution
-%   zef_get_active_compartments
+%   Fields read (all no-ops unless zef.refinement_on)
+%     refinement_surface_on, refinement_surface_number,
+%       refinement_surface_compartments
+%     refinement_surface_on_2, refinement_surface_number_2,
+%       refinement_surface_compartments_2
+%     refinement_volume_on, refinement_volume_number,
+%       refinement_volume_compartments
+%     refinement_volume_on_2, refinement_volume_number_2,
+%       refinement_volume_compartments_2
+%     (surface/volume *_3 blocks are commented out)
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Output
+%     relative_resolution_vec  - 1 × n_active, default ones. Each listed
+%       compartment index i is multiplied by 4.^refinement_*_number(i).
+%       Index −1 means all source compartments (remapped to positions in
+%       the active list). Indices otherwise address that active vector,
+%       not compartment_tags.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[relative_resolution_vec] = zef_find_relative_resolution(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_downsample_surfaces, zef_get_active_compartments.
 
 [active_compartments, source_compartments] = zef_get_active_compartments(zef);
 
+% Map source tag-indices to positions inside the active-compartment vector.
 source_compartments = find(ismember(active_compartments,source_compartments));
 
 relative_resolution_vec = ones(size(active_compartments));

@@ -1,28 +1,12 @@
 function compartmentDataTable = readAsegStatsFile(asegFilePath, kwargs)
-% --- Zeffiro documentation header ---
-% utilities.fs2zef.readers.readAsegStatsFile — Read Aseg Stats File.
+%READASEGSTATSFILE  Parse FreeSurfer aseg.stats into a MATLAB table.
 %
-% Purpose:
-%   Read Aseg Stats File.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   asegFilePath
-%   kwargs
-%
-% Outputs:
-%   compartmentDataTable
-%
-% Calls (project):
-%   utilities.fs2zef.readers.readAsegStatsFile
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[compartmentDataTable] = utilities.fs2zef.readers.readAsegStatsFile(asegFilePath, kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%
-% compartmentDataTable = readAsegStatsFile(asegFilePath, kwargs)
+%   compartmentDataTable = readAsegStatsFile(asegFilePath, kwargs)
 %
 % Reads an aseg.stats file for brain compartment statistics table.
 % These are related to a corresponding aseg.mgz file with the actual compartment data.

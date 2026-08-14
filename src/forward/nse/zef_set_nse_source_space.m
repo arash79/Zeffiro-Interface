@@ -1,34 +1,21 @@
 function zef = zef_set_nse_source_space(zef,nse_field)
-% --- Zeffiro documentation header ---
-% zef_set_nse_source_space — Zef set nse source space.
-%
-% Purpose:
-%   Zef set nse source space.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
-%
-% Inputs:
-%   zef
-%   nse_field
-%
-% Outputs:
-%   zef
-%
-% Zef fields (observed):
-%   zef.source_orientations (read, write)
-%   zef.source_positions (read, write)
-%
-% Calls (project):
-%   zef_set_nse_source_space
-%   zef_source_interpolation
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_set_nse_source_space(zef, nse_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%ZEF_SET_NSE_SOURCE_SPACE  Copy NSE interior nodes into zef.source_positions.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   source_positions = nse_field.nodes(nse_field.i_node_ind,:);
+%   source_orientations = []; then zef_source_interpolation. Lets the
+%   figure tool display NSE nodes as a source space; does not assemble L.
+%
+%   zef = zef_set_nse_source_space(zef, nse_field)
+%
+%   See also zef_source_interpolation, zef_nse_iteration.
 
 zef.source_positions = nse_field.nodes(nse_field.i_node_ind,:);
 zef.source_orientations = [];

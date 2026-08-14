@@ -1,21 +1,13 @@
-% --- Zeffiro documentation header ---
-% full_address = 'exportImage'; — Full address = 'export Image';.
+%PLOT_SOURCES  Script: copy zef.h_axes1 deep and cortex views to PNG/FIG.
 %
-% Purpose:
-%   Full address = 'export Image';.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_axes1 (read)
+%   Reads zef.h_axes1 clim; writes exportImage/carsten*. Not a plugin
+%   button.
 %
-% Side effects:
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `full_address = 'exportImage';` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 full_address = 'exportImage';
 file_name = 'carsten';

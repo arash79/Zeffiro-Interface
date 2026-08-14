@@ -1,37 +1,47 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef_arrange_windows(varargin)
-% --- Zeffiro documentation header ---
-% zef_arrange_windows — Zef arrange windows.
+%ZEF_TILE_WINDOWS  Stale copy of window tiling; prefer src/core/zef_arrange_windows.
 %
-% Purpose:
-%   Zef arrange windows.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Filename zef_tile_windows.m (MATLAB calls this file by that name). The
+%   first function line is still named zef_arrange_windows. No first-party
+%   caller: **Window → Tile / Maximize / Minimize / Close** in
+%   zef_menu_tool uses src/core/zef_arrange_windows. Keep this file only
+%   as a historical duplicate.
 %
-% Outputs:
-%   See function signature and code below.
+%   Unlike the core copy, varargin{1} is stored as arrange_function and
+%   never read. Collecting handles and applying tile/max/min all key off
+%   arrange_mode (varargin{3}, default 'on-screen'). Collecting runs only
+%   for 'on-screen' or 'all'; tiling runs only for 'tile'. Those sets are
+%   disjoint, so a single call cannot both find windows and tile them.
+%   Maximize here sets WindowState to 'normal' (not 'maximized'). There is
+%   no 'close' branch, no zef_window_manager('is_protected') skip, and no
+%   post-tile dock_menu.
 %
-% Calls (project):
-%   zef_arrange_windows
+%   zef_tile_windows
+%   zef_tile_windows(unused_arrange_function)
+%   zef_tile_windows(unused_arrange_function, arrange_target)
+%   zef_tile_windows(unused_arrange_function, arrange_target, arrange_mode)
 %
-% Side effects:
-%   - base/caller workspace
+%   Inputs (parsed, but see the arrange_mode collision above)
+%     unused_arrange_function - ignored (core uses this as 'tile'|…).
+%     arrange_target          - 'windows' (default), 'figs', or 'tools'.
+%     arrange_mode            - 'on-screen' (default), 'all', 'tile',
+%                               'maximize', or 'minimize'.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_arrange_windows(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_arrange_windows, zef_tile_figs.
 
 arrange_mode = 'on-screen';
 arrange_target = 'windows';
 arrange_function = 'tile';
 
 if not(isempty(varargin))
-    arrange_function = varargin{1};
+    arrange_function = varargin{1}; % stored but never used; core uses this as the action
 
     if length(varargin) > 1
         arrange_target = varargin{2};
@@ -64,6 +74,8 @@ elseif isequal(arrange_mode,'all')
 end
 
 if isequal(arrange_mode,'tile')
+    % Core checks arrange_function=='tile'. Here arrange_mode must be 'tile',
+    % which means the handle-collecting branches above did not run.
 
     tile_mat = [1 : n_tiles];
     tile_mat = tile_mat'*tile_mat;

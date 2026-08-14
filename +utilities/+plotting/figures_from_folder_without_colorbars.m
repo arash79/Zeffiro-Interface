@@ -1,27 +1,15 @@
 function figures_from_folder_without_colorbars(folder, filetypes, resolution)
-% --- Zeffiro documentation header ---
-% utilities.plotting.figures_from_folder_without_colorbars — Figures from folder without colorbars.
+%FIGURES_FROM_FOLDER_WITHOUT_COLORBARS  Batch-export .fig files without colorbars.
 %
-% Purpose:
-%   Figures from folder without colorbars.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   folder
-%   filetypes
-%   resolution
+%   figures_from_folder_without_colorbars(folder, filetypes, resolution)
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Calls (project):
-%   utilities.plotting.figure_without_colorbar_fn
-%   utilities.plotting.figures_from_folder_without_colorbars
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `utilities.plotting.figures_from_folder_without_colorbars(folder, filetypes, resolution)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Recursively finds *.fig under folder, opens each, and calls
+%   figure_without_colorbar_fn with the stem path and requested formats.
 
     arguments
 

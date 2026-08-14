@@ -1,14 +1,24 @@
-% --- Zeffiro documentation header ---
-% examples.studies.decision_making.training_data_file_name = ''; — Example or study script demonstrating training_data_file_name = '';.
+%ZEF_PARAMETERS_FOCAL_EPILEPSY  Workspace names for the focal-epilepsy study scripts.
 %
-% Purpose:
-%   Example or study script demonstrating training_data_file_name = '';.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `examples.studies.decision_making.training_data_file_name = '';` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   Script (not a function). Assigns then prefixes paths with
+%   fileparts(mfilename('fullpath'))/data/:
+%     training_data_file_name      starts '' → that folder with a trailing
+%                                  filesep (save() would treat it as a dir)
+%     credibility_data_file_name   'credibility_dataset_p0857_10dB' (no .mat)
+%     project_file_name            set to a ~/Dropbox/... string THEN
+%                                  concatenated under data/ — that default
+%                                  does not resolve; edit after folder_name
+%   Also: snr_vec=[10], training_data_size=50, frame_number=1,
+%   supervised_clustering='on', cred_val_rec/points, max_n_clusters=100,
+%   n_dynamic_levels, tol_val_*, reg_param_*, max_iter.
+%   Other scripts in this package run this first.
+%
+%   See also zef_create_training_data_focal_epilepsy.
 
 training_data_file_name = '';
 credibility_data_file_name = 'credibility_dataset_p0857_10dB';

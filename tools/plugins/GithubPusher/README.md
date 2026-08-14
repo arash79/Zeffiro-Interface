@@ -1,41 +1,35 @@
-# tools/plugins/GithubPusher
+# Github pusher
 
-## Purpose of this folder
+A small Git UI over the Zeffiro working copy: **push**, **pull**, and **reset**. It is **destructive** and it is **not** a general Git client.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+`zef_git_push` rewrites `origin` to
 
-## Contents
+```text
+https://sampsapursiainen:<PAT>@github.com/sampsapursiainen/zeffiro_interface
+```
 
-Subfolders:
-- `m/`
-- `mlapp/`
+then `git pull`, `git add -A`, commit, and `git push -u origin`. That remote is the **upstream Zeffiro repository**, not whatever fork you cloned. A push from this tool therefore targets `sampsapursiainen/zeffiro_interface` and leaves your local `origin` URL rewritten with the PAT in it.
 
-## How this folder fits into the overall workflow
+The default message widget *says* `./data/` and `./profile/` are ignored. `zef_git_push` still runs `git add -A`; those folders are skipped only if they are already in `.gitignore`. Treat the widget text as a warning, not an implemented exclude list.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Reset is `git reset --hard origin` then fetch/pull. There is no dry-run. Review `git status` yourself before using this window.
 
-## GUI usage
+## How to open it
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+**Settings → Github pusher** (default profile; asteroid profiles: **GitHub pusher**). Callback: `zef_github_updater_start` (script). Title: **ZEFFIRO Interface: GitHub pusher tool**.
 
-## Programmatic usage
+## Buttons (`ButtonPushedFcn` in `m/zef_github_updater_start.m`)
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+| Handle | Action |
+|--------|--------|
+| Push (`h_github_updater_button`) | confirm → `zef_github_updater_script` → `zef_git_push(PAT, 'message', author + ': ' + message)` |
+| Reset (`h_github_reset_button`) | confirm → `!git reset --hard origin; !git fetch --all; !git pull;` |
+| Pull (`h_github_pull_button`) | confirm → `!git pull;` |
 
-## Examples
+Author field defaults to `zef.user_tag`. PAT is `zef.h_github_pat`.
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+## Scripting
 
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+```matlab
+zef_git_push(token, 'message', 'user: message text');
+```

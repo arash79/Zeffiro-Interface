@@ -1,28 +1,15 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef.lf_item_selected = get(zef — Zef.lf item selected = get(zef.
+%ZEF_DELETE_LF_ITEM  Remove checked lf_bank_storage cells.
 %
-% Purpose:
-%   Zef.lf item selected = get(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_lf_item_list (read)
-%   zef.lf_bank_storage (read, write)
-%   zef.lf_item_list (read, write)
-%   zef.lf_item_selected (read, write)
+%   Script. Delete-selected button (after questdlg). Keeps items not
+%   in h_lf_item_list value; clears lf_item_selected. Then
+%   zef_update_lf_bank_tool and zef_update. Does not change live zef.L.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.lf_item_selected = get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_add_lf_item.
 
 zef.lf_item_selected = get(zef.h_lf_item_list,'value');
 

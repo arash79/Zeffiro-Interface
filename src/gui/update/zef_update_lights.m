@@ -1,36 +1,27 @@
 function lights_vec = zef_update_lights(varargin)
-% --- Zeffiro documentation header ---
-% zef_update_lights — Syncs GUI control values into `zef` for lights.
+%ZEF_UPDATE_LIGHTS  Figure-tool **Lights:** popup.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for lights.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Finds the popup Tag='lightsselection' on gcf (string={'Default
+%   (vertical)','Lights off','Add x-lights','Add y-lights','Add z-lights',
+%   'Add headlight'}). Value 1 deletes existing Light objects on axes1
+%   and adds a ±z infinite pair. Value 2 deletes lights. Values 3–5
+%   *add* ±x / ±y / ±z pairs without deleting. Value 6 adds camlight
+%   headlight. Accumulates codes in zef.update_lights (returned).
 %
-% Outputs:
-%   lights_vec
+%   The Figure-tool Callback writes the returned vector to
+%   zef.update_lights when gca is parented to h_zeffiro. If axes1 is not
+%   zef.h_axes1 (popped-out figure), the returned vector is the existing
+%   zef.update_lights (scene still updates locally).
 %
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%   zef.h_zeffiro (read)
-%   zef.update_lights (read)
+%   lights_vec = zef_update_lights
+%   lights_vec = zef_update_lights(h_figure)
 %
-% Calls (project):
-%   zef_update_lights
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[lights_vec] = zef_update_lights(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_set_lights, zef_figure_tool.
 if not(isempty(varargin))
     h_figure = varargin{1};
 else

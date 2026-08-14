@@ -1,32 +1,18 @@
 function h_arrow_vec = zef_plot_3D_arrow(x,y,z,u,v,w,varargin)
-% --- Zeffiro documentation header ---
-% zef_plot_3D_arrow — Renders or updates a plot_3d_arrow figure from current `zef` state.
+%ZEF_PLOT_3D_ARROW  Cylinder/sphere arrow meshes on gca (not Figure-tool sliders).
 %
-% Purpose:
-%   Renders or updates a plot_3d_arrow figure from current `zef` state.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   x
-%   y
-%   z
-%   u
-%   v
-%   w
-%   varargin
+%   Function. Builds a unit arrow (type 1 = sphere head, else cone head),
+%   rotates each copy from +z toward (u,v,w), scales by arrow_scale *
+%   vector norm. Optional varargin: scale, type, color, shape, length,
+%   head_size, n_polygons. Draws on gca. Helper for dipole / DTI glyphs;
+%   zef_plot_source uses quiver3 instead.
 %
-% Outputs:
-%   h_arrow_vec
-%
-% Calls (project):
-%   zef_plot_3D_arrow
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[h_arrow_vec] = zef_plot_3D_arrow(x, y, z, u, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_plot_source.
 h_axes = gca;
 hold_state = ishold(h_axes);
 

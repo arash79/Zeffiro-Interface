@@ -1,39 +1,14 @@
-% --- Zeffiro documentation header ---
-% h1 = figure(... — H1 = figure(.
+%ZEF_RAMUS_APP  GUIDE dump: RAMUS inversion tool widgets.
 %
-% Purpose:
-%   H1 = figure(....
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_ramus_apply (read, write)
-%   zef.h_ramus_cancel (read, write)
-%   zef.h_ramus_high_cut_frequency (read, write)
-%   zef.h_ramus_hyperprior (read, write)
-%   zef.h_ramus_ias_map_estimation (read, write)
-%   zef.h_ramus_init_guess_mode (read, write)
-%   zef.h_ramus_inversion_tool (read)
-%   zef.h_ramus_low_cut_frequency (read, write)
-%   zef.h_ramus_make_multires_dec (read, write)
-%   zef.h_ramus_multires_n_decompositions (read, write)
-%   zef.h_ramus_multires_n_iter (read, write)
-%   zef.h_ramus_multires_n_levels (read, write)
-%   zef.h_ramus_multires_sparsity (read, write)
-%   zef.h_ramus_normalize_data (read, write)
-%   zef.h_ramus_number_of_frames (read, write)
-%   … (26 more)
+%   Script. Figure Name 'RAMUS inversion tool' (renamed by
+%   zef_ramus_window). Layout only; Start is bound in zef_ramus_window.
 %
-% Calls (project):
-%   zef_make_multires_dec
-%   zef_ramus_iteration
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `h1 = figure(...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_ramus_window.
 
 h1 = figure(...
     'PaperUnits',get(0,'defaultfigurePaperUnits'),...
@@ -69,7 +44,7 @@ h1 = figure(...
     'DeleteFcn',blanks(0),...
     'Tag','figure1',...
     'UserData',[],...
-    'WindowStyle',get(0,'defaultfigureWindowStyle'),...
+    'WindowStyle','normal',......
     'DockControls',get(0,'defaultfigureDockControls'),...
     'Resize',get(0,'defaultfigureResize'),...
     'PaperPosition',get(0,'defaultfigurePaperPosition'),...

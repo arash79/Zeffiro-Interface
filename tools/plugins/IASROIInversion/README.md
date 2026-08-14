@@ -1,40 +1,56 @@
-# tools/plugins/IASROIInversion
+# IASROIInversion
 
-## Purpose of this folder
+IAS MAP restricted to a region of interest (sphere, threshold, or parcellation). Use it when you already know an approximate focus and want the hierarchical Bayes update only there.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+There is **no** `inverse.*Inverter` for this ROI variant.
 
-## Contents
+## Menu
 
-Subfolders:
-- `m/`
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **IAS ROI Inversion** |
+| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
 
-## How this folder fits into the overall workflow
+INI callback: `ias_map_estimation_roi` (file `m/ias_map_estimation_roi.m`).
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Window title: `ZEFFIRO Interface: IAS ROI MAP estimation`.
 
-## GUI usage
+## Run the solver
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+**Start** (`zef.h_iasroi_start`) Callback in `zef_ias_map_estimation_roi_window` (init does **not** override it):
 
-## Programmatic usage
+```matlab
+zef_update_ias_roi; [zef.reconstruction, zef.iasroi_rec_source] = ias_iteration_roi([]);
+```
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+The function on disk is `zef_ias_iteration_roi`. There is no `ias_iteration_roi.m` in this tree — the live Start string does not match the solver filename.
 
-## Examples
+Also on the window: **Plot Sphere(s)** / **Plot source(s)** for ROI visualization; they do not run the inverse.
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+## Needs
 
-## Dependencies and assumptions
+- `zef.L`, interpolation, `zef.source_positions`
+- `zef.measurements`
+- SNR: `zef.iasroi_snr` (from `inv_snr` at init) → `10^(-iasroi_snr/20)`
+- Frames: `zef.iasroi_number_of_frames`, `iasroi_time_*`, band edges
+- ROI: `zef.iasroi_roi_mode`, `iasroi_roi_sphere`, `iasroi_roi_threshold`, `iasroi_rec_source`
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+ROI mode dropdown (`zef_ias_map_estimation_roi_window` `String`):
 
-## Notes for developers
+| Value | Label | Sources kept |
+|-------|-------|----------------|
+| 1 | Sphere(s) | Inside any `iasroi_roi_sphere` ball `[x y z radius]` (same units as `source_positions`) |
+| 2 | Threshold | Existing `zef.reconstruction` amplitude ≥ `iasroi_roi_threshold` (peak-normalized) |
+| 3 | Parcellation | Selected parcellation labels (`default` in `zef_init_ias_roi`) |
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+IAS MAP then runs only on the corresponding lead-field columns (`L(:, roi_aux_ind)`). **Plot Sphere(s)** / **Plot source(s)** draw on Figure-tool axes; they do not invert.
+
+## Writes
+
+- Intended: `zef.reconstruction` and `zef.iasroi_rec_source` from `zef_ias_iteration_roi` (`[z, rec_source]`)
+- Does **not** fill `zef.reconstruction_information`
+
+## Files
+
+- Start: `m/ias_map_estimation_roi.m` → `zef_init_ias_roi`
+- Solver: `m/zef_ias_iteration_roi.m`

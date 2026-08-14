@@ -1,30 +1,21 @@
 function zef = zef_ramus_inversion_tool(zef)
-% --- Zeffiro documentation header ---
-% zef_ramus_inversion_tool — Zef ramus inversion tool.
+%ZEF_RAMUS_INVERSION_TOOL  RAMUS hierarchical Bayesian sparse inverse plugin.
 %
-% Purpose:
-%   Zef ramus inversion tool.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_ramus_inversion_tool
+%   zef = zef_ramus_inversion_tool(zef)
 %
-% Outputs:
-%   zef
+%   INI callback (Inverse tools → RAMUS Inversion). Opens the RAMUS window
+%   via zef_ramus_window. Start runs zef_ramus_iteration(zef). Create
+%   multiresolution decomposition must fill ramus_multires_dec first.
+%   Needs zef.L and zef.measurements. Does not call inverse.RAMUSInverter.
 %
-% Calls (project):
-%   zef_ramus_inversion_tool
-%   zef_tool_start
+%   See also zef_ramus_window, zef_ramus_iteration.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_ramus_inversion_tool(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     zef = evalin('base','zef');

@@ -1,36 +1,31 @@
 function [f] = zef_getFilteredData(zef)
-% --- Zeffiro documentation header ---
-% zef_getFilteredData — Zef get Filtered Data.
+%ZEF_GETFILTEREDDATA  Normalize and band-pass zef.measurements for legacy inversion.
 %
-% Purpose:
-%   Zef get Filtered Data.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   When zef.inv_data_mode is "filtered_temporal", copies zef.measurements,
+%   divides by a scale derived from zef.normalize_data (1=max entry, 2=max
+%   column norm, 3=average column norm, else 1), then applies 3rd-order
+%   elliptic low-pass (inv_high_cut_frequency) and high-pass
+%   (inv_low_cut_frequency) filters at inv_sampling_frequency. In "raw" mode
+%   returns measurements unchanged.
 %
-% Outputs:
-%   f
+%   f = zef_getFilteredData()
+%   f = zef_getFilteredData(zef)
 %
-% Zef fields (observed):
-%   zef.inv_data_mode (read)
-%   zef.inv_high_cut_frequency (read)
-%   zef.inv_low_cut_frequency (read)
-%   zef.inv_sampling_frequency (read)
-%   zef.measurements (read)
-%   zef.normalize_data (read)
+%   Input
+%     zef - session struct; if omitted, loaded from base workspace.
 %
-% Calls (project):
-%   zef_getFilteredData
+%   Output
+%     f   - filtered data matrix (n_channels x n_samples).
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Errors when inv_data_mode is unsupported. Filter cutoff frequencies of 0
+%   skip the corresponding filter stage.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[f] = zef_getFilteredData(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_getFilteredDataClassObj, zef_getTimeStep, zef_process_inversion.
 
 if (nargin == 0)
 zef = evalin('base','zef');

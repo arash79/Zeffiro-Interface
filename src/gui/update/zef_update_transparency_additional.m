@@ -1,33 +1,28 @@
 function slider_value_new = zef_update_transparency_additional(varargin)
-% --- Zeffiro documentation header ---
-% zef_update_transparency_additional — Syncs GUI control values into `zef` for transparency_additional.
+%ZEF_UPDATE_TRANSPARENCY_ADDITIONAL  Figure-tool **Transp. add.:** slider.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for transparency_additional.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Finds the slider Tag='transparency_additional_slider' on the Figure
+%   tool (or on varargin{1} if a popped-out figure was passed), then sets
+%   FaceAlpha on every axes1 child whose Tag matches regexp 'additional*'
+%   (plugin / extra overlays; first-party plotters tag reconstruction,
+%   surface, sensor, and cones instead).
 %
-% Outputs:
-%   slider_value_new
+%   Alpha is 1.05^(-100*slider). Slider 0 → opaque; larger values fade
+%   those patches. The Figure-tool Callback writes the returned value to
+%   zef.update_transparency_additional when gca is parented to h_zeffiro.
 %
-% Zef fields (observed):
-%   zef.h_zeffiro (read)
+%   Sibling sliders: zef_update_transparency_reconstruction / _surface /
+%   _sensor / _cones. Wired as Callback strings from zef_figure_tool.
 %
-% Calls (project):
-%   zef_update_transparency_additional
+%   slider_value_new = zef_update_transparency_additional
+%   slider_value_new = zef_update_transparency_additional(h_figure)
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[slider_value_new] = zef_update_transparency_additional(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_transparency_reconstruction, zef_figure_tool.
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');
 else
@@ -51,6 +46,7 @@ slider_value_new = h_object.Value;
 
 h = findobj(h,'-regexp','Tag','additional*');
 
+% Same kappa as reconstruction: FaceAlpha = min(1, 1.05^(-100*slider)).
 kappa = 1.05.^(-100*(slider_value_new));
 
 for i = 1 : length(h)

@@ -1,28 +1,18 @@
 function [T, P] = zef_simple_cylinder_generator(R,N,L)
-% --- Zeffiro documentation header ---
-% zef_simple_cylinder_generator — Zef simple cylinder generator.
+%ZEF_SIMPLE_CYLINDER_GENERATOR  Closed triangular cylinder surface (radius R, length L).
 %
-% Purpose:
-%   Zef simple cylinder generator.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   R
-%   N
-%   L
+%   [T, P] = zef_simple_cylinder_generator(R, N, L)
 %
-% Outputs:
-%   T
-%   P
+%   N is circumferential sector count. delaunay + freeBoundary.
+%   Called from zef_create_strip twice (strip vs encapsulation).
+%   No zef I/O.
 %
-% Calls (project):
-%   zef_simple_cylinder_generator
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[T, P]] = zef_simple_cylinder_generator(R, N, L)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_create_strip.
 
 d_r = 2*pi*R/N;
 M = ceil(R/d_r);

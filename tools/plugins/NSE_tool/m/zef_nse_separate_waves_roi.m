@@ -1,40 +1,21 @@
 
 function [forward_pressure, backward_pressure, forward_velocity, backward_velocity, intensities] = zef_nse_separate_waves_roi(zef, nse_field)
-% --- Zeffiro documentation header ---
-% zef_nse_separate_waves_roi — Zef nse separate waves roi.
+%ZEF_NSE_SEPARATE_WAVES_ROI  Split ROI pressure/velocity into forward and backward waves.
 %
-% Purpose:
-%   Zef nse separate waves roi.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nse_field
+%   Called from plot_graph types 3–5 and 9–11. Characteristic speed
+%   c = (1/ρ) sqrt(movmean(Δp²) / movmean(Δu²)) along zef_nse_vel_dir.
+%   dP± / dU± Riemann invariants; if sum(forward_velocity) < sum(backward)
+%   the two families are swapped. Interpolated back to n_time samples.
 %
-% Outputs:
-%   forward_pressure
-%   backward_pressure
-%   forward_velocity
-%   backward_velocity
-%   intensities
+%   [p_f, p_b, u_f, u_b, I] = zef_nse_separate_waves_roi(zef, nse_field)
 %
-% Zef fields (observed):
-%   zef.nse_field (read)
+%   See also zef_nse_vel_dir, zef_nse_plot_graph.
 %
-% Calls (project):
-%   zef_nse_mean_velocity_roi
-%   zef_nse_roi_ind
-%   zef_nse_separate_waves_roi
-%   zef_nse_vel_dir
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[forward_pressure, backward_pressure, forward_velocity]] = zef_nse_separate_waves_roi(zef, nse_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 roi_ind = zef_nse_roi_ind(zef,nse_field);
 dir_aux = zef_nse_vel_dir(zef,nse_field);
@@ -55,6 +36,7 @@ n_cycle = floor(nse_field.cycle_length/d_time);
     end 
 %     c = zeros(n_time-1,1);
 %    c =  sqrt(sqrt(abs(pressure_sum))/(sqrt(abs(velocity_sum))*nse_field.rho));
+% Characteristic speed from cycle-smoothed Δp² / Δu² (ρ in the denominator).
     c =  (1/nse_field.rho)*sqrt(movmean(pressure_sum,2*n_cycle))./(sqrt(movmean(velocity_sum,2*n_cycle)));
 %     c =  sqrt(pressure_sum/velocity_sum)/nse_field.rho;
 %     c(1:end,1) =  (1/nse_field.rho)*sqrt(mean(pressure_sum)/mean(velocity_sum));

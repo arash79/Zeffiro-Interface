@@ -1,90 +1,81 @@
-# src
+# `src` — Zeffiro runtime
 
-## Purpose of this folder
+This folder is the procedural MATLAB that runs when you start Zeffiro: GUI windows, the `zef` session, mesh and lead-field pipelines, file I/O, and inverse *orchestration*. Algorithm classes for the newer inverse solvers live in `+inverse` at the project root; `src/inverse` is the bridge that feeds them `zef`.
 
-Main **procedural runtime** for Zeffiro Interface (~557 `.m` files). Loaded with `addpath(genpath(zef.code_path))` from `zeffiro_interface.m`. Holds the `zef_*` API, GUI tools, FEM mesh pipeline, forward lead fields, inverse **orchestration**, I/O, and visualization. Algorithm cores for refactored inverses live in `+inverse`; this tree wires them to `zef`.
+`zeffiro_interface` does `addpath(genpath(src))`, so these files are called as `zef_create_fem_mesh`, not `src.mesh.zef_create_fem_mesh`.
 
-## Contents
-
-| Subfolder | Files (approx.) | Responsibility |
-|-----------|-----------------|---------------|
-| `core/` | 16 | `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars |
-| `gui/` | 249 | App Designer exports, tools, callbacks, `zef_update_*`, plotting |
-| `mesh/` | 61 | FEM creation, refinement, barycentric operators, surface tools |
-| `forward/` | 109 | Lead fields (`lead_field/`), DTI, NSE, wave models, PCG |
-| `inverse/` | 14 | `zef_inverse_run`, bundles, filtering, post-process to `zef.reconstruction` |
-| `io/` | 20 | `zef_load`/`zef_save`, segmentation import, export |
-| `compartments/` | 8 | Compartment tables, point-in-compartment tests |
-| `sensors/` | 6 | Sensor geometry and attachment |
-| `parcellation/` | 11 | Atlas/ROI parcellation |
-| `visualization/` | 27 | Time-series scaling, graph bank |
-| `sensitivity/` | 1 | `zef_sensitivity_run` bridge |
-| `auxiliary/` | 35 | Distance-to-mesh, MRI helpers, analysis scripts |
-| `constants/` | 0 | Placeholder README (stencil constants documented only) |
-| `nodisplay/` | 0 | Extra path in nodisplay mode (placeholder) |
-
-## How this folder fits into the overall workflow
+## How a session uses this tree
 
 ```
 zeffiro_interface
-  → addpath(genpath(src))
-  → zef_start → zef_segmentation_tool, zef_mesh_tool, zef_menu_tool, …
-  → zef_update  (sync GUI ↔ zef)
+  → src/core/zef_start
+       opens src/gui/tools (segmentation, figure, mesh, menu)
+  → you import anatomy and sensors
+  → src/mesh builds tetrahedra
+  → src/forward builds zef.L
+  → src/inverse or tools/plugins writes zef.reconstruction
+  → src/gui/plot draws it
 ```
 
-**Forward:** `src/forward/lead_field/zef_lead_field_matrix.m` dispatches on `core.types.ZefSourceModel` → fills `zef.L`.
+`zef_update` (`src/core`) is the hub that copies GUI tables into `zef` fields after a user edit.
 
-**Inverse:** `src/inverse/zef_inverse_run.m` extracts bundle → `utilities.cluster.dispatch_inverse` → `+inverse` classes.
+## Subfolders (what to open, not a file inventory)
 
-**Plugins:** `tools/plugins` on separate path; menus via `zef_plugin` + `profile/*/zeffiro_plugins.ini`.
+| Folder | Open this README when you need to… |
+|--------|--------------------------------------|
+| `core/` | Start, close, waitbars, logging, `zef_update` |
+| `gui/` | Menus, tools, callbacks, 3D plot |
+| `mesh/` | Surfaces → tetrahedra, stiffness operators |
+| `forward/` | EEG/MEG/EIT/TES/gravity lead fields, DTI, NSE |
+| `inverse/` | `zef_inverse_run`, lead-field prep, reconstruction post-process |
+| `io/` | `zef_load` / `zef_save`, segmentation import/export |
+| `compartments/` | Point-in-tissue tests used while labeling a mesh |
+| `sensors/` | Attach electrodes/MEG coils to the volume |
+| `parcellation/` | Atlas ROIs on the source space |
+| `visualization/` | Time-series helpers used by the figure tool |
+| `auxiliary/` | Distances, MRI helpers, one-off analysis |
+| `sensitivity/` | `zef_sensitivity_run` |
+| `nodisplay/` | Extra path in `'start_mode','nodisplay'` |
 
-## GUI usage
+## GUI vs scripting
 
-Startup chain (`zef_start.m`):
-
-1. `zef_segmentation_tool` — compartments, sensors, transforms  
-2. `zef_figure_tool` — 3D visualization  
-3. `zef_mesh_tool` — FEM mesh and forward table  
-4. `zef_menu_tool` — file/import/export/edit/tools/plugins  
-
-Callbacks live in `gui/callbacks/`; state sync in `gui/update/`; central refresh `core/zef_update.m`.
-
-## Programmatic usage
+The same functions the buttons call are the scripting API. Examples:
 
 ```matlab
 zef = zeffiro_interface('start_mode','nodisplay');
 
-% Mesh + lead field (simplified)
-zef = zef_create_fem_mesh(zef);
-zef = zef_process_meshes(zef);
+% Mesh (same as Mesh tool → Create FEM mesh)
+zef = zef_create_finite_element_mesh(zef);
+
+% Lead field (or use Mesh tool → Run script / zef_eeg_make_all)
 zef = zef_lead_field_matrix(zef);
 
-% Inverse orchestration
-[zef, r] = zef_inverse_run(zef, 'mne');
+% Class inverse (not the Inverse-tools plugin buttons)
+[zef, r] = zef_inverse_run(zef, 'mne', 'execution', 'local');
 
-% I/O
-zef = zef_load(zef, projectFile);
-zef = zef_save(zef, projectFile);
+zef = zef_save(zef, 'my_project.mat');
 ```
 
-Key public APIs: see subfolder READMEs (`src/gui`, `src/forward`, `src/inverse`, …).
+GUI paths are documented in the child READMEs from the actual `MenuSelectedFcn` / `ButtonPushedFcn` wiring. Do not assume a menu name from an older screenshot; the App Designer export under `src/gui/apps/` is the label source of truth.
 
-## Examples
+## Two inverse tracks
 
-- Bundled: `data/default_project.mat` via `zeffiro_interface('open_project', …)`  
-- Package examples: `+examples/+meshing`, `+forward`, `+inverse`  
-- Lead field: `+examples/+forward/lead_field_example.m`
+- **Menus (Inverse tools):** `tools/plugins/*` still run legacy iterations into `zef.reconstruction`.
+- **`zef_inverse_run`:** `src/inverse` → `utilities.cluster.dispatch_inverse` → `+inverse/@*Inverter`.
 
-## Dependencies and assumptions
+They share `zef.L` and measurements but are not the same code path. See `src/inverse/README.md` and `+inverse/README.md`.
 
-- Entire tree on path via `genpath` (flat `zef_*` names).
-- `zef` struct in base workspace with GUI handles `h_*` when in display mode.
-- Calls into `core.*`, `inverse.*`, `utilities.*` require project root on path.
-- GPU/parallel flags on `zef` affect forward and inverse paths.
+## Packages this tree calls
 
-## Notes for developers
+With the project root on the path:
 
-- **Do not confuse** `src/core` with `+core` package at repo root.
-- New GUI features: App Designer export in `gui/apps/`, wire in `gui/tools/`, callback in `gui/callbacks/`, sync in `gui/update/`.
-- New inverse methods: implement in `+inverse`, register, call via `zef_inverse_run`—avoid new per-frame loops in `src/inverse` unless orchestration only.
-- Subfolder `README.md` files document local `zef_*` entry points.
+- `core.types.ZefSourceModel` — Whitney / H(div) / St. Venant in lead-field assembly
+- `core.io.electrodes.*` and `core.gui.menu_tool.import_electrodes_callback`
+- `inverse.*Inverter` via `zef_inverse_run`
+- `utilities.cluster.*`, `utilities.sn2zef`, `utilities.brainstorm2zef`, …
+
+`src/core` ≠ `+core`.
+
+## See also
+
+Root [README.md](../README.md) for startup and the `zef` field map. `+examples/` for end-to-end scripts.

@@ -1,33 +1,22 @@
-%This function plot intensity as curves or histograms depending on is the
-%ground truth setted or not.
-% --- Zeffiro documentation header ---
-% function zef_plot_source_intensity — Function zef plot source intensity.
+function zef_plot_source_intensity
+%ZEF_PLOT_SOURCE_INTENSITY  Plot time_sequence intensities on h_axes1 (curves or bars).
 %
-% Purpose:
-%   Function zef plot source intensity.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.find_synth_source (read)
-%   zef.fss_time_val (read)
-%   zef.h_axes1 (read)
-%   zef.h_zeffiro (read)
-%   zef.inv_synth_source (read)
-%   zef.time_sequence (read)
-%   zef.time_variable (read)
-%
-% Calls (project):
 %   zef_plot_source_intensity
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Plot-intensity / plot-time-sequence buttons after zef_update_fss.
+%   Reads zef.time_sequence, time_variable, inv_synth_source(:,7) from
+%   base. plot_switch==1 uses selected_source rows; else all.
+%   intensity_direction false → abs(amp.*y); true → signed.
+%   Empty fss_time_val → curves vs time_variable; otherwise a bar at
+%   the last sample with t <= fss_time_val. cla h_axes1; does not
+%   overlay reconstruction (despite the old pre-function comment).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_plot_source_intensity` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-function zef_plot_source_intensity
+%   See also zef_generate_time_sequence, zef_plot_source.
 
 if str2num(evalin('base','zef.find_synth_source.h_plot_switch.Value')) == 1
     name_label = evalin('base','zef.find_synth_source.h_source_list.Data(zef.find_synth_source.selected_source)');
@@ -50,7 +39,8 @@ else
 end
 %Figure visualization setups
 zef_temp_axis = evalin('base','zef.h_axes1');
-axes(zef_temp_axis);
+axes(zef_temp_axis)
+;
 cla(zef_temp_axis);
 hold(zef_temp_axis,'off');
 set(zef_temp_axis,'visible','on')

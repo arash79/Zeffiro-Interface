@@ -1,49 +1,38 @@
-# src/mesh/operators
+# Stiffness operator (`src/mesh/operators`)
 
-## Purpose of this folder
+One file: `zef_stiffness_matrix.m`. This is the sparse P1 conductivity matrix used by EEG/MEG/EIT/TES lead fields.
 
-FEM mesh generation, surface processing, refinement, and barycentric operators.
-
-## Contents
-
-MATLAB sources:
-- `zef_stiffness_matrix.m` — **zef_stiffness_matrix**: Zef stiffness matrix.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
-
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+```
+A_ij = ∫ ∇ψ_i · (σ ∇ψ_j) dV
 ```
 
-Representative entry points in this folder:
-- ``[A] = zef_stiffness_matrix(nodes, tetrahedra, volume, tensor)` with project root and `src` on the path.`
+Pipeline: [`src/mesh/README.md`](../README.md). NSE mass/Laplacian products live in [`barycentric/`](../barycentric/README.md), not here.
 
-## Examples
+## Why every entry is divided by 9V
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+`zef_volume_gradient(nodes, tetra, i)` returns the signed **area vector** of the face opposite local vertex i (½ e1×e2, oriented toward that vertex). It is **not** ∇ψ_i.
 
-## Dependencies and assumptions
+For linear hats, ∇ψ_i = area_i / (3V). Two gradients and the remaining volume in the integral give
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+```
+∫ ∇ψ_i · (σ ∇ψ_j) dV = (area_i · σ area_j) / (9V)
+```
 
-## Notes for developers
+That is the `./ (9 * volume)` in the assembler. Contrast `zef_tetra_gradient_field`, which *does* divide by volume and maps nodal potential → σ∇u (TES), not this matrix.
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+`volume` must come from `zef_tetra_volume(..., true)` in the same length unit as `nodes` (metres on the lead-field path).
+
+## Packed σ (6×T)
+
+| Row | Entry |
+|-----|--------|
+| 1–3 | σ_xx, σ_yy, σ_zz |
+| 4–6 | σ_xy, σ_xz, σ_yz |
+
+Isotropic tissue repeats the scalar on rows 1–3 and leaves 4–6 zero. Off-diagonal rows add both g_i(a)g_j(b) and g_i(b)g_j(a).
+
+## Assembly
+
+Local vertices i ≤ j: `sparse(tetrahedra(:,i), tetrahedra(:,j), entry_vec', N, N)`. Off-diagonals add A_part + A_part'. Side effect: waitbar (closed by `onCleanup`).
+
+Callers: `zef_lead_field_eeg_fem` and the other `src/forward/lead_field` assemblers, after electrode coupling in `zef_build_electrodes`.

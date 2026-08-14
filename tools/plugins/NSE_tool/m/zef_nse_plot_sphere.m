@@ -1,41 +1,26 @@
 function zef_nse_plot_sphere(h_axes,nse_field)
-% --- Zeffiro documentation header ---
-% zef_nse_plot_sphere — Zef nse plot sphere.
+%ZEF_NSE_PLOT_SPHERE  Plot sphere button: grey spheres at nse_field.sphere_* on the current axes.
 %
-% Purpose:
-%   Zef nse plot sphere.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   h_axes
-%   nse_field
+%   ButtonPushedFcn of h_plot_sphere (called with no args → gca and
+%   zef.nse_field). Tag additional:nse_sphere; previous spheres are deleted.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_nse_plot_sphere()
+%   zef_nse_plot_sphere(h_axes, nse_field)
 %
-% Zef fields (observed):
-%   zef.nse_field (read)
+%   See also zef_nse_apply_source, zef_nse_plot_roi.
 %
-% Calls (project):
-%   zef_nse_plot_sphere
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_nse_plot_sphere(h_axes, nse_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     h_axes = evalin('base','gca');
     nse_field = evalin('base','zef.nse_field');
 end
 
-axes(h_axes); 
+axes(h_axes);
 hold_val = ishold(h_axes);
 if not(hold_val)
     hold(h_axes,'on');

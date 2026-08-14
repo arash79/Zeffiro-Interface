@@ -1,40 +1,7 @@
-# +utilities/+fs2zef/data
+# `data/` — default electrodes for fs2zef
 
-## Purpose of this folder
+When `utilities.fs2zef.run` is not given `electrode_file`, it copies `electrodes.dat` from this folder into both `ascii/` and `mesh/` next to `import_segmentation.zef`. That file is then a `type,sensors` row in the manifest.
 
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+Format is the same as **Import → Import electrodes** (`core.io.electrodes.from_dat`): whitespace-separated XYZ, optional labels. Coordinates are **not** converted; they must already match the FreeSurfer tkr RAS millimetre frame of the surfaces. If they do not, Zeffiro will still import them and the electrodes will sit in the wrong place relative to the mesh.
 
-## Contents
-
-Other files:
-- `electrodes.dat`
-- `import_segmentation_template.zef`
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+`import_segmentation_template.zef` is a static example template. `run` never reads it; it always calls `generate_zef_import`. Parent: [`../README.md`](../README.md).

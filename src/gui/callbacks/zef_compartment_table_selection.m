@@ -1,38 +1,26 @@
 function zef_compartment_table_selection(hObject,eventdata,handles)
-% --- Zeffiro documentation header ---
-% zef_compartment_table_selection — Zef compartment table selection.
+%ZEF_COMPARTMENT_TABLE_SELECTION  CellSelectionCallback for the compartment UITable.
 %
-% Purpose:
-%   Zef compartment table selection.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   hObject
-%   eventdata
-%   handles
+%   Wired from zef_segmentation_tool onto h_compartment_table. Runs in the
+%   GUI callback workspace; all zef writes go through evalin('base',...).
 %
-% Outputs:
-%   See function signature and code below.
+%   Table rows are stored in reverse order of zef.compartment_tags (see
+%   zef_update). Row 1 is the last tag. This maps the clicked row to that
+%   tag, sets zef.current_compartment and zef.current_tag, rebuilds the
+%   transform table for that compartment (zef_init_transform), and clears
+%   the parameters table so it can be refilled. Unique selected row indices
+%   are stored in zef.compartments_selected for **Delete compartment(s)**.
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.compartments_selected (read, write)
-%   zef.current_compartment (read, write)
-%   zef.current_tag (read, write)
-%   zef.h_parameters_table (read)
+%   Inputs (MATLAB UITable CellSelectionCallback)
+%     hObject, handles  - unused.
+%     eventdata.Indices - N-by-2 [row, column] of the selection.
 %
-% Calls (project):
-%   zef_compartment_table_selection
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `zef_compartment_table_selection(hObject, eventdata, handles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_delete_compartment, zef_update.
 
 compartment_selected = eventdata.Indices(1);
 compartment_tags = evalin('base','zef.compartment_tags');

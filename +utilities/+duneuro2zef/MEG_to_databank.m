@@ -1,57 +1,17 @@
-% MEG_to_databank.m
-%
-% Adds MEG-related data items to the Zeffiro Interface databank.
-% This function creates a hierarchical structure in the databank for MEG
-% measurements and lead field data.
-%
-% The function creates:
-%   1. A custom 'MEG' node as the parent container
-%   2. A 'MEG measurements' data item under the MEG node
-%   3. A 'MEG leadfield' leadfield item under the MEG node
-%
-% Input:
-%   zef - (Optional) Zeffiro Interface structure. If not provided, uses
-%         the base workspace variable 'zef'.
-%
-% Output:
-%   zef - Updated Zeffiro Interface structure with MEG databank entries
-%         (also assigned to base workspace if nargout == 0)
-%
-% Usage:
-%   % With return value
-%   zef = utilities.duneuro2zef.MEG_to_databank(zef);
-%
-%   % Without return value (modifies base workspace)
-%   utilities.duneuro2zef.MEG_to_databank();
-%
-% See also: EEG_to_databank.m, zef_dataBank_add_data_item
-
 function zef = MEG_to_databank(zef)
-% --- Zeffiro documentation header ---
-% utilities.duneuro2zef.MEG_to_databank — MEG to databank.
+%MEG_TO_DATABANK  Create Data Bank tree nodes MEG / measurements / leadfield.
 %
-% Purpose:
-%   MEG to databank.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Same as EEG_to_databank with names 'MEG', 'MEG measurements',
+%   'MEG leadfield'. Does not write L or measurements into the nodes.
 %
-% Outputs:
-%   zef
+%   zef = MEG_to_databank(zef)
 %
-% Calls (project):
-%   utilities.duneuro2zef.MEG_to_databank
-%   zef_dataBank_add_data_item
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = utilities.duneuro2zef.MEG_to_databank(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also EEG_to_databank.
 
     if nargin < 1
         if evalin('base', 'exist(''zef'', ''var'')')

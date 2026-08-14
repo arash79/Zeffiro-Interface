@@ -1,25 +1,27 @@
 function [z] = zef_postProcessInverseClassObj(z_inverse, procFile)
-% --- Zeffiro documentation header ---
-% zef_postProcessInverseClassObj — Zef post Process Inverse Class Obj.
+%ZEF_POSTPROCESSINVERSECLASSOBJ  Expand class-inverter output to full source grid.
 %
-% Purpose:
-%   Zef post Process Inverse Class Obj.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   z_inverse
-%   procFile
+%   Class-inverter variant of zef_postProcessInverse. Rebuilds s_ind_1 from
+%   procFile.s_ind_0 as interleaved (x,y,z) node indices. Mode 2 averages the
+%   three Cartesian estimates at constrained nodes (s_ind_4) and reapplies
+%   source_directions. Mode 3 element-wise multiplies by direction cosines.
+%   Writes results into a zero-padded vector of length sizeL2 or 3*sizeL2.
 %
-% Outputs:
-%   z
+%   z = zef_postProcessInverseClassObj(z_inverse, procFile)
 %
-% Calls (project):
-%   zef_postProcessInverseClassObj
+%   Inputs
+%     z_inverse - cell array of per-frame inverter outputs.
+%     procFile  - index map struct from zef_processLeadfields.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[z] = zef_postProcessInverseClassObj(z_inverse, procFile)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     z         - cell array aligned with zef.source_positions layout.
+%
+%   See also zef_postProcessInverse, zef_process_inversion, zef_processLeadfields.
 
 source_direction_mode=procFile.source_direction_mode;
 source_directions=procFile.source_directions;

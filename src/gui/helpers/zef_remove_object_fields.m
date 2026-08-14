@@ -1,14 +1,14 @@
-% --- Zeffiro documentation header ---
-% zef_data — Zef data.
+%ZEF_REMOVE_OBJECT_FIELDS  Drop graphics/object fields from zef_data (script).
 %
-% Purpose:
-%   Zef data.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef_data` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   Script: expects zef_data in the caller workspace. fieldnames that
+%   isobject() are rmfield'd, then the helper fields fieldnames and
+%   remove_fieldnames. Used when stripping handles before save/export.
+%   Nested structs are not walked (top-level objects only).
 
 zef_data.fieldnames = fieldnames(zef_data);
 zef_data.remove_fieldnames = cell(0);

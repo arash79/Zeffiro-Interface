@@ -1,25 +1,15 @@
-% --- Zeffiro documentation header ---
-% zef — Zef.
+%ZEF_INIT_SENSORS  Reset sensor sets to the default tag 's' (script).
 %
-% Purpose:
-%   Zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.current_sensors (read, write)
-%   zef.current_tag (read, write)
+%   Script. Clears sensor_tags, sets current_sensors and current_tag to
+%   's', and calls zef_create_sensors(zef,'s'). Does not fill UITables
+%   (see zef_init_sensors_name_table / zef_init_sensors_table).
 %
-% Calls (project):
-%   zef_create_sensors
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_create_sensors, zef_init_sensors_name_table.
 zef.sensor_tags = cell(0);
 zef.current_sensors = 's';
 zef.current_tag = 's';

@@ -1,26 +1,31 @@
 function [size1, size2] = zef_size(data, field)
-% --- Zeffiro documentation header ---
-% zef_size — Zef size.
+%ZEF_SIZE  First two dimensions of data.(field), without loading a matfile.
 %
-% Purpose:
-%   Zef size.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   data
-%   field
+%   Data Bank table helper (zef_databank_showAll). If data is an object
+%   (matfile when save2disk is On), uses size(data, field) so the array is
+%   not loaded. If data is a struct, uses size(data.(field)). Only the
+%   first two dimensions are returned.
 %
-% Outputs:
-%   size1
-%   size2
+%   [size1, size2] = zef_size(data, field)
 %
-% Calls (project):
-%   zef_size
+%   Inputs
+%     data   - node payload struct or matfile object.
+%     field  - char name ('L', 'measurements', 'reconstruction').
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[size1, size2]] = zef_size(data, field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     size1, size2  - sizeOfField(1) and sizeOfField(2).
+%
+%   See also zef_databank_showAll.
+
+%gives the size of the field in the data. If data is a matObject, it is
+%given without loading the data. If data is just a struct, it just gives
+%the size
+%Works only with 2 dimensions!
 
 if isobject(data)
     sizeOfField=size(data, field);

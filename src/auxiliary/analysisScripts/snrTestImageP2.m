@@ -1,31 +1,25 @@
-% --- Zeffiro documentation header ---
-% pat='p2'; — Pat='p2';.
+%SNRTESTIMAGEP2  Lab one-off: distance-to-resection images for patient p2.
 %
-% Purpose:
-%   Pat='p2';.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
-%   zef.reconstruction (read)
-%   zef.reconstruction_information (read)
-%   zef.source_positions (read)
+%   Script, not a product workflow. Not on any Zeffiro menu. pat='p2';
+%   load p2_resectionStuff.mat (res_zef); alphaShape radius 3.4. Needs a
+%   live zef.dataBank. Modalities 1,2,3; hashes node_<mod>_3_* (always
+%   the _3_ branch, unlike snrTestImageP1 which uses _4_ except mod 4).
+%   Nested p=1:16, s=1:10; peak |reconstruction| source →
+%   zef_distance_to_resection vs AP/AF; imagesc of the 16×10 grid.
+%   Subplot titles Ramus / mne / sLoreta. xticklabels use psnr (includes
+%   concatenated tokens as written). That .mat is not in this repo.
 %
-% Calls (project):
-%   zef_distance_to_resection
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `pat='p2';` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also snrTestImageP1, zef_distance_to_resection.
 
 pat='p2';
 
-load(strcat(pat, '_resectionStuff.mat'));
+load(strcat(pat, '_resectionStuff.mat')
+);
 A=alphaShape(res_zef(:,1), res_zef(:,2), res_zef(:,3),3.4);
 [AF, AP]=alphaTriangulation(A);
 

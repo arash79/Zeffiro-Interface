@@ -1,32 +1,17 @@
 function exportSegmentationSTLs(zef, inFolder, outFolder, inflation_parameter, freesurfer_subject_folder)
-% --- Zeffiro documentation header ---
-% utilities.sn2zef.exportSegmentationSTLs — Export Segmentation STLs.
+%EXPORTSEGMENTATIONSTLS  Wrapper intending coregistration-mode STL export.
 %
-% Purpose:
-%   Export Segmentation STLs.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   inFolder
-%   outFolder
-%   inflation_parameter
-%   freesurfer_subject_folder
+%   Calls export_segmentation_meshes with a 6th positional struct
+%   alignment_mode='coregistration'. The worker expects name-value options,
+%   not a positional struct — prefer export_segmentation_meshes(...,
+%   'alignment_mode','coregistration') or utilities.sn2zef.run.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Calls (project):
-%   utilities.sn2zef.exportSegmentationSTLs
-%   utilities.sn2zef.export_segmentation_meshes
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `utilities.sn2zef.exportSegmentationSTLs(zef, inFolder, outFolder, inflation_parameter, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+
 
     utilities.sn2zef.export_segmentation_meshes(zef, inFolder, outFolder, ...
         inflation_parameter, freesurfer_subject_folder, ...

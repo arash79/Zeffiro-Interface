@@ -15,32 +15,21 @@
 % See also: run.m, get_default_config.m
 
 function [success, error_msg] = convert_mesh(config)
-% --- Zeffiro documentation header ---
-% utilities.duneuro2zef.convert_mesh — Convert mesh.
+%CONVERT_MESH  Hex mesh.mat → tetra_mesh.mat (zef_hexa_to_tetra).
 %
-% Purpose:
-%   Convert mesh.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   config
+%   [success, error_msg] = convert_mesh(config)
 %
-% Outputs:
-%   success
-%   error_msg
+%   Finds config.files.mesh under input_folder. Requires elements N×8 and
+%   nodes N×3. Optional labels inverted when invert_domain_labels.
+%   Saves tetra, domain_labels, nodes, optional brain_ind to
+%   output_folder/output.mesh. No unit conversion.
 %
-% Calls (project):
-%   utilities.duneuro2zef.convert_mesh
-%   utilities.duneuro2zef.find_files
-%   zef_hexa_to_tetra
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[success, error_msg]] = utilities.duneuro2zef.convert_mesh(config)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+
 
 
     success = false;

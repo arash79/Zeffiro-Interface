@@ -1,26 +1,16 @@
 function p_vec = zef_wireframe_permittivity_vec(f_vec,p_val)
-% --- Zeffiro documentation header ---
-% zef_wireframe_permittivity_vec — Zef wireframe permittivity vec.
+%ZEF_WIREFRAME_PERMITTIVITY_VEC  Effective permittivity from filling fraction p_val.
 %
-% Purpose:
-%   Zef wireframe permittivity vec.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2019- Sampsa Pursiainen, Liisa-Ida Sorsa, Christelle Eyraud, Jean-Michel Geffrin.
+%   GPU-ToRRe-3D wireframe modeling package.
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   f_vec
-%   p_val
+%   p_vec = zef_wireframe_permittivity_vec(f_vec, p_val)
 %
-% Outputs:
-%   p_vec
+%   Inverse Maxwell-Garnett mixing. No zef I/O.
 %
-% Calls (project):
-%   zef_wireframe_permittivity_vec
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[p_vec] = zef_wireframe_permittivity_vec(f_vec, p_val)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_wireframe_filling_vec.
 
 p_vec = (2.*f_vec.*(p_val - 1) + p_val + 2)./(2 + p_val - f_vec.*(p_val - 1));
 

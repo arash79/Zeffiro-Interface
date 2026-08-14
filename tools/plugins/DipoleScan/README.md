@@ -1,41 +1,47 @@
-# tools/plugins/DipoleScan
+# DipoleScan
 
-## Purpose of this folder
+Scan every source location for the single dipole (or local orientation) that best fits the current time frame. Use it for a one-source localization map, not a distributed image.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+This plugin does **not** construct `inverse.DipoleScanInverter`. Class ids `dipolescan` / `dipole_scan` (and `legacy_dipolescan`) are a separate `zef_inverse_run` track.
 
-## Contents
+## Menu
 
-Subfolders:
-- `m/`
-- `mlapp/`
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **Dipole Scan** |
+| `_legacy`, `_nse` | Inverse tools → **Dipole Scan** |
+| asteroid_radar / asteroid_gravity | Inverse tools → **Dipole scan** |
 
-## How this folder fits into the overall workflow
+INI callback: `zef_dipole_start`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Window title at runtime (`zef_dipole_window`): `ZEFFIRO Interface: Dipole scan tool`. The App Designer resource itself is named `ZEFFIRO Interface: Dipole Scan`.
 
-## GUI usage
+## Run the solver
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+**StartButton** `ButtonPushedFcn`:
 
-## Programmatic usage
+```matlab
+[zef.reconstruction, zef.reconstruction_information]=zef_dipoleScan(zef);
+```
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+Inversion method (`InversionmethodDropDown` `Items` / `ItemsData`): **SVD** / **matlab pseudoinverse** → `'SVD'` / `'pinv'`. Lead-field regularization (`regType`): **None** / **Reduce dimension to (SVD)** → `'1'` / `'SVD'`. The SVD-rank path uses `inv_leadfield_lambda` as the **number of right singular vectors kept** (not a ridge λ). That applies only to free-orientation sources (`notNormal`); cortical-normal columns use a 1-column lead field.
 
-## Examples
+The map stored in `zef.reconstruction` is goodness-of-fit `1 − ‖f−Lf q‖²/‖f‖²`. Constrained-normal locations copy that scalar onto all three xyz slots; free-orientation locations store `gof × unit moment`. `onlymax` is hardcoded `false`, so the **Relative residual variance (max)** dropdown (`estimation_attr`) does **not** collapse the map to a single peak. `dipole_type` is **Fixed** only.
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+## Needs
 
-## Dependencies and assumptions
+- `zef.L`, interpolation, `zef.source_direction_mode`
+- `zef.measurements`
+- SNR: `zef.inv_snr` stored in `reconstruction_information` (scan itself is residual-based)
+- Frames: `zef.number_of_frames`, `inv_time_1/2/3`, sampling frequency, band edges
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## Writes
 
-## Notes for developers
+- `zef.reconstruction` (cell, one frame each)
+- `zef.reconstruction_information` with tag `Dipole` + method name
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## Files
+
+- Start: `m/zef_dipole_start.m` → `zef_dipole_window`
+- Solver: `m/zef_dipoleScan.m`
+- Layout: `mlapp/dipole_app.mlapp`

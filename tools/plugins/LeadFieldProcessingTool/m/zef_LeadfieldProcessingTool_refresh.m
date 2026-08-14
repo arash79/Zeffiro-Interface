@@ -1,25 +1,16 @@
-% --- Zeffiro documentation header ---
-% zef.LeadFieldProcessingTool.app.currentLeadfield.Data={zef.lf_tag, zef.imaging_method_cell{zef.imaging_method}, size(zef.sensors, 1), size(zef.source_positions, 1), zef — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%ZEF_LEADFIELDPROCESSINGTOOL_REFRESH  Rebuild currentLeadfield and BankTable from zef/bank.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.LeadFieldProcessingTool (read)
-%   zef.lead_field_id (read)
-%   zef.lead_field_id_max (read)
+%   Script. refreshButton and start-up. currentLeadfield from live lf_tag,
+%   imaging_method, sensor/source counts, lead_field_id. Each bank cell
+%   missing lead_field_id gets a sequential id (warning: old project).
+%   Then updateTable per row.
 %
-% Calls (project):
-%   zef_update_lead_field_id
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.LeadFieldProcessingTool.app.currentLeadfield.Data={zef.lf_tag, zef.imaging_method_cell{zef.imaging_method}, size(zef.sensors, 1), size(zef.source_positions, 1), zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_LeadfieldProcessingTool_updateTable.
 
 zef.LeadFieldProcessingTool.app.currentLeadfield.Data={zef.lf_tag, zef.imaging_method_cell{zef.imaging_method}, size(zef.sensors, 1), size(zef.source_positions, 1), zef.lead_field_id};
 

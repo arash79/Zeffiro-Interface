@@ -1,19 +1,24 @@
-% --- Zeffiro documentation header ---
-% function [file, file_path, mesh_type] = zef_import_surface_mesh_type — Function [file, file path, mesh type] = zef import surface mesh type.
-%
-% Purpose:
-%   Function [file, file path, mesh type] = zef import surface mesh type.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
-%
-% Calls (project):
-%   zef_import_surface_mesh_type
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `function [file, file_path, mesh_type] = zef_import_surface_mesh_type` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [file, file_path, mesh_type] = zef_import_surface_mesh_type
-
+%ZEF_IMPORT_SURFACE_MESH_TYPE  Dialog to pick surface mesh import type and file.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Opens a modal dialog to choose STL (full mesh), points DAT, or triangles
+%   DAT, then uigetfile for the matching extension. Returns 0 for file and
+%   path when the user cancels.
+%
+%   [file, file_path, mesh_type] = zef_import_surface_mesh_type()
+%
+%   Outputs
+%     file      - selected file name, or 0 if cancelled.
+%     file_path - folder of file, or 0 if cancelled.
+%     mesh_type - popup index (1 STL, 2 points, 3 triangles), or -1
+%                 before selection.
+%
+%   See also zef_get_mesh, zef_import_segmentation.
 
 file = 0;
 file_path = 0;

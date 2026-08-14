@@ -46,41 +46,21 @@
 % See also: Duneuro2Zeffiro_convert.m, import_duneuro_project.m, Duneuro2Zeffiro_import.zef
 
 function zef = Duneuro2Zeffiro_settings(zef)
-% --- Zeffiro documentation header ---
-% utilities.duneuro2zef.Duneuro2Zeffiro_settings — Duneuro2Zeffiro settings.
+%DUNEURO2ZEFFIRO_SETTINGS  Post-import source/filter defaults on zef.
 %
-% Purpose:
-%   Duneuro2Zeffiro settings.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = Duneuro2Zeffiro_settings(zef)
 %
-% Outputs:
-%   zef
+%   Called from Duneuro2Zeffiro_import.zef line 19. If zef omitted, reads
+%   base workspace. Sets source_direction_mode=1, inv_sampling_frequency=2400,
+%   filter cutoffs 0, compartment source constraints, zef_build_compartment_table,
+%   downsampling / interpolation. nargout==0 assignin base.
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.inv_high_cut_frequency (read, write)
-%   zef.inv_low_cut_frequency (read, write)
-%   zef.inv_sampling_frequency (read, write)
-%   zef.source_direction_mode (read, write)
-%
-% Calls (project):
-%   utilities.duneuro2zef.Duneuro2Zeffiro_settings
-%   zef_build_compartment_table
-%   zef_downsample_surfaces
-%   zef_process_meshes
-%   zef_source_interpolation
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = utilities.duneuro2zef.Duneuro2Zeffiro_settings(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+
 
     if nargin < 1 || isempty(zef)
         if evalin('base', 'exist(''zef'', ''var'')')

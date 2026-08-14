@@ -1,52 +1,18 @@
-# +core/+gui/+menu_tool
+# `+menu_tool` — Import electrodes
 
-## Purpose of this folder
+This is the only callback in `+core/+gui`. It exists so **Import → Import electrodes** can call the package parsers `core.io.electrodes.from_dat` / `from_csv` without putting `+core` internals on `genpath(src)`.
 
-Menu callbacks wired from `src/gui/tools/zef_menu_tool.m` into refactored package code.
+`core.gui.menu_tool.import_electrodes_callback(zef)` is wired in `src/gui/tools/zef_menu_tool.m` (`ImportelectrodesMenu`, label **Import electrodes**). It is not under Edit.
 
-## Contents
+1. `uigetfile` for `*.dat` / `*.csv`.
+2. Parse with `from_dat` or `from_csv`.
+3. Write `zef.sensors`, `zef.<prefix>_points`, `zef.<prefix>_name_list` (`prefix` = `zef.current_sensors` or `"s"`).
+4. `zef_update`.
 
-MATLAB sources:
-- `import_electrodes_callback.m` — **core.gui.menu_tool.import_electrodes_callback**: GUI callback for import_electrodes actions.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-- **core.gui.menu_tool.import_electrodes_callback**: Edit → Import electrodes (wired in `zef_menu_tool.m`).
-
-## Programmatic usage
-
-From the project root:
+Cancel or parse errors leave `zef` unchanged (`errordlg` on parse failure). The callback does **not** attach electrodes to the FEM mesh; `zef_process_meshes` / `zef_build_electrodes` do that at lead-field time.
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+zef = core.gui.menu_tool.import_electrodes_callback(zef);
 ```
 
-Representative entry points in this folder:
-- ``[zef] = core.gui.menu_tool.import_electrodes_callback(zef)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-GUI: **Edit → Import electrodes** (`.dat` / `.csv`).
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Formats and CEM columns: [../../+io/+electrodes/README.md](../../+io/+electrodes/README.md). Package overview: [../README.md](../README.md).

@@ -1,83 +1,42 @@
-# src/forward/wave
+# Wave / GPU-ToRRe (`src/forward/wave`)
 
-## Purpose of this folder
+Time-domain electromagnetic wave FEM used for radar-style asteroid imaging (GPU-ToRRe-3D), not for EEG lead fields. These scripts **do not write `zef.L`**. They load nodes/tetra/permittivity from a `torre_dir/system_data` folder, assemble mass/stiffness/damping, leap-frog the fields, and save Jacobians for inverse scattering.
 
-Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+You normally reach this from an **asteroid_radar** (or similar) profile and the associated plugin/scripts, not from the default head Mesh tool **Run script** table.
 
-## Contents
+## What problem it solves
 
-MATLAB sources:
-- `B_T_prod.m` — **B_T_prod**: B T prod.
-- `B_prod.m` — **B_prod**: B prod.
-- `array_min.m` — **array_min**: Array min.
-- `bh_window.m` — **bh_window**: Bh window.
-- `boundary_point_source.m` — **boundary_point_source**: Boundary point source.
-- `boundary_source.m` — **boundary_source**: Boundary source.
-- `calc_cf_and_bw.m` — **calc_cf_and_bw**: Calc cf and bw.
-- `free_boundary.m` — **free_boundary**: Free boundary.
-- `load_jacobian_data.m` — **load_jacobian_data**: Load jacobian data.
-- `load_jacobian_data_complex.m` — **load_jacobian_data_complex**: Load jacobian data complex.
-- `mat_vec.m` — **mat_vec**: Mat vec.
-- `mh_window.m` — **mh_window**: Mh window.
-- `combine_data_complex.m` — **parameters;**: Parameters;.
-- `combine_data_sincos.m` — **parameters;**: Parameters;.
-- `compute_data.m` — **parameters;**: Parameters;.
-- `compute_data_gpu.m` — **parameters;**: Parameters;.
-- `create_system.m` — **parameters;**: Parameters;.
-- `make_interp_mat.m` — **parameters;**: Parameters;.
-- `qam_demod.m` — **qam_demod**: Qam demod.
-- `refine_mesh.m` — **refine_mesh**: Refine mesh.
-- `save_jacobian_data.m` — **save_jacobian_data**: Save jacobian data.
-- `save_jacobian_data_complex.m` — **save_jacobian_data_complex**: Save jacobian data complex.
-- `make_born_approximation_amp.m` — **signal_configuration**: Signal configuration.
-- `make_born_approximation_qam.m` — **signal_configuration**: Signal configuration.
-- `make_difference_data_amp.m` — **signal_configuration**: Signal configuration.
-- `make_difference_data_qam.m` — **signal_configuration**: Signal configuration.
-- `surface_integral.m` — **surface_integral**: Surface integral.
-- `tetra_in_compartment.m` — **tetra_in_compartment**: Tetra in compartment.
+Given a tetrahedral mesh of an asteroid (domain 1) and an orbit/background (domain 2), plus complex relative permittivity, the code builds sparse `C` (mass), `A` (stiffness-like), and `R` (damping), then propagates a pulse (`bh_window` / `mh_window`) from boundary sources. Born and QAM difference-data drivers produce the Jacobian used by radar inverse problems.
 
-## How this folder fits into the overall workflow
+## Entry points (scripts)
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+| Script | Role |
+|--------|------|
+| `create_system.m` | Load mesh + permittivity, optional `refine_mesh`, assemble `C`,`A`,`R`, save `system_data_*.mat` |
+| `compute_data.m` / `compute_data_gpu.m` | Time-step the system (CPU / GPU) |
+| `make_born_approximation_amp.m` / `_qam.m` | Born linearization |
+| `make_difference_data_amp.m` / `_qam.m` | Difference data for inversion |
+| `load_jacobian_data.m` / `save_jacobian_data.m` | Jacobian I/O (real and `*_complex`) |
 
-## GUI usage
+They expect `parameters.m` and `torre_dir` on the path (`system_setting_index`, `n_refinement`, `signal_center_frequency`). Mesh files are `nodes_*.dat`, `tetrahedra_*.dat`, `real_relative_permittivity_*.dat`, `imaginary_relative_permittivity_*.dat`.
 
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
+`compute_data_gpu` leap-frog (per `process_id` source): pulse window on orbit nodes → `pcg_iteration_gpu` on lumped mass `C` for \(\partial u/\partial t\) → update electric `u` → `B_prod` curl into magnetic `p_1,p_2,p_3`, with PML damping on `I_u` / `I_p_*`. Samples every `data_param` steps. CPU twin: `compute_data.m`.
 
-## Programmatic usage
+## Operators
 
-From the project root:
+- `B_prod.m` / `B_T_prod.m` — discrete curl/div-style products used in the leap-frog update
+- `mat_vec.m` — sparse matvec
+- `surface_integral.m`, `free_boundary.m`, `boundary_source.m`, `boundary_point_source.m`
+- `refine_mesh.m` — 4-to-1 tet split local to this module (not `zef_mesh_refinement`)
+- `tetra_in_compartment.m` — domain subset (wave copy; head meshing uses `src/compartments`)
+- `qam_demod.m`, `calc_cf_and_bw.m`, `array_min.m` — signal-side helpers
 
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
-```
+## Relation to the rest of Zeffiro
 
-Representative entry points in this folder:
-- ``[div_u] = B_T_prod(p_1, p_2, p_3, div_vec, …)` with project root and `src` on the path.`
-- ``[p] = B_prod(u, entry_ind, n, t, …)` with project root and `src` on the path.`
-- ``[min_ind] = array_min(i, xq, yq, zq, …)` with project root and `src` on the path.`
-- ``[[bh_vec, d_bh_vec]] = bh_window(t, T, carrier_cycles_per_pulse_cycle, carrier_mode)` with project root and `src` on the path.`
-- ``[[boundary_vec_1, boundary_vec_2]] = boundary_point_source(source_points, orbit_triangles, orbit_nodes)` with project root and `src` on the path.`
-- ``[[boundary_vec_1, boundary_vec_2, s_orbit]] = boundary_source(fade_out_param, source_points, orbit_triangles, orbit_nodes)` with project root and `src` on the path.`
-- ``[[cf, bw, hf]] = calc_cf_and_bw(t_vec, pulse_vec, varargin)` with project root and `src` on the path.`
-- ``[[boundary_triangles, boundary_tetra_ind]] = free_boundary(tetra)` with project root and `src` on the path.`
+Head EEG/MEG/EIT/TES live in `src/forward/lead_field`. Gravity asteroid work is a different modality (`zef_lead_field_matrix_gravity`). This folder is the radar/wave PDE. Do not call `create_system` expecting it to fill `zef.nodes` for a head project.
 
-## Examples
+## See also
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+- Profiles: `profile/asteroid_radar/`
+- Upstream GPU-ToRRe-3D: copyright on these files points at that project
+- Mesh refinement used by the head pipeline: `src/mesh/README.md`

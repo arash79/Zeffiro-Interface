@@ -1,40 +1,21 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [x, theta] = zef_gibbs_sampler_step(L, y, x, theta, theta0, beta, std_lhood, hypermodel, decay_val_hyperprior, nbins_hyperprior, source_direction_mode)
-% --- Zeffiro documentation header ---
-% zef_gibbs_sampler_step — Zef gibbs sampler step.
+%ZEF_GIBBS_SAMPLER_STEP  One Gibbs update of sources x and hyperparameters theta.
 %
-% Purpose:
-%   Zef gibbs sampler step.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   L
-%   y
-%   x
-%   theta
-%   theta0
-%   beta
-%   std_lhood
-%   hypermodel
-%   decay_val_hyperprior
-%   nbins_hyperprior
-%   source_direction_mode
+%   [x, theta] = zef_gibbs_sampler_step(L, y, x, theta, theta0, beta,
+%       std_lhood, hypermodel, decay_val_hyperprior, nbins_hyperprior,
+%       source_direction_mode)
 %
-% Outputs:
-%   x
-%   theta
+%   Called from zef_mcmc. Defaults: hypermodel 'InverseGamma',
+%   decay_val_hyperprior 7, nbins_hyperprior 20, source_direction_mode 1.
+%   Empty x → zeros(size(L,2),1). Scalar theta0 is expanded. Does not
+%   read zef. Returns the next sample; no reconstruction_information.
 %
-% Calls (project):
-%   zef_gibbs_sampler_step
-%
-% Side effects:
-%   - creates/updates figures
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[x, theta]] = zef_gibbs_sampler_step(L, y, x, theta, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_mcmc.
 
 if nargin < 8
     hypermodel = 'InverseGamma';

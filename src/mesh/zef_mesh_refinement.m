@@ -1,40 +1,59 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 function [nodes,tetra,domain_labels_aux,distance_vec,tetra_interp_vec] = zef_mesh_refinement(zef,nodes,tetra,domain_labels_aux,distance_vec, varargin)
-% --- Zeffiro documentation header ---
-% zef_mesh_refinement — Zef mesh refinement.
+%ZEF_MESH_REFINEMENT  8-to-1 tetrahedral split of selected or all elements.
 %
-% Purpose:
-%   Zef mesh refinement.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   GPU-ToRRe-3D / Zeffiro Interface.
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nodes
-%   tetra
-%   domain_labels_aux
-%   distance_vec
-%   varargin
+%   Inserts a midpoint on every edge of the tets being refined and replaces
+%   each parent with eight children (four corner tets plus four octahedron
+%   tets). domain_labels and distance_vec are copied to children;
+%   tetra_interp_vec(i) is the parent index of new tet i (1-based into the
+%   input tetra). Used by volume and adaptive refinement in
+%   zef_create_fem_mesh and by the second-pass volume refine in
+%   zef_postprocess_fem_mesh.
 %
-% Outputs:
-%   nodes
-%   tetra
-%   domain_labels_aux
-%   distance_vec
-%   tetra_interp_vec
+%   Two operating modes
+%     compartment_ind omitted (empty): every tet is 8-split (global).
+%     compartment_ind given: only those labels (or the explicit tetra_ref_ind
+%       subset) are 8-split. Neighbours that share 2 or 3 vertices of a
+%       marked tet are split with a conforming stencil so the mesh stays
+%       valid, then the refined block is concatenated with the untouched
+%       remainder and coincident nodes are merged (round to 15 decimals).
 %
-% Calls (project):
-%   zef_mesh_refinement
+%   [nodes, tetra, domain_labels_aux, distance_vec, tetra_interp_vec] = ...
+%       zef_mesh_refinement(zef, nodes, tetra, domain_labels_aux, distance_vec)
+%   [...] = zef_mesh_refinement(..., compartment_ind)
+%   [...] = zef_mesh_refinement(..., compartment_ind, tetra_ref_ind)
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Inputs
+%     zef               - session; currently unused except empty-zef fallback.
+%                         If zef is empty the code calls evalin('base',zef),
+%                         which is not a valid MATLAB evalin usage.
+%     nodes             - V×3 coordinates (project length unit).
+%     tetra             - T×4 1-based node indices.
+%     domain_labels_aux - T×1 (or T×P) tissue / subdomain IDs.
+%     distance_vec      - V×1 (or V×P) nodal distances; mid-edge values are
+%                         the average of the two endpoints.
+%     compartment_ind   - optional list of domain_labels to refine, or 0
+%                         to mean "use tetra_ref_ind only".
+%     tetra_ref_ind     - optional tet indices (into the input tetra).
+%                         Intersected with the compartment mask when both
+%                         are given. Empty is treated as 0.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[nodes, tetra, domain_labels_aux]] = zef_mesh_refinement(zef, nodes, tetra, domain_labels_aux, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Outputs
+%     nodes, tetra, domain_labels_aux, distance_vec - refined mesh.
+%     tetra_interp_vec - length = size(tetra,1); parent index in the input.
+%
+%   Notes
+%     After the conforming split, tets with positive signed volume have
+%     vertices 1 and 2 swapped so the stored orientation is negative
+%     (same convention zef_tetra_turn uses internally). The global 8-split
+%     path does not run that orientation pass.
+%
+%   See also zef_create_fem_mesh, zef_triangular_mesh_refinement,
+%            zef_get_tetra_to_refine.
 
 if isempty(zef)
     zef = evalin('base',zef);
@@ -62,7 +81,8 @@ if not(isempty(varargin))
 end
 
 if not(isempty(compartment_ind))
-    %***************************************************
+    % Selective refine: mark tets, split them and 2-/3-vertex neighbours,
+    % then 8-split the marked core and stitch back the remainder.
 
     if isequal(compartment_ind,0) || (isempty(compartment_ind) && not(isempty(tetra_ref_ind)))
         I = tetra_ref_ind;
@@ -81,6 +101,7 @@ if not(isempty(compartment_ind))
 
         tetra = tetra(I,:);
 
+        % Faces opposite local vertices 1..4 (same stencil as zef_surface_mesh).
         ind_m = [ 2 4 3 ;
             1 3 4 ;
             1 4 2 ;
@@ -112,6 +133,7 @@ if not(isempty(compartment_ind))
         ind_aux = ismember(tetra,ind_aux);
         sum_aux = sum(ind_aux,2);
 
+        % J: all four vertices marked (full 8-split). J_2 / J_3: hanging-edge cases.
         J_2 = find(sum_aux==2);
         J_3 = find(sum_aux==3);
 
@@ -151,6 +173,7 @@ if not(isempty(compartment_ind))
         [edge_val_aux edge_ind_2] = unique(edge_ind(:,4));
         clear edge_val_aux;
         edge_ind_2 = edge_ind_2(2:end,:);
+        % Mid-edge nodes; skip the 0 placeholder in column 4.
         nodes_new = (1/2)*(nodes(edge_ind(edge_ind_2,1),:) + nodes(edge_ind(edge_ind_2,2),:));
         distance_vec_new = (1/2)*(distance_vec(edge_ind(edge_ind_2,1),:) + distance_vec(edge_ind(edge_ind_2,2),:));
         size_nodes = size(nodes,1);
@@ -173,6 +196,7 @@ if not(isempty(compartment_ind))
             6     9     8    10
             7     9     5     6 ];
 
+        % Columns 1–4 original vertices, 5–10 the six edge midpoints.
         t_ind_2 = [tetra(J,:) edge_mat(1:length(J),:)];
 
         tetra_new = [];
@@ -307,6 +331,7 @@ if not(isempty(compartment_ind))
             - Aux_mat(ind_m(1,2),:).*(Aux_mat(ind_m(2,1),:).*Aux_mat(ind_m(3,3),:)-Aux_mat(ind_m(2,3),:).*Aux_mat(ind_m(3,1),:)) ...
             + Aux_mat(ind_m(1,3),:).*(Aux_mat(ind_m(2,1),:).*Aux_mat(ind_m(3,2),:)-Aux_mat(ind_m(2,2),:).*Aux_mat(ind_m(3,1),:)))/6;
         clear Aux_mat;
+        % Swap vertices 1↔2 on positive-volume tets (store negative orientation).
         I = find(tilavuus > 0);
         tetra(I,:) = tetra(I,[2 1 3 4]);
         clear tilavuus I;
@@ -364,6 +389,7 @@ if not(isempty(compartment_ind))
         [edges,~,edges_ind_2] = unique(tetra_sort,'rows');
         edges_ind = reshape(edges_ind_2,size(edges_ind_2,1)/6,6);
 
+        % 8-split of the marked core: four corners + four octahedron children.
         edges_ind = edges_ind + size(nodes,1);
         nodes = [nodes ; 0.5*(nodes(edges(:,1),:) + nodes(edges(:,2),:))];
         distance_vec = [distance_vec ; 0.5*(distance_vec(edges(:,1),:) + distance_vec(edges(:,2),:))];
@@ -399,6 +425,8 @@ if not(isempty(compartment_ind))
 
     %***************************************************
 else
+
+    % Global 8-split: every tet, no neighbour stencils.
 
     tetra_sort = [tetra(:,[1 2]);
         tetra(:,[2 3]);

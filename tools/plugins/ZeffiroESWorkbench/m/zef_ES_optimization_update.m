@@ -1,35 +1,18 @@
-% --- Zeffiro documentation header ---
-% zef_ES_update_parameter_values; — Zef ES update parameter values;.
+%ZEF_ES_OPTIMIZATION_UPDATE  Copy workbench dropdowns onto zef.ES_opt_solver / method / obj_fun / plot_type.
 %
-% Purpose:
-%   Zef ES update parameter values;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.ES_HPO_search_method (read, write)
-%   zef.ES_fixed_active_electrodes (read, write)
-%   zef.ES_inv_colormap (read, write)
-%   zef.ES_obj_fun (read, write)
-%   zef.ES_obj_fun_2 (read, write)
-%   zef.ES_opt_algorithm (read, write)
-%   zef.ES_opt_algorithm_list (read)
-%   zef.ES_opt_method (read, write)
-%   zef.ES_opt_solver (read, write)
-%   zef.ES_plot_type (read, write)
-%   zef.ES_threshold_condition (read, write)
-%   zef.h_ES_HPO_search_method (read)
-%   zef.h_ES_fixed_active_electrodes (read)
-%   zef.h_ES_inv_colormap (read)
-%   zef.h_ES_obj_fun (read)
-%   … (6 more)
+%   Script. ValueChangedFcn of solver/method/algorithm/obj_fun/plot_type
+%   dropdowns and CellEditCallback of h_ES_parameter_table. Reads table
+%   cells (zef_ES_update_parameter_values), copies dropdown Values onto
+%   zef.ES_*, then rebuilds the table (zef_ES_init_parameter_table) and
+%   copies dropdowns again. Does not solve.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   See also zef_ES_update_parameter_values, zef_ES_init_parameter_table.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef_ES_update_parameter_values;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 zef_ES_update_parameter_values;
 

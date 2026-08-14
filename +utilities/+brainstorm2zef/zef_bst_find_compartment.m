@@ -1,29 +1,20 @@
 function [compartment_file, compartment_type, found] = zef_bst_find_compartment(compartment_name, subject_struct, subject_folder)
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst_find_compartment — Zef bst find compartment.
+%ZEF_BST_FIND_COMPARTMENT  Resolve a Brainstorm surface/anatomy .mat path.
 %
-% Purpose:
-%   Zef bst find compartment.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   compartment_name
-%   subject_struct
-%   subject_folder
+%   [file, type, found] = zef_bst_find_compartment(name, subject, folder)
 %
-% Outputs:
-%   compartment_file
-%   compartment_type
-%   found
+%   Search order: subject.i<Name> index into Surface(i).FileName; then
+%   Surface.Comment exact then normalized; then Anatomy.Comment the same.
+%   file is fullfile(subject_folder, FileName). type is 'Surface' or
+%   'Anatomy'. found is false (empty file/type) if name is empty or subject
+%   is not a struct. First hit wins.
 %
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_find_compartment
-%   utilities.brainstorm2zef.zef_bst_normalize_compartment_name
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[compartment_file, compartment_type, found]] = utilities.brainstorm2zef.zef_bst_find_compartment(compartment_name, subject_struct, subject_folder)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_create_compartment_data, zef_bst_normalize_compartment_name.
 
 compartment_file = '';
 compartment_type = '';

@@ -1,36 +1,19 @@
 function zef = zef_strip_tool_add_contacts(zef)
-% --- Zeffiro documentation header ---
-% zef_strip_tool_add_contacts — Zef strip tool add contacts.
+%ZEF_STRIP_TOOL_ADD_CONTACTS  Append current-strip contact points to sensors.
 %
-% Purpose:
-%   Zef strip tool add contacts.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_strip_tool_add_contacts(zef)
 %
-% Outputs:
-%   zef
+%   Add-contacts button. zef_create_strip then zef_get_strip_contacts
+%   ('points') for each contact; concatenates onto
+%   <current_sensors>_points / impedance / radii. Sets get_functions
+%   so later sensor evals stay bound to this strip_id.
 %
-% Zef fields (observed):
-%   zef.current_sensors (read)
-%   zef.strip_tool (read)
-%
-% Calls (project):
-%   zef_create_strip
-%   zef_get_strip_contacts
-%   zef_get_strip_parameters
-%   zef_init_sensors_name_table
-%   zef_strip_tool_add_contacts
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_strip_tool_add_contacts(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_get_strip_contacts, zef_strip_tool_embed.
 
 points_1 = zef.([zef.current_sensors '_points']);
 impedance_1 = zef.([zef.current_sensors '_electrode_impedance']);

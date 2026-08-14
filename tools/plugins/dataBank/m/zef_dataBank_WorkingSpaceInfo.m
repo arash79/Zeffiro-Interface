@@ -1,27 +1,25 @@
 function [info, columnNames] = zef_dataBank_WorkingSpaceInfo(tree, hash)
-% --- Zeffiro documentation header ---
-% zef_dataBank_WorkingSpaceInfo — Zef data Bank Working Space Info.
+%ZEF_DATABANK_WORKINGSPACEINFO  Table of hash / type / name for workingHashes.
 %
-% Purpose:
-%   Zef data Bank Working Space Info.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tree
-%   hash
+%   showworkingHashes.ButtonPushedFcn and the last step of modifyMenu in
+%   zef_open_dataBank fill currentTable. Does not modify zef or the tree.
 %
-% Outputs:
-%   info
-%   columnNames
+%   [info, columnNames] = zef_dataBank_WorkingSpaceInfo(tree, hash)
 %
-% Calls (project):
-%   zef_dataBank_WorkingSpaceInfo
+%   Inputs
+%     tree  - zef.dataBank.tree.
+%     hash  - char or cellstr of working hashes.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[info, columnNames]] = zef_dataBank_WorkingSpaceInfo(tree, hash)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output
+%     info         - n-by-3 cell: hash, node type, name.
+%     columnNames  - {'hash', 'node type', 'name'}.
+%
+%   See also zef_dataBank_hashToWorkingSpace.
 
 columnNames={'hash', 'node type', 'name'};
 if ~iscell(hash)

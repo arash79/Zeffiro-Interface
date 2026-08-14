@@ -1,17 +1,17 @@
-% --- Zeffiro documentation header ---
-% ary_model — Ary model.
+%CALCULATE_DIFFERENCES  Lab script: four identical MAG/RDM loads (copy-paste).
 %
-% Purpose:
-%   Ary model.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Calls (project):
-%   zef_lead_field_eeg_multilayer_sphere
+%   Script. cwd-relative data/ary_model/ary_model.mat and four times
+%   zeffiro_projects/pallomalli_pem.mat (same file). Sphere L vs FEM with
+%   average reference; writes mag_v_1..4, rdm_v_1..4, s_p_1..4 for
+%   comparison_all_eccentricities / comparison_high_eccentricity.
+%   Those paths are not in this repo. One-off sphere-vs-FEM study.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `ary_model` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also comparison_all_eccentricities, calc_diffs.
 
 load data/ary_model/ary_model.mat;
 

@@ -1,27 +1,30 @@
 function [m, P, K] = kf_update(m,P,y,H,R)
-% --- Zeffiro documentation header ---
-% kf_update — Kf update.
+%KF_UPDATE  Kalman measurement update with H = L and noise R.
 %
-% Purpose:
-%   Kf update.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   m
-%   P
-%   y
-%   H
-%   R
+%   [m, P, K] = kf_update(m, P, y, H, R)
 %
-% Outputs:
-%   m
-%   P
-%   K
+%   Called from kalman_filter (filter_type 1 and 4) and the block filters.
+%   Innovation v = y - H m; K = P H' / (H P H' + R). No zef fields.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[m, P, K]] = kf_update(m, P, y, H, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Inputs
+%     m - predicted mean
+%     P - predicted covariance
+%     y - measurement (one frame)
+%     H - observation (processed lead field L)
+%     R - measurement noise
+%
+%   Outputs
+%     m - updated mean
+%     P - updated covariance (symmetrized)
+%     K - Kalman gain
+%
+%   See also kf_predict, kf_sL_update, kalman_filter.
+%
 
     v = y - H*m;
     PHt = P * H';

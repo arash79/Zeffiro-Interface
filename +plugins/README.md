@@ -1,42 +1,26 @@
-# +plugins
+# `+plugins` — numerical kernels used by class inverse, not GUI plugins
 
-## Purpose of this folder
+This MATLAB package sits at the repository root. `zeffiro_interface` adds the project root to the path, so you call `plugins.ClassGMM.*` and `plugins.ClassKF.*`. Do **not** `addpath('+plugins')`.
 
-Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
+It exists because the class inverters in `+inverse` need Kalman predict/update and optional GMM post-processing without opening a window. **This is not `tools/plugins/`.** That tree is the Inverse/Forward/Multi tools menus (`zeffiro_plugins.ini`). Mixing the two names is the usual source of confusion: GUI Kalman is `zef_KF`; class Kalman is `inverse.KalmanInverter` calling `plugins.ClassKF`.
 
-## Contents
+Nothing here is a menu callback. Nothing here writes `zef.reconstruction` by itself.
 
-Subfolders:
-- `+ClassGMM/`
-- `+ClassKF/`
+| Package | Why it exists | Who calls it |
+|---------|---------------|--------------|
+| `+ClassGMM/` | Fit a Gaussian mixture to a reconstruction (clusters, optional orientation) | `inverse.CommonInverseParameters.computeGMM` after invert. Needs Statistics Toolbox. |
+| `+ClassKF/` | Discrete Kalman predict / update / standardized update | `inverse.KalmanInverter.invert`. Registry ids `kalman` / `kf`. |
 
-## How this folder fits into the overall workflow
+GUI GMM apps (Inverse tools → Gaussian Mixture Model) and GUI Kalman (**Inverse tools → Kalman**) do **not** import this package. DTI structural process-noise `Q` is also GUI-Kalman only.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+```matlab
+[zef, r] = zef_inverse_run(zef, "kalman", "execution", "local");
+% invert used plugins.ClassKF.class_kf_predict / kf_update internally
 
-## GUI usage
+inv = inverse.MNEInverter();
+inv = inv.withPropertiesFromZef(zef);
+[zef, inv] = inv.computeInversionWithZI(zef);
+inv = inv.computeGMM(zef.reconstruction, zef);   % ClassGMM
+```
 
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Math and name-values: [+ClassGMM/README.md](+ClassGMM/README.md), [+ClassKF/README.md](+ClassKF/README.md). Class inverse overview: [../+inverse/README.md](../+inverse/README.md). GUI plugins: [../tools/plugins/README.md](../tools/plugins/README.md).

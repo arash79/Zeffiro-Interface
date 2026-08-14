@@ -1,31 +1,28 @@
 function h_output = zef_find_object_handles(zef, h_input, h_output, node_name)
-% --- Zeffiro documentation header ---
-% zef_find_object_handles — Zef find object handles.
+%ZEF_FIND_OBJECT_HANDLES  Recursively collect zef fields that are valid handles.
 %
-% Purpose:
-%   Zef find object handles.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   h_input
-%   h_output
-%   node_name
+%   Unused from menus. Only caller is zef_gather_object_handles, which
+%   itself has no first-party callers.
 %
-% Outputs:
-%   h_output
+%   h_output = zef_find_object_handles(zef, h_input)
+%   h_output = zef_find_object_handles(zef, h_input, h_output, node_name)
 %
-% Calls (project):
-%   zef_find_object_handles
+%   Inputs
+%     zef        - session (unused except as the default eval root).
+%     h_input    - handle array to match (ismember); on failure the field
+%                  is copied with its properties.
+%     h_output   - struct to fill. Default struct().
+%     node_name  - eval string of the struct to walk. Default 'zef'.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Output
+%     h_output  - struct of matching handle fields; nested structs recurse.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[h_output] = zef_find_object_handles(zef, h_input, h_output, node_name)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_gather_object_handles.
 
 if nargin < 3
     h_output = struct;

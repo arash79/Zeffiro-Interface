@@ -1,39 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'inv_multires_dec')); — If not(isfield(zef,'inv multires dec'));.
+%ZEF_INIT_RAMUS_SAMPLER  Default inv_multires_* / sampler fields onto the fig widgets.
 %
-% Purpose:
-%   If not(isfield(zef,'inv multires dec'));.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_inv_beta (read)
-%   zef.h_inv_data_segment (read)
-%   zef.h_inv_high_cut_frequency (read)
-%   zef.h_inv_hyperprior (read)
-%   zef.h_inv_likelihood_std (read)
-%   zef.h_inv_low_cut_frequency (read)
-%   zef.h_inv_multires_n_decompositions (read)
-%   zef.h_inv_multires_n_iter (read)
-%   zef.h_inv_multires_n_levels (read)
-%   zef.h_inv_multires_sparsity (read)
-%   zef.h_inv_n_burn_in (read)
-%   zef.h_inv_n_sampler (read)
-%   zef.h_inv_sampling_frequency (read)
-%   zef.h_inv_theta0 (read)
-%   zef.h_inv_time_1 (read)
-%   … (29 more)
+%   Script. Called from ramus_sampler after opening ramus_sampler.fig.
+%   Defaults n_decompositions=20 and empty decompositions. Does not
+%   sample (Start → ramus_sampling_process). As written, missing
+%   inv_n_sampler / inv_n_burn_in write inv_multires_n_sampler instead.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'inv_multires_dec'));` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_ramus_sampler, ramus_sampler.
 
 if not(isfield(zef,'inv_multires_dec'));
     zef.inv_multires_dec = [];
@@ -51,10 +28,10 @@ if not(isfield(zef,'inv_multires_n_levels'));
     zef.inv_multires_n_levels= [3];
 end;
 if not(isfield(zef,'inv_n_sampler'));
-    zef.inv_multires_n_sampler = [100];
+    zef.inv_multires_n_sampler = [100];  % as written (field name is inv_n_sampler)
 end;
 if not(isfield(zef,'inv_n_burn_in'));
-    zef.inv_multires_n_sampler = [10];
+    zef.inv_multires_n_sampler = [10];  % as written (overwrites the line above; intended inv_n_burn_in)
 end;
 if not(isfield(zef,'inv_multires_n_levels'));
     zef.inv_multires_n_levels= [3];
@@ -112,7 +89,8 @@ if not(isfield(zef,'number_of_frames'));
     zef.number_of_frames = 1;
 end;
 
-set(zef.h_inv_multires_n_levels ,'string',num2str(zef.inv_multires_n_levels));
+set(zef.h_inv_multires_n_levels ,'string',num2str(zef.inv_multires_n_levels)
+);
 set(zef.h_inv_multires_n_decompositions ,'string',num2str(zef.inv_multires_n_decompositions));
 set(zef.h_inv_multires_sparsity ,'string',num2str(zef.inv_multires_sparsity));
 set(zef.h_inv_hyperprior ,'value',zef.inv_hyperprior);

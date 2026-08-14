@@ -1,32 +1,21 @@
 function x = zef_KDMD(x,K,M,D,use_gpu)
-% --- Zeffiro documentation header ---
-% zef_KDMD — Zef KDMD.
-%
-% Purpose:
-%   Zef KDMD.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
-%
-% Inputs:
-%   x
-%   K
-%   M
-%   D
-%   use_gpu
-%
-% Outputs:
-%   x
-%
-% Calls (project):
-%   zef_KDMD
-%
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[x] = zef_KDMD(x, K, M, D, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%ZEF_KDMD  Apply (K + D M D) x (NSE implicit viscous/mass block).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Matrix-free product used inside PCG: y = K*x + D*(M*(D*x)). Optional
+%   gpuArray promotion when use_gpu is true. Not a DMD time-series method
+%   despite the name.
+%
+%   x = zef_KDMD(x, K, M, D, use_gpu)
+%
+%   See also zef_nse_iteration, pcg_iteration.
 
 if use_gpu
     x = gpuArray(x);

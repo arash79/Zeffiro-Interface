@@ -1,20 +1,15 @@
-% --- Zeffiro documentation header ---
-% ', 'select tra file', '* — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%ZEF_LEADFIELDPROCESSINGTOOL_LOADTRA  uigetfile a *.dat transformation matrix.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.LeadFieldProcessingTool (read)
+%   Script. loadTraButton. Stores path/name on the tool struct and
+%   readmatrix → zef.LeadFieldProcessingTool.tra. Mag2Grad multiplies
+%   checked bank L by this matrix.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `', 'select tra file', '*` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_LeadfieldProcessingTool_mag2Grad.
 
 [zef.LeadFieldProcessingTool.traName, zef.LeadFieldProcessingTool.traPath]=uigetfile('./', 'select tra file', '*.dat');
 

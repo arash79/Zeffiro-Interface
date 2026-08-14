@@ -1,68 +1,49 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%zef_lead_field_matrix is a function for creating a lead field matrix.
 function zef = zef_lead_field_matrix(zef)
-% --- Zeffiro documentation header ---
-% zef_lead_field_matrix — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%ZEF_LEAD_FIELD_MATRIX  Dispatch lead-field assembly for EEG, MEG, EIT, TES (types 1–10).
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nodes
-%   tetra
-%   restricted_brain_inds
-%   source_model
-%   wanted_n_of_sources
-%   source_space_creation_iterations
+%   Central entry for sensor lead fields that inverse methods later read as
+%   zef.L. Does not build a mesh. Callers: modality wrappers
+%   (zef_eeg_lead_field_isotropic and siblings), examples.forward.lead_field_example,
+%   and (indirectly) Mesh tool → Run script.
 %
-% Outputs:
-%   zef
+%   zef.lead_field_type
+%     1 EEG isotropic sigma(:,1)     → zef_lead_field_eeg_fem
+%     2 MEG magnetometers            → zef_lead_field_meg_fem
+%     3 MEG gradiometers             → zef_lead_field_meg_grad_fem
+%     4 EIT                          → zef_lead_field_eit_fem
+%     5 TES / tES                    → zef_lead_field_tes_fem
+%     6–10 same modalities with anisotropic sigma(:,3:8)
+%   Unknown types are ignored (no otherwise error); zef.L is left unchanged.
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.S (read)
-%   zef.acceptable_source_depth (read, write)
-%   zef.active_compartment_ind (read, write)
-%   zef.aux_vec_sources (read, write)
-%   zef.brain_activity_inds (read, write)
-%   zef.brain_ind (read, write)
-%   zef.compartment_tags (read)
-%   zef.eit_count (read)
-%   zef.eit_ind (read)
-%   zef.inv_bg_data (read)
-%   zef.lead_field_id (read)
-%   zef.lead_field_id_max (read)
-%   zef.lead_field_time (read, write)
-%   zef.lead_field_type (read, write)
-%   … (29 more)
+%   Source model: core.types.ZefSourceModel.from(zef.source_model). Continuous
+%   Whitney/H(div)/St. Venant keep nearest_source_neighbour_inds; discrete
+%   models clear them. Direction mode 1/2/3 → cartesian/normal/face_based.
+%   Preconditioner 1/2 → cholinc/ssor; defaults cholinc_tol=0.001, pcg_tol=1e-8.
 %
-% Calls (project):
-%   core.types.ZefSourceModel.from
-%   zef_decompose_dof_space
-%   zef_deep_nodes_and_tetra
-%   zef_fi_dipoles
-%   zef_find_active_compartment_ind
-%   zef_lead_field_eeg_fem
-%   zef_lead_field_eit_fem
-%   zef_lead_field_matrix
-%   zef_lead_field_meg_fem
-%   zef_lead_field_meg_grad_fem
-%   zef_lead_field_tes_fem
-%   zef_source_interpolation
-%   … (1 more)
+%   Coordinates: copies nodes/sensors to *_aux and divides mm by 1000 before
+%   FEM. EEG/EIT/TES with 3-column sensors use sensors_attached_volume(:,1:3).
+%   After the solve, location_unit 1/2/3 scales source_positions back to
+%   mm/cm/m. If source_interpolation_on, calls zef_source_interpolation.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   zef = zef_lead_field_matrix(zef)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_lead_field_matrix(zef, nodes, tetra, restricted_brain_inds, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Input / output
+%     zef  - session struct. If omitted, read from base; if nargout is 0,
+%            assigned back to base.
+%
+%   Fields written
+%     L, source_positions, source_directions, source_ind, brain_activity_inds,
+%     lead_field_time, lead_field_id. EIT also inv_bg_data, eit_ind, eit_count.
+%     TES also S, eit_ind, eit_count. Temporary nodes_aux/sensors_aux removed.
+%
+%   See also zef_lead_field_eeg_fem, zef_source_interpolation, zef_run_forward_simulation.
+
+
 
 
 if nargin == 0

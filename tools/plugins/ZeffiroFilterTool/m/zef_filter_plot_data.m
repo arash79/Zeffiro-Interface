@@ -1,30 +1,21 @@
-% --- Zeffiro documentation header ---
-% function zef_filter_plot_data — Function zef filter plot data.
+function zef_filter_plot_data
+%ZEF_FILTER_PLOT_DATA  Plot zef.processed_data vs time on zef.h_axes1.
 %
-% Purpose:
-%   Function zef filter plot data.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.filter_sampling_rate (read)
-%   zef.filter_zoom (read)
-%   zef.h_axes1 (read)
-%   zef.processed_data (read)
-%
-% Calls (project):
 %   zef_filter_plot_data
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Last step of the Plot button (after zef_filter_schroll_bar,
+%   zef_update_filter_tool, zef_filter_raw_data). Reads processed_data
+%   and filter_sampling_rate from base. Time is (0:N-1)/fs when there
+%   are at least two columns; a single-column series never sets t_vec.
+%   cla h_axes1, plot all channels, pad ylim 5%, apply filter_zoom to
+%   xlim. Does not write measurements.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_filter_plot_data` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-function zef_filter_plot_data
-
+%   See also zef_filter_raw_data, zef_filter_schroll_bar.
 
 f = evalin('base','zef.processed_data');
 sampling_freq = evalin('base','zef.filter_sampling_rate');
@@ -33,7 +24,8 @@ if size(f,2) > 1
     t_vec = double([1:size(f,2)]-1)./sampling_freq;
 end
 
-axes(evalin('base','zef.h_axes1'));
+axes(evalin('base','zef.h_axes1')
+);
 cla(evalin('base','zef.h_axes1'));
 hold(evalin('base','zef.h_axes1'),'off');
 h_plot = plot(t_vec',f');

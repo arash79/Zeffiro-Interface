@@ -1,26 +1,19 @@
-% --- Zeffiro documentation header ---
-% zef_update_filter_tool; — Syncs GUI control values into `zef` for filter_tool;.
+%ZEF_FILTER_RAW_DATA  Run zef.filter_pipeline on zef.raw_data.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for filter_tool;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field (read, write)
-%   zef.filter_parameters (read, write)
-%   zef.filter_pipeline (read)
-%   zef.filter_pipeline_list (read)
-%   zef.filter_pipeline_selected (read, write)
-%   zef.processed_data (read, write)
-%   zef.raw_data (read)
+%   Script. zef_update_filter_tool first, then processed_data = raw_data.
+%   Loops j = 1:length(filter_pipeline_list) (every stage, not the
+%   current selection). Each stage is str2func(entry.file) called as
+%   processed_data = f(processed_data, parameters{:,2}{:}). A string
+%   filter_pipeline_selected is wrapped in a cell but that value is not
+%   used as a subset. Plot and the three Substitute-processed buttons
+%   call this first.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef_update_filter_tool;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_add_filter_item, zef_filter_plot_data.
 
 zef_update_filter_tool;
 zef.processed_data = zef.raw_data;

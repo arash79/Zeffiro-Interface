@@ -1,34 +1,28 @@
 function zef = import_electrodes_callback(zef)
-% --- Zeffiro documentation header ---
-% core.gui.menu_tool.import_electrodes_callback — GUI callback for import_electrodes actions.
+%IMPORT_ELECTRODES_CALLBACK  Menu Import → Import electrodes.
 %
-% Purpose:
-%   GUI callback for import_electrodes actions.
-%   Folder: Menu callbacks wired from `src/gui/tools/zef_menu_tool.m` into refactored package code.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Wired from src/gui/tools/zef_menu_tool.m onto ImportelectrodesMenu
+%   (parent menu text is "Import", item text is "Import electrodes").
+%   Opens uigetfile for *.dat / *.csv, parses with from_dat or from_csv,
+%   then writes:
+%     zef.sensors              - full N-by-3 or N-by-6 matrix
+%     zef.<prefix>_points      - same; CEM columns appended when present
+%     zef.<prefix>_name_list   - string labels
+%   Prefix is zef.current_sensors when that field exists (e.g. "s" or
+%   "s2" for a second sensor set), otherwise "s". Then zef_update so the
+%   segmentation/mesh tools show the new sensors.
 %
-% Outputs:
-%   zef
+%   Cancel (uigetfile returns 0) leaves zef unchanged. Parse errors are
+%   shown with errordlg and also leave zef unchanged.
 %
-% Zef fields (observed):
-%   zef.current_sensors (read)
-%   zef.sensors (read, write)
+%   zef = core.gui.menu_tool.import_electrodes_callback(zef)
 %
-% Calls (project):
-%   core.gui.menu_tool.import_electrodes_callback
-%   core.io.electrodes.from_csv
-%   core.io.electrodes.from_dat
-%   zef_update
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Edit → Import electrodes (wired in `zef_menu_tool.m`).
-%   Programmatic: `[zef] = core.gui.menu_tool.import_electrodes_callback(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also core.io.electrodes.from_csv, core.io.electrodes.from_dat, zef_update.
 
     arguments
         zef (1,1) struct

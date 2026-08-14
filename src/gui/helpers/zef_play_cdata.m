@@ -1,39 +1,28 @@
 function zef_play_cdata(varargin)
-% --- Zeffiro documentation header ---
-% zef_play_cdata — Zef play cdata.
+%ZEF_PLAY_CDATA  Replay stored CData frames on the Figure tool axes.
 %
-% Purpose:
-%   Zef play cdata.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   zef_play_cdata()
+%   zef_play_cdata(loop_count)
+%   zef_play_cdata(loop_count, frame_fraction)
 %
-% Outputs:
-%   See function signature and code below.
+%   Figure tool **Play** calls zef_play_cdata(max(1, loop_movie*loop_count)).
+%   Time slider zef_slidding_callback calls zef_play_cdata(1, slider_value).
 %
-% Zef fields (observed):
-%   zef.h_slider (read)
-%   zef.movie_fps (read)
-%   zef.orbit_1 (read)
-%   zef.orbit_2 (read)
-%   zef.stop_movie (read)
+%   Reads CData stacks previously written by zef_store_cdata onto
+%   axes1 children that have a CData property (UserData(k).CData,
+%   number_of_frames, time_string, frame_step). loop_count repeats the
+%   whole stack. Nonzero frame_fraction picks one frame
+%   round(fraction*n_frames) and does not loop. zef.stop_movie aborts.
+%   Between frames: camorbit by zef.orbit_1/2 scaled by frame_step/movie_fps,
+%   zef_plot_dpq, zef_update_contour. RGB-per-face CData is averaged to
+%   one colour per face when size matches 3*n_faces.
 %
-% Calls (project):
-%   zef_play_cdata
-%   zef_plot_dpq
-%   zef_update_contour
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_play_cdata(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_store_cdata, zef_slidding_callback, zef_figure_tool.
 warning('off');
 if evalin('base','exist(''zef'',''var'');')
     zef = evalin('base','zef');

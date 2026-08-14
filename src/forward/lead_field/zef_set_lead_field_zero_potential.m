@@ -1,25 +1,23 @@
 function out_L = zef_set_lead_field_zero_potential( ...
-% --- Zeffiro documentation header ---
-% out_L — Out L.
-%
-% Purpose:
-%   Out L.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Inputs:
-%   in_L
-%   in_electrodes
-%
-% Calls (project):
-%   zef_set_lead_field_zero_potential
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `out_L(in_L, in_electrodes)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
     in_L, ...
     in_electrodes ...
     )
+
+%ZEF_SET_LEAD_FIELD_ZERO_POTENTIAL  Mean-zero electrode constraint R*L, R = I - 11'/n.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   EEG FEM currently subtracts mean(L,1) in place rather than calling this.
+%   n_electrodes is size(in_electrodes,1), so pass the electrode table (or
+%   any array whose first dimension is the sensor count).
+%
+%   out_L = zef_set_lead_field_zero_potential(in_L, in_electrodes)
+%
+%   See also zef_lead_field_eeg_fem.
+
 
 arguments
     in_L double

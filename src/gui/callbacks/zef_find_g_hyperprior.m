@@ -1,36 +1,39 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [shape_param, scale_param, snr_vec] = zef_find_g_hyperprior(snr_val, tail_length_db, varargin)
-% --- Zeffiro documentation header ---
-% zef_find_g_hyperprior — Zef find g hyperprior.
+%ZEF_FIND_G_HYPERPRIOR  Gamma hyperprior shape/scale from SNR (dB) and optional L.
 %
-% Purpose:
-%   Zef find g hyperprior.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   snr_val
-%   tail_length_db
-%   varargin
+%   Unused from menus. Inverse plugins (IAS, RAMUS, EXP, HBSampler, …)
+%   and zef_plot_hyperprior (inv_hyperprior==2) call this. Same SNR →
+%   source_strength / snr_vec path as zef_find_gaussian_prior. Then a
+%   10-step search picks Gamma shape so the PDF at
+%   (relative_noise_std * tail_length)^2 is near eps_val=1e-10, with
+%     scale_g = relative_noise_std^2 / shape
+%   so the Gamma mean is noise^2. Returned scale_param is
+%     source_strength^2 * noise^2 / (n_sources * shape)
+%   so Gamma(shape, scale_param) has mean equal to the Gaussian theta0.
 %
-% Outputs:
-%   shape_param
-%   scale_param
-%   snr_vec
+%   [shape_param, scale_param, snr_vec] = zef_find_g_hyperprior(snr_val, tail_length_db)
+%   [shape_param, scale_param, snr_vec] = zef_find_g_hyperprior(snr_val, tail_length_db, L, n, norm, balance, bal_param)
 %
-% Calls (project):
-%   zef_find_g_hyperprior
-%   zef_find_gaussian_prior
-%   zef_gamma_gpu
+%   Inputs (after tail_length_db optional)
+%     snr_val           - scalar dB, typically inv_snr - prior-over-measurement.
+%     tail_length_db    - clamped to max(1, tail_length_db); tail_length = 10^(dB/20).
+%     L                 - sensors × sources. Empty → no-L path (strength 1e-2).
+%     source_space_size - default size(L,2) or 1.
+%     normalize_data    - 'maximum' (default) or other → L2 columns.
+%     balance_snr       - default 1 (true).
+%     balance_param     - added to snr_val in the nested Gaussian call.
 %
-% Side effects:
-%   - GPU
+%   Outputs
+%     shape_param  - Gamma shape (same size as snr_vec).
+%     scale_param  - Gamma scale (theta0 / shape).
+%     snr_vec      - per-source SNR in dB (scalar if no balance).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[shape_param, scale_param, snr_vec]] = zef_find_g_hyperprior(snr_val, tail_length_db, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_find_ig_hyperprior, zef_find_gaussian_prior, zef_gamma_gpu.
 
 L = [];
 
@@ -83,6 +86,7 @@ else
 
 
     if balance_snr
+        % Same sLORETA column whitening as zef_find_gaussian_prior.
         theta0 = zef_find_gaussian_prior(snr_val+balance_param);
         std_lhood = 10^(-snr_val/20);
         S_mat = std_lhood^2*eye(size(L,1));
@@ -121,6 +125,7 @@ for j = 1 : 10
 
     shape_param_vec = a + (b-a).*[0:delta_val:1];
 
+    % Gamma PDF at (noise*tail)^2 with mean = noise^2 (scale = noise^2/shape).
     p_val_vec = zef_gamma_gpu(relative_noise_std.^2.*tail_length.^2,shape_param_vec,relative_noise_std(:, ones(size(shape_param_vec,2),1)).^2 ./ (shape_param_vec));
 
     eps_val_aux = eps_val./(relative_noise_std.^2*tail_length.^2);

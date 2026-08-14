@@ -1,56 +1,50 @@
-# tools/plugins/MUSIC
+# MUSIC
 
-## Purpose of this folder
+MUSIC subspace scan: SVD of the data covariance, then score each lead-field column against the signal (or noise) subspace. Use it for a few focal sources when you want a subspace correlation map rather than a distributed inverse.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+There is **no** `inverse.*Inverter` for MUSIC. Registry id `legacy_music` dispatches `MUSIC_iteration`.
 
-## Contents
+## Menu
 
-MATLAB sources:
-- `MUSIC_iteration.m` — **function [z,Var_loc] = MUSIC_iteration**: Function [z,Var loc] = MUSIC iteration.
-- `MUSIC_app_start.m` — **zef**: Zef.
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **MUSIC** |
+| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
 
-Other files:
-- `MUSIC_app.mlapp`
-- `README`
+INI callback: `MUSIC_app_start` (script).
 
-## How this folder fits into the overall workflow
+Window title in the `.mlapp`: `ZEFFIRO Interface: MUSIC`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+## Run the solver
 
-## GUI usage
-
-- **zef**: GUI callback or dialog (`zef`).
-
-## Programmatic usage
-
-From the project root:
+**StartButton** `ButtonPushedFcn`:
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+zef.reconstruction = MUSIC_iteration;
 ```
 
-Representative entry points in this folder:
-- `Call `function [z,Var_loc] = MUSIC_iteration` from MATLAB with the project root on the path.`
-- `Call `zef` from MATLAB with the project root on the path.`
+`Var_loc` (second output of `MUSIC_iteration`) is discarded. `reconstruction_information` is **not** assigned.
 
-## Examples
+Types: `Source projection` / `Noise out-projection` → `zef.MUSIC_type`. Lead-field regularization: `Basic` / `Pseudoinverse` → `zef.MUSIC_L_reg_type`; ridge `zef.MUSIC_leadfield_lambda` (disabled for pseudoinverse).
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+Each frame first **means the time window to a single topography** (`mean(f,2)`), then builds `C = (f − mean(f,1))(·)' / size(f,2)`. After that mean, `f` is `n_sensors × 1`, so `C` is rank-1. The SVD signal subspace is therefore typically one-dimensional (empty `U` still errors if that singular value is below `10^(-inv_snr/20)^2 * max(f.^2)`). This is not a multi-snapshot data covariance.
 
-## Dependencies and assumptions
+Type 2 can return a complex generalized eigenvalue. The solver clamps `amp`, then if the eigenvector is complex it reconstructs a real orientation in the (Re, Im) plane with a 2×2 quadratic. That is not textbook complex-MUSIC. The real type-2 path stores `(1-amp)*orientation` (a perfect noise-space match is a null).
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## Needs
 
-## Notes for developers
+- `zef.L`, interpolation, `zef.source_direction_mode`
+- `zef.measurements`
+- SNR: `zef.inv_snr` → `10^(-inv_snr/20)`; if the signal subspace is empty the solver errors `Given signal-to-noise ratio is too high!`
+- Frames: `zef.number_of_frames`, `inv_time_*`, band edges
+- Reads `zef` from the base workspace (`evalin`)
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## Writes
+
+- `zef.reconstruction` only (peak-normalized in the solver)
+
+## Files
+
+- Start: `MUSIC_app_start.m` constructs `MUSIC_app`
+- Solver: `MUSIC_iteration.m`
+- Layout: `MUSIC_app.mlapp`

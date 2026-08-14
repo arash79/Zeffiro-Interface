@@ -1,37 +1,3 @@
-% --- Zeffiro documentation header ---
-% examples.studies.santtus_peeling_article.helpers.function [dist_vec, angle_vec, mag_vec, dispersion_vec] = zef_rec_diff( ... — Example or study script demonstrating function [dist_vec, angle_vec, mag_vec, dispersion_vec] = zef_rec_diff( .
-%
-% Purpose:
-%   Example or study script demonstrating function [dist_vec, angle_vec, mag_vec, dispersion_vec] = zef_rec_diff( ....
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
-%
-% Inputs:
-%   zef
-%   inverse_method
-%   noise_db
-%   diff_type
-%   dispersion_radius
-%
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.inv_data_mode (read, write)
-%   zef.inv_synth_source (read, write)
-%   zef.measurements (read, write)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   zef_find_source_legacy
-%   zef_rec_diff
-%   zef_waitbar
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `examples.studies.santtus_peeling_article.helpers.function [dist_vec, angle_vec, mag_vec, dispersion_vec] = zef_rec_diff( ...(zef, inverse_method, noise_db, diff_type, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 function [dist_vec, angle_vec, mag_vec, dispersion_vec] = zef_rec_diff( ...
     zef, ...
     inverse_method, ...
@@ -39,8 +5,16 @@ function [dist_vec, angle_vec, mag_vec, dispersion_vec] = zef_rec_diff( ...
     diff_type, ...
     dispersion_radius ...
 )
-
-    arguments
+%ZEF_REC_DIFF  Example script: Rec diff.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%
+%   Run with the project root on the MATLAB path.
+%
 
         zef (1,1) struct
 

@@ -1,26 +1,16 @@
 function to_out = copy_fields ( from, to, kwargs )
-% --- Zeffiro documentation header ---
-% utilities.structs.copy_fields — Copy fields.
+%COPY_FIELDS  Copy all fields from one struct into another.
 %
-% Purpose:
-%   Copy fields.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   from
-%   to
-%   kwargs
+%   to_out = copy_fields(from, to, kwargs)
 %
-% Outputs:
-%   to_out
-%
-% Calls (project):
-%   utilities.structs.copy_fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[to_out] = utilities.structs.copy_fields(from, to, kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Overwrites matching field names on to. When kwargs.error_on_overwrite is
+%   true and a field already exists on to, returns early with
+%   to_out.copy_fields_error__ describing the conflict instead of copying.
 
     arguments
         from                        (1,1)   struct

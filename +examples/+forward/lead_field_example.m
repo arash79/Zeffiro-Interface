@@ -1,30 +1,18 @@
 function project_struct = lead_field_example ( kwargs, mesh_kwargs, lead_field_kwargs )
-% --- Zeffiro documentation header ---
-% examples.forward.lead_field_example — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%LEAD_FIELD_EXAMPLE  Mesh (via zef_meshing_example) then zef_lead_field_matrix.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   kwargs
-%   mesh_kwargs
-%   lead_field_kwargs
+%   project_struct = lead_field_example(kwargs, mesh_kwargs, lead_field_kwargs)
 %
-% Outputs:
-%   project_struct
+%   Needs the same import_segmentation.zef as the meshing example. After
+%   meshing: copy_fields of lead_field_kwargs, zef_attach_sensors_volume,
+%   zef_lead_field_matrix, zef_save to data/lead_field_example.mat.
+%   Default lead_field_type 1 (EEG), n_sources 1e4, Hdiv, direction mode 1.
 %
-% Calls (project):
-%   utilities.structs.copy_fields
-%   zef_attach_sensors_volume
-%   zef_lead_field_matrix
-%   zef_meshing_example
-%   zef_save
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[project_struct] = examples.forward.lead_field_example(kwargs, mesh_kwargs, lead_field_kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
     arguments
         kwargs.start_mode = "nodisplay"

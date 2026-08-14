@@ -1,37 +1,17 @@
-% --- Zeffiro documentation header ---
-% zef.h_find_synthetic_source_legacy = figure(... — Zef.h find synthetic source legacy = figure(.
+%ZEF_FIND_SYNTHETIC_SOURCE_LEGACY_APP  GUIDE dump: Find synthetic source widgets.
 %
-% Purpose:
-%   Zef.h find synthetic source legacy = figure(....
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_find_synthetic_source_legacy (read)
-%   zef.h_inv_synth_source_1 (read, write)
-%   zef.h_inv_synth_source_10 (read, write)
-%   zef.h_inv_synth_source_2 (read, write)
-%   zef.h_inv_synth_source_3 (read, write)
-%   zef.h_inv_synth_source_4 (read, write)
-%   zef.h_inv_synth_source_5 (read, write)
-%   zef.h_inv_synth_source_6 (read, write)
-%   zef.h_inv_synth_source_7 (read, write)
-%   zef.h_inv_synth_source_8 (read, write)
-%   zef.h_inv_synth_source_9 (read, write)
-%   zef.h_synth_source (read, write)
-%   zef.measurements (read, write)
+%   Script. Builds figure Name 'Find synthetic source' (renamed by
+%   the window wrapper). Plot source(s) → zef_update_fss_legacy then
+%   zef_plot_source_legacy(zef,1). Create synthetic data → update
+%   then zef.measurements = zef_find_source_legacy(zef). Layout only
+%   besides those two Callbacks.
 %
-% Calls (project):
-%   zef_find_source_legacy
-%   zef_plot_source_legacy
-%   zef_update_fss_legacy
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.h_find_synthetic_source_legacy = figure(...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_find_synthetic_source_legacy_window.
 
 zef.h_find_synthetic_source_legacy = figure(...
     'PaperUnits','inches',...
@@ -63,7 +43,8 @@ uicontrol(...
     'FontUnits','normalized',...
     'HorizontalAlignment','left',...
     'ListboxTop',0,...
-    'String','Position(s):',...
+    'String','Position(s)
+:',...
     'Style','text',...
     'Position',[0.0388471177944862 0.851925192519252 0.471177944862155 0.0561056105610561],...
     'Children',[],...

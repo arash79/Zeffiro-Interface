@@ -1,33 +1,24 @@
 function kappa = zef_update_zoom(varargin)
-% --- Zeffiro documentation header ---
-% zef_update_zoom — Syncs GUI control values into `zef` for zoom.
+%ZEF_UPDATE_ZOOM  Figure-tool **Distance:** slider.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for zoom.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Finds the slider Tag='update_zoom_slider' on the Figure tool
+%   (or on varargin{1} if a popped-out figure was passed) and assigns
+%   axes1 CameraViewAngle to the slider Value. Range is 0.1–100 degrees
+%   (larger angle = more of the scene, i.e. zoomed out). Default lives in
+%   zef.update_zoom / zef.cam_va.
 %
-% Outputs:
-%   kappa
+%   The Figure-tool Callback writes the returned value to zef.update_zoom
+%   when gca is parented to h_zeffiro.
 %
-% Zef fields (observed):
-%   zef.h_zeffiro (read)
+%   kappa = zef_update_zoom
+%   kappa = zef_update_zoom(h_figure)
 %
-% Calls (project):
-%   zef_update_zoom
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[kappa] = zef_update_zoom(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_figure_tool, zef_set_sliders_plot.
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');
 else

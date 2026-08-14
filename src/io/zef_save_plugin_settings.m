@@ -1,24 +1,15 @@
-% --- Zeffiro documentation header ---
-% zef.plugin_cell = zef.h_plugin_settings_table — Zef.plugin cell = zef.h plugin settings table.
+%ZEF_SAVE_PLUGIN_SETTINGS  Persist plugin settings table to profile INI.
 %
-% Purpose:
-%   Zef.plugin cell = zef.h plugin settings table.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_plugin_settings_table (read)
-%   zef.plugin_cell (read)
-%   zef.profile_name (read)
-%   zef.program_path (read)
+%   Copies zef.h_plugin_settings_table.Data into zef.plugin_cell, writes it
+%   to profile/<zef.profile_name>/zeffiro_plugins.ini, and applies each row
+%   to the corresponding zef field in the base workspace.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.plugin_cell = zef.h_plugin_settings_table` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_save_system_settings, zef_plugin.
 
 zef.plugin_cell = zef.h_plugin_settings_table.Data;
 writecell(zef.plugin_cell,[zef.program_path '/profile/' zef.profile_name '/zeffiro_plugins.ini'],'FileType','text');

@@ -1,31 +1,15 @@
-% --- Zeffiro documentation header ---
-% warning('off'); — Warning('off');.
+%ZEF_EIT_LEAD_FIELD  EIT isotropic lead field (type 4); used by zef_eit_make_all.
 %
-% Purpose:
-%   Warning('off');.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.imaging_method (read, write)
-%   zef.lead_field_filter_quantile (read)
-%   zef.lead_field_type (read, write)
-%   zef.sensors (read)
-%   zef.source_directions (read)
-%   zef.source_interpolation_on (read)
-%   zef.source_positions (read)
+%   Script. Sets lead_field_type=4, imaging_method=1, attaches sensors, calls
+%   zef_lead_field_matrix (writes L, inv_bg_data, eit_ind, eit_count). Default
+%   INI rows call zef_eit_lead_field_isotropic.
 %
-% Calls (project):
-%   zef_attach_sensors_volume
-%   zef_lead_field_filter
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `warning('off');` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_lead_field_eit_fem, zef_eit_lead_field_isotropic.
 
 warning('off');
 zef.lead_field_type = 4;

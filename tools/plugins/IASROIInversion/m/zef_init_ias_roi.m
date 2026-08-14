@@ -1,49 +1,19 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_init_ias_roi(zef)
-% --- Zeffiro documentation header ---
-% zef_init_ias_roi — Initializes GUI widgets and default `zef` fields for ias_roi.
+%ZEF_INIT_IAS_ROI  Open IAS ROI MAP window and default iasroi_* onto widgets.
 %
-% Purpose:
-%   Initializes GUI widgets and default `zef` fields for ias_roi.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_init_ias_roi(zef)
 %
-% Outputs:
-%   zef
+%   Called via zef_tool_start from ias_map_estimation_roi. Names
+%   'ZEFFIRO Interface: IAS ROI MAP estimation'. Defaults roi_mode=3,
+%   sphere [0 0 0 15], threshold 0.5, n_map_iterations=25. Start is
+%   bound in the window dump (update + ias_iteration_roi). Does not invert.
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_iasroi_apply (read)
-%   zef.h_iasroi_cancel (read)
-%   zef.h_iasroi_high_cut_frequency (read)
-%   zef.h_iasroi_hyperprior (read)
-%   zef.h_iasroi_low_cut_frequency (read)
-%   zef.h_iasroi_map_estimation (read)
-%   zef.h_iasroi_n_map_iterations (read)
-%   zef.h_iasroi_normalize_data (read)
-%   zef.h_iasroi_number_of_frames (read)
-%   zef.h_iasroi_plot_roi (read)
-%   zef.h_iasroi_plot_source (read)
-%   zef.h_iasroi_rec_source_8 (read)
-%   zef.h_iasroi_rec_source_9 (read)
-%   zef.h_iasroi_roi_mode (read)
-%   … (36 more)
-%
-% Calls (project):
-%   zef_ias_map_estimation_roi_window
-%   zef_init_ias_roi
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_init_ias_roi(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_update_ias_roi, zef_ias_iteration_roi.
 
 zef = zef_ias_map_estimation_roi_window(zef);
 

@@ -1,35 +1,15 @@
-%Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if isfield(zef.GMM — If isfield(zef.GMM.
+%ZEF_GMMEXPORT_START  Open the GMM export window beside the main GMM app.
 %
-% Purpose:
-%   If isfield(zef.GMM.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.font_size (read)
-%   zef.save_file_path (read)
+%   Script. Closes an existing Export app, constructs GMMExport,
+%   docks it left of the main window. ComponentTable toggles which
+%   of model/dipoles/amplitudes/time_variables/parameters/
+%   reconstruction are saved. ExportButton → zef_GMM_export.
 %
-% Calls (project):
-%   zef_GMM_export
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `if isfield(zef.GMM` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-%Script for starting exporting window for GMM.
-
-%don't allow to open multiple app window because it cause ether App
-%Designer or app's functionalities to crash or both of them
-
-
+%   See also zef_GMM_export, GMModelApp_start.
 
 if isfield(zef.GMM.apps,'Export')
     if isvalid(zef.GMM.apps.Export)

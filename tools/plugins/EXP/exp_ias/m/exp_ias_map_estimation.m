@@ -1,39 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if  ismac — If  ismac.
+%EXP_IAS_MAP_ESTIMATION  Open GUIDE window: IAS MAP estimation for EP (not on default menu).
 %
-% Purpose:
-%   If  ismac.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_exp_ias_apply (read)
-%   zef.h_exp_ias_beta (read)
-%   zef.h_exp_ias_cancel (read)
-%   zef.h_exp_ias_data_segment (read)
-%   zef.h_exp_ias_high_cut_frequency (read)
-%   zef.h_exp_ias_low_cut_frequency (read)
-%   zef.h_exp_ias_map_estimation (read, write)
-%   zef.h_exp_ias_n_map_iterations (read)
-%   zef.h_exp_ias_number_of_frames (read)
-%   zef.h_exp_ias_sampling_frequency (read)
-%   zef.h_exp_ias_snr (read)
-%   zef.h_exp_ias_start (read)
-%   zef.h_exp_ias_theta0 (read)
-%   zef.h_exp_ias_time_1 (read)
-%   … (3 more)
+%   Script. Opens exp_ias_map_estimation.fig (title ZEFFIRO Interface:
+%   IAS MAP estimation for EP), zef_init_exp_ias, enables data-segment
+%   when measurements is a cell. Start in the fig runs
+%   exp_ias_iteration([]). Needs zef.L and zef.measurements. Not the
+%   default Lasso app (zef_exp_app_launch).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if  ismac` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_exp_ias, exp_ias_iteration.
 
 if  ismac
     zef.h_exp_ias_map_estimation = open('exp_ias_map_estimation.fig');
@@ -42,7 +19,7 @@ elseif ispc
 else
     zef.h_exp_ias_map_estimation = open('exp_ias_map_estimation.fig');
 end
-set(zef.h_exp_ias_map_estimation,'Name','ZEFFIRO Interface: IAS MAP estimation for EP');
+set(zef.h_exp_ias_map_estimation,'Name','ZEFFIRO Interface: IAS MAP estimation for EP')
 set(findobj(zef.h_exp_ias_map_estimation.Children,'-property','FontUnits'),'FontUnits','pixels')
 set(findobj(zef.h_exp_ias_map_estimation.Children,'-property','FontSize'),'FontSize',zef.font_size);
 

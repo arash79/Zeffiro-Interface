@@ -1,28 +1,18 @@
 function M = zef_volume_scalar_diagonal_matrix(nodes, tetra, scalar_field, weighting)
-% --- Zeffiro documentation header ---
-% zef_volume_scalar_diagonal_matrix — Zef volume scalar diagonal matrix.
+%ZEF_VOLUME_SCALAR_DIAGONAL_MATRIX  Mass using only local vertex 1 (i=j=1).
 %
-% Purpose:
-%   Zef volume scalar diagonal matrix.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   scalar_field
-%   weighting
+%   Unlike zef_volume_scalar_matrix this loops i=1:1, j=1:1, so only
+%   sparse(tetra(:,1),tetra(:,1), φ V w_diag). Not a lumped four-vertex
+%   mass. No first-party caller except the unused FF wrapper.
 %
-% Outputs:
-%   M
+%   M = zef_volume_scalar_diagonal_matrix(nodes, tetra, scalar_field, weighting)
 %
-% Calls (project):
-%   zef_volume_barycentric
-%   zef_volume_scalar_diagonal_matrix
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_volume_scalar_diagonal_matrix(nodes, tetra, scalar_field, weighting)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_volume_scalar_diagonal_matrix_FF.
 
 N = size(nodes,1);
 K = size(tetra,1);

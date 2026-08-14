@@ -1,41 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'bf_sampling_frequency')) — If not(isfield(zef,'bf sampling frequency')).
+%ZEF_INIT_BUTTERFLY_PLOT  Butterfly-plot defaults and widget fill (script).
 %
-% Purpose:
-%   If not(isfield(zef,'bf sampling frequency')).
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.bf_data_segment (read, write)
-%   zef.bf_high_cut_frequency (read, write)
-%   zef.bf_low_cut_frequency (read, write)
-%   zef.bf_normalize_data (read, write)
-%   zef.bf_sampling_frequency (read, write)
-%   zef.bf_time_1 (read, write)
-%   zef.bf_time_2 (read, write)
-%   zef.h_bf_data_segment (read)
-%   zef.h_bf_high_cut_frequency (read)
-%   zef.h_bf_low_cut_frequency (read)
-%   zef.h_bf_normalize_data (read)
-%   zef.h_bf_sampling_frequency (read)
-%   zef.h_bf_time_1 (read)
-%   zef.h_bf_time_2 (read)
-%   zef.inv_data_segment (read)
-%   … (6 more)
+%   Script. If bf_* fields are missing, copies from inv_sampling_frequency,
+%   inv_low/high_cut_frequency, inv_time_1/2, inv_data_segment,
+%   normalize_data. Then sets h_bf_* String/Value. Run from
+%   zef_butterfly_plot_start after the figure exists.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'bf_sampling_frequency'))` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
-
+%   See also zef_update_butterfly_plot, zef_butterfly_plot.
 if not(isfield(zef,'bf_sampling_frequency'))
     zef.bf_sampling_frequency = zef.inv_sampling_frequency;
 end

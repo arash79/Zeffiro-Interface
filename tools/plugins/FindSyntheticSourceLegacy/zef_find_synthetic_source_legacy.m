@@ -1,30 +1,21 @@
 function zef = zef_find_synthetic_source_legacy(zef)
-% --- Zeffiro documentation header ---
-% zef_find_synthetic_source_legacy — Zef find synthetic source legacy.
+%ZEF_FIND_SYNTHETIC_SOURCE_LEGACY  Open Forward tools → Find synthetic source legacy.
 %
-% Purpose:
-%   Zef find synthetic source legacy.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_find_synthetic_source_legacy(zef)
 %
-% Outputs:
-%   zef
+%   Default-profile INI callback. zef_tool_start(...,
+%   'zef_find_synthetic_source_legacy_window', 1/4, 0). Create synthetic
+%   data: zef.measurements = zef_find_source_legacy(zef) (function
+%   name inside that file is find_source). Single snapshot (no pulse
+%   train). Needs zef.L, zef.source_positions. nargin 0 / nargout 0
+%   use base zef.
 %
-% Calls (project):
-%   zef_find_synthetic_source_legacy
-%   zef_tool_start
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_find_synthetic_source_legacy(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_find_source_legacy, zef_update_fss_legacy.
 
 if nargin == 0
     zef = evalin('base','zef');

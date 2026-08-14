@@ -1,32 +1,24 @@
 function [zef] = zef_turn_compartment_onoff(zef,compartment_onoff_vec)
-% --- Zeffiro documentation header ---
-% zef_turn_compartment_onoff — Zef turn compartment onoff.
+%ZEF_TURN_COMPARTMENT_ONOFF  Set ON flags for all compartments from a vector.
 %
-% Purpose:
-%   Zef turn compartment onoff.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   compartment_onoff_vec
+%   Assigns zef.<compartment_tags{i}_on> = compartment_onoff_vec(i) for
+%   each tag. When compartment_onoff_vec is empty, uses ones(1, n_tags).
 %
-% Outputs:
-%   zef
+%   zef = zef_turn_compartment_onoff(zef, compartment_onoff_vec)
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
+%   Inputs
+%     zef                   - session struct.
+%     compartment_onoff_vec - numeric vector, one ON value per compartment tag.
 %
-% Calls (project):
-%   zef_turn_compartment_onoff
+%   Output
+%     zef - session with updated _on fields.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_turn_compartment_onoff(zef, compartment_onoff_vec)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_build_compartment_table.
 
 c_t = zef.compartment_tags;
 n_c_t = length(c_t);

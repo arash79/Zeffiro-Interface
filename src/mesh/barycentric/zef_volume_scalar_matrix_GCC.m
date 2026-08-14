@@ -1,29 +1,18 @@
 function M = zef_volume_scalar_matrix_GCC(nodes, tetra, g_i_ind, scalar_field, weighting)
-% --- Zeffiro documentation header ---
-% zef_volume_scalar_matrix_GCC — Zef volume scalar matrix GCC.
+%ZEF_VOLUME_SCALAR_MATRIX_GCC  Scatter φ V (∇ψ_i)_α from tets to nodes.
 %
-% Purpose:
-%   Zef volume scalar matrix GCC.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   g_i_ind
-%   scalar_field
-%   weighting
+%   Loop i=1:4 adds sparse(tetra(:,i), aux_vec.*g_i(:,g_i_ind)) with two
+%   arguments only (MATLAB treats the second as values, column index 1).
+%   weighting is read but not used. No first-party caller.
 %
-% Outputs:
-%   M
+%   M = zef_volume_scalar_matrix_GCC(nodes, tetra, g_i_ind, scalar_field, weighting)
 %
-% Calls (project):
-%   zef_volume_barycentric
-%   zef_volume_scalar_matrix_GCC
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_volume_scalar_matrix_GCC(nodes, tetra, g_i_ind, scalar_field, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_volume_scalar_matrix_CC, zef_volume_barycentric.
 
 N = size(nodes,1);
 K = size(tetra,1);

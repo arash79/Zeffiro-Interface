@@ -1,29 +1,23 @@
 function zef = ias_map_estimation(zef)
-% --- Zeffiro documentation header ---
-% ias_map_estimation — Ias map estimation.
+%IAS_MAP_ESTIMATION  IAS ROI plugin entry (filename ias_map_estimation_roi.m).
 %
-% Purpose:
-%   Ias map estimation.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = ias_map_estimation_roi
+%   zef = ias_map_estimation_roi(zef)
 %
-% Outputs:
-%   zef
+%   INI callback ias_map_estimation_roi (Inverse tools → IAS ROI Inversion).
+%   Filename is ias_map_estimation_roi.m; declared function name is
+%   ias_map_estimation (same as the non-ROI start file; MATLAB calls the
+%   filename). Opens the ROI window via zef_init_ias_roi. Does not invert.
+%   Live Start calls ias_iteration_roi; solver on disk is zef_ias_iteration_roi.
+%   Needs zef.L and zef.measurements.
 %
-% Calls (project):
-%   zef_tool_start
+%   See also zef_init_ias_roi, zef_ias_iteration_roi.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = ias_map_estimation(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     zef = evalin('base','zef');

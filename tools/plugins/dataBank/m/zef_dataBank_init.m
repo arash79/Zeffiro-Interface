@@ -1,33 +1,26 @@
 function zef = zef_dataBank_init(zef)
-% --- Zeffiro documentation header ---
-% zef_dataBank_init — Zef data Bank init.
+%ZEF_DATABANK_INIT  Default Combine-panel times, sampling frequency, and workingHashes.
 %
-% Purpose:
-%   Zef data Bank init.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Called from zef_open_dataBank after zef_dataBank_app is created. Ensures
+%   zef.dataBank.var_starttime, var_endtime, var_sampling_frequency, and
+%   workingHashes exist, then copies those scalars onto StarttimeSpinner,
+%   EndtimeSpinner, and SfreqSpinner. Sampling frequency defaults to
+%   zef.inv_sampling_frequency. Does not invert or touch the tree.
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_init(zef)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
-%   zef.inv_sampling_frequency (read)
+%   Inputs
+%     zef  - session with zef.dataBank.app already set. nargin==0 → base.
 %
-% Calls (project):
-%   zef_dataBank_init
+%   Output
+%     zef  - var_* and spinner Values filled. nargout==0 → assignin base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dataBank_init(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_open_dataBank, zef_dataBank_update.
 
 if nargin == 0
     zef = evalin('base','zef')

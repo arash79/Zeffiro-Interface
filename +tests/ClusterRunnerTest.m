@@ -1,27 +1,14 @@
 classdef ClusterRunnerTest < matlab.unittest.TestCase
-% --- Zeffiro documentation header ---
-% tests.ClusterRunnerTest — Automated test: ClusterRunnerTest.
+%CLUSTERRUNNERTEST  utilities.cluster.run_inverse_job writes a result.mat for dspm.
 %
-% Purpose:
-%   Automated test: ClusterRunnerTest.
-%   Folder: MATLAB unit and integration tests for refactored inverse dispatch, lead fields, cluster jobs, and legacy/class parity.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
+%   Synthetic bundle, temp directory. Asserts result.success after
+%   run_inverse_job. Does not require a CSC cluster profile.
 %
-% Calls (project):
-%   utilities.cluster.run_inverse_job
-%   zef_inverse_extract_bundle
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `tests.ClusterRunnerTest(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
 
     methods (Test)
         function testRunInverseJobWritesResultFile(testCase)

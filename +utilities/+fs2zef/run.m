@@ -1,37 +1,12 @@
 function output_info = run(subject_id, segmentation_files, output_dir, options)
-% --- Zeffiro documentation header ---
-% utilities.fs2zef.run — Run.
+%RUN  FreeSurfer volume segmentations → Zeffiro meshes and import script.
 %
-% Purpose:
-%   Run.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   subject_id
-%   segmentation_files
-%   output_dir
-%   options
-%
-% Outputs:
-%   output_info
-%
-% Calls (project):
-%   utilities.fs2zef.environment.setup_freesurfer_env
-%   utilities.fs2zef.environment.validate_environment
-%   utilities.fs2zef.generators.generate_zef_import
-%   utilities.fs2zef.run
-%   zef_import
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[output_info] = utilities.fs2zef.run(subject_id, segmentation_files, output_dir, options)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%
-% run - Unified FreeSurfer to Zeffiro Pipeline
+%   output_info = run(subject_id, segmentation_files, output_dir, options)
 %
 % Process ANY FreeSurfer segmentation files (.mgz) into Zeffiro-compatible
 % formats. Completely file-driven - no assumptions about which compartments
@@ -60,7 +35,9 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
 %   compute_transforms  - Compute affine transforms for alignment (default: true)
 %   reference_volume    - Reference .mgz for transforms (default: 'orig.mgz')
 %   include_surfaces    - Include cortical surfaces (lh/rh pial, white) (default: true)
-%   include_skull_skin  - Include skull and skin surfaces (default: true)
+%   include_skull_skin  - Declared (default: true) but not read by this
+%                         function; skull/skin only appear if those labels
+%                         exist in the chosen .mgz files
 %   electrode_file      - Path to electrode file (default: built-in)
 %   merge_left_right    - Merge L/R compartments in import file (default: true)
 %                         true: name=base only, merge=0/1; false: name=L/R, merge=0 all
@@ -85,7 +62,8 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
 %   
 %   Then:
 %     5. Generate unified ZEF import file from ALL meshes
-%     6. Ready to import into Zeffiro Interface
+%     6. Import with zeffiro_interface(..., 'import_to_new_project', zef_file)
+%        or 'import_to_existing_project' (not zef_import)
 %
 % REQUIREMENTS:
 %   - FREESURFER_HOME environment variable set

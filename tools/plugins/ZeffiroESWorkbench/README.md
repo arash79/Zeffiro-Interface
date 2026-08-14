@@ -1,41 +1,35 @@
-# tools/plugins/ZeffiroESWorkbench
+# ES Workbench
 
-## Purpose of this folder
+Optimizes **tES electrode currents** so the FEM lead field `zef.L` produces a target current density at synthetic source locations (`zef.inv_synth_source`). This is **not** MEG/EEG inverse. Results go to `zef.y_ES_interval` (currents `y_ES`, volumetric density, residuals). **Update reconstruction** copies a density volume into `zef.reconstruction` for mesh plotting.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+Needs `zef.L`, `zef.source_positions`, and at least one row of `zef.inv_synth_source` (position + orientation). Solver packages: MATLAB `linprog`/`quadprog`, Gurobi, CVX, MOSEK (optional folders).
 
-## Contents
+## How to open it
 
-Subfolders:
-- `m/`
-- `mlapp/`
+**Inverse tools → ES Workbench** (default profile). Callback: `zef_ES_optimization` → `zef_tool_start(..., 'zef_ES_optimization_window', ...)`.
 
-## How this folder fits into the overall workflow
+## Buttons (`ButtonPushedFcn` in `m/zef_ES_optimization_window.m`)
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+| Handle | Action |
+|--------|--------|
+| **Find currents** | confirm dialog; if HPO search method == 1 → `zef_ES_find_currents(zef)`, if 2 → `zef_ES_find_currents_recursive(zef)` |
+| **Update reconstruction** | `zef_ES_update_reconstruction` then `zef_plot_meshes` — `zef.reconstruction = y_ES_interval.volumetric_current_density{sr,sc}` from the objective-function indices |
+| **Plot data** | `zef_ES_plot_data` |
 
-## GUI usage
+Right-click on plot: current pattern, bar plot, error chart, optimizer properties, distance curves. Parameter table edits run `zef_ES_optimization_update`. Fixed-electrodes checkbox → `zef.ES_active_electrodes = zef_ES_fix_active_electrodes(zef)`.
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+`zef_ES_find_currents` grids α/ε (`zef_ES_find_parameters`), calls `zef_ES_optimize_current` (LP / QP / SDP search methods), stores `zef.y_ES_interval`. Recursive search wraps the same optimizer.
 
-## Programmatic usage
+HPO search method **2** (`zef_ES_find_currents_recursive`) calls **this folder’s** `zef_ES_recursive_search(zef, num_lattice, recursive_instances)` then a second pass with fixed electrodes. That is not the two-argument study function `examples.studies.tES_hyperparameter_optimization.zef_ES_recursive_search`. Because `tools/plugins` is on the path, an unqualified `zef_ES_recursive_search` is the workbench file.
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+## Scripting
 
-## Examples
+```matlab
+zef = zef_ES_find_currents(zef);
+zef = zef_ES_update_reconstruction(zef);
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+% Same family as HPO method 2 (plugin implementation):
+zef = zef_ES_recursive_search(zef, zef.ES_step_size, zef.ES_HPO_recursive_instances);
+```
 
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Study wrapper with a different signature: `+examples/+studies/+tES_hyperparameter_optimization/`.

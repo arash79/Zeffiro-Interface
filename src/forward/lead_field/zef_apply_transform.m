@@ -1,33 +1,20 @@
-% --- Zeffiro documentation header ---
-% for zef_i = 1 : length(zef — For zef i = 1 : length(zef.
+%ZEF_APPLY_TRANSFORM  Mesh-tool "Apply transform": bake affine into surfaces and sensors.
 %
-% Purpose:
-%   For zef i = 1 : length(zef.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.apply_transform_compartment_tags (read, write)
-%   zef.apply_transform_reuna_p (read, write)
-%   zef.apply_transform_reuna_t (read, write)
-%   zef.apply_transform_sensors (read, write)
-%   zef.compartment_tags (read)
-%   zef.current_sensors (read)
-%   zef.imaging_method (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.sensors (read)
+%   Script. Bound to h_pushbutton23. Restores original surface meshes when
+%   *_points_original_surface_mesh exists, runs zef_process_meshes (which
+%   applies the current scaling/rotation/translation widgets), then writes
+%   the resulting coordinates back into zef.<current_sensors>_points (and
+%   _directions for imaging_method 2 or 3) and each active compartment's
+%   _points/_triangles. Resets scaling, corrections, rotations, and
+%   affine_transform to identity so a second Apply does not double-transform.
+%   Calls zef_update and zef_update_transform.
 %
-% Calls (project):
-%   zef_process_meshes
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `for zef_i = 1 : length(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_process_meshes, zef_mesh_tool.
 
 for zef_i = 1 : length(zef.compartment_tags)
     if evalin('base',['zef.' zef.compartment_tags{zef_i} '_on'])

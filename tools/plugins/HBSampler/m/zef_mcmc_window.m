@@ -1,48 +1,20 @@
 function zef = zef_mcmc_window(zef)
-% --- Zeffiro documentation header ---
-% zef_mcmc_window — Zef mcmc window.
+%ZEF_MCMC_WINDOW  GUIDE figure: Hierarchical Bayesian MCMC sampler.
 %
-% Purpose:
-%   Zef mcmc window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_mcmc_window(zef)
 %
-% Outputs:
-%   zef
+%   Layout. Title 'ZEFFIRO Interface: Hierarchical Bayesian MCMC
+%   sampler'. Stores zef.h_mcmc_cm_estimation. Start Callback in
+%   the dump calls zef_update_mcmc; zef.reconstruction = zef_mcmc(zef)
+%   (open_mcmc overwrites Start to also write reconstruction_information).
+%   Apply → zef_update_mcmc. Opened from zef_open_mcmc.
 %
-% Zef fields (observed):
-%   zef.h_mcmc_apply (read, write)
-%   zef.h_mcmc_cancel (read, write)
-%   zef.h_mcmc_cm_estimation (read, write)
-%   zef.h_mcmc_high_cut_frequency (read, write)
-%   zef.h_mcmc_hyperprior (read, write)
-%   zef.h_mcmc_low_cut_frequency (read, write)
-%   zef.h_mcmc_n_burn_in (read, write)
-%   zef.h_mcmc_normalize_data (read, write)
-%   zef.h_mcmc_number_of_frames (read, write)
-%   zef.h_mcmc_sample_size (read, write)
-%   zef.h_mcmc_sampling_frequency (read, write)
-%   zef.h_mcmc_snr (read, write)
-%   zef.h_mcmc_start (read, write)
-%   zef.h_mcmc_time_1 (read, write)
-%   zef.h_mcmc_time_2 (read, write)
-%   … (14 more)
-%
-% Calls (project):
-%   zef_mcmc
-%   zef_mcmc_window
-%
-% Side effects:
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_mcmc_window(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_open_mcmc, hb_sampler.
 
 h1 = figure(...
     'PaperUnits',get(0,'defaultfigurePaperUnits'),...

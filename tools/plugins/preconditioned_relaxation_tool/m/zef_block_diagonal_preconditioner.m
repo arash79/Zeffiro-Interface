@@ -1,30 +1,18 @@
 function [M, multigrid_perm_output] = zef_block_diagonal_preconditioner(L, multigrid_dec, multigrid_ind, multigrid_perm,varargin)
-% --- Zeffiro documentation header ---
-% zef_block_diagonal_preconditioner — Zef block diagonal preconditioner.
+%ZEF_BLOCK_DIAGONAL_PRECONDITIONER  Block-diagonal MG preconditioner from L'*L blocks.
 %
-% Purpose:
-%   Zef block diagonal preconditioner.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   L
-%   multigrid_dec
-%   multigrid_ind
-%   multigrid_perm
-%   varargin
+%   [M, multigrid_perm_output] = zef_block_diagonal_preconditioner(
+%       L, multigrid_dec, multigrid_ind, multigrid_perm, reg_param)
 %
-% Outputs:
-%   M
-%   multigrid_perm_output
+%   Called from zef_relax_find_preconditioner. Optional reg_param.
+%   Returns sparse M. Does not invert the inverse problem.
 %
-% Calls (project):
-%   zef_block_diagonal_preconditioner
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[M, multigrid_perm_output]] = zef_block_diagonal_preconditioner(L, multigrid_dec, multigrid_ind, multigrid_perm, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_make_multigrid_dec, zef_relax_find_preconditioner.
 
 if not(isempty(varargin))
     reg_param = varargin{1};

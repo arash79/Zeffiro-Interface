@@ -1,29 +1,17 @@
 function v = zef_surface_scalar_vector_Fn(nodes, tetra, n_ind, scalar_field)
-% --- Zeffiro documentation header ---
-% zef_surface_scalar_vector_Fn — Zef surface scalar vector Fn.
+%ZEF_SURFACE_SCALAR_VECTOR_FN  Boundary load ∫ φ n_α ψ_i dS (weight 1/3).
 %
-% Purpose:
-%   Zef surface scalar vector Fn.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   n_ind
-%   scalar_field
+%   Same as zef_surface_scalar_vector_F times unit-normal component n_ind.
+%   NSE n_1,n_2,n_3 (outward flux weights).
 %
-% Outputs:
-%   v
+%   v = zef_surface_scalar_vector_Fn(nodes, tetra, n_ind, scalar_field)
 %
-% Calls (project):
-%   zef_surface_mesh
-%   zef_surface_scalar_vector_Fn
-%   zef_volume_barycentric
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[v] = zef_surface_scalar_vector_Fn(nodes, tetra, n_ind, scalar_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_surface_scalar_vector_F, zef_nse_poisson.
 
 ind_m = [ 2 4 3 ;
     1 3 4 ;

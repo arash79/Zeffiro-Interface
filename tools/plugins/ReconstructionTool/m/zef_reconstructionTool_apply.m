@@ -1,23 +1,23 @@
-% --- Zeffiro documentation header ---
-% trueDex=cell2mat( zef.reconstructionTool — True Dex=cell2mat( zef.reconstruction Tool.
+%ZEF_RECONSTRUCTIONTOOL_APPLY  Run dropdown transform on checked bank rows.
 %
-% Purpose:
-%   True Dex=cell2mat( zef.reconstruction Tool.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.reconstructionTool (read)
+%   Script. ApplytransformationButton. For each bankInfo column-7 true
+%   row, calls str2func('zef_reconstructionTool_' + FunctionDropDown) on
+%   that reconstruction and appends a new bank row (does not overwrite
+%   the source). Copies reconstruction_information, sets
+%   .appliedFunction, and suffixes the tag and bankInfo name with the
+%   dropdown value. New-row column 4 is size(newRec,1). Columns 5 and 6
+%   are written onto the source row (index), not the new row.
 %
-% Calls (project):
-%   zef_reconstructionTool_function
+%   The function handle is cleared inside the loop after the first
+%   checked row. Shipped dropdown items: mean, power
+%   (m/apply_functions/).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `trueDex=cell2mat( zef.reconstructionTool` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_reconstructionTool_mean, zef_reconstructionTool_power.
 
 trueDex=cell2mat( zef.reconstructionTool.bankInfo(:,7));
 
@@ -44,6 +44,7 @@ for index=1:zef.reconstructionTool.bankSize
         zef.reconstructionTool.bankInfo{zef.reconstructionTool.bankSize, 1}=strcat(zef.reconstructionTool.bankInfo{index, 1},'_', zef.reconstructionTool.app.FunctionDropDown.Value);
 
         zef.reconstructionTool.bankInfo{zef.reconstructionTool.bankSize, 4}=size(zef.reconstructionTool.bankReconstruction{zef.reconstructionTool.bankSize}.reconstruction, 1);
+        % Columns 5–6 update the source row, not the appended row.
         zef.reconstructionTool.bankInfo{index, 5}=size(zef.reconstructionTool.bankReconstruction{zef.reconstructionTool.bankSize}.reconstruction{1}, 1);
         zef.reconstructionTool.bankInfo{index, 6}= zef.reconstructionTool.bankReconstruction{zef.reconstructionTool.bankSize,1}.reconstruction_information.lead_field_id;
 

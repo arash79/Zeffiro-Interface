@@ -1,40 +1,16 @@
 function zef = zef_strip_tool_embed(zef)
-% --- Zeffiro documentation header ---
-% zef_strip_tool_embed — Zef strip tool embed.
+%ZEF_STRIP_TOOL_EMBED  Add current strip as mesh compartments.
 %
-% Purpose:
-%   Zef strip tool embed.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef_create_strip + coordinate transform; zef_add_compartment for the
+%   strip and optional encapsulation. Sets strip_status to 'Embedded'.
 %
-% Outputs:
-%   zef
+%   zef = zef_strip_tool_embed(zef)
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.current_sensors (read)
-%   zef.strip_tool (read)
-%
-% Calls (project):
-%   zef_add_compartment
-%   zef_create_strip
-%   zef_get_strip_parameters
-%   zef_strip_coordinate_transform
-%   zef_strip_tool_embed
-%   zef_strip_tool_init
-%   zef_strip_tool_update
-%   zef_update_compartment_table_data
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_strip_tool_embed(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 cell_aux = zef.([zef.current_sensors '_strip_cell']);
 

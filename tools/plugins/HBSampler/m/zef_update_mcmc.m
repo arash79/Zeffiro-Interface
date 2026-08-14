@@ -1,39 +1,15 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef.inv_hyperprior = get(zef — Zef.inv hyperprior = get(zef.
+%ZEF_UPDATE_MCMC  MCMC widgets → zef.inv_hyperprior / snr / burn-in / band / frames.
 %
-% Purpose:
-%   Zef.inv hyperprior = get(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_mcmc_high_cut_frequency (read)
-%   zef.h_mcmc_low_cut_frequency (read)
-%   zef.h_mcmc_n_burn_in (read)
-%   zef.h_mcmc_normalize_data (read)
-%   zef.h_mcmc_number_of_frames (read)
-%   zef.h_mcmc_sample_size (read)
-%   zef.h_mcmc_sampling_frequency (read)
-%   zef.h_mcmc_snr (read)
-%   zef.h_mcmc_time_1 (read)
-%   zef.h_mcmc_time_2 (read)
-%   zef.h_mcmc_time_3 (read)
-%   zef.inv_high_cut_frequency (read, write)
-%   zef.inv_low_cut_frequency (read, write)
-%   zef.inv_n_burn_in (read, write)
-%   zef.inv_normalize_data (read, write)
-%   … (8 more)
+%   Script. Apply and Start (zef_open_mcmc also binds Start here).
+%   Also copies time/band onto zef.inv_time_* and number_of_frames.
+%   Does not sample.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.inv_hyperprior = get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_mcmc, zef_open_mcmc.
 
 zef.inv_hyperprior = get(zef.h_mcmc_hyperprior ,'value');
 zef.inv_snr = str2num(get(zef.h_mcmc_snr,'string'));

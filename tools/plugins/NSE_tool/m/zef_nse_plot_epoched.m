@@ -1,39 +1,21 @@
 
 function  zef_nse_plot_epoched(zef, nse_field, plot_vec, y_label, plot_vec_ref)
-% --- Zeffiro documentation header ---
-% zef_nse_plot_epoched — Zef nse plot epoched.
+%ZEF_NSE_PLOT_EPOCHED  Fold plot_vec on cycle_length and plot quantile curves.
 %
-% Purpose:
-%   Zef nse plot epoched.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nse_field
-%   plot_vec
-%   y_label
-%   plot_vec_ref
+%   Called from zef_nse_plot_graph for epoched graph_types. Quantiles
+%   [0 0.5 1] of the folded cycles. Optional plot_vec_ref shifts the epoch
+%   so the reference peak aligns.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_nse_plot_epoched(zef, nse_field, plot_vec, y_label)
+%   zef_nse_plot_epoched(zef, nse_field, plot_vec, y_label, plot_vec_ref)
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_axes1 (read)
-%   zef.nse_field (read)
+%   See also zef_nse_plot_full, zef_nse_plot_graph.
 %
-% Calls (project):
-%   zef_nse_plot_epoched
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_nse_plot_epoched(zef, nse_field, plot_vec, y_label, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 h_axes = zef.h_axes1;
 axes(h_axes);

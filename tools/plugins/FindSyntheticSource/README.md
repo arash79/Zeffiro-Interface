@@ -1,41 +1,45 @@
-# tools/plugins/FindSyntheticSource
+# Find synthetic source (non-legacy)
 
-## Purpose of this folder
+Places one or more dipoles, optionally with a Gaussian-envelope time course, and writes **`zef.measurements` = L × sources + noise**.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+This tool is **not** a `zeffiro_plugins.ini` row. It is wired in `zef_menu_tool.m` as a built-in Forward-tools item. The INI row **Find synthetic source legacy** opens `FindSyntheticSourceLegacy/` instead (linear-fraction noise, different window).
 
-## Contents
+Needs `zef.L` and `zef.source_positions`. Each source is snapped to the nearest source point. Amplitude is nAm, scaled by `1e-3` in the forward product. Dipole noise and optional background noise are in dB (`10^(dB/20)`).
 
-Subfolders:
-- `m/`
-- `mlapp/`
+## How to open it
 
-## How this folder fits into the overall workflow
+**Forward tools → Find synthetic source** (every profile; hardcoded menu). Callback:
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+```matlab
+find_synthetic_source; zef = zef_update(zef);
+```
 
-## GUI usage
+Or from MATLAB:
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+```matlab
+zef = find_synthetic_source(zef);
+```
 
-## Programmatic usage
+Window comes from `mlapp/` via `find_synthetic_source_app`. Title is set by that app.
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+## Buttons (`ButtonPushedFcn` in `m/find_synthetic_source.m`)
 
-## Examples
+| Handle | Action |
+|--------|--------|
+| Add / Remove source | `add_synthetic_source` / `remove_synthetic_source` — `zef.synth_source_data` |
+| Generate time sequence | `zef_update_fss`; `[zef.time_sequence, zef.time_variable] = zef_generate_time_sequence` |
+| Create synth data | `zef_update_fss`; `zef.measurements = zef_find_source` |
+| Plot intensity / time sequence | `zef_plot_source_intensity` |
+| Plot sources | `zef.h_synth_source = zef_plot_source(1)` |
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+Parameters per source (table): xyz position, xyz orientation, amplitude (nAm), noise STD (dB), sampling frequency, peak times, pulse amplitudes/length, oscillation frequency/phase, visual length/color. Shared: `zef.fss_bg_noise`, `zef.fss_time_val`.
 
-## Dependencies and assumptions
+## Scripting
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+```matlab
+zef = zef_update_fss(zef);
+[zef.time_sequence, zef.time_variable] = zef_generate_time_sequence(zef);
+zef.measurements = zef_find_source(zef);
+```
 
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+The plugin-INI sibling **Forward tools → Find synthetic source legacy** is `FindSyntheticSourceLegacy/` (linear-fraction noise). **Synthetic extended source patch** is `FindSyntheticSourceLegacy_Patch/`.

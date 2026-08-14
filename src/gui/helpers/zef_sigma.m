@@ -1,57 +1,49 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [johtavuus,brain_ind,non_source_ind,nodes,tetra,johtavuus_prisms,prisms,submesh_ind] = zef_sigma(void)
-% --- Zeffiro documentation header ---
-% zef_sigma — Zef sigma.
+%ZEF_SIGMA  Map compartment σ onto tetrahedra; optionally attach DTI anisotropy.
 %
-% Purpose:
-%   Zef sigma.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   void
+%   Reads the base-workspace zef (the dummy argument void is unused). For
+%   each active compartment it takes <tag>_sigma (S/m) and <tag>_priority,
+%   then uses zef.sigma_ind (per-tet candidate compartment indices from
+%   meshing) to pick the lowest-priority label and look up that scalar σ.
 %
-% Outputs:
-%   johtavuus
-%   brain_ind
-%   non_source_ind
-%   nodes
-%   tetra
-%   johtavuus_prisms
-%   prisms
-%   submesh_ind
+%   brain_ind is the list of tetrahedra in compartments with
+%   <tag>_sources true and not equal to 3 (PML-style). Then the scripts
+%   zef_smoothing_step and zef_refinement_step run in this workspace
+%   (they expect tetra/nodes here, same pattern as mesh creation).
 %
-% Zef fields (observed):
-%   zef.brain_ind (read)
-%   zef.compartment_tags (read)
-%   zef.import_mode (read)
-%   zef.mesh_optimization_parameter (read)
-%   zef.nodes (read)
-%   zef.nodes_b (read)
-%   zef.non_source_ind (read)
-%   zef.prisms (read)
-%   zef.reuna_p (read)
-%   zef.sigma (read)
-%   zef.sigma_anisotropy (read)
-%   zef.sigma_bypass (read)
-%   zef.sigma_ind (read)
-%   zef.sigma_prisms (read)
-%   zef.submesh_ind (read)
-%   … (2 more)
+%   If zef.sigma_anisotropy is nonempty (n_tet × 6 from the DTI tool),
+%   rows that are all zero are filled with the isotropic σ on the first
+%   three columns, and the return value is
+%   [σ_iso, compartment_index, σ11 σ22 σ33 σ12 σ13 σ23] (n_tet × 8).
+%   Otherwise it is [σ_iso, compartment_index].
 %
-% Calls (project):
-%   zef_sigma
+%   Short-circuits: zef.sigma_bypass copies existing zef.sigma / brain_ind
+%   / nodes / tetra / prisms. zef.import_mode copies sigma, brain_ind,
+%   nodes, tetra and skips the rebuild.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   The current first-party lead-field path builds a similar table inside
+%   zef_postprocess_fem_mesh rather than calling this function. DTI Apply
+%   writes zef.sigma_anisotropy in the 6-column layout this function
+%   concatenates. zef_save_nodisplay contains a commented-out call.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[johtavuus, brain_ind, non_source_ind]] = zef_sigma(void)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   [johtavuus, brain_ind, non_source_ind, nodes, tetra, ...] = zef_sigma([])
+%
+%   Outputs
+%     johtavuus        - n_tet × 2 or × 8 conductivity (S/m) plus label.
+%     brain_ind        - tetra indices allowed to hold sources.
+%     non_source_ind   - empty in the rebuild path.
+%     nodes, tetra     - after smoothing/refinement scripts.
+%     johtavuus_prisms, prisms - empty unless sigma_bypass.
+%     submesh_ind      - submesh index per brain tet.
+%
+%   See also zef_postprocess_fem_mesh, zef_dti_apply_to_sigma, zef_smoothing_step.
 tetra = [];
 prisms = [];
 johtavuus_prisms = [];

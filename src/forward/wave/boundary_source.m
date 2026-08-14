@@ -1,30 +1,22 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 
 function [boundary_vec_1, boundary_vec_2, s_orbit] = boundary_source(fade_out_param, source_points, orbit_triangles, orbit_nodes)
-% --- Zeffiro documentation header ---
-% boundary_source — Boundary source.
+%BOUNDARY_SOURCE  Far-field distributed sources on the orbit surface.
 %
-% Purpose:
-%   Boundary source.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Inputs:
-%   fade_out_param
-%   source_points
-%   orbit_triangles
-%   orbit_nodes
+%   Used when near_field==0 in compute_data_gpu. fade_out_param tapers the
+%   excitation; source_points [n × 3]; orbit_triangles / orbit_nodes define
+%   the receiver/source hull. Returns two polarizations plus s_orbit.
 %
-% Outputs:
-%   boundary_vec_1
-%   boundary_vec_2
-%   s_orbit
+%   [boundary_vec_1, boundary_vec_2, s_orbit] = boundary_source( ...
+%       fade_out_param, source_points, orbit_triangles, orbit_nodes)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[boundary_vec_1, boundary_vec_2, s_orbit]] = boundary_source(fade_out_param, source_points, orbit_triangles, orbit_nodes)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also boundary_point_source, compute_data_gpu.
+
+
 
 
 n_triangles = size(orbit_triangles(:,1), 1);

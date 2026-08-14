@@ -1,36 +1,28 @@
 function [tree] = zef_dataBank_importDataBank(tree, savePath, saveFile, parentHash, dataBank)
-% --- Zeffiro documentation header ---
-% zef_dataBank_importDataBank — Zef data Bank import Data Bank.
+%ZEF_DATABANK_IMPORTDATABANK  Graft a saved tree .mat under a parent hash.
 %
-% Purpose:
-%   Zef data Bank import Data Bank.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tree
-%   savePath
-%   saveFile
-%   parentHash
-%   dataBank
+%   importNodeButtonPress when typeDropDown is not 'Node'. load()s the
+%   file as a tree, sortTree + rebuildTree, then add()s node_1's payload
+%   under parentHash. Remaining hashes are remapped: first numeric token
+%   shifted by (new first-hash last index − 1), then prefixed with the
+%   parent path numbers. Optional save2disk writes each payload to
+%   dataBank.folder. The save2disk block for node_1 is duplicated in the
+%   body (same write twice).
 %
-% Outputs:
-%   tree
+%   tree = zef_dataBank_importDataBank(tree, savePath, saveFile, parentHash, dataBank)
 %
-% Calls (project):
-%   zef_dataBank_add
-%   zef_dataBank_importDataBank
-%   zef_dataBank_number2hash
-%   zef_dataBank_rebuildTree
-%   zef_dataBank_sortTree
+%   Inputs
+%     tree, savePath, saveFile, parentHash, dataBank  - as importNode.
 %
-% Side effects:
-%   - filesystem I/O
+%   Output
+%     tree  - current bank plus the imported forest under the parent.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[tree] = zef_dataBank_importDataBank(tree, savePath, saveFile, parentHash, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_importNode, zef_dataBank_number2hash.
 
 dataTree=load(strcat(savePath, saveFile));
 

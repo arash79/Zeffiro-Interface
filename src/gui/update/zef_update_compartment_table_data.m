@@ -1,37 +1,22 @@
 function zef = zef_update_compartment_table_data(zef)
-% --- Zeffiro documentation header ---
-% zef_update_compartment_table_data — Syncs GUI control values into `zef` for compartment_table_data.
+%ZEF_UPDATE_COMPARTMENT_TABLE_DATA  Rebuild Segmentation-tool compartment UITable Data.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for compartment_table_data.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Function. Called from zef_update after table edits. Flips
+%   zef.compartment_tags left-right so row 1 matches the on-screen
+%   order, then for each tag runs the script
+%   zef_init_fields_compartment_table (needs workspace zef_i, zef_j,
+%   zef.aux_field_1) and appends enabled Segmentation parameter-profile
+%   columns. Writes zef.h_compartment_table.Data with CellEditCallback
+%   temporarily cleared. Flips tags back. nargout==0 → assignin base.
 %
-% Outputs:
-%   zef
+%   Returns immediately if h_compartment_table is missing/invalid.
 %
-% Zef fields (observed):
-%   zef.aux_field_1 (read)
-%   zef.compartment_table_size (read)
-%   zef.compartment_tags (read, write)
-%   zef.h_compartment_table (read)
-%   zef.parameter_profile (read)
-%
-% Calls (project):
-%   zef_update_compartment_table_data
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_update_compartment_table_data(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_fields_compartment_table, zef_update.
 if nargin == 0
     zef = evalin('base','zef');
 end

@@ -1,34 +1,41 @@
-% --- Zeffiro documentation header ---
-% label_ind = uint32(label_ind); — Label ind = uint32(label ind);.
+%ZEF_MESH_LABELING_STEP  Script: assign or refresh tet tissue IDs during meshing.
 %
-% Purpose:
-%   Label ind = uint32(label ind);.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.distance_smoothing_exp (read)
-%   zef.distance_smoothing_on (read)
-%   zef.priority_mode (read, write)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.smoothing_steps_dist (read)
-%   zef.smoothing_strength (read)
+%   Not a function. zef_create_fem_mesh (and zef_smoothing_step when
+%   mesh_relabeling is on) call it by name so it reads/writes the caller
+%   workspace. Do not run it from the command line unless those variables
+%   already exist.
 %
-% Calls (project):
-%   zef_choose_domain_labels
-%   zef_distance_smoothing
-%   zef_mesh_relabeling
-%   zef_point_in_compartment
-%   zef_solid_angle_labeling
-%   zef_surface_mesh
+%   Caller must provide
+%     zef, nodes, tetra, h (waitbar)
+%     labeling_flag  - 1 initial, 2 post-refinement, 3 priority_mode==3 final
+%     label_ind      - for flag 1: T×8 cube-corner indices (or T×4 tet
+%                      vertices, depending on mesh_labeling_approach).
+%                      For flags 2/3 create_fem_mesh sets this to tetra.
+%     domain_labels, distance_vec  - required for flags 2 and 3; flag 1
+%                      overwrites both.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   labeling_flag
+%     1  Initial solid-angle labeling (zef_solid_angle_labeling). Drops
+%        tets whose vertices are not all inside some compartment
+%        (sum(sign(node_labels)) < n_vertices). Compacts unused nodes.
+%        zef.priority_mode 1: no priority in zef_choose_domain_labels;
+%        2 or 3: use labeling priority. Optional zef_distance_smoothing
+%        of nodes when zef.distance_smoothing_on.
+%     2  Relabel after refinement/smoothing. Calls zef_mesh_relabeling.
+%        priority_mode ≤ 2: no priority; == 3: use priority.
+%     3  Same relabel path as 2 but always without priority. create_fem_mesh
+%        uses this at the end when priority_mode == 3.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `label_ind = uint32(label_ind);` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   Writes back: tetra, nodes, domain_labels, distance_vec, label_ind
+%   (flag 1 only). Does not assign zef.nodes itself.
+%
+%   See also zef_create_fem_mesh, zef_mesh_relabeling, zef_solid_angle_labeling,
+%            zef_choose_domain_labels.
 
 label_ind = uint32(label_ind);
 
@@ -40,6 +47,7 @@ if isequal(labeling_flag,1)
 
     [node_labels,distance_vec] = zef_solid_angle_labeling(zef, label_ind, nodes, h);
 
+    % Keep tets whose every listed vertex has a positive compartment label.
     I = find(sum(sign(node_labels(label_ind)),2)>=size(label_ind,2));
     tetra = tetra(I,:);
     label_ind = label_ind(I,:);

@@ -1,99 +1,25 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_NII_CONDUCTIVITY_TO_SIGMA
-%
-%Assigns isotropic, per-tetrahedron conductivity from a NIfTI volume to
-%zef.sigma_anisotropy.  Each tetrahedron centroid (in mesh / tkRAS space)
-%is mapped to NIfTI voxel space via the inverse of the NIfTI affine
-%transform.  The conductivity value at that voxel is assigned as the
-%isotropic tensor [sigma, sigma, sigma, 0, 0, 0] for that tetrahedron.
-%
-%COORDINATE SYSTEMS
-%   Zeffiro builds its mesh from FreeSurfer surfaces, which are stored in
-%   tkRAS (FreeSurfer surface RAS).  NIfTI files produced by FreeSurfer
-%   tools encode scanner RAS in their sform/qform.  The two differ by the
-%   c_ras vector — the scanner-RAS coordinate of the centre voxel — which
-%   is typically tens of mm and must be accounted for when mapping centroids
-%   into voxel space.
-%
-%   When freesurfer_coords is true (default) the function subtracts c_ras
-%   from the affine translation so that the voxel-lookup correctly maps
-%   tkRAS centroid positions to voxel indices.
-%
-%Inputs (name-value pairs after nii_file):
-%   nii_file     - Path to .nii or .nii.gz conductivity volume (string)
-%   zef          - Zeffiro struct (default: read from base workspace)
-%   interp_mode  - 'nearest' (default) or 'linear' (trilinear)
-%   fallback_val - Conductivity for centroids outside the NIfTI FOV.
-%                  Set to a scalar (e.g. 0.33) to use a fixed value.
-%                  Default: 0.
-%   apply_to_compartments - Cell array of compartment tag names to limit
-%                           which tetrahedra are updated (default: all)
-%   freesurfer_coords - Logical (default: true).
-%                  When true, converts the NIfTI affine from scanner RAS to
-%                  tkRAS by subtracting c_ras (the scanner-RAS position of
-%                  the centre voxel) from the translation column.  Set to
-%                  false only if your NIfTI is already in tkRAS / mesh space.
-%
-%Outputs:
-%   zef - Updated struct with zef.sigma_anisotropy set
-%
-%Usage examples:
-%   % Update entire mesh (FreeSurfer NIfTI, default):
-%   zef = zef_nii_conductivity_to_sigma('conductivity.nii.gz');
-%
-%   % NIfTI already in mesh / tkRAS space (no c_ras correction):
-%   zef = zef_nii_conductivity_to_sigma('conductivity.nii.gz', ...
-%       'freesurfer_coords', false);
-%
-%   % Apply only to white matter and gray matter compartments:
-%   zef = zef_nii_conductivity_to_sigma('conductivity.nii.gz', ...
-%       'apply_to_compartments', {'white_matter', 'gray_matter'});
-%
-%   % Use trilinear interpolation:
-%   zef = zef_nii_conductivity_to_sigma('conductivity.nii.gz', ...
-%       'interp_mode', 'linear');
-%
-%See also: zef_dti_apply_to_sigma, zef_sigma, zef_visualize_nii_slices
-
 function zef = zef_nii_conductivity_to_sigma(nii_file, varargin)
-% --- Zeffiro documentation header ---
-% zef_nii_conductivity_to_sigma — Zef nii conductivity to sigma.
+%ZEF_NII_CONDUCTIVITY_TO_SIGMA  Sample a 3-D NIfTI conductivity volume onto zef.sigma.
 %
-% Purpose:
-%   Zef nii conductivity to sigma.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2024- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nii_file
-%   varargin
+%   Bypasses FA→tensor conversion: each tetra centroid is mapped through the
+%   NIfTI affine (optional FreeSurfer tkRAS) and nearest/trilinear sampled.
+%   Writes diagonal anisotropic columns [σ σ σ 0 0 0] into sigma(:,3:8) for
+%   the selected compartments. Requires zef.nodes and zef.tetra.
 %
-% Outputs:
-%   zef
+%   zef = zef_nii_conductivity_to_sigma(nii_file, 'zef', zef, ...
+%       'interp_mode', 'nearest', 'fallback_val', 0, ...
+%       'apply_to_compartments', {}, 'freesurfer_coords', true)
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.domain_labels (read)
-%   zef.nodes (read)
-%   zef.sigma (read)
-%   zef.sigma_anisotropy (read, write)
-%   zef.sigma_bypass (read, write)
-%   zef.tetra (read)
+%   If 'zef' is omitted, reads/writes the base workspace.
 %
-% Calls (project):
-%   zef_nii_conductivity_to_sigma
-%   zef_sigma
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_nii_conductivity_to_sigma(nii_file, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_dti_apply_to_sigma, zef_visualize_nii_slices.
+
+
 
 
 arguments

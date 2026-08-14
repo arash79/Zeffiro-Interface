@@ -1,26 +1,20 @@
 function [list] = zef_insideGMM(GMM, points, numberOfModels)
-% --- Zeffiro documentation header ---
-% zef_insideGMM — Zef inside GMM.
+%ZEF_INSIDEGMM  Which points lie in the strongest GMM ellipsoids.
 %
-% Purpose:
-%   Zef inside GMM.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   GMM
-%   points
-%   numberOfModels
+%   list = zef_insideGMM(GMM, points)
+%   list = zef_insideGMM(GMM, points, numberOfModels)
 %
-% Outputs:
-%   list
+%   Takes the numberOfModels (default 1) largest ||dipole||^2 components.
+%   Ellipsoid radius from chi2inv(GMM.parameters.Values{6}/100, 3) and
+%   Sigma(1:3,1:3,j). list is N-by-K logical (1 inside). Caps K if fewer
+%   components exist.
 %
-% Calls (project):
-%   zef_insideGMM
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[list] = zef_insideGMM(GMM, points, numberOfModels)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_GMM_resection_volume.
 
 if nargin==2
     numberOfModels=1;

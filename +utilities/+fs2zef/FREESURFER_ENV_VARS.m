@@ -1,24 +1,18 @@
 function ENV_VARS = FREESURFER_ENV_VARS()
-% --- Zeffiro documentation header ---
-% utilities.fs2zef.FREESURFER_ENV_VARS — FREESURFER ENV VARS.
+%FREESURFER_ENV_VARS  Names setup_freesurfer_env may set (not including FREESURFER_HOME).
 %
-% Purpose:
-%   FREESURFER ENV VARS.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   ENV_VARS
+%   ENV_VARS = FREESURFER_ENV_VARS()
 %
-% Outputs:
-%   ENV_VARS
+%   Returns SUBJECTS_DIR, FREESURFER, FUNCTIONALS_DIR, FSFAST_HOME, MNI_DIR,
+%   FSL_DIR, FSF_OUTPUT_FORMAT, LOCAL_DIR. run() still requires FREESURFER_HOME
+%   separately (not in this list).
 %
-% Calls (project):
-%   utilities.fs2zef.FREESURFER_ENV_VARS
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[ENV_VARS] = utilities.fs2zef.FREESURFER_ENV_VARS(ENV_VARS)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+
 
 %
 % FREESURFER_ENV_VARS

@@ -1,24 +1,14 @@
-% --- Zeffiro documentation header ---
-% dltType='gmm'; — Dlt Type='gmm';.
+%DATABANK_DELETE_X  Lab script: delete every databank node of type 'gmm'.
 %
-% Purpose:
-%   Dlt Type='gmm';.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Script. Walks fieldnames of zef.dataBank.tree that start with 'node'.
+%   zef_dataBank_delete(..., 'false') when type=='gmm'. Restarts the scan
+%   after each delete. Needs a live zef.dataBank.
 %
-% Calls (project):
-%   zef_dataBank_delete
-%   zef_dataBank_uiTreeDeleteHash
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `dltType='gmm';` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 dltType='gmm';
 

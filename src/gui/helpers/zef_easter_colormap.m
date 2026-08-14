@@ -1,27 +1,15 @@
 function [colormap_vec] = zef_easter_colormap(colortune_param,colormap_size)
-% --- Zeffiro documentation header ---
-% zef_easter_colormap — Zef easter colormap.
+%ZEF_EASTER_COLORMAP  colormap_cell{14} "Easter" (green ramp then white fade).
 %
-% Purpose:
-%   Zef easter colormap.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   colortune_param
-%   colormap_size
+%   colormap_vec = zef_easter_colormap(colortune_param, colormap_size)
 %
-% Outputs:
-%   colormap_vec
-%
-% Calls (project):
-%   zef_easter_colormap
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[colormap_vec] = zef_easter_colormap(colortune_param, colormap_size)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   First half green/yellow, next quarter orange, remainder lerp to
+%   white. Then .^colortune_param and max-normalize.
 c_aux_1 = floor(colormap_size/2);
 colormap_vec = zeros(colormap_size,3);
 colormap_vec(1:c_aux_1+1,:) = [zeros(c_aux_1+1,1),2*(1:c_aux_1+1)',3*(c_aux_1:-1:0)'];

@@ -1,31 +1,18 @@
-% --- Zeffiro documentation header ---
-% zef.aux_field_1 = zef.h_sensors_name_table — Zef.aux field 1 = zef.h sensors name table.
+%ZEF_UPDATE_SENSORS_NAME_TABLE  Sensors name-table CellEditCallback (script).
 %
-% Purpose:
-%   Zef.aux field 1 = zef.h sensors name table.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field_1 (read, write)
-%   zef.aux_field_2 (read, write)
-%   zef.aux_field_3 (read, write)
-%   zef.current_sensors (read)
-%   zef.h_sensors_name_table (read)
-%   zef.h_sensors_table (read)
-%   zef.parameter_profile (read)
+%   Script. Needs workspace zef with h_sensors_name_table. Columns:
+%   1 Index, 2 Name, 3 Visible. Drops rows whose Index is NaN, sorts by
+%   Index, writes current_sensors _name_list and _visible_list, and
+%   permutes *_points, *_directions, *_get_functions, and enabled Sensors
+%   parameter-profile arrays to match. If any Visible is true, forces
+%   *_visible = 1 and clears h_sensors_table.Data. Ends with zef_update.
 %
-% Calls (project):
-%   zef_fix_sensors_get_functions_array_size
-%   zef_update
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.aux_field_1 = zef.h_sensors_name_table` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_init_sensors_name_table, zef_update.
 zef.aux_field_1 = zef.h_sensors_name_table.Data;
 zef.aux_field_2 = [];
 zef.aux_field_3 = [];

@@ -1,77 +1,67 @@
-# src/gui
+# GUI layer (`src/gui`)
 
-## Folder purpose
+This is everything you click: tool windows, menus, option dialogs, table callbacks, widget→`zef` copy, and the 3-D plot. Mathematics (mesh, lead field, inverse classes) lives elsewhere; this tree opens windows and calls those functions.
 
-The **interactive UI layer** of Zeffiro Interface (~249 `.m` files). Implements App Designer tool shells, menu wiring, event callbacks, widget-to-`zef` synchronization, and 3D plotting. Almost all user-facing behavior outside `tools/plugins` flows through this tree plus `src/core/zef_update.m`.
+`zef_start` opens the core tools in this order: segmentation → figure → mesh → mesh visualization → menu → `zef_update`.
 
-## Main contents
+## Windows you actually see
 
-| Subfolder | Files | Role |
-|-----------|-------|------|
-| `apps/` | 5 exported classdefs + `.mlapp` sources | App Designer UIFigures (`*_app_exported.m`) — layout only, no business logic |
-| `tools/` | 14 | Lifecycle wrappers: create tools, copy `h_*` into `zef`, wire callbacks |
-| `callbacks/` | 48 | Discrete actions: add/delete compartment, sensors, transforms, toggles |
-| `init/` | 20 | Default fields and UITable seeding from profile INIs |
-| `open/` | 8 | Launch modal option dialogs (`zef_open_*`) |
-| `update/` | 35 | Push widget values into `zef` (`zef_update_*`) |
-| `set/` | 13 | Apply `zef` state to graphics (colors, lights, sliders) |
-| `plot/` | 19 | Render into `zef.h_axes1` / butterfly figures |
-| `helpers/` | ~90 | Colormaps, interpolation, import helpers, window management |
+| Window title | Created by | Typical job |
+|--------------|------------|-------------|
+| **ZEFFIRO Interface: Segmentation tool** | `tools/zef_segmentation_tool.m` | Compartments, sensor sets, affine transforms |
+| **ZEFFIRO Interface: Figure tool** | `tools/zef_figure_tool.m` | 3-D axes (`zef.h_axes1`), color sliders, movie |
+| **ZEFFIRO Interface: Mesh tool** | `tools/zef_mesh_tool.m` | Create FEM mesh, Run script (forward table) |
+| **ZEFFIRO Interface: Mesh visualization tool** | `tools/zef_mesh_visualization_tool.m` | Visualize volume/surfaces, camera, contours |
+| Menu bar | `tools/zef_menu_tool.m` | Project / Import / Export / Edit / plugins / Window |
+| **ZEFFIRO Interface: Parcellation tool** | `tools/zef_parcellation_tool.m` | Lazy: **Multi-tools → Parcellation tool** |
 
-## Code functionality
+Closing a tool usually only sets `Visible='off'`. **Project → Exit** (`zef_close_all`) deletes them. **Window → …** tiles or shows hidden tools (`zef_window_manager`, `zef_arrange_windows`, `zef_window_visible`).
 
-**Architecture (handle-oriented MVC):**
+Exact button and menu labels: `tools/README.md` (verified from App Designer `Text=` and `MenuSelectedFcn`). Do not invent names from an old screenshot.
+
+## Subfolders (open the child README)
+
+| Folder | Open when you need to… |
+|--------|-------------------------|
+| `tools/` | How each window is created and which button calls what |
+| `apps/` | App Designer layout only (`*_app_exported.m` = labels, no logic) |
+| `callbacks/` | Add/delete compartment, sensors, transforms, locks, profile apply |
+| `update/` | `zef_update_*`: one widget family → `zef` fields (and often a replot) |
+| `plot/` | Draw into `zef.h_axes1` (`zef_plot_volume`, visualize volume/surfaces) |
+| `init/` | Seed tables and option-dialog defaults from `zef` / profile INIs |
+| `open/` | **Settings** menu: forward/inverse options, graphics, profiles, plugins |
+| `set/` | Apply `zef` to graphics (lights, colors, slider reset, menu size) |
+| `helpers/` | Window manager, waitbar helpers, colormaps, interpolation, import |
+
+## How a click becomes `zef`
+
 ```
-apps (UIFigure) → tools (wire callbacks, zef.h_*)
-  → callbacks / open dialogs
-  → update/* + zef_update (widget → zef)
-  → plot/* (zef → h_axes1)
+App Designer UIFigure (apps/)
+  → tools/* copies widgets onto zef.h_* and sets ButtonPushedFcn / MenuSelectedFcn
+  → string callbacks run in the base workspace (where zef lives)
+  → update/* or zef_update copies values into zef
+  → plot/* reads zef from base and draws
 ```
 
-**Startup** (`zef_start.m`): `zef_segmentation_tool` → `zef_figure_tool` → `zef_mesh_tool` → `zef_mesh_visualization_tool` → `zef_menu_tool` → `zef_update`.
+The Figure tool is **not** App Designer; it is built with `figure` / `uicontrol` in `zef_figure_tool.m` and `assignin('base','zef',zef)` so those string callbacks see the session.
 
-**Workspace contract:** most plotters and callbacks use `evalin('base','zef')` or string callbacks evaluated in base. `zef_figure_tool` explicitly `assignin('base','zef',zef)`.
+## Scripting vs clicking
 
-**Central sync:** `zef_update` reads compartment/sensor/parameter tables via `zef_get_data_compartment_table` and refreshes window titles on all `ZEFFIRO Interface:*` figures.
-
-## Workflow context
-
-| Partner | Interaction |
-|---------|-------------|
-| `src/core` | `zef_update`, `zef_arrange_windows`, `zef_waitbar`, `zef_plugin` |
-| `src/io` | Menu load/save/import calls |
-| `src/forward` | Mesh tool runs `zef_*_make_all`; visualization after forward |
-| `src/inverse` | Inverse option dialogs set `zef.inv_*` fields |
-| `tools/plugins` | Plugin menus attached by `zef_plugin`; callbacks often `eval` plugin start scripts |
-| `+core` | `import_electrodes_callback` wired in `zef_menu_tool.m` |
-
-## Usage instructions
+`start_mode` `'nodisplay'` still constructs hidden figures. For batch work, call the same functions the buttons call (`zef_create_finite_element_mesh`, `zef_lead_field_matrix`, …) rather than poking `h_*`.
 
 ```matlab
-zef = zeffiro_interface;   % opens all core tools
-
-% Reopen a hidden tool
-zef_window_visible(zef, 'zef_mesh_tool', 1);
-
-% Open forward/inverse options
-zef_open_forward_and_inverse_options;
-
-% Refresh after programmatic zef edits
+zef = zeffiro_interface;
+zef.h_mesh_tool = zef_window_visible(zef, zef.h_mesh_tool);  % show a hidden tool
 zef = zef_update(zef);
 ```
 
-Key tools: **Segmentation** (compartments/sensors), **Mesh** (FEM + forward table), **Menu** (project I/O, plugins), **Figure** (3D recon), **Mesh visualization** (contour/camera/plot buttons).
+## Workspace contract
 
-## Important notes
+Most plotters and menu strings use `evalin('base','zef')`. Mixing a local `zef` that is never assigned back to base will make the next click see stale state. Functions that take `zef` and have `nargout==0` typically `assignin('base','zef',zef)`.
 
-- **Figure tool is not App Designer** — built programmatically in `zef_figure_tool.m`.
-- **Parcellation** is lazy-loaded via `zef_tool_start`, not at startup.
-- Profile INIs (`profile/<name>/`) drive init tables, forward simulation rows, and compartment templates.
-- `zef_plot_volume.m.m` is a legacy duplicate filename — prefer `zef_plot_volume.m`.
+## Developer notes
 
-## Developer guidance
-
-- New tool: export App in `apps/`, wrapper in `tools/`, callbacks in `callbacks/`, sync in `update/`, register menu entry in `zef_menu_tool.m` or plugin INI.
-- Always return/assign `zef` from callbacks and call `zef_update` when tables change.
-- Plot functions must read `zef` from base or accept `zef` explicitly — do not assume a local `zef` in nested calls.
-- See subfolder READMEs (`gui/tools`, `gui/callbacks`, …) for detailed patterns.
+- New tool: export in `apps/`, wrapper in `tools/`, events in `callbacks/`, sync in `update/`, menu entry in `zef_menu_tool.m` or `zeffiro_plugins.ini`.
+- Always end table mutations with `zef_update` (or the matching `zef_update_*`).
+- `zef_plot_volume.m.m` is a leftover duplicate filename; use `zef_plot_volume.m`.
+- R2025a+ docking: `helpers/zef_window_manager.m`.

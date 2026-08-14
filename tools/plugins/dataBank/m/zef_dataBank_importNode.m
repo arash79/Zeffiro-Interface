@@ -1,33 +1,30 @@
 function [tree] = zef_dataBank_importNode(tree, savePath, saveFile, parentHash, dataBank)
-% --- Zeffiro documentation header ---
-% zef_dataBank_importNode — Zef data Bank import Node.
+%ZEF_DATABANK_IMPORTNODE  Load one or more node .mat files under a parent hash.
 %
-% Purpose:
-%   Zef data Bank import Node.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tree
-%   savePath
-%   saveFile
-%   parentHash
-%   dataBank
+%   Used by importNodeButtonPress when typeDropDown.Value is 'Node'. Each
+%   file is load()ed as a node with .data and .name; zef_dataBank_add
+%   inserts .data under parentHash and the stored .name is copied onto the
+%   new hash. If dataBank.save2disk is 'On', the payload is also written
+%   to dataBank.folder/hash.mat and .data becomes a matfile handle.
 %
-% Outputs:
-%   tree
+%   tree = zef_dataBank_importNode(tree, savePath, saveFile, parentHash, dataBank)
 %
-% Calls (project):
-%   zef_dataBank_add
-%   zef_dataBank_importNode
+%   Inputs
+%     tree        - zef.dataBank.tree.
+%     savePath    - folder from uigetfile (includes trailing filesep).
+%     saveFile    - char or cellstr of file names.
+%     parentHash  - hash of the selected uitree parent, or 'node'.
+%     dataBank    - zef.dataBank (uses .save2disk and .folder).
 %
-% Side effects:
-%   - filesystem I/O
+%   Output
+%     tree  - new child node(s) added.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[tree] = zef_dataBank_importNode(tree, savePath, saveFile, parentHash, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_importNodeButtonPress, zef_dataBank_importDataBank.
 
 if ~iscell(saveFile)
     node=load(strcat(savePath, saveFile));

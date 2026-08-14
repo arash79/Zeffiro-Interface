@@ -1,31 +1,29 @@
 function self = initialize(self,L,f_data)
-% --- Zeffiro documentation header ---
-% inverse.IASInverter.initialize — Estimates priors, noise covariance, or regularization from multi-frame data.
+%initialize  IAS hyperprior parameters (beta, theta0, d_sqrt) and noise covariance.
 %
-% Purpose:
-%   Estimates priors, noise covariance, or regularization from multi-frame data.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   L
-%   f_data
+%   Called once from utilities.inverse.run_frame_loop before invert.
+%   Inverse tools → IAS uses zef_ias_iteration, not this method.
 %
-% Outputs:
-%   self
+%   modified_SNR = signal_to_noise_ratio - prior_over_measurement_db + amplitude_db
+%   hyperprior "Inverse gamma" → zef_find_ig_hyperprior, d_sqrt = theta0/(beta-1)
+%   hyperprior "Gamma"         → zef_find_g_hyperprior,  d_sqrt = theta0*beta
+%   hyperprior_mode "Balanced" sets the spatial-balance flag on those helpers.
+%   data_normalization_method is passed through as 'maximum entry' or
+%   'something else' (the helpers only special-case the first string).
+%   noise_cov is always (10^(-SNR/10))*I (not estimated from f_data).
+%   f_data is unused (common initialize signature).
 %
-% Calls (project):
-%   inverse.initialize
-%   zef_find_g_hyperprior
-%   zef_find_ig_hyperprior
+%   Inputs
+%     L      - processed lead field (column count = source DOF for the helpers).
+%     f_data - unused.
 %
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[self] = inverse.IASInverter.initialize(self, L, f_data)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     self with dynamic props theta0, beta, d_sqrt, noise_cov filled.
 
     arguments
 

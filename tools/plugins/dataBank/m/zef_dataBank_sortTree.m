@@ -1,27 +1,29 @@
 function [tree, newText] = zef_dataBank_sortTree(tree)
-% --- Zeffiro documentation header ---
-% zef_dataBank_sortTree — Zef data Bank sort Tree.
+%ZEF_DATABANK_SORTTREE  Order tree fields by numeric hash suffix.
 %
-% Purpose:
-%   Zef data Bank sort Tree.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tree
+%   Sorts hashes so that node_11 comes after node_7 (string fieldnames
+%   would not). Extracts every digit run from each name, pads shorter
+%   paths with 0, sortrows, then orderfields. Used after delete and before
+%   rebuildTree / hash2tree. If tree is not a struct, uses properties()
+%   and drops 'Properties' (matfile-like). orderfields runs only for structs.
 %
-% Outputs:
-%   tree
-%   newText
+%   [tree, newText] = zef_dataBank_sortTree(tree)
 %
-% Calls (project):
-%   zef_dataBank_number2hash
-%   zef_dataBank_sortTree
+%   Inputs
+%     tree  - zef.dataBank.tree struct (or object with hash properties).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[tree, newText]] = zef_dataBank_sortTree(tree)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     tree     - same values, fields in numeric hash order.
+%     newText  - cellstr of hashes in that order (node_i_j via number2hash).
+%
+%   See also zef_dataBank_rebuildTree, zef_dataBank_number2hash.
 
+% Sort by the numeric tokens of the hashes so e.g. node_11 > node_7.
 if isstruct(tree)
     text=fieldnames(tree);
 else

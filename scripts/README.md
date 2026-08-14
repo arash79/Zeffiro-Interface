@@ -1,52 +1,24 @@
 # scripts
 
-## Purpose of this folder
-
-Developer-facing scripts that are **not** added to the MATLAB path at Zeffiro startup. Used for contribution guidelines, data-management notes, and documentation maintenance.
+Maintainer tools that are **not** added to the MATLAB path by `zeffiro_interface`. Runtime code lives under `src/`, `+core`, `+inverse`, `+utilities`, and `tools/plugins/`.
 
 ## Contents
 
 | Item | Role |
 |------|------|
-| `CONTRIBUTING.md` | Contribution expectations |
-| `data/README.md` | Notes on script-related data assets |
-| `zeffiro_doc_pass.py` | Regenerates per-file MATLAB headers and per-folder `README.md` from static code analysis |
+| `CONTRIBUTING.md` | How to contribute to this tree. |
+| `data/README.md` | Notes on script-related data assets. |
+| `validate_stl_manifold.py` | Checks exported STL surfaces for manifold issues (used with SimNIBS/FreeSurfer mesh exports). |
 
-## How this folder fits into the overall workflow
-
-Runtime users start `zeffiro_interface.m` at the repo root. Maintainers run `zeffiro_doc_pass.py` after refactors to refresh comments and folder READMEs without changing algorithms.
-
-## GUI usage
-
-None.
-
-## Programmatic usage
+## Usage
 
 ```bash
-cd /path/to/MainZeffiroProject
-python3 scripts/zeffiro_doc_pass.py          # rewrite headers + READMEs
-python3 scripts/zeffiro_doc_pass.py --dry-run # analysis only
+python3 scripts/validate_stl_manifold.py path/to/mesh.stl
 ```
 
-Manifest written to `documentation/doc_pass_manifest.txt` (folder list, updated headers).
+MATLAB documentation (`help` blocks and folder `README.md` files) is maintained by reading the implementation, not by regenerating comments from a script.
 
-## Examples
+## Notes
 
-After moving `+core` or `src` files:
-
-```bash
-python3 scripts/zeffiro_doc_pass.py
-git diff +core README.md src/forward/lead_field/*.m
-```
-
-## Dependencies and assumptions
-
-- Python 3.8+
-- Does not require MATLAB; parses `.m` files as text
-- Skips `external/` and `.git/`
-- Only modifies comment blocks and `README.md` files
-
-## Notes for developers
-
-- Hand-edit architecture READMEs at repo root and `+core`, `+inverse`, `src`, `+utilities` after major design changes—the script uses heuristics for bulk coverage.
-- Do not use the script to change executable MATLAB lines; review diffs for accidental edits.
+- Do not add this folder to the MATLAB path at startup.
+- Do not commit generated cache (`__pycache__/`) or one-off header-rewriting helpers.

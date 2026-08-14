@@ -1,35 +1,18 @@
 function zef_parcellation_roi_plot(zef)
-% --- Zeffiro documentation header ---
-% zef_parcellation_roi_plot — Zef parcellation roi plot.
+%ZEF_PARCELLATION_ROI_PLOT  Draw translucent ROI spheres on the main axes.
 %
-% Purpose:
-%   Zef parcellation roi plot.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Removes prior surfaces tagged 'additional: parcellation roi', then plots
+%   one surf sphere per ROI using parcellation_roi_center, radius, and color
+%   on zef.h_axes1.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_parcellation_roi_plot(zef)
 %
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%   zef.parcellation_roi_center (read)
-%   zef.parcellation_roi_color (read)
-%   zef.parcellation_roi_radius (read)
-%
-% Calls (project):
-%   zef_parcellation_roi_plot
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_parcellation_roi_plot(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_parcellation_roi_pick_center, zef_update_parcellation.
 
 [s_x,s_y,s_z] = sphere(100);
 h_axes1 = zef.h_axes1;

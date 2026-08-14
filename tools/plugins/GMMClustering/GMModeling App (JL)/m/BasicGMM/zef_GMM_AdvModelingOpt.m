@@ -1,35 +1,14 @@
-%Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if isfield(zef.GMM — If isfield(zef.GMM.
+%ZEF_GMM_ADVMODELINGOPT  Open advanced GMM modeling-options window.
 %
-% Purpose:
-%   If isfield(zef.GMM.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.GMM_colors (read)
-%   zef.font_size (read)
+%   Script. Constructs GMM_ModelingOpt, docks it beside main, and
+%   merges widget tags into zef.GMM.parameters. StartButton uses
+%   these fields to choose zef_AdvGMModeling vs zef_GMModeling_K.
 %
-% Calls (project):
-%   zef_aux_mat
-%   zef_aux_str
-%   zef_temp_screen_size
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `if isfield(zef.GMM` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-%This is script for opening advanced GM modeling options.
-
-
-
+%   See also zef_AdvGMModeling, GMModelApp_start.
 
 if isfield(zef.GMM.apps,'ModelingOpt')
     if isvalid(zef.GMM.apps.ModelingOpt)

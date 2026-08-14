@@ -1,36 +1,18 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% set(zef — Set(zef.
+%ZEF_UPDATE_FILTER_TOOL  Refresh pipeline list, parameter table, tag, sampling rate, zoom.
 %
-% Purpose:
-%   Set(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.filter_data_segment (read, write)
-%   zef.filter_pipeline (read)
-%   zef.filter_pipeline_list (read, write)
-%   zef.filter_pipeline_selected (read, write)
-%   zef.filter_sampling_rate (read, write)
-%   zef.filter_tag (read, write)
-%   zef.filter_zoom (read, write)
-%   zef.h_filter_data_segment (read)
-%   zef.h_filter_parameter_list (read)
-%   zef.h_filter_pipeline_list (read)
-%   zef.h_filter_sampling_rate (read)
-%   zef.h_filter_tag (read)
-%   zef.h_filter_zoom (read)
+%   Script. Called after Add/Delete/Move, from Plot, and at the end of
+%   init. Rebuilds filter_pipeline_list as 'Tag: <filter_tag>, Type:
+%   <name>'. Parameter table shows parameters of the first selected
+%   stage (defaults selection to 1 if empty). Then reads tag,
+%   data_segment, sampling_rate, and zoom from widgets: filter_zoom =
+%   100 / h_filter_zoom.Value. Sorts filter_pipeline_selected.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `set(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_filter_tool, zef_filter_raw_data.
 
 set(zef.h_filter_pipeline_list,'Value',cell(0),'Items',cell(0),'Multiselect','on');
 zef.filter_pipeline_list = cell(0);

@@ -1,32 +1,19 @@
 function zef = zef_DBS_strip_struct_update(zef)
-% --- Zeffiro documentation header ---
-% zef_DBS_strip_struct_update — Zef DBS strip struct update.
+%ZEF_DBS_STRIP_STRUCT_UPDATE  Run button: build probe contacts for the selected type.
 %
-% Purpose:
-%   Zef DBS strip struct update.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_DBS_strip_struct_update(zef)
 %
-% Outputs:
-%   zef
+%   strip_type 1 → zef_electrode_strip_multiple_probe (40 contacts
+%   per probe); type 2 → zef_Abbott_infinity_strip_multiple_probe
+%   (8 per probe). Fills strip_struct.electrode_data. Does not copy
+%   onto sensors (Attach electrodes does).
 %
-% Zef fields (observed):
-%   zef.strip_struct (read)
-%
-% Calls (project):
-%   zef_Abbott_infinity_strip_multiple_probe
-%   zef_DBS_strip_struct_update
-%   zef_electrode_strip_multiple_probe
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_DBS_strip_struct_update(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_DBS_update_electrodes.
 
     if zef.strip_struct.strip_type == 1
         zef = zef_electrode_strip_multiple_probe(zef);

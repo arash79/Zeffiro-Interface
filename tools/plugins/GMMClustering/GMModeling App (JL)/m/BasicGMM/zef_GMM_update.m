@@ -1,23 +1,15 @@
-% --- Zeffiro documentation header ---
-% zef_n=0; — Zef n=0;.
+%ZEF_GMM_UPDATE  Push zef.GMM.parameters.Values onto open GMM app widgets.
 %
-% Purpose:
-%   Zef n=0;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMM (read)
+%   Script. Walks main / ModelingOpt / PlotOpt / Export apps when
+%   valid. Also copies scalar parameters onto zef.GMM_<tag>. Called
+%   after loading parameters. Does not start a fit.
 %
-% Calls (project):
-%   zef_aux_str
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef_n=0;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also GMModelApp_start.
 
 zef_n=0;
 if isfield(zef.GMM,'apps')

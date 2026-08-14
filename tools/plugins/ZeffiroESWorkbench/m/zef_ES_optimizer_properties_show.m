@@ -1,39 +1,20 @@
 function zef = zef_ES_optimizer_properties_show(zef)
-% --- Zeffiro documentation header ---
-% zef_ES_optimizer_properties_show — Zef ES optimizer properties show.
+%ZEF_ES_OPTIMIZER_PROPERTIES_SHOW  Fill the properties table from y_ES_interval at the objective-function index.
 %
-% Purpose:
-%   Zef ES optimizer properties show.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Plot-data menu item 4 / plot_type 4. Opens the properties window then
+%   writes zef_ES_table columns at (sr,sc); α uses sc, ε uses sr. Lattice
+%   deviation columns use zef_lattice_deviation on the first 12 metrics.
 %
-% Outputs:
-%   zef
+%   zef = zef_ES_optimizer_properties_show()
+%   zef = zef_ES_optimizer_properties_show(zef)
 %
-% Zef fields (observed):
-%   zef.h_ES_optimizer_properties (read)
-%   zef.h_ES_optimizer_properties_table (read)
-%   zef.h_optimizer_properties (read)
-%   zef.use_display (read)
-%   zef.y_ES_interval (read)
+%   See also zef_ES_optimizer_properties, zef_ES_table.
 %
-% Calls (project):
-%   zef_ES_objective_function
-%   zef_ES_optimizer_properties
-%   zef_ES_optimizer_properties_show
-%   zef_ES_table
-%   zef_lattice_deviation
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_ES_optimizer_properties_show(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 if nargin == 0
     zef = evalin('base','zef');

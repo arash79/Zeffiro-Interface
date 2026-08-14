@@ -1,34 +1,27 @@
 function zef = zef_apply_parameter_profile(zef)
-% --- Zeffiro documentation header ---
-% zef_apply_parameter_profile — Zef apply parameter profile.
+%ZEF_APPLY_PARAMETER_PROFILE  Reload zeffiro_parameters.ini and create missing parameter fields.
 %
-% Purpose:
-%   Zef apply parameter profile.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Settings → **Parameter profile**. Apply (h_parameter_profile_apply)
+%   writecell's the table then calls this. Also from zef_init and
+%   zef_add_compartment (new tissue rows get profile σ / extras).
 %
-% Outputs:
-%   zef
+%   zef = zef_apply_parameter_profile(zef)
+%   zef_apply_parameter_profile          % nargout 0 → assignin base
 %
-% Zef fields (observed):
-%   zef.parameter_profile (read, write)
-%   zef.profile_name (read)
-%   zef.program_path (read)
+%   Input
+%     zef  - session. Omitted → evalin('base','zef').
 %
-% Calls (project):
-%   zef_apply_parameter_profile
+%   Sets zef.parameter_profile from
+%   program_path/profile/<profile_name>/zeffiro_parameters.ini (CSV),
+%   then zef_init_parameter_profile creates missing zef.<tag>_<name>
+%   fields for Segmentation and Sensors rows that are On.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_apply_parameter_profile(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_parameter_profile_table_selection, zef_init_parameter_profile.
 
 if nargin == 0
     zef = evalin('base','zef');

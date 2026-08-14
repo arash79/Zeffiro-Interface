@@ -1,36 +1,18 @@
 function zef = zef_parcellation_roi_add(zef)
-% --- Zeffiro documentation header ---
-% zef_parcellation_roi_add — Zef parcellation roi add.
+%ZEF_PARCELLATION_ROI_ADD  Prepend a default user-defined ROI to the ROI list.
 %
-% Purpose:
-%   Zef parcellation roi add.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Inserts center [0 0 0], radius 10, default color, and name
+%   'Used-defined ROI' at the front of the ROI arrays, sets
+%   parcellation_roi_selected to 1, and calls zef_update_parcellation.
 %
-% Outputs:
-%   zef
+%   zef = zef_parcellation_roi_add(zef)
 %
-% Zef fields (observed):
-%   zef.parcellation_roi_center (read, write)
-%   zef.parcellation_roi_color (read, write)
-%   zef.parcellation_roi_name (read, write)
-%   zef.parcellation_roi_radius (read, write)
-%   zef.parcellation_roi_selected (read, write)
-%
-% Calls (project):
-%   zef_parcellation_roi_add
-%   zef_update_parcellation
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_parcellation_roi_add(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_parcellation_roi_delete, zef_parcellation_roi_embed.
 
 zef.parcellation_roi_selected = 1;
 zef.parcellation_roi_center = [0 0 0; zef.parcellation_roi_center];

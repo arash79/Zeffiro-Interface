@@ -1,28 +1,16 @@
 function M = zef_surface_scalar_matrix_FF(nodes,tetra,scalar_field)
-% --- Zeffiro documentation header ---
-% zef_surface_scalar_matrix_FF — Zef surface scalar matrix FF.
+%ZEF_SURFACE_SCALAR_MATRIX_FF  Boundary mass with weights [1/6 1/12].
 %
-% Purpose:
-%   Zef surface scalar matrix FF.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   scalar_field
+%   Wrapper → zef_surface_scalar_matrix. NSE M_1 (Robin / dynamic mass).
 %
-% Outputs:
-%   M
+%   M = zef_surface_scalar_matrix_FF(nodes, tetra, scalar_field)
 %
-% Calls (project):
-%   zef_barycentric_weighting
-%   zef_surface_scalar_matrix
-%   zef_surface_scalar_matrix_FF
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_surface_scalar_matrix_FF(nodes, tetra, scalar_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_surface_scalar_matrix, zef_nse_poisson.
 
 weighting = zef_barycentric_weighting('surface_FF');
 M = zef_surface_scalar_matrix(nodes, tetra, scalar_field, weighting);

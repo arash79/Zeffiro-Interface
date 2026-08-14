@@ -1,41 +1,18 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isempty(zef.save_file_path)) & not(zef — If not(isempty(zef.save file path)) & not(zef.
+%ZEF_FILTER_SAVE_AS  Save as: filter pipeline, raw_data, zoom, epoch points.
 %
-% Purpose:
-%   If not(isempty(zef.save file path)) & not(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.file (read)
-%   zef.file_path (read)
-%   zef.filter_data_segment (read)
-%   zef.filter_epoch_points (read)
-%   zef.filter_list_selected (read)
-%   zef.filter_name_list (read)
-%   zef.filter_parameter_list (read)
-%   zef.filter_pipeline (read)
-%   zef.filter_pipeline_list (read)
-%   zef.filter_pipeline_selected (read)
-%   zef.filter_sampling_rate (read)
-%   zef.filter_save_file (read, write)
-%   zef.filter_save_file_path (read, write)
-%   zef.filter_tag (read)
-%   zef.filter_zoom (read)
-%   … (1 more)
+%   Script. ButtonPushedFcn of h_filter_save_as. uiputfile '*.mat'.
+%   Writes zef_data with filter_zoom, raw_data, epoch points, name/file/
+%   parameter lists, sampling_rate, tag, data_segment, pipeline cells
+%   (-v7.3). As written, zef_data.filter_file_list is assigned from
+%   zef.filter_name_list (not filter_file_list). Does not save
+%   processed_data (that is zef_filter_save_processed_data_as).
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `if not(isempty(zef.save_file_path)) & not(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_filter_load, zef_filter_save_processed_data_as.
 
 if not(isempty(zef.save_file_path)) & not(zef.save_file_path==0)
     [zef.file zef.file_path] = uiputfile('*.mat','Save as...',[zef.filter_save_file_path zef.filter_save_file]);

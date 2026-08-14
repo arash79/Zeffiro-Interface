@@ -1,33 +1,28 @@
 function [f] = zef_getFilteredDataClassObj(zef,ClassObj)
-% --- Zeffiro documentation header ---
-% zef_getFilteredDataClassObj — Zef get Filtered Data Class Obj.
+%ZEF_GETFILTEREDDATACLASSOBJ  Normalize and filter measurements using CommonInverseParameters.
 %
-% Purpose:
-%   Zef get Filtered Data Class Obj.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   ClassObj
+%   Class-object counterpart to zef_getFilteredData. Normalization follows
+%   ClassObj.data_normalization_method ("maximum entry", "maximum column norm",
+%   "average column norm", or none). Band-pass uses ClassObj.low_cut_frequency,
+%   high_cut_frequency, and sampling_frequency with the same elliptic filters
+%   as the legacy path when inv_data_mode is "filtered_temporal".
 %
-% Outputs:
-%   f
+%   f = zef_getFilteredDataClassObj(zef, ClassObj)
 %
-% Zef fields (observed):
-%   zef.inv_data_mode (read)
-%   zef.measurements (read)
+%   Inputs
+%     zef      - session struct with measurements and inv_data_mode.
+%     ClassObj - inverse.CommonInverseParameters (or compatible) instance.
 %
-% Calls (project):
-%   zef_getFilteredDataClassObj
+%   Output
+%     f        - n_channels x n_samples filtered data.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[f] = zef_getFilteredDataClassObj(zef, ClassObj)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_getFilteredData, zef_getTimeStepClassObj,
+%            zef_inverse_extract_bundle, inverse.CommonInverseParameters.
 
 if (nargin == 0)
 zef = evalin('base','zef');

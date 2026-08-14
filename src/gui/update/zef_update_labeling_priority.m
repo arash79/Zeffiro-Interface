@@ -1,37 +1,20 @@
 function zef = zef_update_labeling_priority(zef,update_type,labeling_priority_vec)
-% --- Zeffiro documentation header ---
-% zef_update_labeling_priority — Syncs GUI control values into `zef` for labeling_priority.
+%ZEF_UPDATE_LABELING_PRIORITY  Reorder **Labeling priority** list in Forward/inverse options.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for labeling_priority.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   update_type
-%   labeling_priority_vec
+%   Function. When called from the dialog menus (update_type =
+%   'one step up' / 'one step down' / 'top' / 'bottom'), reads
+%   h_labeling_priority_order.Value, permutes the order from
+%   zef_choose_domain_labels, writes
+%   zef.<compartment_tags{reuna_mesh_ind(k)}>_labeling_priority = i,
+%   and refreshes Items. When a vector is passed (nargin>=3), only
+%   writes priorities (used at open). Does not remesh.
 %
-% Outputs:
-%   zef
-%
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.h_labeling_priority_order (read)
-%   zef.reuna_mesh_ind (read)
-%
-% Calls (project):
-%   zef_choose_domain_labels
-%   zef_update_labeling_priority
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_update_labeling_priority(zef, update_type, labeling_priority_vec)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_open_forward_and_inverse_options.
 use_settings = 0;
 
 if nargin < 2

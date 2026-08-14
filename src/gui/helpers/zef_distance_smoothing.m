@@ -1,31 +1,20 @@
 function [nodes] = zef_distance_smoothing(tetra, nodes, distance_vec, smoothing_exponent, smoothing_strength, smoothing_steps_dist) 
-% --- Zeffiro documentation header ---
-% zef_distance_smoothing — Zef distance smoothing.
+%ZEF_DISTANCE_SMOOTHING  Taubin node smoothing with exp(−α mean d) edge weights.
 %
-% Purpose:
-%   Zef distance smoothing.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tetra
-%   nodes
-%   distance_vec
-%   smoothing_exponent
-%   smoothing_strength
-%   smoothing_steps_dist
+%   nodes = zef_distance_smoothing(tetra, nodes, distance_vec, ...
+%       smoothing_exponent, smoothing_strength, smoothing_steps_dist)
 %
-% Outputs:
-%   nodes
+%   Edge weight on tet (i,j) is exp(−exponent * mean(distance_vec(tet))).
+%   Graph B from those weights; then Taubin λ=1, μ=−1 until the relative
+%   Frobenius change of the two half-steps is ≤ smoothing_steps_dist
+%   (that argument is a residual threshold, not an iteration count).
 %
-% Calls (project):
-%   zef_distance_smoothing
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[nodes] = zef_distance_smoothing(tetra, nodes, distance_vec, smoothing_exponent, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_smoothing_step.
 N = size(nodes,1);
 B = sparse(N,N,0);
 distance_smoothing = exp(-smoothing_exponent*mean(distance_vec(tetra),2));

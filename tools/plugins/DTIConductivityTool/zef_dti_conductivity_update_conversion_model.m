@@ -1,51 +1,19 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_DTI_CONDUCTIVITY_UPDATE_CONVERSION_MODEL
-%
-%Syncs conversion model parameters from GUI to zef. No recomputation;
-%parameters are used on next "Apply to Mesh".
-
 function zef = zef_dti_conductivity_update_conversion_model(zef)
-% --- Zeffiro documentation header ---
-% zef_dti_conductivity_update_conversion_model — Zef dti conductivity update conversion model.
+%ZEF_DTI_CONDUCTIVITY_UPDATE_CONVERSION_MODEL  Copy conversion widgets into zef.
 %
-% Purpose:
-%   Zef dti conductivity update conversion model.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   ValueChangedFcn for the DTI Conductivity Tool conversion panel. Copies
+%   volume fraction, extra/intra conductivity, scale, anisotropy threshold,
+%   and model dropdown onto zef.dti_* fields. Does not interpolate or
+%   rewrite zef.sigma; those happen on **Apply to Mesh**.
 %
-% Outputs:
-%   zef
+%   Missing or invalid handles are skipped. nargout==0 → assignin base zef.
 %
-% Zef fields (observed):
-%   zef.dti_anisotropy_threshold (read, write)
-%   zef.dti_conductivity_model (read, write)
-%   zef.dti_conductivity_scale (read, write)
-%   zef.dti_extra_conductivity (read, write)
-%   zef.dti_intra_conductivity (read, write)
-%   zef.dti_volume_fraction (read, write)
-%   zef.h_dti_anisotropy_threshold (read)
-%   zef.h_dti_conductivity_scale (read)
-%   zef.h_dti_extra_conductivity (read)
-%   zef.h_dti_intra_conductivity (read)
-%   zef.h_dti_model_dropdown (read)
-%   zef.h_dti_volume_fraction (read)
-%
-% Calls (project):
-%   zef_dti_conductivity_update_conversion_model
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dti_conductivity_update_conversion_model(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dti_apply_to_sigma, zef_dti_conductivity_window.
 
 if nargin == 0
     zef = evalin('base','zef');

@@ -1,31 +1,20 @@
 function zef_plot_synthetic_source(varargin)
-% --- Zeffiro documentation header ---
-% zef_plot_synthetic_source — Renders or updates a plot_synthetic_source figure from current `zef` state.
+%ZEF_PLOT_SYNTHETIC_SOURCE  Queue renderer: quiver3 markers at inv_synth_source.
 %
-% Purpose:
-%   Renders or updates a plot_synthetic_source figure from current `zef` state.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Bank List item. Reads zef.inv_synth_source from base (Find synthetic
+%   source: xyz, orientation, amplitude, noise, visual size, color index).
+%   Draws on caller h_axes_image. Color cycle k r g b y m c via column 10.
+%   Marker size and line width scale with 6*sqrt(column 9). Tag:
+%   'additional: synthetic source'. varargin unused.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.inv_synth_source (read)
-%
-% Calls (project):
 %   zef_plot_synthetic_source
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_plot_synthetic_source(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_plot_3D_arrow_synthetic_source, zef_plot_dpq.
 
 color_cell = {'k','r','g','b','y','m','c'};
 h_axes = evalin('caller','h_axes_image');

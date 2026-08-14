@@ -1,31 +1,18 @@
 function [z_inverse] = ext_sL(timeSteps,P_store,L,R, number_of_frames, smoothing, sL,standardization_exponent)
-% --- Zeffiro documentation header ---
-% ext_sL — Ext s L.
+%EXT_SL  Post-hoc sLORETA weights on a smoothed block state.
 %
-% Purpose:
-%   Ext s L.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   timeSteps
-%   P_store
-%   L
-%   R
-%   number_of_frames
-%   smoothing
-%   sL
-%   standardization_exponent
+%   z_inverse = ext_sL(m_s_store, P_s_store, L, R, number_of_frames, smoothing, sL, standardization_exponent)
 %
-% Outputs:
-%   z_inverse
+%   zef_KF when sL < smoothing-1 after RTS. First argument is the mean
+%   sequence (named timeSteps in the signature). Uses L / L2 / L3 vs sL.
 %
-% Calls (project):
-%   zef_waitbar
+%   See also zef_KF, Block_RTS_smoother.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[z_inverse] = ext_sL(timeSteps, P_store, L, R, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 h = zef_waitbar(0,1, 'Filtering');
 z_inverse = cell(0);

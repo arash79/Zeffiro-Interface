@@ -1,24 +1,16 @@
 function capability = method_capability(method_id)
-% --- Zeffiro documentation header ---
-% utilities.sensitivity.method_capability — Method capability.
+%METHOD_CAPABILITY  Sensitivity-study strategy metadata per inverse method id.
 %
-% Purpose:
-%   Method capability.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   method_id
+%   capability = method_capability(method_id)
 %
-% Outputs:
-%   capability
-%
-% Calls (project):
-%   utilities.sensitivity.method_capability
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[capability] = utilities.sensitivity.method_capability(method_id)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Returns struct with method_id, strategy (linear_static, iterative_static,
+%   stateful_dynamic, unsupported), optional prep_hooks, and notes describing
+%   how run_monte_carlo should batch and initialize each inverter.
 
 arguments
     method_id (1,1) string {mustBeNonempty}

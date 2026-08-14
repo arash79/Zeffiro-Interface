@@ -1,36 +1,19 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
+function zef_dti_conductivity_browse_fa
+%ZEF_DTI_CONDUCTIVITY_BROWSE_FA  uigetfile NIfTI → zef.freesurfer_fa_file.
 %
-%ZEF_DTI_CONDUCTIVITY_BROWSE_FA
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%Browse for FreeSurfer FA file (fa.nii.gz from dt_recon).
-% --- Zeffiro documentation header ---
-% function zef_dti_conductivity_browse_fa — Function zef dti conductivity browse fa.
-%
-% Purpose:
-%   Function zef dti conductivity browse fa.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Zef fields (observed):
-%   zef.dti_ref_mri_file (read)
-%   zef.freesurfer_fa_file (read, write)
-%   zef.h_freesurfer_fa_file (read)
-%   zef.save_file_path (read)
-%
-% Calls (project):
 %   zef_dti_conductivity_browse_fa
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Default folder: existing FA path, else dti_ref_mri_file, else
+%   save_file_path, else pwd. Writes the path to zef.freesurfer_fa_file
+%   and h_freesurfer_fa_file.Value. Cancel (file_name==0) is a no-op.
+%   Does not load the volume (Load FreeSurfer does).
 %
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `function zef_dti_conductivity_browse_fa` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-function zef_dti_conductivity_browse_fa
-
+%   See also zef_dti_conductivity_load_freesurfer, zef_dti_conductivity_browse_v1.
 
 zef = evalin('base','zef');
 

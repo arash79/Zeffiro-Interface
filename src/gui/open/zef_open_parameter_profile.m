@@ -1,39 +1,18 @@
-% --- Zeffiro documentation header ---
-% zef_data = zef_parameter_profile; — Zef data = zef parameter profile;.
+%ZEF_OPEN_PARAMETER_PROFILE  Settings → **Parameter profile**.
 %
-% Purpose:
-%   Zef data = zef parameter profile;.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_menu_parameter_profile_table_add (read)
-%   zef.h_menu_parameter_profile_table_delete (read)
-%   zef.h_parameter_profile (read)
-%   zef.h_parameter_profile_apply (read)
-%   zef.h_parameter_profile_from_project (read)
-%   zef.h_parameter_profile_save (read)
-%   zef.h_parameter_profile_table (read)
-%   zef.parameter_profile (read)
-%   zef.parameter_profile_current_size (read, write)
-%   zef.parameter_profile_relative_size (read, write)
-%   zef.parameter_profile_selected (read)
-%   zef.profile_name (read)
-%   zef.program_path (read)
+%   Script. MenuSelectedFcn of h_menu_parameter_profile. Instantiates
+%   zef_parameter_profile, loads profile/<name>/zeffiro_parameters.ini
+%   into the table. Columns: name, field, Scalar/String, default, …,
+%   On/Off, On/Off, Segmentation/Sensors/Free-form. **Save** writecell
+%   INI; **Apply** writecell then zef_apply_parameter_profile. Closing
+%   does not save.
 %
-% Calls (project):
-%   zef_apply_parameter_profile
-%   zef_change_size_function
-%   zef_get_relative_size
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_data = zef_parameter_profile;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_init_parameter_profile, zef_menu_tool.
 zef_data = zef_parameter_profile;
 zef_assign_data;
 

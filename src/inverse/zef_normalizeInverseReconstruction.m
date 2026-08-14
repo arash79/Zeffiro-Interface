@@ -1,24 +1,24 @@
 function [z] = zef_normalizeInverseReconstruction(z)
-% --- Zeffiro documentation header ---
-% zef_normalizeInverseReconstruction — Zef normalize Inverse Reconstruction.
+%ZEF_NORMALIZEINVERSERECONSTRUCTION  Scale reconstruction cell array to unit peak norm.
 %
-% Purpose:
-%   Zef normalize Inverse Reconstruction.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   z
+%   Finds the maximum per-source vector magnitude across all frames (assuming
+%   each frame stores [x; y; z] components interleaved in groups of three),
+%   then divides every frame by that scalar.
 %
-% Outputs:
-%   z
+%   z = zef_normalizeInverseReconstruction(z)
 %
-% Calls (project):
-%   zef_normalizeInverseReconstruction
+%   Input
+%     z - cell array of reconstruction vectors (one cell per frame).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[z] = zef_normalizeInverseReconstruction(z)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     z - same cell array, peak-normalized in place.
+%
+%   See also zef_process_inversion, zef_postProcessInverseClassObj.
 
     aux_norm_vec = 0;
     for f_ind = 1 : length(z)

@@ -1,34 +1,20 @@
 function [x, function_val, flag_val] = zef_cvx_linprog(z, y, A,b,Aeq,beq,lb,ub,varargin)
-% --- Zeffiro documentation header ---
-% zef_cvx_linprog — Zef cvx linprog.
+%ZEF_CVX_SEMIDEFPROG  CVX wrapper for ES search_method 2 (L1L2 / SDP setup).
 %
-% Purpose:
-%   Zef cvx linprog.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   z
-%   y
-%   A
-%   b
-%   Aeq
-%   beq
-%   lb
-%   ub
-%   varargin
+%   Called as zef_cvx_semidefprog from zef_ES_optimize_current case 2 (not
+%   search_method 5). MATLAB uses the filename; the in-file function name
+%   is still zef_cvx_linprog — left unchanged. Minimizes ||z.*x|| + y'*x
+%   with the same A x <= b bounds as the LP wrapper.
 %
-% Outputs:
-%   x
-%   function_val
-%   flag_val
+%   [x, fval, flag] = zef_cvx_semidefprog(z, y, A, b, Aeq, beq, lb, ub, opts)
 %
-% Calls (project):
-%   zef_cvx_linprog
+%   See also zef_ES_optimize_current, zef_cvx_linprog.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[x, function_val, flag_val]] = zef_cvx_linprog(z, y, A, b, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 opts = [];
 

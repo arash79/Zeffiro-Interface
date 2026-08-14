@@ -1,29 +1,41 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [scale_param, snr_vec] = zef_find_gaussian_prior(snr_val, varargin)
-% --- Zeffiro documentation header ---
-% zef_find_gaussian_prior — Zef find gaussian prior.
+%ZEF_FIND_GAUSSIAN_PRIOR  Convert inv_snr (dB) into a Gaussian prior variance.
 %
-% Purpose:
-%   Zef find gaussian prior.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   snr_val
-%   varargin
+%   Inverse plugins (MNE, IAS, Kalman, …) treat sensor noise as
+%   10^(-snr/20) relative to a unit signal. This helper turns that SNR
+%   into the prior scale theta0 (scale_param) used as source variance:
+%     scale_param = source_strength^2 * (10^(-snr/20))^2 / n_sources
+%   With no lead field, source_strength is 1e-2. With L, it is the mean
+%   reciprocal of column max-abs (or column L2 if normalize_data is not
+%   'maximum'), raised to w_param (default 0.5).
 %
-% Outputs:
-%   scale_param
-%   snr_vec
+%   If balance_snr is true and L is given, columns are sLORETA-whitened
+%   and snr_vec is snr_val plus the dB of a per-column signal_strength
+%   so poorly seen sources get a higher effective SNR. The recursive
+%   call zef_find_gaussian_prior(snr_val+balance_param) has no L, so it
+%   uses the 1e-2 default strength.
 %
-% Calls (project):
-%   zef_find_gaussian_prior
+%   [scale_param, snr_vec] = zef_find_gaussian_prior(snr_val)
+%   [scale_param, snr_vec] = zef_find_gaussian_prior(snr_val, L, n, norm, balance, bal_param)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[scale_param, snr_vec]] = zef_find_gaussian_prior(snr_val, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Inputs (all after snr_val optional)
+%     snr_val          - scalar dB, typically zef.inv_snr.
+%     L                - sensors × sources lead field. Empty → no L path.
+%     source_space_size- default size(L,2) or 1.
+%     normalize_data   - 'maximum' (default) or other → L2 columns.
+%     balance_snr      - default 1 (true).
+%     balance_param    - added to snr_val in the nested prior call.
+%
+%   Outputs
+%     scale_param  - prior variance theta0 (scalar).
+%     snr_vec      - per-source SNR in dB (scalar if no balance).
+%
+%   See also zef_find_g_hyperprior, zef_find_ig_hyperprior.
 
 L = [];
 
@@ -69,6 +81,8 @@ else
         source_strength = mean(1./(sqrt(sum(L.^2)').^w_param));
     end
 
+    % Per-column sLORETA-style whitening, then SNR offset from the
+    % relative column strength so deep/weak sources are not under-prioritized.
     if balance_snr
         theta0 = zef_find_gaussian_prior(snr_val+balance_param);
         std_lhood = 10^(-snr_val/20);

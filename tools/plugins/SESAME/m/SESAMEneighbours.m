@@ -1,22 +1,16 @@
 function [neighbours,neighboursp] = SESAMEneighbours(V)
-% --- Zeffiro documentation header ---
-% SESAMEneighbours — SESAMEneighbours.
+%SESAMENEIGHBOURS  Spatial neighbour graph and jump probabilities for SESAME.
 %
-% Purpose:
-%   SESAMEneighbours.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   V
+%   [neighbours, neighboursp] = SESAMEneighbours(V)
 %
-% Outputs:
-%   neighbours
-%   neighboursp
+%   V is source positions. Radius from mean inter-point spacing.
+%   KDTree rangesearch. Called from SESAME_inversion. No zef I/O.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[neighbours, neighboursp]] = SESAMEneighbours(V)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also inverse_SESAME.
 
 radius = 1.5 * ((max(V(:,1))-min(V(:,1))) * (max(V(:,2))-min(V(:,2))) * (max(V(:,3))-min(V(:,3)))/ size(V,1) ) ^(1/3) ;
 neighbours = compute_neighbours(V, radius);

@@ -15,23 +15,23 @@
 % See also: run.m, validate_config.m
 
 function config = get_default_config()
-% --- Zeffiro documentation header ---
-% utilities.duneuro2zef.get_default_config — Get default config.
+%GET_DEFAULT_CONFIG  Default folder paths and filenames for Duneuro import.
 %
-% Purpose:
-%   Get default config.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Outputs:
-%   config
+%   config = get_default_config()
 %
-% Calls (project):
-%   utilities.duneuro2zef.get_default_config
+%   input_folder 'data/exported', output_folder 'data/converted'. File patterns:
+%   mesh.mat (hex), sp_vol_rgv_N*.mat, sensors.mat, LF_EEG.mat / LF_MEG.mat,
+%   spikeAvgEEG.mat / spikeAvgMEG.mat, resection_points.dat. Flags process_eeg,
+%   process_meg, process_resection_points, invert_domain_labels, verbose,
+%   continue_on_error. EEG channel_indices default [302:358, inf] (dataset-
+%   specific). Outputs tetra_mesh.mat, source_space.mat, L_EEG.mat, etc.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `utilities.duneuro2zef.get_default_config` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+
 
     config.input_folder = 'data/exported';
     config.output_folder = 'data/converted';

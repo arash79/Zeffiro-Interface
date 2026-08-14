@@ -1,83 +1,25 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_DTI_GET_MESH2VOXEL
-%
-%Computes the 4×4 affine matrix that transforms Zeffiro mesh display
-%coordinates to FreeSurfer FA voxel coordinates (0-based, same as mri_info).
-%
-%This matches the INVERSE of the transformation chain used by
-%zef_visualize_dti_streamlines (which goes FA_voxel → mesh_display).
-%
-%FORWARD (FA_voxel → mesh_display, as in visualization):
-%   1. FA_voxel → DWI_tkRAS:     T_dwi_vox2ras_tkr * voxel
-%   2. DWI_tkRAS → T1_tkRAS:     inv(T_register) * DWI_tkRAS
-%   3. T1_tkRAS → scanner_RAS:   T_ref_vox2ras * inv(T_ref_vox2ras_tkr) * T1_tkRAS
-%   4. scanner_RAS → mesh_display: scanner - ref_center
-%
-%INVERSE (mesh_display → FA_voxel, for conductivity pipeline):
-%   1. mesh_display → scanner_RAS:   mesh + ref_center
-%   2. scanner_RAS → T1_tkRAS:       T_ref_vox2ras_tkr * inv(T_ref_vox2ras) * scanner
-%   3. T1_tkRAS → DWI_tkRAS:         T_register * T1_tkRAS
-%   4. DWI_tkRAS → FA_voxel:         inv(T_dwi_vox2ras_tkr) * DWI_tkRAS
-%
-%Combined:
-%   T_mesh2voxel = inv(T_dwi_vox2ras_tkr) * T_register
-%                  * T_ref_vox2ras_tkr * inv(T_ref_vox2ras) * T_translate(+ref_center)
-%
-%Matrix sources (in priority order):
-%   1. Auto-extracted from files:
-%      - zef.dti_dwi_vox2ras_tkr  ← extracted from fa.nii.gz on load
-%      - zef.dti_ref_vox2ras      ← extracted from reference MRI on load
-%      - zef.dti_ref_vox2ras_tkr  ← extracted from reference MRI on load
-%      - zef.dti_ref_center       ← extracted from reference MRI on load
-%   2. Auto-computed from file data:
-%      - zef.freesurfer_fa_info   ← niftiinfo struct for FA
-%      - zef.dti_ref_geometry     ← geometry struct from reference MRI
-%   3. Legacy GUI handles (backward compatibility):
-%      - zef.h_dti_dwi_vox2ras_tkr.Data, etc.
-%
-%Inputs:
-%   zef - Zeffiro struct with transformation data (see above)
-%
-%Outputs:
-%   T_mesh2voxel - [4×4] Affine matrix: mesh_display → FA_voxel (0-based voxel indices)
-%   info         - Struct with source info for debugging
-%
-%See also: zef_visualize_dti_streamlines, zef_freesurfer_read_volume_geometry
-
 function [T_mesh2voxel, info] = zef_dti_get_mesh2voxel(zef)
-% --- Zeffiro documentation header ---
-% zef_dti_get_mesh2voxel — Zef dti get mesh2voxel.
+%ZEF_DTI_GET_MESH2VOXEL  Combined 4×4 mesh-tkRAS → FA-voxel transform from zef DTI fields.
 %
-% Purpose:
-%   Zef dti get mesh2voxel.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2024- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Collects FA vox2ras-tkr, reference vox2ras / vox2ras-tkr, reference
+%   center, and register.dat from zef fields or DTI-tool GUI handles
+%   (h_dti_*). Used when composing the interpolation inverse. Errors listing
+%   missing pieces if FA or reference MRI is not loaded.
 %
-% Outputs:
-%   T_mesh2voxel
-%   info
+%   [T_mesh2voxel, info] = zef_dti_get_mesh2voxel(zef)
 %
-% Zef fields (observed):
-%   zef.dti_ref_geometry (read)
-%   zef.freesurfer_fa_file (read)
-%   zef.freesurfer_fa_info (read)
-%   zef.freesurfer_register_transform (read)
+%   Output
+%     T_mesh2voxel - 4×4, p_vox = [p_mesh 1] * T'
+%     info         - struct of the constituent matrices and a source string
 %
-% Calls (project):
-%   zef_dti_get_mesh2voxel
-%   zef_freesurfer_read_volume_geometry
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[T_mesh2voxel, info]] = zef_dti_get_mesh2voxel(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_dti_apply_to_sigma, zef_freesurfer_read_register_dat.
+
+
 
 
 arguments

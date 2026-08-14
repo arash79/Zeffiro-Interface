@@ -1,44 +1,63 @@
-# tools/plugins/Kalman
+# Kalman
 
-## Purpose of this folder
+Discrete-time Kalman filter / RTS smoother on the source vector (`A = I`). Use it for time-resolved imaging when consecutive frames should share a process-noise prior. Optional DTI structural `Q` (`zef.kf_structural_Q_type` 1 FA, 2 tractography) is **this plugin only**, not `inverse.KalmanInverter`.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+This plugin does **not** construct `inverse.KalmanInverter`. Class ids `kalman` / `kf` (and `legacy_kalman`) are a separate `zef_inverse_run` track.
 
-## Contents
+## Menu
 
-Subfolders:
-- `Scripts/`
-- `clusterScripts/`
-- `m/`
-- `mlapp/`
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **Kalman** |
+| `_legacy`, `_nse` | Inverse tools → **Kalman** |
+| asteroid_radar / asteroid_gravity | **not in those INIs** |
 
-## How this folder fits into the overall workflow
+INI callback: `zef_kf_start`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Window title: `ZEFFIRO Interface: Kalman Filter`.
 
-## GUI usage
+## Run the solver
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+**StartButton** `ButtonPushedFcn`:
 
-## Programmatic usage
+```matlab
+zef = zef_KF(zef);
+```
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+**ApplyButton** copies widget `Value` fields onto `zef` (does not invert). **CloseButton** deletes the app.
 
-## Examples
+Filter dropdown (`zef.KF.filter_type` → `zef.filter_type`, ItemsData `'1'`…`'9'` in `zef_kf_open_window`):
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+| Value | Label | Solver |
+|-------|-------|--------|
+| 1 | No standardization | `kalman_filter` (plain KF, A = I). Caps smoother at RTS. |
+| 2 | EnKF | `EnKF`; ensemble count from `number_of_ensembles`. Caps smoother at none. |
+| 3 | Spatiotemporal standardization | `kalman_filter_sLORETA` inside the update |
+| 4 | Spatial standardization | `kalman_filter` then diagonal sLORETA weights `W` on each frame |
+| 5 / 6 | Double block Kalman (sLORETA1 / 2) | `double_kf_sL` with `sL` = 1 or 2 |
+| 7 / 8 / 9 | Triple block Kalman (sLORETA1 / 2 / 3) | `triple_kf_sL` with `sL` = 1, 2, or 3 |
 
-## Dependencies and assumptions
+Smoother (`zef.kf_smoothing`): none / RTS / 2Block RTS / 3Block RTS → 1–4. After the filter, `ext_sL` may still apply if `sL < smoothing-1`. Standardization exponent Items: 1/2, 1, 5/4, 3/2, 7/4, 2.
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## Needs
 
-## Notes for developers
+- `zef.L`, interpolation, `zef.source_positions`, `zef.source_direction_mode`
+- `zef.measurements`
+- SNR: `zef.inv_snr` → `R = (10^(-inv_snr/20))^2 I`; prior scale from `inv_prior_over_measurement_db` / `inv_amplitude_db`
+- Process noise: `zef.inv_evolution_prior` via `find_evolution_prior`, or optional second argument `q_value`
+- Frames: `zef.number_of_frames`, `inv_time_*`, band edges; `zef.kf_burn_in` for block filters
+- `zef.filter_type`, `zef.kf_smoothing`, `zef.standardization_exponent`
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## Writes
+
+- `zef.reconstruction` after `zef_postProcessInverse` / peak-norm
+- `zef.reconstruction_information` with tag `Kalman`, Q scale, `structural_Q_type`
+
+If `nargout == 0`, `zef_KF` assigns `zef` into the base workspace.
+
+## Files
+
+- Start: `m/zef_kf_start.m` → `zef_kf_open_window`
+- Solver: `m/zef_KF.m` (plus `kalman_filter.m`, RTS / block helpers)
+- Layout: `mlapp/zef_kf_app.mlapp`
+- `Scripts/` and `clusterScripts/` are extra plotting / batch helpers, not the Inverse-tools button

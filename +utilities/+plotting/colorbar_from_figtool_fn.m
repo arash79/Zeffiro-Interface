@@ -1,27 +1,16 @@
 function colorbar_from_figtool_fn(figtool, filename_without_suffix, filetypes, kwargs)
-% --- Zeffiro documentation header ---
-% utilities.plotting.colorbar_from_figtool_fn — Colorbar from figtool fn.
+%COLORBAR_FROM_FIGTOOL_FN  Export standalone colorbar from Zeffiro Figure tool.
 %
-% Purpose:
-%   Colorbar from figtool fn.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   figtool
-%   filename_without_suffix
-%   filetypes
-%   kwargs
+%   colorbar_from_figtool_fn(figtool, filename_without_suffix, filetypes, kwargs)
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Calls (project):
-%   utilities.plotting.colorbar_from_figtool_fn
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `utilities.plotting.colorbar_from_figtool_fn(figtool, filename_without_suffix, filetypes, kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Reads limits from the rightColorbar tag on figtool, builds a minimal figure
+%   with five tick marks, and exportgraphics to each filetypes entry (.png,
+%   .pdf, .eps). kwargs: colormap, fontsize (20), resolution (400), decplaces (1).
 
     arguments
 

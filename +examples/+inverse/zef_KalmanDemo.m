@@ -1,33 +1,16 @@
-% --- Zeffiro documentation header ---
-% examples.inverse.zef = zef_KalmanDemo_create_measurement(); — Example or study script demonstrating zef = zef_KalmanDemo_create_measurement();.
+%ZEF_KALMANDEMO  Script: synthetic EEG then legacy zef_KF (not KalmanInverter).
 %
-% Purpose:
-%   Example or study script demonstrating zef = zef_KalmanDemo_create_measurement();.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_zeffiro (read)
-%   zef.use_display (read, write)
+%   run('+examples/+inverse/zef_KalmanDemo.m') with project root on the path.
+%   create_measurement calls examples.forward.lead_field_example (n_sources
+%   2000, EEG) then two dipoles (cortical / thalamic). runKalman sets
+%   filter_type=1, kf_smoothing=1, number_of_frames=26, then zef_KF.
+%   Save and visualization cells are commented.
 %
-% Calls (project):
-%   zef_KF
-%   zef_KalmanDemo_create_measurement
-%   zef_KalmanDemo_runKalman
-%   zef_KalmanDemo_save
-%   zef_KalmanDemo_visualize
-%   zef_Kalman_visualization
-%   zef_close_all
-%   zef_processLeadfields
-%   zef_save
-%   zef_visualize_surfaces
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `examples.inverse.zef = zef_KalmanDemo_create_measurement();` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 zef = zef_KalmanDemo_create_measurement();
 %%
@@ -40,12 +23,11 @@ zef = zef_KalmanDemo_runKalman(zef);
 %%
 
 function project_struct = zef_KalmanDemo_runKalman(project_struct)
-    % zef_KalmanDemo_runKalman - Configure and execute Kalman filter reconstruction.
-    %
-    % Configures the Kalman filter settings and runs the inverse reconstruction
-    % on the measurement data stored in project_struct.
-    %
-    % Kalman filter settings:
+%ZEF_KALMANDEMO_RUNKALMAN  Legacy zef_KF on the demo session (filter_type 1).
+%
+%   Sets inv_snr=25 dB, 26 frames at 2500 Hz, kf_smoothing=1 (no RTS),
+%   then [project_struct] = zef_KF(project_struct). Not KalmanInverter.
+
     project_struct.inv_snr = 25;
     project_struct.inv_sampling_frequency = 2500;
     project_struct.inv_low_cut_frequency = 0;
@@ -67,12 +49,25 @@ function project_struct = zef_KalmanDemo_runKalman(project_struct)
 end % function
 
 function project_struct = zef_KalmanDemo_save(project_struct)
+%ZEF_KALMANDEMO_SAVE  zef_save to data/example_project.mat then zef_close_all.
+%
+%   Commented out in the script body (not run by default).
+
     % zef_KalmanDemo_save - Save project struct and close Zeffiro windows.
     zef_save(project_struct, 'example_project.mat', 'data/');
     zef_close_all(project_struct);
 end
 
 function project_struct = zef_KalmanDemo_create_measurement()
+%ZEF_KALMANDEMO_CREATE_MEASUREMENT  EEG lead field + two synthetic P20/N20 dipoles.
+%
+%   examples.forward.lead_field_example (n_sources 2000, EEG), then cortical
+%   [-33,-37,80] mm and thalamic [-12,-32,50] mm dipoles (10 nAm) with a
+%   Blackman–Harris pulse, 2 ms delay, and 25 dB Gaussian noise. Temporarily
+%   sets source_direction_mode=2 for zef_processLeadfields, then restores 1.
+%   Positions are nearest interpolated brain nodes (Euclidean). L is scaled
+%   1e-6 (µV/nAm) before y = L*ori*amp*time + noise.
+
     % zef_KalmanDemo_create_measurement - Create synthetic P20/N20 EEG measurements.
     %
     % Generates a mesh and lead field, then simulates the somatosensory P20/N20
@@ -136,6 +131,8 @@ function project_struct = zef_KalmanDemo_create_measurement()
 end % function
 
 function project_struct = zef_KalmanDemo_visualize(project_struct)
+%ZEF_KALMANDEMO_VISUALIZE  Show surfaces (visualization_type 3). Unused by the script.
+
     % zef_KalmanDemo_visualize - Display reconstruction in Zeffiro GUI.
     zef.h_zeffiro.Visible = 1;
     zef.use_display = 1;
@@ -144,6 +141,8 @@ function project_struct = zef_KalmanDemo_visualize(project_struct)
 end
 
 function project_struct = zef_Kalman_visualization(project_struct)
+%ZEF_KALMAN_VISUALIZATION  zef_figure_tool then zef_visualize_surfaces. Marked under maintenance.
+
     % zef_Kalman_visualization - Open figure tool and visualize surfaces.
     zef_figure_tool
     project_struct.h_zeffiro.Visible = 1;

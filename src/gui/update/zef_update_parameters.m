@@ -1,29 +1,22 @@
-% --- Zeffiro documentation header ---
-% zef.aux_field_1 = zef.h_parameters_table — Zef.aux field 1 = zef.h parameters table.
+%ZEF_UPDATE_PARAMETERS  Parameters-table CellEditCallback (script).
 %
-% Purpose:
-%   Zef.aux field 1 = zef.h parameters table.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field_1 (read)
-%   zef.aux_field_2 (read, write)
-%   zef.current_parameters (read)
-%   zef.current_sensor_name (read)
-%   zef.current_sensors (read)
-%   zef.current_tag (read)
-%   zef.current_transform (read)
-%   zef.imaging_method_cell (read)
-%   zef.parameter_profile (read)
+%   Script. Reads zef.h_parameters_table.Data. Branch on
+%   zef.current_parameters:
+%     'transform' — rows map to current_tag _scaling, _x/y/z_correction,
+%       _xy/yz/zx_rotation, _affine_transform at zef.current_transform.
+%     'sensor' — rows map to current_sensors _points / _directions columns
+%       (3, 6, or 9 entries from imaging_method_cell{1,2,3}) plus enabled
+%       Sensors parameter-profile scalars, at zef.current_sensor_name.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Does not replot. Inverse of zef_init_sensor_parameters /
+%   zef_init_transform_parameters.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.aux_field_1 = zef.h_parameters_table` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_update_transform_parameters.
 zef.aux_field_1 = zef.h_parameters_table.Data;
 
 if isequal(zef.current_parameters,'transform')

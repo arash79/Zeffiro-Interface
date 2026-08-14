@@ -1,41 +1,37 @@
-% --- Zeffiro documentation header ---
-% if isfield(zef,'h_mesh_tool') — If isfield(zef,'h mesh tool').
+%ZEF_MESH_TOOL  Open the Mesh tool and wire mesh / forward-simulation controls.
 %
-% Purpose:
-%   If isfield(zef,'h mesh tool').
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.downsample_surfaces (read, write)
-%   zef.font_size (read)
-%   zef.forward_simulation_column_selected (read)
-%   zef.forward_simulation_selected (read)
-%   zef.forward_simulation_table (read, write)
-%   zef.h_checkbox_mesh_smoothing_on (read)
-%   zef.h_downsample_surfaces (read)
-%   zef.h_edit65 (read)
-%   zef.h_edit75 (read)
-%   zef.h_edit76 (read)
-%   zef.h_edit_meshing_accuracy (read)
-%   zef.h_field_downsampling (read)
-%   zef.h_forward_simulation_script (read)
-%   zef.h_forward_simulation_table (read)
-%   zef.h_forward_simulation_update_from_profile (read)
-%   … (42 more)
+%   Script (not a function). Called from zef_start after the segmentation
+%   and figure tools. Instantiates zef_mesh_tool_app_exported, copies
+%   handles onto zef via zef_assign_data, and binds buttons to the mesh
+%   pipeline. Window title is "ZEFFIRO Interface: Mesh tool".
 %
-% Calls (project):
-%   zef_assign_data
-%   zef_attach_sensors_volume
-%   zef_set_size_change_function
+%   Buttons (verified in the App Designer export)
+%     Create FEM mesh      → zef_create_finite_element_mesh
+%     Postprocess FEM mesh → zef_postprocess_finite_element_mesh; zef_update
+%     Source interpolation → zef_source_interpolation
+%     Resample field       → zef_field_downsampling
+%     Resample surfaces    → zef_surface_downsampling
+%     Run script           → zef_run_forward_simulation (evals the selected
+%                            row of the forward-simulation table)
+%     Apply transform      → zef_apply_transform
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
+%   Checkboxes and numeric fields sync through zef_update_mesh_tool:
+%     Mesh smoothing, Refinement, LF source interp., Resample surf.,
+%     Mesh resolution, Meshing accuracy, Source/Field count, Smoothing
+%     strength, Solver tolerance, Surface triangles max., inflating
+%     iterations/strength, length unit, source directions.
 %
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `if isfield(zef,'h_mesh_tool')` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   The forward-simulation table is loaded from
+%   profile/<profile_name>/zeffiro_forward_simulation.ini. Add/Delete
+%   insert or remove rows; Save profile writes the table back as CSV.
+%
+%   See also zef_create_finite_element_mesh, zef_update_mesh_tool,
+%            zef_run_forward_simulation.
 
 if isfield(zef,'h_mesh_tool')
     if isvalid(zef.h_mesh_tool)
@@ -148,6 +144,7 @@ width_aux = relative_size*zef.segmentation_tool_default_position(3);
         vertical_aux = zef.segmentation_tool_default_position(2)+zef.segmentation_tool_default_position(4)-height_aux;
         horizontal_aux = zef.segmentation_tool_default_position(1)+zef.segmentation_tool_default_position(3)-width_aux;
         zef.h_mesh_tool.Position = [horizontal_aux vertical_aux width_aux height_aux]; 
+zef_window_manager('standalone', zef.h_mesh_tool); 
 
 set(findobj(zef.h_mesh_tool.Children,'-property','FontSize'),'FontSize',zef.font_size);
 

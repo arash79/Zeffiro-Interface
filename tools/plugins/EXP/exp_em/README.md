@@ -1,41 +1,14 @@
-# tools/plugins/EXP/exp_em
+# EXP EM (GUIDE, not on the default menu)
 
-## Purpose of this folder
+Legacy **EM MAP estimation** window. Default Inverse tools → Lasso uses `common/zef_exp_app_launch` instead.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+Call `exp_em_map_estimation` from MATLAB. That **script** `open`s `fig/exp_em_map_estimation.fig`, runs `zef_init_exp_em`, and the fig **Start** callback runs `exp_em_iteration([])`. Needs `zef.L` and `zef.measurements`. Window title: **ZEFFIRO Interface: EM MAP estimation**.
 
-## Contents
+| Path | Role |
+|------|------|
+| `m/exp_em_map_estimation.m` | Open the fig |
+| `m/exp_em_iteration.m` | Solver |
+| `m/zef_init_exp_em.m` / `zef_update_exp_em.m` | Widget ↔ `zef` |
+| `fig/exp_em_map_estimation.fig` | GUIDE layout |
 
-Subfolders:
-- `fig/`
-- `m/`
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
-
-## Programmatic usage
-
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Parent EXP README: [../README.md](../README.md).

@@ -1,25 +1,18 @@
-%% Copyright © 2025- Joonas Lahtinen
 classdef CSMInverter < inverse.CommonInverseParameters & handle
-% --- Zeffiro documentation header ---
-% inverse.CSMInverter.CSMInverter — Inverse solver class implementing CSM reconstruction.
+%CSMInverter  Cortical source mapping: dSPM, sLORETA, 3D sLORETA, and SBL.
 %
-% Purpose:
-%   Inverse solver class implementing CSM reconstruction.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   args
+%   method_type selects the algorithm. dSPM and sLORETA share a precomputed
+%   minimum-norm backbone P = L'/(L*L'+S) with per-source standardization d;
+%   3D sLORETA applies block-wise sqrtm corrections per dipole triplet. SBL runs
+%   iterative gamma updates from the data covariance.
 %
-% Calls (project):
-%   inverse.CommonInverseParameters
+%   See also inverse.MNEInverter, inverse.ELORETAInverter.
 %
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `inverse.CSMInverter.CSMInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
 
     properties
 
@@ -50,12 +43,11 @@ classdef CSMInverter < inverse.CommonInverseParameters & handle
     methods
 
         function self = CSMInverter(args)
-
+            %CSMInverter  Construct a CSM inverter (dSPM / sLORETA / SBL).
             %
-            % CSMInverter
-            %
-            % The constructor for this class.
-            %
+            %   Name-value: method_type ("dSPM","sLORETA","sLORETA 3D","SBL"),
+            %   theta0, SBL_number_of_iterations, normalize_reconstruction,
+            %   plus CommonInverseParameters band/frame/SNR fields.
 
             arguments
 
@@ -115,11 +107,11 @@ classdef CSMInverter < inverse.CommonInverseParameters & handle
         % Declare the initialize and inverse method defined in the files invert and initialize in this same
         % folder.
         
-        self = initialize(self)
+        self = initialize(self, L, f_data)
 
         self = precompute(self, L)
 
-        [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode)
+        [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
 
     end % methods
 

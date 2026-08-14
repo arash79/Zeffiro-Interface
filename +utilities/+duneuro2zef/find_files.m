@@ -1,47 +1,20 @@
-% find_files.m
-%
-% Finds files matching patterns in the input folder. Supports wildcards and
-% pattern matching for flexible file discovery.
-%
-% Input:
-%   pattern - File name pattern (can include wildcards like '*.mat')
-%   folder - Folder to search in
-%   priority - 'smallest', 'largest', or 'first' (for multiple matches)
-%
-% Output:
-%   filepath - Full path to found file (empty if not found)
-%   filename - Name of found file (empty if not found)
-%
-% Usage:
-%   [filepath, filename] = utilities.duneuro2zef.find_files('sp_vol_rgv_N*.mat', 'data/exported', 'smallest');
-%
-% See also: run.m
-
 function [filepath, filename] = find_files(pattern, folder, priority)
-% --- Zeffiro documentation header ---
-% utilities.duneuro2zef.find_files — Find files.
+%FIND_FILES  First/smallest/largest dir() match of a pattern in a folder.
 %
-% Purpose:
-%   Find files.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   pattern
-%   folder
-%   priority
+%   files = dir(fullfile(folder, pattern)), directories dropped. One match
+%   is returned as-is. Several matches: priority 'smallest'/'largest' by
+%   bytes, 'first' (dir order, typically alphabetical). Unknown priority
+%   falls back to first. Missing folder or no match → empty strings.
 %
-% Outputs:
-%   filepath
-%   filename
+%   [filepath, filename] = find_files(pattern, folder)
+%   [filepath, filename] = find_files(pattern, folder, priority)
 %
-% Calls (project):
-%   utilities.duneuro2zef.find_files
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[filepath, filename]] = utilities.duneuro2zef.find_files(pattern, folder, priority)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Used for hex mesh.mat and sp_vol_rgv_N*.mat in the Duneuro converter.
 
     if nargin < 3
         priority = 'first';

@@ -1,70 +1,21 @@
-# tools/plugins/LeadFieldProcessingTool/m
+# LeadFieldProcessingTool internals (`m`)
 
-## Purpose of this folder
+Implementations behind the App Designer **LeadFieldProcessingTool** bank (`zef.LeadFieldProcessingTool.bank`). Start script is `../LeadFieldProcessingTool_start.m`. User manual (menu, buttons, scripting): [parent README](../README.md).
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+This bank is **not** the Multi lead field tool (`LFBankTool/`, `zef.lf_bank_storage`). That tool can **recompute** `L` from stored sensors. This tool instead snapshots the live `L`, can left-multiply a magnetometer→gradiometer `tra`, and can noise-weight `vertcat` several rows. Use LFBank when you need Merge + recompute; use this tool when you already have `L` and want mag→grad or a noise-weighted stack.
 
-## Contents
+## Files
 
-MATLAB sources:
-- `zef_LeadfieldProcessingTool_loadTra.m` — **', 'select tra file', '***: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_LeadfieldProcessingTool_BankTableLabelUpdate.m` — **for zef_LeadFieldProcessingTool_TableUpdate_index2=1:size(zef.LeadFieldProcessingTool.app.BankTable**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_LeadfieldProcessingTool_aux2current.m` — **for zef_LeadFieldProcessingTool_index=1:zef.LeadFieldProcessingTool**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_LeadfieldProcessingTool_mag2Grad.m` — **for zef_LeadFieldProcessingTool_index=1:zef.LeadFieldProcessingTool**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_LeadfieldProcessingTool_combine.m` — **zef.LeadFieldProcessingTool**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_LeadfieldProcessingTool_combinebla.m` — **zef.LeadFieldProcessingTool**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_LeadfieldProcessingTool_refresh.m` — **zef.LeadFieldProcessingTool.app.currentLeadfield.Data={zef.lf_tag, zef.imaging_method_cell{zef.imaging_method}, size(zef.sensors, 1), size(zef.source_positions, 1), zef**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_LeadFieldProcessingTool_add.m` — **zef.LeadFieldProcessingTool.auxData.source_interpolation_ind = zef**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_LeadFieldProcessingTool_addCurrentData2bank.m` — **zef.LeadFieldProcessingTool.auxData.source_interpolation_ind = zef**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_LeadfieldProcessingTool_bank2aux_bank2auxIndex.m` — **zef.LeadFieldProcessingTool.auxData=zef.LeadFieldProcessingTool.bank{zef.LeadFieldProcessingTool**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_LeadfieldProcessingTool_delete.m` — **zef.LeadFieldProcessingTool.bank=zef.LeadFieldProcessingTool.bank(~cell2mat( zef.LeadFieldProcessingTool.app.BankTable**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_LeadFieldProcessingTool_aux2bank_new.m` — **zef.LeadFieldProcessingTool.bankPosition=zef.LeadFieldProcessingTool**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_LeadFieldProcessingTool_aux2bank_bankPosition.m` — **zef.LeadFieldProcessingTool.bank{zef.LeadFieldProcessingTool.bankPosition}=zef.LeadFieldProcessingTool**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_LeadfieldProcessingTool_updateTable.m` — **zef_LeadFieldProcessingTool_TableUpdate_index=zef.LeadFieldProcessingTool**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+| File | Role |
+|------|------|
+| `zef_LeadFieldProcessingTool_addCurrentData2bank.m` | **Add**: snapshot live `L` / sensors / measurements / noise / interpolation / compartment source flags; new `lead_field_id` |
+| `zef_LeadFieldProcessingTool_add.m` | Alternate add path (fills `auxData` then `aux2bank_new`); not the wired Add button |
+| `zef_LeadfieldProcessingTool_aux2current.m` | **Replace**: checked row → live `zef` |
+| `zef_LeadfieldProcessingTool_bank2aux_bank2auxIndex.m` | `bank{bank2auxIndex}` → `auxData` |
+| `zef_LeadFieldProcessingTool_aux2bank_new.m` / `_bankPosition.m` | Append or overwrite `auxData` in the bank |
+| `zef_LeadfieldProcessingTool_mag2Grad.m` / `_loadTra.m` | **Mag2Grad** / **loadTra**: `L ← tra*L` on checked rows, `imaging_method = 3`, new bank entry |
+| `zef_LeadfieldProcessingTool_combine.m` | **Combine**: each checked row’s `L` and measurements divided by per-channel std on Noise start:end, then `vertcat` |
+| `zef_LeadfieldProcessingTool_combinebla.m` | Same combine, selection column 5; **not** wired |
+| `zef_LeadfieldProcessingTool_delete.m` / `_refresh.m` / `_updateTable.m` / `_BankTableLabelUpdate.m` | Drop rows, rebuild table, edit label |
 
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-- **zef_LeadFieldProcessingTool_TableUpdate_index=zef.LeadFieldProcessingTool**: GUI callback or dialog (`zef_LeadFieldProcessingTool_TableUpdate_index=zef.LeadFieldProcessingTool`).
-
-## Programmatic usage
-
-From the project root:
-
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
-```
-
-Representative entry points in this folder:
-- `Call `', 'select tra file', '*` from MATLAB with the project root on the path.`
-- `Call `for zef_LeadFieldProcessingTool_TableUpdate_index2=1:size(zef.LeadFieldProcessingTool.app.BankTable` from MATLAB with the project root on the path.`
-- `Call `for zef_LeadFieldProcessingTool_index=1:zef.LeadFieldProcessingTool` from MATLAB with the project root on the path.`
-- `Call `for zef_LeadFieldProcessingTool_index=1:zef.LeadFieldProcessingTool` from MATLAB with the project root on the path.`
-- `Call `zef.LeadFieldProcessingTool` from MATLAB with the project root on the path.`
-- `Call `zef.LeadFieldProcessingTool` from MATLAB with the project root on the path.`
-- `Call `zef.LeadFieldProcessingTool.app.currentLeadfield.Data={zef.lf_tag, zef.imaging_method_cell{zef.imaging_method}, size(zef.sensors, 1), size(zef.source_positions, 1), zef` from MATLAB with the project root on the path.`
-- `Call `zef.LeadFieldProcessingTool.auxData.source_interpolation_ind = zef` from MATLAB with the project root on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Bank table checkbox column (index 6) selects rows for Replace / Mag2Grad / Combine / Delete.

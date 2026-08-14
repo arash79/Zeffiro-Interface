@@ -1,54 +1,20 @@
-# +utilities/+cluster/+examples
+# Cluster inverse examples
 
-## Purpose of this folder
-
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
-
-## Contents
-
-MATLAB sources:
-- `eloreta_workflow.m` — **utilities.cluster.examples.eloreta_workflow**: Example or study script demonstrating eloreta_workflow.
-- `kalman_workflow.m` — **utilities.cluster.examples.kalman_workflow**: Example or study script demonstrating kalman_workflow.
-- `parameter_sweep.m` — **utilities.cluster.examples.parameter_sweep**: Example or study script demonstrating parameter_sweep.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+How to submit class inverse jobs after you already have a `zef` with `L` and measurements. These are functions, not GUI demos. They need `parallel.Cluster` (Parallel Computing Toolbox). `parameter_sweep` and `configure_cluster_profile` assume a CSC-style `parcluster`.
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+addpath(fileparts(which('zeffiro_interface')));
+% zef = ... mesh + lead field + measurements ...
+cluster = parcluster;  % or utilities.cluster.configure_cluster_profile(...)
+
+[sub, bundles] = utilities.cluster.examples.eloreta_workflow(zef, cluster);
+[sub, bundles] = utilities.cluster.examples.kalman_workflow(zef, cluster, ...
+    "MethodParams", struct("method_type", "Basic Kalman filter"));
+
+sweep = struct("noise_level_vec", 30, "evolution_prior_vec", [20 25], "pm_snr_vec", 0);
+[sub, bundles] = utilities.cluster.examples.parameter_sweep(zef, cluster, sweep);
+
+[results, summary] = utilities.cluster.collect_inverse_results(sub);
 ```
 
-Representative entry points in this folder:
-- ``[[submissions, bundles]] = utilities.cluster.examples.eloreta_workflow(zef_inputs, cluster_profile, opts)` with project root and `src` on the path.`
-- ``[[submissions, bundles]] = utilities.cluster.examples.kalman_workflow(zef_inputs, cluster_profile, opts)` with project root and `src` on the path.`
-- ``[[submissions, bundles]] = utilities.cluster.examples.parameter_sweep(zef, cluster_profile, sweep, opts)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Each workflow: `zef_inverse_extract_bundle` → `submit_inverse_jobs`. Defaults write `./cluster_bundles` and `./cluster_results`. `eloreta_workflow` / `kalman_workflow` accept a struct array or cell of `zef` structs (`MethodId` overridable). `parameter_sweep` Cartesian-products `noise_level`, `inv_evolution_prior`, `pm_snr` into Kalman `MethodParams`.

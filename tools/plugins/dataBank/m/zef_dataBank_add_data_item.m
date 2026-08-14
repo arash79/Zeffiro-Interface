@@ -1,38 +1,32 @@
 function zef = zef_dataBank_add_data_item(zef,data_type,parent_node_name,node_name)
-% --- Zeffiro documentation header ---
-% zef_dataBank_add_data_item — Zef data Bank add data item.
+%ZEF_DATABANK_ADD_DATA_ITEM  Programmatic Add: select parent by name, set Entrytype, rename.
 %
-% Purpose:
-%   Zef data Bank add data item.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   data_type
-%   parent_node_name
-%   node_name
+%   Not a button. Needs the Data Bank App already open (zef_start_dataBank).
+%   Refreshes the uitree, selects the child whose Text equals
+%   parent_node_name (empty → root), sets Entrytype to data_type, then
+%   zef_dataBank_addButtonPress. The new hash is the setdiff of hashList
+%   before/after; that node's .name is set to node_name. Used by duneuro
+%   EEG_to_databank / MEG_to_databank to create a custom parent plus data
+%   and leadfield children (getData has no custom case, so that parent
+%   stores only .type).
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_add_data_item(zef, data_type, parent_node_name, node_name)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef               - session with dataBank.app and tree.
+%     data_type         - char in Entrytype.Items, or a 1-based index into Items.
+%     parent_node_name  - uitree Text to select, or [] for the root.
+%     node_name         - char stored as tree.(new_hash).name.
 %
-% Calls (project):
-%   zef_dataBank_addButtonPress
-%   zef_dataBank_add_data_item
-%   zef_dataBank_refreshTree
-%   zef_dataBank_treeSearch
+%   Output
+%     zef  - tree/uitree updated; nargout==0 → assignin base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dataBank_add_data_item(zef, data_type, parent_node_name, node_name)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_addButtonPress, zef_dataBank_treeSearch.
 
 zef = zef_dataBank_refreshTree(zef);
 h_tree = zef.dataBank.app.Tree;

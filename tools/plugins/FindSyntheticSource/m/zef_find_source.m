@@ -1,41 +1,22 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [meas_data] = zef_find_source(zef)
-% --- Zeffiro documentation header ---
-% zef_find_source — Zef find source.
+%ZEF_FIND_SOURCE  Dipole(s) through L → measurements (+ dB noise).
 %
-% Purpose:
-%   Zef find source.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   meas_data = zef_find_source(zef)
 %
-% Outputs:
-%   meas_data
+%   Snaps zef.inv_synth_source xyz to nearest zef.source_positions.
+%   Moment 1e-3 * amplitude * unit orientation. Dipole noise:
+%   10^(inv_synth_source(1,8)/20) (warns if that factor > 1). Optional
+%   zef.fss_bg_noise (dB) added the same way. If zef.time_sequence
+%   exists, one column per sample (plot_switch==1 uses selected sources
+%   only). nargin 0 → base zef. Does not assign zef.measurements (caller
+%   does).
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.find_synth_source (read)
-%   zef.fss_bg_noise (read)
-%   zef.fss_time_val (read)
-%   zef.inv_synth_source (read)
-%   zef.source_positions (read)
-%   zef.time_sequence (read)
-%   zef.time_variable (read)
-%
-% Calls (project):
-%   zef_find_source
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[meas_data] = zef_find_source(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_update_fss, zef_generate_time_sequence.
 
 if nargin == 0
     zef = evalin('base', 'zef');
@@ -62,6 +43,10 @@ if ~eval( 'isfield(zef,''time_sequence'')')
     s_f = 1e-3*repmat(s_a,1,3).*s_o;
     L = eval( 'zef.L');
     meas_data = zeros(size(L(:,1),1),1);
+    % Snap each dipole to the nearest source_positions row. Columns of L
+    % are Cartesian triplets, so source s_ind uses 3*(s_ind-1)+1:3.
+    % Amplitude is nAm → 1e-3 scaling above. Then add dipole and
+    % background noise as 10^(dB/20) * max|meas| * randn.
     for i = 1 : size(s_p,1)
         [s_min,s_ind] = min(sqrt(sum((source_positions - repmat(s_p(i,:),size(source_positions,1),1)).^2,2)));
         meas_data = meas_data + s_f(i,1)*L(:,3*(s_ind-1)+1) + s_f(i,2)*L(:,3*(s_ind-1)+2) + s_f(i,3)*L(:,3*(s_ind-1)+3);

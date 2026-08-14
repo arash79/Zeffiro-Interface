@@ -1,29 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isempty(zef.save_file_path)) & not(zef — If not(isempty(zef.save file path)) & not(zef.
+%ZEF_MERGE_LEAD_FIELD  Vertically concatenate an external L onto zef.L.
 %
-% Purpose:
-%   If not(isempty(zef.save file path)) & not(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.L (read, write)
-%   zef.aux (read, write)
-%   zef.file (read)
-%   zef.file_path (read)
-%   zef.save_file_path (read)
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `if not(isempty(zef.save_file_path)) & not(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   Script. Menu **Edit → Merge lead field with...** is wired to
+%   merge_lead_field (no first-party file of that name). This script is
+%   zef_merge_lead_field: uigetfile *.mat, load variable L, and if
+%   size(L,2)==size(zef.L,2) or zef.L is empty, zef.L = [zef.L; L].
+%   Column mismatch silently skips the append. Call as zef_merge_lead_field
+%   with zef in the workspace (or add a wrapper named merge_lead_field).
 
 if not(isempty(zef.save_file_path)) & not(zef.save_file_path==0)
     [zef.file zef.file_path] = uigetfile('*.mat','Merge lead field with...',zef.save_file_path);

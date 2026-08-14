@@ -1,35 +1,19 @@
 function zef = zef_GMModel_window(zef)
-% --- Zeffiro documentation header ---
-% zef_GMModel_window — Zef GMModel window.
+%ZEF_GMMODEL_WINDOW  GUIDE figure: Gaussian Mixture Model tool (SP).
 %
-% Purpose:
-%   Zef GMModel window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_GMModel_window(zef)
 %
-% Outputs:
-%   zef
+%   Layout. Title 'ZEFFIRO Interface: Gaussian Mixture Model tool'.
+%   Run → zef_GMModel_update then zef_cluster_reconstruction(zef)
+%   into GMModel.cluster_centres / dipole_moments / Param. Opened
+%   from zef_GMModel_open. Not the JL GMModelApp.
 %
-% Zef fields (observed):
-%   zef.GMModel (read)
-%
-% Calls (project):
-%   zef_GMModel_update
-%   zef_GMModel_window
-%   zef_cluster_reconstruction
-%
-% Side effects:
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_GMModel_window(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_GMModel_open, zef_cluster_reconstruction.
 
 h1 = figure(...
     'PaperUnits',get(0,'defaultfigurePaperUnits'),...

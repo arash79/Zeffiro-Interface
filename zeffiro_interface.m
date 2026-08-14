@@ -1,57 +1,83 @@
 function zef = zeffiro_interface(args)
-% --- Zeffiro documentation header ---
-% zeffiro_interface — Zeffiro interface.
+%ZEFFIRO_INTERFACE  Start Zeffiro Interface (GUI or batch) and return the project state.
 %
-% Purpose:
-%   Zeffiro interface.
-%   Folder: Repository root: startup (`zeffiro_interface`, `zeffiro_setup`), path configuration, and entry to `src/`, `+core`, `+inverse`, `+utilities`, `tools/plugins`, and bundled data.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   args
+%   Builds the session struct zef, puts src/, plugins, profiles, and GUI
+%   assets on the MATLAB path, optionally installs git submodules via
+%   zeffiro_setup, then runs zef_start. Name-value arguments can open a
+%   project, import a .zef segmentation, export a FEM mesh, run a trusted
+%   script, or shut down Zeffiro/MATLAB after startup.
 %
-% Outputs:
-%   zef
+%   zef = zeffiro_interface
+%   zef = zeffiro_interface(Name, Value, ...)
+%   zef = zeffiro_interface(Name=Value, ...)   % R2021a+
 %
-% Zef fields (observed):
-%   zef.cluster_path (read, write)
-%   zef.code_path (read, write)
-%   zef.data_path (read, write)
-%   zef.external_path (read, write)
-%   zef.file (read, write)
-%   zef.file_path (read, write)
-%   zef.gpu_count (read, write)
-%   zef.gpu_num (read)
-%   zef.h_mesh_tool (read)
-%   zef.h_mesh_visualization_tool (read)
-%   zef.h_zeffiro (read)
-%   zef.h_zeffiro_menu (read)
-%   zef.h_zeffiro_window_main (read)
-%   zef.new_empty_project (read, write)
-%   zef.program_path (read, write)
-%   … (7 more)
+%   Name-value arguments (all optional)
+%     zeffiro_restart     - logical, default false. If true, skip the
+%                           "already open" check so a new session can start.
+%     start_mode          - "display", "nodisplay", or "default". Controls
+%                           whether GUI windows are shown. Hidden windows
+%                           may still be created in the background.
+%     open_project        - path to a .mat project loaded after start.
+%                           Empty path defaults to data/; empty suffix to .mat.
+%     import_to_new_project
+%                         - path to a .zef segmentation imported into a new
+%                           empty project (zef_start_new_project).
+%     import_to_existing_project
+%                         - path to a .zef segmentation imported into the
+%                           current project.
+%     save_project        - path where the full project is saved via zef_save.
+%     export_fem_mesh     - path for zef_export_fem_mesh_as.
+%     open_figure         - path to a .fig opened with zef_import_figure.
+%                           Default folder is assets/fig/.
+%     open_figure_folder  - folder (relative to program_path) whose .fig
+%                           files are opened. The dir listing skips the
+%                           first two entries (typically . and ..).
+%     run_script          - string passed to eval after other I/O setup and
+%                           before save/export/exit. Treat as a security
+%                           hole: only pass trusted content.
+%     exit_zeffiro        - logical, default false. Calls zef_close_all on return.
+%     quit_matlab         - logical, default false. Calls quit force on return.
+%     use_github          - logical, default false. Forwarded into zef; zef_start
+%                           may run !git pull when this is true.
+%     use_gpu             - logical. Select gpuDevice(zef.gpu_num) when a GPU
+%                           is present. Missing fields are copied from args
+%                           by utilities.structs.copy_fields.
+%     use_gpu_graphic     - logical. GPU graphics acceleration flag stored on zef.
+%     gpu_num             - nonnegative integer GPU device index.
+%     use_display         - logical. Whether file dialogs are shown.
+%     parallel_processes  - positive integer worker count stored on zef.
+%     verbose_mode        - logical. Logger verbosity stored on zef.
+%     use_waitbar         - logical. Waitbar flag stored on zef.
+%     use_log             - logical. Log-file flag stored on zef.
+%     log_file_name       - string log path stored on zef.
+%     submodules          - string array of names from .gitmodules, or "all".
+%                           Passed to zeffiro_setup.
+%     skip_submodules     - logical, default false. Skip submodule setup.
+%     always_show_waitbar - logical, default false. Show waitbar even when
+%                           other windows are suppressed.
 %
-% Calls (project):
-%   utilities.structs.copy_fields
-%   zef_build_compartment_table
-%   zef_close_all
-%   zef_export_fem_mesh_as
-%   zef_import_figure
-%   zef_import_segmentation
-%   zef_load
-%   zef_save
-%   zef_start
-%   zef_start_log
+%   Output
+%     zef  - session struct (paths, GPU flags, GUI handles, project data).
+%            If called with no output argument, zef is assigned into the
+%            base workspace and cleared locally so ans is not duplicated.
 %
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - parallel/cluster
-%   - reads/updates `zef` struct fields
+%   Side effects
+%     Adds project paths, may write src/core/zef_start_config.m via
+%     zeffiro_setup, creates GUI figures, may load default_project.mat,
+%     and may mutate GPU device, files, and the base workspace.
 %
-% Workflow:
-%   GUI: Primary startup: paths, `zef` struct, optional CLI import/save/export.
-%   Programmatic: `[zef] = zeffiro_interface(args)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Failure
+%     Errors if zef already exists in the base workspace and
+%     zeffiro_restart is false. Errors if zef_start_config cannot be run
+%     (typically because zeffiro_setup was never executed). Warns and
+%     continues if gpu_num does not match a device.
+%
+%   See also zeffiro_setup, zef_start, zef_close_all, zef_load, zef_save.
 
 arguments
 
@@ -122,7 +148,11 @@ if not(args.zeffiro_restart) && evalin("base","exist('zef', 'var');")
 
 end
 
-addpath([fileparts(mfilename('fullpath')) filesep 'src' filesep 'core']);
+root_path = fileparts(mfilename('fullpath'));
+addpath(fullfile(root_path, 'src', 'core'));
+% zef_close_all restores R2025a+ WindowStyle via zef_window_manager, which
+% lives next to the other GUI helpers, not in src/core.
+addpath(fullfile(root_path, 'src', 'gui', 'helpers'));
 
 zef_close_all();
 
@@ -223,11 +253,11 @@ end
 
 %% Finally, do the things specified by the input arguments.
 
-% Choose GPU device, if available.
+% Choose GPU device, if available. gpuDeviceCount requires Parallel
+% Computing Toolbox; zef_gpu_count returns 0 when it is missing.
+zef.gpu_count = zef_gpu_count();
 
-zef.gpu_count = gpuDeviceCount;
-
-if zef.gpu_count > 0 && zef.use_gpu
+if zef.gpu_count > 0 && isfield(zef, 'use_gpu') && zef.use_gpu
 
     try
 

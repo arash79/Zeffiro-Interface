@@ -1,30 +1,32 @@
 function [vertices, faces, surface_data, surface] = zef_bst_2_zef_surface(varargin)
-% --- Zeffiro documentation header ---
-% zef_bst_2_zef_surface — Zef bst 2 zef surface.
+%ZEF_BST_2_ZEF_SURFACE  Read Brainstorm subject surface geometry into Zeffiro units.
 %
-% Purpose:
-%   Zef bst 2 zef surface.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Uses Brainstorm bst_get to locate subject surfaces. With surface index
+%   and optional property names, loads the surface MAT file and returns
+%   Vertices scaled by 1000 (m to mm) and Faces. Without index, returns
+%   the Surface struct array for browsing.
 %
-% Outputs:
-%   vertices
-%   faces
-%   surface_data
-%   surface
+%   surface = zef_bst_2_zef_surface()
+%   surface = zef_bst_2_zef_surface(subject)
+%   [vertices, faces] = zef_bst_2_zef_surface(subject, surface_ind)
+%   [vertices, faces, surface_data] = zef_bst_2_zef_surface(subject, surface_ind, properties)
 %
-% Calls (project):
-%   zef_bst_2_zef_surface
+%   Inputs
+%     subject        - Brainstorm subject index (optional).
+%     surface_ind    - index into Subject.Surface (optional).
+%     properties     - cell of field names to load from the surface file.
 %
-% Side effects:
-%   - filesystem I/O
+%   Outputs
+%     vertices, faces - mesh arrays when surface_ind is given.
+%     surface_data    - loaded struct or selected fields.
+%     surface         - Surface metadata array when mesh not loaded.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[vertices, faces, surface_data]] = zef_bst_2_zef_surface(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_2_zef_atlas, zef_import_segmentation.
 
 surface_data = struct;
 surface_ind_aux = [];

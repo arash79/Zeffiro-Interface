@@ -1,64 +1,31 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef_plot_volume(varargin)
-% --- Zeffiro documentation header ---
-% zef_plot_volume — Renders or updates a plot_volume figure from current `zef` state.
+%ZEF_PLOT_VOLUME  Draw reconstruction / parameter field on Figure-tool axes1.
 %
-% Purpose:
-%   Renders or updates a plot_volume figure from current `zef` state.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Function. evalin('base','zef'). Draws into zef.h_axes1 (Tag='axes1').
+%   volumetric_distribution_mode: 1 = zef.reconstruction, 2/3 = real/imag
+%   of the Mesh-vis parameter (replicated to 3 Cartesian components /
+%   sqrt(3)). Patches: Tag='reconstruction' (CData from the field),
+%   Tag='surface' (compartments), Tag='sensor'. Colorbar Tag=
+%   'rightColorbar'. Cones via zef_plot_cone_field (Tag='cones').
+%   Clipping: zef.cp_on / cp2_on / cp3_on and plane coefficients from
+%   the Mesh visualization tool. Frames via zef_store_cdata.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef.inv_scale 1 = 20*log10 (dB, floored by inv_dynamic_range),
+%   2 = linear, 3 = sqrt. visualization_type (Mesh vis Type dropdown):
+%   1 domain labels, 2 volume distribution, 4 parcellation on the cut
+%   volume. reconstruction_type 1–7: Amplitude / Normal / Tangential /
+%   Normal constraint −/+ / Value / Amplitude smoothed. cp_mode 1–4:
+%   Cut out / Cut in / … & whole brain. Then zef_set_sliders_plot(1).
+%   Called from zef_visualize_volume. Unused varargin is historical.
 %
-% Zef fields (observed):
-%   zef.active_compartment_ind (read)
-%   zef.attach_electrodes (read)
-%   zef.axes_visible (read)
-%   zef.azimuth (read)
-%   zef.brain_transparency (read)
-%   zef.cam_va (read)
-%   zef.colormap_cell (read)
-%   zef.colormap_size (read)
-%   zef.colortune_param (read)
-%   zef.compartment_tags (read)
-%   zef.cp2_a (read)
-%   zef.cp2_b (read)
-%   zef.cp2_c (read)
-%   zef.cp2_d (read)
-%   zef.cp2_on (read)
-%   … (58 more)
-%
-% Calls (project):
-%   zef_attach_sensors_volume
-%   zef_clipping_plane
-%   zef_fix_sensors_get_functions_array_size
-%   zef_get_profile_parameters
-%   zef_minimal_mesh
-%   zef_plot_cone_field
-%   zef_plot_dpq
-%   zef_plot_volume
-%   zef_set_sliders_plot
-%   zef_smooth_field
-%   zef_store_cdata
-%   zef_surface_mesh
-%   … (2 more)
-%
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_plot_volume(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_visualize_volume, zef_plot_meshes, zef_plot_cone_field.
 zef = evalin('base','zef');
 
 f_ind = 1;
@@ -367,6 +334,8 @@ for k = 1 : length(compartment_tags)
     end
 end
 
+% Visible tetrahedra only, then clip by cp / cp2 / cp3 on tet centroids.
+% cp_mode 1 Cut out, 2 Cut in, 3/4 also union the active (brain) tets.
 johtavuus = eval('zef.domain_labels');
 
 if eval('zef.use_gpu_graphic') == 1 & eval('zef.use_gpu') == 1 & eval('zef.gpu_count') > 0
@@ -429,6 +398,8 @@ else
 end;
 I_aux = I(aux_ind);
 
+% Exposed faces of the (clipped) tet subset. reconstruction CData is
+% interpolated onto these triangles; domain-label colours use johtavuus.
 [surface_triangles, ~, tetra_ind] = zef_surface_mesh(tetra, [], [], 'graphics');
 
 n_compartments = i;
@@ -491,6 +462,7 @@ if iscell(volumetric_distribution) &&  eval('zef.visualization_type') == 2
     end
     if not(ismember(eval('zef.reconstruction_type'), [6]))
         if eval('zef.inv_scale') == 1
+            % dB: 20*log10 of amplitude, floored by inv_dynamic_range (first occurrence of this block).
             min_rec_log10 = 20*log10(max(min_rec,max_abs_reconstruction/eval('zef.inv_dynamic_range')));
             max_rec = -min_rec_log10  + 20*log10(max(max_rec,max_abs_reconstruction/eval('zef.inv_dynamic_range')));
             min_rec = 0;
@@ -555,7 +527,10 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
             h_colorbar = [];
         end
         hold on;
-        %**************************************************************************
+        % visualization_type 2 = Distribution (volume), 4 = Parcellation:
+        % map reconstruction onto cut-surface triangles I_3. Parameter
+        % modes 2/4 colour every tet, not only active_compartment_ind.
+        % reconstruction_type 6 ("Value") uses mean of xyz / √3.
         if ismember(eval('zef.visualization_type'),[2,4])
             if ismember(eval('zef.volumetric_distribution_mode'), [2,4])
                 active_compartment_ind_aux = [1:eval('size(zef.tetra,1)')]';
@@ -601,12 +576,16 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
             reconstruction = reconstruction(:);
             reconstruction = reshape(reconstruction,3,length(reconstruction)/3);
 
+            % Mesh-vis Component: 1/7 amplitude ||xyz||; 6 mean xyz/√3;
+            % 2–5 keep Cartesian components for the normal/tangential split.
             if ismember(eval('zef.reconstruction_type'),[1 7])
                 reconstruction = sqrt(sum(reconstruction.^2))';
             elseif eval('zef.reconstruction_type') == 6
                 reconstruction = (1/sqrt(3))*sum(reconstruction)';
             end
             if ismember(eval('zef.reconstruction_type'), [1 6 7])
+                % Average the 4 tet-node nearest-source values (size = 4
+                % after zef_source_interpolation). print_meshes hard-codes /4.
                 reconstruction = sum(reconstruction(s_i_ind),2)/size(s_i_ind,2);
                 reconstruction = reconstruction(I_2);
                 I_2_b_rec = I_2;
@@ -644,6 +623,8 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                 n_vec_aux = n_vec_aux./repmat(sqrt(sum(n_vec_aux.^2,2)),1,3);
             end
 
+            % Type 2: |dipole · n|. Type 3 overwrites with a per-axis
+            % |n| remainder (not a true tangent-plane projection).
             if ismember(eval('zef.reconstruction_type'), [2 3 4 5])
                 reconstruction = sqrt((rec_x.*n_vec_aux(:,1)).^2 + (rec_y.*n_vec_aux(:,2)).^2 + (rec_z.*n_vec_aux(:,3)).^2);
             end
@@ -652,6 +633,7 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                 reconstruction = sqrt((rec_x - rec_x.*abs(n_vec_aux(:,1))).^2 + (rec_y - rec_y.*abs(n_vec_aux(:,2))).^2 + (rec_z - rec_z.*abs(n_vec_aux(:,3))).^2);
             end
 
+            % Types 4/5: zero faces whose signed normal is + or −.
             if eval('zef.reconstruction_type') == 4
                 aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                 I_aux_rec = find(aux_rec > 0);
@@ -687,6 +669,11 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
             if not(ismember(eval('zef.visualization_type'),[4]))
                 if eval('zef.use_parcellation')
 
+                    % Overlay (Type 2 Distribution): Settings → Additional
+                    % options parcellation_type. 1 Point-wise (skip); 2–4
+                    % quantile / sqrt / cbrt; 5 mean. Then mask by selected
+                    % parcels (reconstruction_p_2). Type 4 visualization
+                    % colours by parcel index instead and skips this block.
                     if eval('zef.parcellation_type') > 1
                         rec_aux = zeros(size(reconstruction));
                         if eval('zef.parcellation_type') == 2
@@ -832,6 +819,7 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
     end
 
     hold on
+    % Keep sensor glyphs above tissue patches (Tag='sensor').
     sensor_patches = findobj(eval('zef.h_axes1'),'Type','Patch','Tag','sensor');
     uistack(sensor_patches,'top');
     try
@@ -885,6 +873,10 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
         reconstruction = reconstruction(:);
         reconstruction = reshape(reconstruction,3,length(reconstruction)/3);
 
+        % Movie-frame pass of the same Component mapping as the first
+        % draw: 1/7 amplitude, 6 xyz/√3, 2–5 Cartesian then |· n| /
+        % per-axis remainder / signed-normal mask. Average over
+        % size(s_i_ind,2) (4 tet nodes after zef_source_interpolation).
         if ismember(eval('zef.reconstruction_type'),[1 7])
             reconstruction = sqrt(sum(reconstruction.^2))';
         elseif eval('zef.reconstruction_type') == 6

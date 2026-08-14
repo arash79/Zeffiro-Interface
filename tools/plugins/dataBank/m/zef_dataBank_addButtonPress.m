@@ -1,35 +1,28 @@
 function zef = zef_dataBank_addButtonPress(zef)
-% --- Zeffiro documentation header ---
-% zef_dataBank_addButtonPress — Zef data Bank add Button Press.
+%ZEF_DATABANK_ADDBUTTONPRESS  Snapshot live zef onto the selected uitree node.
 %
-% Purpose:
-%   Zef data Bank add Button Press.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   addButton.ButtonPushedFcn in zef_open_dataBank. Reads Entrytype.Value,
+%   calls zef_dataBank_getData, then zef_dataBank_add under the selected
+%   node's NodeData (or 'node' if nothing is selected). Creates a uitreenode
+%   with Text = tree.(hash).name and the treeMenu context menu. If
+%   zef.dataBank.save2disk is 'On', writes folder/hash.mat and replaces
+%   .data with a matfile handle. Refuses more than one selected parent.
+%   Also used programmatically by zef_dataBank_add_data_item.
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_addButtonPress(zef)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef  - session with dataBank.app, tree, Entrytype. nargin==0 → base.
 %
-% Calls (project):
-%   zef_dataBank_add
-%   zef_dataBank_addButtonPress
-%   zef_dataBank_getData
+%   Output
+%     zef  - tree and uitree updated. nargout==0 → assignin base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dataBank_addButtonPress(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_add, zef_dataBank_getData, zef_dataBank_add_data_item.
 
 if nargin == 0
     zef = evalin('base','zef');

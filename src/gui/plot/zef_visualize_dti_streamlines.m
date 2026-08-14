@@ -26,60 +26,20 @@
 %   h_streamlines - Handle to streamline plot objects
 
 function h_streamlines = zef_visualize_dti_streamlines(zef, seed_point)
-% --- Zeffiro documentation header ---
-% zef_visualize_dti_streamlines — Renders or updates a visualize_dti_streamlines figure from current `zef` state.
+%ZEF_VISUALIZE_DTI_STREAMLINES  Mesh visualization → **Visualize DTI streamlines**.
 %
-% Purpose:
-%   Renders or updates a visualize_dti_streamlines figure from current `zef` state.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   seed_point
+%   Function. ButtonPushedFcn of h_pushbutton_dti_streamlines. Requires
+%   zef.freesurfer_fa_data (and typically v1 / register.dat). Transforms
+%   a seed (default mesh center) from mesh space to FA voxels, runs
+%   zef_dti_streamlines, transforms tracks back, and plots on the current
+%   axes (Figure-tool axes1 if that is gca). nargin==0 reads zef from base.
 %
-% Outputs:
-%   h_streamlines
-%
-% Zef fields (observed):
-%   zef.auto_axes_limits (read)
-%   zef.dti_dwi_vox2ras_tkr (read)
-%   zef.dti_ref_center (read)
-%   zef.dti_ref_geometry (read)
-%   zef.dti_ref_vox2ras (read)
-%   zef.dti_ref_vox2ras_tkr (read)
-%   zef.dti_streamline_alpha (read)
-%   zef.dti_streamline_color (read)
-%   zef.dti_streamline_direction_coloring (read)
-%   zef.dti_streamline_fa_thresh (read)
-%   zef.dti_streamline_linewidth (read)
-%   zef.dti_streamline_max_steps (read)
-%   zef.dti_streamline_n_dir (read)
-%   zef.dti_streamline_roi_radius (read)
-%   zef.dti_streamline_step_size (read)
-%   … (12 more)
-%
-% Calls (project):
-%   zef_dti_get_mesh2voxel
-%   zef_dti_streamlines
-%   zef_freesurfer_load_fa
-%   zef_freesurfer_load_v1
-%   zef_freesurfer_read_register_dat
-%   zef_freesurfer_read_volume_geometry
-%   zef_visualize_dti_streamlines
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - creates/updates figures
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[h_streamlines] = zef_visualize_dti_streamlines(zef, seed_point)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_mesh_visualization_tool.
 h_waitbar = [];
 try
     h_waitbar = zef_waitbar(0, 1, 'Initializing FreeSurfer DTI streamline visualization...');

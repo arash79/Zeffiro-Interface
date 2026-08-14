@@ -1,30 +1,24 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if isempty(zef — If isempty(zef.
+%ZEF_PLUGIN  Wire profile plugin entries into the Zeffiro menu tool.
 %
-% Purpose:
-%   If isempty(zef.
-%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_menu_1 (read, write)
-%   zef.h_menu_2 (read, write)
-%   zef.h_zeffiro_menu (read)
-%   zef.plugin_cell (read, write)
-%   zef.profile_name (read)
-%   zef.program_path (read)
+%   Script. Reads profile/<profile_name>/zeffiro_plugins.ini (CSV) when
+%   zef.plugin_cell is empty. Each row is {label, parent menu Tag, callback}.
+%   Existing matching uimenu items get their Callback replaced; otherwise a
+%   child uimenu is created. Temporary handles h_menu_1/h_menu_2 are removed
+%   from zef afterwards.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Workspace
+%     zef  - session with h_zeffiro_menu, program_path, profile_name.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if isempty(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   Notes
+%     Warns and skips a row when the parent Tag is missing. Callback strings
+%     always append "; zef_update;".
+%
+%   See also zef_menu_tool, zef_update.
 
 if isempty(zef.plugin_cell)
     zef.plugin_cell = readcell([zef.program_path '/profile/' zef.profile_name '/zeffiro_plugins.ini'],'filetype','text','delimiter',',');

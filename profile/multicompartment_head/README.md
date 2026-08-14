@@ -1,43 +1,17 @@
-# profile/multicompartment_head
+# `multicompartment_head` (default profile)
 
-## Purpose of this folder
+Default EEG/MEG/EIT/TES head profile. `profile/zeffiro_interface.ini` sets `profile_name` to this folder. Switch from the segmentation tool **Profile:** dropdown (`h_profile_name`); that only stores `zef.profile_name` — reload INIs from the matching Settings / Mesh tool **Update from profile** buttons, or restart Zeffiro.
 
-Startup profiles and `zeffiro_plugins.ini` that attach plugin menus.
+Parent overview: [`profile/README.md`](../README.md).
 
-## Contents
+## Five INIs
 
-Other files:
-- `zeffiro_forward_simulation.ini`
-- `zeffiro_init.ini`
-- `zeffiro_parameters.ini`
-- `zeffiro_plugins.ini`
-- `zeffiro_segmentation.ini`
+| File | Loaded by | This profile |
+|------|-----------|--------------|
+| `zeffiro_plugins.ini` | `zef_plugin` | Full EEG/MEG inverse set: SL1, EXP Lasso, dual GMM (SP/JL), Kalman, NSE, DTI, synthetic source patch. **No** `exp_ias_map_estimation_multires`. |
+| `zeffiro_init.ini` | `zef_apply_init_profile` | Initial `zef` fields after `zef_init`. |
+| `zeffiro_segmentation.ini` | `zef_init_compartments` | **Header only** (empty compartment table). Import `data/segmentations/multicompartment_head_project/` for anatomy. |
+| `zeffiro_parameters.ini` | `zef_apply_parameter_profile` | `sigma` On (0.33 S/m). `rho` Off. Sensor CEM radii/impedance On. |
+| `zeffiro_forward_simulation.ini` | Mesh tool table | Isotropic and anisotropic EEG, MEG magnetometer/gradiometer, EIT, tES (`zef_*_lead_field_*`). |
 
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+There is no `zeffiro_interface.ini` here — that file lives only in `profile/`.

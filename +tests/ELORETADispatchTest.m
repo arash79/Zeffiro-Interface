@@ -1,28 +1,16 @@
 classdef ELORETADispatchTest < matlab.unittest.TestCase
-% --- Zeffiro documentation header ---
-% tests.ELORETADispatchTest — Automated test: ELORETADispatchTest.
+%ELORETADISPATCHTEST  Registry id eloreta is class ELORETAInverter; local zef_inverse_run fills reconstruction.
 %
-% Purpose:
-%   Automated test: ELORETADispatchTest.
-%   Folder: MATLAB unit and integration tests for refactored inverse dispatch, lead fields, cluster jobs, and legacy/class parity.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
+%   Synthetic zef. Asserts inverse_method_registry("eloreta") has
+%   execution_kind "class" and class_name inverse.ELORETAInverter;
+%   dispatch_inverse and zef_inverse_run(..., "eloreta", "execution",
+%   "local") write reconstruction; dspm dispatch still works afterward.
 %
-% Calls (project):
-%   utilities.cluster.dispatch_inverse
-%   utilities.cluster.inverse_method_registry
-%   zef_inverse_extract_bundle
-%   zef_inverse_run
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `tests.ELORETADispatchTest(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
 
     methods (Test)
         function testRegistryResolvesEloreta(testCase)

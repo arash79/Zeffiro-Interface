@@ -1,50 +1,23 @@
 function nse_field = zef_nse_haemodynamic_response_solver(zef, nse_field,nodes,tetra,domain_labels,mvd_length)
-% --- Zeffiro documentation header ---
-% zef_nse_haemodynamic_response_solver — Zef nse haemodynamic response solver.
+%ZEF_NSE_HAEMODYNAMIC_RESPONSE_SOLVER  NSE solver_type 3 (this plugin, not src/forward/nse).
 %
-% Purpose:
-%   Zef nse haemodynamic response solver.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nse_field
-%   nodes
-%   tetra
-%   domain_labels
-%   mvd_length
+%   Time-dependent haemodynamic response on artery/capillary domains.
+%   Called from zef_nse_run_solver when solver_type == 3 (that script also
+%   sets nse_type=2 and microcirculation_model=1). Does not write zef.L.
+%   Nodes are converted mm→m. Pulse amplitude is mmHg → Pa (101325/760).
+%   Writes nse_field.bp_vessels, bv_vessels_1/2/3, mu_vessels,
+%   bf_capillaries, bf_capillaries_background. Balloon / NVC ODE via
+%   zef_nse_balloon_model_solver.
 %
-% Outputs:
-%   nse_field
+%   nse_field = zef_nse_haemodynamic_response_solver(zef, nse_field, nodes, tetra, domain_labels, mvd_length)
 %
-% Zef fields (observed):
-%   zef.inv_synth_source (read)
+%   See also zef_nse_run_solver, zef_nse_balloon_model_solver, zef_nse_poisson.
 %
-% Calls (project):
-%   zef_find_adjacent_tetra
-%   zef_get_submesh
-%   zef_nse_balloon_model_solver
-%   zef_nse_haemodynamic_response_solver
-%   zef_nse_signal_pulse
-%   zef_surface_mesh
-%   zef_surface_scalar_matrix_FF
-%   zef_surface_scalar_vector_F
-%   zef_surface_scalar_vector_Fn
-%   zef_volume_barycentric
-%   zef_volume_scalar_matrix_FF
-%   zef_volume_scalar_matrix_FG
-%   … (3 more)
-%
-% Side effects:
-%   - GPU
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[nse_field] = zef_nse_haemodynamic_response_solver(zef, nse_field, nodes, tetra, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 nse_field.bp_vessels = cell(0);
 nse_field.bv_vessels_1 = cell(0);
@@ -67,6 +40,7 @@ gamma_val = nse_field.nvc_flow_based_elimination;
 zeta_val = nse_field.neural_drive;
 nvc_mollification = nse_field.nvc_mollification;
 
+% mmHg→Pa, millimetres→metres, ml/min→m^3/s.
 hgmm_conversion = 101325/760;
 mm_conversion = 0.001;
 ml_min_conversion = 1E-6/60;
@@ -375,6 +349,7 @@ for i = 1 : n_time
    I_boundary = find(bf_vessels_to_capillaries);
    %total_flow_estimate = (sum(((p + pressure_reference)/hgmm_conversion).*w_3)/sum_w_3)*nse_field.total_flow/nse_field.pressure;
    %r = total_flow_estimate*bf_vessels_to_capillaries./sum(pressure_reference.*w_2(I_boundary));
+   % Balloon / NVC flow increment (plugin helper, not src/forward/nse).
    [~, d_balloon] = zef_nse_balloon_model_solver(time_vec(i), kappa_val, gamma_val, zeta_val, nvc_mollification, time_vec(1), time_vec(end));
 
    if nse_field.use_gpu

@@ -1,28 +1,4 @@
 function sensitivity_map = zef_sensitivity_map_mne( ...
-% --- Zeffiro documentation header ---
-% examples.studies.santtus_peeling_article.helpers.sensitivity_map — Example or study script demonstrating sensitivity_map.
-%
-% Purpose:
-%   Example or study script demonstrating sensitivity_map.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
-%
-% Inputs:
-%   project_struct
-%   weighting_type
-%   n_reconstructions
-%   noise_level
-%   diff_type
-%   dispersion_radius
-%
-% Calls (project):
-%   zef_minimum_norm_estimation
-%   zef_rec_diff
-%   zef_sensitivity_map_mne
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `examples.studies.santtus_peeling_article.helpers.sensitivity_map(project_struct, weighting_type, n_reconstructions, noise_level, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
     project_struct, ...
     weighting_type, ...
     n_reconstructions, ...
@@ -30,6 +6,16 @@ function sensitivity_map = zef_sensitivity_map_mne( ...
     diff_type, ...
     dispersion_radius ...
 )
+%ZEF_SENSITIVITY_MAP_MNE  Monte Carlo MNE sensitivity maps for the Santtus peeling study.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Repeatedly perturbs dipole locations, runs MNE reconstructions, and
+%   records localization error metrics (distance, angle, magnitude, dispersion).
+%
 
     arguments
 

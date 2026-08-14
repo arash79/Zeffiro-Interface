@@ -1,28 +1,31 @@
 function [newtree, listOld, listNew] = zef_dataBank_reorderTree(tree)
-% --- Zeffiro documentation header ---
-% zef_dataBank_reorderTree — Zef data Bank reorder Tree.
+%ZEF_DATABANK_REORDERTREE  Depth-first renumber of hashes starting at node_1.
 %
-% Purpose:
-%   Zef data Bank reorder Tree.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tree
+%   Legacy helper to close gaps after deletions (numbering starts at 1
+%   with no jumps). hash2tree currently calls sortTree + rebuildTree
+%   instead; the reorderTree calls there are commented out. Not a button.
+%   Walks remaining fieldnames: a unique prefix is a finished node (emit
+%   and go up); multiple matches are children (take the smallest next
+%   index; a unique child is emitted, a family goes one level deeper).
 %
-% Outputs:
-%   newtree
-%   listOld
-%   listNew
+%   [newtree, listOld, listNew] = zef_dataBank_reorderTree(tree)
 %
-% Calls (project):
-%   zef_dataBank_number2hash
-%   zef_dataBank_reorderTree
+%   Inputs
+%     tree  - zef.dataBank.tree.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[newtree, listOld, listNew]] = zef_dataBank_reorderTree(tree)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     newtree  - payloads under the new hashes (.hash updated).
+%     listOld  - N-by-1 cell of original hashes in visit order.
+%     listNew  - N-by-1 cell of corresponding new hashes.
+%
+%   See also zef_dataBank_rebuildTree, zef_dataBank_number2hash.
 
+% Reorder so numbering starts at 1 and continues without jumping.
 array=[];
 arrayToGive=1;
 

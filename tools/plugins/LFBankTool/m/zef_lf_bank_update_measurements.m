@@ -1,27 +1,15 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef.lf_item_selected = get(zef — Zef.lf item selected = get(zef.
+%ZEF_LF_BANK_UPDATE_MEASUREMENTS  Copy live zef.measurements onto selected items.
 %
-% Purpose:
-%   Zef.lf item selected = get(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.lf_bank_storage (read)
-%   zef.lf_item_selected (read)
-%   zef.measurements (read)
+%   Script. Update-measurements button. Writes
+%   lf_bank_storage{i}.measurements = zef.measurements for selected
+%   indices. Then zef_update_lf_bank_tool. Does not touch L.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.lf_item_selected = get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_lf_bank_update_noise_data.
 
 zef.lf_item_selected = get(zef.h_lf_item_list,'value');
 

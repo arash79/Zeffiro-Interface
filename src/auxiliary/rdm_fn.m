@@ -1,22 +1,18 @@
 function rdm = rdm_fn(La, Lfem)
-% --- Zeffiro documentation header ---
-% rdm_fn — Rdm fn.
+%RDM_FN  Relative difference measure, one value per lead-field column.
 %
-% Purpose:
-%   Rdm fn.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   La
-%   Lfem
+%   rdm = rdm_fn(La, Lfem)
 %
-% Outputs:
-%   rdm
+%   Column-normalizes La and Lfem by Euclidean column norms, then
+%   rdm(j) = ||Lfem(:,j)/||.|| - La(:,j)/||.||||_2. Used to compare an
+%   analytic sphere field to FEM L. Not on the Zeffiro menu.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[rdm] = rdm_fn(La, Lfem)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also mag_fn, zef_lead_field_eeg_multilayer_sphere.
 
 arguments
     La double

@@ -1,27 +1,19 @@
 function distance_vec = zef_distance_to_mesh(p,nodes,triangles)
-% --- Zeffiro documentation header ---
-% zef_distance_to_mesh — Zef distance to mesh.
+%ZEF_DISTANCE_TO_MESH  Min distance from each point to a triangle surface.
 %
-% Purpose:
-%   Zef distance to mesh.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   p
-%   nodes
-%   triangles
+%   distance_vec = zef_distance_to_mesh(p, nodes, triangles)
 %
-% Outputs:
-%   distance_vec
+%   p N-by-3, nodes M-by-3, triangles K-by-3 indices into nodes. For each
+%   point: min vertex distance, then min |plane offset| over triangles
+%   whose barycentric (lambda_1,lambda_2) lie in (0,1). Returns 1-by-N.
+%   Duplicate under mesh_averaging/. Not on the menu.
 %
-% Calls (project):
-%   zef_distance_to_mesh
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[distance_vec] = zef_distance_to_mesh(p, nodes, triangles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_distance_to_resection.
 
 nodes = nodes';
 c = nodes(:,triangles(:,1));

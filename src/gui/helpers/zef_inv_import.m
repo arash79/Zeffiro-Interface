@@ -1,36 +1,16 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isempty(zef.save_file_path)) & not(zef — If not(isempty(zef.save file path)) & not(zef.
+%ZEF_INV_IMPORT  Import measurements, reconstruction, current pattern, or noise.
 %
-% Purpose:
-%   If not(isempty(zef.save file path)) & not(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.current_pattern (read, write)
-%   zef.file (read)
-%   zef.file_path (read)
-%   zef.file_type (read, write)
-%   zef.h_inv_data_segment (read)
-%   zef.imaging_method (read)
-%   zef.inv_bg_data (read)
-%   zef.inv_import_type (read, write)
-%   zef.measurements (read, write)
-%   zef.reconstruction (read, write)
-%   zef.save_file_path (read)
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `if not(isempty(zef.save_file_path)) & not(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   Script. Menu Import → Import measurement data (inv_import_type=1),
+%   Import reconstruction (2), Import current pattern (3), Import noise
+%   data (4). uigetfile .mat/.dat; writes zef.measurements, reconstruction,
+%   current_pattern, or noise as appropriate.
 if not(isempty(zef.save_file_path)) & not(zef.save_file_path==0)
     [zef.file zef.file_path zef.file_type] = uigetfile({'*.mat','*.dat'},'Import',zef.save_file_path);
 else

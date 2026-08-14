@@ -18,45 +18,24 @@
 %
 % Copyright © 2025- Joonas Lahtinen
 function [MethodClassObj] = ClassGMModeling(MethodClassObj,reconstruction,zef,args)
-% --- Zeffiro documentation header ---
-% plugins.ClassGMM.ClassGMModeling — Class GMModeling.
+%CLASSGMMODELING  Fit a GMM to a reconstruction; store on MethodClassObj.GMM.
 %
-% Purpose:
-%   Class GMModeling.
-%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
+%   Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   MethodClassObj
-%   reconstruction
-%   zef
-%   args
+%   [MethodClassObj] = ClassGMModeling(MethodClassObj, reconstruction, zef, args)
 %
-% Outputs:
-%   MethodClassObj
+%   reconstruction: vector or cell of frames. zef.source_positions required.
+%   Name-values (args): number_of_clusters (3), sought_estimate, covariance_type,
+%   MaxIter, reconstruction_threshold, regularization_parameter, SharedCovariance,
+%   use_selected_parcellations, amplitude_estimation_type,
+%   model_selection_criterion, initial_cluster_finding_approach,
+%   number_of_replicates, log_posterior_threshold_dB,
+%   reconstruction_smoothing_std, mixture_component_probability,
+%   start_frame, stop_frame. Opens a waitbar. Statistics Toolbox.
 %
-% Zef fields (observed):
-%   zef.parcellation_interp_ind (read)
-%   zef.parcellation_selected (read)
-%   zef.source_interpolation_ind (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   plugins.ClassGMM.ClassGMModeling
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[MethodClassObj] = plugins.ClassGMM.ClassGMModeling(MethodClassObj, reconstruction, zef, args)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
-arguments
-    MethodClassObj (1,1) inverse.CommonInverseParameters
-    reconstruction (:,:) {mustBeA(reconstruction,["double","gpuArray","cell"])}
     zef (:,:) struct
     args.number_of_clusters (1,:) int8 = 3
     args.sought_estimate (1,1) string {mustBeMember(args.sought_estimate,["Location & orientation","Location"])} = "Location & orientation"

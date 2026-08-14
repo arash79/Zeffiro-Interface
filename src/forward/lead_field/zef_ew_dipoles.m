@@ -1,18 +1,3 @@
-% --- Zeffiro documentation header ---
-% function [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_nodes] = zef_ew_dipoles( ... — Function [stensil, signs, source moments, source directions, source locations, n of adj nodes] = zef ew dipoles( .
-%
-% Purpose:
-%   Function [stensil, signs, source moments, source directions, source locations, n of adj nodes] = zef ew dipoles( ....
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Calls (project):
-%   zef_ew_dipoles
-%   zef_waitbar
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_nodes] = zef_ew_dipoles( ...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_nodes] = zef_ew_dipoles( ...
     nodes       ...
     ,               ...
@@ -20,6 +5,27 @@ function [stensil, signs, source_moments, source_directions, source_locations, n
     ,               ...
     brain_ind   ...
     )
+
+%ZEF_EW_DIPOLES  Edge-Whitney dipole stencils for Whitney-type source models.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Unique edges of brain tetrahedra become Whitney dipoles: location at the
+%   edge midpoint, direction along the edge, moment = edge length. signs
+%   places ±1/moment at the two nodes; stensil marks which tetrahedra own
+%   each edge.
+%
+%   [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_nodes] = ...
+%       zef_ew_dipoles(nodes, tetrahedra, brain_ind)
+%
+%   Input / output shapes match zef_fi_dipoles, with n_of_adj_nodes = number
+%   of unique edges rather than face-pairs.
+%
+%   See also zef_fi_dipoles, zef_whitney_interpolation.
+
 
 wb = zef_waitbar(0,1, 'Edgewise dipoles');
 

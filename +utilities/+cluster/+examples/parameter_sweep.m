@@ -1,34 +1,17 @@
 function [submissions, bundles] = parameter_sweep(zef, cluster_profile, sweep, opts)
-% --- Zeffiro documentation header ---
-% utilities.cluster.examples.parameter_sweep — Example or study script demonstrating parameter_sweep.
+%PARAMETER_SWEEP  Cartesian grid of Kalman params → cluster inverse submissions.
 %
-% Purpose:
-%   Example or study script demonstrating parameter_sweep.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   cluster_profile
-%   sweep
-%   opts
+%   [submissions, bundles] = parameter_sweep(zef, cluster_profile, sweep, opts)
 %
-% Outputs:
-%   submissions
-%   bundles
-%
-% Calls (project):
-%   utilities.cluster.examples.parameter_sweep
-%   utilities.cluster.submit_inverse_jobs
-%   zef_inverse_extract_bundle
-%
-% Side effects:
-%   - parallel/cluster
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[submissions, bundles]] = utilities.cluster.examples.parameter_sweep(zef, cluster_profile, sweep, opts)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Nested loop over sweep.noise_level_vec (default 30),
+%   sweep.evolution_prior_vec (default 20), and sweep.pm_snr_vec (default 0).
+%   Each combination becomes MethodParams for zef_inverse_extract_bundle with
+%   opts.MethodId (default "kalman"), then all bundles are submitted together.
 
 arguments
     zef (1,1) struct

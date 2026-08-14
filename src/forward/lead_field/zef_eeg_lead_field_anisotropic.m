@@ -1,45 +1,24 @@
 function zef = zef_eeg_lead_field_anisotropic(zef)
-% --- Zeffiro documentation header ---
-% zef_eeg_lead_field_anisotropic — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Inputs:
-%   zef
-%
-% Outputs:
-%   zef
-%
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.imaging_method (read, write)
-%   zef.lead_field_filter_quantile (read)
-%   zef.lead_field_type (read, write)
-%   zef.sensors (read)
-%   zef.sensors_attached_volume (read, write)
-%   zef.source_directions (read)
-%   zef.source_interpolation_on (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   zef_attach_sensors_volume
-%   zef_eeg_lead_field_anisotropic
-%   zef_lead_field_filter
-%   zef_lead_field_matrix
-%   zef_process_meshes
-%   zef_source_interpolation
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_eeg_lead_field_anisotropic(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%ZEF_EEG_LEAD_FIELD_ANISOTROPIC  EEG anisotropic lead field (type 6, sigma(:,3:8)).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Mesh-tool INI Script for "EEG lead field with anisotropic electrical
+%   conductivity". Same pipeline as the isotropic wrapper except
+%   lead_field_type=6 so zef_lead_field_matrix passes zef.sigma(:,3:8) into
+%   the EEG FEM. Fill those columns first (DTI Conductivity Tool /
+%   zef_dti_apply_to_sigma, or zef_nii_conductivity_to_sigma). Tensors must
+%   be symmetric positive definite per tetrahedron.
+%
+%   zef = zef_eeg_lead_field_anisotropic(zef)
+%
+%   See also zef_lead_field_matrix, zef_dti_apply_to_sigma, zef_eeg_lead_field_isotropic.
 
 if nargin == 0
     zef = evalin('base','zef');

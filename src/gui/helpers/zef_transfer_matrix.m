@@ -1,31 +1,3 @@
-% --- Zeffiro documentation header ---
-% function [T, Schur_complement, A] = zef_transfer_matrix(zef, ... — Function [T, Schur complement, A] = zef transfer matrix(zef, .
-%
-% Purpose:
-%   Function [T, Schur complement, A] = zef transfer matrix(zef, ....
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.parallel_processes (read)
-%   zef.processes_per_core (read)
-%   zef.use_gpu (read)
-%
-% Calls (project):
-%   zef_transfer_matrix
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - filesystem I/O
-%   - parallel/cluster
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [T, Schur_complement, A] = zef_transfer_matrix(zef, ...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [T, Schur_complement, A] = zef_transfer_matrix(zef, ...
     A                                                    ...
     ,                                                        ...
@@ -53,6 +25,51 @@ function [T, Schur_complement, A] = zef_transfer_matrix(zef, ...
     ,                                                        ...
     schur_expression                                     ...
     )
+%ZEF_TRANSFER_MATRIX  PCG solve of A X = B; Schur complement per electrode.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   EEG/MEG/EIT/TES lead fields assemble the sparse stiffness A, then need
+%   the nodal potential for each independent electrode load. This function
+%   is that solve: Jacobi-preconditioned CG (CPU or GPU) on each column of
+%   B, with optional AMD/RCM permutation of A.
+%
+%   PEM with infinite impedance zeros the first load (reference). The
+%   waitbar title is "Stencil PCG iteration". If a column does not meet
+%   tol_val, T is set to [] and the loop stops.
+%
+%   Schur_complement(:,i) = schur_expression(x, i). Callers pass
+%     impedance_inf==0 → @(x,i) C(:,i) - B'*x
+%     otherwise        → @(x,i) C(:,i)
+%
+%   [T, Schur_complement, A] = zef_transfer_matrix(zef, A, B, C, N, L, ...
+%       electrode_model, permutation, precond, impedance_vec, ...
+%       impedance_inf, tol_val, m_max, schur_expression)
+%
+%   Inputs
+%     zef               - session (use_gpu, gpu_count).
+%     A                 - N-by-N sparse stiffness (returned permuted).
+%     B                 - N-by-L electrode loads from zef_build_electrodes.
+%     C                 - L-by-L (or compatible) electrode block.
+%     n_of_fem_nodes    - N = size(A,1).
+%     n_of_electrodes   - L = size(B,2).
+%     electrode_model   - 'PEM' or CEM string used by the FEM cores.
+%     permutation       - 'symamd','symmmd','symrcm', or identity.
+%     precond           - unused in the GPU Jacobi path (kept for callers).
+%     impedance_vec     - per-electrode impedance; scales that column's tol.
+%     impedance_inf     - 1 → infinite-impedance PEM branch.
+%     tol_val, m_max    - CG relative residual and iteration cap.
+%     schur_expression  - function handle (x, i) → L-vector.
+%
+%   Outputs
+%     T                  - N-by-L potentials (unpermuted nodal order).
+%     Schur_complement   - L-by-L (filled column-wise).
+%     A                  - permuted A used internally.
+%
+%   See also zef_stiffness_matrix, zef_build_electrodes, zef_lead_field_eeg_fem.
 
 if isequal(permutation,'symamd')
     perm_vec = symamd(A)';

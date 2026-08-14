@@ -1,70 +1,78 @@
-# +utilities
+# `+utilities` — converters, cluster inverse, shared helpers
 
-## Purpose of this folder
+This MATLAB package is the glue between Zeffiro sessions and everything that is not the GUI runtime: **importing** anatomy from Brainstorm / FreeSurfer / SimNIBS / Duneuro, **dispatching** class inverse jobs (local or cluster), and small I/O/struct helpers. Call it as `utilities.*` after `zeffiro_interface` (or `addpath` of the project root). Do not `addpath('+utilities')`.
 
-Reusable **package utilities** used by cluster jobs, converters, examples, and `src/inverse` orchestration. Not loaded by adding `+utilities` directly—call with qualified names (`utilities.cluster.dispatch_inverse`, etc.) after `addpath(projectRoot)`.
+Nothing here is a menu item except where a converter has its own plugin start (Brainstorm). Cluster inverse is the backend of `zef_inverse_run`.
 
-## Contents
+## Inverse dispatch (what `zef_inverse_run` actually calls)
 
-| Area | Path | Role |
-|------|------|------|
-| Cluster | `+cluster/` | `dispatch_inverse`, `submit_inverse_jobs`, `run_inverse_job`, profiles, examples |
-| Inverse loop | `+inverse/run_frame_loop.m` | Shared per-frame loop for `+inverse` classes |
-| Brainstorm | `+brainstorm2zef/` | Brainstorm → Zeffiro project conversion |
-| FreeSurfer | `+fs2zef/` | FS surfaces/segmentation import |
-| Duneuro | `+duneuro2zef/` | Duneuro FEM/EEG/MEG import |
-| SN / LUT | `+sn2zef/` | Statistical parametric mapping helpers |
-| Sensitivity | `+sensitivity/` | Monte Carlo sensitivity driver |
-| Plotting | `+plotting/` | Figure helpers for studies |
-| I/O | `+io/` | Small shared I/O (e.g. `float_is_int`) |
-| Structs | `+structs/` | `copy_fields` and struct helpers |
-| Dev | `+dev/` | `lint_mfiles`, `indent_mfiles`, `get_mfile_paths` |
+```
+zef_inverse_run(zef, method_id, …)
+  → src/inverse extracts a bundle (L, measurements, frames, params)
+  → utilities.cluster.dispatch_inverse(bundle)
+       class path: construct inverse.*Inverter
+                   utilities.inverse.run_frame_loop
+                   zef_postProcessInverseClassObj
+       legacy path: feval(legacy_function) with zef in base
+  → zef.reconstruction
+```
 
-## How this folder fits into the overall workflow
+Register new method ids in `+cluster/inverse_method_registry.m` (verified ids are listed in `+inverse/README.md`).
 
-- **Inverse:** `zef_inverse_run` → `utilities.cluster.dispatch_inverse` → `utilities.inverse.run_frame_loop`.
-- **Batch:** `submit_inverse_jobs` / `collect_inverse_results` for HPC-style runs.
-- **Import pipelines:** external tools (BST, FS, Duneuro) build Zeffiro-compatible projects without GUI.
-- **Studies:** `+examples/+studies` and ES workbench call cluster and sensitivity utilities.
+Batch / HPC:
 
-## GUI usage
+```matlab
+% See +cluster/+examples/eloreta_workflow.m and kalman_workflow.m
+utilities.cluster.submit_inverse_jobs(...)
+utilities.cluster.collect_inverse_results(...)
+```
 
-Generally **none** directly—utilities are programmatic. Cluster configuration may be triggered from developer workflows or examples, not main Zeffiro menus.
+`configure_cluster_profile`, `create_batch_job`, `run_inverse_job`, `with_zef_in_base` are the job plumbing. You need the Parallel Computing Toolbox for parallel pools; cluster profiles are MATLAB's, not Zeffiro INI profiles.
 
-## Programmatic usage
+## Anatomy converters
+
+Each `*2zef` subpackage has a `run.m` (or `import_*`) that writes a Zeffiro-style folder: surfaces, `import_segmentation.zef`, often `electrodes.dat`. After conversion, start Zeffiro with `'import_to_new_project'` pointing at that `.zef`, then mesh as usual.
+
+| Package | External tool | Entry |
+|---------|---------------|--------|
+| `utilities.fs2zef` | FreeSurfer `surf/` + `mri/aseg` | `utilities.fs2zef.run` |
+| `utilities.sn2zef` | SimNIBS `final_tissues.nii.gz` (not the Gmsh `.msh`) | `utilities.sn2zef.run` |
+| `utilities.brainstorm2zef` | Brainstorm protocol | `utilities.brainstorm2zef.run` / plugin start `zef_bst_plugin_start` |
+| `utilities.duneuro2zef` | Duneuro FEM + EEG/MEG | `utilities.duneuro2zef.run` / `import_duneuro_project` |
+
+SimNIBS `meshLoadGmsh4.m` is vendor code (Thielscher/Antunes); do not re-attribute it. FreeSurfer environment helpers live under `+fs2zef/+environment`.
+
+Child READMEs in those packages should explain **that converter's flags, coordinate conventions, and output files**, not repeat Zeffiro startup.
+
+## Other subpackages
+
+| Package | Role |
+|---------|------|
+| `utilities.sensitivity` | Monte Carlo on inverse methods (`run_monte_carlo`, synthesize measurements) |
+| `utilities.leadfield.lf_tag_from_lf_type` | Maps lead_field_type **1–5** to a tag (anisotropic 6–10 are not in this map) |
+| `utilities.structs.copy_fields` | Used at startup to copy name-value args onto `zef` |
+| `utilities.io` | `abspath`, `read_gitmodules` (for `zeffiro_setup`), `float_is_int`, reconstruction-from-EDF |
+| `utilities.plotting` | Paper-style figure helpers for `+examples/+studies` |
+| `utilities.dev` | Lint/indent/`get_mfile_paths` for maintainers |
+
+## Scripting sketch
 
 ```matlab
 addpath(fileparts(which('zeffiro_interface')));
 
-% Inverse dispatch
-[zef, result] = utilities.cluster.dispatch_inverse(bundle, "eloreta", opts);
+% After a mesh + L + measurements:
+[zef, run_result] = zef_inverse_run(zef, "eloreta", "execution", "local");
+% equivalent guts:
+%   bundle = … (see zef_inverse_extract_bundle)
+%   result = utilities.cluster.dispatch_inverse(bundle);
 
-% Frame loop (advanced)
-z_inverse = utilities.inverse.run_frame_loop(inv, L, f_cell, procFile, ...);
-
-% Cluster job
-utilities.cluster.submit_inverse_jobs(jobSpecs, profile);
-
-% Converters (see each subfolder README)
-utilities.brainstorm2zef.run(...)
+% FreeSurfer → Zeffiro folder (see +fs2zef/README.md for real arguments)
+utilities.fs2zef.run(...)
 ```
 
-## Examples
+## See also
 
-- `+utilities/+cluster/+examples/eloreta_workflow.m`
-- `+utilities/+cluster/+examples/kalman_workflow.m`
-- `+utilities/+cluster/+examples/parameter_sweep.m`
-- `+utilities/+fs2zef/test_unified_pipeline.m`
-
-## Dependencies and assumptions
-
-- Project root on path for `utilities.*` namespace.
-- Cluster functions need Parallel Computing Toolbox / cluster profiles where applicable.
-- Converters assume external tool outputs on disk (paths in each converter README).
-- `run_frame_loop` expects `+inverse` classes on path.
-
-## Notes for developers
-
-- Register new inverse methods in `utilities.cluster.inverse_method_registry.m`.
-- Keep bundle layout in sync with `zef_inverse_extract_bundle.m` in `src/inverse`.
-- Add converter subpackages under `+utilities/+name2zef` pattern with a top-level `run.m` entry.
+- `+inverse/README.md` — class solvers and registry ids
+- `src/inverse/README.md` — bundle extraction
+- `+utilities/+cluster/+examples/` — eloreta / Kalman / parameter sweep
+- Root README — typical GUI workflow these converters feed into

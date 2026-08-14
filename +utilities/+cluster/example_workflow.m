@@ -1,22 +1,13 @@
-% --- Zeffiro documentation header ---
-% utilities.cluster.cluster = utilities.cluster.configure_cluster_profile( ... — Example or study script demonstrating cluster = utilities.cluster.configure_cluster_profile( .
+%EXAMPLE_WORKFLOW  End-to-end cluster inverse: configure, submit, collect.
 %
-% Purpose:
-%   Example or study script demonstrating cluster = utilities.cluster.configure_cluster_profile( ....
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Calls (project):
-%   utilities.cluster.collect_inverse_results
-%   utilities.cluster.submit_inverse_jobs
-%   zef_inverse_extract_bundle
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `utilities.cluster.cluster = utilities.cluster.configure_cluster_profile( ...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   Script outline: configure_cluster_profile → zef_inverse_extract_bundle →
+%   submit_inverse_jobs → collect_inverse_results. Requires base-workspace zef
+%   and a configured parallel cluster (e.g. CSC Puhti).
 
 cluster = utilities.cluster.configure_cluster_profile( ...
     "project_2002680", ...

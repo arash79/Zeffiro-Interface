@@ -1,67 +1,27 @@
-# tools/plugins/FindSyntheticSourceLegacy_Patch
+# Synthetic extended source patch
 
-## Purpose of this folder
+Same job as the legacy dipole tool, but each “source” can be a **ball or ellipsoid of interpolated source points** with optional cortical-normal orientation. Default-profile menu label is **Synthetic extended source patch**.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+Writes `zef.measurements`. Extra flags on `zef.inv_synth_source`: use volume, radius, normal orientation, plot cones, fix amplitude (spread vs per-point), VEP ellipsoid config.
 
-## Contents
+## How to open it
 
-MATLAB sources:
-- `zef_init_fss_patch.m` — **if not(isfield(zef,'inv_synth_source'));**: If not(isfield(zef,'inv synth source'));.
-- `zef_find_synthetic_source_patch_app.m` — **zef.h_find_synthetic_source_legacy = figure(...**: Zef.h find synthetic source legacy = figure(....
-- `zef_find_source_patch.m` — **zef_find_source_patch**: Zef find source patch.
-- `zef_find_synthetic_source_patch.m` — **zef_find_synthetic_source_patch**: Zef find synthetic source patch.
-- `zef_find_synthetic_source_patch_window.m` — **zef_find_synthetic_source_patch_window**: Zef find synthetic source patch window.
-- `zef_plot_cones_in_roi.m` — **zef_plot_cones_in_roi**: Renders or updates a plot_cones_in_roi figure from current `zef` state.
-- `zef_plot_ellipsoid.m` — **zef_plot_ellipsoid**: Renders or updates a plot_ellipsoid figure from current `zef` state.
-- `zef_plot_source_patch.m` — **zef_plot_source_patch**: Renders or updates a plot_source_patch figure from current `zef` state.
-- `zef_plot_sphere.m` — **zef_plot_sphere**: Renders or updates a plot_sphere figure from current `zef` state.
-- `zef_project_L_in_roi.m` — **zef_project_L_in_roi**: Zef project L in roi.
-- `zef_update_fss_patch.m` — **zef_update_fss_patch**: Syncs GUI control values into `zef` for fss_patch.
+**Forward tools → Synthetic extended source patch** (default profile). Callback: `zef_find_synthetic_source_patch` → `zef_tool_start(..., 'zef_find_synthetic_source_patch_window', ...)`.
 
-## How this folder fits into the overall workflow
+Need `zef.L`, `zef.source_positions`, and `zef.source_interpolation_ind{1}`. Normal-orientation mode calls `zef_processLeadfields` and `zef_project_L_in_roi`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+## Buttons (`Callback` in `zef_find_synthetic_source_patch_app.m`)
 
-## GUI usage
+| Label | Action |
+|-------|--------|
+| **Plot source(s)** | `zef = zef_update_fss_patch(zef); zef.h_synth_source = zef_plot_source_patch(zef,1)` |
+| **Create synthetic data** | `zef = zef_update_fss_patch(zef); zef.measurements = zef_find_source_patch(zef)` |
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+Volume on: all interpolated sources within `radius` (or a VEP ellipsoid toward the nearest `zef.s2_points` sensor). Overlapping ROIs keep only the first owner. Noise: `noise_level * max(abs(meas)) * randn`.
 
-## Programmatic usage
-
-From the project root:
+## Scripting
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+zef = zef_update_fss_patch(zef);
+zef.measurements = zef_find_source_patch(zef);
 ```
-
-Representative entry points in this folder:
-- `Call `if not(isfield(zef,'inv_synth_source'));` from MATLAB with the project root on the path.`
-- `Call `zef.h_find_synthetic_source_legacy = figure(...` from MATLAB with the project root on the path.`
-- ``[[meas_data, all_roi_sources, orientations]] = zef_find_source_patch(zef)` with project root and `src` on the path.`
-- ``[zef] = zef_find_synthetic_source_patch(zef)` with project root and `src` on the path.`
-- ``[zef] = zef_find_synthetic_source_patch_window(zef)` with project root and `src` on the path.`
-- ``[h_synth_source] = zef_plot_cones_in_roi(zef, s_length)` with project root and `src` on the path.`
-- ``[h_surf] = zef_plot_ellipsoid(position, a, b, c, …)` with project root and `src` on the path.`
-- ``[h_source] = zef_plot_source_patch(zef, source_type)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

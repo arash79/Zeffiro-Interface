@@ -1,39 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef.exp_em_q = get(zef — Zef.exp em q = get(zef.
+%ZEF_UPDATE_EXP_EM  EXP EM widgets → zef.exp_em_* and zef.inv_* / number_of_frames.
 %
-% Purpose:
-%   Zef.exp em q = get(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.exp_em_beta (read, write)
-%   zef.exp_em_hyper_type (read, write)
-%   zef.exp_em_theta0 (read, write)
-%   zef.h_exp_em_beta (read)
-%   zef.h_exp_em_data_segment (read)
-%   zef.h_exp_em_high_cut_frequency (read)
-%   zef.h_exp_em_hyper_type (read)
-%   zef.h_exp_em_low_cut_frequency (read)
-%   zef.h_exp_em_n_L1_iterations (read)
-%   zef.h_exp_em_n_map_iterations (read)
-%   zef.h_exp_em_normalize_data (read)
-%   zef.h_exp_em_number_of_frames (read)
-%   zef.h_exp_em_pcg_tol (read)
-%   zef.h_exp_em_sampling_frequency (read)
-%   zef.h_exp_em_snr (read)
-%   … (17 more)
+%   Script. get/str2num on h_exp_em_q, hyper_type, beta, theta0, snr,
+%   n_map/L1 iterations, band, times, normalize_data. Called before
+%   exp_em_iteration. Siblings: zef_update_exp_ias / _em_multires /
+%   _ias_multires.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.exp_em_q = get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_exp_em, exp_em_iteration.
 
 zef.exp_em_q = get(zef.h_exp_em_q,'value');
 zef.exp_em_hyper_type = get(zef.h_exp_em_hyper_type,'value');

@@ -1,27 +1,15 @@
 function [colormap_vec] = zef_contrast_2_colormap(colortune_param, colormap_size)
-% --- Zeffiro documentation header ---
-% zef_contrast_2_colormap — Zef contrast 2 colormap.
+%ZEF_CONTRAST_2_COLORMAP  colormap_cell{6} "Contrast II" (green-weighted).
 %
-% Purpose:
-%   Zef contrast 2 colormap.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   colortune_param
-%   colormap_size
-%
-% Outputs:
-%   colormap_vec
-%
-% Calls (project):
-%   zef_contrast_2_colormap
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[colormap_vec] = zef_contrast_2_colormap(colortune_param, colormap_size)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   Four-band mix like Contrast I; first row uses floor(size/2) as well
+%   as the colortune_param edges. zef_init colormap_cell{6}; Figure-tool
+%   Colormap: item 6.
+%   colormap_vec = zef_contrast_2_colormap(colortune_param, colormap_size)
 c_aux_1 = floor(colortune_param*colormap_size/3);
 c_aux_2 = floor(colormap_size - colortune_param*colormap_size/3);
 c_aux_3 = floor(colormap_size/2);

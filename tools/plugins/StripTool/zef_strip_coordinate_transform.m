@@ -1,27 +1,20 @@
-function points = zef_strip_coordinate_transform(strip_struct,transform_type,points) 
-% --- Zeffiro documentation header ---
-% zef_strip_coordinate_transform — Zef strip coordinate transform.
+function points = zef_strip_coordinate_transform(strip_struct,transform_type,points)
+%ZEF_STRIP_COORDINATE_TRANSFORM  Map strip-local points to/from world via tip and axes.
 %
-% Purpose:
-%   Zef strip coordinate transform.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   strip_struct
-%   transform_type
-%   points
+%   points = zef_strip_coordinate_transform(strip_struct, transform_type)
+%   points = zef_strip_coordinate_transform(strip_struct, transform_type, points)
 %
-% Outputs:
-%   points
+%   transform_type 'forward' or 'reverse'. Uses orientation_axis,
+%   rotation_axis/angle, strip_angle, tip_point, encapsulation_shift.
+%   Three-arg form transforms a single xyz row. Called from plot/embed
+%   and zef_get_strip_contacts. Does not write zef.
 %
-% Calls (project):
-%   zef_strip_coordinate_transform
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[points] = zef_strip_coordinate_transform(strip_struct, transform_type, points)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_create_strip.
 
     if nargin > 2
     points = mat2cell(points,1);

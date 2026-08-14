@@ -1,55 +1,23 @@
-# +inverse/@GroupLassoInverter
+# inverse.GroupLassoInverter
 
-## Purpose of this folder
+Group LASSO MAP (L2 over each 3-DOF block) via `LG_optimization`. Registry ids: `grouplasso`, `group_lasso`. No Inverse-tools wiring to this class.
 
-Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+Inner solver `estimation_type`: `"IAS"` (1), `"EM"` (2), `"Standardized"` (3). Each MAP iteration updates `gamma = beta ./ (theta0 + zL2)` with `zL2` the per-triplet Euclidean norms repeated three times.
 
-## Contents
+## Parameters
 
-MATLAB sources:
-- `GroupLassoInverter.m` — **inverse.GroupLassoInverter.GroupLassoInverter**: Inverse solver class implementing GroupLasso reconstruction.
-- `initialize.m` — **inverse.GroupLassoInverter.initialize**: Estimates priors, noise covariance, or regularization from multi-frame data.
-- `invert.m` — **inverse.GroupLassoInverter.invert**: Runs one inverse reconstruction step for a single measurement frame.
+- `beta` (3), `theta0` (1e-10) — used when `hyperprior_mode` is `"Manually selected"`
+- `hyperprior_mode`: `"Sensitivity weighted"` (default; auto `beta`/`theta0` from `L` and `SNR_variable`) or `"Manually selected"`
+- `n_map_iterations` (25), `n_L1_iterations` (5) — inner `LG_optimization` steps
+- `initial_prior_steering_db` — scales `SNR_variable` in `initialize`
+- `noise_cov` — sample cov or SNR identity
+- `use_multiresolution` — constructor **assigns `false`**, ignoring the name-value argument. The invert branch still references `multires_dec` / `n_interp` that are never defined on this object.
 
-## How this folder fits into the overall workflow
+`make_multires_dec` calls `zef_make_multires_dec(self.number_of_decompositions, self.number_of_multiresolution_levels, self.sparsity_factor)` — those property names belong to RAMUS, not this class.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+## Call
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+[zef, r] = zef_inverse_run(zef, "grouplasso", "execution", "local", ...
+    "MethodParams", struct("estimation_type", "IAS", "n_map_iterations", 25));
 ```
-
-Representative entry points in this folder:
-- ``inverse.GroupLassoInverter.GroupLassoInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.`
-- ``[self] = inverse.GroupLassoInverter.initialize(self, L, f_data)` with project root and `src` on the path.`
-- ``[[z_vec, self]] = inverse.GroupLassoInverter.invert(self, f_data, L, procFile, …)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-Programmatic: `zef_inverse_run(zef, 'eloreta')` or `inverse.ELORETAInverter().computeInversionWithZI(zef)`.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

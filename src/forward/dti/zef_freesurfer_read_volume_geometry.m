@@ -1,64 +1,20 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_FREESURFER_READ_VOLUME_GEOMETRY
-%
-%Reads volume geometry from FreeSurfer MGZ/MGH files or NIfTI files using
-%ONLY FreeSurfer's mri_info command. No fallbacks, no alternate parsers.
-%
-%Extracts all matrices needed for the DTI coordinate transformation chain:
-%  - vox2ras      : 4×4 voxel-to-scanner-RAS (0-based voxel indices, as from mri_info)
-%  - vox2ras_tkr  : 4×4 voxel-to-FreeSurfer-tkRAS (0-based; from mri_info --vox2ras-tkr)
-%  - center_ras   : 3×1 volume center in scanner RAS [c_r; c_a; c_s]
-%
-%FreeSurfer convention: mri_info uses 0-based voxel indices. Both vox2ras and
-%vox2ras_tkr are read directly from mri_info (voxel to ras transform and
-%--vox2ras-tkr). Use voxel indices 0..dim-1 when applying.
-%
-%Inputs:
-%   input - One of:
-%           (a) File path (string/char) to .mgz, .mgh, .nii, or .nii.gz
-%           (b) MATLAB niftiinfo struct (will attempt to extract Filename)
-%
-%Outputs:
-%   geom  - Struct with fields:
-%     .vox2ras      [4×4]  Voxel→scanner-RAS (0-based voxel, same as mri_info)
-%     .vox2ras_tkr  [4×4]  Voxel→tkRAS (0-based voxel)
-%     .center_ras   [3×1]  Volume center in scanner RAS (c_r, c_a, c_s)
-%     .dimensions   [1×3]  Volume dimensions [nx ny nz]
-%     .voxel_sizes  [1×3]  Voxel sizes in mm
-%     .source       char   Description of how geometry was obtained
-%
-%See also: zef_dti_get_mesh2voxel, zef_freesurfer_load_fa
-%
-%Implementation Notes:
-%  - Uses ONLY mri_info from FreeSurfer (no fallbacks)
-%  - Requires FREESURFER_HOME environment variable to be set
-%  - mri_info must be available in PATH (via FreeSurfer setup)
-%  - If mri_info fails or returns incomplete data, function errors immediately
-%  - All geometry is extracted from mri_info output parsing
-
 function geom = zef_freesurfer_read_volume_geometry(input)
-% --- Zeffiro documentation header ---
-% zef_freesurfer_read_volume_geometry — Zef freesurfer read volume geometry.
+%ZEF_FREESURFER_READ_VOLUME_GEOMETRY  vox2ras / vox2ras-tkr / center from mri_info.
 %
-% Purpose:
-%   Zef freesurfer read volume geometry.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2024- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   input
+%   Runs FreeSurfer mri_info on a volume path (or a niftiinfo struct that
+%   still carries Filename). Fills geom.vox2ras, vox2ras_tkr, center_ras,
+%   dimensions, voxel_sizes. Used when auto-filling DTI-tool affine fields.
 %
-% Outputs:
-%   geom
+%   geom = zef_freesurfer_read_volume_geometry(input)
 %
-% Calls (project):
-%   zef_freesurfer_read_volume_geometry
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[geom] = zef_freesurfer_read_volume_geometry(input)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_dti_get_mesh2voxel.
+
+
 
 
 geom = struct('vox2ras', [], 'vox2ras_tkr', [], 'center_ras', [], ...

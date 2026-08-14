@@ -1,40 +1,21 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function h_source = zef_plot_source(source_type)
-% --- Zeffiro documentation header ---
-% zef_plot_source — Renders or updates a plot_source figure from current `zef` state.
+%ZEF_PLOT_SOURCE  Dipole glyphs on Figure-tool axes1 (quiver3).
 %
-% Purpose:
-%   Renders or updates a plot_source figure from current `zef` state.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   source_type
+%   Function. source_type 1 = synthetic (zef.inv_synth_source columns
+%   1:3 position, 4:6 orientation, 7 amplitude, 9 length, 10 color
+%   index); else reconstructed (zef.inv_rec_source, length in column 8,
+%   color in 9). Deletes prior h_synth_source / h_rec_source. Draws on
+%   zef.h_axes1. Color cell is k,r,g,b,y,m,c. Does not tag patches
+%   (transparency sliders do not affect these quivers).
 %
-% Outputs:
-%   h_source
-%
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%   zef.h_rec_source (read)
-%   zef.h_synth_source (read)
-%   zef.inv_rec_source (read)
-%   zef.inv_synth_source (read)
-%
-% Calls (project):
-%   zef_plot_source
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[h_source] = zef_plot_source(source_type)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_plot_3D_arrow, zef_plot_roi.
 if source_type == 1
     h_axes1 = evalin('base','zef.h_axes1');
     if isfield(evalin('base','zef'),'h_synth_source')

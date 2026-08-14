@@ -1,39 +1,30 @@
-% --- Zeffiro documentation header ---
-% if zef — If zef.
+%ZEF_SMOOTHING_STEP  Taubin smoothing of the FEM mesh (script).
 %
-% Purpose:
-%   If zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.fix_outer_surface (read)
-%   zef.mesh_optimization_repetitions (read)
-%   zef.mesh_relabeling (read)
-%   zef.mesh_smoothing_repetitions (read)
-%   zef.sensors (read)
-%   zef.smoothing_steps_ele (read)
-%   zef.smoothing_steps_surf (read)
-%   zef.smoothing_steps_vol (read)
-%   zef.smoothing_strength (read)
-%   zef.use_fem_mesh_inflation (read)
+%   Script, not a function. Mutates caller-workspace nodes (and may
+%   relabel via zef_mesh_labeling_step). Requires zef, tetra, domain
+%   labels, priority_vec, pml_vec, h. Called from
+%   zef_postprocess_fem_mesh when zef.mesh_smoothing_on.
 %
-% Calls (project):
-%   zef_attach_sensors_volume
-%   zef_electrode_struct
-%   zef_fix_negatives
-%   zef_inflate_surfaces
-%   zef_surface_mesh
-%   zef_tetra_turn
-%   zef_waitbar
+%   Mesh tool **Mesh smoothing** stores zef.mesh_smoothing_on.
+%   Strength zef.smoothing_strength. Step counts:
+%     smoothing_steps_surf / _vol / _ele — surface nodes, volume
+%     nodes, electrode nodes. A scalar is expanded across
+%     2*mesh_smoothing_repetitions (odd slots 0 for surface/electrodes).
+%   If a step count is in (0,1), the loop is a relative Frobenius
+%   residual; otherwise it is a fixed iteration count.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Graph Laplacian from unique faces (surface) or tet edges (volume).
+%   Each pass is Taubin: λ=1 then μ=−1 times smoothing_strength toward
+%   the neighbour mean. Outer-surface nodes can be frozen
+%   (zef.fix_outer_surface). After repetition > 2, optional
+%   mesh_relabeling (labeling_flag=2).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_postprocess_fem_mesh, zef_distance_smoothing.
 if zef.mesh_smoothing_on
 
     length_waitbar = 4+length(priority_vec);
@@ -108,6 +99,9 @@ if zef.mesh_smoothing_on
         A = sparse(N, N, 0);
         B = sparse(N, N, 0);
 
+        % Odd slots: volume Laplacian on tet edges. Even slots: surface
+        % Laplacian on unique faces (A). Electrode smoothing is a third
+        % graph on CEM edges after attach_sensors_volume.
         if mod(smoothing_repetition_ind,2)==0
 
             for i = 1 : 3
@@ -164,6 +158,9 @@ if zef.mesh_smoothing_on
         taubin_lambda = 1;
         taubin_mu = -1;
 
+        % Taubin λ/μ pair: move toward neighbour mean, then an opposite
+        % μ step so the mesh does not shrink. Step count < 1 is a
+        % relative Frobenius residual; otherwise a fixed iteration count.
         if smoothing_steps_surf(smoothing_repetition_ind) > 0
             if smoothing_steps_surf(smoothing_repetition_ind) < 1
                 convergence_criterion = Inf;

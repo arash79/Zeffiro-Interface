@@ -1,48 +1,18 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_update_fss_patch(zef)
-% --- Zeffiro documentation header ---
-% zef_update_fss_patch — Syncs GUI control values into `zef` for fss_patch.
+%ZEF_UPDATE_FSS_PATCH  Patch widgets → zef.inv_synth_source (16 columns); unit ori.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for fss_patch.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_update_fss_patch(zef)
 %
-% Outputs:
-%   zef
+%   Called from Plot source(s) and Create synthetic data. Adds
+%   use_volume, radius, norm_ori, plot_cones, fix_amp, VEP_config
+%   beyond the legacy ten columns. Does not project through L.
 %
-% Zef fields (observed):
-%   zef.h_inv_synth_source_1 (read)
-%   zef.h_inv_synth_source_10 (read)
-%   zef.h_inv_synth_source_2 (read)
-%   zef.h_inv_synth_source_3 (read)
-%   zef.h_inv_synth_source_4 (read)
-%   zef.h_inv_synth_source_5 (read)
-%   zef.h_inv_synth_source_6 (read)
-%   zef.h_inv_synth_source_7 (read)
-%   zef.h_inv_synth_source_8 (read)
-%   zef.h_inv_synth_source_9 (read)
-%   zef.h_inv_synth_source_VEP_config (read)
-%   zef.h_inv_synth_source_fix_amp (read)
-%   zef.h_inv_synth_source_norm_ori (read)
-%   zef.h_inv_synth_source_plot_cones (read)
-%   zef.h_inv_synth_source_radius (read)
-%   … (2 more)
-%
-% Calls (project):
-%   zef_update_fss_patch
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_update_fss_patch(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_find_source_patch, zef_init_fss_patch.
 
 zef.inv_synth_source = str2num(get(zef.h_inv_synth_source_1 ,'string'));
 zef.inv_synth_source = zef.inv_synth_source(:);

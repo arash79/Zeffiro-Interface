@@ -1,33 +1,30 @@
 function [tree] = zef_dataBank_delete(tree, parentHash, save2disk)
-% --- Zeffiro documentation header ---
-% zef_dataBank_delete — Zef data Bank delete.
+%ZEF_DATABANK_DELETE  Remove a hash and its children from the tree.
 %
-% Purpose:
-%   Zef data Bank delete.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tree
-%   parentHash
-%   save2disk
+%   deleteMenu.MenuSelectedFcn (and deleteMenuData) in zef_open_dataBank:
+%   after getHashForMenu, tree = zef_dataBank_delete(tree, hash, save2disk)
+%   then refreshTree. Drops parentHash and every field that starts with
+%   parentHash_ (so node_1 does not delete node_11). If a node's .data is
+%   a matfile object, deletes that file. Then sortTree + rebuildTree so
+%   sibling numbers are dense; if save2disk is 'On', rebuildTreeSaveFile
+%   renames remaining .mat files.
 %
-% Outputs:
-%   tree
+%   tree = zef_dataBank_delete(tree, parentHash, save2disk)
 %
-% Calls (project):
-%   zef_dataBank_delete
-%   zef_dataBank_rebuildTree
-%   zef_dataBank_rebuildTreeSaveFile
-%   zef_dataBank_sortTree
+%   Inputs
+%     tree        - zef.dataBank.tree.
+%     parentHash  - char hash to remove (and descendants).
+%     save2disk   - 'On' or other; only 'On' rewrites disk names.
 %
-% Side effects:
-%   - filesystem I/O
+%   Output
+%     tree  - struct with those fields gone and hashes rebuilt.
 %
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[tree] = zef_dataBank_delete(tree, parentHash, save2disk)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_refreshTree, zef_dataBank_rebuildTree.
 
 hashNames=fieldnames(tree);
 

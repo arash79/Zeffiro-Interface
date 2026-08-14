@@ -1,37 +1,20 @@
 function zef = zef_ES_plot_distance_curves(zef)
-% --- Zeffiro documentation header ---
-% zef_ES_plot_distance_curves — Zef ES plot distance curves.
+%ZEF_ES_PLOT_DISTANCE_CURVES  Field vs distance from inv_synth_source using zef.reconstruction.
 %
-% Purpose:
-%   Zef ES plot distance curves.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Plot-data menu item 5 and plot_type 5. Needs zef.reconstruction (Update
+%   reconstruction first). Sliding 10 mm window along distance from
+%   inv_synth_source; plots |J| and angle vs the requested orientation.
 %
-% Outputs:
-%   zef
+%   zef = zef_ES_plot_distance_curves()
+%   zef = zef_ES_plot_distance_curves(zef)
 %
-% Zef fields (observed):
-%   zef.h_ES_distance_curves (read, write)
-%   zef.inv_synth_source (read)
-%   zef.reconstruction (read)
-%   zef.source_positions (read)
-%   zef.use_display (read)
+%   See also zef_ES_update_reconstruction.
 %
-% Calls (project):
-%   zef_ES_plot_distance_curves
-%
-% Side effects:
-%   - base/caller workspace
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_ES_plot_distance_curves(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
 zef = evalin('base','zef');

@@ -1,38 +1,21 @@
 function [time_serie,time_var] = zef_generate_time_sequence(zef)
-% --- Zeffiro documentation header ---
-% zef_generate_time_sequence — Zef generate time sequence.
+%ZEF_GENERATE_TIME_SEQUENCE  Blackman–Harris pulses × cosine for each synthetic source.
 %
-% Purpose:
-%   Zef generate time sequence.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   [time_serie, time_var] = zef_generate_time_sequence(zef)
 %
-% Outputs:
-%   time_serie
-%   time_var
+%   Generate-time-sequence button (after zef_update_fss). Reads
+%   inv_synth_sampling_frequency (max across sources),
+%   inv_pulse_peak_time/amplitude/length, inv_oscillation_frequency/phase.
+%   Each pulse is pulse_amp * blackmanharris(N) .* cos(2*pi*f*t+phi)
+%   on [peak-length/2, peak+length/2]. nargin 0 → base zef. Does not
+%   write measurements (caller stores time_sequence / time_variable).
 %
-% Zef fields (observed):
-%   zef.inv_oscillation_frequency (read)
-%   zef.inv_oscillation_phase (read)
-%   zef.inv_pulse_amplitude (read)
-%   zef.inv_pulse_length (read)
-%   zef.inv_pulse_peak_time (read)
-%   zef.inv_synth_sampling_frequency (read)
-%
-% Calls (project):
-%   zef_generate_time_sequence
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[time_serie, time_var]] = zef_generate_time_sequence(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_find_source, zef_update_fss.
 
 h = zef_waitbar(0,1,['Generate time sequence.']);
 if nargin == 0
@@ -44,7 +27,7 @@ sampling_freq = eval( 'max(cell2mat(zef.inv_synth_sampling_frequency))');
 peak_time = eval( 'zef.inv_pulse_peak_time');
 %Amplitude of the pulse between 0 and 1
 pulse_amp = eval( 'zef.inv_pulse_amplitude');
-%Length of the Gaussian envelope on seconds
+%Length of the pulse envelope in seconds (Blackman–Harris window)
 pulse_length = eval( 'zef.inv_pulse_length');
 %Oscillation frequency
 oscillation_freq = eval( 'zef.inv_oscillation_frequency');

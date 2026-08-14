@@ -1,29 +1,18 @@
 function self = initialize(self,L,f_data)
-% --- Zeffiro documentation header ---
-% inverse.RAMUSInverter.initialize — Estimates priors, noise covariance, or regularization from multi-frame data.
+%initialize  RAMUS noise_cov = 10^(-SNR/10) * I (always overwritten).
 %
-% Purpose:
-%   Estimates priors, noise covariance, or regularization from multi-frame data.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   L
-%   f_data
+%   Adds dynamic property noise_cov if missing. Unlike dipole scan, this
+%   does not scale by mean(f.^2) and does not keep a user-supplied matrix.
+%   f_data unused. Multiresolution hyperpriors are built inside invert.
+%   Called from utilities.inverse.run_frame_loop before invert.
+%   Inverse tools → RAMUS uses zef_ramus_iteration.
 %
-% Outputs:
-%   self
-%
-% Calls (project):
-%   inverse.initialize
-%
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[self] = inverse.RAMUSInverter.initialize(self, L, f_data)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   self = initialize(self, L, f_data)
 
     arguments
 

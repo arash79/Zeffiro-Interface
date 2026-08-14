@@ -1,35 +1,3 @@
-% --- Zeffiro documentation header ---
-% examples.studies.santtus_peeling_article.function [ sensitivities_with_statistics, L ] = main ( ... — Example or study script demonstrating function [ sensitivities_with_statistics, L ] = main ( .
-%
-% Purpose:
-%   Example or study script demonstrating function [ sensitivities_with_statistics, L ] = main ( ....
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
-%
-% Inputs:
-%   project_path
-%   inverse_method
-%   n_of_runs
-%   noise_level_db
-%   diff_type
-%   dispersion_radius
-%   args
-%   mustBeGreaterThanOrEqual
-%   mustBeLessThanOrEqual
-%
-% Calls (project):
-%   zef_create_finite_element_mesh
-%   zef_eeg_lead_field
-%   zef_minimum_norm_estimation
-%   zef_sensitivity_map_dipoleScan
-%   zef_sensitivity_map_mne
-%
-% Side effects:
-%   - base/caller workspace
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `examples.studies.santtus_peeling_article.function [ sensitivities_with_statistics, L ] = main ( ...(project_path, inverse_method, n_of_runs, noise_level_db, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 function [ sensitivities_with_statistics, L ] = main ( ...
     project_path, ...
     inverse_method, ...
@@ -39,8 +7,23 @@ function [ sensitivities_with_statistics, L ] = main ( ...
     dispersion_radius, ...
     args ...
 )
-
-    arguments
+%MAIN  Monte Carlo localization study (legacy MNE / dipole scan).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   [sensitivities_with_statistics, L] = main(project_path, inverse_method, ...
+%       n_of_runs, noise_level_db, diff_type, dispersion_radius, args)
+%
+%   project_path: .mat for zeffiro_interface('open_project', ...), or '' if
+%   name-value zef= is a non-empty struct. inverse_method: 'sLORETA',
+%   'dSPM', 'MNE', or 'Dipole Scan'. noise_level_db ≤ 0. Optional args:
+%   use_gpu, build_mesh, mesh_resolution, build_lead_field (uses
+%   zef_eeg_lead_field), n_of_sources, source_model, build_reconstructions.
+%   In-memory zef is assignin('base','zef',...) for legacy tools.
+%
 
         project_path (:,:) char = char.empty(0,0)
 

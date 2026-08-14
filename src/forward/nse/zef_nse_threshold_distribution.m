@@ -1,27 +1,21 @@
 function d = zef_nse_threshold_distribution(d,quantile_min,quantile_max)
-% --- Zeffiro documentation header ---
-% zef_nse_threshold_distribution — Zef nse threshold distribution.
-%
-% Purpose:
-%   Zef nse threshold distribution.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
-%
-% Inputs:
-%   d
-%   quantile_min
-%   quantile_max
-%
-% Outputs:
-%   d
-%
-% Calls (project):
-%   zef_nse_threshold_distribution
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[d] = zef_nse_threshold_distribution(d, quantile_min, quantile_max)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%ZEF_NSE_THRESHOLD_DISTRIBUTION  Clamp |d| into [quantile_min, quantile_max].
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Used by zef_nse_reconstruction before visualization. Values below the
+%   lower abs-quantile are raised to that floor; values above the upper
+%   quantile are clipped.
+%
+%   d = zef_nse_threshold_distribution(d, quantile_min, quantile_max)
+%
+%   See also zef_nse_reconstruction.
 
 a = quantile(abs(d),quantile_min);
 b = quantile(abs(d),quantile_max);

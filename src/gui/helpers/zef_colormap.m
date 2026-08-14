@@ -1,35 +1,27 @@
 function colormap_vec = zef_colormap(inv_colormap)
-% --- Zeffiro documentation header ---
-% zef_colormap — Zef colormap.
+%ZEF_COLORMAP  Evaluate the LUT named by zef.colormap_cell{inv_colormap}.
 %
-% Purpose:
-%   Zef colormap.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   inv_colormap
+%   colormap_vec = zef_colormap(inv_colormap)
 %
-% Outputs:
-%   colormap_vec
+%   inv_colormap is a 1-based index into zef.colormap_items /
+%   zef.colormap_cell (set in zef_init). Figure-tool popup **Colormap:**
+%   stores zef.update_colormap as that index. This function evals
 %
-% Zef fields (observed):
-%   zef.colormap_cell (read)
-%   zef.colormap_size (read)
-%   zef.colortune_param (read)
+%     colormap_cell{k}(zef.colortune_param, zef.colormap_size)
 %
-% Calls (project):
-%   zef_colormap
+%   and returns size-by-3 RGB in [0,1]. zef is taken from the caller
+%   workspace if present, else base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Indices (zef_init): 1 Monterosso, 2–4 Intensity I–III, 5–9 Contrast
+%   I–V, 10–12 Blue brain I–III, 13 Parcellation (src/parcellation),
+%   14 Easter, 15 Greyscale.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[colormap_vec] = zef_colormap(inv_colormap)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_brightness_and_contrast, zef_init.
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');
 else

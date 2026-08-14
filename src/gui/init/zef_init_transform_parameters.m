@@ -1,27 +1,16 @@
-% --- Zeffiro documentation header ---
-% zef — Zef.
+%ZEF_INIT_TRANSFORM_PARAMETERS  Load h_parameters_table for the selected transform (script).
 %
-% Purpose:
-%   Zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_data_1 (read)
-%   zef.aux_data_2 (read, write)
-%   zef.current_parameters (read, write)
-%   zef.current_tag (read)
-%   zef.current_transform (read)
-%   zef.h_parameters_table (read)
+%   Script. Required: zef.current_transform (slot) and zef.current_tag.
+%   Rows (name → field): Scaling, X/Y/Z-shift, Xy/Yz/Zx-rotation,
+%   Affine transform. Affine is mat2str of a 4-by-4 (eye(4) if missing).
+%   Sets current_parameters='transform' for zef_update_parameters.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_update_transform_parameters, zef_init_transform.
 zef.aux_data_1 = cell(0);
 zef.aux_data_2 = {{'Scaling','scaling'},{'X-shift','x_correction'},{'Y-shift','y_correction'},{'Z-shift','z_correction'},{'Xy-rotation','xy_rotation'},{'Yz-rotation','yz_rotation'},{'Zx-rotation','zx_rotation'},{'Affine transform','affine_transform'}};
 zef_i = evalin('base','zef.current_transform');

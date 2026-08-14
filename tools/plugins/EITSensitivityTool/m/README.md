@@ -1,59 +1,14 @@
-# tools/plugins/EITSensitivityTool/m
+# EIT Sensitivity Tool — MATLAB files (`m/`)
 
-## Purpose of this folder
+Not on any default INI. Open with `zef_eit_sensitivity_tool_start`. The tool compares stored conductivity interpolants / lead fields and can **Substitute** a chosen map into `zef.reconstruction` (and sometimes `zef.sigma` or `zef.L`) so the Figure tool can plot it. Button table and dropdown metrics: parent [../README.md](../README.md).
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+This is **not** `src/sensitivity` (`zef_sensitivity_run` Monte Carlo on EEG/MEG inverse ids).
 
-## Contents
+| File | Role |
+|------|------|
+| `zef_eit_sensitivity_tool_start.m` | **script** — construct `zef_eit_sensitivity_tool.mlapp`, set Distribution.Items, wire Activate / Import / Substitute. |
+| `zef_eit_sensitivity_tool_import.m` / `_import_2.m` | `uigetfile` `.mat` → `zef.eit_sensitivity_tool_data` / `_data_2` (expect `.avg`, often `.covK`). |
+| `zef_eit_sensitivity_tool_substitute.m` | Huge switch on the dropdown: interpolate σ, EIT MAG/RDM/orthogonal maps vs `inv_bg_data`, EEG `L` differences, Store/Use lead fields. |
+| `zef_eit_sensitivity_tool_volume.m` | Tetra volumes accumulated on `eit_ind`; several metrics use it as weights. |
 
-MATLAB sources:
-- `zef_eit_sensitivity_tool_import.m` — **[zef.file zef.file_path] = uigetfile({'*.mat'},'Import interpolation',zef**: [zef.file zef.file path] = uigetfile({'*.mat'},'Import interpolation',zef.
-- `zef_eit_sensitivity_tool_import_2.m` — **[zef.file zef.file_path] = uigetfile({'*.mat'},'Import interpolation',zef**: [zef.file zef.file path] = uigetfile({'*.mat'},'Import interpolation',zef.
-- `zef_eit_sensitivity_tool_substitute.m` — **if isequal(zef.h_eit_sensitivity_tool_distribution.Value,zef.h_eit_sensitivity_tool_distribution**: If isequal(zef.h eit sensitivity tool distribution.Value,zef.h eit sensitivity tool distribution.
-- `zef_eit_sensitivity_tool_volume.m` — **tilavuus_vec**: Tilavuus vec.
-- `zef_eit_sensitivity_tool_start.m` — **zef_data = zef_eit_sensitivity_tool;**: Zef data = zef eit sensitivity tool;.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-- **zef_data = zef_eit_sensitivity_tool;**: GUI callback or dialog (`zef_data = zef_eit_sensitivity_tool;`).
-- **if isequal(zef.h_eit_sensitivity_tool_distribution.Value,zef.h_eit_sensitivity_tool_distribution**: GUI callback or dialog (`if isequal(zef.h_eit_sensitivity_tool_distribution.Value,zef.h_eit_sensitivity_tool_distribution`).
-
-## Programmatic usage
-
-From the project root:
-
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
-```
-
-Representative entry points in this folder:
-- `Call `[zef.file zef.file_path] = uigetfile({'*.mat'},'Import interpolation',zef` from MATLAB with the project root on the path.`
-- `Call `[zef.file zef.file_path] = uigetfile({'*.mat'},'Import interpolation',zef` from MATLAB with the project root on the path.`
-- `Call `if isequal(zef.h_eit_sensitivity_tool_distribution.Value,zef.h_eit_sensitivity_tool_distribution` from MATLAB with the project root on the path.`
-- `Call `tilavuus_vec` from MATLAB with the project root on the path.`
-- `Call `zef_data = zef_eit_sensitivity_tool;` from MATLAB with the project root on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+**Activate** toggles `zef.sigma_bypass` so later lead-field assembly can skip overwriting σ. Confirm dialogs inside Substitute are commented out in the current tree (the switch runs immediately).

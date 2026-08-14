@@ -1,28 +1,21 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 
 function [nodes,tetra,interp_vec] = refine_mesh(nodes,tetra)
-% --- Zeffiro documentation header ---
-% refine_mesh — Refine mesh.
+%REFINE_MESH  Split every tetra into 8 by inserting edge midpoints.
 %
-% Purpose:
-%   Refine mesh.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Inputs:
-%   nodes
-%   tetra
+%   Unique edges become new nodes; interp_vec maps each child tet back to
+%   its parent (length 8*n_tet). Domain label column 5 is copied. Called
+%   n_refinement times from create_system.
 %
-% Outputs:
-%   nodes
-%   tetra
-%   interp_vec
+%   [nodes, tetra, interp_vec] = refine_mesh(nodes, tetra)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[nodes, tetra, interp_vec]] = refine_mesh(nodes, tetra)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also create_system.
+
+
 
 
 tetra_sort = [tetra(:,[1 2]);

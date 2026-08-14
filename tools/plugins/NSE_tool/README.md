@@ -1,41 +1,39 @@
-# tools/plugins/NSE_tool
+# NSE tool
 
-## Purpose of this folder
+Opens a window for hemodynamic Poisson / Navier–Stokes-style solves on vessel compartments of the current FEM mesh. It does **not** compute an EEG lead field. Results are stored on `zef.nse_field`. The PDE lives in `src/forward/nse/`; this plugin is the UI.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+## How to open it
 
-## Contents
+**Multi tools → NSE tool** (default profile). Callback: `zef_nse_tool_start` → `zef_tool_start(..., 'zef_nse_tool_window', ...)`.
 
-Subfolders:
-- `m/`
-- `mlapp/`
+Need `zef.nodes`, `zef.tetra`, `zef.domain_labels`, and `zef.mvd_length` (microvessel density).
 
-## How this folder fits into the overall workflow
+## Solve
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+The window copies widgets into `zef.nse_field` (`zef_nse_tool_update`). **Solve system** (`h_solve_system`) runs the script `zef_nse_run_solver`, which switches on `nse_field.solver_type`:
 
-## GUI usage
+- 1–2: steady `zef_nse_poisson` (microcirculation off/on)
+- 3: `zef_nse_haemodynamic_response_solver` (in this plugin, not `src/forward/nse`)
+- 4–7: `zef_nse_poisson_dynamic` with `nse_type` 1/2 × microcirculation 0/1
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+Outputs: `nse_field.bp_vessels`, `bv_vessels_1/2/3`, `mu_vessels`, `bf_capillaries`. Optional conductivity coupling: `zef_nse_sigma`.
 
-## Programmatic usage
+**Parse reconstruction** copies the selected dropdown type (1–17: artery pressure/velocity/viscosity and microcirculation concentration, plus mean/max/STD collapses) into `zef.reconstruction` via `zef_nse_reconstruction`, and copies `nse_field.inv_time_*` onto `zef.inv_time_*`. Type table: `src/forward/nse/README.md`. **Interpolate** (`zef_nse_interpolate`) sets source flags from artery vs microcirculation type lists, then `zef_source_interpolation`.
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+## Scripting
 
-## Examples
+```matlab
+zef = zef_nse_tool_update(zef);
+zef.nse_field.solver_type = 1;
+zef_nse_run_solver;   % script; uses/assigns base-workspace zef
+```
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+Or call `zef_nse_poisson` directly (see `src/forward/nse/README.md`). Nodes are converted mm→m inside the Poisson solver.
 
-## Dependencies and assumptions
+## Layout
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+- `m/zef_nse_tool_start.m`, `m/zef_nse_tool_window.m`, update helpers
+- `m/zef_nse_haemodynamic_response_solver.m` — solver_type 3 only
+- `mlapp/` — App Designer layout; not the algorithm
 
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Profile `multicompartment_head_nse` has NSE-oriented defaults. Details of matrices and pulse BCs: `src/forward/nse/README.md`.

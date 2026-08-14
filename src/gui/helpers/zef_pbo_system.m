@@ -1,69 +1,34 @@
-% zef_pbo_system
-%
-% A function for generating a matrix of interpolation coefficients via
-% position-based optimization or PBO.
-%
-% Input:
-%
-% - arg_locs
-%
-%   An N × 3 dipole location matrix needed in interpolation.
-%
-% - arg_dirs
-%
-%   An N × 3 dipole direction matrix needed in interpolation.
-%
-% - arg_interp_locs
-%
-%   The M × 3 interpolation positions needed in interpolation.
-%
-% - arg_interp_loc_row
-%
-%   Since this function will be usually called in a loop, we need the loop
-%   index that signifies which interpolation position (row) we are at. Can
-%   also be a vector of indices.
-%
-% - arg_n_of_coeffs
-%
-%   The number if interpolation / optimization coefficients or the size of the
-%   output system one wishes to obtain.
-%
-% Output:
-%
-% - out_coeff_sys
-%
-%   The interpolation system matrix, from which interpolation / optimization
-%   coefficients can be extracted.
-
 function out_coeff_sys = zef_pbo_system( ...
-% --- Zeffiro documentation header ---
-% out_coeff_sys — Out coeff sys.
-%
-% Purpose:
-%   Out coeff sys.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Inputs:
-%   arg_locs
-%   arg_dirs
-%   arg_interp_locs
-%   arg_interp_loc_row
-%   arg_n_of_coeffs
-%
-% Calls (project):
-%   zef_L2_norm
-%   zef_pbo_system
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `out_coeff_sys(arg_locs, arg_dirs, arg_interp_locs, arg_interp_loc_row, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
     arg_locs, ...
     arg_dirs, ...
     arg_interp_locs, ...
     arg_interp_loc_row, ...
     arg_n_of_coeffs ...
     )
+%ZEF_PBO_SYSTEM  Position-based optimization (PBO) weights for one source.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Whitney / H(div) interpolation when optimization_system_type is 'pbo'.
+%
+%   out_coeff_sys = zef_pbo_system(locs, dirs, interp_locs, interp_row, n_coeff)
+%
+%   locs, dirs  - n_coeff×3 dipole positions and unit directions.
+%   interp_locs - barycentra; row interp_row is the target x*.
+%
+%   Saddle-point system (n_coeff+3)×(n_coeff+3) for each of 3 Cartesian
+%   right-hand sides:
+%
+%     [ diag(||x_k − x*||)   dirs ]
+%     [ dirs'                  0  ]  [λ; μ] = [0; I_3]
+%
+%   Distances from zef_L2_norm. Output is (n_coeff+3)×3; callers keep
+%   rows 1:n_coeff as the dipole weights (three columns = e_x, e_y, e_z).
+%
+%   See also zef_mpo_system, zef_whitney_interpolation.
 
 
 arguments

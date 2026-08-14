@@ -1,34 +1,20 @@
-function vec = zef_ES_error_criteria(zef) 
-% --- Zeffiro documentation header ---
-% zef_ES_error_criteria — Zef ES error criteria.
+function vec = zef_ES_error_criteria(zef)
+%ZEF_ES_ERROR_CRITERIA  Build an error/score table from y_ES_interval.
 %
-% Purpose:
-%   Zef ES error criteria.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Not used by zef_ES_plot_error_chart (that uses zef_ES_table) and not
+%   bound in zef_ES_optimization_window. Reads y_ES_interval residual,
+%   field_source relative/magnitude/angle, ||y||_1, max y, rwnnz.
 %
-% Outputs:
-%   vec
+%   vec = zef_ES_error_criteria()
+%   vec = zef_ES_error_criteria(zef)
 %
-% Zef fields (observed):
-%   zef.ES_relative_weight_nnz (read)
-%   zef.y_ES_interval (read)
+%   See also zef_ES_table, zef_ES_rwnnz.
 %
-% Calls (project):
-%   zef_ES_error_criteria
-%   zef_ES_rwnnz
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[vec] = zef_ES_error_criteria(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0 
     zef = evalin('base','zef');

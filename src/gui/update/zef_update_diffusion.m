@@ -1,33 +1,23 @@
 function  diffusion_val = zef_update_diffusion(varargin)
-% --- Zeffiro documentation header ---
-% zef_update_diffusion — Syncs GUI control values into `zef` for diffusion.
+%ZEF_UPDATE_DIFFUSION  Figure-tool **Diffusion:** slider.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for diffusion.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Finds the slider Tag='update_diffusion_slider' on the Figure tool
+%   (or on varargin{1}) and sets DiffuseStrength on every axes1 child
+%   that has that property. Range 0–1. This is Lambert diffuse lighting,
+%   not conductivity / DTI diffusion.
 %
-% Outputs:
-%   diffusion_val
+%   The Figure-tool Callback writes the returned value to
+%   zef.update_diffusion when gca is parented to h_zeffiro.
 %
-% Zef fields (observed):
-%   zef.h_zeffiro (read)
+%   diffusion_val = zef_update_diffusion
+%   diffusion_val = zef_update_diffusion(h_figure)
 %
-% Calls (project):
-%   zef_update_diffusion
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[diffusion_val] = zef_update_diffusion(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_ambience, zef_update_specular, zef_figure_tool.
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');
 else

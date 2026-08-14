@@ -1,32 +1,29 @@
 function zef = zef_dataBank_getHasForMenu(zef)
-% --- Zeffiro documentation header ---
-% zef_dataBank_getHasForMenu — Zef data Bank get Has For Menu.
+%ZEF_DATABANK_GETHASHFORMENU  Selected uitree NodeData → zef.dataBank.hash.
 %
-% Purpose:
-%   Zef data Bank get Has For Menu.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Tree.SelectionChangedFcn and tree-menu callbacks in zef_open_dataBank
+%   (loadMenu, loadwithparentsMenu, deleteMenu, modifyMenu, changeName,
+%   showinformationMenu, exportButtonPress). If nothing is selected, prints
+%   'please select nodes' and returns. Multiple SelectedNodes are allowed
+%   only when zef.dataBank.selectMultiple is true (modifyMenu sets that);
+%   then hash is a cell of NodeData strings. Otherwise hash is the single
+%   NodeData char. Filename is zef_dataBank_getHashForMenu.m; the function
+%   symbol is zef_dataBank_getHasForMenu.
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_getHashForMenu(zef)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef  - session with dataBank.app.Tree. nargin==0 → base.
 %
-% Calls (project):
-%   zef_dataBank_getHasForMenu
+%   Output
+%     zef  - zef.dataBank.hash set. nargout==0 → assignin base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dataBank_getHasForMenu(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_getHashForTableMenu, zef_dataBank_setData.
 
 if nargin == 0
     zef = evalin('base','zef');

@@ -1,35 +1,33 @@
 function zef = zef_delete_compartment(zef,compartments_selected)
-% --- Zeffiro documentation header ---
-% zef_delete_compartment — Zef delete compartment.
+%ZEF_DELETE_COMPARTMENT  Drop selected *inactive* compartment table rows.
 %
-% Purpose:
-%   Zef delete compartment.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   compartments_selected
+%   Right-click the Segmentation compartment table → **Delete compartment(s)**.
+%   zef_menu_tool sets MenuSelectedFcn to
+%   "zef_delete_compartment;zef_init_sensors_parameter_profile;".
 %
-% Outputs:
-%   zef
+%   Rows come from zef.compartments_selected (set by
+%   zef_compartment_table_selection) unless you pass compartments_selected.
+%   Only rows with column 2 **On** false are flagged: column 1 (Index) is
+%   set to NaN. zef_update then removes those tags and their zef.<tag>_*
+%   fields. Active (On) rows are left alone — turn On off first, then delete.
 %
-% Zef fields (observed):
-%   zef.compartments_selected (read)
-%   zef.h_compartment_table (read)
+%   zef_start_new_project uses zef_delete_all_compartments, which calls this
+%   after turning compartments off.
 %
-% Calls (project):
-%   zef_delete_compartment
-%   zef_update
+%   zef = zef_delete_compartment(zef)
+%   zef = zef_delete_compartment(zef, row_indices)
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Inputs
+%     zef                    - session. Omitted → base workspace.
+%     compartments_selected  - 1-based table row indices. Default
+%                              zef.compartments_selected; empty uses that field.
 %
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_delete_compartment(zef, compartments_selected)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_add_compartment, zef_update, zef_delete_all_compartments.
 
 if nargin < 2
     compartments_selected = [];

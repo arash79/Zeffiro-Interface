@@ -1,57 +1,20 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% relative_size = 1; — Relative size = 1;.
+%ZEF_FIGURE_TOOL  Build the Figure tool (3-D axes and color/movie controls).
 %
-% Purpose:
-%   Relative size = 1;.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.clear_axes1 (read, write)
-%   zef.colormap_items (read)
-%   zef.colorscale_max_slider (read, write)
-%   zef.colorscale_min_slider (read, write)
-%   zef.font_size (read)
-%   zef.h (read, write)
-%   zef.h_aux (read, write)
-%   zef.h_axes1 (read, write)
-%   zef.h_colorbar (read, write)
-%   zef.h_colorscale_max_slider (read, write)
-%   zef.h_colorscale_min_slider (read, write)
-%   zef.h_compartment_visible_color (read, write)
-%   zef.h_logoplot (read, write)
-%   zef.h_loop_movie (read, write)
-%   zef.h_loop_movie_count (read, write)
-%   … (47 more)
+%   Script (not a function). Not App Designer. Creates figure
+%   "ZEFFIRO Interface: Figure tool" with uiaxes h_axes1. assignin
+%   ('base','zef',zef) so string callbacks see the session. DeleteFcn
+%   zef_reopen_figure. Buttons: Toggle controls, Toggle edges, Reset,
+%   Play, Stop, Logo. Sliders call zef_update_*. Compartments/Sensors
+%   lists call zef_set_compartment_color / zef_set_sensor_color.
 %
-% Calls (project):
-%   zef_colormap
-%   zef_logoplot
-%   zef_play_cdata
-%   zef_set_figure_tool_sliders
-%   zef_set_size_change_function
-%   zef_update_ambience
-%   zef_update_colorscale
-%   zef_update_colorscale_max
-%   zef_update_colorscale_min
-%   zef_update_contrast_and_brightness
-%   zef_update_diffusion
-%   zef_update_fig_details
-%   … (8 more)
-%
-% Side effects:
-%   - base/caller workspace
-%   - creates/updates figures
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `relative_size = 1;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_plot_volume, zef_set_figure_tool_sliders.
 %if zef.h_segmentation_tool_toggle == 1
 
  %   zef.size_temp = [zef.segmentation_tool_default_position(1) + 0.505*zef.segmentation_tool_default_position(3), ...
@@ -87,6 +50,7 @@ width_aux = relative_size*zef.segmentation_tool_default_position(3);
 end
 
 zef.h_zeffiro = figure(...
+    'WindowStyle','normal',...
     'PaperUnits',get(0,'defaultfigurePaperUnits'),...
     'Units','Pixels',...
     'OuterPosition',zef.size_temp,...
@@ -107,7 +71,6 @@ zef.h_zeffiro = figure(...
     'DeleteFcn','zef_reopen_figure;',...
     'Tag','figure_tool',...
     'UserData',[],...
-    'WindowStyle',get(0,'defaultfigureWindowStyle'),...
     'Resize',get(0,'defaultfigureResize'),...
     'PaperPosition',get(0,'defaultfigurePaperPosition'),...
     'PaperSize',[20.99999864 29.69999902],...
@@ -193,11 +156,19 @@ set(zef.h_loop_movie_count,'string',num2str(zef.loop_movie_count));
 
 %***********************
 
-zef.h_compartment_visible_color = uicontrol('Style','ListBox','Parent',zef.h_zeffiro,'visible','on','Units','normalized','Position',[0.03 0.03 0.20 0.20],'Tag','compartment_visible_color');
-zef.h_sensor_visible_color = uicontrol('Style','ListBox','Parent',zef.h_zeffiro,'visible','on','Units','normalized','Position',[0.24 0.03 0.20 0.20],'Tag','sensor_visible_color');
-zef.h_system_information = uicontrol('Style','ListBox','Parent',zef.h_zeffiro,'visible','on','Units','normalized','Position',[0.45 0.03 0.20 0.20],'Tag','system_information');
-set(zef.h_compartment_visible_color,'ButtonDownFcn','zef_set_compartment_color; zef_update;');
-set(zef.h_sensor_visible_color,'ButtonDownFcn','zef_set_sensor_color; zef_update;');
+zef.h_compartment_visible_color = zef_colored_list('create', zef.h_zeffiro, ...
+    [0.03 0.03 0.20 0.20], 'compartment_visible_color', ...
+    'Callback', 'zef_set_compartment_color; zef_update;', ...
+    'Multiselect', false, ...
+    'Trigger', 'buttondown');
+zef.h_sensor_visible_color = zef_colored_list('create', zef.h_zeffiro, ...
+    [0.24 0.03 0.20 0.20], 'sensor_visible_color', ...
+    'Callback', 'zef_set_sensor_color; zef_update;', ...
+    'Multiselect', true, ...
+    'Trigger', 'buttondown');
+zef.h_system_information = zef_colored_list('create', zef.h_zeffiro, ...
+    [0.45 0.03 0.20 0.20], 'system_information', ...
+    'ShowSwatches', false);
 
 uicontrol(...
     'Parent',zef.h_zeffiro,...
@@ -284,6 +255,7 @@ zef = rmfield(zef,'size_temp');
 zef_logoplot;
 
 zef.h_zeffiro.Visible = zef.use_display;
+zef_window_manager('standalone', zef.h_zeffiro);
 set(findobj(zef.h_zeffiro.Children,'-property','FontUnits'),'FontUnits','pixels')
 set(findobj(zef.h_zeffiro.Children,'-property','FontSize'),'FontSize',zef.font_size);
 

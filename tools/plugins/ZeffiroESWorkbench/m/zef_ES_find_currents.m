@@ -1,53 +1,24 @@
 function zef = zef_ES_find_currents(varargin)
-% --- Zeffiro documentation header ---
-% zef_ES_find_currents — Zef ES find currents.
+%ZEF_ES_FIND_CURRENTS  Grid α/ε and solve tES currents into y_ES_interval.
 %
-% Purpose:
-%   Zef ES find currents.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Find currents button when HPO search method == 1. Builds zef_data from
+%   zef.L' (rows = sources×3, columns = electrodes), inv_synth_source
+%   positions/orientations, ES_* current limits and solver package. Inner
+%   loop: zef_ES_optimize_current on a parfor grid of α (j) × ε (i).
+%   Stores y_ES, volumetric_current_density, residuals, flags, nnz, and
+%   field_source (amplitude, angle, relative errors) in zef.y_ES_interval.
 %
-% Outputs:
-%   zef
+%   zef = zef_ES_find_currents()
+%   zef = zef_ES_find_currents(zef)
+%   zef = zef_ES_find_currents(zef, alpha, epsilon)
 %
-% Zef fields (observed):
-%   zef.ES_absolute_tolerance (read)
-%   zef.ES_active_electrodes (read)
-%   zef.ES_constraint_tolerance (read)
-%   zef.ES_display (read)
-%   zef.ES_max_current_channel (read)
-%   zef.ES_max_n_iterations (read)
-%   zef.ES_max_time (read)
-%   zef.ES_opt_algorithm (read)
-%   zef.ES_opt_method (read)
-%   zef.ES_opt_solver (read, write)
-%   zef.ES_opt_solver_list (read)
-%   zef.ES_relative_tolerance (read)
-%   zef.ES_relative_weight_nnz (read)
-%   zef.ES_roi_range (read)
-%   zef.ES_score_dose (read)
-%   … (11 more)
+%   See also zef_ES_optimize_current, zef_ES_find_parameters.
 %
-% Calls (project):
-%   zef_ES_find_currents
-%   zef_ES_find_parameters
-%   zef_ES_optimize_current
-%   zef_ES_rwnnz
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - parallel/cluster
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_ES_find_currents(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 switch nargin
     case {0,1}
@@ -165,6 +136,9 @@ if zef.use_waitbar == 1
         );
 end
 %% The real task...
+% α/ε lattice: i indexes ε, j indexes α. Methods 1–2 (LP/SDP) use a
+% parpool of zef.parallel_processes workers; each cell calls
+% zef_ES_optimize_current. Method 4 (backpropagation) forces step_size=1.
 zef.y_ES_interval = [];
 
 n_parallel = zef.parallel_processes;
@@ -218,6 +192,9 @@ for i = 1:step_size
             zef.y_ES_interval.source_amplitude{i,j}             = source_amplitude{parallel_ind};
             zef.y_ES_interval.nnz{i,j}                          = zef_ES_rwnnz(y_ES{parallel_ind}, zef_data.relative_weight_nnz, zef_data.score_dose);
             %% Field source
+            % On a successful flag, compare L*y at the target source (or
+            % ES_roi_range ball) to the requested orientation: amplitude,
+            % angle (deg), relative norm/RDM, mean off-target |J|.
             if ismember(flag{parallel_ind}, [1, 3]) && norm(y_ES{parallel_ind}, 2) > 0
                 for running_index = 1:length(source_position_index{parallel_ind})
                     vec_1 = source_amplitude{parallel_ind}(running_index)*source_directions{parallel_ind}(running_index,:);

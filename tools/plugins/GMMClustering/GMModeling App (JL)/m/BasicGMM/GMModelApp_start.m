@@ -1,27 +1,15 @@
-% --- Zeffiro documentation header ---
-% if isfield(zef,'GMM — If isfield(zef,'GMM.
+%GMMODELAPP_START  Entry point that opens the Gmmclustering plugin.
 %
-% Purpose:
-%   If isfield(zef,'GMM.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.font_size (read)
-%   zef.reconstruction (read)
-%   zef.save_file_path (read, write)
+%   INI callback (Inverse tools → Gaussian Mixture Model (JL) / GMM App).
+%   Constructs GMModelApp. StartButton runs zef_GMModeling_K or
+%   zef_AdvGMModeling into zef.GMM.* from an existing reconstruction.
+%   Not an inverse solver and not plugins.ClassGMM.
 %
-% Calls (project):
-%   zef_load_GMM
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `if isfield(zef,'GMM` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 if isfield(zef,'GMM.apps')
 if isfield(zef.GMM.apps,'main')
@@ -242,4 +230,5 @@ zef.GMM.apps.main.ImportMenu.MenuSelectedFcn = 'if not(isempty(zef.save_file_pat
 zef.GMM.apps.main.UIFigure.CloseRequestFcn = 'if isfield(zef.GMM.apps,''ModelingOpt''); delete(zef.GMM.apps.ModelingOpt); end; if isfield(zef.GMM.apps,''PlotOpt''); delete(zef.GMM.apps.PlotOpt); end; if isfield(zef.GMM.apps,''Export''); delete(zef.GMM.apps.Export); end; delete(zef.GMM.apps.main);';
 
 %set fonts
-set(findobj(zef.GMM.apps.main.UIFigure.Children,'-property','FontSize'),'FontSize',zef.font_size);
+set(findobj(zef.GMM.apps.main.UIFigure.Children,'-property','FontSize')
+,'FontSize',zef.font_size);

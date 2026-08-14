@@ -44,41 +44,27 @@
 % See also: run.m, get_default_config.m, Duneuro2Zeffiro_import.zef
 
 function results = import_duneuro_project(config, import_to_zeffiro)
-% --- Zeffiro documentation header ---
-% utilities.duneuro2zef.import_duneuro_project — Import duneuro project.
+%IMPORT_DUNEURO_PROJECT  Convert Duneuro files then zef_import_segmentation.
 %
-% Purpose:
-%   Import duneuro project.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   config
-%   import_to_zeffiro
+%   results = import_duneuro_project(config, import_to_zeffiro)
 %
-% Outputs:
-%   results
+%   Step 1: utilities.duneuro2zef.run(config). Step 2 (if import_to_zeffiro):
+%   requires zef in the base workspace; sets zef.file / file_path to
+%   Duneuro2Zeffiro_import.zef in this package, new_empty_project=0, then
+%   zef_import_segmentation + zef_build_compartment_table and assignin base.
 %
-% Zef fields (observed):
-%   zef.file (read, write)
-%   zef.file_path (read, write)
-%   zef.new_empty_project (read, write)
+%   That .zef uses relative foldername data/converted/ from pwd. Second
+%   argument default: true iff exist('zef','var') in base. Duneuro2Zeffiro_settings
+%   runs as a script line inside the .zef (not called again here).
 %
-% Calls (project):
-%   utilities.duneuro2zef.get_default_config
-%   utilities.duneuro2zef.import_duneuro_project
-%   utilities.duneuro2zef.run
-%   zef_build_compartment_table
-%   zef_import_segmentation
+%   results adds .import_success. Overall .success is conversion AND import.
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[results] = utilities.duneuro2zef.import_duneuro_project(config, import_to_zeffiro)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+
 
     results = struct();
     results.success = false;

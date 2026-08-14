@@ -1,25 +1,30 @@
 function [folder_list] = zef_add_path(import_path,varargin)
-% --- Zeffiro documentation header ---
-% zef_add_path — Zef add path.
+%ZEF_ADD_PATH  Recursively addpath folders, skipping packages and external/.
 %
-% Purpose:
-%   Zef add path.
-%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   import_path
-%   varargin
+%   Walks import_path with dir(), skipping names that are empty, "external",
+%   or start with + or @ (MATLAB packages/classes must not be addpath'd).
+%   Unique folders are addpath'd; an optional accumulator avoids re-adding.
 %
-% Outputs:
-%   folder_list
+%   folder_list = zef_add_path(import_path)
+%   folder_list = zef_add_path(import_path, recursive)
+%   folder_list = zef_add_path(import_path, recursive, folder_list_aux)
 %
-% Calls (project):
-%   zef_add_path
+%   Inputs
+%     import_path     - root directory to scan.
+%     varargin{1}     - 1 or 'recursive' to descend into subfolders.
+%     varargin{2}     - existing cell list of folders already on the path;
+%                       only the setdiff is addpath'd.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[folder_list] = zef_add_path(import_path, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     folder_list  - unique cell column of folder paths discovered (including
+%                    those already in varargin{2}).
+%
+%   See also zeffiro_interface.
 
 
 folder_list_aux = [];

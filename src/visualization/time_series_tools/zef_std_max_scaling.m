@@ -1,32 +1,14 @@
 function [y_vals, plot_mode] = zef_std_no_scaling(time_series)
-% --- Zeffiro documentation header ---
-% zef_std_no_scaling — Zef std no scaling.
+%ZEF_STD_NO_SCALING  Std after max-scaling (this file is zef_std_max_scaling.m).
 %
-% Purpose:
-%   Zef std no scaling.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   time_series
-%
-% Outputs:
-%   y_vals
-%   plot_mode
-%
-% Calls (project):
-%   zef_std_no_scaling
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[y_vals, plot_mode]] = zef_std_no_scaling(time_series)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%This function processes the N-by-M data array f for N channels and M time
-%steps. The other arguments can be controlled via the ZI user interface.
-%The desctiption and argument definitions shown in ZI are listed below.
-%Description: Standard deviation (STD), no scaling
+%   Description: Max scale then STD
+%   Function. MATLAB calls this file by filename zef_std_max_scaling.
+%   Inner function name is zef_std_no_scaling. plot_mode=1.
 
 time_series = time_series./max(time_series);
 y_vals = std(time_series');

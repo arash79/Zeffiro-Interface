@@ -1,33 +1,16 @@
 function zef_histogram(parameter_vec)
-% --- Zeffiro documentation header ---
-% zef_histogram — Zef histogram.
+%ZEF_HISTOGRAM  Histogram of log10(parameter_vec) on the Figure-tool axes.
 %
-% Purpose:
-%   Zef histogram.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   parameter_vec
-%
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%
-% Calls (project):
-%   zef_histogram
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_histogram(parameter_vec)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Function. Mesh visualization → Plot graph. cla zef.h_axes1 (base).
+%   200 bins, gray faces. evalin('base','zef.h_axes1').
 
-axes(evalin('base','zef.h_axes1'));
+axes(evalin('base','zef.h_axes1')
+);
 
 h_axes = evalin('base','zef.h_axes1');
 cla(h_axes,'reset');

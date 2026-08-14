@@ -1,27 +1,3 @@
-% --- Zeffiro documentation header ---
-% function [ ... — Function [ .
-%
-% Purpose:
-%   Function [ ....
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
-%
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.use_gpu (read)
-%   zef.use_gpu_graphic (read)
-%
-% Calls (project):
-%   zef_surface_mesh
-%
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [ ...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [ ...
     surface_triangles, ...
     surface_nodes, ...
@@ -31,6 +7,58 @@ function [ ...
     node_ind, ...
     node_pair, ...
     face_ind] = zef_surface_mesh(tetra, nodes, I, gpu_mode)
+%ZEF_SURFACE_MESH  Boundary faces of a tet mesh (or of a tet subset).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Lists every triangular face of tetra, sorts vertex triples, and keeps
+%   faces that appear once (the skin). Optional I restricts the tet set;
+%   extra outputs then relate those skin faces to the complementary tets.
+%   This is the workhorse for labeling, inflation, plotting, NSE boundary
+%   integrals, and barycentric surface operators.
+%
+%   [surface_triangles, surface_nodes, tetra_ind, tetra_ind_global, ...
+%       tetra_ind_diff, node_ind, node_pair, face_ind] = ...
+%       zef_surface_mesh(tetra, nodes, I, gpu_mode)
+%
+%   Inputs
+%     tetra     - T×4 1-based indices (cast to uint32).
+%     nodes     - optional N×3. If given, surface_triangles are remapped
+%                 into the unique skin vertices and surface_nodes is those
+%                 coordinates. Needed for nargout>3 as well (the nargin>1
+%                 guard).
+%     I         - optional tet indices (into tetra) defining a subset.
+%     gpu_mode  - 'graphics' (default) uses zef.use_gpu_graphic when the
+%                 caller has zef; 'normal' uses zef.use_gpu. GPU is used
+%                 only if zef.gpu_count > 0. If the caller has no zef,
+%                 everything stays on CPU.
+%
+%   Outputs (all empty if unused)
+%     surface_triangles - F×3. Winding flipped to [1 3 2] after gathering
+%                         the opposite-face stencil. With nodes, indices
+%                         refer to surface_nodes; without, to the original
+%                         node numbering.
+%     surface_nodes     - unique skin vertices (only if nodes was passed).
+%     tetra_ind         - F×1 tet index in the (possibly subset) tetra
+%                         that owns each skin face.
+%     tetra_ind_global  - same in the original tet numbering when I was
+%                         given; [] if I was empty.
+%     tetra_ind_diff    - tet indices in the complement of I that share a
+%                         face with the subset skin (requires nargin>2).
+%     node_ind          - for those complementary tets, the vertex not on
+%                         the shared face.
+%     node_pair         - unique [skin_vertex, interior_vertex] edges
+%                         across that interface (used by zef_inflate_surfaces).
+%     face_ind          - 1..4, which local vertex of tetra_ind is opposite
+%                         the skin face (barycentric surface operators).
+%
+%   Face stencil (row i opposite local vertex i): [2 4 3; 1 3 4; 1 4 2; 1 2 3].
+%
+%   See also zef_inflate_surfaces, zef_mesh_relabeling, zef_surface_scalar_matrix.
+
 
 surface_triangles = [];
 surface_nodes = [];
@@ -73,6 +101,7 @@ if evalin('caller', 'exist(''zef'', ''var'' )')
     end
 end
 
+% Optional subset: work on tetra(I,:), keep a map back to global tet numbers.
 I_global = [];
 tetra_diff = [];
 if not(isempty(I))
@@ -116,6 +145,7 @@ tetra_sort_1 = sort(tetra_sort_1,2);
 
 tetra_ind = zeros(size(tetra_sort_1,1),1);
 
+% Consecutive identical triples are interior faces (shared by two tets).
 I = find(sum(abs(tetra_sort_1(2:end,1:3)-tetra_sort_1(1:end-1,1:3)),2)==0);
 clear tetra_sort_1;
 tetra_sort_2 = tetra_sort_2(J,:);

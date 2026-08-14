@@ -1,33 +1,29 @@
 function zef = zef_dataBank_set_reconstructions(zef,rec_cell,frame_number)
-% --- Zeffiro documentation header ---
-% zef_dataBank_set_reconstructions — Zef data Bank set reconstructions.
+%ZEF_DATABANK_SET_RECONSTRUCTIONS  Write reconstruction cells back onto matching tree nodes.
 %
-% Purpose:
-%   Zef data Bank set reconstructions.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   rec_cell
-%   frame_number
+%   Scripting helper complementary to get_reconstructions. Used by
+%   zef_process_training_data_focal_epilepsy. Walks fieldnames of
+%   zef.dataBank.tree and, for each type 'reconstruction', writes
+%   rec_cell{rec_ind} into .data.reconstruction{frame_number} in that
+%   same order. Does not refresh the uitree. Assumes rec_cell has as many
+%   entries as reconstruction nodes (and the same order as get_).
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_set_reconstructions(zef, rec_cell, frame_number)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef           - session with dataBank.tree.
+%     rec_cell      - cell of reconstruction arrays, one per rec node.
+%     frame_number  - index into each node's reconstruction cell.
 %
-% Calls (project):
-%   zef_dataBank_set_reconstructions
+%   Output
+%     zef  - tree payloads updated (in-memory; disk files unchanged).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dataBank_set_reconstructions(zef, rec_cell, frame_number)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_get_reconstructions.
 
 data_tree = zef.dataBank.tree;
 rec_ind = 1;

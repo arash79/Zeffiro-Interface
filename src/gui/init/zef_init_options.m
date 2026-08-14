@@ -1,41 +1,18 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'streamline_draw')) — If not(isfield(zef,'streamline draw')).
+%ZEF_INIT_OPTIONS  Shared visualization / inversion defaults (script).
 %
-% Purpose:
-%   If not(isfield(zef,'streamline draw')).
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.brain_transparency (read, write)
-%   zef.colortune_param (read, write)
-%   zef.cone_alpha (read, write)
-%   zef.cone_field_lattice_resolution (read, write)
-%   zef.cone_scale (read, write)
-%   zef.cp2_a (read, write)
-%   zef.cp2_b (read, write)
-%   zef.cp2_c (read, write)
-%   zef.cp2_d (read, write)
-%   zef.cp2_on (read, write)
-%   zef.cp3_a (read, write)
-%   zef.cp3_b (read, write)
-%   zef.cp3_c (read, write)
-%   zef.cp3_d (read, write)
-%   zef.cp3_on (read, write)
-%   … (43 more)
+%   Script. Historical catch-all (streamlines, cones, parcellation,
+%   reconstruction_type, clipping cp2/cp3, inv_scale/colormap,
+%   transparency, frame/orbit, hyperprior, mesh optimization). Settings
+%   dialogs now call the split inits (forward/inverse, graphics,
+%   gaussian prior). Still used where a single default dump is needed.
+%   Does not open a window.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'streamline_draw'))` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
-
+%   See also zef_init_forward_and_inverse_options, zef_init_graphics_options.
 if not(isfield(zef,'streamline_draw'))
     zef.streamline_draw = 0;
 end
@@ -68,6 +45,10 @@ if not(isfield(zef,'cone_alpha'));
     zef.cone_alpha = 1;
 end;
 
+% Mesh-vis Component (1 Amplitude … 7 Amplitude smoothed). Default 1
+% only if the field is missing. zef_init already writes 7 (Amplitude
+% smoothed), so a normal session never hits this branch until Mesh-vis
+% overwrites the value.
 if not(isfield(zef,'reconstruction_type'));
     zef.reconstruction_type = 1;
 end;
@@ -138,6 +119,9 @@ end;
 if not(isfield(zef,'inv_snr'));
     zef.inv_snr = 30;
 end;
+
+% Second and third clipping planes (Mesh visualization tool). Plane 1
+% (cp_*) is seeded elsewhere (zef_init / mesh vis).
 
 if not(isfield(zef,'cp2_on'));
     zef.cp2_on = 0;

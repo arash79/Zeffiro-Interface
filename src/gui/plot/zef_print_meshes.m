@@ -1,64 +1,26 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [void] = zef_print_meshes(~);
-% --- Zeffiro documentation header ---
-% zef_print_meshes — Zef print meshes.
+%ZEF_PRINT_MESHES  Hardcopy the current mesh/volume view (Frame / Movie).
 %
-% Purpose:
-%   Zef print meshes.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   ~
+%   Function. Called from zef_snapshot_movie (Mesh visualization
+%   **Frame / Movie**). Copies camera from zef.h_axes1 onto a hidden
+%   print figure (axes Tag='axes1'), re-draws the same patches as
+%   zef_plot_volume or zef_plot_meshes depending on zef.on_screen,
+%   applies zef_set_sliders_print, then print() to
+%   zef.file_path / zef.file as JPEG/TIFF/PNG (or RGBImage frames).
+%   Snapshot size from zef.snapshot_*_resolution. Unused argument is
+%   historical. visualization_type 1–5 = Domain labels / Distribution
+%   (volume) / Distribution (surface) / Parcellation / Topography
+%   (zef_mesh_visualization_tool Items). Volume branch when on_screen is
+%   0 or 1 and type is not 3; otherwise surfaces (reuna_p / reuna_t).
 %
-% Outputs:
-%   void
-%
-% Zef fields (observed):
-%   zef.active_compartment_ind (read)
-%   zef.attach_electrodes (read)
-%   zef.axes_visible (read)
-%   zef.azimuth (read)
-%   zef.brain_transparency (read)
-%   zef.cam_va (read)
-%   zef.colormap_cell (read)
-%   zef.colormap_size (read)
-%   zef.colortune_param (read)
-%   zef.compartment_tags (read)
-%   zef.contour_set (read)
-%   zef.cp2_a (read)
-%   zef.cp2_b (read)
-%   zef.cp2_c (read)
-%   zef.cp2_d (read)
-%   … (67 more)
-%
-% Calls (project):
-%   zef_attach_sensors_volume
-%   zef_clipping_plane
-%   zef_fix_sensors_get_functions_array_size
-%   zef_get_profile_parameters
-%   zef_minimal_mesh
-%   zef_plot_cone_field
-%   zef_plot_contour
-%   zef_plot_dpq
-%   zef_print_meshes
-%   zef_sensor_get_function_eval
-%   zef_set_sliders_print
-%   zef_smooth_field
-%   … (3 more)
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[void] = zef_print_meshes(~)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_snapshot_movie, zef_set_sliders_print.
 zef = evalin('base','zef');
 f_ind = 1;
 
@@ -108,6 +70,9 @@ c_ta = camtarget(eval('zef.h_axes1'));
 c_p = camproj(eval('zef.h_axes1'));
 c_u = camup(eval('zef.h_axes1'));
 
+% Volume hardcopy: Figure-tool camera copied onto a hidden print figure.
+% Skip this branch when visualization_type is 3 (surface distribution) —
+% that always uses reuna_p below even if on_screen is 0/1.
 if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')==3)
 
     h_axes_text = [];
@@ -179,6 +144,7 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
     %January 2023
     sensor_explosion_parameter_1 = zef.sensor_explosion_parameter_1;
     sensor_explosion_parameter_2 = zef.sensor_explosion_parameter_2;
+    % Visual-only inflate of a local sensors copy (xy vs depth along z).
     sensors(:,1) = sensors(:,1).*(1 + sensor_explosion_parameter_2.*exp(sensor_explosion_parameter_1.*(max(sensors(:,3))-sensors(:,3))./(max(sensors(:,3))-min(sensors(:,3)))));
     sensors(:,2) = sensors(:,2).*(1 + sensor_explosion_parameter_2.*exp(sensor_explosion_parameter_1.*((max(sensors(:,3))-sensors(:,3))/(max(sensors(:,3))-min(sensors(:,3))))));
     sensors(:,3) = sensors(:,3)+sign(sensor_explosion_parameter_2).*(max(sensors(:,3))-sensors(:,3));
@@ -202,6 +168,8 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
     Z_s = sphere_scale*Z_s;
     nodes = eval('zef.nodes');
 
+    % imaging_method 1/4/5 (EEG/EIT/TES) with 6-column sensors → CEM
+    % (electrode_model 2). Otherwise point electrodes (1).
     if size(sensors,2) == 6 & ismember(eval('zef.imaging_method'), [1 4 5])
         electrode_model = 2;
     else
@@ -433,6 +401,9 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
         clipped = 1;
     end
 
+    % Clip tetrahedra by centroid vs the three Mesh-vis planes.
+    % cp_mode 1 Cut out / 2 Cut in / 3–4 also union the active
+    % (source-containing) compartments so the "brain" stays.
     if eval('zef.cp_on') || eval('zef.cp2_on') || eval('zef.cp3_on')
         if eval('zef.cp_mode') == 1
             tetra = tetra(aux_ind,:);
@@ -463,8 +434,9 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
     frame_stop = 1;
     frame_step = 1;
 
+    % Reconstruction CData uses source_interpolation_ind{1} (volume
+    % barycentric map). Parameter modes 2/4 colour every tetra instead.
     if ismember(eval('zef.visualization_type'), [2,4])
-        if ismember(eval('zef.volumetric_distribution_mode'), [1,3])
             if not(isempty(eval('zef.source_interpolation_ind')))
                 s_i_ind = eval('zef.source_interpolation_ind{1}');
             end
@@ -664,6 +636,9 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
             reconstruction = reconstruction(:);
             reconstruction = reshape(reconstruction,3,length(reconstruction)/3);
 
+            % Mesh-vis Component dropdown (reconstruction_type):
+            % 1/7 amplitude ||xyz||; 6 scalar mean xyz/√3; 2–5 keep the
+            % three Cartesian components for a later normal/tangential split.
             if ismember(eval('zef.reconstruction_type'),[1 7])
                 reconstruction = sqrt(sum(reconstruction.^2))';
             elseif eval('zef.reconstruction_type') == 6
@@ -682,6 +657,8 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
                 reconstruction = reconstruction(I_2(I_1));
             end
 
+            % Interpolate each Cartesian component onto tetrahedra, then
+            % onto the visible surface faces (I_2 / I_3 / tetra_ind).
             if ismember(eval('zef.reconstruction_type'), [2 3 4 5])
                 rec_x = reconstruction(1,:)';
                 rec_y = reconstruction(2,:)';
@@ -707,6 +684,8 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
                 n_vec_aux = n_vec_aux./repmat(sqrt(sum(n_vec_aux.^2,2)),1,3);
             end
 
+            % Type 2: |dipole · n|. Type 3 overwrites with a tangential
+            % remainder using |n| on each axis (not a true tangent plane).
             if ismember(eval('zef.reconstruction_type'), [2 3 4 5])
                 reconstruction = sqrt((rec_x.*n_vec_aux(:,1)).^2 + (rec_y.*n_vec_aux(:,2)).^2 + (rec_z.*n_vec_aux(:,3)).^2);
             end
@@ -715,6 +694,8 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
                 reconstruction = sqrt((rec_x - rec_x.*abs(n_vec_aux(:,1))).^2 + (rec_y - rec_y.*abs(n_vec_aux(:,2))).^2 + (rec_z - rec_z.*abs(n_vec_aux(:,3))).^2);
             end
 
+            % Types 4/5: keep only the inward (−) or outward (+) normal
+            % hemisphere; the other faces are zeroed for CData.
             if eval('zef.reconstruction_type') == 4
                 aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                 I_aux_rec = find(aux_rec > 0);
@@ -751,6 +732,8 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
             if not(ismember(eval('zef.visualization_type'),[4]))
                 if eval('zef.use_parcellation')
 
+                    % Same overlay aggregates as zef_plot_volume (types 2–5);
+                    % type 1 is point-wise. visualization_type 4 skips this.
                     if eval('zef.parcellation_type') > 1
                         rec_aux = zeros(size(reconstruction));
                         if eval('zef.parcellation_type') == 2
@@ -988,6 +971,8 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
         end
         reconstruction = reconstruction(:);
         reconstruction = reshape(reconstruction,3,length(reconstruction)/3);
+        % Histogram / colour-limit pass: amplitude only (types 2–5 are
+        % ignored here). The CData mapping just below applies Component.
         reconstruction = sqrt(sum(reconstruction.^2))';
         reconstruction = sum(reconstruction(s_i_ind),2)/4;
         if eval('zef.inv_scale') == 1
@@ -1018,6 +1003,8 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
             reconstruction = (1/sqrt(3))*sum(reconstruction)';
         end
         if ismember(eval('zef.reconstruction_type'), [1 6 7])
+            % Movie-frame CData: same Component mapping as the first
+            % volume draw; still hard-coded /4 on tet-node sources.
             reconstruction = sum(reconstruction(s_i_ind),2)/4;
             reconstruction = reconstruction(I_2_b_rec);
             reconstruction = reconstruction(I_2_rec(I_1_rec));
@@ -1154,7 +1141,9 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
             warning('Contour plot not successful.')
         end
         zef_set_sliders_print(1,h_axes_image);
-        camorbit(frame_step*eval('zef.orbit_1')/movie_fps,frame_step*eval('zef.orbit_2')/movie_fps);
+        % Copy Figure-tool camera onto this print figure, then dump JPEG /
+        % TIFF / PNG or an RGBImage movie frame. file_index 1–3 are stills;
+        % 4 is AVI (print -RGBImage into VideoWriter).
 
         if eval('zef.visualization_type') == 2
             h_bar = bar(h_axes_hist,b_hist+(max_rec-min_rec)/(2*50),a_hist,'hist');
@@ -1213,6 +1202,9 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
     %**************************************************************************
     %**************************************************************************
 
+% Surface hardcopy (Visualize surfaces, or Type = Distribution surface).
+% Drop a trailing PML box (reuna_type{end,1}==-1). Types 3/4 colour
+% surfaces with volumetric_distribution; type 5 uses top_reconstruction.
 else
 
     reuna_p = eval('zef.reuna_p');
@@ -1301,6 +1293,8 @@ else
     submesh_num = eval('zef.submesh_num');
 
     if ismember(eval('zef.visualization_type'), [3,4])
+        % Surface CData uses interpolation{2} (triangles). Volume
+        % interpolation{1} is s_i_ind_2 for parameter vs reconstruction.
         if not(isempty(eval('zef.source_interpolation_ind')))
             s_i_ind = eval('zef.source_interpolation_ind{2}');
         end
@@ -1491,6 +1485,7 @@ else
     %January 2023
     sensor_explosion_parameter_1 = zef.sensor_explosion_parameter_1;
     sensor_explosion_parameter_2 = zef.sensor_explosion_parameter_2;
+    % Visual-only inflate of a local sensors copy (xy vs depth along z).
     sensors(:,1) = sensors(:,1).*(1 + sensor_explosion_parameter_2.*exp(sensor_explosion_parameter_1.*(max(sensors(:,3))-sensors(:,3))./(max(sensors(:,3))-min(sensors(:,3)))));
     sensors(:,2) = sensors(:,2).*(1 + sensor_explosion_parameter_2.*exp(sensor_explosion_parameter_1.*((max(sensors(:,3))-sensors(:,3))/(max(sensors(:,3))-min(sensors(:,3))))));
     sensors(:,3) = sensors(:,3)+sign(sensor_explosion_parameter_2).*(max(sensors(:,3))-sensors(:,3));
@@ -1702,6 +1697,8 @@ else
     aux_ind_2 = cell(1,length(reuna_t));
     triangle_c = cell(1,length(reuna_t));
 
+    % Surface hardcopy: CEM if EEG/EIT/TES and 6 columns; PEM if those
+    % modalities with fewer columns; 0 for MEG (no electrode attach).
     if ismember(eval('zef.imaging_method'), [1 4 5])  & size(sensors,2) == 6
         electrode_model = 2;
     elseif ismember(eval('zef.imaging_method'), [1 4 5])
@@ -1916,6 +1913,10 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                             reconstruction = reconstruction(:);
                             reconstruction = reshape(reconstruction,3,length(reconstruction)/3);
 
+                            % Surface CData: /3 averages the three triangle
+                            % vertices (volume used /4 on tet nodes). Types
+                            % 1/7 amplitude; 6 xyz/√3; 2–5 keep Cartesian
+                            % components for the normal/tangential split.
                             if ismember(eval('zef.reconstruction_type'),[1 7])
                                 reconstruction = sqrt(sum(reconstruction.^2))';
                             elseif eval('zef.reconstruction_type') == 6
@@ -1941,6 +1942,8 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                                 reconstruction = sqrt((rec_x.*n_vec_aux(:,1)).^2 + (rec_y.*n_vec_aux(:,2)).^2 + (rec_z.*n_vec_aux(:,3)).^2);
                             end
 
+                            % Type 3 remainder uses |n| per axis, not a
+                            % true tangent-plane projection (same as volume).
                             if eval('zef.reconstruction_type') == 3
                                 reconstruction = sqrt((rec_x - rec_x.*abs(n_vec_aux(:,1))).^2 + (rec_y - rec_y.*abs(n_vec_aux(:,2))).^2 + (rec_z - rec_z.*abs(n_vec_aux(:,3))).^2);
                             end
@@ -2346,6 +2349,8 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                         reconstruction = reconstruction(:);
                         reconstruction = reshape(reconstruction,3,length(reconstruction)/3);
 
+                        % Movie-frame pass of the same surface CData as above
+                        % (/3 on triangle vertices; types 1–7 as Mesh-vis Component).
                         if ismember(eval('zef.reconstruction_type'),[1 7])
                             reconstruction = sqrt(sum(reconstruction.^2))';
                         elseif eval('zef.reconstruction_type') == 6

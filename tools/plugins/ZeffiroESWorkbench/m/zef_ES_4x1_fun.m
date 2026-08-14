@@ -1,29 +1,19 @@
 function ell_idx = zef_ES_4x1_fun
-% --- Zeffiro documentation header ---
-% ell_idx — Ell idx.
+%ZEF_ES_4X1_FUN  Plot the 4×1 montage from zef_ES_4x1_sensors on zef.h_axes1.
 %
-% Purpose:
-%   Ell idx.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.ES_separation_angle (read)
-%   zef.h_axes1 (read)
-%   zef.inv_synth_source (read)
-%   zef.sensors (read)
+%   Not bound in zef_ES_optimization_window. Reads ES_separation_angle,
+%   sensors, inv_synth_source from base. Red = anode, blue = returns.
+%   The literal 'moi' below is leftover debug output (not removed).
 %
-% Calls (project):
-%   zef_ES_4x1_fun
-%   zef_ES_4x1_sensors
+%   ell_idx = zef_ES_4x1_fun
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   See also zef_ES_4x1_sensors, zef_ES_plot_4x1.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `ell_idx` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 separation_angle = evalin('base','zef.ES_separation_angle');
 sensors    = evalin('base','zef.sensors(:,1:3)');
@@ -32,7 +22,8 @@ source_ori = evalin('base','zef.inv_synth_source(1,4:6)'); % Orientation
 'moi'
 
 ell_idx = zef_ES_4x1_sensors(separation_angle, source_pos, source_ori, sensors);
-axes(evalin('base','zef.h_axes1'));
+axes(evalin('base','zef.h_axes1')
+);
 
 quiver3(source_pos(1), source_pos(2), source_pos(3), source_ori(1),source_ori(2),source_ori(3),20,'g','linewidth',1,'marker','o');
 hold on

@@ -1,26 +1,19 @@
-% --- Zeffiro documentation header ---
-% [~, indexOfMinimumTrueElement]=max(cell2mat( zef.reconstructionTool — [~, index Of Minimum True Element]=max(cell2mat( zef.reconstruction Tool.
+%ZEF_RECONSTRUCTIONTOOL_REPLACE  First checked bank row → live zef.reconstruction.
 %
-% Purpose:
-%   [~, index Of Minimum True Element]=max(cell2mat( zef.reconstruction Tool.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.inv_sampling_frequency (read, write)
-%   zef.inv_time_1 (read, write)
-%   zef.inv_time_2 (read, write)
-%   zef.inv_time_3 (read, write)
-%   zef.reconstruction (read, write)
-%   zef.reconstructionTool (read)
-%   zef.reconstruction_information (read, write)
+%   Script. replaceButton. max() on the column-7 logicals picks the first
+%   true row. Copies that reconstruction onto zef.reconstruction before
+%   the checkbox-clearing loop. The loop reuses the index name, so
+%   reconstruction_information is then taken from the last bank row
+%   (bankSize), not the checked row. Also copies inv_time_1/2/3 and
+%   inv_sampling_frequency when all four fields exist. Clears every
+%   checkbox. Does not invert.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `[~, indexOfMinimumTrueElement]=max(cell2mat( zef.reconstructionTool` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_reconstructionTool_addCurrent2bank, zef_reconstructionTool_refresh.
 
 [~, indexOfMinimumTrueElement]=max(cell2mat( zef.reconstructionTool.bankInfo(:,7)));
 
@@ -36,6 +29,7 @@ end
 zef.reconstructionTool.app.BankTable.Data=zef.reconstructionTool.bankInfo;
 zef.reconstructionTool.app.current.Data=zef.reconstructionTool.currentInfo;
 
+% Loop reused the index name, so this is the last bank row (bankSize).
 zef.reconstruction_information=zef.reconstructionTool.bankReconstruction{indexOfMinimumTrueElement,1}.reconstruction_information;
 
 clear indexOfMinimumTrueElement;

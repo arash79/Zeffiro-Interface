@@ -1,32 +1,17 @@
-% --- Zeffiro documentation header ---
-% warning('off'); — Warning('off');.
+%ZEF_MEG_MAGNETOMETERS_LEAD_FIELD  MEG magnetometer lead field (type 2); used by make_all.
 %
-% Purpose:
-%   Warning('off');.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.imaging_method (read, write)
-%   zef.lead_field_filter_quantile (read)
-%   zef.lead_field_type (read, write)
-%   zef.source_directions (read)
-%   zef.source_ind (read, write)
-%   zef.source_interpolation_on (read)
-%   zef.source_positions (read)
+%   Script (reads zef in the base workspace). Sets lead_field_type=2,
+%   imaging_method=2, clears source_ind, process_meshes, zef_lead_field_matrix,
+%   quantile filter, optional interpolation. Does not attach sensors via
+%   zef_attach_sensors_volume (MEG uses zef.sensors columns 1:3 / 4:6 in metres
+%   inside the dispatcher). Default INI rows call the _isotropic sibling.
 %
-% Calls (project):
-%   zef_lead_field_filter
-%   zef_lead_field_matrix
-%   zef_process_meshes
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `warning('off');` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_lead_field_meg_fem, zef_meg_magnetometers_lead_field_isotropic.
 
 warning('off');
 zef.lead_field_type = 2;

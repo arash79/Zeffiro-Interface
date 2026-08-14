@@ -1,32 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [gravity_ind,gravity_count] = zef_make_gravity_dec(nodes,tetrahedra,brain_ind,source_ind)
-% --- Zeffiro documentation header ---
-% zef_make_gravity_dec — Zef make gravity dec.
+%ZEF_MAKE_GRAVITY_DEC  Nearest-source binning of brain tetrahedra for gravity DOFs.
 %
-% Purpose:
-%   Zef make gravity dec.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018, Sampsa Pursiainen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
 %
-% Inputs:
-%   nodes
-%   tetrahedra
-%   brain_ind
-%   source_ind
+%   Same centroid knnsearch as zef_make_eit_dec, used by gravity FEM when
+%   grouping tetrahedra onto source locations.
 %
-% Outputs:
-%   gravity_ind
-%   gravity_count
+%   [gravity_ind, gravity_count] = zef_make_gravity_dec(nodes, tetrahedra, brain_ind, source_ind)
 %
-% Calls (project):
-%   zef_make_gravity_dec
-%   zef_waitbar
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[gravity_ind, gravity_count]] = zef_make_gravity_dec(nodes, tetrahedra, brain_ind, source_ind)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_make_eit_dec, zef_lead_field_gravity.
 
 h = zef_waitbar(0,1,'Field decomposition');
 

@@ -1,52 +1,17 @@
-# +utilities/+fs2zef/+environment
+# `+environment` — FreeSurfer env from MATLAB
 
-## Purpose of this folder
-
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
-
-## Contents
-
-MATLAB sources:
-- `setup_freesurfer_env.m` — **utilities.fs2zef.environment.setup_freesurfer_env**: Setup freesurfer env.
-- `validate_environment.m` — **utilities.fs2zef.environment.validate_environment**: Validate environment.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+`run` cannot call `mri_mc` until the MATLAB process has the same environment a FreeSurfer shell would. This folder does that mutation, then checks that the binaries exist. It is not a GUI tool.
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+utilities.fs2zef.environment.setup_freesurfer_env(getenv("FREESURFER_HOME"));
+report = utilities.fs2zef.environment.validate_environment();
+if ~report.valid
+    error("%s", strjoin(report.errors, newline));
+end
 ```
 
-Representative entry points in this folder:
-- ``utilities.fs2zef.environment.setup_freesurfer_env(FREESURFER_HOME, options)` with project root and `src` on the path.`
-- ``[report] = utilities.fs2zef.environment.validate_environment(options)` with project root and `src` on the path.`
+`setup_freesurfer_env(FREESURFER_HOME)` sets `FREESURFER_HOME`, `FSFAST_HOME`, `SUBJECTS_DIR` (if empty), `FUNCTIONALS_DIR`, MNI/FSL-related vars, and prepends `bin/` to `PATH`. Optional `fs_override` (default true) fills defaults when a variable is unset.
 
-## Examples
+`validate_environment` returns `report.valid`, `report.errors`, `report.warnings` after checking those binaries (`mri_mc`, `mri_segstats`, `mris_convert`) and directories. `run` calls setup then validate and errors `fs2zef:InvalidEnvironment` if `valid` is false.
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Side effect: `setenv` / `PATH` mutation in the MATLAB process for the rest of the session. Parent: [`../README.md`](../README.md).

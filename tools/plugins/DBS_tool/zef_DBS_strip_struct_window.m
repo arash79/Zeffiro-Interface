@@ -1,34 +1,21 @@
 function zef = zef_DBS_strip_struct_window(zef)
-% --- Zeffiro documentation header ---
-% zef_DBS_strip_struct_window — Zef DBS strip struct window.
+%ZEF_DBS_STRIP_STRUCT_WINDOW  GUIDE figure: Deeb brain stimulation strip struct.
 %
-% Purpose:
-%   Zef DBS strip struct window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_DBS_strip_struct_window(zef)
 %
-% Outputs:
-%   zef
+%   Layout only. Title 'ZEFFIRO Interface: Deeb brain stimulation
+%   strip struct' (spelling as in the figure Name). Edits write
+%   strip_struct.center_point / dir_vec / strip_type / probe_num.
+%   Run → zef_DBS_strip_struct_update (build probe geometry).
+%   Attach electrodes → zef_DBS_update_electrodes. Opened from
+%   zef_DBS_strip_struct_open.
 %
-% Zef fields (observed):
-%   zef.strip_struct (read)
-%
-% Calls (project):
-%   zef_DBS_strip_struct_update
-%   zef_DBS_strip_struct_window
-%   zef_DBS_update_electrodes
-%
-% Side effects:
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_DBS_strip_struct_window(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_DBS_strip_struct_open, zef_DBS_strip_struct_start.
 
 h1 = figure(...
 'PaperUnits',get(0,'defaultfigurePaperUnits'),...

@@ -1,30 +1,18 @@
 function [multigrid_dec, multigrid_ind, multigrid_perm] = zef_make_multigrid_dec(center_points,n_subset,n_decs,n_levels)
-% --- Zeffiro documentation header ---
-% zef_make_multigrid_dec — Zef make multigrid dec.
+%ZEF_MAKE_MULTIGRID_DEC  Random nested source subsets for relaxation multigrid.
 %
-% Purpose:
-%   Zef make multigrid dec.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   center_points
-%   n_subset
-%   n_decs
-%   n_levels
+%   [multigrid_dec, multigrid_ind, multigrid_perm] =
+%       zef_make_multigrid_dec(center_points, n_subset, n_decs, n_levels)
 %
-% Outputs:
-%   multigrid_dec
-%   multigrid_ind
-%   multigrid_perm
+%   Called when building the relaxation preconditioner. No zef write
+%   besides what the caller stores.
 %
-% Calls (project):
-%   zef_make_multigrid_dec
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[multigrid_dec, multigrid_ind, multigrid_perm]] = zef_make_multigrid_dec(center_points, n_subset, n_decs, n_levels)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_relax_find_preconditioner.
 
 multigrid_dec = cell(0);
 multigrid_ind = cell(0);

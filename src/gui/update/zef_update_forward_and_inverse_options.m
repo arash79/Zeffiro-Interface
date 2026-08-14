@@ -1,44 +1,19 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef.preconditioner = get(zef — Zef.preconditioner = get(zef.
+%ZEF_UPDATE_FORWARD_AND_INVERSE_OPTIONS  Settings → Forward and inverse processing options (script).
 %
-% Purpose:
-%   Zef.preconditioner = get(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.adaptive_refinement_compartments (read, write)
-%   zef.adaptive_refinement_k_param (read, write)
-%   zef.adaptive_refinement_number (read, write)
-%   zef.adaptive_refinement_on (read, write)
-%   zef.adaptive_refinement_thresh_val (read, write)
-%   zef.distance_smoothing_exp (read, write)
-%   zef.distance_smoothing_on (read, write)
-%   zef.exclude_box (read, write)
-%   zef.extensive_relabeling (read, write)
-%   zef.fem_mesh_inflation_strength (read, write)
-%   zef.fix_outer_surface (read, write)
-%   zef.gpu_count (read)
-%   zef.gpu_num (read, write)
-%   zef.h_adaptive_refinement_compartments (read)
-%   zef.h_adaptive_refinement_k_param (read)
-%   … (90 more)
+%   Script. ValueChangedFcn on every control of
+%   zef.h_zef_forward_and_inverse_processing_options (wired in
+%   zef_open_forward_and_inverse_options). Copies h_as_opt_* /
+%   h_refinement_* / h_pml_* / h_adaptive_* / GPU / source_model
+%   (ZefSourceModel.from) / FEM inflation / labeling / distance-smoothing
+%   widgets into the matching zef fields. Selects gpuDevice(zef.gpu_num)
+%   when use_gpu is on and a device exists. Does not replot or remesh.
 %
-% Calls (project):
-%   core.types.ZefSourceModel.from
-%
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.preconditioner = get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_open_forward_and_inverse_options, zef_init_forward_and_inverse_options.
 zef.preconditioner = get(zef.h_as_opt_1,'Value');
 zef.preconditioner_tolerance = str2num(get(zef.h_as_opt_2,'Value'));
 zef.smoothing_steps_surf = str2num(get(zef.h_as_opt_3,'Value'));

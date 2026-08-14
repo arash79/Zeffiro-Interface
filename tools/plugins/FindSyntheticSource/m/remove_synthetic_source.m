@@ -1,21 +1,15 @@
-% --- Zeffiro documentation header ---
-% if isfield(zef,'synth_source_data') — If isfield(zef,'synth source data').
+%REMOVE_SYNTHETIC_SOURCE  Delete the selected synth_source_data cell.
 %
-% Purpose:
-%   If isfield(zef,'synth source data').
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.find_synth_source (read)
-%   zef.synth_source_data (read)
+%   Script. Remove button. Drops selected_source from synth_source_data
+%   and the list. If empty, rmfield synth_source_data. Does not change
+%   zef.measurements.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if isfield(zef,'synth_source_data')` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also add_synthetic_source.
 
 if isfield(zef,'synth_source_data')
     zef.synth_source_data(zef.find_synth_source.selected_source) = [];

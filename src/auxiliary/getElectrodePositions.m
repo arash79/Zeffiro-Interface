@@ -1,29 +1,20 @@
 function [pos, label] = getElectrodePositions(data, OptionalNameforElectrodeFile, OptionalNameForLabelFile, OptionalSaveToFile0or1)
-% --- Zeffiro documentation header ---
-% getElectrodePositions — Get Electrode Positions.
+%GETELECTRODEPOSITIONS  Match data.label to data.elec and optionally write DAT.
 %
-% Purpose:
-%   Get Electrode Positions.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   data
-%   OptionalNameforElectrodeFile
-%   OptionalNameForLabelFile
-%   OptionalSaveToFile0or1
+%   [pos, label] = getElectrodePositions(data)
+%   [pos, label] = getElectrodePositions(data, elecFile, labelFile, saveFlag)
 %
-% Outputs:
-%   pos
-%   label
+%   data.label{i} must equal some data.elec.label{j}; pos(i,:) =
+%   data.elec.chanpos(j,:). Defaults: save on, ./electrodes.dat (ascii)
+%   and ./electrodesLabel.dat (writecell). Not Import → Import electrodes
+%   (that uses core.io.electrodes.from_csv / from_dat).
 %
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[pos, label]] = getElectrodePositions(data, OptionalNameforElectrodeFile, OptionalNameForLabelFile, OptionalSaveToFile0or1)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also getMagnetometerPositions.
 
 if nargin==3
     OptionalSaveToFile0or1=1;

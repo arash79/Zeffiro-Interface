@@ -1,28 +1,24 @@
 function self = precompute(self, L)
-% --- Zeffiro documentation header ---
-% inverse.DipoleScanInverter.precompute — Precomputes cached operators before the per-frame inversion loop.
+%precompute  Whiten L and store per-source SVD factorisations (U, S, V pages).
 %
-% Purpose:
-%   Precomputes cached operators before the per-frame inversion loop.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   L
+%   Called from run_frame_loop before the time loop. invert then uses
+%   i_invert_cached. If noise_cov is empty, caches stay empty and invert
+%   takes the per-call whitening path.
 %
-% Outputs:
-%   self
+%   Chalf = sqrtm(noise_cov), whitening = Chalf \ I, L_w = whitening*L.
+%   Each 3-column source block is SVD'd into U, S, V pages. When
+%   reg_type is "Basic", singular values are Tikhonov-regularized.
+%   Lead field must have a multiple of 3 columns (error otherwise).
+%   gpuArray L is gathered before the SVD loop.
 %
-% Calls (project):
-%   inverse.precompute
-%
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[self] = inverse.DipoleScanInverter.precompute(self, L)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Input  L  - n_sensors×(3 n_sources) processed lead field.
+%   Output self with precomputed_L_w, precomputed_whitening,
+%          precomputed_U_pages, precomputed_S_diag, precomputed_V_pages.
 
 arguments
     self (1,1) inverse.DipoleScanInverter

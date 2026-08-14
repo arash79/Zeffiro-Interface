@@ -1,26 +1,24 @@
 function volume_val = zef_find_enclosed_volume(nodes, triangles)
-% --- Zeffiro documentation header ---
-% zef_find_enclosed_volume — Zef find enclosed volume.
+%ZEF_FIND_ENCLOSED_VOLUME  Scalar volume enclosed by a closed triangle mesh.
 %
-% Purpose:
-%   Zef find enclosed volume.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   triangles
+%   Unused from menus. No first-party callers.
 %
-% Outputs:
-%   volume_val
+%   volume_val = zef_find_enclosed_volume(nodes, triangles)
 %
-% Calls (project):
-%   zef_find_enclosed_volume
+%   Inputs
+%     nodes      - N×3.
+%     triangles  - F×3.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[volume_val] = zef_find_enclosed_volume(nodes, triangles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output
+%     volume_val  - abs((1/3) * sum(dot(centroid, n) * area)) with
+%                   n = cross(p3-p1, p2-p1) and area = |n|/2.
+%
+%   See also zef_find_intersecting_triangle.
 
 c_t = (1/3)*(nodes(triangles(:,1),:) + nodes(triangles(:,2),:) + nodes(triangles(:,3),:));
 n_t = cross(nodes(triangles(:,3),:)'-nodes(triangles(:,1),:)', nodes(triangles(:,2),:)'-nodes(triangles(:,1),:)');

@@ -1,32 +1,19 @@
 function [P_s_store, m_s_store, G_store] = Block_RTS_smoother(P_store, z_inverse, A, Q, number_of_frames, dim,sL)
-% --- Zeffiro documentation header ---
-% Block_RTS_smoother — Block RTS smoother.
+%BLOCK_RTS_SMOOTHER  RTS on a 2- or 3-block (position / velocity / acceleration) state.
 %
-% Purpose:
-%   Block RTS smoother.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   P_store
-%   z_inverse
-%   A
-%   Q
-%   number_of_frames
-%   dim
-%   sL
+%   [P_s_store, m_s_store, G_store] = Block_RTS_smoother(P_store, z_inverse, A, Q, number_of_frames, dim, sL)
 %
-% Outputs:
-%   P_s_store
-%   m_s_store
-%   G_store
+%   zef_KF when kf_smoothing is 3 (2Block RTS, dim=2) or 4 (3Block RTS,
+%   dim=3). Rebuilds the same A/Q blocks as double_kf_sL / triple_kf_sL.
+%   m_s_store is I1*m_s (position / selected block), not the full state.
 %
-% Calls (project):
-%   zef_waitbar
+%   See also RTS_smoother, double_kf_sL, triple_kf_sL.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[P_s_store, m_s_store, G_store]] = Block_RTS_smoother(P_store, z_inverse, A, Q, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 P_s_store = cell(0);
 m_s_store = cell(0);

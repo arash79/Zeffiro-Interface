@@ -1,33 +1,35 @@
 function zef = zef_merge_surface_mesh(zef,compartment_tag,triangles,points,varargin)
-% --- Zeffiro documentation header ---
-% zef_merge_surface_mesh — Zef merge surface mesh.
+%ZEF_MERGE_SURFACE_MESH  Append or replace zef.<tag>_points / _triangles.
 %
-% Purpose:
-%   Zef merge surface mesh.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   compartment_tag
-%   triangles
-%   points
-%   varargin
+%   Used by zef_import_segmentation when a compartment already has geometry
+%   and the import should concatenate a new patch (unique vertex merge, face
+%   indices remapped, submesh_ind extended with the new last-face index).
+%   If merge is false the existing mesh is discarded and submesh_ind is
+%   just size(triangles,1).
 %
-% Outputs:
-%   zef
+%   zef = zef_merge_surface_mesh(zef, compartment_tag, triangles, points)
+%   zef = zef_merge_surface_mesh(zef, compartment_tag, triangles, points, merge)
 %
-% Calls (project):
-%   zef_merge_surface_mesh
+%   Inputs
+%     zef             - session. Empty → evalin('base','zef',zef) (the extra
+%                       argument is ignored by evalin).
+%     compartment_tag - char/string, e.g. 'd1'. Reads/writes
+%                       zef.<tag>_points, _triangles, _submesh_ind, _merge.
+%     triangles       - F×3 1-based indices into points.
+%     points          - V×3.
+%     merge           - optional logical. Default zef.<tag>_merge.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Output
+%     zef  - updated session. If nargout==0 the code calls assign('base',...)
+%            (not assignin); callers that care about the base workspace
+%            should capture the output.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_merge_surface_mesh(zef, compartment_tag, triangles, points, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_process_meshes, zef_import_segmentation.
 
 if isempty(zef)
     zef = evalin('base','zef',zef);
@@ -45,6 +47,7 @@ submesh_ind_0 = eval(['zef.' compartment_tag '_submesh_ind;']);
 
 if merge
 
+    % Unique rows of [old; new]; remap both triangle blocks through ind_aux.
     [points,~,ind_aux] = unique([points_0 ; points],'rows');
     triangles = ind_aux([triangles_0; triangles + size(points_0,1)]);
     submesh_ind = [submesh_ind_0 size(triangles,1)];

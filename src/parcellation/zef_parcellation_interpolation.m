@@ -1,48 +1,27 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [parcellation_interpolation_ind] = zef_parcellation_interpolation(zef)
-% --- Zeffiro documentation header ---
-% zef_parcellation_interpolation — Zef parcellation interpolation.
+%ZEF_PARCELLATION_INTERPOLATION  Build volume and surface parcellation interpolation indices.
 %
-% Purpose:
-%   Zef parcellation interpolation.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Merges imported parcellation colortables and points, scales coordinates
+%   per zef.location_unit_current, and for each selected parcel computes
+%   tetrahedra in brain compartments (KD-tree nearest-neighbor within
+%   zef.parcellation_tolerance) and surface triangle masks on active
+%   reuna meshes. Returns parcellation_interpolation_ind{p}{1} volume rows
+%   and parcellation_interpolation_ind{p}{2}{compartment} triangle indices.
 %
-% Outputs:
-%   parcellation_interpolation_ind
+%   parcellation_interpolation_ind = zef_parcellation_interpolation(zef)
 %
-% Zef fields (observed):
-%   zef.brain_ind (read)
-%   zef.compartment_tags (read)
-%   zef.domain_labels (read)
-%   zef.location_unit_current (read)
-%   zef.nodes (read)
-%   zef.parcellation_colortable (read)
-%   zef.parcellation_compartment (read)
-%   zef.parcellation_p (read, write)
-%   zef.parcellation_points (read)
-%   zef.parcellation_selected (read)
-%   zef.parcellation_tolerance (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.submesh_ind (read)
-%   zef.tetra (read)
+%   Input
+%     zef - session with parcellation_*, brain_ind, tetra, reuna_p/t.
 %
-% Calls (project):
-%   zef_parcellation_interpolation
-%   zef_waitbar
+%   Output
+%     parcellation_interpolation_ind - cell array indexed by parcel id.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[parcellation_interpolation_ind] = zef_parcellation_interpolation(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_parcellation_time_series, zef_import_parcellation_points.
 
 domain_labels = eval('zef.domain_labels(zef.brain_ind)');
 submesh_ind_vec = eval('zef.submesh_ind');
@@ -97,7 +76,6 @@ for k = 1 : length(compartment_tags)
         if ismember(compartment_tags{k},parcellation_compartment)
             cortex_surface_ind_aux = [cortex_surface_ind_aux i];
         end
-
 
     end
 end
@@ -220,14 +198,11 @@ end
 
 for ab_ind = 1 : length(aux_brain_ind)
 
-
-
     p_counter = 0;
     for p_ind = p_selected + 1
         p_counter = p_counter + 1;
 
         zef_waitbar([ab_ind p_counter], [length(aux_brain_ind) length(p_selected)],h,['Interp. 2: ' num2str(p_counter) '/' num2str(length(p_selected)) '.']);
-
 
         parcellation_interpolation_ind{p_ind-1}{2}{ab_ind} = [];
         triangles = eval(['zef.reuna_t{' int2str(aux_brain_ind(ab_ind)) '}']);
@@ -278,7 +253,6 @@ for ab_ind = 1 : length(aux_brain_ind)
                 %source_interpolation_ind{2}{ab_ind} = rand_perm_aux(source_interpolation_ind{2});
                 %end
                 parcellation_interpolation_ind{p_ind-1}{2}{ab_ind} = find(mean(sqrt(distance_vec(triangles)),2)<p_tolerance);
-
 
             end
             %end

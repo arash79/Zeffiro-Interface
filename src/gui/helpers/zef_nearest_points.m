@@ -1,29 +1,40 @@
 function nearest_list = zef_nearest_points( ...
-% --- Zeffiro documentation header ---
-% nearest_list — Nearest list.
-%
-% Purpose:
-%   Nearest list.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Inputs:
-%   points
-%   neighbour_points
-%   quantity
-%   quantity_interpretation
-%
-% Calls (project):
-%   zef_nearest_points
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `nearest_list(points, neighbour_points, quantity, quantity_interpretation)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
     points, ...
     neighbour_points, ...
     quantity, ...
     quantity_interpretation ...
     )
+%ZEF_NEAREST_POINTS  Neighbours of query points via KD-tree or range search.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Searches neighbour_points for each row of points. quantity_interpretation:
+%     'single'  knnsearch K=1; nearest_list is n_points-by-1 indices
+%     'count'   knnsearch K=quantity (nonnegative integer); n_points-by-K
+%     'range'   rangesearch radius quantity, then unique([cells{:}]') so
+%               the result is a single column of neighbour indices, not
+%               a per-query cell array
+%
+%   Only first-party caller is zef_deep_nodes_and_tetra, twice with
+%   'range' (drop source-compartment nodes within a depth of the
+%   submesh boundary, including the boundary nodes themselves).
+%
+%   nearest_list = zef_nearest_points(points, neighbour_points, quantity, interpretation)
+%
+%   Inputs
+%     points                  - n-by-3 query coordinates.
+%     neighbour_points        - m-by-3 search set.
+%     quantity                - K (count) or radius (range); ignored for
+%                               'single' except the nonnegative check.
+%     quantity_interpretation - 'single', 'count', or 'range'.
+%
+%   Output
+%     nearest_list - indices into neighbour_points (see modes above).
+%
+%   See also zef_deep_nodes_and_tetra.
 
 arguments
     points (:, 3) double

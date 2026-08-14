@@ -1,32 +1,27 @@
 function [contacts, sensor_info, triangle_index] = zef_sensor_get_function_eval(function_string, project_struct, domain_type)
-% --- Zeffiro documentation header ---
-% zef_sensor_get_function_eval — Zef sensor get function eval.
+%ZEF_SENSOR_GET_FUNCTION_EVAL  Evaluate a sensor attachment function string.
 %
-% Purpose:
-%   Zef sensor get function eval.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   function_string
-%   project_struct
-%   domain_type
+%   Runs function_string in the caller workspace via feval and evalin,
+%   passing project_struct and domain_type. Used by zef_attach_sensors_volume
+%   for custom per-sensor attachment logic.
 %
-% Outputs:
-%   contacts
-%   sensor_info
-%   triangle_index
+%   [contacts, sensor_info, triangle_index] = ...
+%       zef_sensor_get_function_eval(function_string, project_struct, domain_type)
 %
-% Calls (project):
-%   zef_sensor_get_function_eval
+%   Inputs
+%     function_string - MATLAB expression or function handle name as string.
+%     project_struct  - zef session passed to the evaluated code.
+%     domain_type     - attachment domain ('mesh', 'geometry', 'points', ...).
 %
-% Side effects:
-%   - base/caller workspace
+%   Outputs
+%     contacts, sensor_info, triangle_index - return values from the evaluated code.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[contacts, sensor_info, triangle_index]] = zef_sensor_get_function_eval(function_string, project_struct, domain_type)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_attach_sensors_volume.
 
 [contacts, sensor_info, triangle_index] = feval(@(project_struct, domain_type)evalin('caller',function_string),project_struct, domain_type);
 

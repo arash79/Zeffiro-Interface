@@ -1,31 +1,15 @@
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'h_create_dipolar_pair_x')) — If not(isfield(zef,'h create dipolar pair x')).
+%ZEF_CREATE_DIPOLAR_PAIR_INIT  Default pair xyz/ori/strength onto the table.
 %
-% Purpose:
-%   If not(isfield(zef,'h create dipolar pair x')).
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.create_dipolar_pair_color (read, write)
-%   zef.create_dipolar_pair_impedance (read, write)
-%   zef.create_dipolar_pair_length (read, write)
-%   zef.create_dipolar_pair_ori_x (read, write)
-%   zef.create_dipolar_pair_ori_y (read, write)
-%   zef.create_dipolar_pair_ori_z (read, write)
-%   zef.create_dipolar_pair_separation (read, write)
-%   zef.create_dipolar_pair_strength (read, write)
-%   zef.create_dipolar_pair_tag (read, write)
-%   zef.create_dipolar_pair_x (read, write)
-%   zef.create_dipolar_pair_y (read, write)
-%   zef.create_dipolar_pair_z (read, write)
+%   Script. Called from start. Defaults origin 0, ori [1 0 0],
+%   strength 10 nAm, separation 2. Then update_table. Does not add
+%   sensors.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'h_create_dipolar_pair_x'))` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_create_dipolar_pair_update_table.
 
 if not(isfield(zef,'h_create_dipolar_pair_x'))
     zef.create_dipolar_pair_x = 0;

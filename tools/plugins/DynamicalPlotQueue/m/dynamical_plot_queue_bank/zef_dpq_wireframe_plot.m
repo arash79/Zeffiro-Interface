@@ -1,28 +1,19 @@
-% --- Zeffiro documentation header ---
-% function zef_dpq_wireframe_plot — Function zef dpq wireframe plot.
+function zef_dpq_wireframe_plot
+%ZEF_DPQ_WIREFRAME_PLOT  Queue renderer: zef.wireframe_triangles as a grey surface.
 %
-% Purpose:
-%   Function zef dpq wireframe plot.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%   zef.wireframe_nodes (read)
-%   zef.wireframe_triangles (read)
+%   Reads zef.wireframe_triangles and zef.wireframe_nodes from base
+%   (WireframeTool). trimesh on base zef.h_axes1, FaceColor 0.5 grey,
+%   two opposing lights, phong, axis equal, then hides the axes.
+%   Tag: 'additional'.
 %
-% Calls (project):
 %   zef_dpq_wireframe_plot
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_dpq_wireframe_plot` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-function zef_dpq_wireframe_plot
-
+%   See also zef_dpq_plot_resection, zef_plot_dpq.
 
 w_t = evalin('base','zef.wireframe_triangles');
 w_n = evalin('base','zef.wireframe_nodes');

@@ -1,20 +1,19 @@
-% --- Zeffiro documentation header ---
-% zef — Zef.
+%ZEF_DELETE_ORIGINAL_SURFACE_MESHES  Drop all *_original_surface_mesh backup fields.
 %
-% Purpose:
-%   Zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.fieldnames (read)
+%   Unused from menus. Real caller: zef_init (with zef_delete_original_field)
+%   so a new session does not keep resample/transform caches from a previous
+%   zef. zef_downsample_surfaces and zef_apply_transform *write* those
+%   fields; this script only rmfields them.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Script. fieldnames containing 'original_surface_mesh' are removed,
+%   then the temporary zef.fieldnames field is removed.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_delete_original_field, zef_apply_transform, zef_init.
 
 zef.fieldnames = fieldnames(zef);
 zef = rmfield(zef,zef.fieldnames(find(contains(zef.fieldnames, 'original_surface_mesh'))));

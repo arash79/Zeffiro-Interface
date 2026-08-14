@@ -1,46 +1,22 @@
 function [processed_data] = zef_ellip_band_stop_filter(f, filter_order, ripple, attenuation, center_frequency, band_width, harmonic_filtering, sampling_frequency)
-% --- Zeffiro documentation header ---
-% zef_ellip_band_stop_filter — Zef ellip band stop filter.
+%ZEF_ELLIP_BAND_STOP_FILTER  Pipeline stage: elliptic band-stop, optional harmonic notches.
 %
-% Purpose:
-%   Zef ellip band stop filter.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   f
-%   filter_order
-%   ripple
-%   attenuation
-%   center_frequency
-%   band_width
-%   harmonic_filtering
-%   sampling_frequency
+%   center_frequency / band_width; if harmonic_filtering, repeats at k*f0
+%   until Nyquist. Add parses Input: including Default: true.
 %
-% Outputs:
-%   processed_data
-%
-% Calls (project):
-%   zef_ellip_band_stop_filter
-%   zef_waitbar
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[processed_data] = zef_ellip_band_stop_filter(f, filter_order, ripple, attenuation, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%This function processes the N-by-M data array f for N channels and M time
-%steps. The other arguments can be controlled via the ZI user interface.
-%The desctiption and argument definitions shown in ZI are listed below.
 %Description: Elliptic band-stop filter
 %Input: 1 Polynomial order [Default: 3], 2 Peak-to-peak ripple (dB) [Default: 3],
 %3 Attenuation (dB) [Default: 80], 4 Center frequency (Hz) [Default: 50],
 %5 Band-width (Hz) [Default: 0.1], 6 Harmonic filtering (true/false) [Default: true],
 %7 Sampling frequency (Hz) [Default: filter_sampling_rate]
 %Output: Band-stop filtered data.
+%
 
-%Conversion between string and numeric data types.
 if isstr(filter_order)
     filter_order = str2num(filter_order);
 end

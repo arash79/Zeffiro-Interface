@@ -1,26 +1,40 @@
-% --- Zeffiro documentation header ---
-% pml_ind_aux = []; — Pml ind aux = [];.
+%ZEF_SEGMENTATION_COUNTER_STEP  Script: inject compartment lists into create_fem_mesh.
 %
-% Purpose:
-%   Pml ind aux = [];.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.mesh_resolution (read)
-%   zef.reuna_p (read)
-%   zef.reuna_submesh_ind (read)
-%   zef.reuna_type (read)
-%   zef.sensors (read)
+%   Not a function. zef_create_fem_mesh calls it first so the volume builder
+%   can see mesh_res, reuna_type, pml_ind_aux, submesh_cell, name_tags,
+%   aux_active_compartment_ind, and the labeling-priority vectors without
+%   passing them as extra arguments. zef_smoothing_step also calls it on
+%   the first smoothing repetition when mesh_relabeling is on.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Reads from zef (caller workspace)
+%     compartment_tags, mesh_resolution, reuna_type, reuna_p, reuna_submesh_ind,
+%     sensors, and per-tag _on / _sigma / _priority / _name / _sources /
+%     optional _labeling_priority.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `pml_ind_aux = [];` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   Writes into the caller workspace (not onto zef)
+%     mesh_res              - copy of zef.mesh_resolution
+%     reuna_type, sensors   - copies
+%     pml_ind, pml_ind_aux  - index among *active* compartments of the one
+%                             with _sources == -1 (PML), or []
+%     sigma_vec, priority_vec - one row per active (_on) compartment
+%     labeling_priority_aux_1 - per active compartment (0 if field missing)
+%     name_tags             - 1×C cell of names
+%     aux_active_compartment_ind - active compartments with _sources in {1,2}
+%     submesh_cell          - zef.reuna_submesh_ind
+%     n_compartments        - sum over surfaces of max(1, n_submeshes)
+%     submesh_ind_1, submesh_ind_2 - map subdomain id → (reuna index, patch k)
+%     priority_vec_labeling - length n_compartments: copy of the parent
+%                             compartment priority, then overwritten on
+%                             entries where labeling_priority_aux_2 is
+%                             nonzero; others are shifted by
+%                             max(labeling_priority_aux_2)
+%
+%   See also zef_create_fem_mesh, zef_process_meshes, zef_smoothing_step.
 pml_ind_aux = [];
 pml_ind = [];
 
@@ -63,6 +77,7 @@ for k = 1 : length(compartment_tags)
         name_tags{i} = eval(var_4);
 
         if isequal(eval(var_5),-1)
+            % This active compartment is the PML box (_sources == -1).
             pml_ind_aux = i;
         end
 
@@ -99,5 +114,6 @@ end
 
 
 priority_vec_labeling = priority_vec_labeling + max(labeling_priority_aux_2);
+% Explicit per-compartment labeling_priority replaces the shifted default.
 priority_vec_labeling(find(labeling_priority_aux_2)) = labeling_priority_aux_2(find(labeling_priority_aux_2));
 %priority_vec_aux = max(submesh_ind_1) +1 - submesh_ind_1;

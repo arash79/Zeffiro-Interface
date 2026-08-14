@@ -1,39 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if  ismac — If  ismac.
+%EXP_EM_MAP_ESTIMATION_MULTIRES  Open GUIDE window: EM MAP RAMUS for EP (not on default menu).
 %
-% Purpose:
-%   If  ismac.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_exp_em_map_estimation_multires (read, write)
-%   zef.h_exp_em_multires_apply (read)
-%   zef.h_exp_em_multires_beta (read)
-%   zef.h_exp_em_multires_cancel (read)
-%   zef.h_exp_em_multires_data_segment (read)
-%   zef.h_exp_em_multires_high_cut_frequency (read)
-%   zef.h_exp_em_multires_low_cut_frequency (read)
-%   zef.h_exp_em_multires_n_L1_iterations (read)
-%   zef.h_exp_em_multires_n_iter (read)
-%   zef.h_exp_em_multires_n_levels (read)
-%   zef.h_exp_em_multires_number_of_frames (read)
-%   zef.h_exp_em_multires_q (read)
-%   zef.h_exp_em_multires_sampling_frequency (read)
-%   zef.h_exp_em_multires_snr (read)
-%   … (7 more)
+%   Script. Opens exp_em_map_estimation_multires.fig (title ZEFFIRO
+%   Interface: EM MAP multiresolution (RAMUS) for EP),
+%   zef_init_exp_em_multires. Start in the fig runs
+%   exp_em_iteration_multires([]). Needs zef.L, measurements, and
+%   exp_multires_dec from exp_make_multires_dec.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if  ismac` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_exp_em_multires, exp_em_iteration_multires.
 
 if  ismac
     zef.h_exp_em_map_estimation_multires = open('exp_em_map_estimation_multires.fig');
@@ -42,7 +19,8 @@ elseif ispc
 else
     zef.h_exp_em_map_estimation_multires = open('exp_em_map_estimation_multires.fig');
 end
-set(zef.h_exp_em_map_estimation_multires,'Name','ZEFFIRO Interface: EM MAP multiresolution (RAMUS) for EP');
+set(zef.h_exp_em_map_estimation_multires,'Name','ZEFFIRO Interface: EM MAP multiresolution (RAMUS)
+ for EP');
 set(findobj(zef.h_exp_em_map_estimation_multires.Children,'-property','FontUnits'),'FontUnits','pixels')
 set(findobj(zef.h_exp_em_map_estimation_multires.Children,'-property','FontSize'),'FontSize',zef.font_size);
 

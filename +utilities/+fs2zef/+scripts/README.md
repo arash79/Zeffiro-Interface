@@ -1,39 +1,11 @@
-# +utilities/+fs2zef/+scripts
+# `+scripts` — `makeParcellation.sh`
 
-## Purpose of this folder
+This is the only file in the folder. `utilities.fs2zef.run` does not extract surfaces in MATLAB; it shells out to FreeSurfer:
 
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+```text
+bash -lc "source $FREESURFER_HOME/SetUpFreeSurfer.sh && bash makeParcellation.sh <subject_id> <mgz_file> <output_dir>"
+```
 
-## Contents
+For each label in the volume (`mri_segstats` + LUT): `mri_mc` writes a marching-cubes surface as ASCII under `output_dir/ascii/` and/or STL under `output_dir/mesh/`. Optional `--lut PATH`. Requires `SUBJECTS_DIR` and `FREESURFER_HOME` in the **shell** environment (MATLAB `run` sources FreeSurfer first via `+environment`).
 
-Other files:
-- `makeParcellation.sh`
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+After the script returns, `+generators` writes `import_segmentation.zef` from those files. Parent: [`../README.md`](../README.md).

@@ -1,31 +1,19 @@
 function [meshStruct, tissueTable] = export_from_gmsh_mesh(meshFile, tissueListingFile, kwargs)
-% --- Zeffiro documentation header ---
-% utilities.sn2zef.export_from_gmsh_mesh — Export from gmsh mesh.
+%EXPORT_FROM_GMSH_MESH  Legacy Gmsh .msh surface export (open sheets).
 %
-% Purpose:
-%   Export from gmsh mesh.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   meshFile
-%   tissueListingFile
-%   kwargs
+%   [meshStruct, tissueTable] = export_from_gmsh_mesh(meshFile, ...
+%       tissueListingFile, kwargs)
 %
-% Outputs:
-%   meshStruct
-%   tissueTable
+%   Loads via vendor meshLoadGmsh4. Optional kwargs.outputFolder writes STLs.
+%   Surfaces are single-sided tissue interfaces, not watertight shells.
+%   Prefer export_segmentation_meshes / run for Zeffiro import.
 %
-% Calls (project):
-%   utilities.sn2zef.export_from_gmsh_mesh
-%   utilities.sn2zef.meshLoadGmsh4
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[meshStruct, tissueTable]] = utilities.sn2zef.export_from_gmsh_mesh(meshFile, tissueListingFile, kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+
 
     arguments
         meshFile (1,1) string { mustBeFile }

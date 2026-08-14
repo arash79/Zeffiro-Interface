@@ -1,34 +1,21 @@
 function zef_plugin_settings_table_selection(hObject,eventdata,handles)
-% --- Zeffiro documentation header ---
-% zef_plugin_settings_table_selection — Zef plugin settings table selection.
+%ZEF_PLUGIN_SETTINGS_TABLE_SELECTION  CellSelectionCallback for the plugin-settings table.
 %
-% Purpose:
-%   Zef plugin settings table selection.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   hObject
-%   eventdata
-%   handles
+%   Wired from zef_open_plugin_settings (Settings → **Plugin settings**).
+%   Unique selected rows → zef.plugin_settings_selected for that table's
+%   Add/Delete menus. Apply on that window is zef_save_plugin_settings;
+%   zef_plugin (not a callback in this folder).
 %
-% Outputs:
-%   See function signature and code below.
+%   Inputs (MATLAB UITable CellSelectionCallback)
+%     hObject, handles  - unused.
+%     eventdata.Indices - N-by-2 [row, column] of the selection.
 %
-% Zef fields (observed):
-%   zef.plugin_settings_selected (read, write)
-%
-% Calls (project):
-%   zef_plugin_settings_table_selection
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `zef_plugin_settings_table_selection(hObject, eventdata, handles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_open_plugin_settings.
 
 plugin_settings_selected = eventdata.Indices(:,1);
 plugin_settings_selected = unique(plugin_settings_selected);

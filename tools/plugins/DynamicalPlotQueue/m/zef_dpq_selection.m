@@ -1,40 +1,28 @@
 function zef_dpq_selection(hObject,eventdata,handles)
-% --- Zeffiro documentation header ---
-% zef_dpq_selection — Zef dpq selection.
+%ZEF_DPQ_SELECTION  Table selection → zef.dpq_selected and the edit boxes.
 %
-% Purpose:
-%   Zef dpq selection.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   hObject
-%   eventdata
-%   handles
+%   CellSelectionCallback of h_dynamical_plot_queue_table (GUIDE-style
+%   three-argument signature; hObject and handles are unused). Writes
+%   selected row indices into base zef.dpq_selected and copies column 1
+%   (script) and column 4 (description) of the first selected row into
+%   the script and description boxes.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_dpq_selection(hObject, eventdata, handles)
 %
-% Zef fields (observed):
-%   zef.dpq_selected (read, write)
-%   zef.h_dynamical_plot_queue_description (read)
-%   zef.h_dynamical_plot_queue_script (read)
-%   zef.h_dynamical_plot_queue_table (read)
+%   Delete uses zef.dpq_selected. The script/description ValueChangedFcn
+%   callbacks in zef_dpq_window write those boxes back into the selected
+%   table row.
 %
-% Calls (project):
-%   zef_dpq_selection
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `zef_dpq_selection(hObject, eventdata, handles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dpq_delete, zef_dpq_window.
 
 functions_selected = eventdata.Indices(:,1)';
-evalin('base',['zef.dpq_selected = [' num2str(functions_selected) ']'';']);
+evalin('base',['zef.dpq_selected = [' num2str(functions_selected)
+ ']'';']);
 evalin('base',['zef.h_dynamical_plot_queue_script.Value=zef.h_dynamical_plot_queue_table.Data{' num2str(functions_selected(1)) ',1};']);
 evalin('base',['zef.h_dynamical_plot_queue_description.Value=zef.h_dynamical_plot_queue_table.Data{' num2str(functions_selected(1)) ',4};']);
 

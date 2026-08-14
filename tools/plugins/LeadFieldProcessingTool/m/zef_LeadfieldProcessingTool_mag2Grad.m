@@ -1,25 +1,16 @@
-% --- Zeffiro documentation header ---
-% for zef_LeadFieldProcessingTool_index=1:zef.LeadFieldProcessingTool — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%ZEF_LEADFIELDPROCESSINGTOOL_MAG2GRAD  Apply loaded tra to checked bank L (magnetometer→gradiometer).
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.LeadFieldProcessingTool (read)
-%   zef.lead_field_id (read)
-%   zef.lead_field_id_max (read)
+%   Script. Mag2GradButton. For each checked row: bank→auxData, L = tra*L,
+%   sensors truncated to size(tra,1), imaging_method = 3, new lead_field_id
+%   ('bank_apply'), then aux2bank_new (appends; does not overwrite).
+%   Needs zef.LeadFieldProcessingTool.tra from loadTra.
 %
-% Calls (project):
-%   zef_update_lead_field_id
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `for zef_LeadFieldProcessingTool_index=1:zef.LeadFieldProcessingTool` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_LeadfieldProcessingTool_loadTra.
 
 for zef_LeadFieldProcessingTool_index=1:zef.LeadFieldProcessingTool.bankSize
 

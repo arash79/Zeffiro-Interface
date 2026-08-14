@@ -1,27 +1,17 @@
 function [colormap_vec] = zef_monterosso_colormap(colortune_param, colormap_size)
-% --- Zeffiro documentation header ---
-% zef_monterosso_colormap — Zef monterosso colormap.
+%ZEF_MONTEROSSO_COLORMAP  colormap_cell{1} "Monterosso" four-stop LUT.
 %
-% Purpose:
-%   Zef monterosso colormap.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   colortune_param
-%   colormap_size
+%   colormap_vec = zef_monterosso_colormap(colortune_param, colormap_size)
 %
-% Outputs:
-%   colormap_vec
-%
-% Calls (project):
-%   zef_monterosso_colormap
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[colormap_vec] = zef_monterosso_colormap(colortune_param, colormap_size)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   Four RGB anchors (dark, teal, light blue, yellow) blended with four
+%   piecewise-linear weight rows. Band edges at floor(param*size/3) and
+%   floor(size - param*size/3). Output size×3 in [0,1], max-normalized.
+%   Called only through zef_colormap.
 color_mat = [26 26 26;   0.2 11.8 13.2; 42.5   98.5  108.5; 203 203 100];
 
 color_mat = color_mat';

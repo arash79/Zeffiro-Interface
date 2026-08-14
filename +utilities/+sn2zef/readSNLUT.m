@@ -1,27 +1,19 @@
 function lut = readSNLUT(folderPath)
-% --- Zeffiro documentation header ---
-% utilities.sn2zef.readSNLUT — Read SNLUT.
+%READSNLUT  Parse SimNIBS final_tissues_LUT.txt (id, name, RGBA).
 %
-% Purpose:
-%   Read SNLUT.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   folderPath
+%   File must sit in folderPath. Lines: label_number label_name R G B A;
+%   '#' comments skipped. Used by export_segmentation_meshes to name
+%   compartments in import_segmentations.zef.
 %
-% Outputs:
-%   lut
+%   lut = readSNLUT(folderPath)
+%   lut.No, .Name, .R, .G, .B, .A
 %
-% Calls (project):
-%   utilities.sn2zef.readSNLUT
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[lut] = utilities.sn2zef.readSNLUT(folderPath)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also export_segmentation_meshes.
 
     fname = fullfile(folderPath, 'final_tissues_LUT.txt');
 

@@ -1,28 +1,4 @@
 function [ll, post, logpdf] = estep(log_lh, prob_th)
-% --- Zeffiro documentation header ---
-% plugins.ClassGMM.estep — Estep.
-%
-% Purpose:
-%   Estep.
-%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
-%
-% Inputs:
-%   log_lh
-%   prob_th
-%
-% Outputs:
-%   ll
-%   post
-%   logpdf
-%
-% Calls (project):
-%   plugins.ClassGMM.estep
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[ll, post, logpdf]] = plugins.ClassGMM.estep(log_lh, prob_th)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 %ESTEP E-step for Gaussian mixture model (posterior computation).
 %
 %   [LL, POST] = ESTEP(LOG_LH) computes the E-step of the EM algorithm for

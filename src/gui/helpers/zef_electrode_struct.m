@@ -1,25 +1,20 @@
 function [electrode_struct] = zef_electrode_struct(sensors_attached_volume)
-% --- Zeffiro documentation header ---
-% zef_electrode_struct — Zef electrode struct.
+%ZEF_ELECTRODE_STRUCT  Boundary edges of each attached CEM electrode patch.
 %
-% Purpose:
-%   Zef electrode struct.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   sensors_attached_volume
+%   sensors_attached_volume must be N×4: [electrode_index, n1, n2, n3]
+%   (triangle vertices on the skin). For each electrode index 1:max(col1),
+%   unique interior edges (appear twice) are dropped; remaining edges are
+%   the patch boundary. Used by zef_smooth_electrodes (Taubin on those
+%   nodes). Non-4-column input → [].
 %
-% Outputs:
-%   electrode_struct
+%   electrode_struct(i).triangles, .edges, .nodes
 %
-% Calls (project):
-%   zef_electrode_struct
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[electrode_struct] = zef_electrode_struct(sensors_attached_volume)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_attach_sensors_volume, zef_smooth_electrodes.
 
 electrode_struct = [];
 

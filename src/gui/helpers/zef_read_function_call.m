@@ -1,29 +1,33 @@
 function [fnc_call, fnc_str, fnc_name] = zef_read_function_call(file_name)
-% --- Zeffiro documentation header ---
-% zef_read_function_call — Zef read function call.
+%ZEF_READ_FUNCTION_CALL  Parse the first function line of a .m file.
 %
-% Purpose:
-%   Zef read function call.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   file_name
+%   Skips leading % comment lines, then if the remainder starts with
+%   'function' takes the text through the first ')'. fnc_str is that
+%   full line including 'function'; fnc_call is the same without the
+%   'function ' prefix (outputs = name(args) or name(args)). fnc_name
+%   is always fileparts of file_name, not the parsed identifier. Files
+%   that are not functions, or whose first non-comment line is not
+%   'function', set fnc_call to that file name.
 %
-% Outputs:
-%   fnc_call
-%   fnc_str
-%   fnc_name
+%   Only caller is zef_add_package (writes +package wrappers). That
+%   function itself has no first-party callers.
 %
-% Calls (project):
-%   zef_read_function_call
+%   [fnc_call, fnc_str, fnc_name] = zef_read_function_call(file_name)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[fnc_call, fnc_str, fnc_name]] = zef_read_function_call(file_name)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   Input
+%     file_name - path to a .m file.
+%
+%   Outputs
+%     fnc_call - callable fragment, or the file name for scripts.
+%     fnc_str  - full 'function ...' header, or '' for scripts.
+%     fnc_name - [~, name] = fileparts(file_name).
+%
+%   See also zef_add_package.
 [~,fnc_name,~] = fileparts(file_name);
 fnc_str = '';
 %fnc_name = '';

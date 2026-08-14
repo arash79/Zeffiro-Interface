@@ -1,42 +1,22 @@
 function [processed_data] = zef_manual_epoching(f, epoch_points, start_time, end_time, sampling_frequency)
-% --- Zeffiro documentation header ---
-% zef_manual_epoching — Zef manual epoching.
+%ZEF_MANUAL_EPOCHING  Pipeline stage: average windows around zef.filter_epoch_points.
 %
-% Purpose:
-%   Zef manual epoching.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   f
-%   epoch_points
-%   start_time
-%   end_time
-%   sampling_frequency
+%   Default Input token filter_epoch_points is filled from that zef field
+%   when Add runs. Get epoch points button writes the field.
 %
-% Outputs:
-%   processed_data
-%
-% Calls (project):
-%   zef_manual_epoching
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[processed_data] = zef_manual_epoching(f, epoch_points, start_time, end_time, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%This function processes the N-by-M data array f for N channels and M time
-%steps. The other arguments can be controlled via the ZI user interface.
-%The desctiption and argument definitions shown in ZI are listed below.
 %Description: Averaging over manually selected epochs
 %Input: 1 Manually selected epoch points [Default: filter_epoch_points],
 %2 Start time w.r.t. point (s) [Default: -0.18],
 %3 End time w.r.t. point (s) [Default: 0.18],
 %4 Sampling frequency (Hz) [Default: filter_sampling_rate]
 %Output: Averaged data for the manually selected epochs.
+%
 
-%Conversion between string and numeric data types.
 if isstr(epoch_points)
     epoch_points = str2num(epoch_points);
 end

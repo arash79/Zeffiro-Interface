@@ -1,28 +1,17 @@
-% --- Zeffiro documentation header ---
-% number_of_points = 10; — Number of points = 10;.
+%ZEF_PLOT_SURFACE_TRIANGLES  Lab script: distances from grey-matter nodes (broken).
 %
-% Purpose:
-%   Number of points = 10;.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.nodes (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.sigma (read)
-%   zef.tetra (read)
+%   Script. Hard-codes grey_matter_ind=15, number_of_points=10. Needs
+%   workspace zef.tetra, zef.sigma(:,2), zef.reuna_t/p, compartment_ind.
+%   The zef_distance_to_mesh call is missing a closing parenthesis and
+%   passes a scalar node index as the first argument. Does not plot.
+%   Unfinished lab helper.
 %
-% Calls (project):
-%   zef_distance_to_mesh
-%   zef_get_surface_triangles
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `number_of_points = 10;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_find_distance_to_mesh, zef_get_surface_triangles.
 
 number_of_points = 10;
 grey_matter_ind = 15;

@@ -1,37 +1,23 @@
 function [alpha, epsilon] = zef_ES_find_parameters(varargin)
-% --- Zeffiro documentation header ---
-% zef_ES_find_parameters — Zef ES find parameters.
+%ZEF_ES_FIND_PARAMETERS  Log-spaced α and ε vectors from ES_alpha(_max), ES_epsilon(_min), ES_step_size.
 %
-% Purpose:
-%   Zef ES find parameters.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Called from zef_ES_find_currents and zef_ES_centralize_recursive_search.
+%   No widgets. Zero α or ε is replaced by 1. If min==max the scalar is
+%   kept; otherwise exp(log-linspace) of length step_size.
 %
-% Outputs:
-%   alpha
-%   epsilon
+%   [alpha, epsilon] = zef_ES_find_parameters()
+%   [alpha, epsilon] = zef_ES_find_parameters(zef)
+%   [alpha, epsilon] = zef_ES_find_parameters(zef, step_size)
+%   [alpha, epsilon] = zef_ES_find_parameters(alpha_vec, epsilon_vec, step_size)
+%   [alpha, epsilon] = zef_ES_find_parameters(alpha, alpha_max, epsilon_min, epsilon, step_size)
 %
-% Zef fields (observed):
-%   zef.ES_alpha (read)
-%   zef.ES_alpha_max (read)
-%   zef.ES_epsilon (read)
-%   zef.ES_epsilon_min (read)
-%   zef.ES_step_size (read)
+%   See also zef_ES_find_currents.
 %
-% Calls (project):
-%   zef_ES_find_parameters
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[alpha, epsilon]] = zef_ES_find_parameters(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 switch nargin
 case {0,1,2}

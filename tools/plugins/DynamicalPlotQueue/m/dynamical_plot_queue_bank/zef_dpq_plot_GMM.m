@@ -1,25 +1,26 @@
-% --- Zeffiro documentation header ---
-% function zef_PlotGMModel — Function zef Plot GMModel.
-%
-% Purpose:
-%   Function zef Plot GMModel.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Zef fields (observed):
-%   zef.GMM (read)
-%
-% Calls (project):
-%   zef_PlotGMModel
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_PlotGMModel` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function zef_PlotGMModel
+%ZEF_PLOTGMMODEL  Queue renderer: GMMClustering ellipsoids/dipoles (zef.GMM).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   File zef_dpq_plot_GMM.m; first function is named zef_PlotGMModel
+%   (same as GMMClustering's plot helper). Queue List stores this
+%   filename, so zef_plot_dpq evalin-calls the bank file. Reads
+%   zef.GMM.parameters.Values, meta{2}, model, dipoles. Caller f_ind is
+%   the time-series frame. Axes: caller h_axes_image.
+%
+%   zef_dpq_plot_GMM
+%
+%   Non-cell model: one snapshot. Cell model: GMModel{f_ind}. Component
+%   order: '1' stored, '2' by dipole amplitude, '3' explicit indices.
+%   Custom-color numeric branch contains a leftover keyboard. start_t /
+%   stop_t / ellip_trans are read and unused (FaceAlpha commented out).
+%   Not the SP-tool overlay zef_plot_GMModel (that reads zef.GMModel).
+%
+%   See also zef_dpq_plot_GMM_v1, zef_plot_GMModel.
 
 h = evalin('caller','h_axes_image');
 %axes(h);
@@ -72,7 +73,7 @@ else
         if size(colors,2) < 3 || size(colors,2) > 3
             colors = reshape(colors',3,[])';
         end
-        keyboard
+        keyboard   % leftover debugger in the custom RGB-numeric color path
         if size(colors,1) < K
             colors = [colors; repmat(colors(end,:),K-size(colors,1),1)];
         end
@@ -198,11 +199,12 @@ if ~iscell(GMModel)
     plot3(h,GMModel.mu(dip_ind,1),GMModel.mu(dip_ind,2),GMModel.mu(dip_ind,3),m_sym,'LineWidth',m_width,'MarkerSize',m_size)
     %set direction vectors (original can be non-unit length)
     %direct = s_length*GMModel.mu(dip_ind,4:6)./sqrt(sum(GMModel.mu(dip_ind,4:6).^2,2));
+    % y uses mu(:,1) here; the cell-model branch below uses mu(:,4).
     direct = s_length*[cos(GMModel.mu(dip_ind,5)).*sin(GMModel.mu(dip_ind,4)),sin(GMModel.mu(dip_ind,5)).*sin(GMModel.mu(dip_ind,1)),cos(GMModel.mu(dip_ind,4))];
     quiver3(h,GMModel.mu(dip_ind,1),GMModel.mu(dip_ind,2),GMModel.mu(dip_ind,3),direct(:,1),direct(:,2),direct(:,3),0,'color',erase(m_sym,'o'), 'linewidth',m_width,'MarkerSize',m_size);
     hold(h,'off')%set old time parameters back to their places:
 
-    %If time serie exists:
+    %If time serie exists (one GMM per reconstruction frame):
 else
 
     if isempty(GMModel{t})

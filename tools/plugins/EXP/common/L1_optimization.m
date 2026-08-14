@@ -1,27 +1,19 @@
 function x = L1_optimization(A,sigma,y,gamma,x,maxiter,estimation_type)
-% --- Zeffiro documentation header ---
-% L1_optimization — L1 optimization.
+%L1_OPTIMIZATION  Weighted L1 inner loop for EXP (FOCUSS if type==3).
 %
-% Purpose:
-%   L1 optimization.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   A
-%   sigma
-%   y
-%   gamma
-%   x
-%   maxiter
-%   estimation_type
+%   x = L1_optimization(A, sigma, y, gamma, x, maxiter, estimation_type)
 %
-% Outputs:
-%   x
+%   Scales A and y by 1/sigma. D = diag(|x|/gamma). Each iter:
+%   x = D A' (A D A' + reg trace(D) I)^{-1} b with
+%   reg = sqrt(0.5*pi/m)*||A||_F. estimation_type==3 also applies
+%   T_scale from the FOCUSS residual. Called from exp_iteration.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[x] = L1_optimization(A, sigma, y, gamma, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also LG_optimization, EM_Lasso, exp_iteration.
 
 [m,~]=size(A);
 A = 1/sigma*A;

@@ -1,39 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'relax_preconditioner')); — If not(isfield(zef,'relax preconditioner'));.
+%ZEF_INIT_RELAX_INVERSION_TOOL  Default relax_* fields and copy onto the tool widgets.
 %
-% Purpose:
-%   If not(isfield(zef,'relax preconditioner'));.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_relax_db (read)
-%   zef.h_relax_high_cut_frequency (read)
-%   zef.h_relax_iteration_type (read)
-%   zef.h_relax_low_cut_frequency (read)
-%   zef.h_relax_multires_n_decompositions (read)
-%   zef.h_relax_multires_n_iter (read)
-%   zef.h_relax_multires_n_levels (read)
-%   zef.h_relax_multires_sparsity (read)
-%   zef.h_relax_normalize_data (read)
-%   zef.h_relax_number_of_frames (read)
-%   zef.h_relax_preconditioner_type (read)
-%   zef.h_relax_sampling_frequency (read)
-%   zef.h_relax_snr (read)
-%   zef.h_relax_time_1 (read)
-%   zef.h_relax_time_2 (read)
-%   … (29 more)
+%   Script. Called from zef_relax_inversion_tool. Defaults
+%   n_decompositions=1, n_levels=3, sparsity=10, n_iter=10000.
+%   Copies inv_snr / sampling / band / inv_time_* into relax_*.
+%   Does not invert (Start → zef_relax_iteration).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'relax_preconditioner'));` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_relax_inversion_tool, zef_relax_iteration.
 
 if not(isfield(zef,'relax_preconditioner'));
     zef.relax_multires_precondtioner = [];
@@ -82,7 +59,7 @@ end;
 
 zef.relax_snr = zef.inv_snr;
 
-set(zef.h_relax_iteration_type,'value',zef.relax_iteration_type);
+set(zef.h_relax_iteration_type,'value',zef.relax_iteration_type)
 set(zef.h_relax_preconditioner_type,'value',zef.relax_preconditioner_type);
 set(zef.h_relax_tolerance ,'value',num2str(zef.relax_tolerance));
 set(zef.h_relax_db ,'value',num2str(zef.relax_db));

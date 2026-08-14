@@ -1,33 +1,21 @@
 function hauk_map = zef_sensitivity_map_dipoleScan( ...
-% --- Zeffiro documentation header ---
-% examples.studies.santtus_peeling_article.helpers.hauk_map — Example or study script demonstrating hauk_map.
-%
-% Purpose:
-%   Example or study script demonstrating hauk_map.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
-%
-% Inputs:
-%   project_struct
-%   n_reconstructions
-%   noise_level
-%   diff_type
-%   dispersion_radius
-%
-% Calls (project):
-%   zef_dipole_start
-%   zef_rec_diff
-%   zef_sensitivity_map_dipoleScan
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `examples.studies.santtus_peeling_article.helpers.hauk_map(project_struct, n_reconstructions, noise_level, diff_type, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
     project_struct, ...
     n_reconstructions, ...
     noise_level, ...
     diff_type, ...
     dispersion_radius ...
 )
+%ZEF_SENSITIVITY_MAP_DIPOLESCAN  Monte Carlo dipole-scan sensitivity maps for the Santtus peeling study.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Repeatedly perturbs dipole locations, runs dipole-scan reconstructions,
+%   and records localization error metrics (distance, angle, magnitude, dispersion).
+%   Dipole scan fits best single dipole per time frame by residual minimization.
+%
 
     arguments
 
@@ -50,7 +38,6 @@ function hauk_map = zef_sensitivity_map_dipoleScan( ...
     project_struct.number_of_frames = 3 * size(project_struct.source_positions, 1);
 
     % Run Monte Carlo sensitivity analysis.
-    for i = 1 : n_reconstructions
 
         [dist_vec, angle_vec, mag_vec, dispersion_vec] = examples.studies.santtus_peeling_article.helpers.zef_rec_diff( ...
             project_struct, ...

@@ -1,45 +1,20 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_butterfly_plot_start(zef)
-% --- Zeffiro documentation header ---
-% zef_butterfly_plot_start — Zef butterfly plot start.
+%ZEF_BUTTERFLY_PLOT_START  Build the butterfly window and fill bf_* widgets.
 %
-% Purpose:
-%   Zef butterfly plot start.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Function. Called via zef_tool_start from zef_butterfly_plot. Runs
+%   zef_butterfly_plot_app (uicontrol figure), names it 'ZEFFIRO
+%   Interface: Butterfly plot', zef_init_butterfly_plot, and enables
+%   h_bf_data_segment only when zef.measurements is a cell. Does not
+%   draw until **Plot**.
 %
-% Outputs:
-%   zef
-%
-% Zef fields (observed):
-%   zef.h_bf_apply (read)
-%   zef.h_bf_cancel (read)
-%   zef.h_bf_data_segment (read)
-%   zef.h_bf_high_cut_frequency (read)
-%   zef.h_bf_low_cut_frequency (read)
-%   zef.h_bf_normalize_data (read)
-%   zef.h_bf_plot (read)
-%   zef.h_bf_sampling_frequency (read)
-%   zef.h_bf_time_1 (read)
-%   zef.h_bf_time_2 (read)
-%   zef.h_butterfly_plot (read)
-%   zef.measurements (read)
-%
-% Calls (project):
-%   zef_butterfly_plot_start
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_butterfly_plot_start(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_butterfly_plot_app, zef_init_butterfly_plot.
 zef_butterfly_plot_app;
 
 set(zef.h_butterfly_plot,'Name','ZEFFIRO Interface: Butterfly plot');

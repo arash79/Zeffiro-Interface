@@ -1,33 +1,21 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef_i = length(zef — Zef i = length(zef.
+%ZEF_ADD_FILTER_ITEM  Add button: append selected filter_bank stage; parse help() Input: defaults.
 %
-% Purpose:
-%   Zef i = length(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field (read, write)
-%   zef.filter_file_list (read)
-%   zef.filter_list_selected (read)
-%   zef.filter_name_list (read)
-%   zef.filter_parameter_list (read, write)
-%   zef.filter_pipeline (read)
-%   zef.filter_pipeline_selected (read, write)
-%   zef.filter_tag (read)
+%   Script. ButtonPushedFcn of h_add_filter (wired in zef_filter_tool).
+%   Index is length(filter_pipeline_list)+1. Copies name/file from
+%   filter_name_list / filter_file_list at filter_list_selected, and
+%   filter_tag. help(file) slice from 'Input:' to 'Output:' is split on
+%   commas; each token's label is before '[Default:' and the default is
+%   inside the brackets. If that default string is a field of zef (e.g.
+%   filter_sampling_rate), evalin('base','zef.<name>') replaces it.
+%   Writes filter_pipeline{i}.parameters as an N-by-2 cell, clears
+%   filter_pipeline_selected, then zef_update_filter_tool.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef_i = length(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_init_filter_tool, zef_filter_raw_data.
 
 zef_i = length(zef.filter_pipeline_list)+1;
 zef.filter_pipeline{zef_i}.name = zef.filter_name_list{zef.filter_list_selected};

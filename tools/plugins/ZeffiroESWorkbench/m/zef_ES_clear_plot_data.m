@@ -1,36 +1,19 @@
 function zef = zef_ES_clear_plot_data(zef)
-% --- Zeffiro documentation header ---
-% zef_ES_clear_plot_data — Zef ES clear plot data.
+%ZEF_ES_CLEAR_PLOT_DATA  Delete ES plot handles (bar, colorbar, current markers) for the current plot_type.
 %
-% Purpose:
-%   Zef ES clear plot data.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Not bound in zef_ES_optimization_window. Deletes h_current_ES /
+%   h_barplot_ES / h_colorbar_ES according to ES_plot_type 1–3.
 %
-% Outputs:
-%   zef
+%   zef = zef_ES_clear_plot_data()
+%   zef = zef_ES_clear_plot_data(zef)
 %
-% Zef fields (observed):
-%   zef.ES_plot_type (read)
-%   zef.h_barplot_ES (read)
-%   zef.h_colorbar_ES (read)
-%   zef.h_current_ES (read)
+%   See also zef_ES_plot_data.
 %
-% Calls (project):
-%   zef_ES_clear_plot_data
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_ES_clear_plot_data(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0 
 zef = eval('zef');

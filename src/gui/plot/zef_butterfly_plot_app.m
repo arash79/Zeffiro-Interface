@@ -1,40 +1,17 @@
-% --- Zeffiro documentation header ---
-% h1 = figure(... — H1 = figure(.
+%ZEF_BUTTERFLY_PLOT_APP  GUIDE-style butterfly window (script-like figure builder).
 %
-% Purpose:
-%   H1 = figure(....
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.bf_data_segment (read, write)
-%   zef.bf_high_cut_frequency (read, write)
-%   zef.bf_low_cut_frequency (read, write)
-%   zef.bf_normalize_data (read, write)
-%   zef.bf_sampling_frequency (read, write)
-%   zef.bf_time_1 (read, write)
-%   zef.bf_time_2 (read, write)
-%   zef.h_bf_apply (read, write)
-%   zef.h_bf_cancel (read, write)
-%   zef.h_bf_data_segment (read, write)
-%   zef.h_bf_high_cut_frequency (read, write)
-%   zef.h_bf_low_cut_frequency (read, write)
-%   zef.h_bf_normalize_data (read, write)
-%   zef.h_bf_plot (read, write)
-%   zef.h_bf_sampling_frequency (read, write)
-%   … (3 more)
+%   Script-like: figure() plus uicontrols assigned onto zef.h_butterfly_plot
+%   / h_bf_*. Labels: Sampling frequency (Hz), Low/High-cut frequency,
+%   **Plot** (Callback zef_update_butterfly_plot; zef_make_butterfly_plot),
+%   **Close**, **Apply**, time window, normalize. Not App Designer.
+%   Called from zef_butterfly_plot_start. Body is Position dumps.
 %
-% Calls (project):
-%   zef_make_butterfly_plot
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `h1 = figure(...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_butterfly_plot_start.
 h1 = figure(...
     'PaperUnits',get(0,'defaultfigurePaperUnits'),...
     'Units','normalized',...

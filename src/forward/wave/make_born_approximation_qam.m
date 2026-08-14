@@ -1,24 +1,12 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
-% --- Zeffiro documentation header ---
-% signal_configuration — Signal configuration.
+%MAKE_BORN_APPROXIMATION_QAM  Born Jacobian driver with QAM demodulation.
 %
-% Purpose:
-%   Signal configuration.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Side effects:
-%   - filesystem I/O
-%   - parallel/cluster
+%   Script. Same torre_dir layout as the AMP sibling; combines I/Q via qam_demod.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `signal_configuration` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
-
+%   See also qam_demod, make_born_approximation_amp.
 
 load([torre_dir '/system_data/signal_configuration.mat']);
 load([torre_dir '/system_data/mesh_1.mat']);
@@ -28,6 +16,8 @@ load([torre_dir '/system_data/tetrahedra_1.dat']);
 
 system_setting_index = 1;
 parameters;
+
+%% Born/QAM path: baseline simulation, perturbations, qam_demod Jacobian assembly
 
 tic
 

@@ -1,32 +1,30 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 
 function [x,conv_val,n_iter] = pcg_iteration(A,b,tol_val,max_it,M,x)
-% --- Zeffiro documentation header ---
-% pcg_iteration — Pcg iteration.
+%PCG_ITERATION  Preconditioned conjugate gradient for sparse FEM systems.
 %
-% Purpose:
-%   Pcg iteration.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Inputs:
-%   A
-%   b
-%   tol_val
-%   max_it
-%   M
-%   x
+%   Custom PCG used by NSE and wave solvers (distinct from zef_transfer_matrix
+%   PCG in EEG lead fields). Accepts numeric matrix or function_handle A,
+%   optional preconditioner M (function_handle, matrix, or [] for identity).
+%   Relative residual sqrt(||r||^2/||b||^2) drives termination.
 %
-% Outputs:
-%   x
-%   conv_val
-%   n_iter
+%   [x, conv_val, n_iter] = pcg_iteration(A, b, tol_val, max_it, M, x)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[x, conv_val, n_iter]] = pcg_iteration(A, b, tol_val, max_it, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Input
+%     A        - sparse matrix or function_handle @(x)
+%     b        - [n × k] right-hand side (k right-hand sides allowed)
+%     tol_val  - relative residual threshold
+%     max_it   - iteration cap
+%     M        - preconditioner matrix, function_handle, or [] (identity)
+%     x        - initial guess, default zeros(n,1)
+%
+%   Output: x solution, conv_val last relative residual, n_iter count.
+%
+%   See also pcg_iteration_gpu, zef_transfer_matrix.
 
 
 if nargin < 5
@@ -53,6 +51,8 @@ p = z;
 j = 1;
 
 conv_val = sqrt(max(sum(r.^2)'./sum(b.^2)'));
+
+%% PCG loop: minimize Ax-b with preconditioner M
 
 while (conv_val > tol_val) & (j < max_it)
     if isequal(class(A),'function_handle')

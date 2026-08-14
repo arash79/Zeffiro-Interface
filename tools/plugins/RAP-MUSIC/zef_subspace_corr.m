@@ -1,28 +1,20 @@
 function [S_C,orj] = zef_subspace_corr(A,B,chararcter)
-% --- Zeffiro documentation header ---
-% zef_subspace_corr — Zef subspace corr.
+%ZEF_SUBSPACE_CORR  Principal angles / correlation between subspaces A and B.
 %
-% Purpose:
-%   Zef subspace corr.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   A
-%   B
-%   chararcter
+%   [S_C, orj] = zef_subspace_corr(A, B, chararcter)
 %
-% Outputs:
-%   S_C
-%   orj
+%   SVD of each matrix (drop zero singular values), C = U_A' U_B, SVD of
+%   C. S_C is diag of that SVD, or max(S_C) when chararcter is 'max'
+%   (third argument is spelled chararcter). orj is the first column of
+%   V_A*(S_A\U_C), unit-normalized — used as the dipole orientation in
+%   RAP_MUSIC_iteration. No zef I/O.
 %
-% Calls (project):
-%   zef_subspace_corr
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[S_C, orj]] = zef_subspace_corr(A, B, chararcter)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also RAP_MUSIC_iteration.
 
 [U_A,S_A,V_A]=svd(A,'econ');
 U_A = U_A(:,abs(diag(S_A))>0);

@@ -1,31 +1,21 @@
-% --- Zeffiro documentation header ---
-% function []=zef_slidding_callback — GUI callback for function []=slidding actions.
-%
-% Purpose:
-%   GUI callback for function []=slidding actions.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Zef fields (observed):
-%   zef.frame_start (read, write)
-%   zef.frame_step (read)
-%   zef.frame_stop (read, write)
-%   zef.h_slider (read)
-%   zef.store_cdata (read)
-%   zef.visualization_type (read)
-%
-% Calls (project):
-%   zef_play_cdata
-%   zef_slidding_callback
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `function []=zef_slidding_callback` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function []=zef_slidding_callback
+%ZEF_SLIDDING_CALLBACK  Figure-tool **Time:** slider (legacy spelling).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Wired as Callback of zef.h_slider in zef_figure_tool. If
+%   zef.store_cdata is true, plays one stored frame via
+%   zef_play_cdata(1, slider Value). Otherwise maps the slider (0–1)
+%   onto the frame range
+%     ceil(((frame_stop-frame_start+frame_step)/frame_step)*Value)
+%   and writes both zef.frame_start and zef.frame_stop to that index,
+%   then redraws: visualization_type 2 → zef_visualize_volume, 3 →
+%   zef_visualize_surfaces.
+%
+%   See also zef_figure_tool, zef_play_cdata.
 
 
 if evalin('base','zef.store_cdata')

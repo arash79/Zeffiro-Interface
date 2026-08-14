@@ -1,34 +1,31 @@
 function [rec_cell, rec_info] = zef_dataBank_get_reconstructions(zef,frame_number)
-% --- Zeffiro documentation header ---
-% zef_dataBank_get_reconstructions — Zef data Bank get reconstructions.
+%ZEF_DATABANK_GET_RECONSTRUCTIONS  Collect one frame from every reconstruction node.
 %
-% Purpose:
-%   Zef data Bank get reconstructions.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   frame_number
+%   Scripting helper (not a button). Used by the decision-making examples
+%   (zef_create_training_data_focal_epilepsy, zef_decision_script_focal_epilepsy)
+%   after zef_start_dataBank. Walks fieldnames of zef.dataBank.tree in
+%   order: a custom node sets data_type to that node's .name; each
+%   reconstruction node appends reconstruction{frame_number} and
+%   {data_type, rec_name}. Also sets zef.reconstruction = cell(0) (side
+%   effect; the returned zef is not written back). frame_number defaults to 1.
 %
-% Outputs:
-%   rec_cell
-%   rec_info
+%   [rec_cell, rec_info] = zef_dataBank_get_reconstructions(zef)
+%   [rec_cell, rec_info] = zef_dataBank_get_reconstructions(zef, frame_number)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
-%   zef.reconstruction (read, write)
+%   Inputs
+%     zef           - session with dataBank.tree (custom parents + rec children).
+%     frame_number  - index into each node's reconstruction cell (default 1).
 %
-% Calls (project):
-%   zef_dataBank_get_reconstructions
+%   Output
+%     rec_cell  - 1-by-n cell of reconstruction arrays for that frame.
+%     rec_info  - n-by-2 cell: {custom parent name, reconstruction node name}.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[rec_cell, rec_info]] = zef_dataBank_get_reconstructions(zef, frame_number)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_set_reconstructions.
 
 if nargin < 2
     frame_number = 1;

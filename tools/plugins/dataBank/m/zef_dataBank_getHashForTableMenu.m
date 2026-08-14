@@ -1,32 +1,27 @@
 function zef = zef_dataBank_getHashForTableMenu(zef)
-% --- Zeffiro documentation header ---
-% zef_dataBank_getHashForTableMenu — Zef data Bank get Hash For Table Menu.
+%ZEF_DATABANK_GETHASHFORTABLEMENU  DataTable row → zef.dataBank.hash via DataTableHashList.
 %
-% Purpose:
-%   Zef data Bank get Hash For Table Menu.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Same role as getHashForMenu but for the type table context menus
+%   (showinformationMenuData, deleteMenuData, modifyMenuData).
+%   DataTable.Selection(:,1) indexes zef.dataBank.DataTableHashList, which
+%   showAll filled when the table was last drawn. Multi-row selection
+%   requires selectMultiple. Empty Selection prints 'please select nodes'.
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_getHashForTableMenu(zef)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef  - session with DataTable.Selection and DataTableHashList.
+%            nargin==0 → base.
 %
-% Calls (project):
-%   zef_dataBank_getHashForTableMenu
+%   Output
+%     zef  - zef.dataBank.hash char or cell. nargout==0 → assignin base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_dataBank_getHashForTableMenu(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_getHashForMenu, zef_databank_showAll.
 
 if nargin == 0
     zef = evalin('base','zef')

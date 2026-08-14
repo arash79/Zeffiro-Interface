@@ -1,26 +1,29 @@
 function clipped_nodes_ind = zef_clipping_plane(nodes, clipping_plane, varargin)
-% --- Zeffiro documentation header ---
-% zef_clipping_plane — Zef clipping plane.
+%ZEF_CLIPPING_PLANE  Keep mesh nodes on one side (or a slab) of a plane.
 %
-% Purpose:
-%   Zef clipping plane.
-%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   clipping_plane
-%   varargin
+%   Tests n·x against a scalar or interval offset. The plane is the cell
+%   {nx, ny, nz, d} where n = [nx ny nz] and d is clipping_plane{4}.
+%   Nodes satisfy n·x >= d, or d(1) <= n·x <= d(2) when d has two entries.
+%   Coordinates are those of the current mesh (typically millimetres in
+%   the project frame; this function does not convert units).
 %
-% Outputs:
-%   clipped_nodes_ind
+%   ind = zef_clipping_plane(nodes, clipping_plane)
+%   ind = zef_clipping_plane(nodes, clipping_plane, aux_node_ind)
 %
-% Calls (project):
-%   zef_clipping_plane
+%   Inputs
+%     nodes           - N-by-3 node coordinates.
+%     clipping_plane  - 1-by-4 cell: {nx, ny, nz, d} with d scalar or 1-by-2.
+%     aux_node_ind    - optional index subset; result is intersected with it.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[clipped_nodes_ind] = zef_clipping_plane(nodes, clipping_plane, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     clipped_nodes_ind  - linear indices into nodes that pass the test.
+%
+%   See also zef_visualize_volume.
 
 
 clipped = 0;

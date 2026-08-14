@@ -1,75 +1,63 @@
-# src/auxiliary
+# Auxiliary scripts (`src/auxiliary`)
 
-## Purpose of this folder
+One-off analysis, sphere-model lead fields, MRI affine helpers, and mesh-distance utilities that are **not** on the main Zeffiro menus. Nothing here is opened by `zef_start`. Use them from the MATLAB prompt or from study scripts under `+examples`.
 
-Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+## Lead-field and error metrics (root of this folder)
 
-## Contents
+| File | Kind | Role |
+|------|------|------|
+| `zef_lead_field_eeg_multilayer_sphere.m` | function | Analytic EEG lead field for a Berg–Scherg multilayer sphere (`sphere_model.lambda_berg`, `mu_berg`, `sigma`). Empty `source_directions` expands to 3 Cartesian dipoles per position. |
+| `rdm_fn.m` | function | Relative difference measure: column-normalize `La` and `Lfem`, then RMS of the difference (one value per column). |
+| `mag_fn.m` | function | MAG (magnitude) error between analytic and FEM lead-field columns. |
+| `calc_diffs.m` | **script** plus local functions | Builds MAG/RDM vs eccentricity figures; local copies of `mag_fn`/`rdm_fn`. |
+| `calculate_differences.m` | similar study driver | Same family. |
+| `eccentricity_diff_fig_fn.m` | function | `[mag_fig, rdm_fig] = …(source_points, mags, rdms, legend_labels, …)` |
+| `comparison_all_eccentricities.m` / `comparison_high_eccentricity.m` | **scripts** | Fixed `n_intervals` (15 / 5); not a GUI entry. |
 
-Subfolders:
-- `analysisScripts/`
-- `mesh_averaging/`
-- `mri/`
-- `plotting/`
+## Distances
 
-MATLAB sources:
-- `calc_diffs.m` — **ary_model**: Ary model.
-- `calculate_differences.m` — **ary_model**: Ary model.
-- `eccentricity_diff_fig_fn.m` — **function [mag_fig, rdm_fig] = eccentricity_diff_fig_fn( ...**: Function [mag fig, rdm fig] = eccentricity diff fig fn( ....
-- `getElectrodePositions.m` — **getElectrodePositions**: Get Electrode Positions.
-- `getMagnetometerPositions.m` — **getMagnetometerPositions**: Get Magnetometer Positions.
-- `mag_fn.m` — **mag_fn**: Mag fn.
-- `comparison_all_eccentricities.m` — **n_intervals = 15;**: N intervals = 15;.
-- `comparison_high_eccentricity.m` — **n_intervals = 5;**: N intervals = 5;.
-- `rdm_fn.m` — **rdm_fn**: Rdm fn.
-- `zef_distance_to_mesh.m` — **zef_distance_to_mesh**: Zef distance to mesh.
-- `zef_distance_to_resection.m` — **zef_distance_to_resection**: Zef distance to resection.
-- `zef_lead_field_eeg_multilayer_sphere.m` — **zef_lead_field_eeg_multilayer_sphere**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+| File | Role |
+|------|------|
+| `zef_distance_to_mesh.m` | Distance from points `p` to a triangle mesh `(nodes, triangles)` |
+| `zef_distance_to_resection.m` | Distance from points to a resection surface |
+| `mesh_averaging/zef_find_distance_to_mesh.m` | **script** wrapper around the same idea |
+| `mesh_averaging/zef_distance_to_mesh.m` | Duplicate of the root function |
 
-## How this folder fits into the overall workflow
+## Mesh averaging / source-space split
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+| File | Role |
+|------|------|
+| `mesh_averaging/zef_average_lead_field.m` | **script** — average `L` over a decomposition |
+| `mesh_averaging/zef_decompose_soure_space.m` | Split source positions into `source_count` groups (filename spelling `soure`) |
+| `mesh_averaging/zef_get_surface_triangles.m` | Faces of one `domain_labels` compartment |
+| `mesh_averaging/zef_plot_surface_triangles.m` | **script** — plot those faces |
 
-## GUI usage
+## Sensors from vendor structs
 
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
+`getElectrodePositions.m` / `getMagnetometerPositions.m` — pull EEG/MEG coordinates (and optional labels) out of a data struct and optionally write DAT files. Not wired to **Import → Import electrodes**.
 
-## Programmatic usage
+## MRI
 
-From the project root:
+`mri/myAffine3d.m` — apply a 4×4 affine to points. `mri/scriptForAlignment.m` — **script** for a one-off alignment. See `mri/README.md`.
+
+## Analysis scripts (`analysisScripts/`)
+
+GMM / SNR / reconstruction batch helpers used by older papers (`makeGMM`, `snrTest`, `zef_insideGMM`, `zef_GMM_resection_volume`, …). They are **scripts or functions with local `zef` assumptions**, not session API. See that folder’s README.
+
+## Plotting
+
+`plotting/zef_get_reconstruction_field.m` is an unfinished leftover (undeclared `type`, unused `intersect_ind`). Not a supported API. Live volume drawing is `src/gui/plot/zef_plot_volume.m`. See `plotting/README.md`.
+
+## Scripting
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+rdm = rdm_fn(L_analytic, zef.L);
+Lsph = zef_lead_field_eeg_multilayer_sphere(electrodes, src_pos, [], sphere_model);
 ```
 
-Representative entry points in this folder:
-- `Call `ary_model` from MATLAB with the project root on the path.`
-- `Call `ary_model` from MATLAB with the project root on the path.`
-- ``function [mag_fig, rdm_fig] = eccentricity_diff_fig_fn( ...(source_points, mags, rdms, legend_labels, …)` with project root and `src` on the path.`
-- ``[[pos, label]] = getElectrodePositions(data, OptionalNameforElectrodeFile, OptionalNameForLabelFile, OptionalSaveToFile0or1)` with project root and `src` on the path.`
-- ``[[posOri, magnetometerLabel, gradiometerLabel]] = getMagnetometerPositions(MEGdata, OptionalName, OptionalPlace, OptionalSave1or0)` with project root and `src` on the path.`
-- ``[mag] = mag_fn(La, Lfem)` with project root and `src` on the path.`
-- `Call `n_intervals = 15;` from MATLAB with the project root on the path.`
-- `Call `n_intervals = 5;` from MATLAB with the project root on the path.`
+These do not call `zef_update`. Sphere geometry is independent of the FEM mesh.
 
-## Examples
+## Developer notes
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-Programmatic: populate mesh and sensors, then `zef_lead_field_matrix(zef, ...)` or modality-specific `zef_*_make_all`.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+- Prefer `src/forward/lead_field` for production EEG/MEG; the multilayer sphere is a comparison / test field.
+- Duplicated `zef_distance_to_mesh` / `zef_distance_to_resection` exist under `analysisScripts/` and `mesh_averaging/` — same names, keep behaviour in sync if you edit one.

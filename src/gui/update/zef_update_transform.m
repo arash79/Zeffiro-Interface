@@ -1,39 +1,19 @@
 function zef = zef_update_transform(zef)
-% --- Zeffiro documentation header ---
-% zef_update_transform — Syncs GUI control values into `zef` for transform.
+%ZEF_UPDATE_TRANSFORM  Transform-table CellEditCallback.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for transform.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Function. Reads zef.h_transform_table.Data (columns: Index, Name).
+%   Drops NaN-index rows, sorts by Index, rebuilds current_tag
+%   _transform_name and permutes the parallel _scaling / _*_correction /
+%   _*_rotation / _affine_transform arrays (affine defaults to {eye(4)}
+%   if the field is missing). Then runs the script zef_init_transform to
+%   refresh the table. nargout==0 → assignin base. Does not replot.
 %
-% Outputs:
-%   zef
-%
-% Zef fields (observed):
-%   zef.aux_field_1 (read, write)
-%   zef.aux_field_2 (read, write)
-%   zef.aux_field_3 (read, write)
-%   zef.aux_field_4 (read, write)
-%   zef.aux_field_5 (read, write)
-%   zef.current_tag (read)
-%   zef.h_transform_table (read)
-%
-% Calls (project):
-%   zef_update_transform
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_update_transform(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_transform, zef_update_transform_parameters.
 if nargin == 0
     zef = evalin('base','zef');
 end

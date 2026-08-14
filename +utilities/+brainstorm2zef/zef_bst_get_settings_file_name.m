@@ -1,24 +1,21 @@
 function [file_name] = zef_bst_get_settings_file_name(h_parent)
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst_get_settings_file_name — Zef bst get settings file name.
+%ZEF_BST_GET_SETTINGS_FILE_NAME  Path of the settings .m chosen in the plugin figure.
 %
-% Purpose:
-%   Zef bst get settings file name.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   h_parent
+%   file_name = zef_bst_get_settings_file_name
+%   file_name = zef_bst_get_settings_file_name(h_parent)
 %
-% Outputs:
-%   file_name
+%   Reads figure properties folder_name, settings_subfolder_name, and
+%   settings_file_name (set by zef_bst_plugin_start / zef_bst_settings_file)
+%   and returns fullfile of those three. Default h_parent is
+%   get(gcbo,'Parent') — intended as a GUI callback, not a script API.
+%   The file is a .m settings script, not a .mat.
 %
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_get_settings_file_name
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[file_name] = utilities.brainstorm2zef.zef_bst_get_settings_file_name(h_parent)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_settings_file, zef_bst_plugin_start.
 
 if nargin < 1
     h_parent = get(gcbo,'Parent');

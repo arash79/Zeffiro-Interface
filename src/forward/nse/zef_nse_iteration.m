@@ -1,46 +1,30 @@
 
 function zef = zef_nse_iteration(zef)
-% --- Zeffiro documentation header ---
-% zef_nse_iteration — Zef nse iteration.
+%ZEF_NSE_ITERATION  Navier–Stokes hemodynamic time-step iteration.
 %
-% Purpose:
-%   Zef nse iteration.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Stages: extract active submesh (zef_get_submesh), locate synthetic sources
+%   on surface nodes, assemble NSE operators (zef_nse_matrices), apply pulse
+%   boundary flux (zef_nse_signal_pulse), solve velocity/pressure systems via
+%   zef_QinvMQ / pcg_iteration(_gpu), update nse_field state. Uses mm/1000
+%   node scaling internally.
 %
-% Outputs:
-%   zef
+%   zef = zef_nse_iteration(zef)
 %
-% Zef fields (observed):
-%   zef.active_compartment_ind (read)
-%   zef.inv_synth_source (read)
-%   zef.nodes (read)
-%   zef.nse_field (read)
-%   zef.tetra (read)
+%   Input zef needs nodes, tetra, active_compartment_ind, inv_synth_source
+%   [n × 6] (xyz mm + direction), nse_field.density, viscosity, time_step_length,
+%   time_length, and pulse-shape fields used by zef_nse_signal_pulse.
+%   Hard-coded: flux_val=7.5e-4/60 m³/s split across sources, artery_diameter
+%   0.005 m, atmosphere_pressure 1.01325e5 Pa. Nodes are divided by 1000.
 %
-% Calls (project):
-%   zef_QinvMQ
-%   zef_get_submesh
-%   zef_nse_iteration
-%   zef_nse_matrices
-%   zef_nse_signal_pulse
-%   zef_surface_mesh
-%   zef_volume_scalar_uFG
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_nse_iteration(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_nse_poisson, zef_nse_run_solver, zef_nse_matrices.
 
+
+%% Stage 1: submesh extraction and surface source boundary conditions
 
 [zef.nse_field.nodes, zef.nse_field.tetra] = zef_get_submesh(zef.nodes,zef.tetra,zef.active_compartment_ind);
 b_node_ind = zef_surface_mesh(zef.nse_field.tetra);
@@ -90,6 +74,8 @@ div_data = zeros(size(zef.nse_field.t_data));
 div_data(1) = 1;
 
 h_waitbar = zef_waitbar(0,1,'NSE iteration.');
+
+%% Stage 2: barycentric NSE matrix assembly on interior nodes
 
 nse_mat = zef_nse_matrices(zef.nse_field.nodes,zef.nse_field.tetra,zef.nse_field.rho,zef.nse_field.mu);
 
@@ -195,6 +181,8 @@ else
 end
 
 QinvMQ = @(x) zef_QinvMQ(x,nse_mat.Q_1,nse_mat.Q_2,nse_mat.Q_3,nse_mat.M,zef.nse_field.pcg_tol,zef.nse_field.pcg_maxit,nse_mat.DM,zef.nse_field.use_gpu);
+
+%% Stage 3: time stepping (convection, pressure, velocity updates)
 
 field_store_ind = floor((length(zef.nse_field.t_data)-1)/(zef.nse_field.number_of_frames-1));
 field_store_counter = 0;

@@ -1,26 +1,16 @@
-% --- Zeffiro documentation header ---
-% ROI_radius = 10;     %radius of the spherical region of interest, initial 2 cm diameter — ROI radius = 10;     %radius of the spherical region of interest, initial 2 cm diameter.
+%ROIMEDIANCURVES  Script: mean |reconstruction| in spherical ROIs vs time.
 %
-% Purpose:
-%   ROI radius = 10;     %radius of the spherical region of interest, initial 2 cm diameter.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.inv_time_1 (read)
-%   zef.inv_time_3 (read)
-%   zef.measurements (read, write)
-%   zef.number_of_frames (read)
-%   zef.reconstruction (read, write)
-%   zef.source_positions (read)
+%   Not a Kalman-window callback. Loads AuditorySlowEP.mat, runs
+%   zef_find_mne_reconstruction (KF line is commented), averages sources
+%   within ROI_radius of given positions. Reads zef.source_positions,
+%   number_of_frames, inv_time_1/3; writes zef.measurements and
+%   reconstruction.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `ROI_radius = 10;     %radius of the spherical region of interest, initial 2 cm diameter` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 ROI_radius = 10;     %radius of the spherical region of interest, initial 2 cm diameter
 load('AuditorySlowEP.mat')

@@ -1,86 +1,136 @@
 \section{Lead field construction}\label{sec:lead-field-construction}
 
-\subsection{Fields of \code{zef} needed by the lead field construction routines}%
-\label{ssec:meshing-fields}
+A lead field is the linear map from sources in the brain (or other active
+tissue) to sensors. Zeffiro stores it as \ccode{zef.L}: rows are sensors,
+columns are source degrees of freedom. Inverse methods solve
+\(y \approx Lx\) and never assemble \(L\) themselves.
 
-This section lists the fields of central struct \ccode{zef} of Zeffiro
-Interface, that a user needs to set with the syntax
+The live dispatcher is \ccode{zef\_lead\_field\_matrix} in
+\ccode{src/forward/lead\_field}. From the Mesh tool, pick a row in the
+forward-simulation table (CSV
+\ccode{profile/<name>/zeffiro\_forward\_simulation.ini}) and click
+\textbf{Run script}. That evaluates the Script cell (for example
+\ccode{zef\_eeg\_lead\_field\_isotropic;}). There is no live
+\textbf{make\_all} button; the \ccode{zef\_*\_make\_all} scripts still exist
+as one-shot MATLAB helpers.
+
 \begin{lstlisting}[style=unnumberedlines, language=Matlab]
-zef.field_name = field_value;
+zef = zef_eeg_lead_field_isotropic(zef);   % type 1, Mesh-tool Script
+% or, after setting zef.lead_field_type yourself:
+zef = zef_lead_field_matrix(zef);
 \end{lstlisting}
-in order to successfully generate a lead field via Zeffiro Interface's lead
-field routines. The names, sizes, types, validators and descriptions are
-specified, in the spirit of Matlab's class property and function argument
-validation, even if no validation is actually performed for these fields.
 
-\zeffield{nodes}{:,3}{double}{}{The nodes of the currently existing finite
-element mesh. This will be constructed alongside with \ccode{zef.tetra} when
-the mesh generation routine is run.}
+\textbf{Before.} A labelled tetrahedral mesh and \ccode{zef.sigma}, plus
+\ccode{zef.sensors}. \textbf{After.} \ccode{zef.L},
+\ccode{source\_positions}, \ccode{source\_directions}. If
+\ccode{source\_interpolation\_on} is true (Mesh tool \textbf{LF source
+interp.}), \ccode{zef\_source\_interpolation} fills
+\ccode{source\_interpolation\_ind}, which inverse plugins require.
 
-\zeffield{tetra}{:,4}{uint32}{ mustBePositive }{The tetrahedra in the current
-finite element mesh. This will be constructed alongside with \ccode{zef.nodes}
-when the mesh generation routine is run. }
+\subsection{Modality types}
 
-\zeffield{acceptable\_source\_depth}{1,1}{double}{mustBeNonnegative}{Determines
-how much of the active layers are peeled off before sources are placed
-into them. The depth of \SI{0}{\milli\meter} means that only the
-surfacemost layer is peeled off, as the peeling algorithm requires that
-all nodes in a tetrahedron are further than the given value for the tetra
-to be considered as a valid source position.}
+\ccode{zef\_lead\_field\_matrix} switches on \ccode{zef.lead\_field\_type}:
 
-\zeffield{optimization\_system\_type}{1,:}{char}{mustBeMember(['pbo',
-'mpo'])}{Determines what optimization method is used in source space
-interpolation. Options are \ccode{'pbo'} for position-based optimization, or
-\ccode{'mpo'} for mean position and orientation.}
+\begin{tabularx}{\linewidth}{rX}
+\(1\) & EEG, isotropic \(\sigma\) column 1, \ccode{zef\_lead\_field\_eeg\_fem} \\
+\(2\) & MEG magnetometers, isotropic, \ccode{zef\_lead\_field\_meg\_fem} \\
+\(3\) & MEG gradiometers, isotropic, \ccode{zef\_lead\_field\_meg\_grad\_fem} \\
+\(4\) & EIT, isotropic, \ccode{zef\_lead\_field\_eit\_fem} \\
+\(5\) & TES / tES, isotropic, \ccode{zef\_lead\_field\_tes\_fem} \\
+\(6\)--\(10\) & Same five modalities with anisotropic \(\sigma(:,3{:}8)\) \\
+\end{tabularx}
 
-\zeffield{source\_model}{1,1}{ZefSourceModel}{}{Determines which source model
-is to be used when positioning the sources. Options include
-\ccode{ZefSourceModel.\{Hdiv, Whitney, StVenant\}}.}
+Gravity lead fields (asteroid profiles) bypass this integer dispatcher.
 
-\zeffield{source\_direction\_mode}{1,1}{int32}{mustBeMember([1,2,3])}{Determines
-how the columns of a lead field \ccode{zef.L} are interpreted. The options are
-\ccode{1} (Cartesian), \ccode{2} (normal) and \ccode{3} (face-based).}
+EEG/EIT/TES assemble a sparse stiffness \(A\), couple electrodes
+(\ccode{zef\_build\_electrodes}: PEM if the electrode array has 3 columns,
+CEM if 4), PCG-solve the transfer with \ccode{zef\_transfer\_matrix}, then
+form \(L\) from interpolation \(G\) or, for TES, from
+\ccode{zef\_tetra\_gradient\_field}. Nodes must already be in metres inside
+those FEM cores; the wrappers convert using \ccode{location\_unit}.
 
-\zeffield{lead\_field\_type}{1,1}{uint32}{mustBeMember([1,2,3,4,5])}{Determines which
-type of lead field is to be constructed. The options are \ccode{1} (EEG),
-\ccode{2} (MMEG), \ccode{3} (GMEG), \ccode{4} (EIT) and \ccode{5} (tES).}
+DTI conductivity (\textbf{Forward tools \(\to\) DTI Conductivity Tool})
+writes the six-column tensor used by types \(6\)--\(10\). It does not write
+\ccode{zef.L}.
 
-\zeffield{location\_unit}{1,1}{uint32}{mustBeMember([1,2,3])}{Determines the
-units of \code{zef.source\_positions}, before conversion to millimeters at the
-end of the lead field routine: \ccode{1} (m), \ccode{2} (cm) and \ccode{3}
-(mm). Effectively translates to the conversion coefficient, as
-source positions are converted to mm, before performing interpolation.}
+\subsection{Fields of \code{zef} needed by the lead field routines}%
+\label{ssec:leadfield-fields}
 
-\zeffield{location\_unit\_current}{1,1}{uint32}{mustBeMember([1,2,3])}{Works
-together with \code{zef.location\_unit} during source interpolation, in
-determining the coefficient of unit conversion of
-\code{zef.source\_positions}.}
+\zeffield{nodes}{:,3}{double}{}{Volume-mesh vertices after Create FEM mesh.
+FEM cores expect metres; wrappers convert from \ccode{location\_unit}.}
 
-\zeffield{preconditioner}{1,:}{uint32}{mustBeMember([1,2])}{Sets the type of
-preconditioner used during the preconditioned conjugate gradient optimization
-routine: \ccode 1 (Cholinc) and \ccode 2 (SSOR).}
+\zeffield{tetra}{:,4}{double}{}{Tetrahedra (1-based vertex indices), same
+length as \ccode{domain\_labels}.}
 
-\zeffield{preconditioner\_tolerance}{1,1}{double}{mustBePositive}{Sets an
-acceptable accuracy for the preconditioner.}
+\zeffield{sigma}{size(tetra,1), :}{double}{}{Conductivity. Column 1 is
+isotropic \(\sigma\) (S/m). Types \(6\)--\(10\) read columns \(3{:}8\) as
+the packed tensor \(xx,yy,zz,xy,xz,yz\). DTI Apply to Mesh fills those
+columns.}
 
-\zeffield{solver\_tolerance}{1,1}{double}{mustBePositive}{Sets an accuracy for
-the PCG transfer matrix solver itself.}
+\zeffield{sensors}{:,3 or 6}{double}{}{Sensor geometry in the mesh frame.
+PEM: \(N\times 3\) positions. CEM import (\ccode{core.io.electrodes}) may
+be \(N\times 6\) (\(xyz\), inner radius, outer radius, impedance in ohms).
+After attachment, EEG FEM sees PEM as \(N\times 3\) or CEM as an index
+table with 4 columns.}
 
-\zeffield{n\_sources}{1,1}{uint32}{mustBePositive}{The number of sources whose
-even placement is attempted into the the currently existing mesh. If the
-mesh is not fine enough, the number of actually placed sources might not
-be as high as requested.}
+\zeffield{lead\_field\_type}{1,1}{double}{}{Integer \(1\)--\(10\) as in the
+table above. Gravity scripts set a separate \ccode{gravity\_field\_type}.}
 
-\zeffield{sigma}{size(tetra,1),1}{double}{}{The conductivities of the tetrahedra.}
+\zeffield{imaging\_method}{1,1}{double}{}{Sensor family used while
+processing meshes: \(1\) EEG (optional CEM patch via
+\ccode{create\_patch\_sensor}), \(2\) MEG magnetometer directions,
+\(3\) MEG gradiometer (may use six direction columns).}
 
-\zeffield{sensors}{:,3 or 6}{double}{}{A set of sensors. If point electrode model (PEM) is
-used, this will be a \code{(:,3)} array of electrode positions, whereas if
-complete eletrode model is used, this should be a \code{(:,6)} array of 3D
-positions, inner and outer radii and finally impedances.}
+\zeffield{source\_model}{1,1}{ZefSourceModel}{}{\ccode{core.types.ZefSourceModel}:
+Whitney / ContinuousWhitney, Hdiv / ContinuousHdiv, StVenant /
+ContinuousStVenant. Interpolation \(G\) is built in
+\ccode{zef\_whitney\_interpolation}, \ccode{zef\_hdiv\_interpolation}, or
+\ccode{zef\_st\_venant\_interpolation}.}
 
-\zeffield{lead\_field\_filter\_quantile}{1,1}{double}{mustBeInRange(0,1)}{A
-quantile above which the \(2\)-norm of a column of \ccode{zef.L} is considered
-to be too high to be maintained in the solution. Is used by
-\ccode{zef\_lead\_field\_filter} to determine which columns are to be removed.
-A value of \ccode{0} means that all columns are removed, whereas a value of
-\ccode{1} means that no columns are removed.}
+\zeffield{optimization\_system\_type}{1,:}{char}{}{\ccode{'pbo'}
+(position-based optimization) or \ccode{'mpo'} (mean position and
+orientation) for Whitney/H(div) interpolation.}
+
+\zeffield{source\_direction\_mode}{1,1}{double}{}{Mesh tool
+\textbf{Directions}: \(1\) Cartesian, \(2\) Normal, \(3\) Basis. Controls
+how columns of \(L\) are interpreted in inverse and visualization, not
+which FEM file is called.}
+
+\zeffield{n\_sources}{1,1}{double}{}{Requested source count (default
+\(10000\)). The mesh may not be fine enough to place that many; the actual
+count is \ccode{size(source\_positions,1)}.}
+
+\zeffield{acceptable\_source\_depth}{1,1}{double}{mustBeNonnegative}{Peel
+depth (millimetres in the interpolation helpers) so sources are not placed
+on the outermost layer of active tissue.}
+
+\zeffield{location\_unit}{1,1}{double}{}{\(1\) metres, \(2\) centimetres,
+\(3\) millimetres. Source interpolation converts positions toward
+millimetres internally.}
+
+\zeffield{location\_unit\_current}{1,1}{double}{}{Unit currently stored on
+\ccode{source\_positions} during interpolation.}
+
+\zeffield{preconditioner}{1,1}{double}{}{PCG preconditioner in the FEM
+transfer: \(1\) incomplete Cholesky, \(2\) SSOR. Default in
+\ccode{zef\_init} is \(2\). The package
+\ccode{core.linalg.preconditioners} is not yet this call site.}
+
+\zeffield{preconditioner\_tolerance}{1,1}{double}{}{Drop tolerance for
+incomplete Cholesky when that preconditioner is selected.}
+
+\zeffield{solver\_tolerance}{1,1}{double}{}{Relative residual for
+\ccode{zef\_transfer\_matrix} PCG (default \(10^{-6}\)). A column that
+fails this tolerance aborts and returns an empty transfer.}
+
+\zeffield{lead\_field\_filter\_quantile}{1,1}{double}{mustBeInRange(0,1)}{%
+Quantile of column \(2\)-norms kept by \ccode{zef\_lead\_field\_filter}.
+\(1\) keeps every column; \(0\) would drop all.}
+
+\zeffield{source\_interpolation\_on}{1,1}{logical}{}{If true, wrappers call
+\ccode{zef\_source\_interpolation} so inverse
+\ccode{zef\_processLeadfields} can subset columns.}
+
+NSE (\ccode{src/forward/nse}) and GPU-ToRRe wave
+(\ccode{src/forward/wave}) are separate forward models; they do not write
+EEG/MEG \ccode{zef.L}.

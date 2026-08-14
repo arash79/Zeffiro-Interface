@@ -1,37 +1,18 @@
-%Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef_GMM_export(save_file_path,GMM,saved_ones)
-% --- Zeffiro documentation header ---
-% zef_GMM_export — Zef GMM export.
+%ZEF_GMM_EXPORT  uiputfile *.mat of selected GMM fields (ExportButton).
 %
-% Purpose:
-%   Zef GMM export.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   save_file_path
-%   GMM
-%   saved_ones
+%   zef_GMM_export(save_file_path, GMM, saved_ones)
 %
-% Outputs:
-%   See function signature and code below.
+%   Called from zef_GMMExport_start ExportButton. saved_ones is six
+%   logicals: model, dipoles, amplitudes, time_variables, parameters,
+%   reconstruction (from base zef.reconstruction). Writes zef_GMM in the
+%   chosen .mat (-v7.3). Does not modify zef.GMM.apps.
 %
-% Zef fields (observed):
-%   zef.reconstruction (read)
-%
-% Calls (project):
-%   zef_GMM_export
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `zef_GMM_export(save_file_path, GMM, saved_ones)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_GMMExport_start, zef_load_GMM.
 
 if not(isempty(save_file_path)) && prod(not(save_file_path==0))
     [zef_aux_file,zef_aux_path] = uiputfile('*.mat','Select Gaussian Mixature Model',save_file_path);

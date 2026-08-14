@@ -1,35 +1,34 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef_arrange_windows(varargin)
-% --- Zeffiro documentation header ---
-% zef_arrange_windows — Zef arrange windows.
+%ZEF_ARRANGE_WINDOWS  Tile, maximize, minimize, or close Zeffiro windows.
 %
-% Purpose:
-%   Zef arrange windows.
-%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Selects figures whose Name matches "ZEFFIRO Interface:*" (or Figure
+%   tool only), optionally limited to WindowState 'normal'. Protected
+%   windows (zef_window_manager('is_protected')) are skipped. Tile picks a
+%   grid whose aspect roughly matches the screen, then sets Position in
+%   pixels or normalized units.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.h_zeffiro_window_main (read)
-%
-% Calls (project):
 %   zef_arrange_windows
+%   zef_arrange_windows(arrange_function)
+%   zef_arrange_windows(arrange_function, arrange_target)
+%   zef_arrange_windows(arrange_function, arrange_target, arrange_mode)
 %
-% Side effects:
-%   - base/caller workspace
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
+%   Inputs
+%     arrange_function - 'tile' (default), 'maximize', 'minimize', or 'close'.
+%     arrange_target   - 'windows' (default), 'figs', or 'tools' (windows
+%                        minus Figure tool).
+%     arrange_mode     - 'on-screen' (default: WindowState normal only) or
+%                        'all'.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_arrange_windows(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Side effects
+%     Mutates figure Position/WindowState. After tiling, docks the menu
+%     via zef_window_manager if zef exists in the base workspace.
+%
+%   See also zef_window_manager, zef_tile_figs.
 
 arrange_function = 'tile';
 arrange_target = 'windows';
@@ -52,22 +51,40 @@ h_aux = [];
 
 if isequal(arrange_mode,'on-screen')
     if isequal(arrange_target,'windows')
-        h_aux = evalin('base','findall(groot,''-regexp'',''Name'',''ZEFFIRO Interface:*'',''WindowState'',''normal'')');
+        h_aux = findall(groot,'-regexp','Name','ZEFFIRO Interface:*','WindowState','normal');
     elseif isequal(arrange_target,'figs')
-        h_aux = evalin('base','findall(groot,''-regexp'',''Name'',''ZEFFIRO Interface: Figure tool*'',''WindowState'',''normal'')');
+        h_aux = findall(groot,'-regexp','Name','ZEFFIRO Interface: Figure tool*','WindowState','normal');
     elseif isequal(arrange_target,'tools')
-        h_aux = evalin('base','findall(groot,''-regexp'',''Name'',''ZEFFIRO Interface:*'',''WindowState'',''normal'')');
-        h_aux = h_aux(find(not(ismember(h_aux, evalin('base','findall(groot,''-regexp'',''Name'',''ZEFFIRO Interface: Figure tool*'',''WindowState'',''normal'')')))));
+        h_aux = findall(groot,'-regexp','Name','ZEFFIRO Interface:*','WindowState','normal');
+        h_figs = findall(groot,'-regexp','Name','ZEFFIRO Interface: Figure tool*','WindowState','normal');
+        h_aux = h_aux(find(not(ismember(h_aux, h_figs))));
     end
 elseif isequal(arrange_mode,'all')
     if isequal(arrange_target,'windows')
-        h_aux = evalin('base','findall(groot,''-regexp'',''Name'',''ZEFFIRO Interface:*'')');
+        h_aux = findall(groot,'-regexp','Name','ZEFFIRO Interface:*');
     elseif isequal(arrange_target,'figs')
-        h_aux = evalin('base','findall(groot,''-regexp'',''Name'',''ZEFFIRO Interface: Figure tool*'')');
+        h_aux = findall(groot,'-regexp','Name','ZEFFIRO Interface: Figure tool*');
     elseif isequal(arrange_target,'tools')
-        h_aux = evalin('base','findall(groot,''-regexp'',''Name'',''ZEFFIRO Interface:*'')');
-        h_aux = h_aux(find(not(ismember(h_aux, evalin('base','findall(groot,''-regexp'',''Name'',''ZEFFIRO Interface: Figure tool*'',''WindowState'',''normal'')')))));
+        h_aux = findall(groot,'-regexp','Name','ZEFFIRO Interface:*');
+        h_figs = findall(groot,'-regexp','Name','ZEFFIRO Interface: Figure tool*','WindowState','normal');
+        h_aux = h_aux(find(not(ismember(h_aux, h_figs))));
     end
+end
+
+if isempty(h_aux)
+    return
+end
+
+% Drop stale handles and windows that must not be rearranged/closed.
+keep = false(size(h_aux));
+for i = 1:numel(h_aux)
+    keep(i) = isgraphics(h_aux(i)) && isvalid(h_aux(i)) ...
+        && ~zef_window_manager('is_protected', h_aux(i), arrange_function);
+end
+h_aux = h_aux(keep);
+
+for i = 1:numel(h_aux)
+    zef_window_manager('standalone', h_aux(i));
 end
 
 if isequal(arrange_function,'tile')
@@ -99,38 +116,41 @@ if isequal(arrange_function,'tile')
     end
 
     for i = 1 : length(h_aux)
-        figure(h_aux(i));
-        evalin('base',get(h_aux(i),'SizeChangedFcn'));
+        zef_window_manager('raise', h_aux(i));
+        zef_window_manager('sizechanged', h_aux(i));
     end
 
     for i = 1 : length(h_aux)
-        figure(h_aux(i));
-        evalin('base',get(h_aux(i),'SizeChangedFcn'));
+        zef_window_manager('raise', h_aux(i));
+        zef_window_manager('sizechanged', h_aux(i));
     end
 
-    figure(evalin('base','zef.h_zeffiro_window_main'));
+    if evalin('base','exist(''zef'',''var'')')
+        zef_window_manager('dock_menu', evalin('base','zef'));
+        try
+            zef_window_manager('raise', evalin('base','zef.h_zeffiro_window_main'));
+        catch
+        end
+    end
 
 end
 
 if isequal(arrange_function,'maximize')
     for i = 1 : length(h_aux)
-        set(h_aux(i),'WindowState','normal');
+        zef_window_manager('standalone', h_aux(i));
+        set(h_aux(i),'WindowState','maximized');
     end
 end
 
 if isequal(arrange_function,'minimize')
     for i = 1 : length(h_aux)
-        if not(contains(get(h_aux(i),'Name'),'ZEFFIRO Interface: Segmentation tool'))
-            set(h_aux(i),'WindowState','minimized');
-        end
+        set(h_aux(i),'WindowState','minimized');
     end
 end
 
 if isequal(arrange_function,'close')
     for i = 1 : length(h_aux)
-        if not(contains(get(h_aux(i),'Name'),'ZEFFIRO Interface: Segmentation tool'))
-            close(h_aux(i));
-        end
+        close(h_aux(i));
     end
 end
 

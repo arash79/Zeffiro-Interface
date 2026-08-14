@@ -1,41 +1,16 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if zef — If zef.
+%ZEF_UPDATE_MESH_TOOL  Push mesh-tool widgets into zef.
 %
-% Purpose:
-%   If zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.cp_on (read)
-%   zef.downsample_surfaces (read, write)
-%   zef.enable_str (read, write)
-%   zef.forward_simulation_column_selected (read)
-%   zef.forward_simulation_script (read, write)
-%   zef.forward_simulation_selected (read)
-%   zef.forward_simulation_table (read, write)
-%   zef.h_checkbox_mesh_smoothing_on (read)
-%   zef.h_downsample_surfaces (read)
-%   zef.h_edit65 (read)
-%   zef.h_edit75 (read)
-%   zef.h_edit76 (read)
-%   zef.h_edit_cp_a (read)
-%   zef.h_edit_cp_b (read)
-%   zef.h_edit_cp_c (read)
-%   … (27 more)
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
-
+%   Script. When zef.mlapp==1 copies Mesh smoothing / Refinement /
+%   LF source interp. / Resample surf. and numeric fields; writes the
+%   selected forward-simulation table cell from the script box. Else
+%   (legacy) enables clipping-plane edits from zef.cp_on.
 if zef.mlapp == 1
 
     zef.mesh_smoothing_on = zef.h_checkbox_mesh_smoothing_on.Value;

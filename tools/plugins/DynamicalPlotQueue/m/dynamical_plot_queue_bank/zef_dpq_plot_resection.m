@@ -1,32 +1,25 @@
 function zef_dpq_plot_resection(varargin)
-% --- Zeffiro documentation header ---
-% zef_dpq_plot_resection — Zef dpq plot resection.
+%ZEF_DPQ_PLOT_RESECTION  Queue renderer: free-boundary mesh of resection points.
 %
-% Purpose:
-%   Zef dpq plot resection.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Delaunay tetrahedralization of the point cloud, then trimesh of
+%   freeBoundary. Default points are base zef.resection_points. Draws on
+%   caller h_axes_image. Default color 'g'. If alpha is 0 (default), Tag
+%   is 'additional' and facealpha is left unset; otherwise facealpha is
+%   set and the tag is not.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.resection_points (read)
-%
-% Calls (project):
 %   zef_dpq_plot_resection
-%   zef_tetra_volume
+%   zef_dpq_plot_resection(points)
+%   zef_dpq_plot_resection(points, color)
+%   zef_dpq_plot_resection(points, color, alpha)
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Tetra volumes and centroids are computed and unused.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_dpq_plot_resection(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_dpq_wireframe_plot, zef_plot_dpq.
 
 alpha_value = 0;
 resection_color = 'g';
@@ -57,7 +50,7 @@ h_f = gcf;
 h_f.CurrentAxes = h;
 %axes(h);
 h_resection = trimesh(FB,nodes(:,1),nodes(:,2),nodes(:,3));
-set(h_resection,'facecolor',resection_color);
+set(h_resection,'facecolor',resection_color)
 set(h_resection,'edgecolor','none');
 if alpha_value == 0
     set(h_resection,'tag','additional');

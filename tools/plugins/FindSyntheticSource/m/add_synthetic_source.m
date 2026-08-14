@@ -1,21 +1,18 @@
-% --- Zeffiro documentation header ---
-% zef.find_synth_source.h_source_parameters.Data=zef — Zef.find synth source.h source parameters.Data=zef.
+%ADD_SYNTHETIC_SOURCE  Append a Source(n) row to the synthetic-source list.
 %
-% Purpose:
-%   Zef.find synth source.h source parameters.Data=zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.find_synth_source (read)
-%   zef.synth_source_data (read, write)
+%   Script. Add button in find_synthetic_source. Picks the smallest
+%   unused n from the Source(k) labels, copies synth_source_init into
+%   h_source_parameters, and stores name+parameters on
+%   zef.synth_source_data (flip to prepend). Errors if synth_source_data
+%   is missing on the first add (else branch only sets itemnum=1). Does
+%   not project through L (Create synth data does).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.find_synth_source.h_source_parameters.Data=zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also remove_synthetic_source, find_synthetic_source.
 
 zef.find_synth_source.h_source_parameters.Data=zef.synth_source_init;
 

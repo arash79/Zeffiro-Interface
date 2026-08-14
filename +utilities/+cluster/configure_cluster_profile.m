@@ -1,41 +1,21 @@
 function cluster_profile = configure_cluster_profile(computing_project, opts)
-% --- Zeffiro documentation header ---
-% utilities.cluster.configure_cluster_profile — Configure cluster profile.
+%CONFIGURE_CLUSTER_PROFILE  Set CSC Puhti SLURM properties on a cluster profile.
 %
-% Purpose:
-%   Configure cluster profile.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   computing_project
-%   opts
+%   cluster_profile = configure_cluster_profile(computing_project, opts)
 %
-% Outputs:
-%   cluster_profile
+%   Configures parcluster AdditionalProperties for CSC/MathWorks Puhti integration:
+%   ComputingProject, MemPerCPU (default "4g"), WallTime (default "24:00:00"),
+%   and optional Partition, CPUsPerNode, GPUsPerNode, GPUCard, Constraint,
+%   Reservation, RequireExclusiveNode, LocalStorageSpacePerNode, EmailAddress,
+%   AdditionalSubmitArgs. Sets NumThreads (default 1) and saves under
+%   opts.ProfileName (default "CSCPuhti").
 %
-% Calls (project):
-%   utilities.cluster.configure_cluster_profile
-%
-% Side effects:
-%   - parallel/cluster
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[cluster_profile] = utilities.cluster.configure_cluster_profile(computing_project, opts)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%CONFIGURE_CLUSTER_PROFILE Configure a CSC Puhti cluster profile.
-%
-% This utility configures MATLAB's current cluster profile so that the
-% AdditionalProperties names match the CSC/MathWorks SLURM integration
-% scripts. In particular, the required properties are:
-%   - ComputingProject
-%   - MemPerCPU
-%   - WallTime
-%
-% Prerequisite:
-%   Run CSC's `configCluster` first so `parcluster` points to the Puhti
-%   Generic profile.
+%   Prerequisite: run CSC configCluster so parcluster points at the Puhti profile.
 
 arguments
     computing_project (1,1) string {mustBeNonempty}

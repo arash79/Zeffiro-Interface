@@ -1,38 +1,45 @@
 function [zef, run_result] = zef_inverse_run(zef, method_id, opts)
-% --- Zeffiro documentation header ---
-% zef_inverse_run — Zef inverse run.
+%ZEF_INVERSE_RUN  Run a registered class inverter locally or on a MATLAB cluster.
 %
-% Purpose:
-%   Zef inverse run.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   method_id
-%   opts
+%   Packs the current project into an inverse bundle, dispatches the method
+%   named by method_id (see utilities.cluster.inverse_method_registry), and
+%   writes reconstruction fields back onto zef. This is the programmatic
+%   entry; most GUI inverse buttons still call legacy plugin iteration
+%   functions instead.
 %
-% Outputs:
-%   zef
-%   run_result
+%   [zef, run_result] = zef_inverse_run(zef, method_id)
+%   [zef, run_result] = zef_inverse_run(zef, method_id, Name, Value, ...)
 %
-% Zef fields (observed):
-%   zef.reconstruction (read, write)
-%   zef.reconstruction_information (read, write)
+%   Inputs
+%     zef        - session struct with lead field and measurements.
+%     method_id  - nonempty string registry id (e.g. "eloreta", "mne", "kalman").
+%     execution  - "local" (default) or "cluster".
+%     MethodParams
+%                - struct of inverter name-value fields, default struct().
+%     ClusterProfile
+%                - required when execution is "cluster"; profile name or object
+%                  forwarded to utilities.cluster.submit_inverse_jobs.
+%     WorkDir    - cluster working directory, default pwd.
+%     BundleDir  - bundle output directory, default pwd/cluster_bundles.
+%     ResultDir  - result directory, default pwd/cluster_results.
 %
-% Calls (project):
-%   utilities.cluster.collect_inverse_results
-%   utilities.cluster.dispatch_inverse
-%   utilities.cluster.submit_inverse_jobs
-%   zef_inverse_extract_bundle
-%   zef_inverse_run
+%   Outputs
+%     zef         - input struct with reconstruction and
+%                   reconstruction_information copied from run_result.
+%     run_result  - dispatcher result struct. On cluster runs, field
+%                   cluster_summary holds collect_inverse_results summary.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Failure
+%     Errors if cluster execution is requested without ClusterProfile, or
+%     if the collected cluster result is empty or unsuccessful.
 %
-% Workflow:
-%   GUI: Programmatic inverse entry; GUI plugins often call legacy `zef_*_iteration` instead.
-%   Programmatic: `[[zef, run_result]] = zef_inverse_run(zef, method_id, opts)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_inverse_extract_bundle, utilities.cluster.dispatch_inverse,
+%            utilities.cluster.inverse_method_registry.
 
 arguments
     zef (1,1) struct

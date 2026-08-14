@@ -1,39 +1,14 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef.sl1_hyperprior = get(zef — Zef.sl1 hyperprior = get(zef.
+%ZEF_UPDATE_SL1  sL1 widgets → zef.sl1_* and zef.inv_time_*/snr/frames.
 %
-% Purpose:
-%   Zef.sl1 hyperprior = get(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_sl1_high_cut_frequency (read)
-%   zef.h_sl1_low_cut_frequency (read)
-%   zef.h_sl1_n_map_iterations (read)
-%   zef.h_sl1_normalize_data (read)
-%   zef.h_sl1_number_of_frames (read)
-%   zef.h_sl1_sampling_frequency (read)
-%   zef.h_sl1_snr (read)
-%   zef.h_sl1_time_1 (read)
-%   zef.h_sl1_time_2 (read)
-%   zef.h_sl1_time_3 (read)
-%   zef.h_sl1_type (read)
-%   zef.inv_high_cut_frequency (read, write)
-%   zef.inv_low_cut_frequency (read, write)
-%   zef.inv_sampling_frequency (read, write)
-%   zef.inv_snr (read, write)
-%   … (15 more)
+%   Script. Apply and Start. Copies hyperprior, type, n_map_iterations,
+%   band, time windows. Does not invert.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.sl1_hyperprior = get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_sl1, zef_sl1_iteration.
 
 zef.sl1_hyperprior = get(zef.h_sl1_hyperprior ,'value');
 zef.sl1_snr = str2num(get(zef.h_sl1_snr,'string'));

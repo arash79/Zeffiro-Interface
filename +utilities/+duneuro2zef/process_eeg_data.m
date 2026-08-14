@@ -1,46 +1,23 @@
-% process_eeg_data.m
-%
-% Processes EEG lead fields, measurements, and sensor configurations.
-%
-% Input:
-%   config - Configuration structure
-%
-% Output:
-%   success - Logical indicating success
-%   error_msg - Error message if failed (empty if successful)
-%
-% Usage:
-%   [success, error_msg] = utilities.duneuro2zef.process_eeg_data(config);
-%
-% See also: run.m, get_default_config.m, process_sensors.m
-
 function [success, error_msg] = process_eeg_data(config)
-% --- Zeffiro documentation header ---
-% utilities.duneuro2zef.process_eeg_data — Process eeg data.
+%PROCESS_EEG_DATA  Duneuro EEG L + measurements → converted .mat + sensors.
 %
-% Purpose:
-%   Process eeg data.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   config
+%   Stage of utilities.duneuro2zef.run. No-op success if ~config.process_eeg.
+%   Loads input_folder/files.leadfield_eeg (variable LF_EEG, else L, else the
+%   sole field) and files.measurements_eeg (spikeAvg_EEG, eeg_data, or sole
+%   field). Measurements are struct.(config.eeg.measurement_field) or .data;
+%   labels must exist. Channel subset: config.eeg.channel_indices with inf
+%   meaning end, matched to spikeAvg label vs the nested channel_path.
+%   Writes output.leadfield_eeg as L and output.measurements_eeg as
+%   measurements (-v7.3), then process_sensors(config,'EEG', used_indices).
 %
-% Outputs:
-%   success
-%   error_msg
+%   [success, error_msg] = process_eeg_data(config)
 %
-% Calls (project):
-%   utilities.duneuro2zef.process_eeg_data
-%   utilities.duneuro2zef.process_sensors
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[success, error_msg]] = utilities.duneuro2zef.process_eeg_data(config)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also process_meg_data, process_sensors, run.
 
     success = false;
     error_msg = '';

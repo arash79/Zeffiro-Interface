@@ -1,56 +1,45 @@
-# tools/plugins/ClassicalSparseMethods
+# ClassicalSparseMethods
 
-## Purpose of this folder
+dSPM, sLORETA, 3D sLORETA, and Sparse Bayesian Learning on the processed lead field. Use dSPM/sLORETA for standardized noise-normalized maps; use SBL when you want an iterative sparse posterior (`zef.csm_n_iter`, default 10).
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+This plugin does **not** construct `inverse.CSMInverter`. Class ids `csm` / `dspm` / `sloreta` / `sloreta3d` / `sbl` (and `legacy_csm`) are a separate `zef_inverse_run` track.
 
-## Contents
+## Menu
 
-MATLAB sources:
-- `zef_CSM_iteration.m` — **function [z,reconstruction_information] = zef_CSM_iteration**: Function [z,reconstruction information] = zef CSM iteration.
-- `CSM_app_start.m` — **zef**: Zef.
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **Classical Sparse Methods** |
+| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
 
-Other files:
-- `CSM_app.mlapp`
-- `README`
+INI callback: `CSM_app_start` (script).
 
-## How this folder fits into the overall workflow
+Window title: `ZEFFIRO Interface: Classical Sparse Methods`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+## Run the solver
 
-## GUI usage
-
-- **zef**: GUI callback or dialog (`zef`).
-
-## Programmatic usage
-
-From the project root:
+**StartButton** `ButtonPushedFcn`:
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+[zef.reconstruction,zef.reconstruction_information]=zef_CSM_iteration;
 ```
 
-Representative entry points in this folder:
-- `Call `function [z,reconstruction_information] = zef_CSM_iteration` from MATLAB with the project root on the path.`
-- `Call `zef` from MATLAB with the project root on the path.`
+Method dropdown items (wired in `CSM_app_start`): `dSPM`, `sLORETA`, `3D sLORETA`, `Sparse Bayesian Learning` → `zef.csm_type` 1–4. Iteration count is disabled for types 1–3.
 
-## Examples
+## Needs
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+- `zef.L`, `zef.source_interpolation_ind`, `zef.source_direction_mode`
+- `zef.measurements`
+- SNR: `zef.inv_snr` (dB) → `std_lhood = 10^(-inv_snr/20)`; also `inv_prior_over_measurement_db` / `inv_amplitude_db` for SBL scale
+- Frames: `zef.number_of_frames`, `inv_time_1/2/3`, `inv_sampling_frequency`, band edges `inv_low_cut_frequency` / `inv_high_cut_frequency`
+- Solver is `evalin('base',…)` — it reads the base-workspace `zef`, not a passed struct
 
-## Dependencies and assumptions
+## Writes
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+- `zef.reconstruction` after `zef_postProcessInverse`
+- `zef.reconstruction_information` with tag `CSM/dSPM`, `CSM/sLORETA`, `CSM/sLORETA-3D`, or `CSM/SBL`
 
-## Notes for developers
+## Files
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+- Start: `CSM_app_start.m` constructs `CSM_app`
+- Solver: `zef_CSM_iteration.m`
+- Layout: `CSM_app.mlapp` (no `mlapp/` subfolder)

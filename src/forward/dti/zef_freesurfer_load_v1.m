@@ -1,33 +1,20 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_FREESURFER_LOAD_V1
-%
-%Loads FreeSurfer dt_recon output v1.nii.gz (principal eigenvector).
-%This is needed for streamline visualization.
-
 function [v1_data, v1_info] = zef_freesurfer_load_v1(v1_file)
-% --- Zeffiro documentation header ---
-% zef_freesurfer_load_v1 — Zef freesurfer load v1.
+%ZEF_FREESURFER_LOAD_V1  Load FreeSurfer v1.nii.gz principal diffusion direction.
 %
-% Purpose:
-%   Zef freesurfer load v1.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2024- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   v1_file
+%   Expects 4-D NIfTI [nx ny nz 3]. Normalizes each voxel vector; norms
+%   below 1e-6 are left as unit fallback (divide by 1). Used as
+%   principal_direction in zef_freesurfer_fa_to_conductivity.
 %
-% Outputs:
-%   v1_data
-%   v1_info
+%   [v1_data, v1_info] = zef_freesurfer_load_v1(v1_file)
 %
-% Calls (project):
-%   zef_freesurfer_load_v1
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[v1_data, v1_info]] = zef_freesurfer_load_v1(v1_file)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_freesurfer_load_fa, zef_freesurfer_fa_to_conductivity.
+
+
 
 
 arguments

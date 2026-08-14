@@ -1,21 +1,18 @@
 classdef BeamformerInverter < inverse.CommonInverseParameters & handle
-% --- Zeffiro documentation header ---
-% inverse.BeamformerInverter.BeamformerInverter — Inverse solver class implementing Beamformer reconstruction.
+%BeamformerInverter  Per-source LCMV, UNG, and unit-gain beamformers.
 %
-% Purpose:
-%   Inverse solver class implementing Beamformer reconstruction.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   args
+%   Scans each source (fixed then free orientation). With error_cov, lead fields
+%   are Mahalanobis-whitened (C\\L). Weights w = (L' C^{-1} L + lambda I)^{-1} L' C^{-1} f
+%   with optional UNG / unit-gain normalization. Unit-gain constrained mode picks
+%   optimal orientation via dominant eigenvector of L'*L (Rayleigh–Ritz).
 %
-% Calls (project):
-%   inverse.CommonInverseParameters
+%   See also inverse.DipoleScanInverter.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `inverse.BeamformerInverter.BeamformerInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
 
     properties
 
@@ -74,12 +71,12 @@ classdef BeamformerInverter < inverse.CommonInverseParameters & handle
     methods
 
         function self = BeamformerInverter(args)
-
+            %BeamformerInverter  Construct an LCMV / UNG / unit-gain beamformer.
             %
-            % BeamformerInverter
-            %
-            % The constructor for this class.
-            %
+            %   Name-value: method_type, cov_reg_parameter, leadfield_reg_parameter,
+            %   reg_type (stored as leadfield_reg_type), error_cov,
+            %   leadfield_normalization, plus CommonInverseParameters fields.
+            %   SNR is inherited but invert uses error_cov, not inv_snr, for C.
             arguments
 
                 args.method_type = "Linearly constrained minimum variance (LCMV) beamformer"
@@ -155,9 +152,9 @@ classdef BeamformerInverter < inverse.CommonInverseParameters & handle
         % Declare the initialize and inverse method defined in the files invert and initialize in this same
         % folder.
 
-        self = initialize(self)
+        self = initialize(self, L, f_data)
 
-        [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode)
+        [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
 
         % Function that ZI runs after all inversions are done for each
         % desired time steps. With this function, one can reset the
@@ -165,9 +162,7 @@ classdef BeamformerInverter < inverse.CommonInverseParameters & handle
         % computing process
 
         function self = terminateComputation(self)
-            %If the user has not given their own inversion parameters, we
-            %reset the automatically computed parameters because the user 
-            %could change the data or model between separate runs.
+            %terminateComputation  Clear auto-estimated error_cov unless user-set.
             if not(self.error_covSetted)
                 self.error_cov = [];
             end
@@ -181,6 +176,7 @@ classdef BeamformerInverter < inverse.CommonInverseParameters & handle
         % The function set the respective *Setted property value true when 
         % value is changed.
         function setEventsFlags(src,evnt,self) %two first inputs must be there and have these dedicated roles. The third 'self' is an extra variable.
+        %setEventsFlags  PostSet listener: mark error_cov as user-set when not computing.
          if not(self.computing_parameters)
                if isempty(self.error_cov)
                    self.error_covSetted = false;

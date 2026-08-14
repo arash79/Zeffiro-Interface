@@ -1,24 +1,19 @@
 function [file_name] = zef_bst_get_project_file_name(h_parent)
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst_get_project_file_name — Zef bst get project file name.
+%ZEF_BST_GET_PROJECT_FILE_NAME  Proposed .mat path beside the settings script.
 %
-% Purpose:
-%   Zef bst get project file name.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   h_parent
+%   file_name = zef_bst_get_project_file_name
+%   file_name = zef_bst_get_project_file_name(h_parent)
 %
-% Outputs:
-%   file_name
+%   From figure properties: folder_name / project_subfolder_name /
+%   fileparts(settings_file_name) + '.mat'. Default h_parent is
+%   get(gcbo,'Parent'). Does not check that the .mat exists.
 %
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_get_project_file_name
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[file_name] = utilities.brainstorm2zef.zef_bst_get_project_file_name(h_parent)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_plugin_start, zef_bst_edit_project.
 
 if nargin < 1
     h_parent = get(gcbo,'Parent');

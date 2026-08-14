@@ -1,24 +1,25 @@
 function prec = jacobi ( A )
-% --- Zeffiro documentation header ---
-% core.linalg.preconditioners.jacobi — Jacobi.
+%JACOBI  Jacobi (diagonal) preconditioner matrix M = D^{-1}.
 %
-% Purpose:
-%   Jacobi.
-%   Folder: Builds Jacobi and SSOR preconditioner matrices for sparse systems; not yet wired into legacy lead-field PCG loops.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   A
+%   Builds the dense inverse-diagonal of A as (diag(diag(A)) \ I). Intended
+%   for left-preconditioned iterative solvers. Lead-field PCG in src/forward
+%   still uses its own SSOR/ichol path; this package helper is not yet wired
+%   there.
 %
-% Outputs:
-%   prec
+%   prec = core.linalg.preconditioners.jacobi(A)
 %
-% Calls (project):
-%   core.linalg.preconditioners.jacobi
+%   Input
+%     A  - square matrix (sparse or dense).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[prec] = core.linalg.preconditioners.jacobi(A)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     prec  - D^{-1} with D = diag(A), same size as A.
+%
+%   See also core.linalg.preconditioners.ssor.
 
     arguments
         A (:,:)

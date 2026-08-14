@@ -1,29 +1,17 @@
 function metrics = compute_metrics(z, source_positions, source_indices, diff_type, dispersion_radius, opts)
-% --- Zeffiro documentation header ---
-% utilities.sensitivity.compute_metrics — Compute metrics.
+%COMPUTE_METRICS  Localization metrics for sensitivity probe reconstructions.
 %
-% Purpose:
-%   Compute metrics.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   z
-%   source_positions
-%   source_indices
-%   diff_type
-%   dispersion_radius
-%   opts
+%   metrics = compute_metrics(z, source_positions, source_indices, ...
+%       diff_type, dispersion_radius, opts)
 %
-% Outputs:
-%   metrics
-%
-% Calls (project):
-%   utilities.sensitivity.compute_metrics
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[metrics] = utilities.sensitivity.compute_metrics(z, source_positions, source_indices, diff_type, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   z is a cell of per-probe reconstructions (3 dirs per source unless mode 3).
+%   Computes distance, angle, magnitude, dispersion (sources within radius of
+%   peak), and max_ind per probe. diff_type is "L2" or "minabs".
 
 arguments
     z (1,:) cell

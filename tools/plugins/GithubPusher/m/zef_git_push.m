@@ -1,26 +1,20 @@
 function zef_git_push(my_key,varargin)
-% --- Zeffiro documentation header ---
-% zef_git_push — Zef git push.
+%ZEF_GIT_PUSH  git add/commit/push using a PAT as the remote password.
 %
-% Purpose:
-%   Zef git push.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   my_key
-%   varargin
+%   zef_git_push(my_key)
+%   zef_git_push(my_key, 'message', commit_message)
 %
-% Outputs:
-%   See function signature and code below.
+%   Called from zef_github_updater_script. Rewrites origin to
+%   https://sampsapursiainen:KEY@github.com/sampsapursiainen/
+%   zeffiro_interface then !git add -A, commit, push. Side effects:
+%   git and the remote URL. Default message 'Regular push.'
 %
-% Calls (project):
-%   zef_git_push
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_git_push(my_key, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_github_updater_start.
 
 message = '"Regular push."';
 
@@ -36,8 +30,11 @@ if not(isempty(varargin))
     end
 end
 
-eval(['!git remote set-url origin https://sampsapursiainen:' my_key '@github.com/sampsapursiainen/zeffiro_interface']);
+eval(['!git remote set-url origin https://sampsapursiainen:' my_key '@github.com/sampsapursiainen/zeffiro_interface'])
+;
 
+% Same set-url twice (as written). Origin becomes the upstream Zeffiro
+% repo with the PAT in the URL; this is not your clone's previous remote.
 eval(['!git remote set-url origin https://sampsapursiainen:' my_key '@github.com/sampsapursiainen/zeffiro_interface'])
 !git config http.postBuffer 524288000
 !git pull

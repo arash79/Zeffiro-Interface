@@ -1,34 +1,25 @@
 function zef = zef_exp_app_start(zef)
-% --- Zeffiro documentation header ---
-% zef_exp_app_start — Zef exp app start.
+%ZEF_EXP_APP_START  Open EXP App Designer window (Exponential Prior Tool).
 %
-% Purpose:
-%   Zef exp app start.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_exp_app_start(zef)
 %
-% Outputs:
-%   zef
+%   Called via zef_tool_start from zef_exp_app_launch. Constructs
+%   exp_app unless zef.EXP.app already exists (early return). Syncs
+%   edit/dropdown widgets: exp_* fields move onto zef.EXP.parameters
+%   (and are rmfield'd from zef); inv_* stay on zef. StartButton:
+%   [reconstruction, reconstruction_information] = exp_iteration(zef).
+%   CreateDecButton writes EXP.parameters.exp_multires_* from
+%   exp_make_multires_dec (that helper reads top-level
+%   zef.exp_multires_* from base, not EXP.parameters). ApplyButton is
+%   zef_exp_init (no such function in the tree). Numeric exp_*
+%   ValueChangedFcn uses num2double (not a MATLAB function).
 %
-% Zef fields (observed):
-%   zef.EXP (read, write)
-%   zef.font_size (read)
-%   zef.reconstruction (read)
-%   zef.reconstruction_information (read)
-%
-% Calls (project):
-%   zef_exp_app_start
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_exp_app_start(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_exp_app_launch, exp_iteration, exp_make_multires_dec.
 
 if isfield(zef,'EXP')
     if isfield(zef.EXP,'app')

@@ -1,27 +1,21 @@
 function method_info = inverse_method_registry(method_id)
-% --- Zeffiro documentation header ---
-% utilities.cluster.inverse_method_registry — Inverse method registry.
+%INVERSE_METHOD_REGISTRY  Map inverse method id to class or legacy dispatch info.
 %
-% Purpose:
-%   Inverse method registry.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   method_id
+%   method_info = inverse_method_registry(method_id)
 %
-% Outputs:
-%   method_info
+%   method_id is case-insensitive. Returns struct with fields method_id,
+%   execution_kind ("class" or "legacy"), class_name (e.g. "inverse.CSMInverter"),
+%   and legacy_function (e.g. "zef_CSM_iteration"). Aliases include csm/dspm/
+%   sloreta/sbl → CSMInverter; mne/wmne → MNEInverter; kalman/kf → KalmanInverter;
+%   dipolescan/dipole_scan → DipoleScanInverter; grouplasso/group_lasso →
+%   GroupLassoInverter; legacy_* ids map to historical zef_* entry points.
 %
-% Calls (project):
-%   utilities.cluster.inverse_method_registry
-%
-% Side effects:
-%   - parallel/cluster
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[method_info] = utilities.cluster.inverse_method_registry(method_id)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Errors if method_id is unknown.
 
 arguments
     method_id (1,1) string {mustBeNonempty}

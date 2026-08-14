@@ -1,28 +1,18 @@
-%% Copyright © 2025- Joonas Lahtinen and Alexandra Koulouri
 classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
-% --- Zeffiro documentation header ---
-% inverse.GroupLassoInverter.GroupLassoInverter — Inverse solver class implementing GroupLasso reconstruction.
+%GroupLassoInverter  Group LASSO MAP inversion via LG_optimization.
 %
-% Purpose:
-%   Inverse solver class implementing GroupLasso reconstruction.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen and Alexandra Koulouri
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   args
+%   Hierarchical gamma hyperprior with group sparsity (L2 over 3-DOF blocks).
+%   estimation_type selects IAS, EM, or Standardized inner solvers. Optional
+%   multiresolution path (use_multiresolution) averages over random sub-grids.
+%   hyperprior_mode "Sensitivity weighted" auto-tunes beta and theta0 from L.
 %
-% Calls (project):
-%   inverse.CommonInverseParameters
-%   zef_make_multires_dec
+%   See also inverse.HALpRInverter, LG_optimization.
 %
-% Side effects:
-%   - GPU
-%   - filesystem I/O
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `inverse.GroupLassoInverter.GroupLassoInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
 
     properties
 
@@ -90,12 +80,12 @@ classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
     methods
 
         function self = GroupLassoInverter(args)
-
+            %GroupLassoInverter  Construct a group-LASSO MAP inverter.
             %
-            % GroupLassoInverter
-            %
-            % The constructor for this class.
-            %
+            %   Name-value: estimation_type, beta, theta0, hyperprior_mode,
+            %   n_map_iterations, n_L1_iterations, initial_prior_steering_db,
+            %   noise_cov, use_multiresolution (currently ignored: constructor
+            %   sets false), plus CommonInverseParameters.
 
             arguments
 
@@ -204,6 +194,12 @@ classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
         %multiresolution decompositions as it would by pressing the make
         %decomposition button
         function self = make_multires_dec(self)
+            %make_multires_dec  Intended wrapper around zef_make_multires_dec.
+            %
+            %   Calls zef_make_multires_dec with number_of_decompositions,
+            %   number_of_multiresolution_levels, sparsity_factor — property
+            %   names this class does not define (RAMUS names). Will error if
+            %   invoked until those properties exist or the call is updated.
             arguments
                 self (1,1)
             end
@@ -212,14 +208,12 @@ classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
     
         % Declare the initialize and inverse method defined in the files invert and initialize in this same
         % folder.
-        self = initialize(self)
+        self = initialize(self, L, f_data)
 
-        [reconstruction, self] = invert(self)
+        [reconstruction, self] = invert(self, f_data, L, procFile, source_direction_mode, source_positions, opts)
 
         function self = terminateComputation(self)
-            %If the user has not given their own inversion parameters, we
-            %reset the automatically computed parameters because the user 
-            %could change the data or model between separate runs.
+            %terminateComputation  Drop SNR_variable; clear auto-estimated noise_cov.
             SNR_variable = findprop(self,'SNR_variable');
             delete(SNR_variable);
             if not(self.noise_covSetted)
@@ -235,6 +229,7 @@ classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
         % The function set the respective *Setted property value true when 
         % value is changed.
         function setEventsFlags(src,evnt,self) %two first inputs must be there and have these dedicated roles. The third 'self' is an extra variable.
+        %setEventsFlags  PostSet listener: mark noise_cov as user-set when not computing.
          if not(self.computing_parameters)
              if isempty(self.noise_cov)
                  self.noise_covSetted = false;

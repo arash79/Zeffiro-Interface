@@ -1,40 +1,55 @@
-# tools/plugins/IASInversion
+# IASInversion
 
-## Purpose of this folder
+Iterative alternating sequential (IAS) MAP: alternate a Gaussian source update with a gamma / inverse-gamma hyperprior on per-source variance. Use it for sparse-ish hierarchical Bayes without RAMUS multiresolution.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+This plugin does **not** construct `inverse.IASInverter`. Class id `ias` (and `legacy_ias`) is a separate `zef_inverse_run` track.
 
-## Contents
+## Menu
 
-Subfolders:
-- `m/`
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **IAS Inversion** |
+| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
 
-## How this folder fits into the overall workflow
+INI callback: `ias_map_estimation`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Window title: `ZEFFIRO Interface: IAS MAP estimation`.
 
-## GUI usage
+## Run the solver
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+**Start** (`zef.h_ias_start`) Callback, set in `zef_init_ias` (overrides the window constructor):
 
-## Programmatic usage
+```matlab
+zef_update_ias; [zef.reconstruction, zef.reconstruction_information] = zef_ias_iteration(zef);
+```
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+Hyperprior popup: spatially balanced vs constant (`zef.ias_hyperprior`). Standardization popup (`zef.h_ias_type` `String`):
 
-## Examples
+| Value | Label | What `zef_ias_iteration` does |
+|-------|-------|-------------------------------|
+| 1 | None | Weighted MNE step only: `z = √θ · L' (LθL' + σ²I)⁻¹ f` |
+| 2 | sLORETA each step | Divide that operator by `sqrt(sum(L.*L_aux',2))` **every** MAP iteration |
+| 3 | sLORETA last step | **Not reached.** Both sLORETA branches are `isequal(ias_type,2)` as written, so value 3 never standardizes |
+| 4 | dSPM each step | Divide by `sqrt(sum(L.^2,2))` every iteration |
+| 5 | dSPM last step | Same dSPM scale only on the last MAP iteration |
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+IAS then updates `θ` (inverse-gamma or gamma from `zef.inv_hyperprior`) and repeats `ias_n_map_iterations` times.
 
-## Dependencies and assumptions
+## Needs
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+- `zef.L`, `zef.source_interpolation_ind`, `zef.source_direction_mode`
+- `zef.measurements`
+- SNR: `zef.ias_snr` (copied from `zef.inv_snr` at init) → `std_lhood = 10^(-ias_snr/20)`
+- Frames: `zef.ias_number_of_frames`, `ias_time_1/2/3`, `ias_sampling_frequency`, `ias_low_cut_frequency`, `ias_high_cut_frequency`
+- MAP iterations: `zef.ias_n_map_iterations` (default 25)
+- Hyperprior family still uses `zef.inv_hyperprior` (1 inverse-gamma, 2 gamma) plus `inv_prior_over_measurement_db`
 
-## Notes for developers
+## Writes
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+- `zef.reconstruction` after `zef_postProcessInverse` / peak-norm
+- `zef.reconstruction_information` with tag `IAS`
+
+## Files
+
+- Start: `m/ias_map_estimation.m` → `zef_init_ias` → `zef_ias_map_estimation_window`
+- Solver: `m/zef_ias_iteration.m`

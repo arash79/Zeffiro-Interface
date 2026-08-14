@@ -1,54 +1,13 @@
-# tools/plugins/DipoleScan/m
+# DipoleScan / m
 
-## Purpose of this folder
+This is the **legacy GUI solver** for Inverse tools → **Dipole Scan**. It fits one equivalent dipole (or a GOF map of all locations) per time frame. The class path is `inverse.DipoleScanInverter` via `zef_inverse_run(zef,'dipolescan')` — this folder does not construct that object.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+User manual (menu, Start button, SNR): [parent README](../README.md).
 
-## Contents
+| File | Role |
+|------|------|
+| `zef_dipole_start.m` | INI callback |
+| `zef_dipole_window.m` | Instantiates `dipole_app`; Start → `zef_dipoleScan` |
+| `zef_dipoleScan.m` | Per location: SVD (`econ`) or `pinv` of the 1- or 3-column lead field vs the frame; stores GOF × moment. `onlymax` is false as written (full map). Constrained normals use `source_interpolation_ind{3}`. |
 
-MATLAB sources:
-- `zef_dipoleScan.m` — **zef_dipoleScan**: Zef dipole Scan.
-- `zef_dipole_start.m` — **zef_dipole_start**: Zef dipole start.
-- `zef_dipole_window.m` — **zef_dipole_window**: Zef dipole window.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-- **zef_dipole_window**: GUI callback or dialog (`zef_dipole_window`).
-
-## Programmatic usage
-
-From the project root:
-
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
-```
-
-Representative entry points in this folder:
-- ``[[z, reconstruction_information]] = zef_dipoleScan(zef)` with project root and `src` on the path.`
-- ``[zef] = zef_dipole_start(zef)` with project root and `src` on the path.`
-- ``[zef] = zef_dipole_window(zef)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Needs `zef.L`, interpolation, `zef.measurements`. Method/regularization come from `zef.dipole_app` dropdowns, not from `+inverse` properties.

@@ -1,38 +1,20 @@
-% --- Zeffiro documentation header ---
-% zef_data = zef_eit_sensitivity_tool; — Zef data = zef eit sensitivity tool;.
+%ZEF_EIT_SENSITIVITY_TOOL_START  Open EIT Sensitivity Tool (no default menu).
 %
-% Purpose:
-%   Zef data = zef eit sensitivity tool;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.eit_sensitivity_tool_active (read, write)
-%   zef.eit_sensitivity_tool_current_size (read, write)
-%   zef.eit_sensitivity_tool_file (read, write)
-%   zef.eit_sensitivity_tool_file_2 (read, write)
-%   zef.eit_sensitivity_tool_lower_quantile (read, write)
-%   zef.eit_sensitivity_tool_upper_quantile (read, write)
-%   zef.font_size (read)
-%   zef.h_eit_sensitivity_tool (read, write)
-%   zef.h_eit_sensitivity_tool_activate (read, write)
-%   zef.h_eit_sensitivity_tool_distribution (read, write)
-%   zef.h_eit_sensitivity_tool_file (read, write)
-%   zef.h_eit_sensitivity_tool_file_2 (read, write)
-%   zef.h_eit_sensitivity_tool_import (read, write)
-%   zef.h_eit_sensitivity_tool_import_2 (read, write)
-%   zef.h_eit_sensitivity_tool_lower_quantile (read, write)
-%   … (3 more)
+%   Script. Not in any zeffiro_plugins.ini — call from MATLAB. Constructs
+%   zef_eit_sensitivity_tool, title ZEFFIRO Interface: EIT Sensitivity
+%   Tool. Defaults eit_sensitivity_tool_file/file_2 '', active 0,
+%   quantiles 0 and 1. Activate toggles zef.sigma_bypass and
+%   eit_sensitivity_tool_active. Import / Import 2 / Substitute buttons
+%   as named. Distribution.Items lists Sigma 1/2, EIT sensitivity
+%   (parallel/MAG/orthogonal/RDM and relative/difference variants), EEG
+%   lead-field difference, amplitudes, Store/Use lead fields.
 %
-% Calls (project):
-%   zef_change_size_function
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_data = zef_eit_sensitivity_tool;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_eit_sensitivity_tool_substitute.
 
 zef_data = zef_eit_sensitivity_tool;
 
@@ -68,7 +50,7 @@ zef.h_eit_sensitivity_tool_lower_quantile = zef_data.h_eit_sensitivity_tool_lowe
 zef.h_eit_sensitivity_tool_upper_quantile = zef_data.h_eit_sensitivity_tool_upper_quantile;
 
 zef.sigma_bypass = 0;
-set(zef.h_eit_sensitivity_tool_activate,'fontcolor',[0 0 0]);
+set(zef.h_eit_sensitivity_tool_activate,'fontcolor',[0 0 0])
 set(zef.h_eit_sensitivity_tool_activate,'text','Inactive');
 
 set(zef.h_eit_sensitivity_tool_activate,'ButtonPushedFcn','if zef.sigma_bypass == 0; zef.sigma_bypass = 1; zef.eit_sensitivity_tool_active = 1; set(zef.h_eit_sensitivity_tool_activate,''fontcolor'',[1 0 0]); set(zef.h_eit_sensitivity_tool_activate,''text'',''Active''); else;  zef.sigma_bypass = 0; zef.eit_sensitivity_tool_active = 0; set(zef.h_eit_sensitivity_tool_activate,''fontcolor'',[0 0 0]); set(zef.h_eit_sensitivity_tool_activate,''text'',''Inactive'');end;');

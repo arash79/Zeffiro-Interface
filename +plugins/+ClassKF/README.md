@@ -1,46 +1,33 @@
-# +plugins/+ClassKF
+# +plugins/+ClassKF — Kalman numerical kernels
 
-## Folder purpose
+Predict/update steps used by `inverse.KalmanInverter.invert`. Not a user-facing inverse method: there is no registry id for this package. Registry ids `kalman` / `kf` select `inverse.KalmanInverter`, which calls these functions.
 
-**Kalman filter numerical core** consumed by `inverse.KalmanInverter` — predict/update steps for basic, standardized, and approximate standardized filters. Legacy GUI Kalman (`tools/plugins/Kalman/m/zef_KF.m`) uses a **parallel copy** of related logic, not these package functions directly.
+Legacy GUI Kalman (`tools/plugins/Kalman/m/zef_KF.m`) does **not** import this package. DTI structural Q (`zef_dti_structural_Q`) is also plugin-side; the class path accepts a user matrix via `evolution_prior_model` `"User supplied Q"` and `evolution_cov`.
 
-## Main contents
+## Files
 
-| File | Role |
-|------|------|
-| `class_kf_predict.m` | State mean/covariance prediction from `KFclassObj` |
-| `kf_update.m` | Standard Kalman measurement update |
-| `kf_sL_update.m` | Standardized (sLORETA-style) update |
-| `kf_sL_update_approx.m` | Approximate standardized update |
+| File | Called when | Math |
+|------|-------------|------|
+| `class_kf_predict.m` | Basic / standardized / approx sKF | `m = A x`, `P = A P A' + Q` (identity-`A` shortcut: `P = P + Q`) |
+| `kf_update.m` | `"Basic Kalman filter"`, and sKF when smoother type is RTS (see invert.m branch) | Standard update: `K = P H' / (H P H' + R)`, Joseph-style `P` |
+| `kf_sL_update.m` | `"Standardized Kalman filter"` | Same update plus sLORETA scale `D` from `sqrtm(P)` so invert returns `D*x` |
+| `kf_sL_update_approx.m` | `"Approximated Standardized Kalman filter"` | Same idea; `P^{1/2}` via a few Schulz iterations |
 
-(Older monolithic files like `kalman_filter.m`, `EnKF.m` were removed from package — EnKF may remain in plugin tree.)
+EnKF is implemented inside `KalmanInverter.invert`, not here.
 
-## Code functionality
+## Usage
 
-Called from `+inverse/@KalmanInverter/invert.m` based on `self.method_type` string. Operates on state vectors sized to processed lead-field columns, not full GUI `zef` unless wrapped.
+Not called directly. Configure the inverter:
 
-## Workflow context
-
-```
-inverse.KalmanInverter.invert → plugins.ClassKF.kf_*
-```
-
-Registry: `kalman` / `kf` class IDs. Cluster: `kalman_workflow.m` example.
-
-## Usage instructions
-
-Not called directly by users — configure via:
 ```matlab
-inv = inverse.KalmanInverter('method_type', 'Standardized Kalman filter');
-[zef, inv] = inv.computeInversionWithZI(zef);
+[zef, r] = zef_inverse_run(zef, "kalman", "execution", "local", ...
+    "MethodParams", struct("method_type", "Standardized Kalman filter"));
 ```
 
-## Important notes
+`method_type` strings must match the `mustBeMember` list on `inverse.KalmanInverter`.
 
-- Legacy `zef_KF` path does not import this package — parity is behavioral, not shared code.
-- Structural covariance from DTI is plugin-side (`zef_dti_structural_Q`).
+## Developer notes
 
-## Developer guidance
-
-- Consolidate legacy `zef_KF` onto `plugins.ClassKF` before removing duplicate plugin `.m` files.
-- Any change to update equations requires Kalman inverter tests + manual comparison to legacy on sample data.
+- `class_kf_predict` reads `state_transition_model_A`, `prev_step_reconstruction`, `prev_step_posterior_cov`, `evolution_cov` from the inverter object.
+- `kf_sL_update` hard-codes `method = '1'` (dense `sqrtm`). Path `'2'` (truncated SVD) is dead code unless that string is changed.
+- Changing these equations requires Kalman inverter tests plus a manual comparison to `zef_KF` on sample data; the two trees are copies, not shared.

@@ -1,42 +1,14 @@
-%Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if size(zef — If size(zef.
+%SESAME_PLOT_MOVIE  Plot SESAME dipole estimates on h_axes1 (one frame or movie).
 %
-% Purpose:
-%   If size(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.SESAME_App (read)
-%   zef.SESAME_time_serie (read)
-%   zef.h_axes1 (read)
-%   zef.h_rec_source (read, write)
-%   zef.h_synth_source (read, write)
-%   zef.h_zeffiro (read)
-%   zef.inv_rec_source (read, write)
-%   zef.inv_time_1 (read)
-%   zef.inv_time_2 (read)
-%   zef.inv_time_3 (read)
+%   Script. Plot-dipoles button. Packs SESAME_time_serie into
+%   zef.inv_rec_source and zef_plot_source(2). Multi-frame: loops
+%   with image_details time text. Does not rerun the sampler.
 %
-% Calls (project):
-%   zef_plot_active_source
-%   zef_plot_source
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if size(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-%Script for plotting dipoles that SESAME estimates.
-
-
-
+%   See also SESAME_inversion, zef_plot_source.
 
 if size(zef.SESAME_time_serie,2) == 1
     d_est = zef.SESAME_time_serie{1}.estimated_dipoles;

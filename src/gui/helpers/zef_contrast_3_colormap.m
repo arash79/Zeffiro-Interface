@@ -1,27 +1,15 @@
 function [colormap_vec] = zef_contrast_3_colormap(colortune_param, colormap_size)
-% --- Zeffiro documentation header ---
-% zef_contrast_3_colormap — Zef contrast 3 colormap.
+%ZEF_CONTRAST_3_COLORMAP  colormap_cell{7} "Contrast III" (red-weighted).
 %
-% Purpose:
-%   Zef contrast 3 colormap.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   colortune_param
-%   colormap_size
-%
-% Outputs:
-%   colormap_vec
-%
-% Calls (project):
-%   zef_contrast_3_colormap
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[colormap_vec] = zef_contrast_3_colormap(colortune_param, colormap_size)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   Three-row mix; band edge floor(size - param*size/2). Swap channels
+%   1↔2 then fold later bands into red. zef_init colormap_cell{7};
+%   Figure-tool Colormap: item 7.
+%   colormap_vec = zef_contrast_3_colormap(colortune_param, colormap_size)
 c_aux_1 = floor(colormap_size - colortune_param*colormap_size/2);
 colormap_vec = [10*(colormap_size/3)*[c_aux_1:-1:1]/c_aux_1 zeros(1,colormap_size-c_aux_1); 3*(colormap_size/3)*[1: c_aux_1]/c_aux_1 3*(colormap_size/3)*[colormap_size-c_aux_1:-1:1]/(colormap_size-c_aux_1); zeros(1,c_aux_1) 3.8*(colormap_size/3)*[1:colormap_size-c_aux_1]/(colormap_size-c_aux_1)];
 colormap_vec([1 2],:) = colormap_vec([2 1],:);

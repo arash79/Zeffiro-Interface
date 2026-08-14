@@ -1,33 +1,12 @@
 function [labels, colors] = read_ascii_label_file ( fname )
-% --- Zeffiro documentation header ---
-% utilities.fs2zef.readers.read_ascii_label_file — Read ascii label file.
+%READ_ASCII_LABEL_FILE  Parse FreeSurfer cortical label .asc (coords + colors).
 %
-% Purpose:
-%   Read ascii label file.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   fname
-%
-% Outputs:
-%   labels
-%   colors
-%
-% Calls (project):
-%   utilities.fs2zef.readers.read_ascii_label_file
-%   utilities.io.float_is_int
-%   utilities.io.is_eof
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[labels, colors]] = utilities.fs2zef.readers.read_ascii_label_file(fname)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%
-% read_ascii_label_file ( fname )
+%   [labels, colors] = read_ascii_label_file(fname)
 %
 % Reads a given FreeSurfer-generated ASCII label file.
 %

@@ -1,27 +1,15 @@
-%Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef_ind = find(strcmp(zef.GMM.parameters — Zef ind = find(strcmp(zef.GMM.parameters.
+%ZEF_UPDATE_GMMPLOTOPTS  Default empty dip_num/ellip_num to the K parameter.
 %
-% Purpose:
-%   Zef ind = find(strcmp(zef.GMM.parameters.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMM (read)
+%   Script. Called from zef_GMMPlotOpt and PlotModel/PlotAmp buttons.
+%   If dip_num or ellip_num Values are empty, copy parameters.Values{1}
+%   (component count). Does not draw.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef_ind = find(strcmp(zef.GMM.parameters` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-%Update script for possibly hidden advanced plot options for GMM app.
-
-
-
+%   See also zef_GMMPlotOpt, zef_PlotGMModel.
 
 zef_ind = find(strcmp(zef.GMM.parameters.Tags,'dip_num'));
 if isempty(zef.GMM.parameters.Values{zef_ind})

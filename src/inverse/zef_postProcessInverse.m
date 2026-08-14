@@ -1,25 +1,30 @@
 function [z] = zef_postProcessInverse(z_inverse, procFile)
-% --- Zeffiro documentation header ---
-% zef_postProcessInverse — Zef post Process Inverse.
+%ZEF_POSTPROCESSINVERSE  Map inverter output back to full source grid (legacy indexing).
 %
-% Purpose:
-%   Zef post Process Inverse.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   z_inverse
-%   procFile
+%   Expands each frame of z_inverse from the reduced lead-field column layout
+%   (procFile.s_ind_1 or s_ind_2) to length procFile.sizeL2 (or 3*sizeL2 for
+%   normal-constrained mode 3). For mode 2, collapses the three Cartesian
+%   components at constrained nodes (s_ind_4) to a scalar times fixed
+%   source_directions. For mode 3, multiplies by per-node direction cosines and
+%   stores the 3-component vector in s_ind_2 slots.
 %
-% Outputs:
-%   z
+%   z = zef_postProcessInverse(z_inverse, procFile)
 %
-% Calls (project):
-%   zef_postProcessInverse
+%   Inputs
+%     z_inverse - cell array, one n_columns x 1 vector per frame from inverter.
+%     procFile  - struct from zef_processLeadfields (source_direction_mode,
+%                 source_directions, s_ind_*, sizeL2, n_interp).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[z] = zef_postProcessInverse(z_inverse, procFile)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     z         - cell array of full-grid reconstruction vectors per frame.
+%
+%   See also zef_postProcessInverseClassObj, zef_processLeadfields,
+%            zef_process_inversion.
 
 source_direction_mode=procFile.source_direction_mode;
 source_directions=procFile.source_directions;

@@ -1,31 +1,21 @@
 function result = run_inverse_job(bundle_path, result_path, opts)
-% --- Zeffiro documentation header ---
-% utilities.cluster.run_inverse_job — Run inverse job.
+%RUN_INVERSE_JOB  Cluster worker entry: load bundle, invert, save result MAT-file.
 %
-% Purpose:
-%   Run inverse job.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   bundle_path
-%   result_path
-%   opts
+%   result = run_inverse_job(bundle_path, result_path, opts)
 %
-% Outputs:
-%   result
+%   Loads variable bundle from bundle_path, calls dispatch_inverse, and writes
+%   result to result_path (-v7.3). result includes success, error, executionTime,
+%   maxNumCompThreads, method_id, reconstruction, reconstruction_information,
+%   and z_inverse. On failure, saves the partial result then rethrows.
 %
-% Calls (project):
-%   utilities.cluster.dispatch_inverse
-%   utilities.cluster.run_inverse_job
-%
-% Side effects:
-%   - filesystem I/O
-%   - parallel/cluster
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[result] = utilities.cluster.run_inverse_job(bundle_path, result_path, opts)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   opts.EnableProfiler (default false) wraps dispatch in profile on/off and
+%   stores profilerInfo in result when enabled. Intended as the batch() target
+%   for submit_inverse_jobs.
 
 arguments
     bundle_path (1,1) string {mustBeFile}

@@ -1,36 +1,27 @@
 function [contrast_val, brightness_val] = zef_update_contrast(varargin)
-% --- Zeffiro documentation header ---
-% zef_update_contrast — Syncs GUI control values into `zef` for contrast.
+%ZEF_UPDATE_CONTRAST_AND_BRIGHTNESS  Figure-tool **Contrast:** / **Brightness:** sliders.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for contrast.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Filename is zef_update_contrast_and_brightness.m; the primary function
+%   name inside the file is zef_update_contrast (MATLAB still dispatches
+%   on the filename). Both sliders' Callbacks call this file, not the
+%   split helpers zef_update_contrast.m / zef_update_brightness.m.
 %
-% Outputs:
-%   contrast_val
-%   brightness_val
+%   Finds Tag='update_contrast_slider' (range -1..1), Tag=
+%   'update_brightness_slider' (range 0..5), and Tag='colormapselection'
+%   on the Figure tool (or varargin{1}). Rebuilds axes1 Colormap as
+%   zef_brightness_and_contrast(zef_colormap(index), b, c) with
+%   ((x+b)/(1+b))^(1+c). Does not rewrite zef.update_* itself; the
+%   Callback assigns both returned values.
 %
-% Zef fields (observed):
-%   zef.h_zeffiro (read)
+%   [contrast_val, brightness_val] = zef_update_contrast_and_brightness
+%   [contrast_val, brightness_val] = zef_update_contrast_and_brightness(h_figure)
 %
-% Calls (project):
-%   zef_brightness_and_contrast
-%   zef_colormap
-%   zef_update_contrast
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[contrast_val, brightness_val]] = zef_update_contrast(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_contrast, zef_update_brightness, zef_brightness_and_contrast.
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');
 else

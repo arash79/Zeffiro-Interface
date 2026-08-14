@@ -1,24 +1,22 @@
 classdef ZefSourceModel
-% --- Zeffiro documentation header ---
-% core.types.ZefSourceModel — Zef Source Model.
+%ZEFSOURCEMODEL  Enumeration of FEM source discretizations used in lead-field assembly.
 %
-% Purpose:
-%   Zef Source Model.
-%   Folder: Canonical enumeration for forward/inverse source discretizations (Whitney, H(div), St. Venant and continuous variants). Used across `src/forward` and GUI option dialogs.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   obj_or_struct
+%   Members: Whitney, Hdiv, StVenant, ContinuousWhitney, ContinuousHdiv,
+%   ContinuousStVenant, and Error (sentinel). Legacy numeric codes 1–6
+%   (and the strings "1"–"6") are mapped by from(). to_string() returns
+%   display names such as "H(div)". variants() lists all members including
+%   Error. loadobj maps a saved value through from(); if that yields
+%   Error it becomes Hdiv so a corrupt .mat still loads a valid model.
 %
-% Calls (project):
-%   core.types.ZefSourceModel.from
+%   Used by src/forward/lead_field when assembling zef.L, and by the
+%   Forward & inverse options GUI dropdown.
 %
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `core.types.ZefSourceModel(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
+%   See also core.ZefSourceModel, zef_lead_field_matrix.
 
     enumeration
         Hdiv
@@ -32,46 +30,14 @@ classdef ZefSourceModel
 
     methods
 
-        function self = loadobj ( obj_or_struct )
+        function self = loadobj(obj_or_struct)
         % loadobj — Restore ZefSourceModel from saved .mat or struct.
-        %
-        % Converts a struct or a ZefSourceModel instance loaded from a .mat
-        % file into a valid in-memory ZefSourceModel. Used by MATLAB's load()
-        % when the saved object's class definition has changed or was stored
-        % as a struct.
-        %
-        % Input:
-        %   obj_or_struct (1,1) — Saved value: ZefSourceModel enum or struct
-        %       with field ValueNames (e.g. from older save format).
-        %
-        % Output:
-        %   self (1,1) core.types.ZefSourceModel — Restored enumeration member.
-        %       Defaults to Hdiv if the input cannot be interpreted.
 
-            arguments
-                obj_or_struct (1,1)
+            self = core.types.ZefSourceModel.from(obj_or_struct);
+            if self == core.types.ZefSourceModel.Error
+                self = core.types.ZefSourceModel.Hdiv;
             end
-
-            classname = string ( class ( obj_or_struct ) ) ;
-
-            % Default used when input is not a valid ZefSourceModel or struct.
-            self = core.types.ZefSourceModel.Hdiv ;
-
-            if endsWith ( classname, "ZefSourceModel" )
-
-                self = obj_or_struct ;
-
-            elseif classname == "struct"
-
-                if isfield ( obj_or_struct, "ValueNames" )
-
-                    self = core.types.ZefSourceModel.from ( obj_or_struct.ValueNames ) ;
-
-                end
-
-            end % if
-
-        end % function
+        end
 
     end % methods
 
@@ -80,9 +46,10 @@ classdef ZefSourceModel
         function source_model = from(p_input)
         % from — Create ZefSourceModel from string, numeric, or enum input.
         %
-        % Maps legacy numeric codes (1–6), string equivalents ("1"–"6"), or
-        % an existing ZefSourceModel enum to the corresponding enumeration
-        % member. Returns Error for invalid or unrecognized input.
+        % Maps legacy numeric codes (1–6), member names ("Hdiv"), display
+        % names ("H(div)"), structs with ValueNames, core.ZefSourceModel,
+        % or an existing core.types.ZefSourceModel. Returns Error for
+        % unrecognized input.
         %
         % Input:
         %   p_input — Scalar: double (1–6), char/string ("1"–"6"), or
@@ -97,42 +64,35 @@ classdef ZefSourceModel
             source_model = core.types.ZefSourceModel.Error;
 
             if nargin ~= 1
-                warning ( 'ZefSourceModel.from: Exactly one input is required. Returning Error.' );
+                warning('ZefSourceModel.from: Exactly one input is required. Returning Error.');
                 return
             end
 
-            % Idempotent: passing an existing enum returns it unchanged.
-            if isenum(p_input)
-
-                switch p_input
-                    case core.types.ZefSourceModel.Error
-                        source_model = p_input;
-                    case core.types.ZefSourceModel.Whitney
-                        source_model = p_input;
-                    case core.types.ZefSourceModel.Hdiv
-                        source_model = p_input;
-                    case core.types.ZefSourceModel.StVenant
-                        source_model = p_input;
-                    case core.types.ZefSourceModel.ContinuousWhitney
-                        source_model = p_input;
-                    case core.types.ZefSourceModel.ContinuousHdiv
-                        source_model = p_input;
-                    case core.types.ZefSourceModel.ContinuousStVenant
-                        source_model = p_input;
-                    otherwise
-                        warning ( "ZefSourceModel.from: Input enum is not a ZefSourceModel. Returning Error." );
-                        source_model = core.types.ZefSourceModel.Error;
+            if iscell(p_input)
+                if isempty(p_input)
+                    return
                 end
-
+                source_model = core.types.ZefSourceModel.from(p_input{1});
                 return
-
             end
 
-            % Map legacy numeric codes (1–6) to enumeration members.
-            KNOWN_INTEGERS = [1, 2, 3, 4, 5, 6];
+            if isstruct(p_input)
+                if isfield(p_input, 'ValueNames')
+                    source_model = core.types.ZefSourceModel.from(p_input.ValueNames);
+                end
+                return
+            end
 
-            if isreal(p_input)
+            if isenum(p_input)
+                if isa(p_input, 'core.types.ZefSourceModel')
+                    source_model = p_input;
+                    return
+                end
+                source_model = core.types.ZefSourceModel.from(string(p_input));
+                return
+            end
 
+            if isnumeric(p_input) && isscalar(p_input) && isreal(p_input)
                 if p_input == 1
                     source_model = core.types.ZefSourceModel.Whitney;
                 elseif p_input == 2
@@ -145,35 +105,35 @@ classdef ZefSourceModel
                     source_model = core.types.ZefSourceModel.ContinuousHdiv;
                 elseif p_input == 6
                     source_model = core.types.ZefSourceModel.ContinuousStVenant;
-                else
-                    source_model = core.types.ZefSourceModel.Error;
                 end
-
+                if source_model == core.types.ZefSourceModel.Error
+                    warning('ZefSourceModel.from: Invalid input. Use one of %s.', mat2str(1:6));
+                end
+                return
             end
 
-            % Map string codes "1"–"6" to enumeration members.
             if ischar(p_input) || isstring(p_input)
-
-                if strcmp(p_input, '1')
-                    source_model = core.types.ZefSourceModel.Whitney;
-                elseif strcmp(p_input, '2')
-                    source_model = core.types.ZefSourceModel.Hdiv;
-                elseif strcmp(p_input, '3')
-                    source_model = core.types.ZefSourceModel.StVenant;
-                elseif strcmp(p_input, '4')
-                    source_model = core.types.ZefSourceModel.ContinuousWhitney;
-                elseif strcmp(p_input, '5')
-                    source_model = core.types.ZefSourceModel.ContinuousHdiv;
-                elseif strcmp(p_input, '6')
-                    source_model = core.types.ZefSourceModel.ContinuousStVenant;
-                else
-                    source_model = core.types.ZefSourceModel.Error;
+                txt = string(p_input);
+                key = lower(strtrim(char(txt(1))));
+                key = strrep(strrep(strrep(key, ' ', ''), '.', ''), '_', '');
+                switch key
+                    case {'1', 'whitney'}
+                        source_model = core.types.ZefSourceModel.Whitney;
+                    case {'2', 'hdiv', 'h(div)'}
+                        source_model = core.types.ZefSourceModel.Hdiv;
+                    case {'3', 'stvenant'}
+                        source_model = core.types.ZefSourceModel.StVenant;
+                    case {'4', 'continuouswhitney'}
+                        source_model = core.types.ZefSourceModel.ContinuousWhitney;
+                    case {'5', 'continuoushdiv', 'continuoush(div)'}
+                        source_model = core.types.ZefSourceModel.ContinuousHdiv;
+                    case {'6', 'continuousstvenant'}
+                        source_model = core.types.ZefSourceModel.ContinuousStVenant;
+                    case {'error'}
+                        source_model = core.types.ZefSourceModel.Error;
+                    otherwise
+                        warning('ZefSourceModel.from: Invalid input. Use one of %s.', mat2str(1:6));
                 end
-
-            end
-
-            if source_model == core.types.ZefSourceModel.Error
-                warning ( "ZefSourceModel.from: Invalid input. Use one of %s.", mat2str(KNOWN_INTEGERS) );
             end
 
         end % from

@@ -1,48 +1,23 @@
 function zef_ES_plot_current_pattern(varargin)
-% --- Zeffiro documentation header ---
-% zef_ES_plot_current_pattern — Zef ES plot current pattern.
+%ZEF_ES_PLOT_CURRENT_PATTERN  2-D / 3-D electrode current map from y_ES_interval.y_ES{sr,sc}.
 %
-% Purpose:
-%   Zef ES plot current pattern.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Plot-data menu item 1 and plot_type 1. Coloured spheres at zef.sensors
+%   using ES_inv_colormap 1–13 and ES_boundary_color_limit. Checkbox
+%   h_ES_2D_electrode_map flattens sensors to max(z) with a radial explode.
+%   Zero-current channels are translucent white.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_ES_plot_current_pattern()
+%   zef_ES_plot_current_pattern(zef)
+%   zef_ES_plot_current_pattern(zef, interval)
+%   zef_ES_plot_current_pattern(zef, interval, sr, sc)
 %
-% Zef fields (observed):
-%   zef.ES_boundary_color_limit (read)
-%   zef.ES_inv_colormap (read, write)
-%   zef.attach_electrodes (read)
-%   zef.colortune_param (read)
-%   zef.explode_everything (read)
-%   zef.h_ES_2D_electrode_map (read)
-%   zef.h_ES_current (read, write)
-%   zef.h_ES_current_coords (read, write)
-%   zef.h_axes1 (read)
-%   zef.h_zeffiro (read)
-%   zef.parcellation_colormap (read)
-%   zef.sensors (read)
-%   zef.sensors_visual_size (read)
-%   zef.y_ES_interval (read)
+%   See also zef_ES_plot_data, zef_ES_objective_function.
 %
-% Calls (project):
-%   zef_ES_objective_function
-%   zef_ES_plot_current_pattern
-%   zef_attach_sensors_volume
-%   zef_process_meshes
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_ES_plot_current_pattern(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 switch nargin
     case {0,1}
@@ -232,6 +207,7 @@ for i = 1:size(sensors,1)
     if not(zef.h_ES_2D_electrode_map.Value)
         h_ES_current(i) = surf(sensors(i,1) + X_s, sensors(i,2) + Y_s, sensors(i,3) + Z_s);
     else
+        % Flatten to the top z-plane; explode XY by how far the sensor is from max z.
         sensor_explosion_parameter_1 = 3.25;
         sensor_explosion_parameter_2 = 0.1;
         h_ES_current(i) = surf( sensors(i,1)*(1 + sensor_explosion_parameter_2*exp(sensor_explosion_parameter_1 * ( (max(sensors(:,3)) - sensors(i,3)) / (max(sensors(:,3)) - min(sensors(:,3)))) )) + X_s, ...

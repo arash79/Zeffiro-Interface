@@ -1,34 +1,29 @@
 function zef = zef_add_transform(zef)
-% --- Zeffiro documentation header ---
-% zef_add_transform — Zef add transform.
+%ZEF_ADD_TRANSFORM  Append one identity transform step on the current tag.
 %
-% Purpose:
-%   Zef add transform.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Right-click the Transform UITable → **Add transform**
+%   (h_menu_add_transform; MenuSelectedFcn "zef_add_transform;").
+%   current_tag is the selected compartment or sensor set (set by the
+%   matching table-selection callback). Does nothing when
+%   zef.lock_transforms_on is true.
 %
-% Outputs:
-%   zef
+%   Each step is one layer later multiplied in zef_process_meshes:
+%   name "Transform k", scaling 1, xyz correction 0, xy/yz/zx rotation 0
+%   (degrees), affine_transform{k} = eye(4). Then zef_init_transform
+%   rebuilds the two-column table (Index, Name).
 %
-% Zef fields (observed):
-%   zef.current_tag (read)
-%   zef.lock_transforms_on (read)
+%   zef = zef_add_transform(zef)
+%   zef_add_transform          % nargout 0 → assignin base
 %
-% Calls (project):
-%   zef_add_transform
+%   Input
+%     zef  - session. Omitted → evalin('base','zef').
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_add_transform(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_delete_transform, zef_apply_transform, zef_process_meshes.
 
 if nargin == 0
     zef = evalin('base','zef');

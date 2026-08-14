@@ -1,24 +1,15 @@
 function abspaths = abspath ( files )
-% --- Zeffiro documentation header ---
-% utilities.io.abspath — Abspath.
+%ABSPATH  Resolve file paths to absolute paths via dir().
 %
-% Purpose:
-%   Abspath.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   files
+%   abspaths = abspath(files)
 %
-% Outputs:
-%   abspaths
-%
-% Calls (project):
-%   utilities.io.abspath
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[abspaths] = utilities.io.abspath(files)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   files is a column vector of existing file paths (string). Returns the same
+%   count of absolute paths built from each file's dir().folder and name.
 
     arguments
 

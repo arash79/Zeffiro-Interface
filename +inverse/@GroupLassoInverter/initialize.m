@@ -1,30 +1,24 @@
-%% Copyright © 2025- Joonas Lahtinen and Alexandra Koulouri 
 function self = initialize(self,L,f_data)
-% --- Zeffiro documentation header ---
-% inverse.GroupLassoInverter.initialize — Estimates priors, noise covariance, or regularization from multi-frame data.
+%initialize  Group-lasso noise_cov (if empty) and SNR_variable.
 %
-% Purpose:
-%   Estimates priors, noise covariance, or regularization from multi-frame data.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen and Alexandra Koulouri
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   L
-%   f_data
+%   Identical noise_cov / SNR_variable formulae to HALpRInverter.initialize.
+%   invert uses SNR_variable when hyperprior_mode is "Sensitivity weighted"
+%   to scale automatic beta/theta0. Called from utilities.inverse.run_frame_loop
+%   before invert (not from invert itself). Inverse-tools Lasso / EXP uses
+%   exp_iteration, not this class.
 %
-% Outputs:
-%   self
+%   Inputs
+%     L      - processed lead field (size(L,1) for the one-frame noise I).
+%     f_data - n_sensors × n_frames filtered measurements (cov or power).
 %
-% Calls (project):
-%   inverse.initialize
-%
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[self] = inverse.GroupLassoInverter.initialize(self, L, f_data)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     self.noise_cov     filled when empty (cov(f') or SNR-scaled I).
+%     self.SNR_variable  scalar prior scale (dynamic property if missing).
 
         arguments
     

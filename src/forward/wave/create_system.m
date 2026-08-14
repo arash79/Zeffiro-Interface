@@ -1,22 +1,17 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
-% --- Zeffiro documentation header ---
-% parameters; — Parameters;.
+%CREATE_SYSTEM  Build GPU-ToRRe FEM system matrices from compartment mesh (driver).
 %
-% Purpose:
-%   Parameters;.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Side effects:
-%   - filesystem I/O
+%   Script. Expects torre_dir and parameters.m on the path (system_setting_index,
+%   n_refinement, signal_center_frequency). Loads nodes/tetra/permittivity
+%   from torre_dir/system_data, extracts asteroid (AST, domain 1) and orbit
+%   (domain 2) submeshes, optionally refine_mesh, assembles sparse mass C,
+%   stiffness-like A, and damping R. Saves mesh_*.mat and system_data_*.mat.
+%   Does not write zef.L.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `parameters;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also compute_data_gpu, refine_mesh.
 
 parameters;
 

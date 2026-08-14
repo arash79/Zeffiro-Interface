@@ -1,37 +1,28 @@
-%% Copyright © 2025- Joonas Lahtinen
 function [z_vec, self] = invert(self, f_data, L, procFile, source_direction_mode, source_positions, opts)
-% --- Zeffiro documentation header ---
-% inverse.HALpRInverter.invert — Runs one inverse reconstruction step for a single measurement frame.
+%invert  HALpR MAP loop: L1_optimization (q=1) or weighted L2 IRLS (q=2) with gamma updates.
 %
-% Purpose:
-%   Runs one inverse reconstruction step for a single measurement frame.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   f_data
-%   L
-%   procFile
-%   source_direction_mode
-%   source_positions
-%   opts
+%   Called from utilities.inverse.run_frame_loop. Related GUI tool is
+%   Inverse tools → Standardized Hierarchical L1 MAP (zef_sl1_iteration),
+%   which is not this class.
 %
-% Outputs:
-%   z_vec
-%   self
+%   q=1: inner L1_optimization, then gamma = beta ./ (theta0 + |z|).
+%   q=2: weighted L2 IRLS; optional Standardized T_scale from resolution
+%   rows; gamma uses |z|^q. Multiresolution averaging matches
+%   GroupLassoInverter when use_multiresolution is true.
 %
-% Calls (project):
-%   inverse.invert
-%   zef_waitbar
+%   Inputs
+%     f_data - n_sensors×1 frame (or a matrix if you call invert yourself).
+%     L      - processed lead field.
+%     procFile, source_direction_mode, source_positions - unused here.
+%     opts.use_gpu / normalize_data - GPU for inner solves; normalize unused.
 %
-% Side effects:
-%   - GPU
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z_vec, self]] = inverse.HALpRInverter.invert(self, f_data, L, procFile, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Outputs
+%     z_vec - n_dof×1 HALpR MAP estimate.
 
     arguments
 
@@ -237,6 +228,7 @@ if q == 1
             end
             z_vec(isnan(z_vec))=mean(abs(z_vec(not(isnan(z_vec)))));
         end
+        % L1 hyperupdate: gamma ← β / (θ₀ + |z|)
         gamma = beta./(theta0+abs(z_vec));
 
         x_old = z_vec;
@@ -264,6 +256,7 @@ else
         if sum(isnan(z_vec))>0
             z_vec(isnan(z_vec)) = 0;
         end
+        % L2 IRLS: z = (T w) .* L' (L diag(w) L' + I)^{-1} f; then gamma ← β/(θ₀+|z|^q)
         z_vec = (T_scale.*w).*(L_aux'*((L_aux*(w.*L_aux') + eye(size(L_aux,1)))\f));
         gamma = beta./(theta0+abs(z_vec).^q);
         if multires_n_decompositions == 1 && self.number_of_frames <= 1

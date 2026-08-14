@@ -1,43 +1,14 @@
-# profile/multicompartment_head_nse
+# `multicompartment_head_nse`
 
-## Purpose of this folder
+Head profile with extra **Navier–Stokes / microvessel** parameter rows. Plugin list matches `multicompartment_head_legacy` (including EXP IAS RAMUS). Segmentation INI is an empty template like the default head — import anatomy separately.
 
-Startup profiles and `zeffiro_plugins.ini` that attach plugin menus.
+Switch: segmentation tool **Profile:** dropdown, then apply INIs. Parent: [`profile/README.md`](../README.md). NSE solvers: `src/forward/nse`.
 
-## Contents
+## Extra parameter rows
 
-Other files:
-- `zeffiro_forward_simulation.ini`
-- `zeffiro_init.ini`
-- `zeffiro_parameters.ini`
-- `zeffiro_plugins.ini`
-- `zeffiro_segmentation.ini`
+`zeffiro_parameters.ini` adds (On) relative to the default head:
 
-## How this folder fits into the overall workflow
+- `mvd_length` — microvessel density, default 200 Count/mm³
+- `nse_sigma` — NSE conductivity field, default 0 S/m (On, not written from segmentation)
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+`sigma` stays On. Forward-simulation INI is the same EEG/MEG/EIT/tES table as the other head profiles (NSE itself is started from the NSE tool, not from those rows).

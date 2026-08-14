@@ -1,52 +1,26 @@
-# +core/+linalg/+preconditioners
+# Jacobi and SSOR preconditioners
 
-## Purpose of this folder
+Helpers `core.linalg.preconditioners.jacobi` and `.ssor`. No GUI. Lead-field PCG does **not** call these (see parent `+linalg` README).
 
-Builds Jacobi and SSOR preconditioner matrices for sparse systems; not yet wired into legacy lead-field PCG loops.
-
-## Contents
-
-MATLAB sources:
-- `jacobi.m` — **core.linalg.preconditioners.jacobi**: Jacobi.
-- `ssor.m` — **core.linalg.preconditioners.ssor**: Ssor.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+## Jacobi
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+M = core.linalg.preconditioners.jacobi(A);
 ```
 
-Representative entry points in this folder:
-- ``[prec] = core.linalg.preconditioners.jacobi(A)` with project root and `src` on the path.`
-- ``[prec] = core.linalg.preconditioners.ssor(A, kwargs)` with project root and `src` on the path.`
+`M = diag(diag(A)) \ I`, i.e. the inverse of the diagonal of `A`. Intended as a left preconditioner \(M \approx A^{-1}\) in the Jacobi sense.
 
-## Examples
+## SSOR
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+```matlab
+M = core.linalg.preconditioners.ssor(A);                 % ω = 1
+M = core.linalg.preconditioners.ssor(A, "coeff", omega); % ω in [0, 2]
+```
 
-## Dependencies and assumptions
+The file sets `L = tril(A)` and `U = triu(A)` (**including** the diagonal) and `D = diag(diag(A))`, then
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+```matlab
+prec = (D + coeff * L) * invD * (D + coeff * U);
+```
 
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+That is **not** the textbook SSOR factor that uses *strictly* triangular \(L\)/\(U\). Document and use the matrix this function actually returns. Default `coeff` is `1`.

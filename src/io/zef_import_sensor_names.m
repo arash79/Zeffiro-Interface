@@ -1,26 +1,15 @@
-% --- Zeffiro documentation header ---
-% [zef.file,zef.file_path] = uigetfile('* — [zef.file,zef.file path] = uigetfile('*.
+%ZEF_IMPORT_SENSOR_NAMES  Load sensor name list from a DAT file into zef.
 %
-% Purpose:
-%   [zef.file,zef.file path] = uigetfile('*.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field (read, write)
-%   zef.current_sensors (read)
-%   zef.file (read)
-%   zef.file_path (read)
-%   zef.h_aux (read, write)
+%   Prompts uigetfile for *.dat, reads whitespace-delimited names, assigns
+%   them to zef.<current_sensors>_name_list in the base workspace, and
+%   refreshes the sensor name table via zef_init_sensors_name_table.
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `[zef.file,zef.file_path] = uigetfile('*` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_import_segmentation, zef_build_sensors_table.
 
 [zef.file,zef.file_path] = uigetfile('*.dat');
 

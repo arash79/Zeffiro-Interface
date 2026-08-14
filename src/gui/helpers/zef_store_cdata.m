@@ -1,40 +1,23 @@
 function zef_store_cdata(varargin)
-% --- Zeffiro documentation header ---
-% zef_store_cdata — Zef store cdata.
+%ZEF_STORE_CDATA  Append current axes1 CData onto each child's UserData.
 %
-% Purpose:
-%   Zef store cdata.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   zef_store_cdata()
+%   zef_store_cdata(data_status)
+%   zef_store_cdata(data_status, cdata_info)
 %
-% Outputs:
-%   See function signature and code below.
+%   Called from zef_plot_volume / zef_plot_meshes while drawing a frame.
+%   Finds zef.h_zeffiro axes1 children with CData. data_status==1 (default)
+%   clears UserData first. If zef.store_cdata is true, appends a struct
+%   with CData, inv_time_1/2/3, frame_start/stop/step, frame_vec,
+%   number_of_frames, and time_text.String. zef_play_cdata reads that
+%   stack. System INI Store CData maps to zef.store_cdata.
 %
-% Zef fields (observed):
-%   zef.frame_start (read)
-%   zef.frame_step (read)
-%   zef.frame_stop (read)
-%   zef.h_zeffiro (read)
-%   zef.inv_time_1 (read)
-%   zef.inv_time_2 (read)
-%   zef.inv_time_3 (read)
-%   zef.store_cdata (read)
-%
-% Calls (project):
-%   zef_store_cdata
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_store_cdata(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_play_cdata, zef_plot_volume.
 data_status = 1;
 cdata_info.frame_start = evalin('base','zef.frame_start');
 cdata_info.frame_stop = evalin('base','zef.frame_stop');

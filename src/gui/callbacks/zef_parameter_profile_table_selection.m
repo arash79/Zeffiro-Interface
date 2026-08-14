@@ -1,34 +1,21 @@
 function zef_parameter_profile_table_selection(hObject,eventdata,handles)
-% --- Zeffiro documentation header ---
-% zef_parameter_profile_table_selection — Zef parameter profile table selection.
+%ZEF_PARAMETER_PROFILE_TABLE_SELECTION  CellSelectionCallback for the parameter-profile table.
 %
-% Purpose:
-%   Zef parameter profile table selection.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   hObject
-%   eventdata
-%   handles
+%   Wired from zef_open_parameter_profile (Settings → **Parameter
+%   profile**). Unique selected rows → zef.parameter_profile_selected
+%   for that table's Add/Delete menus. Apply writes the INI then
+%   zef_apply_parameter_profile.
 %
-% Outputs:
-%   See function signature and code below.
+%   Inputs (MATLAB UITable CellSelectionCallback)
+%     hObject, handles  - unused.
+%     eventdata.Indices - N-by-2 [row, column] of the selection.
 %
-% Zef fields (observed):
-%   zef.parameter_profile_selected (read, write)
-%
-% Calls (project):
-%   zef_parameter_profile_table_selection
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `zef_parameter_profile_table_selection(hObject, eventdata, handles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_apply_parameter_profile, zef_open_parameter_profile.
 
 parameter_profile_selected = eventdata.Indices(:,1);
 parameter_profile_selected = unique(parameter_profile_selected);

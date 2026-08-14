@@ -1,31 +1,47 @@
 function zeffiro_setup ( kwargs )
-% --- Zeffiro documentation header ---
-% zeffiro_setup — Zeffiro setup.
+%ZEFFIRO_SETUP  Clone optional git submodules and write zef_start_config.m.
 %
-% Purpose:
-%   Zeffiro setup.
-%   Folder: Repository root: startup (`zeffiro_interface`, `zeffiro_setup`), path configuration, and entry to `src/`, `+core`, `+inverse`, `+utilities`, `tools/plugins`, and bundled data.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   kwargs
+%   Reads .gitmodules, optionally runs git submodule update for the named
+%   packages under external/, and writes src/core/zef_start_config.m so a
+%   later zeffiro_interface session can addpath those trees and run their
+%   startup scripts. Called from zeffiro_interface and zeffiro_downloader.
 %
-% Outputs:
-%   See function signature and code below.
+%   zeffiro_setup
+%   zeffiro_setup(Name, Value, ...)
 %
-% Zef fields (observed):
-%   zef.zeffiro_restart (read)
+%   Name-value arguments
+%     submodules       - string column of submodule names from .gitmodules,
+%                        or "all". Matching is case-insensitive. Default is
+%                        empty (no packages cloned, but the config file is
+%                        still opened for write unless skip_submodules).
+%     init             - logical, default true. Pass --init to git.
+%     remote           - logical, default true. Pass --remote to git.
+%     recursive        - logical, default true. Pass --recursive to git.
+%     skip_submodules  - logical, default false. Write an empty config
+%                        (warning off/on only) and return without git.
 %
-% Calls (project):
-%   utilities.io.read_gitmodules
+%   Side effects
+%     Overwrites src/core/zef_start_config.m. Runs git submodule update,
+%     which mutates external/. The generated config addpath's each cloned
+%     submodule when zef.zeffiro_restart is 0, and run()'s a startupscript
+%     when .gitmodules defines one that exists on disk.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
+%   Failure
+%     Errors if a requested name is not in .gitmodules (plus "all").
+%     Errors if the config file cannot be opened for write.
+%     Errors with a Git-not-found message on system() status 127.
+%     Non-zero git status other than 127 is printed to stderr and skipped.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zeffiro_setup(kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Notes
+%     The error text still mentions an "m" folder; this tree uses src/core.
+%     The fopen handle is closed by onCleanup even on early return.
+%
+%   See also zeffiro_interface, utilities.io.read_gitmodules.
 
 arguments
     kwargs.submodules (:,1) string = string ( [] )
@@ -74,10 +90,6 @@ mfolder = fullfile ( this_folder, "src", "core" ) ;
 
 start_config = fullfile ( mfolder, "zef_start_config.m" ) ;
 
-%% Do things with paths.
-
-addpath ( mfolder );
-
 zeffiro_start_config_fid = fopen ( start_config, 'w' );
 
 if zeffiro_start_config_fid == -1
@@ -95,6 +107,8 @@ end
 
 cleanup_obj = onCleanup( @() cleanup_fn ( zeffiro_start_config_fid ) ) ;
 
+fprintf(zeffiro_start_config_fid, "warning off;");
+
 %% Return early if asked to.
 
 if kwargs.skip_submodules
@@ -102,8 +116,6 @@ if kwargs.skip_submodules
 end
 
 %% Start installation of individual packages.
-
-fprintf(zeffiro_start_config_fid, "warning off;");
 
 % Set Git submodule cloning settings.
 
@@ -191,18 +203,20 @@ for ii = 1 : numel ( iterable )
 
     if not ( isempty ( submodule.startupscript ) )
 
-        fprintf ( ...
-            zeffiro_start_config_fid, ...
-            newline + "run ( '" + submodule.startupscript + "' ) ;" ...
-        ) ;
+        startup_script = fullfile ( this_folder, strtrim ( submodule.startupscript ) ) ;
+
+        if isfile ( startup_script )
+
+            fprintf ( ...
+                zeffiro_start_config_fid, ...
+                newline + "run ( '" + submodule.startupscript + "' ) ;" ...
+            ) ;
+
+        end % if
 
     end % if
 
 end % for
-
-%% Perform finalization.
-
-rmpath ( mfolder ) ;
 
 end % function
 

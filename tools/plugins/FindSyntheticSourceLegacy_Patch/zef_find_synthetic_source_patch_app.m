@@ -1,40 +1,17 @@
-% --- Zeffiro documentation header ---
-% zef.h_find_synthetic_source_legacy = figure(... — Zef.h find synthetic source legacy = figure(.
+%ZEF_FIND_SYNTHETIC_SOURCE_PATCH_APP  GUIDE dump: extended synthetic source widgets.
 %
-% Purpose:
-%   Zef.h find synthetic source legacy = figure(....
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_find_synthetic_source_legacy (read)
-%   zef.h_inv_synth_source_1 (read, write)
-%   zef.h_inv_synth_source_10 (read, write)
-%   zef.h_inv_synth_source_2 (read, write)
-%   zef.h_inv_synth_source_3 (read, write)
-%   zef.h_inv_synth_source_4 (read, write)
-%   zef.h_inv_synth_source_5 (read, write)
-%   zef.h_inv_synth_source_6 (read, write)
-%   zef.h_inv_synth_source_7 (read, write)
-%   zef.h_inv_synth_source_8 (read, write)
-%   zef.h_inv_synth_source_9 (read, write)
-%   zef.h_inv_synth_source_VEP_config (read, write)
-%   zef.h_inv_synth_source_fix_amp (read, write)
-%   zef.h_inv_synth_source_norm_ori (read, write)
-%   zef.h_inv_synth_source_plot_cones (read, write)
-%   … (4 more)
+%   Script. Figure Name 'Find synthetic source'. Plot source(s) →
+%   zef_update_fss_patch then zef_plot_source_patch(zef,1). Create
+%   synthetic data → update then zef.measurements =
+%   zef_find_source_patch(zef). Extra toggles: volume, radius,
+%   cortical normal, cones, fix amplitude, VEP config.
 %
-% Calls (project):
-%   zef_find_source_patch
-%   zef_plot_source_patch
-%   zef_update_fss_patch
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.h_find_synthetic_source_legacy = figure(...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_find_synthetic_source_patch_window.
 
 zef.h_find_synthetic_source_legacy = figure(...
     'PaperUnits','inches',...
@@ -66,7 +43,8 @@ uicontrol(...
     'FontUnits','normalized',...
     'HorizontalAlignment','left',...
     'ListboxTop',0,...
-    'String','Position(s):',...
+    'String','Position(s)
+:',...
     'Style','text',...
     'Position',[0.0388471177944862 0.851925192519252 0.471177944862155 0.0561056105610561],...
     'Children',[],...

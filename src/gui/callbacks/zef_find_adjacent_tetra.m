@@ -1,28 +1,28 @@
 function [tetra_ind_out, face_ind_out] = zef_find_adjacent_tetra(tetra,tetra_ind,face_ind)
-% --- Zeffiro documentation header ---
-% zef_find_adjacent_tetra — Zef find adjacent tetra.
+%ZEF_FIND_ADJACENT_TETRA  Neighbor tetra and face sharing a given tet face.
 %
-% Purpose:
-%   Zef find adjacent tetra.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tetra
-%   tetra_ind
-%   face_ind
+%   Unused from menus. Callers: zef_nse_poisson, zef_nse_poisson_dynamic,
+%   NSE plugin haemodynamic/perfusion solvers (face flux neighbors).
+%   Pure mesh helper; no zef, no GUI.
 %
-% Outputs:
-%   tetra_ind_out
-%   face_ind_out
+%   [tetra_ind_out, face_ind_out] = zef_find_adjacent_tetra(tetra, tetra_ind, face_ind)
 %
-% Calls (project):
-%   zef_find_adjacent_tetra
+%   Inputs
+%     tetra      - T×4 node indices.
+%     tetra_ind  - M×1 tet indices (column).
+%     face_ind   - M×1 local face 1..4. Face node order:
+%                  1: [2 4 3], 2: [1 3 4], 3: [1 4 2], 4: [1 2 3].
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[tetra_ind_out, face_ind_out]] = zef_find_adjacent_tetra(tetra, tetra_ind, face_ind)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Outputs
+%     tetra_ind_out  - M×1 neighbor tet (starts as tetra_ind; unmatched stay).
+%     face_ind_out   - M×1 neighbor local face (starts as face_ind).
+%
+%   See also zef_find_intersecting_triangle, zef_nse_poisson.
 
 tetra_ind = tetra_ind(:);
 face_ind = face_ind(:);

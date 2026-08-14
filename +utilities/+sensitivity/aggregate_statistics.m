@@ -1,24 +1,16 @@
 function stats = aggregate_statistics(runs)
-% --- Zeffiro documentation header ---
-% utilities.sensitivity.aggregate_statistics — Aggregate statistics.
+%AGGREGATE_STATISTICS  Mean and std of Monte Carlo sensitivity metric vectors.
 %
-% Purpose:
-%   Aggregate statistics.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   runs
+%   stats = aggregate_statistics(runs)
 %
-% Outputs:
-%   stats
-%
-% Calls (project):
-%   utilities.sensitivity.aggregate_statistics
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[stats] = utilities.sensitivity.aggregate_statistics(runs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   runs is a cell of per-realization metric structs (dist_vec, angle_vec,
+%   mag_vec, dispersion_vec). Returns per-run cells plus *_avg and *_std
+%   column vectors. std columns are NaN when n_runs == 1.
 
 arguments
     runs (1,:) cell

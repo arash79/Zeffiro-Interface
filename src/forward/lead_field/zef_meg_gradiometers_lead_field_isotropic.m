@@ -1,29 +1,14 @@
-% --- Zeffiro documentation header ---
-% warning('off'); — Warning('off');.
+%ZEF_MEG_GRADIOMETERS_LEAD_FIELD_ISOTROPIC  MEG gradiometer isotropic (type 3); Mesh-tool Script.
 %
-% Purpose:
-%   Warning('off');.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.imaging_method (read, write)
-%   zef.lead_field_filter_quantile (read)
-%   zef.lead_field_type (read, write)
-%   zef.source_directions (read)
-%   zef.source_interpolation_on (read)
-%   zef.source_positions (read)
+%   Script. Default INI row for gradiometers with isotropic conductivity.
+%   Same body as zef_meg_gradiometers_lead_field.
 %
-% Calls (project):
-%   zef_lead_field_filter
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `warning('off');` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_lead_field_matrix, zef_run_forward_simulation.
 
 warning('off');
 zef.lead_field_type = 3;

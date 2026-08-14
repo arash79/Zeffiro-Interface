@@ -1,32 +1,3 @@
-% --- Zeffiro documentation header ---
-% function [G, interpolation_positions] = zef_whitney_interpolation( ... — Function [G, interpolation positions] = zef whitney interpolation( .
-%
-% Purpose:
-%   Function [G, interpolation positions] = zef whitney interpolation( ....
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Inputs:
-%   p_nodes
-%   p_tetrahedra
-%   p_brain_inds
-%   p_intended_source_inds
-%   p_nearest_neighbour_inds
-%   p_optimization_system_type
-%   mustBeText
-%   mustBeMember
-%
-% Calls (project):
-%   zef_fi_dipoles
-%   zef_mpo_system
-%   zef_pbo_system
-%   zef_tetra_barycentra
-%   zef_waitbar
-%   zef_whitney_interpolation
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `function [G, interpolation_positions] = zef_whitney_interpolation( ...(p_nodes, p_tetrahedra, p_brain_inds, p_intended_source_inds, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 function [G, interpolation_positions] = zef_whitney_interpolation( ...
     p_nodes, ...
     p_tetrahedra, ...
@@ -35,6 +6,37 @@ function [G, interpolation_positions] = zef_whitney_interpolation( ...
     p_nearest_neighbour_inds, ...
     p_optimization_system_type ...
     )
+%ZEF_WHITNEY_INTERPOLATION  Whitney (face-intersecting) source interpolation G.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Called from zef_lead_field_interpolation for ZefSourceModel.Whitney
+%   and ContinuousWhitney. Builds a sparse map from nodal degrees of
+%   freedom to three Cartesian source columns per intended tetrahedron.
+%
+%   [G, interpolation_positions] = zef_whitney_interpolation(nodes, tetra, ...
+%       brain_inds, intended_source_inds, nearest_neighbour_inds, ...
+%       optimization_system_type)
+%
+%   Dipoles: zef_fi_dipoles (face-intersecting / FI) only — not edge
+%   Whitney (EW). interpolation_positions are barycentra of
+%   tetra(intended_source_inds,:).
+%
+%   For each source tet i, neighbours are the nonzero rows of T_fi(:,i).
+%   If nearest_neighbour_inds is nonempty (continuous model), the
+%   neighbourhood is the union of T_fi columns for i and the brain tets
+%   listed for that source. Empty nearest_neighbour_inds → discrete local.
+%
+%   Coefficients: p_optimization_system_type must be 'pbo' or 'mpo'
+%   (otherwise error). PBO/MPO return n_coeff×3 weights; those fill S_fi
+%   and G = G_fi * S_fi (G_fi from zef_fi_dipoles). Size of G is
+%   n_nodes × 3*n_sources.
+%
+%   See also zef_hdiv_interpolation, zef_pbo_system, zef_mpo_system,
+%            zef_lead_field_interpolation, zef_fi_dipoles.
 
 arguments
     p_nodes (:,3) double {mustBeNonNan}

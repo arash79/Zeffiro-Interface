@@ -1,37 +1,18 @@
 function zef = zef_set_position(zef)
-% --- Zeffiro documentation header ---
-% zef_set_position — Zef set position.
+%ZEF_SET_POSITION  Segmentation-tool **Set position**: write default window rect to INI.
 %
-% Purpose:
-%   Zef set position.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Function. Reads h_zeffiro_window_main.Position; if the Segmentation
+%   **Toggle controls** UserData==1, halves width (expanded layout).
+%   Writes that vector into profile/zeffiro_interface.ini field
+%   segmentation_tool_default_position via writecell, and into
+%   zef.segmentation_tool_default_position. nargout==0 → assignin base.
 %
-% Outputs:
-%   zef
-%
-% Zef fields (observed):
-%   zef.h_segmentation_tool_toggle (read)
-%   zef.h_zeffiro_window_main (read)
-%   zef.ini_cell (read, write)
-%   zef.program_path (read)
-%   zef.segmentation_tool_default_position (read, write)
-%
-% Calls (project):
-%   zef_set_position
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_set_position(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_segmentation_tool.
 if nargin == 0
     zef = evalin('base','zef');
 end

@@ -1,41 +1,27 @@
-# tools/plugins/FindSyntheticGravityData
+# Find synthetic gravity data
 
-## Purpose of this folder
+Synthesizes gravity (or related potential) measurements from tetrahedral density `zef.rho` plus spherical ROI density perturbations. Writes **`zef.measurements`**. This is a gravity/EIT-style volume integral (`zef_compute_gravity_data`), not an EEG dipole through `zef.L`.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+**Not in the default profile INI** (nor in `asteroid_gravity` despite the name). Call the start script from MATLAB.
 
-## Contents
+## How to open it
 
-Subfolders:
-- `fig/`
-- `m/`
+```matlab
+zef_find_synthetic_gravity_data;   % script; uses base-workspace zef
+```
 
-## How this folder fits into the overall workflow
+Opens GUIDE figure `fig/find_synthetic_gravity_data.fig`, title **ZEFFIRO Interface: Find Synthetic Gravity Data**. Init copies `zef.inv_roi_sphere` (xyz + radius) and `zef.inv_roi_perturbation` onto the widgets.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Need `zef.nodes`, `zef.tetra`, `zef.rho`, `zef.sensors`, `zef.brain_ind`, `zef.imaging_method` in 1–4. Subtracts `zef.inv_bg_data` and adds `zef.inv_eit_noise * randn`. Scales by `6.67408E-11` (G).
 
-## GUI usage
+## Buttons
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+GUIDE widgets stacked on open: ROI sphere coords, perturbation, **Compute data** (`h_inv_compute_data`), **Plot ROI** (`h_inv_plot_roi`). Callbacks live in the `.fig`. Matching algorithms: `zef_synthetic_gravity_data` (writes `zef.measurements`) and `zef_plot_gravity_roi`.
 
-## Programmatic usage
+`imaging_method` 1–4 pick different kernels (directed vs scalar, 1/r² vs 1/r³).
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+## Scripting
 
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+```matlab
+zef_synthetic_gravity_data;   % script; zef.measurements = zef_compute_gravity_data(...)
+```

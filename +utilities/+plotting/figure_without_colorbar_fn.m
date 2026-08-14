@@ -1,27 +1,15 @@
 function figure_without_colorbar_fn(figtool, filename, filetypes, resolution)
-% --- Zeffiro documentation header ---
-% utilities.plotting.figure_without_colorbar_fn — Figure without colorbar fn.
+%FIGURE_WITHOUT_COLORBAR_FN  Export figure with all colorbars hidden.
 %
-% Purpose:
-%   Figure without colorbar fn.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   figtool
-%   filename
-%   filetypes
-%   resolution
+%   figure_without_colorbar_fn(figtool, filename, filetypes, resolution)
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Calls (project):
-%   utilities.plotting.figure_without_colorbar_fn
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `utilities.plotting.figure_without_colorbar_fn(figtool, filename, filetypes, resolution)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Hides every colorbar on figtool, then exportgraphics to filename+suffix for
+%   each of filetypes (.pdf, .eps, .png). resolution defaults to 400 DPI.
 
     arguments
 

@@ -1,36 +1,29 @@
 function [zef] = zef_dataBank_hash2tree(zef)
-% --- Zeffiro documentation header ---
-% zef_dataBank_hash2tree — Zef data Bank hash2tree.
+%ZEF_DATABANK_HASH2TREE  Rebuild the uitree from zef.dataBank.tree hash keys.
 %
-% Purpose:
-%   Zef data Bank hash2tree.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Called from zef_open_dataBank when a tree already exists, and from
+%   zef_dataBank_refreshTree after the uitree children are deleted. Sorts
+%   and rebuilds hashes so sibling indices are dense; if save2disk is 'On',
+%   rebuildTreeSaveFile keeps .mat names in sync. Then walks each hash
+%   after the 'node_' prefix: each numeric segment before the last selects
+%   Children(k) as parent, and the last segment becomes a new uitreenode
+%   with Text = node.name, NodeData = node.hash, ContextMenu = treeMenu.
+%   Assumes hashes are already a forest under 'node'. nargout==0 → base.
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_hash2tree(zef)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef  - session with dataBank.tree and dataBank.app.Tree.
 %
-% Calls (project):
-%   zef_dataBank_hash2tree
-%   zef_dataBank_rebuildTree
-%   zef_dataBank_rebuildTreeSaveFile
-%   zef_dataBank_reorderTree
-%   zef_dataBank_sortTree
+%   Output
+%     zef  - uitree filled; hashList = fieldnames(tree); hash used as scratch.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dataBank_hash2tree(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_refreshTree, zef_dataBank_sortTree, zef_dataBank_rebuildTree.
 
 if nargin == 0
     zef = evalin('base','zef')

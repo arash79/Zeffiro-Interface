@@ -1,39 +1,34 @@
 function zef = zef_create_finite_element_mesh(zef)
-% --- Zeffiro documentation header ---
-% zef_create_finite_element_mesh — Zef create finite element mesh.
+%ZEF_CREATE_FINITE_ELEMENT_MESH  Mesh-tool wrapper: downsample, volume mesh, postprocess.
 %
-% Purpose:
-%   Zef create finite element mesh.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   This is what the Mesh tool button "Create FEM mesh" (h_pushbutton21)
+%   runs. It is the full user-facing mesh pipeline, not the lattice
+%   builder itself:
 %
-% Outputs:
-%   zef
+%     if zef.downsample_surfaces == 1
+%         zef_downsample_surfaces
+%     zef_process_meshes      % surfaces → zef.reuna_p / reuna_t
+%     zef_create_fem_mesh     % lattice, label, refine → nodes/tetra
+%     zef_postprocess_fem_mesh
+%     clear source index cache; zef_update
 %
-% Zef fields (observed):
-%   zef.downsample_surfaces (read, write)
-%   zef.n_sources_mod (read, write)
-%   zef.source_ind (read, write)
+%   After this, sensors still need attaching and a lead field still needs
+%   assembling (Mesh tool forward-simulation table / Run script, or
+%   zef_eeg_make_all and the other modality wrappers).
 %
-% Calls (project):
-%   zef_create_fem_mesh
-%   zef_create_finite_element_mesh
-%   zef_downsample_surfaces
-%   zef_postprocess_fem_mesh
-%   zef_process_meshes
-%   zef_update
+%   zef = zef_create_finite_element_mesh(zef)
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Input / output
+%     zef  - session struct. If omitted, read from the base workspace.
+%            If nargout is 0, assigned back to base.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_create_finite_element_mesh(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_create_fem_mesh, zef_process_meshes, zef_postprocess_fem_mesh,
+%            zef_mesh_tool, zef_run_forward_simulation, zef_eeg_make_all.
 
 if nargin == 0
     zef = evalin('base','zef');

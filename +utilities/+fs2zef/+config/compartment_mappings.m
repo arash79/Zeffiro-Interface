@@ -1,21 +1,21 @@
 function mappings = compartment_mappings()
-% --- Zeffiro documentation header ---
-% utilities.fs2zef.config.compartment_mappings — Compartment mappings.
+%COMPARTMENT_MAPPINGS  Keyword → sigma, activity, inflate for fs2zef import.
 %
-% Purpose:
-%   Compartment mappings.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Outputs:
-%   mappings
+%   generate_zef_import matches mesh filenames against .keywords (grey,
+%   white, csf, skull, skin, subcortical names, cerebellum, brainstem, …).
+%   sigma is S/m; activity is the Zeffiro sources code (1 cortex, 2 other
+%   source tissue, 3 white-style, 0 no sources); inflate is a mesh-processing
+%   hint (default fallback inflate 100). Used only by the import-file
+%   generator, not by MATLAB meshing itself.
 %
-% Calls (project):
-%   utilities.fs2zef.config.compartment_mappings
+%   mappings = compartment_mappings()
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `utilities.fs2zef.config.compartment_mappings` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also generate_zef_import.
 
     mappings = struct();
     

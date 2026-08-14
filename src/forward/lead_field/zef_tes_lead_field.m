@@ -1,45 +1,22 @@
 function zef = zef_tes_lead_field(zef)
-% --- Zeffiro documentation header ---
-% zef_tes_lead_field — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Inputs:
-%   zef
-%
-% Outputs:
-%   zef
-%
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.imaging_method (read, write)
-%   zef.lead_field_filter_quantile (read)
-%   zef.lead_field_type (read, write)
-%   zef.sensors (read)
-%   zef.sensors_attached_volume (read, write)
-%   zef.source_directions (read)
-%   zef.source_interpolation_on (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   zef_attach_sensors_volume
-%   zef_lead_field_filter
-%   zef_lead_field_matrix
-%   zef_process_meshes
-%   zef_source_interpolation
-%   zef_tes_lead_field
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_tes_lead_field(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%ZEF_TES_LEAD_FIELD  TES / tES isotropic lead field (type 5); used by zef_tes_make_all.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Sets lead_field_type=5, imaging_method=1, attaches volume sensors, calls
+%   zef_lead_field_matrix (zef_lead_field_tes_fem, which uses
+%   zef_tetra_gradient_field). Writes zef.L and zef.S. Default INI rows call
+%   zef_tes_lead_field_isotropic instead.
+%
+%   zef = zef_tes_lead_field(zef)
+%
+%   See also zef_lead_field_tes_fem, zef_tes_lead_field_isotropic, zef_tes_make_all.
 
 if nargin == 0
     zef = evalin('base','zef');

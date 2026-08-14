@@ -1,30 +1,22 @@
 function zef = zef_nse_tool_start(zef)
-% --- Zeffiro documentation header ---
-% zef_nse_tool_start — Zef nse tool start.
+%ZEF_NSE_TOOL_START  Open Multi tools → NSE tool.
 %
-% Purpose:
-%   Zef nse tool start.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Menu callback from profile/*/zeffiro_plugins.ini (label "NSE tool",
+%   parent multi_tools). zef_tool_start(..., 'zef_nse_tool_window', ...).
+%   Hemodynamic Poisson / NSE window. Solve system runs zef_nse_run_solver
+%   (src/forward/nse); results on zef.nse_field. Does not write zef.L.
+%   solver_type 3 uses zef_nse_haemodynamic_response_solver in this plugin.
 %
-% Outputs:
-%   zef
+%   zef = zef_nse_tool_start()
+%   zef = zef_nse_tool_start(zef)
 %
-% Calls (project):
-%   zef_nse_tool_start
-%   zef_tool_start
+%   See also zef_nse_tool_window, zef_nse_run_solver.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_nse_tool_start(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     zef = evalin('base','zef');

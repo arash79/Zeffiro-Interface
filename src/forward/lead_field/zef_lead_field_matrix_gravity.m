@@ -1,43 +1,23 @@
-%Copyright © 2018, Sampsa Pursiainen
+%ZEF_LEAD_FIELD_MATRIX_GRAVITY  Dispatch gravity lead field from zef.gravity_field_type.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018, Sampsa Pursiainen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%
+%   Gravity analogue of zef_lead_field_matrix. Does not use lead_field_type.
+%   gravity_field_type 1 or 2 → zef_lead_field_gravity_grad; 3 or 4 →
+%   zef_lead_field_gravity. Density is zef.rho(:,1). Source tetrahedra are a
+%   random subset of brain_ind of length min(n_sources, numel(brain_ind)).
+%   Nodes are not converted mm→m (unlike EEG). Optional interpolation if
+%   source_interpolation_on. Profile scripts usually call the gravity FEM
+%   directly rather than this dispatcher.
+%
+%   Side effects: writes zef.L, inv_bg_data, source_positions,
+%   source_directions, lead_field_time; removes nodes_aux/sensors_aux/aux_vec.
+%
+%   See also zef_lead_field_gravity, zef_gravity_lead_field_scalar.
+
 %[zef.rho,zef.brain_ind] = zef_rho([]);
-% --- Zeffiro documentation header ---
-% tic; — Tic;.
-%
-% Purpose:
-%   Tic;.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.aux_vec (read, write)
-%   zef.brain_ind (read)
-%   zef.gravity_field_type (read)
-%   zef.imaging_method (read, write)
-%   zef.inv_bg_data (read)
-%   zef.lead_field_time (read, write)
-%   zef.lf_param (read)
-%   zef.location_unit (read, write)
-%   zef.location_unit_current (read, write)
-%   zef.n_sources (read, write)
-%   zef.n_sources_mod (read, write)
-%   zef.n_sources_old (read, write)
-%   zef.nodes (read)
-%   zef.nodes_aux (read, write)
-%   … (19 more)
-%
-% Calls (project):
-%   zef_lead_field_gravity
-%   zef_lead_field_gravity_grad
-%   zef_source_interpolation
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `tic;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 
 

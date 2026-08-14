@@ -1,25 +1,26 @@
 function [newtree] = zef_dataBank_rebuildTree(tree)
-% --- Zeffiro documentation header ---
-% zef_dataBank_rebuildTree — Zef data Bank rebuild Tree.
+%ZEF_DATABANK_REBUILDTREE  Renumber sibling hashes so they are contiguous.
 %
-% Purpose:
-%   Zef data Bank rebuild Tree.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tree
+%   After delete (and from hash2tree / importDataBank). Walks fieldnames in
+%   the current order (call sortTree first). Depth of each hash is the
+%   count of numeric tokens. Same depth → increment the last index; shallower
+%   → pop the path and increment; deeper → append 1. First node becomes
+%   node_1. Does not rewrite disk files (see rebuildTreeSaveFile).
 %
-% Outputs:
-%   newtree
+%   newtree = zef_dataBank_rebuildTree(tree)
 %
-% Calls (project):
-%   zef_dataBank_number2hash
-%   zef_dataBank_rebuildTree
+%   Inputs
+%     tree  - struct whose fields are hashes (already sorted numerically).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[newtree] = zef_dataBank_rebuildTree(tree)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     newtree  - same payloads with dense hashes and .hash updated.
+%
+%   See also zef_dataBank_sortTree, zef_dataBank_rebuildTreeSaveFile.
 
 hashes=fieldnames(tree);
 newtree=struct;

@@ -1,25 +1,22 @@
-% --- Zeffiro documentation header ---
-% zef.LeadFieldProcessingTool — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%ZEF_LEADFIELDPROCESSINGTOOL_COMBINE  Noise-weighted vertcat of checked bank rows.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.LeadFieldProcessingTool (read)
-%   zef.lead_field_id (read)
-%   zef.lead_field_id_max (read)
+%   Script. CombineButton. For each BankTable column-6 true row: bank →
+%   auxData, per-channel std of measurements(:, Noisestart:Noiseend),
+%   then L, measurements, and noise_data (when nonempty) are divided by
+%   that std and vertically concatenated. First checked row supplies
+%   interpolation, source positions/directions, source_structure,
+%   compartment_tags, and imaging_method. Sensors are stacked as xyz
+%   only. imaging_method_Name is 'combined'. New lead_field_id
+%   ('bank_apply'), then aux2bank_new (appends). Does not write live
+%   zef.L.
 %
-% Calls (project):
-%   zef_update_lead_field_id
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.LeadFieldProcessingTool` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_LeadfieldProcessingTool_combinebla,
+%   zef_LeadFieldProcessingTool_aux2bank_new.
 
 zef.LeadFieldProcessingTool.combineNew=true;
 zef.LeadFieldProcessingTool.combinePoints=zef.LeadFieldProcessingTool.app.NoisestartSpinner.Value:zef.LeadFieldProcessingTool.app.NoiseendSpinner.Value;

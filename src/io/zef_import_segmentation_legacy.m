@@ -1,58 +1,28 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_import_segmentation_legacy(zef, file_name, folder_name)
-% --- Zeffiro documentation header ---
-% zef_import_segmentation_legacy — Loads external data or a saved Zeffiro project into `zef`.
+%ZEF_IMPORT_SEGMENTATION_LEGACY  Import legacy 12-column .zef segmentation format.
 %
-% Purpose:
-%   Loads external data or a saved Zeffiro project into `zef`.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   file_name
-%   folder_name
+%   Reads the older comma-separated segmentation manifest (optional 55-line
+%   header), loads sensor_points, sensor_directions, mat_struct, ASC, STL,
+%   VOL, or DAT mesh entries into fixed compartment name fields (d1–d22,
+%   w, g, c, sk, sc), and applies translation offsets from manifest columns.
 %
-% Outputs:
-%   zef
+%   zef = zef_import_segmentation_legacy(zef)
+%   zef = zef_import_segmentation_legacy(zef, file_name, folder_name)
 %
-% Zef fields (observed):
-%   zef.domain_labels (read)
-%   zef.file (read)
-%   zef.file_path (read)
-%   zef.nodes (read)
-%   zef.s_directions (read, write)
-%   zef.s_points (read, write)
-%   zef.s_scaling (read, write)
-%   zef.s_x_correction (read, write)
-%   zef.s_xy_correction (read, write)
-%   zef.s_xy_rotation (read, write)
-%   zef.s_y_correction (read, write)
-%   zef.s_yz_correction (read, write)
-%   zef.s_yz_rotation (read, write)
-%   zef.s_z_correction (read, write)
-%   zef.s_zx_correction (read, write)
-%   … (4 more)
+%   Inputs
+%     zef        - session struct.
+%     file_name  - legacy *.zef file name.
+%     folder_name - folder containing mesh sidecar files.
 %
-% Calls (project):
-%   zef_import_asc
-%   zef_import_mat_struct
-%   zef_import_segmentation_legacy
-%   zef_smooth_surface
-%   zef_surface_mesh
-%   zef_waitbar
+%   Output
+%     zef - session with legacy compartment and sensor fields populated.
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_import_segmentation_legacy(zef, file_name, folder_name)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_import_segmentation, zef_import_asc, zef_surface_mesh.
 
 void = [];
 
@@ -79,6 +49,14 @@ if not(isequal(file_name,0));
         ini_cell = textscan(h_import,'%s','HeaderLines',0,'Delimiter',',');
     end
     n_columns = 12;
+    % Each row is 12 comma fields, 1-based:
+    %   1  sidecar basename (no extension)
+    %   2  token: sensor_points | sensor_directions | mat_struct | or a
+    %      compartment name from compartment_cell (detail_1…scalp)
+    %   3–8  meaning depends on token (sensors: scaling/xyz corr/rotations;
+    %      compartments: scaling, sigma, priority, sources, name, invert)
+    %   9  mesh format ASC|STL|VOL or DAT pair, or unused for sensors
+    %   10–12  xyz translation added to loaded points
 
     compartment_cell = {'detail_1', 'detail_2', 'detail_3', 'detail_4', 'detail_5', 'detail_6', 'detail_7','detail_8','detail_9', ...
         'detail_10', 'detail_11', 'detail_12', 'detail_13', 'detail_14', 'detail_15', 'detail_16','detail_17','detail_18',...
@@ -101,6 +79,8 @@ if not(isequal(file_name,0));
             zef_waitbar(i,n_segmentation,h_waitbar,['Item ' int2str(i) ' of ' int2str(n_segmentation) '.']);
         end
 
+        % Dispatch on column 2. Sensors and mat_struct are unique tokens;
+        % everything else is a named compartment surface (d1…sc).
         if isequal(ini_cell{1}{n_columns*(i-1)+2},'sensor_points')
 
             compartment_count_vec(1) = compartment_count_vec(1) + 1;
@@ -238,12 +218,15 @@ if not(isequal(file_name,0));
             end
 
         elseif isequal(ini_cell{1}{n_columns*(i-1)+2},'mat_struct')
+            % Merge a sidecar .mat into zef (same helper as modern type=struct).
 
             file_name_1 = [folder_name ini_cell{1}{n_columns*(i-1)+1} '.mat'];
             zef_import_mat_struct(load(file_name_1));
 
         else
 
+            % Column 9 selects how the surface is obtained. VOL does not
+            % load a file: it extracts the current tetrahedral boundary.
             if isequal(ini_cell{1}{n_columns*(i-1)+9},'ASC') || isequal(ini_cell{1}{n_columns*(i-1)+9},'asc')
 
                 file_name_1 = [folder_name ini_cell{1}{n_columns*(i-1)+1} '.asc'];
@@ -321,12 +304,15 @@ if not(isequal(file_name,0));
                     end
 
                     compartment_count_vec(j+2) = compartment_count_vec(j+2) + 1;
+                    % Column 8: swap triangle winding (invert normals).
                     if isequal(ini_cell{1}{n_columns*(i-1)+8},'0')
                         invert_on = 0;
                     else
                         invert_on = 1;
                     end
 
+                    % A second row for the same compartment concatenates
+                    % points/triangles (legacy merge) instead of replacing.
                     if compartment_count_vec(j+2) == 1
                         merge_on = 0;
                     else

@@ -1,21 +1,42 @@
 function zeffiro_downloader( kwargs )
-% --- Zeffiro documentation header ---
-% zeffiro_downloader — Zeffiro downloader.
+%ZEFFIRO_DOWNLOADER  Shallow-clone Zeffiro Interface and optionally run setup.
 %
-% Purpose:
-%   Zeffiro downloader.
-%   Folder: Repository root: startup (`zeffiro_interface`, `zeffiro_setup`), path configuration, and entry to `src/`, `+core`, `+inverse`, `+utilities`, `tools/plugins`, and bundled data.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   kwargs
+%   Clones the official GitHub repository into install_directory/folder_name,
+%   writes profile_name into profile/zeffiro_interface.ini, then optionally
+%   runs zeffiro_setup in that clone. This helper is intended for a fresh
+%   install, not for updating an existing working tree.
 %
-% Outputs:
-%   See function signature and code below.
+%   zeffiro_downloader
+%   zeffiro_downloader(Name, Value, ...)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zeffiro_downloader(kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Name-value arguments
+%     install_directory - existing folder that will contain the clone.
+%                         Default pwd. Validated with mustBeFolder.
+%     branch_name       - git branch to clone, default "master".
+%     profile_name      - value written to the profile_name field of
+%                         profile/zeffiro_interface.ini. Default
+%                         "multicompartment_head".
+%     folder_name       - clone directory name. Default "zeffiro_interface".
+%                         If passed empty, becomes
+%                         "zeffiro_interface-" + branch_name.
+%     run_setup         - logical, default true. Call zeffiro_setup after clone.
+%     git_address       - remote URL, default
+%                         https://github.com/sampsapursiainen/zeffiro_interface.git
+%     submodules        - forwarded to zeffiro_setup as "submodules".
+%
+%   Side effects
+%     Creates a git working tree, rewrites the profile INI, and changes
+%     directory to the clone while setup runs (restored afterwards).
+%
+%   Failure
+%     Errors if git clone returns a non-zero status.
+%
+%   See also zeffiro_setup, zeffiro_interface.
 
 arguments
     kwargs.install_directory (1,1) string { mustBeFolder } = pwd

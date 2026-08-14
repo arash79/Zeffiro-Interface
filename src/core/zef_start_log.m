@@ -1,37 +1,21 @@
 function zef = zef_start_log(zef)
-% --- Zeffiro documentation header ---
-% zef_start_log — Zef start log.
+%ZEF_START_LOG  Open a rotating session log file under data/log/.
 %
-% Purpose:
-%   Zef start log.
-%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   When zef.use_log is true, creates data/log if needed, names a new file
+%   zef.zeffiro_log_file_name_<n>.log, deletes oldest files beyond
+%   zef.max_n_log_files, and writes a banner with version, date, and path.
+%   Always stores the current log path on zef.h_zeffiro_menu.ZefCurrentLogFile
+%   (adding the dynamic property if missing), even when logging is off.
 %
-% Outputs:
-%   zef
+%   Input / output
+%     zef  - session; current_log_file is set when logging is enabled.
 %
-% Zef fields (observed):
-%   zef.current_log_file (read, write)
-%   zef.current_version (read)
-%   zef.h_zeffiro_menu (read)
-%   zef.max_n_log_files (read)
-%   zef.program_path (read)
-%   zef.use_log (read)
-%   zef.zeffiro_log_file_name (read)
-%
-% Calls (project):
-%   zef_start_log
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_start_log(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_start.
 
 
 if zef.use_log

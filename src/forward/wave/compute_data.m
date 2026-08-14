@@ -1,23 +1,13 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
-% --- Zeffiro documentation header ---
-% parameters; — Parameters;.
+%COMPUTE_DATA  Wrapper script: gpuDevice then compute_data_gpu (optionally in pieces).
 %
-% Purpose:
-%   Parameters;.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Side effects:
-%   - GPU
-%   - filesystem I/O
+%   Script. parameters.m supplies gpu_id (or default_gpu_id), compute_in_pieces,
+%   time_series_id. Does not populate zef.L.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `parameters;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also compute_data_gpu.
 
 parameters;
 

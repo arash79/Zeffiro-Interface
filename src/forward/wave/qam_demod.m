@@ -1,31 +1,21 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 
 function [data_val_inphase,data_val_quad,amp_val] = qam_demod(wave_val,carrier_cycles_per_pulse_cycle,pulse_length,t_data,varargin)
-% --- Zeffiro documentation header ---
-% qam_demod — Qam demod.
+%QAM_DEMOD  In-phase / quadrature / amplitude demodulation of a pulsed carrier.
 %
-% Purpose:
-%   Qam demod.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Inputs:
-%   wave_val
-%   carrier_cycles_per_pulse_cycle
-%   pulse_length
-%   t_data
-%   varargin
+%   Mixes wave_val with cos/sin at carrier_cycles_per_pulse_cycle over
+%   pulse_length, sampled at t_data. Optional varargin extra flags.
 %
-% Outputs:
-%   data_val_inphase
-%   data_val_quad
-%   amp_val
+%   [data_val_inphase, data_val_quad, amp_val] = qam_demod( ...
+%       wave_val, carrier_cycles_per_pulse_cycle, pulse_length, t_data, varargin)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[data_val_inphase, data_val_quad, amp_val]] = qam_demod(wave_val, carrier_cycles_per_pulse_cycle, pulse_length, t_data, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also make_born_approximation_qam, bh_window.
+
+
 
 
 equalize_components = 1;

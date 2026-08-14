@@ -1,32 +1,4 @@
 function [log_lh, mahalaD] = WeightedCondDensity(positions, mu, weight, Sigma, p, sharedCov, CovType)
-% --- Zeffiro documentation header ---
-% plugins.ClassGMM.WeightedCondDensity — Weighted Cond Density.
-%
-% Purpose:
-%   Weighted Cond Density.
-%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
-%
-% Inputs:
-%   positions
-%   mu
-%   weight
-%   Sigma
-%   p
-%   sharedCov
-%   CovType
-%
-% Outputs:
-%   log_lh
-%   mahalaD
-%
-% Calls (project):
-%   plugins.ClassGMM.WeightedCondDensity
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[log_lh, mahalaD]] = plugins.ClassGMM.WeightedCondDensity(positions, mu, weight, Sigma, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 %WEIGHTEDCONDDENSITY Log component-conditional density for weighted GMM.
 %
 %   LOG_LH = WEIGHTEDCONDDENSITY(POSITIONS, MU, WEIGHT, SIGMA, P, SHAREDCOV, COVTYPE)

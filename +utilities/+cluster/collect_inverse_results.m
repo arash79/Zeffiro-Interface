@@ -1,30 +1,20 @@
 function [results, summary] = collect_inverse_results(submissions, opts)
-% --- Zeffiro documentation header ---
-% utilities.cluster.collect_inverse_results — Collect inverse results.
+%COLLECT_INVERSE_RESULTS  Wait for batch jobs and load saved inverse results.
 %
-% Purpose:
-%   Collect inverse results.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   submissions
-%   opts
+%   [results, summary] = collect_inverse_results(submissions, opts)
 %
-% Outputs:
-%   results
-%   summary
+%   submissions is the struct array returned by submit_inverse_jobs. When
+%   opts.WaitForCompletion is true (default), waits on each parallel.Job before
+%   loading its result_path MAT-file.
 %
-% Calls (project):
-%   utilities.cluster.collect_inverse_results
-%
-% Side effects:
-%   - filesystem I/O
-%   - parallel/cluster
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[results, summary]] = utilities.cluster.collect_inverse_results(submissions, opts)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   results is a cell array of loaded result structs (empty cell when file
+%   missing or malformed). summary holds job_id, state, success, result_path,
+%   and error per submission.
 
 arguments
     submissions (1,:) struct

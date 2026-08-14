@@ -1,29 +1,17 @@
 function M = zef_volume_scalar_matrix_FG(nodes,tetra,g_i_ind,scalar_field)
-% --- Zeffiro documentation header ---
-% zef_volume_scalar_matrix_FG — Zef volume scalar matrix FG.
+%ZEF_VOLUME_SCALAR_MATRIX_FG  ∫ φ ψ (∇ψ)_α dV with FG weight 1/4.
 %
-% Purpose:
-%   Zef volume scalar matrix FG.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   g_i_ind
-%   scalar_field
+%   Wrapper → zef_volume_scalar_matrix_D. NSE divergence/gradient blocks
+%   Q_1,Q_2,Q_3 (one per Cartesian component).
 %
-% Outputs:
-%   M
+%   M = zef_volume_scalar_matrix_FG(nodes, tetra, g_i_ind, scalar_field)
 %
-% Calls (project):
-%   zef_barycentric_weighting
-%   zef_volume_scalar_matrix_D
-%   zef_volume_scalar_matrix_FG
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_volume_scalar_matrix_FG(nodes, tetra, g_i_ind, scalar_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_volume_scalar_matrix_D, zef_nse_poisson.
 
 weighting = zef_barycentric_weighting('FG');
 M = zef_volume_scalar_matrix_D(nodes, tetra, g_i_ind, scalar_field, weighting);

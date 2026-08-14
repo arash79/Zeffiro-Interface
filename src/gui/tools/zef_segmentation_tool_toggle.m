@@ -1,33 +1,30 @@
 function zef_segmentation_tool_toggle(zef,h_button)
-% --- Zeffiro documentation header ---
-% zef_segmentation_tool_toggle — Zef segmentation tool toggle.
+%ZEF_SEGMENTATION_TOOL_TOGGLE  Narrow/widen the Segmentation tool window.
 %
-% Purpose:
-%   Zef segmentation tool toggle.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   h_button
+%   ButtonPushedFcn of **Toggle controls** (h_segmentation_tool_toggle),
+%   wired in zef_segmentation_tool. That constructor also sets the
+%   button's UserData to 1 the first time it is created. Does not dock
+%   to the menu bar (zef_window_manager('dock_menu') is a separate path).
 %
-% Outputs:
-%   See function signature and code below.
+%   UserData 1 (initial) is the wide layout: this call multiplies
+%   h_zeffiro_window_main.Position(3) by 0.505 and stores UserData 0.
+%   UserData 0 is the narrow layout: width is divided by 0.505 and
+%   UserData returns to 1. SizeChangedFcn is blanked for the move, then
+%   restored with zef_set_size_change_function. warning off/on wraps the
+%   resize.
 %
-% Zef fields (observed):
-%   zef.h_zeffiro_window_main (read)
+%   zef_segmentation_tool_toggle(zef, h_button)
 %
-% Calls (project):
-%   zef_segmentation_tool_toggle
-%   zef_set_size_change_function
+%   Inputs
+%     zef      - session; uses h_zeffiro_window_main.
+%     h_button - the Toggle controls uibutton (UserData 0 or 1).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `zef_segmentation_tool_toggle(zef, h_button)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_segmentation_tool, zef_set_position, zef_set_size_change_function.
 
 if isequal(h_button.UserData,1)
     h_button.UserData = 0;

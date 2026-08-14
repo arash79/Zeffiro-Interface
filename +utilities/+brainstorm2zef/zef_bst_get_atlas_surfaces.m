@@ -1,37 +1,25 @@
 function atlas_surfaces = zef_bst_get_atlas_surfaces(zef, atlas_struct, n_inflation_steps, transform_cell, compartment_type, volume_extension_vec)
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst_get_atlas_surfaces — Zef bst get atlas surfaces.
+%ZEF_BST_GET_ATLAS_SURFACES  Voxel Cube → one inflated triangle mesh per label.
 %
-% Purpose:
-%   Zef bst get atlas surfaces.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   atlas_struct
-%   n_inflation_steps
-%   transform_cell
-%   compartment_type
-%   volume_extension_vec
+%   atlas_surfaces = zef_bst_get_atlas_surfaces(zef, atlas_struct, n_infl)
+%   atlas_surfaces = zef_bst_get_atlas_surfaces(..., transform_cell, type, vol_ext)
 %
-% Outputs:
-%   atlas_surfaces
+%   atlas_struct.Cube (required) and .Labels (N-by-up-to-3: id, name, RGB
+%   0–255). Optional .Comment, .InitTransf, .SkipZefWaitbar.
+%   Each voxel → 5 tets; zef_surface_mesh + zef_inflate_surface(n_infl).
+%   volume_extension_vec(i)>0 dilates label i by that many tet rings
+%   (default zeros). transform_cell containing 'InitTransf' applies
+%   atlas_struct.InitTransf{2} (4×4) to nodes. Last entry is a dark
+%   "domain fill" union of all labels. Faces reordered [1 3 2].
 %
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_get_atlas_surfaces
-%   zef_inflate_surface
-%   zef_surface_mesh
-%   zef_waitbar
+%   Fields: .Name .Type .Color (0–1) .Points .Triangles.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[atlas_surfaces] = utilities.brainstorm2zef.zef_bst_get_atlas_surfaces(zef, atlas_struct, n_inflation_steps, transform_cell, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_create_compartment_data, zef_surface_mesh.
 
 if nargin < 4
     transform_cell = cell(0);

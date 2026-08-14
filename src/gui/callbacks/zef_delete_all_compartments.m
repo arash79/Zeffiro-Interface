@@ -1,39 +1,37 @@
 function zef = zef_delete_all_compartments(zef)
-% --- Zeffiro documentation header ---
-% zef_delete_all_compartments — Zef delete all compartments.
+%ZEF_DELETE_ALL_COMPARTMENTS  Turn every tissue and sensor set off, then delete them.
 %
-% Purpose:
-%   Zef delete all compartments.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Not the right-click **Delete compartment(s)** item. Used by
+%   zef_start_new_project, which is Project → **New project from profile**
+%   and **New empty project** (and import-to-new-project paths).
 %
-% Outputs:
-%   zef
+%   zef = zef_delete_all_compartments(zef)
+%   zef_delete_all_compartments          % nargout 0 → assignin base
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.compartments_selected (read, write)
-%   zef.h_compartment_table (read)
-%   zef.h_sensors_table (read)
-%   zef.sensor_sets_selected (read, write)
-%   zef.sensor_tags (read)
+%   Input
+%     zef  - session. Omitted → evalin('base','zef').
 %
-% Calls (project):
-%   zef_delete_all_compartments
-%   zef_delete_compartment
-%   zef_delete_sensor_sets
+%   Output
+%     zef  - session after zef_delete_compartment and zef_delete_sensor_sets.
+%            If the compartment table Data is empty, zef is unchanged
+%            (aside from assignin when nargout is 0).
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Side effects (when the table is non-empty)
+%     1. Every compartment-table column 2 **On** cell → 0.
+%     2. Every sensors-table column 4 **On** cell → 0.
+%     3. zef.compartments_selected = 1:length(compartment_tags);
+%        zef_delete_compartment (NaN on those now-inactive rows, zef_update).
+%     4. zef.compartments_selected = [].
+%     5. zef.sensor_sets_selected = 1:length(sensor_tags);
+%        zef_delete_sensor_sets.
+%     6. zef.sensor_sets_selected = [].
 %
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_delete_all_compartments(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_delete_compartment, zef_start_new_project.
 
 if nargin == 0
     zef = evalin('base','zef');

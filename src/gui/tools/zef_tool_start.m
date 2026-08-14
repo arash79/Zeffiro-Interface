@@ -1,43 +1,20 @@
 function [zef] = zef_tool_start(zef,tool_script,relative_size,scale_positions)
-% --- Zeffiro documentation header ---
-% zef_tool_start — Zef tool start.
+%ZEF_TOOL_START  Lazy-launch a tool figure; skip a second copy by ZefTool tag.
 %
-% Purpose:
-%   Zef tool start.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   tool_script
-%   relative_size
-%   scale_positions
+%   Function. If findall(groot,'ZefTool',tool_script) hits, raise those
+%   figures via zef_window_manager. Else evalc(['zef =' tool_script '(zef)']),
+%   tag new ZEFFIRO Interface* figures, and append new numeric fields to
+%   zef.zeffiro_variable_data (reloaded from the project MAT on later
+%   opens). Sets zef_closereq and zef_set_size_change_function.
 %
-% Outputs:
-%   zef
+%   zef = zef_tool_start(zef, tool_script, relative_size, scale_positions)
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_zeffiro_menu (read)
-%   zef.project_matfile (read)
-%   zef.use_display (read)
-%   zef.zeffiro_variable_data (read, write)
-%
-% Calls (project):
-%   zef_closereq
-%   zef_set_size_change_function
-%   zef_tool_start
-%
-% Side effects:
-%   - creates/updates figures
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_tool_start(zef, tool_script, relative_size, scale_positions)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_parcellation_tool, zef_window_manager.
 if nargin < 3
     relative_size = 1/2;
 else
@@ -58,7 +35,7 @@ screen_size_aux = get(0,'screensize');
 if not(isempty(h_tool))
     if zef.use_display
         for i = 1 : length(h_tool)
-            figure(h_tool(i));
+            zef_window_manager('raise', h_tool(i));
         end
     end
 
@@ -160,7 +137,7 @@ else
         h_groot_children(i).ZefTool = tool_script;
      
         position_aux = h_groot_children(i).Position;
-        h_groot_children(i).Position = [horizontal_aux vertical_aux width_aux height_aux];
+        zef_window_manager('standalone', h_groot_children(i), [horizontal_aux vertical_aux width_aux height_aux]);
 
         set(findobj(h_groot_children(i).Children,'-property','FontUnits'),'FontUnits','pixels');
         set(findobj(h_groot_children(i).Children,'-property','FontSize'),'FontSize',zef.font_size);

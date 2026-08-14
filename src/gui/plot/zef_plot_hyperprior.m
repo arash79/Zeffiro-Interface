@@ -1,37 +1,20 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% function zef_plot_hyperprior — Function zef plot hyperprior.
-%
-% Purpose:
-%   Function zef plot hyperprior.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_axes1 (read)
-%   zef.inv_amplitude_db (read)
-%   zef.inv_hyperprior (read)
-%   zef.inv_hyperprior_tail_length_db (read)
-%   zef.inv_prior_over_measurement_db (read)
-%   zef.inv_snr (read)
-%
-% Calls (project):
-%   zef_find_g_hyperprior
-%   zef_find_ig_hyperprior
-%   zef_gamma_gpu
-%   zef_inverse_gamma_gpu
-%   zef_plot_hyperprior
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_plot_hyperprior` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function zef_plot_hyperprior
+%ZEF_PLOT_HYPERPRIOR  Hierarchical-prior density on Figure-tool axes1.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Function. ButtonPushedFcn of h_plot_hyperprior in Settings →
+%   Hierarchical prior options. cla zef.h_axes1, loglog of inverse-gamma
+%   (inv_hyperprior==1) or gamma (==2) density vs amplitude, with mean /
+%   tail / amplitude reference lines from inv_snr, tail_length_db,
+%   prior_over_measurement_db, inv_amplitude_db. Does not write zef.
+%
+%   See also zef_open_gaussian_prior_options.
 
 
 axes(evalin('base','zef.h_axes1'));

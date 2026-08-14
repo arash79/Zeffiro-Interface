@@ -1,29 +1,24 @@
 function self = initialize(self,L,f_data)
-% --- Zeffiro documentation header ---
-% inverse.DipoleScanInverter.initialize — Estimates priors, noise covariance, or regularization from multi-frame data.
+%initialize  Dipole-scan noise_cov = (10^(-SNR/10))*mean(f.^2)*I if empty.
 %
-% Purpose:
-%   Estimates priors, noise covariance, or regularization from multi-frame data.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   L
-%   f_data
+%   Called once from utilities.inverse.run_frame_loop before precompute /
+%   invert. Inverse tools → Dipole Scan uses zef_dipoleScan.
 %
-% Outputs:
-%   self
+%   size(L,1) is the sensor count. An existing noise_cov is left unchanged
+%   so MethodParams can pin a covariance. precompute then builds
+%   whitening = sqrtm(noise_cov) \ I.
 %
-% Calls (project):
-%   inverse.initialize
+%   Inputs
+%     L      - processed lead field (only size(L,1) is used).
+%     f_data - n_sensors × n_frames filtered measurements.
 %
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[self] = inverse.DipoleScanInverter.initialize(self, L, f_data)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     self.noise_cov  n_sensors × n_sensors when it was empty.
 
     arguments
 

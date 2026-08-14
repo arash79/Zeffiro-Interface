@@ -1,24 +1,23 @@
-% --- Zeffiro documentation header ---
-% for zef_i = 1 : size(zef — For zef i = 1 : size(zef.
+%ZEF_RESET_PARAMETER_PROFILE  Script: write parameter_profile defaults onto zef.
 %
-% Purpose:
-%   For zef i = 1 : size(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.parameter_profile (read)
-%   zef.sensor_tags (read)
+%   Script, not a function. Needs zef in the caller (and base) workspace.
+%   For each parameter_profile row with column 6 'On':
+%     column 8 'Segmentation' → for every compartment_tag, set
+%       zef.<tag>_<column2> to column 4 (num2str eval if Scalar, raw
+%       eval if String)
+%     column 8 'Sensors' → for every sensor_tag, set
+%       zef.<tag>_<column2> = []
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   No first-party callers. Parameter profile Apply / init uses
+%   zef_apply_parameter_profile (re-reads zeffiro_parameters.ini, then
+%   zef_init_parameter_profile).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `for zef_i = 1 : size(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_apply_parameter_profile, zef_open_parameter_profile.
 for zef_i = 1 : size(zef.parameter_profile,1)
 
     for zef_j = 1 : length(zef.compartment_tags)

@@ -1,37 +1,28 @@
-%% Copyright © 2025- Joonas Lahtinen and Alexandra Koulouri
 function [z_vec, self] = invert(self, f_data, L, procFile, source_direction_mode, source_positions, opts)
-% --- Zeffiro documentation header ---
-% inverse.GroupLassoInverter.invert — Runs one inverse reconstruction step for a single measurement frame.
+%invert  Group LASSO MAP iterations: LG_optimization with updating gamma = beta./(theta0+zL2).
 %
-% Purpose:
-%   Runs one inverse reconstruction step for a single measurement frame.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen and Alexandra Koulouri
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   f_data
-%   L
-%   procFile
-%   source_direction_mode
-%   source_positions
-%   opts
+%   Called from utilities.inverse.run_frame_loop (f_data is still one
+%   frame vector there). Inverse tools Lasso / EXP uses exp_iteration,
+%   not this class. The GroupLasso constructor currently forces
+%   use_multiresolution = false; the multiresolution branch in this file
+%   is therefore only reachable if that property is set after construct.
 %
-% Outputs:
-%   z_vec
-%   self
+%   Inner solver LG_optimization; hyperparameter
+%   gamma = beta ./ (theta0 + zL2) from the current group norms.
 %
-% Calls (project):
-%   inverse.invert
-%   zef_waitbar
+%   Inputs
+%     f_data - n_sensors×1 frame (or a matrix if you call invert yourself).
+%     L      - processed lead field.
+%     procFile, source_direction_mode, source_positions - unused here.
+%     opts.use_gpu / normalize_data - GPU for inner solves; normalize unused.
 %
-% Side effects:
-%   - GPU
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z_vec, self]] = inverse.GroupLassoInverter.invert(self, f_data, L, procFile, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Outputs
+%     z_vec - n_dof×1 group-LASSO MAP estimate.
 
     arguments
 
@@ -214,6 +205,8 @@ for i = 1 : n_map_iterations(j)
     if sum(isnan(z_vec))>0
         z_vec(isnan(z_vec))=mean(abs(z_vec(not(isnan(z_vec)))));
     end
+    % Group residual zL2 = ‖(x,y,z)‖ per source, repeated on the 3 columns;
+    % gamma ← β / (θ₀ + zL2) for the next inner solve.
     zL2 = repelem(sqrt(sum(reshape(gather(z_vec).^2,3,[]))),3)';
     gamma = beta./(theta0+zL2);
 

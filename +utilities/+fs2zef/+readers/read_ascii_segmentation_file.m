@@ -1,33 +1,12 @@
 function [nodes, faces] =  read_ascii_segmentation_file ( fname )
-% --- Zeffiro documentation header ---
-% utilities.fs2zef.readers.read_ascii_segmentation_file — Read ascii segmentation file.
+%READ_ASCII_SEGMENTATION_FILE  Parse FreeSurfer ASCII mesh (nodes + triangle faces).
 %
-% Purpose:
-%   Read ascii segmentation file.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   fname
-%
-% Outputs:
-%   nodes
-%   faces
-%
-% Calls (project):
-%   utilities.fs2zef.readers.read_ascii_segmentation_file
-%   utilities.io.float_is_int
-%   utilities.io.is_eof
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[nodes, faces]] = utilities.fs2zef.readers.read_ascii_segmentation_file(fname)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%
-% read_ascii_segmentation_file ( fname )
+%   [nodes, faces] = read_ascii_segmentation_file(fname)
 %
 % Reads in a segmentation file line by line and extracts the information from
 % within it. Throws an exception if the given file does not conform to the

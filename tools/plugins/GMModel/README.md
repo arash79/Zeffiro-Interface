@@ -1,62 +1,44 @@
-# tools/plugins/GMModel
+# GMModel
 
-## Purpose of this folder
+Gaussian-mixture clustering of an **existing** reconstruction (SP tool). This is not an inverse solver: it needs `zef.reconstruction` already filled. Use it to turn a distributed map into a few equivalent dipoles / cluster centres.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+`plugins.ClassGMM` is unused from this GUI. There is no Inverse-tools button that calls `+inverse`.
 
-## Contents
+## Menu
 
-MATLAB sources:
-- `zef_GMModel_init.m` — **if not(isfield(zef,'GMModel'))**: If not(isfield(zef,'GMModel')).
-- `zef_GMModel_open.m` — **zef_GMModel_open**: Zef GMModel open.
-- `zef_GMModel_start.m` — **zef_GMModel_start**: Zef GMModel start.
-- `zef_GMModel_update.m` — **zef_GMModel_update**: Zef GMModel update.
-- `zef_GMModel_window.m` — **zef_GMModel_window**: Zef GMModel window.
-- `zef_cluster_reconstruction.m` — **zef_cluster_reconstruction**: Zef cluster reconstruction.
-- `zef_find_clusters.m` — **zef_find_clusters**: Zef find clusters.
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **Gaussian Mixture Model (SP)** |
+| `_legacy`, `_nse` | Inverse tools → **Gaussian Mixture Model (SP)** |
+| asteroid_radar / asteroid_gravity | **not in those INIs** (they register the JL app only) |
 
-## How this folder fits into the overall workflow
+INI callback: `zef_GMModel_start`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Window title: `ZEFFIRO Interface: Gaussian Mixture Model tool`.
 
-## GUI usage
+## Run clustering
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
-
-## Programmatic usage
-
-From the project root:
+**Run** (`zef.GMModel.h_start`) Callback — not labelled Start:
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+zef = zef_GMModel_update(zef); [zef.GMModel.cluster_centres,zef.GMModel.dipole_moments,~,zef.GMModel.Param] = zef_cluster_reconstruction(zef);
 ```
 
-Representative entry points in this folder:
-- `Call `if not(isfield(zef,'GMModel'))` from MATLAB with the project root on the path.`
-- ``[zef] = zef_GMModel_open(zef)` with project root and `src` on the path.`
-- ``[zef] = zef_GMModel_start(zef)` with project root and `src` on the path.`
-- ``[zef] = zef_GMModel_update(zef)` with project root and `src` on the path.`
-- ``[zef] = zef_GMModel_window(zef)` with project root and `src` on the path.`
-- ``[[cluster_centres, dipole_moments, index_vec]] = zef_cluster_reconstruction(zef)` with project root and `src` on the path.`
-- ``[[index_vec, MahalanobisD, GMModel]] = zef_find_clusters(n_clusters, rec_points, reg_val, cred_val, …)` with project root and `src` on the path.`
+## Needs
 
-## Examples
+- `zef.reconstruction` (cell uses `zef.GMModel.frame_number`)
+- `zef.source_positions`
+- GMM options on `zef.GMModel`: `max_n_clusters`, `credibility`, `n_dynamic_levels`, `reg_param`, `max_n_iter`, `tol_val`
+- Does **not** read `zef.L` or `zef.measurements`
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+Amplitude is peak-normalized, then split into `n_dynamic_levels` bands. The **lowest** band (`amp ≤ 1/n_dynamic_levels`) is discarded; clustering uses only the remaining sources as `[xyz, dipole_xyz]` rows. If that table has fewer rows than columns, it is tiled (`repmat`) until `fitgmdist` can run. `zef_find_clusters` then increases `K` from 1 until `max_n_clusters` or every point already has a unique label, using a χ² Mahalanobis cutoff (`chi2inv(credibility, 6)` on the 6-D rows). Cluster centres are the mean xyz of assigned points; dipole moments are the **sum** of the xyz components in that cluster (not the mean). Empty clusters are NaN.
 
-## Dependencies and assumptions
+## Writes
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+- `zef.GMModel.cluster_centres`, `dipole_moments`, `Param`
+- Does **not** overwrite `zef.reconstruction`
 
-## Notes for developers
+## Files
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+- Start: `zef_GMModel_start.m` → `zef_GMModel_open` → `zef_GMModel_window`
+- Solver: `zef_cluster_reconstruction.m` / `zef_find_clusters.m`

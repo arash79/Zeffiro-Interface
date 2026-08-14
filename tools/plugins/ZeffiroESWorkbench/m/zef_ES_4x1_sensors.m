@@ -1,33 +1,23 @@
 function ell_idx = zef_ES_4x1_sensors(varargin)
-% --- Zeffiro documentation header ---
-% zef_ES_4x1_sensors — Zef ES 4x1 sensors.
+%ZEF_ES_4X1_SENSORS  Five sensor indices for a 4×1 montage around inv_synth_source.
 %
-% Purpose:
-%   Zef ES 4x1 sensors.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Not bound in zef_ES_optimization_window. Anode = nearest sensor to
+%   inv_synth_source; four returns at ±separation_angle along the source
+%   orientation and the cross product with the anode radial. Optional first
+%   argument is the angle in degrees; else zef.ES_separation_angle.
+%   Further varargin entries are ignored — sensors and inv_synth_source
+%   always come from the base workspace (zef_ES_4x1_fun still passes them).
 %
-% Outputs:
-%   ell_idx
+%   ell_idx = zef_ES_4x1_sensors()
+%   ell_idx = zef_ES_4x1_sensors(separation_angle)
 %
-% Zef fields (observed):
-%   zef.ES_separation_angle (read)
-%   zef.inv_synth_source (read)
-%   zef.sensors (read)
+%   See also zef_ES_plot_4x1, zef_ES_find_valid_separation_angle.
 %
-% Calls (project):
-%   zef_ES_4x1_sensors
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[ell_idx] = zef_ES_4x1_sensors(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 if length(varargin) >= 1
     separation_angle = varargin{1};
@@ -43,6 +33,7 @@ ell_idx    = zeros(5,1);
 source_pos = source_pos(:)';
 source_ori = source_ori(:)';
 
+% Anode: nearest sensor to the synthetic source.
 d_norm = sqrt(sum((source_pos - sensor_coord).^2,2));
 [~,m_ind] = min(d_norm);
 
@@ -62,6 +53,7 @@ p_1 = sensor_coord((m_ind),:);
     sensor_coord_aux = sensor_coord;
     sensor_coord = sensor_coord_aux(source_index,:);
 
+% Returns ±separation_angle along source orientation (v_2) then along v_3 = v_1 × v_2.
 p_2 = p_1 + p_1_norm*tan(pi*separation_angle/180)*v_2;
     d_norm = sqrt(sum((p_2 - sensor_coord).^2,2));
     [~,m_ind] = min(d_norm);

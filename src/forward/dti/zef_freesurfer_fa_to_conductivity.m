@@ -1,66 +1,28 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_FREESURFER_FA_TO_CONDUCTIVITY
-%
-%Converts FreeSurfer FA (fractional anisotropy) volume to a conductivity
-%tensor volume [nx×ny×nz×6]. Optional v1 (principal eigenvector) defines
-%the direction of anisotropy; conductivity and diffusion share the same
-%eigenvectors (Tuch et al., PNAS 2002).
-%
-%Models (academic references):
-%  1 = Volume fraction (Tuch-style): Isotropic base from two-phase mixture
-%      sigma_iso = f*sigma_intra + (1-f)*sigma_extra; anisotropy from FA
-%      with same eigenvectors as DTI. FA-based eigenvalue scaling preserves
-%      trace and gives sigma_par/sigma_perp ratio increasing with FA.
-%      Ref: Tuch et al., Conductivity tensor mapping of the human brain
-%      using diffusion tensor MRI, PNAS 99(10):6667-6672, 2002.
-%  2 = Effective medium (Tuch linear): sigma_nu = k*(d_nu - d_epsilon).
-%      Uses Tuch's experimental linear fit (k ≈ 0.844 S·s/mm³, d_ε ≈ 0.124
-%      μm²/ms). Diffusion eigenvalues d_nu are approximated from FA and
-%      mean diffusivity when full DTI tensor is not available.
-%      Ref: Same Tuch et al. PNAS 2002.
-%  3 = Direct scaling: sigma = scale * (isotropic + anisotropy from FA).
-%      Simple scaling of an FA-derived tensor; no biophysical parameters.
-%
-%Inputs:
-%   fa_data    - [nx×ny×nz] FA values in [0,1]
-%   model_type - 1, 2, or 3 (see above)
-%   Optional name-value pairs:
-%     'volume_fraction'      - scalar (default 0.7)
-%     'extra_conductivity'   - scalar S/m (default 1.0)
-%     'intra_conductivity'   - scalar S/m (default 0.6)
-%     'scale_factor'        - scalar (default 0.33)
-%     'anisotropy_threshold' - FA below this → isotropic (default 0.2)
-%     'principal_direction'  - [nx×ny×nz×3] or empty (default [])
-%     'mean_diffusivity'     - scalar μm²/ms, for model 2 only (default 0.7)
-%
-%Outputs:
-%   conductivity_tensor - [nx×ny×nz×6] symmetric tensor (11,22,33,12,13,23)
-
 function conductivity_tensor = zef_freesurfer_fa_to_conductivity(fa_data, model_type, varargin)
-% --- Zeffiro documentation header ---
-% zef_freesurfer_fa_to_conductivity — Zef freesurfer fa to conductivity.
+%ZEF_FREESURFER_FA_TO_CONDUCTIVITY  FA volume → symmetric conductivity tensor [nx ny nz 6].
 %
-% Purpose:
-%   Zef freesurfer fa to conductivity.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2024- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   fa_data
+%   Called from zef_dti_apply_to_sigma. Eigenframe is principal_direction
+%   (v1.nii.gz) or +x if omitted. Tensor T = σ_par v1 v1' + σ_perp (I - v1 v1'),
+%   stored as [s11 s22 s33 s12 s13 s23]. FA is clamped to [0,1]; voxels below
+%   anisotropy_threshold become isotropic.
+%
 %   model_type
-%   varargin
+%     1  volume fraction: σ_iso = vf*σ_i + (1-vf)*σ_e, σ_par = σ_iso(1+2 FA),
+%        σ_perp = σ_iso(1-FA)
+%     2  Tuch effective medium: σ = 0.844*(d - 0.124) S/m with
+%        d_par = MD(1+2 FA), d_perp = MD(1-FA); MD default 0.7 μm²/ms
+%     3  direct scaling: σ_par = scale*(1+2 FA), σ_perp = scale*(1-FA)
 %
-% Outputs:
-%   conductivity_tensor
+%   conductivity_tensor = zef_freesurfer_fa_to_conductivity(fa_data, model_type, varargin)
 %
-% Calls (project):
-%   zef_freesurfer_fa_to_conductivity
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[conductivity_tensor] = zef_freesurfer_fa_to_conductivity(fa_data, model_type, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_dti_apply_to_sigma, zef_freesurfer_load_v1.
+
+
 
 
 p = inputParser;

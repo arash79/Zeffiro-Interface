@@ -1,33 +1,18 @@
 classdef ELORETAInverterTest < matlab.unittest.TestCase
-% --- Zeffiro documentation header ---
-% tests.ELORETAInverterTest — Inverse solver class implementing ELORETATest reconstruction.
+%ELORETAINVERTERTEST  inverse.ELORETAInverter numerics on synthetic L (no GUI).
 %
-% Purpose:
-%   Inverse solver class implementing ELORETATest reconstruction.
-%   Folder: MATLAB unit and integration tests for refactored inverse dispatch, lead fields, cluster jobs, and legacy/class parity.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
+%   Uses tests.createSyntheticInverseZef and zef_processLeadfields.
+%   testOutputShapeMatchesLeadField — numel(z) == size(L,2).
+%   testFixedPointConverges — precompute finishes with a finite T.
+%   testZeroLocalizationErrorPointSource — recovering a column of L.
+%   testManualRegularizationOverridesSNR — explicit alpha is kept.
+%   testReconstructionStableUnderRescaling — scale of f vs reconstruction.
 %
-% Zef fields (observed):
-%   zef.inv_snr (read)
-%   zef.measurements (read)
-%   zef.normalize_data (read)
-%   zef.source_direction_mode (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   inverse.ELORETAInverter
-%   zef_processLeadfields
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `tests.ELORETAInverterTest(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
 
     methods (Test)
         function testOutputShapeMatchesLeadField(testCase)

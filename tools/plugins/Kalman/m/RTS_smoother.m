@@ -1,30 +1,30 @@
 function [P_s_store, m_s_store, G_store] = RTS_smoother(P_store, z_inverse, A, Q, number_of_frames)
-% --- Zeffiro documentation header ---
-% RTS_smoother — RTS smoother.
+%RTS_SMOOTHER  Rauch–Tung–Striebel smoother on stored P and filtered means.
 %
-% Purpose:
-%   RTS smoother.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   P_store
-%   z_inverse
-%   A
-%   Q
-%   number_of_frames
+%   [P_s_store, m_s_store, G_store] = RTS_smoother(P_store, z_inverse, A, Q, number_of_frames)
 %
-% Outputs:
-%   P_s_store
-%   m_s_store
-%   G_store
+%   zef_KF when zef.kf_smoothing == 2 (dropdown RTS). Walks frames backward
+%   with A (usually I) and Q. zef_KF then replaces z_inverse with m_s_store.
 %
-% Calls (project):
-%   zef_waitbar
+%   Inputs
+%     P_store           - cell of filtered P (from kalman_filter when smoothing==2)
+%     z_inverse         - cell of filtered means
+%     A                 - transition
+%     Q                 - process noise
+%     number_of_frames  - length of the cells
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[P_s_store, m_s_store, G_store]] = RTS_smoother(P_store, z_inverse, A, Q, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Outputs
+%     P_s_store  - smoothed covariances
+%     m_s_store  - smoothed means (used as reconstruction)
+%     G_store    - RTS gains
+%
+%   See also zef_KF, Block_RTS_smoother, kalman_filter.
+%
 
 P_s_store = cell(0);
 m_s_store = cell(0);

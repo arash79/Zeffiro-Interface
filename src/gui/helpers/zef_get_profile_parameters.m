@@ -1,33 +1,21 @@
 function [name_cell, variable_cell] = zef_get_profile_parameters(zef,varargin)
-% --- Zeffiro documentation header ---
-% zef_get_profile_parameters — Zef get profile parameters.
+%ZEF_GET_PROFILE_PARAMETERS  On scalar Segmentation/Free-form parameter names.
 %
-% Purpose:
-%   Zef get profile parameters.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   varargin
+%   From zef.parameter_profile rows where column 8 is Segmentation or
+%   Free-form, column 6 is On, and column 3 is Scalar. name_cell is column 1
+%   (display name); variable_cell is 'zef.' plus column 2 (field name).
 %
-% Outputs:
-%   name_cell
-%   variable_cell
+%   Mesh visualization **Parameter:** list calls this with one output
+%   (names). zef_plot_volume / zef_print_meshes / zef_plot_graph pass
+%   parameter_index to get the matching zef.* field for the selected row.
 %
-% Zef fields (observed):
-%   zef.parameter_profile (read)
-%
-% Calls (project):
-%   zef_get_profile_parameters
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[name_cell, variable_cell]] = zef_get_profile_parameters(zef, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   [name_cell, variable_cell] = zef_get_profile_parameters(zef)
+%   [name, variable] = zef_get_profile_parameters(zef, parameter_index)
 
 parameter_index = [];
 

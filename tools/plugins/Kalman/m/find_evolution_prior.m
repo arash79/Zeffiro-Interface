@@ -1,26 +1,19 @@
 function [q] = find_evolution_prior(L, theta0, number_of_frames, evolution_prior_db, prior_over_measurement_db, snr)
-% --- Zeffiro documentation header ---
-% find_evolution_prior — Find evolution prior.
+%FIND_EVOLUTION_PRIOR  Scalar process-noise scale q from inv_evolution_prior (dB).
 %
-% Purpose:
-%   Find evolution prior.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   L
-%   theta0
-%   number_of_frames
-%   evolution_prior_db
-%   prior_over_measurement_db
-%   snr
+%   q = find_evolution_prior(L, theta0, number_of_frames, evolution_prior_db, prior_over_measurement_db, snr)
 %
-% Outputs:
-%   q
+%   Called from zef_KF when q_value is omitted:
+%   q = (1/n_frames)*10^(2*evolution_prior_db/20)*theta0.
+%   L, snr, and prior_over_measurement_db are unused in the formula.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[q] = find_evolution_prior(L, theta0, number_of_frames, evolution_prior_db, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_KF.
+%
 
 q = (1./number_of_frames)*10^(2*(evolution_prior_db)/20) * theta0;
 

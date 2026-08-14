@@ -1,29 +1,28 @@
 function [tree] = zef_dataBank_saveTreeNodes(tree, folder)
-% --- Zeffiro documentation header ---
-% zef_dataBank_saveTreeNodes — Zef data Bank save Tree Nodes.
+%ZEF_DATABANK_SAVETREENODES  Write each node payload as folder/hash.mat.
 %
-% Purpose:
-%   Zef data Bank save Tree Nodes.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tree
-%   folder
+%   Used when savetodiskSwitch turns On. For every field, save(...,
+%   '-struct', 'nodeData') then replace .data with matfile(folder+hash).
+%   Subsequent Add/import with save2disk On writes the same way.
 %
-% Outputs:
-%   tree
+%   tree = zef_dataBank_saveTreeNodes(tree, folder)
 %
-% Calls (project):
-%   zef_dataBank_saveTreeNodes
+%   Inputs
+%     tree    - zef.dataBank.tree (payloads currently in-memory structs).
+%     folder  - zef.dataBank.folder, including trailing filesep.
 %
-% Side effects:
-%   - filesystem I/O
+%   Output
+%     tree  - same nodes; .data is a matfile handle per hash.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[tree] = zef_dataBank_saveTreeNodes(tree, folder)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_dataBank_loadTreeNodes, zef_dataBank_saveTreeNodeSwitchChange.
 
+%changes the data in the nodes of the tree from
+% struct to matFileObject by saving to folder
 dbFieldNames=fieldnames(tree);
 
 for i=1:length(dbFieldNames)

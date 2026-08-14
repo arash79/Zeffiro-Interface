@@ -1,37 +1,20 @@
 function zef_nse_plot_roi(h_axes,zef,nse_field)
-% --- Zeffiro documentation header ---
-% zef_nse_plot_roi — Zef nse plot roi.
+%ZEF_NSE_PLOT_ROI  Plot ROI button: translucent sphere at roi_* plus optional mean-velocity arrow.
 %
-% Purpose:
-%   Zef nse plot roi.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   h_axes
-%   zef
-%   nse_field
+%   ButtonPushedFcn of h_plot_roi (no args → gca / zef). Arrow if
+%   bv_vessels_1 is non-empty and reconstruction_type is an artery type.
+%   Tag additional: nse_sphere (note the space vs plot_sphere).
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_nse_plot_roi()
+%   zef_nse_plot_roi(h_axes, zef, nse_field)
 %
-% Zef fields (observed):
-%   zef.nse_field (read)
+%   See also zef_nse_apply_roi, zef_nse_mean_velocity_roi.
 %
-% Calls (project):
-%   zef_nse_mean_velocity_roi
-%   zef_nse_plot_roi
-%   zef_plot_3D_arrow
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_nse_plot_roi(h_axes, zef, nse_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     h_axes = evalin('base','gca');
@@ -39,7 +22,7 @@ if nargin == 0
     nse_field = zef.nse_field;
 end
 
-axes(h_axes); 
+axes(h_axes);
 hold_val = ishold(h_axes);
 if not(hold_val)
     hold(h_axes,'on');

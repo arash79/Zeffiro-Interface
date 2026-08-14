@@ -1,39 +1,14 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'exp_multires_dec')); — If not(isfield(zef,'exp multires dec'));.
+%ZEF_INIT_EXP_EM_MULTIRES  Default exp_em_* plus exp_multires_* on EM-multires widgets.
 %
-% Purpose:
-%   If not(isfield(zef,'exp multires dec'));.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.exp_em_multires_beta (read, write)
-%   zef.exp_em_multires_hyper_type (read, write)
-%   zef.exp_em_multires_q (read, write)
-%   zef.exp_em_multires_theta0 (read, write)
-%   zef.exp_multires_count (read, write)
-%   zef.exp_multires_dec (read, write)
-%   zef.exp_multires_ind (read, write)
-%   zef.exp_multires_n_decompositions (read, write)
-%   zef.exp_multires_n_iter (read, write)
-%   zef.exp_multires_n_levels (read, write)
-%   zef.exp_multires_sparsity (read, write)
-%   zef.h_exp_em_map_estimation_multires (read)
-%   zef.h_exp_em_multires_beta (read)
-%   zef.h_exp_em_multires_data_segment (read)
-%   zef.h_exp_em_multires_high_cut_frequency (read)
-%   … (28 more)
+%   Script. Also initializes empty exp_multires_dec. Does not invert
+%   (exp_em_iteration_multires / exp_make_multires_dec).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'exp_multires_dec'));` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_exp_em_multires, exp_make_multires_dec.
 
 if not(isfield(zef,'exp_multires_dec'));
     zef.exp_multires_dec = [];
@@ -117,7 +92,7 @@ else
 end
 clear zef_childs
 
-set(zef.h_exp_em_multires_q ,'value',zef.exp_em_multires_q);
+set(zef.h_exp_em_multires_q ,'value',zef.exp_em_multires_q)
 set(zef.h_exp_em_multires_hyper_type ,'value',zef.exp_em_multires_hyper_type);
 set(zef.h_exp_em_multires_n_levels ,'string',num2str(zef.exp_multires_n_levels));
 set(zef.h_exp_em_multires_n_decompositions ,'string',num2str(zef.exp_multires_n_decompositions));

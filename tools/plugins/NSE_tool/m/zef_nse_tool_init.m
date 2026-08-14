@@ -1,36 +1,27 @@
 function zef = zef_nse_tool_init(zef)
-% --- Zeffiro documentation header ---
-% zef_nse_tool_init — Zef nse tool init.
+%ZEF_NSE_TOOL_INIT  Default zef.nse_field (domains, pulse waves, solver_type, graph_type).
 %
-% Purpose:
-%   Zef nse tool init.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Called from the window constructor. isfield-guards only; does not copy
+%   widgets. Pulse amplitude default 50 (mmHg on the tool); mu 3e-3 Pa s;
+%   solver_type 1 (steady Poisson). Copies inv_time_* if present on zef.
 %
-% Outputs:
-%   zef
+%   zef = zef_nse_tool_init(zef)
 %
-% Zef fields (observed):
-%   zef.nse_field (read, write)
+%   See also zef_nse_tool_window, zef_nse_tool_update.
 %
-% Calls (project):
-%   zef_nse_tool_init
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_nse_tool_init(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if not(isfield(zef,'nse_field'))
     zef.nse_field = struct;
 end
 
+% Time window copied from inverse settings when those fields exist on zef
+% (the tool also has its own nse_field.inv_time_* later). Missing
+% zef.inv_time_* still writes nse_field.inv_time_* = 0 here.
 if not(isfield(zef,'inv_time_1'))
     zef.nse_field.inv_time_1 = 0;
 end
@@ -104,6 +95,9 @@ if not(isfield(zef.nse_field,'pulse_amplitude'))
     zef.nse_field.pulse_amplitude = 50;
 end
 
+% Spherical inlet / ROI (mm on the tool). dir_v_* is the inlet velocity
+% direction used with the pulse waveform below.
+
 
 if not(isfield(zef.nse_field,'sphere_radius'))
     zef.nse_field.sphere_radius = 30;
@@ -155,6 +149,9 @@ if not(isfield(zef.nse_field,'cycle_length'))
     zef.nse_field.cycle_length = 1;
 end
 
+% Cardiac-cycle P/T/D pressure components (seconds into the cycle, weights
+% relative to pulse_amplitude). Used when assembling the inlet waveform.
+
 if not(isfield(zef.nse_field,'p_wave_start'))
     zef.nse_field.p_wave_start = 0.05;
 end
@@ -194,6 +191,10 @@ end
 if not(isfield(zef.nse_field,'arteriole_diameter'))
     zef.nse_field.arteriole_diameter = 1e-5;
 end
+
+% Domain lists: empty cells until the user picks compartments. A later
+% pair of isfield guards in this same file would set them to 1, but those
+% never run once these fields exist (as written).
 
 if not(isfield(zef.nse_field,'artery_domain_ind'))
     zef.nse_field.artery_domain_ind = cell(0);
@@ -287,6 +288,8 @@ if not(isfield(zef.nse_field,'reconstruction_type'))
     zef.nse_field.reconstruction_type = 1;
 end
 
+% solver_type 1 = steady Poisson (default). Other integers select the
+% time-dependent NSE variants in zef_nse_iteration (see NSE_tool README).
 if not(isfield(zef.nse_field,'solver_type'))
     zef.nse_field.solver_type = 1;
 end

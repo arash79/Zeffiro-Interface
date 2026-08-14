@@ -1,35 +1,24 @@
 function [aux_compartment_ind, aux_brain_ind, property_compartment, property_brain] = zef_get_active_compartments(zef,varargin)
-% --- Zeffiro documentation header ---
-% zef_get_active_compartments — Zef get active compartments.
+%ZEF_GET_ACTIVE_COMPARTMENTS  Indices of On compartments and source tissues.
 %
-% Purpose:
-%   Zef get active compartments.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   varargin
+%   Walks zef.compartment_tags. A compartment is active if <tag>_on is true.
+%   It is a "brain"/source compartment if <tag>_sources is 1 or 2 (not 0
+%   inactive, not 3 PML-style). Optional property_name (e.g. 'name') returns
+%   that field for each active / source compartment.
 %
-% Outputs:
-%   aux_compartment_ind
-%   aux_brain_ind
-%   property_compartment
-%   property_brain
+%   Callers: zef_find_relative_resolution; zef_open_forward_and_inverse_options
+%   (names for the options dialog).
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
+%   [comp_ind, brain_ind] = zef_get_active_compartments(zef)
+%   [comp_ind, brain_ind, prop_comp, prop_brain] = ...
+%       zef_get_active_compartments(zef, property_name)
 %
-% Calls (project):
-%   zef_get_active_compartments
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[aux_compartment_ind, aux_brain_ind, property_compartment]] = zef_get_active_compartments(zef, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Outputs are indices into compartment_tags (find of the filled slots).
 
 property_name = cell(0);
 property_compartment = cell(0);

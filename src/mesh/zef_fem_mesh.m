@@ -1,46 +1,41 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [nodes, nodes_b, tetra, johtavuus_ind, surface_triangles,name_tags] = zef_fem_mesh(void)
-% --- Zeffiro documentation header ---
-% zef_fem_mesh — Zef fem mesh.
+%ZEF_FEM_MESH  Legacy 6-tet lattice builder (not on the current Mesh-tool path).
 %
-% Purpose:
-%   Zef fem mesh.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   void
+%   Reads zef from the *base* workspace (the dummy argument void is ignored
+%   and immediately set to []). Fills the bounding box of the last reuna_p
+%   surface with a uniform meshgrid at zef.mesh_resolution, splits every
+%   cube into six tetrahedra (one stencil, no parity flip), labels nodes
+%   with zef_tetra_in_compartment, keeps tets whose eight cube corners all
+%   sit inside some compartment, and resolves overlapping labels by
+%   minimum compartment priority.
 %
-% Outputs:
-%   nodes
-%   nodes_b
-%   tetra
-%   johtavuus_ind
-%   surface_triangles
-%   name_tags
+%   The live pipeline is zef_create_fem_mesh (5- or 6-tet mode, PML,
+%   solid-angle labeling). This function is still in the tree but has no
+%   first-party callers.
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.mesh_labeling_approach (read)
-%   zef.mesh_resolution (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.sensors (read)
+%   [nodes, nodes_b, tetra, johtavuus_ind, surface_triangles, name_tags] = zef_fem_mesh()
 %
-% Calls (project):
-%   zef_fem_mesh
-%   zef_tetra_in_compartment
-%   zef_waitbar
+%   Inputs (from base zef, not function arguments)
+%     mesh_resolution, reuna_p, reuna_t, sensors, compartment_tags, and
+%     per-tag _on / _sigma / _priority / _submesh_ind / _name.
+%     zef.mesh_labeling_approach == 2 uses the 4-node tet corners for the
+%     label vote instead of the 8 cube corners.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Outputs
+%     nodes              - V×3 lattice vertices that remain after dropping
+%                          exterior tets, same frame/unit as reuna_p.
+%     nodes_b            - copy of nodes (legacy alias).
+%     tetra              - T×4 1-based indices, 6 tets per kept cube.
+%     johtavuus_ind      - T×1 winning compartment index (priority min).
+%     surface_triangles  - boundary faces of the tet mesh, winding [1 3 2].
+%     name_tags          - 1×C cell of active compartment names.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[nodes, nodes_b, tetra]] = zef_fem_mesh(void)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_create_fem_mesh, zef_hexa_to_tetra, zef_tetra_in_compartment.
 
 void = [];
 
@@ -111,6 +106,7 @@ x_lim = [min(reuna_p{end}(:,1)) max(reuna_p{end}(:,1))];
 y_lim = [min(reuna_p{end}(:,2)) max(reuna_p{end}(:,2))];
 z_lim = [min(reuna_p{end}(:,3)) max(reuna_p{end}(:,3))];
 
+% Uniform Cartesian lattice from the last (typically outermost) surface only.
 x_vec = [x_lim(1):mesh_res:x_lim(2)];
 y_vec = [y_lim(1):mesh_res:y_lim(2)];
 z_vec = [z_lim(1):mesh_res:z_lim(2)];
@@ -121,6 +117,7 @@ size_xyz = size(X);
 
 n_cubes = (length(x_vec)-1)*(length(y_vec)-1)*(length(z_vec)-1);
 
+% Six tets per cube (same local stencil as zef_hexa_to_tetra).
 ind_mat_1 = [     3     4     1     7 ;
     2     3     1     7 ;
     1     2     7     6 ;
@@ -186,6 +183,7 @@ for i = 1 : length(reuna_p)
     end
 end
 
+% Keep cubes whose eight corners all have a nonzero compartment label.
 I_1 = find(sum(sign(I(johtavuus_ind)),2)==8);
 tetra = tetra(I_1,:);
 johtavuus_ind = johtavuus_ind(I_1,:);

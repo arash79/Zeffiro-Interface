@@ -1,54 +1,19 @@
-# +utilities/+fs2zef/+generators
+# `+generators` — write `import_segmentation.zef`
 
-## Purpose of this folder
-
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
-
-## Contents
-
-MATLAB sources:
-- `generate_zef_import.m` — **utilities.fs2zef.generators.generate_zef_import**: Generate zef import.
-- `save_color_tables.m` — **utilities.fs2zef.generators.save_color_tables**: Save color tables.
-- `save_dats.m` — **utilities.fs2zef.generators.save_dats**: Save dats.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+After `makeParcellation.sh` has created ASCII/STL surfaces, this folder writes the CSV manifest Zeffiro’s **Import → Import data to a new project** understands. It does not call FreeSurfer and does not mesh. `utilities.fs2zef.run` is what a user calls; this package is the last stage of that pipeline.
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+% Typical call from run (you rarely invoke this yourself):
+utilities.fs2zef.generators.generate_zef_import(output_dir, ...
+    "include_electrodes", true, ...
+    "include_box", true, ...
+    "compute_transforms", true, ...
+    "reference_volume", "orig.mgz", ...
+    "merge_left_right", true);
 ```
 
-Representative entry points in this folder:
-- ``[zef_file] = utilities.fs2zef.generators.generate_zef_import(output_dir, options)` with project root and `src` on the path.`
-- ``utilities.fs2zef.generators.save_color_tables(in_dir, out_dir)` with project root and `src` on the path.`
-- ``utilities.fs2zef.generators.save_dats(out_dir)` with project root and `src` on the path.`
+`generate_zef_import(output_dir, ...)` scans `*.asc` / `*.stl` (skips FreeSurfer **label** `.asc` files), looks up color/sigma/activity from `+config/compartment_mappings` and the LUT, optional CRAS `affine_transform` from `+transforms`, and writes `import_segmentation.zef` (or `options.output_file`).
 
-## Examples
+Name-values used by `run`: `include_electrodes`, `include_box`, `compute_transforms`, `reference_volume`, `segmentation_volume`, `path_prefix`, `merge_left_right`.
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+`save_dats` / `save_color_tables` write atlas extras (`*.dat` / colortables) when a study needs parcellation points — not invoked by `run`. Parent: [`../README.md`](../README.md). Manifest `type=` rows: [`../../../src/io/README.md`](../../../src/io/README.md).

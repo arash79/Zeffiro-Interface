@@ -1,26 +1,22 @@
 function y = zef_nse_signal_pulse(t,nse_field)
-% --- Zeffiro documentation header ---
-% zef_nse_signal_pulse — Zef nse signal pulse.
-%
-% Purpose:
-%   Zef nse signal pulse.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
-%
-% Inputs:
-%   t
-%   nse_field
-%
-% Outputs:
-%   y
-%
-% Calls (project):
-%   zef_nse_signal_pulse
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[y] = zef_nse_signal_pulse(t, nse_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%ZEF_NSE_SIGNAL_PULSE  Blackman–Harris P/T/D pulse waveform at times t (Pa).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Sums three windowed harmonics (p_wave_*, t_wave_*, d_wave_* weight/length/start
+%   on nse_field, plus cycle_length). Normalizes to max-abs 1, then scales by
+%   pulse_amplitude * 101325/760 (mmHg → Pa). Some callers pass a third
+%   argument (legacy 256); this function only accepts (t, nse_field).
+%
+%   y = zef_nse_signal_pulse(t, nse_field)
+%
+%   See also zef_nse_plot_pulse, zef_nse_poisson.
 
 hgmm_conversion = 101325/760;
 

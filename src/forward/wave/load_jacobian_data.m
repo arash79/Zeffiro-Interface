@@ -1,31 +1,19 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 
 function [u_data_mat, f_data_mat] = load_jacobian_data(path_data, data_name, torre_dir)
-% --- Zeffiro documentation header ---
-% load_jacobian_data — Load jacobian data.
+%LOAD_JACOBIAN_DATA  Load Born u/f matrices from torre_dir/<data_name>/point_*.mat.
 %
-% Purpose:
-%   Load jacobian data.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Inputs:
-%   path_data
-%   data_name
-%   torre_dir
+%   path_data is a 2-vector of point indices (u from first, f from second).
 %
-% Outputs:
-%   u_data_mat
-%   f_data_mat
+%   [u_data_mat, f_data_mat] = load_jacobian_data(path_data, data_name, torre_dir)
 %
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[u_data_mat, f_data_mat]] = load_jacobian_data(path_data, data_name, torre_dir)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also save_jacobian_data, load_jacobian_data_complex.
+
+
 
 
 load([torre_dir '/' data_name '/point_' int2str(path_data(1)) '_data.mat'], 'u_data_mat');

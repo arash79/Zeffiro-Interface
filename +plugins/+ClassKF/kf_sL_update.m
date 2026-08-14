@@ -1,31 +1,19 @@
 function [m, P, K, D] = kf_sL_update(m, P, y, H, R)
-% --- Zeffiro documentation header ---
-% plugins.ClassKF.kf_sL_update — Kf s L update.
+%KF_SL_UPDATE  Kalman update plus sLORETA standardization matrix D.
 %
-% Purpose:
-%   Kf s L update.
-%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   m
-%   P
-%   y
-%   H
-%   R
+%   [m, P, K, D] = kf_sL_update(m, P, y, H, R)
 %
-% Outputs:
-%   m
-%   P
-%   K
-%   D
+%   Builds D = w .* inv(sqrtm(P)) with w_i = 1/sqrt(diag(G' B)) from
+%   B = H sqrtm(P) and G = B' / (B B' + R), then the same K/m/P update as
+%   kf_update. KalmanInverter.invert returns z = D*x. Local flag method='1'
+%   selects dense sqrtm; '2' (truncated SVD) is unused unless that string changes.
 %
-% Calls (project):
-%   plugins.ClassKF.kf_sL_update
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[m, P, K]] = plugins.ClassKF.kf_sL_update(m, P, y, H, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also plugins.ClassKF.kf_sL_update_approx, plugins.ClassKF.kf_update.
 
 method = '1';  % 1: sqrtm; 2: SVD-based (for singular/near-singular P)
 if method == '1'

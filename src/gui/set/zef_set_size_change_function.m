@@ -1,37 +1,18 @@
 function zef_set_size_change_function(h_window,type,scale_positions,exclude_cell)
-% --- Zeffiro documentation header ---
-% zef_set_size_change_function — Zef set size change function.
+%ZEF_SET_SIZE_CHANGE_FUNCTION  Install SizeChangedFcn on a tool window at creation.
 %
-% Purpose:
-%   Zef set size change function.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   h_window
-%   type
-%   scale_positions
-%   exclude_cell
+%   Function. Turns AutoResizeChildren off, stores CurrentSize /
+%   ScalePositions / ExcludeCell / RelativeSize in UserData (type 2
+%   also captures zef_get_relative_size), and sets SizeChangedFcn to
+%   @(src,evt) zef_window_manager('on_size_changed', src) so R2025a+
+%   arrange/tile can invoke it without gcbo.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.h_aux (read, write)
-%
-% Calls (project):
-%   zef_change_size_function
-%   zef_get_relative_size
-%   zef_set_size_change_function
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_set_size_change_function(h_window, type, scale_positions, exclude_cell)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_window_manager, zef_change_size_function.
 if nargin < 2
     type = 2;
 end
@@ -53,18 +34,30 @@ if isprop(h_window,'AutoResizeChildren')
 end
 warning off;
 
-if type == 1
-    h_window.UserData = struct;
-    h_window.UserData.CurrentSize = get(h_window,'Position');
-    set(h_window,'SizeChangedFcn',['zef.h_aux = get(gcbo,''UserData''); zef.h_aux.CurrentSize = zef_change_size_function(gcbo,getfield(get(gcbo,''UserData''),''CurrentSize''),[],' exclude_cell ',' num2str(scale_positions) ');set(gcbo,''UserData'',zef.h_aux);']);
+exclude_eval = {};
+if ischar(exclude_cell) || isstring(exclude_cell)
+    try
+        exclude_eval = eval(char(exclude_cell));
+    catch
+        exclude_eval = {};
+    end
+elseif iscell(exclude_cell)
+    exclude_eval = exclude_cell;
 end
 
+ud = struct;
+ud.CurrentSize = get(h_window,'Position');
+ud.ScalePositions = scale_positions;
+ud.ExcludeCell = exclude_eval;
 if type == 2
-    h_window.UserData = struct;
-    h_window.UserData.CurrentSize = get(h_window,'Position');
-    h_window.UserData.RelativeSize = zef_get_relative_size(h_window);
-    set(h_window,'SizeChangedFcn',['zef.h_aux = get(gcbo,''UserData''); zef.h_aux.CurrentSize = zef_change_size_function(gcbo,getfield(get(gcbo,''UserData''),''CurrentSize''),getfield(get(gcbo,''UserData''),''RelativeSize''),' exclude_cell ',' num2str(scale_positions) ');set(gcbo,''UserData'',zef.h_aux);']);
+    ud.RelativeSize = zef_get_relative_size(h_window);
+else
+    ud.RelativeSize = [];
 end
+h_window.UserData = ud;
+% Function handle (not a gcbo character callback): R2025a+ SizeChangedFcn
+% can be a handle, and arrange/tile must be able to invoke it without gcbo.
+set(h_window,'SizeChangedFcn', @(src, evt) zef_window_manager('on_size_changed', src));
 
 warning on;
 

@@ -1,35 +1,19 @@
-%Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% function zef_plot_GMM_amplitudes — Function zef plot GMM amplitudes.
+function zef_plot_GMM_amplitudes
+%ZEF_PLOT_GMM_AMPLITUDES  Bar plot of zef.GMM.amplitudes on h_axes1.
 %
-% Purpose:
-%   Function zef plot GMM amplitudes.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.h_axes1 (read)
-%   zef.h_zeffiro (read)
-%   zef.inv_sampling_frequency (read)
-%   zef.inv_time_1 (read)
-%   zef.inv_time_2 (read)
-%   zef.inv_time_3 (read)
-%
-% Calls (project):
 %   zef_plot_GMM_amplitudes
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   PlotAmpButton after a GMM fit. Errors if zef.GMM.amplitudes is missing
+%   ('Please recalculate Gaussian mixature model.'). Cell amplitudes loop
+%   frames; reads GMM.parameters (component order, ellipsoid count) and
+%   optional GMM.time_variables. cla/hold on h_axes1; does not refit.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_plot_GMM_amplitudes` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-%Plot estimated amplitudes as a bar plot
-function zef_plot_GMM_amplitudes
+%   See also zef_PlotGMModel, zef_GMModeling_K.
 
 if ~evalin('base','isfield(zef.GMM,''amplitudes'')')
     error('Amplitudes are not saved to zef.GMM structure. Please recalculate Gaussian mixature model.');
@@ -126,8 +110,7 @@ end
 
 %Figure visualization setups
 zef_temp_axis = evalin('base','zef.h_axes1');
-axes(zef_temp_axis);
-cla(zef_temp_axis);
+axes(zef_temp_axis)
 hold(zef_temp_axis,'off');
 if ~isempty(findobj(zef_temp_axis.Parent.Children,'Tag','image_details'))
     TimeVars = evalin('base','zef.GMM.time_variables');

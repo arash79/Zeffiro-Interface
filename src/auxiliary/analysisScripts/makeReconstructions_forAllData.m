@@ -1,29 +1,14 @@
-% --- Zeffiro documentation header ---
-% allHashes=fieldnames(zef.dataBank — All Hashes=fieldnames(zef.data Bank.
+%MAKERECONSTRUCTIONS_FORALLDATA  Same inverses for every node_1* type 'data'.
 %
-% Purpose:
-%   All Hashes=fieldnames(zef.data Bank.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.beamformer (read)
-%   zef.bf_var_loc (read)
-%   zef.dataBank (read)
-%   zef.reconstruction (read)
-%   zef.reconstruction_information (read)
+%   Script. fieldnames starting with 'node_1'; zef_dataBank_setData then
+%   MNE, RAMUS, CSM, dipole scan, beamformer; zef_dataBank_add as
+%   reconstruction children. Needs a live dataBank tree.
 %
-% Calls (project):
-%   zef_dataBank_add
-%   zef_dataBank_getData
-%   zef_ramus_iteration
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `allHashes=fieldnames(zef.dataBank` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 allHashes=fieldnames(zef.dataBank.tree);
 

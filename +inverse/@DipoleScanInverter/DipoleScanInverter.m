@@ -1,24 +1,18 @@
 classdef DipoleScanInverter < inverse.CommonInverseParameters & handle
-% --- Zeffiro documentation header ---
-% inverse.DipoleScanInverter.DipoleScanInverter — Inverse solver class implementing DipoleScan reconstruction.
+%DipoleScanInverter  Dipole scan with goodness-of-fit (GoF) metric per source.
 %
-% Purpose:
-%   Inverse solver class implementing DipoleScan reconstruction.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   args
+%   For each source, fits a dipole (SVD or pseudoinverse) to whitened data and
+%   stores GoF = 1 - ||f - L s||^2/||f||^2 in the orientation components. Free
+%   sources also encode estimated direction. precompute caches per-source SVDs for
+%   batched pagemtimes in invert.
 %
-% Calls (project):
-%   inverse.CommonInverseParameters
+%   See also inverse.BeamformerInverter.
 %
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `inverse.DipoleScanInverter.DipoleScanInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
 
     properties
 
@@ -71,12 +65,11 @@ classdef DipoleScanInverter < inverse.CommonInverseParameters & handle
     methods
 
         function self = DipoleScanInverter(args)
-
+            %DipoleScanInverter  Construct a dipole-scan GoF inverter.
             %
-            % DipoleScanInverter
-            %
-            % The constructor for this class.
-            %
+            %   Name-value: method_type ("SVD"|"Pseudoinverse"), reg_type
+            %   ("None"|"Basic"), reg_parameter, noise_cov, plus
+            %   CommonInverseParameters band/frame fields.
 
             arguments
 
@@ -134,11 +127,11 @@ classdef DipoleScanInverter < inverse.CommonInverseParameters & handle
         % Declare the inverse method defined in the file invert, in this same
         % folder.
 
-        self = initialize(self)
+        self = initialize(self, L, f_data)
 
         self = precompute(self, L)
 
-        [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode)
+        [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
 
     end % methods
 

@@ -1,38 +1,3 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% function [L_eit, bg_data, dof_positions, dof_directions, dof_ind, dof_count] = lead_field_eit_fem( ... — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Zef fields (observed):
-%   zef.current_pattern (read)
-%   zef.eit_count (read)
-%   zef.eit_ind (read)
-%   zef.gpu_count (read)
-%   zef.parallel_processes (read)
-%   zef.processes_per_core (read)
-%   zef.redo_eit_dec (read)
-%   zef.source_positions (read)
-%   zef.use_gpu (read)
-%
-% Calls (project):
-%   zef_decompose_dof_space
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - filesystem I/O
-%   - parallel/cluster
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [L_eit, bg_data, dof_positions, dof_directions, dof_ind, dof_count] = lead_field_eit_fem( ...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [L_eit, bg_data, dof_positions, dof_directions, dof_ind, dof_count] = lead_field_eit_fem( ...
     zef, ...
     nodes, ...
@@ -42,6 +7,36 @@ function [L_eit, bg_data, dof_positions, dof_directions, dof_ind, dof_count] = l
     p_nearest_neighbour_inds, ...
     varargin ...
     )
+
+%LEAD_FIELD_EIT_FEM  FEM electrical impedance tomography lead field (types 4, 9).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Called as zef_lead_field_eit_fem from zef_lead_field_matrix. Builds CEM/PEM
+%   electrode patterns, conductivity stiffness, transfer/Schur system, and
+%   the EIT Jacobian with respect to tetrahedral conductivity. Also returns
+%   background electrode data and the nearest-source binning from
+%   zef_make_eit_dec / zef_decompose_dof_space (zef.redo_eit_dec).
+%
+%   [L_eit, bg_data, dof_positions, dof_directions, dof_ind, dof_count] = ...
+%       zef_lead_field_eit_fem(zef, nodes, elements, sigma, electrodes, ...
+%       p_nearest_neighbour_inds, brain_ind, source_ind, lf_param)
+%
+%   Input: nodes in metres; sigma isotropic 1-col or anisotropic 6-col as in
+%   EEG FEM. Electrodes PEM [n × 3] or CEM [n × 4]; impedances in lf_param.
+%
+%   Output
+%     L_eit           - EIT lead field / Jacobian (sensors × source DOFs)
+%     bg_data         - stored as zef.inv_bg_data
+%     dof_positions   - [n_dof × 3] metres
+%     dof_directions  - source orientation placeholders
+%     dof_ind, dof_count - tetra→source occupancy (zef.eit_ind, zef.eit_count)
+%
+%   See also zef_lead_field_matrix, zef_make_eit_dec.
+
 
 
 N = size(nodes,1);
@@ -182,6 +177,11 @@ h=zef_waitbar(0,waitbar_length,'System matrices.');
 waitbar_ind = 0;
 
 D_A_count = 0;
+% Assemble conductivity-weighted stiffness A and the unweighted gradient
+% products D_A. D_A(:,1:10) stores the unique (i,j) node-pair integrals of
+% ∇ψ_i·∇ψ_j / (9V) on brain tetrahedra; the Jacobian loop below uses those
+% as the 4×4 local conductivity derivative (no σ). Face-area vectors as in
+% zef_volume_gradient (signed cross products / 2), not true ∇ψ.
 for i = 1 : 4
 
     grad_1 = cross(nodes(tetrahedra(:,ind_m(i,2)),:)'-nodes(tetrahedra(:,ind_m(i,1)),:)', nodes(tetrahedra(:,ind_m(i,3)),:)'-nodes(tetrahedra(:,ind_m(i,1)),:)')/2;
@@ -254,6 +254,9 @@ end
 
 clear A_part grad_1 grad_2 ala sigma_tetrahedra;
 
+% Complete electrode model: triangle areas ala, then B (nodes×electrodes)
+% and C (electrodes×electrodes) from 1/Z. Infinite impedance is rejected
+% for EIT (return with a printed message). Point electrodes skip this block.
 if isequal(electrode_model,'CEM')
 
     I_triangles = find(ele_ind(:,4)>0);
@@ -322,6 +325,10 @@ A_aux = A(perm_vec,perm_vec);
 A = A_aux;
 clear A_aux A_part;
 
+% Permute A (symamd/symmmd/symrcm) then PCG for each electrode column of B.
+% GPU: Jacobi (1./diag(A)). CPU: incomplete Cholesky S1/S2 in blocks.
+% CEM fills L_eit(i,:) with the nodal potential and Aux_mat(:,i) = C(:,i)-B'*x
+% (Schur). Non-converged PCG returns L_eit = [].
 zef_waitbar(0,L-1,h,'PCG iteration.');
 
 if eval('zef.use_gpu')==1 && evalin('base','zef.gpu_count') > 0
@@ -508,6 +515,9 @@ end
 
 clear S r p x aux_vec inv_M_r a b;
 
+% Electrode voltages: invert the Schur block and left-multiply nodal
+% potentials. Aux_mat_6 is the mean-zero projector (I - 11'/L) used both
+% for background data and the Jacobian (reference-free voltages).
 if isequal(electrode_model,'CEM')
     Aux_mat = inv(Aux_mat);
     L_eit = Aux_mat*L_eit;
@@ -528,6 +538,12 @@ else
     [dof_ind, dof_count, dof_positions] = zef_decompose_dof_space(nodes,tetrahedra,brain_ind,source_ind);
 end
 
+% Background electrode data for the injected current patterns, then the
+% EIT Jacobian: for each brain tetra i, form the 4×4 local ∇ψ·∇ψ matrix
+% from D_A, pull nodal potentials on that tet, and accumulate
+%   -R * Φ_tet * G_local * Φ_tet' * Current_pattern
+% into the source bin dof_ind(i). Volume weighting of the bins is commented
+% out (tilavuus_vec_aux). zef.redo_eit_dec==0 reuses zef.eit_ind/eit_count.
 Current_pattern = eval('zef.current_pattern');
 bg_data = Aux_mat*Current_pattern;
 bg_data = Aux_mat_6 * bg_data;

@@ -1,37 +1,28 @@
 function [triangles_out, points_out] = zef_get_sensor_boundary(zef)
-% --- Zeffiro documentation header ---
-% zef_get_sensor_boundary — Zef get sensor boundary.
+%ZEF_GET_SENSOR_BOUNDARY  Concatenate outer surface with listed sensor-boundary compartments.
 %
-% Purpose:
-%   Zef get sensor boundary.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   If zef.<current_sensors>_boundary_cell exists, prepends
+%   zef.reuna_t{end} / reuna_p{end} and then each compartment tag in
+%   that cell (looked up in zef.compartment_tags → reuna index).
+%   Otherwise returns only the last reuna surface. No first-party
+%   callers in this tree.
 %
-% Outputs:
-%   triangles_out
-%   points_out
+%   [triangles_out, points_out] = zef_get_sensor_boundary(zef)
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.current_sensors (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
+%   Input
+%     zef - session with current_sensors, reuna_p, reuna_t, optional
+%           <current_sensors>_boundary_cell (cellstr of compartment tags).
 %
-% Calls (project):
-%   zef_get_sensor_boundary
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[triangles_out, points_out]] = zef_get_sensor_boundary(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
-    points_ind = []; 
+%   Outputs
+%     triangles_out - concatenated triangles (index origin is the first
+%                     block; later blocks add a running point offset).
+%     points_out    - concatenated points.
+points_ind = []; 
     triangles_ind = [];
     compartments_ind = [];
 

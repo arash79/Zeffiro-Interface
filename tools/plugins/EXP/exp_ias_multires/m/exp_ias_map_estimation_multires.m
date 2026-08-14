@@ -1,39 +1,19 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if  ismac — If  ismac.
+%EXP_IAS_MAP_ESTIMATION_MULTIRES  Open GUIDE window: IAS MAP RAMUS for EP (asteroid INI).
 %
-% Purpose:
-%   If  ismac.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_exp_ias_map_estimation_multires (read, write)
-%   zef.h_exp_ias_multires_apply (read)
-%   zef.h_exp_ias_multires_beta (read)
-%   zef.h_exp_ias_multires_cancel (read)
-%   zef.h_exp_ias_multires_data_segment (read)
-%   zef.h_exp_ias_multires_high_cut_frequency (read)
-%   zef.h_exp_ias_multires_low_cut_frequency (read)
-%   zef.h_exp_ias_multires_n_L1_iterations (read)
-%   zef.h_exp_ias_multires_n_iter (read)
-%   zef.h_exp_ias_multires_n_levels (read)
-%   zef.h_exp_ias_multires_number_of_frames (read)
-%   zef.h_exp_ias_multires_q (read)
-%   zef.h_exp_ias_multires_sampling_frequency (read)
-%   zef.h_exp_ias_multires_snr (read)
-%   … (7 more)
+%   Script. Asteroid / _legacy / _nse INI callback (Inverse tools →
+%   EXP IAS RAMUS). Opens exp_ias_map_estimation_multires.fig (title
+%   ZEFFIRO Interface: IAS MAP multiresolution (RAMUS) for EP),
+%   zef_init_exp_ias_multires. Start in the fig runs
+%   exp_ias_iteration_multires([]). Needs zef.L, measurements, and
+%   exp_multires_dec. Not the default-profile Lasso app
+%   (zef_exp_app_launch).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if  ismac` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_exp_ias_multires, exp_ias_iteration_multires.
 
 if  ismac
     zef.h_exp_ias_map_estimation_multires = open('exp_ias_map_estimation_multires.fig');
@@ -42,7 +22,8 @@ elseif ispc
 else
     zef.h_exp_ias_map_estimation_multires = open('exp_ias_map_estimation_multires.fig');
 end
-set(zef.h_exp_ias_map_estimation_multires,'Name','ZEFFIRO Interface: IAS MAP multiresolution (RAMUS) for EP');
+set(zef.h_exp_ias_map_estimation_multires,'Name','ZEFFIRO Interface: IAS MAP multiresolution (RAMUS)
+ for EP');
 set(findobj(zef.h_exp_ias_map_estimation_multires.Children,'-property','FontUnits'),'FontUnits','pixels')
 set(findobj(zef.h_exp_ias_map_estimation_multires.Children,'-property','FontSize'),'FontSize',zef.font_size);
 

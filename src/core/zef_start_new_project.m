@@ -1,20 +1,19 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if zef — If zef.
+%ZEF_START_NEW_PROJECT  Restart Zeffiro and delete all compartments.
 %
-% Purpose:
-%   If zef.
-%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Calls (project):
-%   zef_delete_all_compartments
+%   Script. Calls zeffiro_interface('zeffiro_restart', true), preserving
+%   nodisplay when zef.use_display is false, then
+%   zef_delete_all_compartments. Used by import-to-new-project and
+%   Project → New project from profile / New empty project.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   Workspace
+%     zef  - replaced by the restarted session.
+%
+%   See also zeffiro_interface, zef_delete_all_compartments.
 
 
 if zef.use_display

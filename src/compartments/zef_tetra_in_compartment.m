@@ -1,44 +1,28 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [I] = zef_tetra_in_compartment(reuna_p,reuna_t,nodes,varargin)
-% --- Zeffiro documentation header ---
-% zef_tetra_in_compartment — Zef tetra in compartment.
+%ZEF_TETRA_IN_COMPARTMENT  Test which nodes lie inside a closed surface (tetra meshing).
 %
-% Purpose:
-%   Zef tetra in compartment.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   reuna_p
-%   reuna_t
-%   nodes
-%   varargin
+%   Same solid-angle inclusion test as zef_point_in_compartment but reads
+%   meshing settings from the base zef workspace and returns only node
+%   indices I (no distance vector). Supports optional compartment_info and
+%   meshing_threshold in varargin.
 %
-% Outputs:
-%   I
+%   I = zef_tetra_in_compartment(reuna_p, reuna_t, nodes)
+%   I = zef_tetra_in_compartment(reuna_p, reuna_t, nodes, compartment_info)
+%   I = zef_tetra_in_compartment(reuna_p, reuna_t, nodes, compartment_info, meshing_threshold)
 %
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.gpu_num (read)
-%   zef.meshing_accuracy (read)
-%   zef.meshing_threshold (read)
-%   zef.parallel_vectors (read)
-%   zef.use_gpu (read)
+%   Inputs
+%     reuna_p, reuna_t - surface mesh vertices and triangles.
+%     nodes            - coordinates to classify.
 %
-% Calls (project):
-%   zef_tetra_in_compartment
-%   zef_waitbar
+%   Output
+%     I - indices of nodes classified as inside the surface.
 %
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[I] = zef_tetra_in_compartment(reuna_p, reuna_t, nodes, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_point_in_compartment.
 
 if evalin('base','exist(''zef'')')
     if evalin('base','isfield(zef,''meshing_threshold'')')

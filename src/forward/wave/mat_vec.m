@@ -1,30 +1,20 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 
 function [y] = mat_vec(R,x,gpu_extended_memory)
-% --- Zeffiro documentation header ---
-% mat_vec — Mat vec.
+%MAT_VEC  Sparse y = R*x, with optional gather when gpu_extended_memory ∈ [0 2].
 %
-% Purpose:
-%   Mat vec.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Inputs:
-%   R
-%   x
-%   gpu_extended_memory
+%   Damping/mass product in the leap-frog loop. R is the sparse matrix from
+%   create_system; x is the current field.
 %
-% Outputs:
-%   y
+%   y = mat_vec(R, x, gpu_extended_memory)
 %
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[y] = mat_vec(R, x, gpu_extended_memory)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also compute_data_gpu, pcg_iteration_gpu.
+
+
 
 
 R = gpuArray(R);

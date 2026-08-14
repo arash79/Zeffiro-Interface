@@ -1,33 +1,17 @@
 function [alpha_psi, epsilon_psi] = zef_ES_centralize_recursive_search(alpha, epsilon, sr, sc, original_window, s_alpha, s_epsilon, varargin)
-% --- Zeffiro documentation header ---
-% examples.studies.tES_hyperparameter_optimization.helpers.zef_ES_centralize_recursive_search — Example or study script demonstrating zef_ES_centralize_recursive_search.
+%ZEF_ES_CENTRALIZE_RECURSIVE_SEARCH  Shrink alpha/epsilon window about (sr, sc).
 %
-% Purpose:
-%   Example or study script demonstrating zef_ES_centralize_recursive_search.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   alpha
-%   epsilon
-%   sr
-%   sc
-%   original_window
-%   s_alpha
-%   s_epsilon
-%   varargin
+%   [alpha_psi, epsilon_psi] = zef_ES_centralize_recursive_search(alpha, ...
+%       epsilon, sr, sc, original_window, s_alpha, s_epsilon, non_floating)
 %
-% Outputs:
-%   alpha_psi
-%   epsilon_psi
+%   8th arg 0: allow the window outside original min/max; default clamps.
+%   Calls zef_ES_find_parameters for the new lattice.
 %
-% Calls (project):
-%   zef_ES_centralize_recursive_search
-%   zef_ES_find_parameters
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[alpha_psi, epsilon_psi]] = examples.studies.tES_hyperparameter_optimization.helpers.zef_ES_centralize_recursive_search(alpha, epsilon, sr, sc, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
     if nargin >= 8 && ~isempty(varargin) && ismember(varargin{1}, [0 1])
         non_floating_flag = varargin{1};

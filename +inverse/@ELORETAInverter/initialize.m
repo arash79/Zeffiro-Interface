@@ -1,29 +1,19 @@
 function self = initialize(self, L, f_data)
-% --- Zeffiro documentation header ---
-% inverse.ELORETAInverter.initialize — Estimates priors, noise covariance, or regularization from multi-frame data.
+%initialize  Estimate eLORETA noise covariance and regularization from data.
 %
-% Purpose:
-%   Estimates priors, noise covariance, or regularization from multi-frame data.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   L
-%   f_data
+%   Called once from utilities.inverse.run_frame_loop before precompute /
+%   invert. There is no default-profile Inverse-tools button for this class.
+%   If noise_cov is empty, uses sample covariance of f_data when multiple frames
+%   exist, otherwise SNR-scaled identity. If regularization_parameter (alpha) is
+%   empty, sets alpha = trace(L*L') / (n_sensors * 10^(SNR/10)).
 %
-% Outputs:
-%   self
-%
-% Calls (project):
-%   inverse.initialize
-%
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[self] = inverse.ELORETAInverter.initialize(self, L, f_data)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Inputs:  self — ELORETAInverter; L — lead field; f_data — m×T measurements.
+%   Output:  self with noise_cov and regularization_parameter filled when empty.
 
 arguments
     self (1,1) inverse.ELORETAInverter
@@ -44,6 +34,7 @@ if isempty(self.noise_cov)
 end
 
 if isempty(self.regularization_parameter)
+    % α = tr(L L') / (n_sensors * 10^(SNR/10))  when the user did not pin alpha
     self.regularization_parameter = ...
         trace(L*L') / (size(L,1) * 10^(self.signal_to_noise_ratio/10));
 end

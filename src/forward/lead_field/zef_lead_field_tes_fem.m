@@ -1,37 +1,6 @@
-% %%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% function [L_tes, S_tes, dof_positions, dof_directions, dof_ind, dof_count] = lead_field_tes_fem( ... — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Zef fields (observed):
-%   zef.dof_count (read)
-%   zef.dof_ind (read)
-%   zef.n_sources (read)
-%   zef.redo_eit_dec (read)
-%   zef.source_model (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   zef_build_electrodes
-%   zef_decompose_dof_space
-%   zef_stiffness_matrix
-%   zef_tetra_gradient_field
-%   zef_tetra_volume
-%   zef_transfer_matrix
-%   zef_waitbar
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [L_tes, S_tes, dof_positions, dof_directions, dof_ind, dof_count] = lead_field_tes_fem( ...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [L_tes, S_tes, dof_positions, dof_directions, dof_ind, dof_count] = lead_field_tes_fem( ...
+
+
     zef, ...
     nodes, ...
     elements, ...
@@ -40,6 +9,37 @@ function [L_tes, S_tes, dof_positions, dof_directions, dof_ind, dof_count] = lea
     p_nearest_neighbour_inds, ...
     varargin ...
     )
+
+%LEAD_FIELD_TES_FEM  FEM transcranial electrical stimulation lead field (types 5, 10).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Called as zef_lead_field_tes_fem from zef_lead_field_matrix. Stiffness and
+%   electrode transfer as in EEG, then the tetrahedral current-density gradient
+%   zef_tetra_gradient_field maps the transfer potentials to (Jx,Jy,Jz) per
+%   source tetra, averaged into DOF bins from zef_decompose_dof_space.
+%   Stimulation matrix S_tes is the mean-zero electrode map
+%   (I - 11'/L) * C^{-1} * (I + B'*R) after inverting the Schur block Aux_mat.
+%
+%   [L_tes, S_tes, dof_positions, dof_directions, dof_ind, dof_count] = ...
+%       zef_lead_field_tes_fem(zef, nodes, elements, sigma, electrodes, ...
+%       p_nearest_neighbour_inds, brain_ind, source_ind, lf_param)
+%
+%   Input: same geometry/sigma/electrode conventions as zef_lead_field_eeg_fem
+%   (nodes in metres). lf_param.impedances used when electrodes have 4 columns.
+%
+%   Output
+%     L_tes           - [n_electrodes × 3*n_dof] current-density lead field
+%     S_tes           - [n_electrodes × n_electrodes] stimulation / Schur map
+%     dof_positions   - [n_dof × 3] metres
+%     dof_directions  - ones(size(dof_positions)) placeholder
+%     dof_ind, dof_count - tetra→DOF map and occupancy counts
+%
+%   See also zef_lead_field_matrix, zef_tetra_gradient_field, zef_tes_make_all.
+
 
 N = size(nodes,1);
 source_model = eval('zef.source_model');
@@ -272,6 +272,8 @@ Aux_mat = inv(Aux_mat);
 R_tes = R_tes*Aux_mat;
 
 % S_tes
+% S_tes: mean-zero electrode map from inverted Schur block Aux_mat.
+% (I - 11'/L) removes the average potential; C is the electrode Gramian.
 J = eye(size(B'*R_tes));
 S_tes = ( (eye(L)-(1/L)*ones(L,L)) ) * (inv(C) * (J+(B'*R_tes))) * J;
 
@@ -287,6 +289,8 @@ else
     [dof_ind, dof_count, dof_positions] = zef_decompose_dof_space(nodes,tetrahedra,brain_ind,source_ind,zef.n_sources);
 end
 
+% Map transfer potentials through −grad(σ) so each source tetra contributes
+% a current-density triplet; average by dof_count when several tetra share a DOF.
 R_tes_1 = -Grad_1*R_tes;
 R_tes_2 = -Grad_2*R_tes;
 R_tes_3 = -Grad_3*R_tes;

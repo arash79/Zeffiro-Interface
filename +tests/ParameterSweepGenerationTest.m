@@ -1,22 +1,15 @@
 classdef ParameterSweepGenerationTest < matlab.unittest.TestCase
-% --- Zeffiro documentation header ---
-% tests.ParameterSweepGenerationTest — Automated test: ParameterSweepGenerationTest.
+%PARAMETERSWEEPGENERATIONTEST  Cluster parameter sweep submits four bundles.
 %
-% Purpose:
-%   Automated test: ParameterSweepGenerationTest.
-%   Folder: MATLAB unit and integration tests for refactored inverse dispatch, lead fields, cluster jobs, and legacy/class parity.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
+%   Skips unless parcluster has ComputingProject (CSC). Builds a small
+%   sweep struct on synthetic zef and asserts the submission shape is 4
+%   jobs. See +tests/README.md.
 %
-% Calls (project):
-%   utilities.cluster.examples.parameter_sweep
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `tests.ParameterSweepGenerationTest(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
 
     methods (Test)
         function testParameterSweepSubmissionShape(testCase)

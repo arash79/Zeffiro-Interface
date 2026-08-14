@@ -1,38 +1,27 @@
 function zef_plot_GMModel(varargin)
-% --- Zeffiro documentation header ---
-% zef_plot_GMModel — Renders or updates a plot_gmmodel figure from current `zef` state.
+%ZEF_PLOT_GMMODEL  Queue renderer: covariance ellipsoids for zef.GMModel.
 %
-% Purpose:
-%   Renders or updates a plot_gmmodel figure from current `zef` state.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Gaussian Mixture Model (SP) overlay: one surf per component using
+%   Param.Sigma(1:3,1:3,:) around cluster_centres. Skips NaN
+%   |dipole_moments|. Deletes Tag 'additional: Gaussian mixture model'
+%   on caller h_axes_image first. Caller f_ind is read and unused.
+%   varargin unused. Not the JL GMMClustering plot (zef_dpq_plot_GMM).
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.GMModel (read)
-%
-% Calls (project):
 %   zef_plot_GMModel
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_plot_GMModel(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_plot_GMModel_max, zef_dpq_plot_GMM.
 
 [X_0,Y_0,Z_0] = sphere(50);
 h_axes = evalin('caller','h_axes_image');
 
 f_ind = evalin('caller','f_ind');
-delete(findobj(h_axes,'Tag','additional: Gaussian mixture model'));
+delete(findobj(h_axes,'Tag','additional: Gaussian mixture model')
+);
 GMModel = evalin('base','zef.GMModel');
 c_map = lines(size(GMModel.Param.mu,1));
 

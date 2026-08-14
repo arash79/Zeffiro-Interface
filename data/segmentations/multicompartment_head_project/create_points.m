@@ -1,17 +1,20 @@
-% --- Zeffiro documentation header ---
-% a = load ('lh_labels_76 — A = load ('lh labels 76.
+%CREATE_POINTS  Convert FreeSurfer label ASCII tables to point .dat files.
 %
-% Purpose:
-%   A = load ('lh labels 76.
-%   Folder: Bundled sample projects, segmentations, and runtime data roots referenced by examples and default startup.
+%   Zeffiro Interface helper for the bundled multicompartment head sample.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Side effects:
-%   - filesystem I/O
+%   Script. Must be run from this folder. Loads lh/rh *_labels_76.asc and
+%   *_labels_36.asc, drops the first two header rows, keeps columns 1–4,
+%   and writes lh_point_76.dat, rh_point_76.dat, lh_point_36.dat.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `a = load ('lh_labels_76` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   Notes
+%     The last two save commands both write lh_point_36.dat (including the
+%     rh 36-label table). That overwrite is in the original script; do not
+%     treat rh_point_36.dat as produced here.
+%
+%   See also creat_points, create_colortable.
 
 a = load ('lh_labels_76.asc');
 c = a([3:end],[1:4]);

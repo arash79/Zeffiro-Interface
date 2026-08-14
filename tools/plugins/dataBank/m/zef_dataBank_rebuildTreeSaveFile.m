@@ -1,28 +1,29 @@
 function [tree] = zef_dataBank_rebuildTreeSaveFile(tree)
-% --- Zeffiro documentation header ---
-% zef_dataBank_rebuildTreeSaveFile — Zef data Bank rebuild Tree Save File.
+%ZEF_DATABANK_REBUILDTREESAVEFILE  Rename on-disk node .mat files after rebuildTree.
 %
-% Purpose:
-%   Zef data Bank rebuild Tree Save File.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tree
+%   When save2disk is 'On', node.data is a matfile whose Source path still
+%   uses the old hash. After sort/rebuild the field names may no longer
+%   match those files. Two-pass rename via *_temporaryDataBankFile.mat
+%   avoids overwriting, then each .data is a new matfile(newhash.mat).
+%   Folder is taken from the first node's Source (strip through filesep+'node_').
 %
-% Outputs:
-%   tree
+%   tree = zef_dataBank_rebuildTreeSaveFile(tree)
 %
-% Calls (project):
-%   zef_dataBank_rebuildTreeSaveFile
+%   Inputs
+%     tree  - rebuilt tree whose .data objects still point at old files.
 %
-% Side effects:
-%   - filesystem I/O
+%   Output
+%     tree  - .data handles updated to the renamed files.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[tree] = zef_dataBank_rebuildTreeSaveFile(tree)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_dataBank_rebuildTree, zef_dataBank_saveTreeNodes.
 
+% Tree hashes may no longer match save-file names. Rename old files to
+% tmp names, then to the new hashes (avoids overwriting).
 hashes=fieldnames(tree);
 
 if length(hashes)>=1

@@ -1,24 +1,15 @@
-% --- Zeffiro documentation header ---
-% zef — Zef.
+%ZEF_INIT_TRANSFORM  Fill h_transform_table from current_tag names (script).
 %
-% Purpose:
-%   Zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_data_1 (read)
-%   zef.aux_data_2 (read, write)
-%   zef.current_tag (read)
-%   zef.h_transform_table (read)
+%   Script. Two columns: Index, Name from zef.<current_tag>_transform_name.
+%   Called after zef_update_transform and when the Segmentation tool
+%   switches the current tag.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_init_transform_parameters, zef_update_transform.
 zef.aux_data_1 = cell(0);
 zef.aux_data_2 = eval(['zef.' zef.current_tag '_transform_name']);
 

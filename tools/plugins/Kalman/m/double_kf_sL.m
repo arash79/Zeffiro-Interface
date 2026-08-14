@@ -1,42 +1,26 @@
 function [P_store, z_inverse] = double_kf_sL(m,P,A,Q,L,R,timeSteps, number_of_frames, smoothing, sL, standardization_exponent,burn_in)
-% --- Zeffiro documentation header ---
-% double_kf_sL — Double kf s L.
+%DOUBLE_KF_SL  Two-block Kalman (state and derivative) with optional sLORETA.
 %
-% Purpose:
-%   Double kf s L.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   m
-%   P
-%   A
-%   Q
-%   L
-%   R
-%   timeSteps
-%   number_of_frames
-%   smoothing
-%   sL
-%   standardization_exponent
-%   burn_in
+%   [P_store, z_inverse] = double_kf_sL(m, P, A, Q, L, R, timeSteps, number_of_frames, smoothing, sL, standardization_exponent, burn_in)
 %
-% Outputs:
-%   P_store
-%   z_inverse
+%   zef_KF filter_type 5 (sL=1) and 6 (sL=2). Augments A, P, Q; L2 observes
+%   the position block only. burn_in from zef.kf_burn_in (zero-data
+%   updates). P_store kept when smoothing > 1.
 %
-% Calls (project):
-%   zef_waitbar
+%   See also triple_kf_sL, zef_KF, Block_RTS_smoother.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[P_store, z_inverse]] = double_kf_sL(m, P, A, Q, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 P_store = cell(0);
 z_inverse = cell(0);
 h = zef_waitbar(0,1, 'Filtering');
 
 
+% Two-block state [position; derivative]. L2 observes the first block only.
 zero_m=zeros(size(A,1));
 L_zero=zeros(size(L,1),size(L,2));
 

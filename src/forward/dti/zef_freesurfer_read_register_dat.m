@@ -1,45 +1,19 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_FREESURFER_READ_REGISTER_DAT
-%
-%Reads FreeSurfer register.dat file and returns the 4×4 affine transformation
-%matrix. The matrix maps FROM diffusion/DWI/FA tkRAS TO anatomical tkRAS:
-%  anatomical_tkRAS = T_register * diffusion_tkRAS
-%
-%So to transform mesh (anatomical) points TO FA voxel space you use
-%inv(T_register) to get from anatomical to diffusion tkRAS, then NIfTI
-%inverse to get to FA voxel.
-%
-%Inputs:
-%   filepath - Path to register.dat (string/char)
-%
-%Outputs:
-%   T - [4×4] double, affine transformation matrix
-%
-%See also: zef_freesurfer_transform_coordinates
-
 function T = zef_freesurfer_read_register_dat(filepath)
-% --- Zeffiro documentation header ---
-% zef_freesurfer_read_register_dat — Zef freesurfer read register dat.
+%ZEF_FREESURFER_READ_REGISTER_DAT  Parse FreeSurfer register.dat 4×4 affine.
 %
-% Purpose:
-%   Zef freesurfer read register dat.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2024- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   filepath
+%   Skips header lines; first four numeric 4-token rows become T. Stored on
+%   zef as freesurfer_register_transform (FA voxel → mesh tkRAS).
 %
-% Outputs:
-%   T
+%   T = zef_freesurfer_read_register_dat(filepath)
 %
-% Calls (project):
-%   zef_freesurfer_read_register_dat
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[T] = zef_freesurfer_read_register_dat(filepath)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_dti_apply_to_sigma, zef_dti_get_mesh2voxel.
+
+
 
 
 if isstring(filepath)

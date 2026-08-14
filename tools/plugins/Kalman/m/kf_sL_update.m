@@ -1,30 +1,36 @@
 function [m, P, K, D] = kf_sL_update(m,P,y,H,R,standardization_exponent)
-% --- Zeffiro documentation header ---
-% kf_sL_update — Kf s L update.
+%KF_SL_UPDATE  sLORETA-weighted Kalman update; also returns diagonal weights D.
 %
-% Purpose:
-%   Kf s L update.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   m
-%   P
-%   y
-%   H
-%   R
-%   standardization_exponent
+%   [m, P, K, D] = kf_sL_update(m, P, y, H, R, standardization_exponent)
 %
-% Outputs:
-%   m
-%   P
-%   K
-%   D
+%   Called from kalman_filter_sLORETA (zef_KF filter_type 3). Builds D from
+%   sqrtm(P) and H so z_inverse = D*m. standardization_exponent comes from
+%   zef.standardization_exponent via zef_KF. Live path uses method = '1'
+%   (sqrtm). No zef fields here.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[m, P, K]] = kf_sL_update(m, P, y, H, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Inputs
+%     m                         - predicted mean
+%     P                         - predicted covariance
+%     y                         - measurement
+%     H                         - observation (L)
+%     R                         - measurement noise
+%     standardization_exponent  - power on the sLORETA weights
+%
+%   Outputs
+%     m - updated mean
+%     P - updated covariance
+%     K - Kalman gain
+%     D - sLORETA weight matrix (z = D*m)
+%
+%   See also kf_sL_update_approx, kalman_filter_sLORETA.
+%
 
+    % Live path: method = '1' (sqrtm). Branch '2' is SVD square-root, unused.
     method = '1';
     if(method == '1')
     P_sqrtm = sqrtm(P);

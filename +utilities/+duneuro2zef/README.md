@@ -1,75 +1,98 @@
-# +utilities/+duneuro2zef
+# `utilities.duneuro2zef` — Duneuro export folder → Zeffiro `.mat` + databank
 
-## Purpose of this folder
+Converts a Duneuro/FieldTrip-style export directory into Zeffiro tetra mesh, source space, sensors, lead fields, and measurements. Two layers:
 
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+1. **File conversion** — `run(config)` writes `config.output_folder` `.mat` files (no Zeffiro session required).
+2. **Session import** — `import_duneuro_project(config)` then runs `zef_import_segmentation` on bundled `Duneuro2Zeffiro_import.zef` **if** `zef` already exists in the base workspace.
 
-## Contents
+## What must exist on disk
 
-MATLAB sources:
-- `Duneuro2Zeffiro_convert.m` — **utilities.duneuro2zef.Duneuro2Zeffiro_convert**: Duneuro2Zeffiro convert.
-- `Duneuro2Zeffiro_settings.m` — **utilities.duneuro2zef.Duneuro2Zeffiro_settings**: Duneuro2Zeffiro settings.
-- `EEG_to_databank.m` — **utilities.duneuro2zef.EEG_to_databank**: EEG to databank.
-- `MEG_to_databank.m` — **utilities.duneuro2zef.MEG_to_databank**: MEG to databank.
-- `convert_mesh.m` — **utilities.duneuro2zef.convert_mesh**: Convert mesh.
-- `find_files.m` — **utilities.duneuro2zef.find_files**: Find files.
-- `get_default_config.m` — **utilities.duneuro2zef.get_default_config**: Get default config.
-- `import_duneuro_project.m` — **utilities.duneuro2zef.import_duneuro_project**: Import duneuro project.
-- `process_eeg_data.m` — **utilities.duneuro2zef.process_eeg_data**: Process eeg data.
-- `process_meg_data.m` — **utilities.duneuro2zef.process_meg_data**: Process meg data.
-- `process_resection_points.m` — **utilities.duneuro2zef.process_resection_points**: Process resection points.
-- `process_sensors.m` — **utilities.duneuro2zef.process_sensors**: Process sensors.
-- `process_source_space.m` — **utilities.duneuro2zef.process_source_space**: Process source space.
-- `run.m` — **utilities.duneuro2zef.run**: Run.
-- `validate_config.m` — **utilities.duneuro2zef.validate_config**: Validate config.
+Defaults from `get_default_config` (override `config.input_folder` / filenames):
 
-Other files:
-- `Duneuro2Zeffiro_import.zef`
+| Config field | Default pattern | Contents expected |
+|--------------|-----------------|-------------------|
+| `files.mesh` | `mesh.mat` | Hexahedral `elements` (N×8) and `nodes` (N×3), optional `labels` |
+| `files.source_space` | `sp_vol_rgv_N*.mat` | Source positions; `source_space.priority` `'smallest'` / `'largest'` / pattern |
+| `files.sensors` | `sensors.mat` | Channel geometry |
+| `files.leadfield_eeg` / `_meg` | `LF_EEG.mat` / `LF_MEG.mat` | Lead-field matrices |
+| `files.measurements_eeg` / `_meg` | `spikeAvgEEG.mat` / `spikeAvgMEG.mat` | FieldTrip-like structs; measurement field default `'avg'` |
+| `files.resection_points` | `resection_points.dat` | Optional |
 
-## How this folder fits into the overall workflow
+`validate_config` requires `input_folder` to exist when conversion runs. Output folder is created as needed. **Relative output paths are resolved from `pwd`**, not from this package directory. The bundled `.zef` hard-codes `foldername,data/converted/` — stay in the project root (or match that layout).
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+## Public entries
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+config = utilities.duneuro2zef.get_default_config();
+config.input_folder = 'my_duneuro_export';
+config.output_folder = 'data/converted';
+
+% Files only:
+results = utilities.duneuro2zef.run(config);
+
+% Files + import into an already-running Zeffiro session:
+zef = zeffiro_interface('start_mode', 'nodisplay');  % must assign to base for auto-detect
+assignin('base', 'zef', zef);
+results = utilities.duneuro2zef.import_duneuro_project(config, true);
 ```
 
-Representative entry points in this folder:
-- ``[results] = utilities.duneuro2zef.Duneuro2Zeffiro_convert(config)` with project root and `src` on the path.`
-- ``[zef] = utilities.duneuro2zef.Duneuro2Zeffiro_settings(zef)` with project root and `src` on the path.`
-- ``[zef] = utilities.duneuro2zef.EEG_to_databank(zef)` with project root and `src` on the path.`
-- ``[zef] = utilities.duneuro2zef.MEG_to_databank(zef)` with project root and `src` on the path.`
-- ``[[success, error_msg]] = utilities.duneuro2zef.convert_mesh(config)` with project root and `src` on the path.`
-- ``[[filepath, filename]] = utilities.duneuro2zef.find_files(pattern, folder, priority)` with project root and `src` on the path.`
-- `Call `utilities.duneuro2zef.get_default_config` from MATLAB with the project root on the path.`
-- ``[results] = utilities.duneuro2zef.import_duneuro_project(config, import_to_zeffiro)` with project root and `src` on the path.`
+`Duneuro2Zeffiro_convert` is the same conversion as `run`, used as a **script line** inside `Duneuro2Zeffiro_import.zef`. If key outputs already exist, it skips reconversion.
 
-## Examples
+`import_duneuro_project(config, false)` converts only. If the second argument is omitted, import runs only when `exist('zef','var')` in base.
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+## Config flags (`get_default_config`)
 
-## Dependencies and assumptions
+| Flag | Default | Effect |
+|------|---------|--------|
+| `process_eeg` / `process_meg` | true | Convert LF, measurements, sensors |
+| `process_resection_points` | true | Optional; failure is a **warning** |
+| `invert_domain_labels` | true | `labels = max(labels)+1-labels` (Duneuro vs Zeffiro numbering) |
+| `continue_on_error` | false | Stop vs collect errors |
+| `verbose` | true | |
+| `domain_labels.brain` | `2` | Used when saving `brain_ind` |
+| `eeg.channel_indices` | `[302:358, inf]` | `inf` means end of channel list |
+| `eeg.channel_path` | `{'cfg','previous','previous','channel'}` | FieldTrip nested path |
+| `meg.max_channels` | 274 | Magnetometers first if `use_magnetometers` |
+| `mesh.save_brain_ind` | true | Extra variable in `tetra_mesh.mat` |
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## Output files (`config.output.*`)
 
-## Notes for developers
+Written under `output_folder`:
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+| File | From |
+|------|------|
+| `tetra_mesh.mat` | Hex → tet via `zef_hexa_to_tetra`; variables `tetra`, `domain_labels`, `nodes`, optional `brain_ind` |
+| `source_space.mat` | Source positions |
+| `resection_points.mat` | Optional |
+| `L_EEG.mat` / `L_MEG.mat` | Lead fields |
+| `EEG_measurements.mat` / `MEG_measurements.mat` | |
+| `EEG_sensors.mat` / `MEG_sensors.mat` | |
+
+## Coordinate / mesh conventions
+
+- Input mesh **must** be hexahedral (8 nodes per element). Tet input fails `convert_mesh`.
+- Nodes are copied as stored (no unit conversion in `convert_mesh`).
+- Domain labels may be inverted so Zeffiro compartment indices match the bundled `.zef` names (Scalp … White matter).
+
+## Import into Zeffiro (`Duneuro2Zeffiro_import.zef`)
+
+Line order (implementation):
+
+1. Script `Duneuro2Zeffiro_convert`
+2. Sensors: Coils (`MEG_sensors.mat`), Electrodes (`EEG_sensors.mat`)
+3. Structs: `tetra_mesh`, `source_space`, `L_MEG`, `MEG_measurements`, `resection_points`
+4. Script `MEG_to_databank`
+5. Structs: `L_EEG`, `EEG_measurements`
+6. Script `EEG_to_databank`
+7. Empty segmentation names: Scalp, Compact bone, Spongious bone, CSF, Grey matter, White matter
+8. Script `Duneuro2Zeffiro_settings` — sets `source_direction_mode=1`, `inv_sampling_frequency=2400`, compartment source constraints, `zef_build_compartment_table`, downsampling / interpolation
+
+`import_duneuro_project` sets `zef.file` / `zef.file_path` to that `.zef`, `zef.new_empty_project = 0`, then `zef_import_segmentation`. Databank helpers also `assignin('base','zef',...)`.
+
+Alternatively, with Zeffiro already open: **Import → Import data to project** pointing at this `.zef`, from a cwd where `data/converted/` exists. (The live labels are assigned in `zef_menu_tool.m`; the App Designer defaults still say “Import new segmentation from folder”.)
+
+## Gaps
+
+- `Duneuro2Zeffiro_import.zef` paths are not rewritten from `config.output_folder`. Custom output directories require editing the `.zef` or matching `data/converted/`.
+- `run` initializes databank only if `zef` is already in base; conversion itself does not start Zeffiro.
+- EEG channel index default `[302:358, inf]` is dataset-specific, not a universal 10–20 map.

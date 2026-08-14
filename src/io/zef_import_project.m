@@ -1,43 +1,25 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef_import_project(file_name, folder_name)
-% --- Zeffiro documentation header ---
-% zef_import_project — Loads external data or a saved Zeffiro project into `zef`.
+%ZEF_IMPORT_PROJECT  Import a multi-item ASCII project (.zef manifest).
 %
-% Purpose:
-%   Loads external data or a saved Zeffiro project into `zef`.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   file_name
-%   folder_name
+%   Reads a comma-separated project manifest (22 header lines skipped),
+%   then for each row sets zef.lf_tag and zef.imaging_method when the
+%   modality column matches zef.imaging_method_cell, and calls
+%   zef_import_segmentation on the named *.zef file. Updates the mesh tool
+%   and lead-field bank when those tools are available.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_import_project()
+%   zef_import_project(file_name, folder_name)
 %
-% Zef fields (observed):
-%   zef.h_mesh_tool (read)
-%   zef.imaging_method (read, write)
-%   zef.imaging_method_cell (read)
-%   zef.lf_tag (read, write)
-%   zef.save_file_path (read)
+%   Inputs
+%     file_name    - manifest file name; uigetfile when omitted.
+%     folder_name  - folder containing file_name and segmentation files.
 %
-% Calls (project):
-%   zef_import_project
-%   zef_import_segmentation
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `zef_import_project(file_name, folder_name)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_import_segmentation, zef_update.
 
 void = [];
 

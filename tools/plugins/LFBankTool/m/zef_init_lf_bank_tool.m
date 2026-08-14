@@ -1,39 +1,17 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'lf_bank_scaling_factor')); — If not(isfield(zef,'lf bank scaling factor'));.
+%ZEF_INIT_LF_BANK_TOOL  Default lf_* fields, scan normalizers, push onto widgets.
 %
-% Purpose:
-%   If not(isfield(zef,'lf bank scaling factor'));.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field (read, write)
-%   zef.h_lf_bank_scaling_factor (read)
-%   zef.h_lf_bank_tool (read)
-%   zef.h_lf_normalization (read)
-%   zef.h_lf_tag (read)
-%   zef.lf_bank_scaling_factor (read, write)
-%   zef.lf_bank_storage (read, write)
-%   zef.lf_item_list (read, write)
-%   zef.lf_item_selected (read, write)
-%   zef.lf_item_type (read, write)
-%   zef.lf_normalization (read, write)
-%   zef.lf_normalization_functions_dir (read, write)
-%   zef.lf_normalization_functions_file_list (read, write)
-%   zef.lf_normalization_functions_name_list (read, write)
-%   zef.lf_tag (read, write)
+%   Script. Called from zef_lf_bank_tool after the window opens.
+%   Defaults: lf_bank_scaling_factor=1, lf_tag='EEG', lf_normalization=1,
+%   empty lf_bank_storage. Lists m/lead_field_normalization_functions
+%   using each file's Description: line as the dropdown label.
+%   Then zef_update_lf_bank_tool. Does not compute L.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'lf_bank_scaling_factor'));` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_update_lf_bank_tool, zef_lf_bank_tool.
 
 if not(isfield(zef,'lf_bank_scaling_factor'));
     zef.lf_bank_scaling_factor = 1;

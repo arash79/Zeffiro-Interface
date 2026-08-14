@@ -1,56 +1,26 @@
-# src/visualization/graph_bank
+# Graph bank (`src/visualization/graph_bank`)
 
-## Purpose of this folder
+These files are the **Graph:** dropdown in **ZEFFIRO Interface: Mesh visualization tool**. `zef_plot_graph` lists every `.m` next to `zef_histogram` and uses MATLAB `help` of each file as the visible label. **Plot graph** `feval`s the selected file. Adding a new `.m` here adds a list item; no INI edit.
 
-Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+They are **not** the 3-D renderer. Volume/surface drawing is `src/gui/plot`. Parcellation **Plot** uses `src/visualization/time_series_tools/`, not this folder.
 
-## Contents
+## What they need
 
-MATLAB sources:
-- `zef_histogram.m` — **zef_histogram**: Zef histogram.
-- `zef_logarithmic_distribution.m` — **zef_logarithmic_distribution**: Zef logarithmic distribution.
-- `zef_logarithmic_histogram.m` — **zef_logarithmic_distribution**: Zef logarithmic distribution.
-- `zef_plot_dof_space.m` — **zef_plot_dof_space**: Renders or updates a plot_dof_space figure from current `zef` state.
+A live Figure tool (`zef.h_axes1`). Histogram-style files `cla` that axes first. Input is the currently selected Mesh-vis **Parameter:** vector (`zef_plot_graph` passes it). `zef_plot_dof_space` ignores that vector and scatters `zef.source_positions` (`hold on`); source interpolation must already have run.
 
-## How this folder fits into the overall workflow
+## What each file actually draws
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+| File | Axes | Computation |
+|------|------|-------------|
+| `zef_histogram.m` | `cla` then histogram | `log10` of the parameter vector, 200 bins |
+| `zef_logarithmic_distribution.m` | `cla` then `plot` | Same bins, then `log10(counts)` |
+| `zef_logarithmic_histogram.m` | `cla` then histogram | `log10` of the parameter, log y-axis. **Filename vs function:** the first function line is named `zef_logarithmic_distribution`; MATLAB still calls it by filename. |
+| `zef_plot_dof_space.m` | `hold on` scatter3 | `zef.source_positions` (dummy argument unused) |
 
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+Parent table of Parcellation time-series tools (a different **Plot** button): [`../README.md`](../README.md).
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+% Needs a live Figure tool
+zef_histogram(zef.sigma(:,1));
+zef_plot_dof_space([]);   % dummy arg unused
 ```
-
-Representative entry points in this folder:
-- ``zef_histogram(parameter_vec)` with project root and `src` on the path.`
-- ``zef_logarithmic_distribution(parameter_vec)` with project root and `src` on the path.`
-- ``zef_logarithmic_distribution(parameter_vec)` with project root and `src` on the path.`
-- ``zef_plot_dof_space(void)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

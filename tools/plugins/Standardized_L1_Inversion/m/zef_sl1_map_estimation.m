@@ -1,29 +1,24 @@
 function zef = sl1_map_estimation(zef)
-% --- Zeffiro documentation header ---
-% sl1_map_estimation — Sl1 map estimation.
+%SL1_MAP_ESTIMATION  Standardized L1 (sL1) sparse inverse plugin.
 %
-% Purpose:
-%   Sl1 map estimation.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_sl1_map_estimation
+%   zef = zef_sl1_map_estimation(zef)
 %
-% Outputs:
-%   zef
+%   INI callback zef_sl1_map_estimation (Inverse tools → Standardized
+%   Hierarchical L1 MAP Inversion (quadprog); default profile only).
+%   Filename is zef_sl1_map_estimation.m; declared function name is
+%   sl1_map_estimation. Opens the sL1 window via zef_init_sl1. Start runs
+%   zef_sl1_iteration(zef). Window dump Start still names sl1_iteration
+%   (overridden by init). Needs zef.L, measurements, and quadprog. Does
+%   not call inverse.HALpRInverter.
 %
-% Calls (project):
-%   zef_tool_start
+%   See also zef_init_sl1, zef_sl1_iteration.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = sl1_map_estimation(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     zef = evalin('base','zef');

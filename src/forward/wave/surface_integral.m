@@ -1,31 +1,17 @@
 function [integ_vec] = surface_integral(u_data, du_dt_data, p_1_data, p_2_data, p_3_data, t_data, t_shift, source_points, orbit_nodes, orbit_triangles)
-% --- Zeffiro documentation header ---
-% surface_integral — Surface integral.
-%
-% Purpose:
-%   Surface integral.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
-%
-% Inputs:
-%   u_data
-%   du_dt_data
-%   p_1_data
-%   p_2_data
-%   p_3_data
-%   t_data
-%   t_shift
-%   source_points
-%   orbit_nodes
-%   orbit_triangles
-%
-% Outputs:
-%   integ_vec
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[integ_vec] = surface_integral(u_data, du_dt_data, p_1_data, p_2_data, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%SURFACE_INTEGRAL  Kirchhoff-style integral of (u, du/dt, p) on the orbit hull.
+%
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
+%
+%   integ_vec = surface_integral(u_data, du_dt_data, p_1_data, p_2_data, ...
+%       p_3_data, t_data, t_shift, source_points, orbit_nodes, orbit_triangles)
+%
+%   See also compute_data_gpu, boundary_source.
 
 n_triangles = size(orbit_triangles(:,1), 1);
 n_nodes = size(orbit_nodes(:,1), 1);

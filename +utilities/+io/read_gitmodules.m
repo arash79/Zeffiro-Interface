@@ -1,25 +1,17 @@
 function submodule_structs = read_gitmodules ( gitmodules_file, kwargs )
-% --- Zeffiro documentation header ---
-% utilities.io.read_gitmodules — Read gitmodules.
+%READ_GITMODULES  Parse .gitmodules into struct array with abspath and name.
 %
-% Purpose:
-%   Read gitmodules.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   gitmodules_file
-%   kwargs
+%   submodule_structs = read_gitmodules(gitmodules_file, kwargs)
 %
-% Outputs:
-%   submodule_structs
-%
-% Calls (project):
-%   utilities.io.read_gitmodules
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[submodule_structs] = utilities.io.read_gitmodules(gitmodules_file, kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Reads [submodule "…"] blocks and key=value lines (path, url, branch,
+%   startupscript). Adds abspath (relative to .gitmodules folder) and name
+%   (final path component). kwargs.required_fields selects which keys must
+%   appear (default path, url, branch, startupscript).
 
     arguments
 

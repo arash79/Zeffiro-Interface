@@ -1,37 +1,17 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isempty(zef — If not(isempty(zef.
+%ZEF_ADD_LF_ITEM  Append current L, sensors, and measurements to lf_bank_storage.
 %
-% Purpose:
-%   If not(isempty(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.imaging_method (read)
-%   zef.imaging_method_cell (read)
-%   zef.lf_bank_scaling_factor (read)
-%   zef.lf_bank_storage (read)
-%   zef.lf_tag (read)
-%   zef.measurements (read)
-%   zef.noise_data (read)
-%   zef.parcellation_interp_ind (read)
-%   zef.sensors (read)
-%   zef.source_directions (read)
-%   zef.source_interpolation_ind (read)
-%   zef.source_positions (read)
+%   Script. If zef.s_points is non-empty, zef_process_meshes first.
+%   New cell: source_interpolation_ind, parcellation_interp_ind,
+%   source_positions/directions, L, sensors, imaging_method string,
+%   measurements, noise_data, lf_bank_scaling_factor, lf_tag.
+%   Then zef_update_lf_bank_tool and zef_update.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isempty(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_delete_lf_item, zef_combine_lead_fields, zef_lf_bank_tool.
 
 if not(isempty(zef.s_points))
     zef_process_meshes;

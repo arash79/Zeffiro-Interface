@@ -1,55 +1,32 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef_make_butterfly_plot(zef,h_axes_image)
-% --- Zeffiro documentation header ---
-% zef_make_butterfly_plot — Zef make butterfly plot.
+%ZEF_MAKE_BUTTERFLY_PLOT  Overlay filtered measurement traces vs time.
 %
-% Purpose:
-%   Zef make butterfly plot.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   h_axes_image
+%   Copies zef.bf_* (sampling frequency, band edges, data segment,
+%   time window, normalize) onto the inv_* fields zef_getFilteredData
+%   / zef_getTimeStep read, then plot(t', f') on h_axes_image. Default
+%   axes: caller's h_axes_image if that variable exists, else
+%   zef.h_axes1 (Figure tool). Each line and the axes have ButtonDownFcn
+%   zef_set_timepointline. Title is Time value = inv_time_1. Deletes any
+%   Legend sibling of the axes.
 %
-% Outputs:
-%   See function signature and code below.
+%   Called from the butterfly-plot window **Plot** button
+%   (zef_butterfly_plot_app: zef_update_butterfly_plot then this).
+%   Menu: Forward tools → Butterfly plot → zef_butterfly_plot →
+%   zef_butterfly_plot_start.
 %
-% Zef fields (observed):
-%   zef.bf_data_segment (read)
-%   zef.bf_high_cut_frequency (read)
-%   zef.bf_low_cut_frequency (read)
-%   zef.bf_normalize_data (read)
-%   zef.bf_sampling_frequency (read)
-%   zef.bf_time_1 (read)
-%   zef.bf_time_2 (read)
-%   zef.colormap_size (read)
-%   zef.font_size (read)
-%   zef.h_axes1 (read)
-%   zef.inv_data_segment (read, write)
-%   zef.inv_high_cut_frequency (read, write)
-%   zef.inv_low_cut_frequency (read, write)
-%   zef.inv_normalize_data (read, write)
-%   zef.inv_sampling_frequency (read, write)
-%   … (3 more)
+%   zef_make_butterfly_plot(zef)
+%   zef_make_butterfly_plot(zef, h_axes_image)
 %
-% Calls (project):
-%   zef_getFilteredData
-%   zef_getTimeStep
-%   zef_make_butterfly_plot
-%   zef_set_timepointline
+%   Inputs
+%     zef           - session with bf_* filter fields and measurements.
+%     h_axes_image  - target axes; optional (see default above).
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_make_butterfly_plot(zef, h_axes_image)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_butterfly_plot, zef_getFilteredData, zef_set_timepointline.
 if nargin < 2
     if evalin('caller','exist(''h_axes_image'',''var'')')
         h_axes_image = evalin('caller','h_axes_image');

@@ -1,34 +1,26 @@
 function slider_value_new = zef_update_colorscale_max(varargin)
-% --- Zeffiro documentation header ---
-% zef_update_colorscale_max — Syncs GUI control values into `zef` for colorscale_max.
+%ZEF_UPDATE_COLORSCALE_MAX  Figure-tool **Color max:** slider.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for colorscale_max.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Finds the slider Tag='colorscale_max_slider' on the Figure tool
+%   (or on varargin{1} if a popped-out figure was passed). Multiplies
+%   axes1 CLim(2) by 10^(new-old), where old is the previous Value stored
+%   in the slider UserData. Slider range is [-1, 1]; 0 is identity.
+%   Decade scaling is incremental so dragging does not compound from the
+%   original CLim on every callback.
 %
-% Outputs:
-%   slider_value_new
+%   Then calls zef_update_contour so contour levels follow the new CLim.
+%   The Figure-tool Callback writes the returned value to
+%   zef.colorscale_max_slider when gca is parented to h_zeffiro.
 %
-% Zef fields (observed):
-%   zef.h_zeffiro (read)
+%   slider_value_new = zef_update_colorscale_max
+%   slider_value_new = zef_update_colorscale_max(h_figure)
 %
-% Calls (project):
-%   zef_update_colorscale_max
-%   zef_update_contour
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[slider_value_new] = zef_update_colorscale_max(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_colorscale_min, zef_update_colorscale, zef_update_contour.
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');
 else
@@ -59,6 +51,7 @@ end
 h_object.UserData = slider_value_new;
 
 clim_vec = h.CLim;
+% Incremental decade shift: CLim(2) *= 10^(new-old) so each drag step is relative.
 if length(slider_value_new) == 1
     clim_vec(2) = clim_vec(2)*10^(slider_value_new - slider_value_old);
 else

@@ -1,31 +1,19 @@
 function zef = zef_nse_tool_update(zef)
-% --- Zeffiro documentation header ---
-% zef_nse_tool_update — Zef nse tool update.
+%ZEF_NSE_TOOL_UPDATE  Copy every NSE widget Value onto zef.nse_field (solver_type, ROI, pulse, viscosity, …).
 %
-% Purpose:
-%   Zef nse tool update.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   ValueChangedFcn of the workbench controls and the first step of
+%   zef_nse_run_solver. Sphere/ROI/dir_v fields are str2num from edit
+%   boxes. Does not solve and does not write zef.L.
 %
-% Outputs:
-%   zef
+%   zef = zef_nse_tool_update(zef)
 %
-% Zef fields (observed):
-%   zef.nse_field (read)
+%   See also zef_nse_tool_window, zef_nse_run_solver.
 %
-% Calls (project):
-%   zef_nse_tool_update
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_nse_tool_update(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 zef.nse_field.use_gpu = zef.nse_field.h_use_gpu.Value;
 zef.nse_field.pcg_tol = zef.nse_field.h_pcg_tol.Value;

@@ -1,34 +1,25 @@
-% --- Zeffiro documentation header ---
-% p='p1'; — P='p1';.
+%P_OUTPUTNEW_SUBPLOT  Lab one-off: GMM-vs-resection figures, tighter grid.
 %
-% Purpose:
-%   P='p1';.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.dataBank (read)
-%   zef.reconstruction (read)
-%   zef.source_positions (read)
+%   Script, not a product workflow. Not on any Zeffiro menu. p='p1';
+%   load p1_resectionStuff.mat (res_zef); alphaShape radius 3.4. Needs a
+%   live zef.dataBank and zef.GMM.parameters.Values{6} (chi2 credibility).
+%   GMM_number=2+1 (two GMM columns plus a max column) vs 3+1 in
+%   p_outputNew. Walks hashes starting node_<1:3>, type 'data', then
+%   children _<meth>_<gmmInd>; distance-to-resection, GMM amplitude, and
+%   volume/exclusivity cells dumped into subplots. That .mat is not in
+%   this repo. Sibling: p_outputNew, gmm_subplot.
 %
-% Calls (project):
-%   zef_GMM_resection_volume
-%   zef_distance_to_resection
-%
-% Side effects:
-%   - base/caller workspace
-%   - creates/updates figures
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `p='p1';` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also p_outputNew, zef_distance_to_resection, zef_insideGMM.
 
 p='p1';
 
-load(strcat(p, '_resectionStuff.mat'));
+load(strcat(p, '_resectionStuff.mat')
+);
 A=alphaShape(res_zef(:,1), res_zef(:,2), res_zef(:,3),3.4);
 [AF, AP]=alphaTriangulation(A);
 

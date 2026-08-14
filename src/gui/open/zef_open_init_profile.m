@@ -1,38 +1,19 @@
-% --- Zeffiro documentation header ---
-% zef_data = zef_init_profile; — Zef data = zef init profile;.
+%ZEF_OPEN_INIT_PROFILE  Settings → **Pre-settings profile**.
 %
-% Purpose:
-%   Zef data = zef init profile;.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_init_profile (read)
-%   zef.h_init_profile_apply (read)
-%   zef.h_init_profile_save (read)
-%   zef.h_init_profile_table (read)
-%   zef.h_init_profile_update_from_profile (read)
-%   zef.h_menu_init_profile_add (read)
-%   zef.h_menu_init_profile_delete (read)
-%   zef.init_profile (read, write)
-%   zef.init_profile_current_size (read, write)
-%   zef.init_profile_relative_size (read, write)
-%   zef.init_profile_selected (read)
-%   zef.profile_name (read)
-%   zef.program_path (read)
+%   Script. MenuSelectedFcn of h_menu_init_profile. Instantiates
+%   zef_init_profile, loads profile/<name>/zeffiro_init.ini (or existing
+%   zef.init_profile). Table columns: …, value, zef field, type
+%   {number, string, evaluate}. **Save** writecell; **Apply** writecell
+%   then zef_apply_init_profile (which runs zef_init_init_profile).
+%   CellSelectionCallback zef_init_profile_table_selection. Closing does
+%   not save.
 %
-% Calls (project):
-%   zef_change_size_function
-%   zef_get_relative_size
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_data = zef_init_profile;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_init_init_profile, zef_apply_init_profile.
 zef_data = zef_init_profile;
 zef_assign_data;
 

@@ -1,22 +1,17 @@
 function [point] = myAffine3d(point, matrix)
-% --- Zeffiro documentation header ---
-% myAffine3d — My Affine3d.
+%MYAFFINE3D  Apply a 4×4 affine to N-by-3 points (homogeneous).
 %
-% Purpose:
-%   My Affine3d.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   point
-%   matrix
+%   point = myAffine3d(point, matrix)
 %
-% Outputs:
-%   point
+%   Appends a row of ones, left-multiplies by matrix, returns the first
+%   three rows as N-by-3. Used by scriptForAlignment. Not MATLAB affine3d.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[point] = myAffine3d(point, matrix)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also scriptForAlignment.
 
 [N, ~]=size(point);
 

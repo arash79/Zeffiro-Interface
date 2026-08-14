@@ -1,36 +1,19 @@
-% --- Zeffiro documentation header ---
-% zef.use_gpu_graphic = get(zef — Zef.use gpu graphic = get(zef.
+%ZEF_UPDATE_GRAPHICS_OPTIONS  Settings → Graphics processing options (script).
 %
-% Purpose:
-%   Zef.use gpu graphic = get(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.colormap_size (read, write)
-%   zef.colortune_param (read, write)
-%   zef.cone_alpha (read, write)
-%   zef.cone_lattice_resolution (read, write)
-%   zef.cone_scale (read, write)
-%   zef.contour_line_width (read, write)
-%   zef.contour_n_smoothing (read, write)
-%   zef.h_colormap_size (read)
-%   zef.h_colortune_param (read)
-%   zef.h_cone_alpha (read)
-%   zef.h_cone_lattice_resolution (read)
-%   zef.h_cone_scale (read)
-%   zef.h_contour_line_width (read)
-%   zef.h_contour_n_smoothing (read)
-%   zef.h_n_streamline (read)
-%   … (13 more)
+%   Script. ValueChangedFcn on zef.h_zef_graphics_processing_options
+%   (wired in zef_open_graphics_options). Copies GPU-graphic,
+%   parcellation_type/quantile, cone lattice/scale, colormap_size,
+%   streamlines, colortune_param, sensors_visual_size, contour smoothing
+%   and line width. Widget cone alpha is stored inverted:
+%   zef.cone_alpha = 1 - str2num(h_cone_alpha.Value). Does not replot;
+%   next Visualize volume/surfaces picks the new values up.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.use_gpu_graphic = get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_open_graphics_options, zef_init_graphics_options.
 zef.use_gpu_graphic = get(zef.h_use_gpu_graphic,'Value');
 zef.parcellation_type = get(zef.h_parcellation_type,'Value');
 zef.parcellation_quantile = str2num(get(zef.h_parcellation_quantile,'Value'));

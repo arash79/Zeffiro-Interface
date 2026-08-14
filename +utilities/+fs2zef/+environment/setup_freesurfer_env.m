@@ -1,29 +1,12 @@
 function setup_freesurfer_env(FREESURFER_HOME, options)
-% --- Zeffiro documentation header ---
-% utilities.fs2zef.environment.setup_freesurfer_env — Setup freesurfer env.
+%SETUP_FREESURFER_ENV  Set FreeSurfer environment variables (Matlab FreeSurferEnv.sh).
 %
-% Purpose:
-%   Setup freesurfer env.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   FREESURFER_HOME
-%   options
-%
-% Outputs:
-%   See function signature and code below.
-%
-% Calls (project):
-%   utilities.fs2zef.FREESURFER_ENV_VARS
-%   utilities.fs2zef.environment.setup_freesurfer_env
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `utilities.fs2zef.environment.setup_freesurfer_env(FREESURFER_HOME, options)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%
-% setup_freesurfer_env - Set up FreeSurfer environment variables
+%   setup_freesurfer_env(FREESURFER_HOME, options)
 %
 % Matlab implementation of FreeSurferEnv.sh that sets up all required
 % environment variables for FreeSurfer operations. Validates directories

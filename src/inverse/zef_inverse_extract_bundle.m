@@ -1,40 +1,33 @@
 function bundle = zef_inverse_extract_bundle(zef, method_id, opts)
-% --- Zeffiro documentation header ---
-% zef_inverse_extract_bundle — Zef inverse extract bundle.
+%ZEF_INVERSE_EXTRACT_BUNDLE  Pack lead field, data, and method metadata for cluster dispatch.
 %
-% Purpose:
-%   Zef inverse extract bundle.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   method_id
-%   opts
+%   Builds the struct consumed by utilities.cluster.dispatch_inverse: processed
+%   lead field L, procFile index maps, per-frame measurement columns F, source
+%   positions, common inverse parameters, and optional legacy_zef snapshot.
 %
-% Outputs:
-%   bundle
+%   bundle = zef_inverse_extract_bundle(zef, method_id)
+%   bundle = zef_inverse_extract_bundle(zef, method_id, "MethodParams", struct(...))
 %
-% Zef fields (observed):
-%   zef.inverse_initialization_measurements (read)
-%   zef.source_direction_mode (read)
-%   zef.source_positions (read)
-%   zef.use_gpu (read)
+%   Inputs
+%     zef       - session struct with lead field and measurements.
+%     method_id - registry string (see utilities.cluster.inverse_method_registry).
+%     MethodParams - optional struct forwarded to the inverter (default struct()).
 %
-% Calls (project):
-%   inverse.CommonInverseParameters
-%   utilities.cluster.inverse_method_registry
-%   zef_getFilteredDataClassObj
-%   zef_getTimeStepClassObj
-%   zef_inverse_extract_bundle
-%   zef_processLeadfields
+%   Output
+%     bundle    - struct with fields version, method_id, method_info, L,
+%                 procFile, F, source_positions, number_of_frames, use_gpu, etc.
+%                 F is n_channels x number_of_frames (column per frame).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Reorders L to node-wise triplets when source_direction_mode is 1 or 2.
+%   Includes zef.inverse_initialization_measurements as F_initialize when set.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[bundle] = zef_inverse_extract_bundle(zef, method_id, opts)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_inverse_run, zef_processLeadfields, zef_getFilteredDataClassObj,
+%            zef_getTimeStepClassObj.
 
 arguments
     zef (1,1) struct

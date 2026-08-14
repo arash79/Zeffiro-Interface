@@ -1,36 +1,29 @@
 function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
-% --- Zeffiro documentation header ---
-% inverse.IASInverter.invert — Runs one inverse reconstruction step for a single measurement frame.
+%invert  Run n_map_iterations IAS MAP updates for one measurement frame.
 %
-% Purpose:
-%   Runs one inverse reconstruction step for a single measurement frame.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   f
-%   L
-%   procFile
-%   source_direction_mode
-%   source_positions
-%   opts
+%   Called from utilities.inverse.run_frame_loop. Inverse tools → IAS uses
+%   zef_ias_iteration, not this class method.
 %
-% Outputs:
-%   z_vec
-%   self
+%   Each MAP step: W = L .* d_sqrt (broadcast), then
+%   W ← d_sqrt .* (W' / (W*W' + S_mat)), z = W*f. Hyperprior (inverse-gamma
+%   or gamma, from initialize) updates d_sqrt from |z|. method_type may
+%   row-scale W by dSPM or sLORETA weights each step or on the last
+%   iteration only (see IASInverter.m mustBeMember list).
 %
-% Calls (project):
-%   inverse.invert
-%   zef_waitbar
+%   Inputs
+%     f, L - current frame and processed lead field (n_sensors×n_dof).
+%     procFile, source_direction_mode, source_positions - unused here.
+%     opts.use_gpu - gpuArray for S_mat, L, f, d_sqrt when a device exists.
+%     opts.normalize_data - unused here.
 %
-% Side effects:
-%   - GPU
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z_vec, self]] = inverse.IASInverter.invert(self, f, L, procFile, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Outputs
+%     z_vec - n_dof×1 MAP estimate after n_map_iterations.
+%     self  - d_sqrt updated for the next frame.
 
     arguments
 
@@ -87,6 +80,7 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
             date_str = display_waitbar(h,i,self.n_map_iterations,update_freq,date_str,time_val);
         end
 
+        % IAS MAP filter: W = diag(d_sqrt) * L' * inv(L diag(d_sqrt^2) L' + C)
         W = L .* repmat( d_sqrt' , size(L,1), 1);
         W = d_sqrt.*( W' * inv( W * W' + S_mat ) );
         
@@ -95,6 +89,8 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
             dspm_vec = sqrt(dspm_vec);
             W = W./dspm_vec;
         elseif strcmp(method_type, "dSPM last step")
+            % Property is n_map_iterations; n_n_map_iterations is as written
+            % (those last-step branches never run). Documented, not patched.
             if i == self.n_n_map_iterations
                 dspm_vec = sum(W.^2, 2);
                 dspm_vec = sqrt(dspm_vec);
@@ -113,6 +109,8 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
             z_vec = gather(z_vec);
         end
 
+        % Hyperposterior for next MAP step: IG → d ∝ (θ₀ + z²/2)/(β+3/2);
+        % Gamma uses the corresponding quadratic root.
         if strcmp(self.hyperprior,"Inverse gamma")
             d_sqrt = sqrt((theta0+0.5*z_vec.^2)./(beta + 1.5));
         elseif strcmp(self.hyperprior,"Gamma")

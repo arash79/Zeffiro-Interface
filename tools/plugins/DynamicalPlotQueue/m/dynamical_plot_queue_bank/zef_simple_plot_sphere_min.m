@@ -1,33 +1,21 @@
 function zef_simple_plot_sphere_min(varargin)
-% --- Zeffiro documentation header ---
-% zef_simple_plot_sphere_min — Zef simple plot sphere min.
+%ZEF_SIMPLE_PLOT_SPHERE_MIN  Queue renderer: sphere at min |reconstruction|.
 %
-% Purpose:
-%   Zef simple plot sphere min.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Same zef.reconstruction / source_positions / f_ind path as
+%   zef_simple_plot_sphere_max, with min instead of max. Default radius
+%   10, color [1 0 0]. Deletes and retags 'additional: max sphere' (same
+%   tag as the max renderer).
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.reconstruction (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
 %   zef_simple_plot_sphere_min
+%   zef_simple_plot_sphere_min(radius)
+%   zef_simple_plot_sphere_min(radius, color)
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_simple_plot_sphere_min(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_simple_plot_sphere_max.
 
 if not(isempty(varargin))
     radius_val = varargin{1};
@@ -47,7 +35,8 @@ h_axes = evalin('caller','h_axes_image');
 hold on;
 
 f_ind = evalin('caller','f_ind');
-delete(findobj(h_axes,'Tag','additional: max sphere'));
+delete(findobj(h_axes,'Tag','additional: max sphere')
+);
 r = evalin('base','zef.reconstruction');
 p = evalin('base','zef.source_positions');
 if iscell(r)

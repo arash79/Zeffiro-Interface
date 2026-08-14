@@ -1,41 +1,18 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'smoothing_steps_ele')); — If not(isfield(zef,'smoothing steps ele'));.
+%ZEF_INIT_FORWARD_AND_INVERSE_OPTIONS  Defaults for Settings → Forward and inverse (script).
 %
-% Purpose:
-%   If not(isfield(zef,'smoothing steps ele'));.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.adaptive_refinement_compartments (read, write)
-%   zef.adaptive_refinement_k_param (read, write)
-%   zef.adaptive_refinement_number (read, write)
-%   zef.adaptive_refinement_on (read, write)
-%   zef.adaptive_refinement_thresh_val (read, write)
-%   zef.distance_smoothing_exp (read, write)
-%   zef.distance_smoothing_on (read, write)
-%   zef.exclude_box (read, write)
-%   zef.extensive_relabeling (read, write)
-%   zef.fem_mesh_inflation_strength (read, write)
-%   zef.fix_outer_surface (read, write)
-%   zef.gpu_num (read, write)
-%   zef.initial_mesh_mode (read, write)
-%   zef.lead_field_filter_quantile (read, write)
-%   zef.mesh_optimization_parameter (read, write)
-%   … (39 more)
+%   Script. isfield-guarded defaults only (does not copy widgets). Run
+%   from zef_open_forward_and_inverse_options before the App Designer
+%   figure is created. Covers smoothing, PML, GPU, mesh optimization,
+%   surface/volume/adaptive refinement, FEM inflation, labeling,
+%   distance smoothing, source_model (Whitney). Does not open the
+%   dialog.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'smoothing_steps_ele'));` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
-
+%   See also zef_open_forward_and_inverse_options.
 if not(isfield(zef,'smoothing_steps_ele'));
     zef.smoothing_steps_ele = 100;
 end
@@ -76,6 +53,8 @@ if not(isfield(zef,'streamline_linewidth'));
     zef.streamline_linewidth = 1;
 end
 
+% Perfectly matched layer (PML) bounding box around the FEM mesh.
+% Units follow location_unit; outer_radius / max_size are relative sizes.
 if not(isfield(zef,'pml_outer_radius_unit'));
     zef.pml_outer_radius_unit = 1;
 end
@@ -123,6 +102,8 @@ end;
 if not(isfield(zef,'source_model'));
     zef.source_model = core.types.ZefSourceModel.Whitney;
 end;
+% Lead-field PCG preconditioner: 1 incomplete Cholesky, 2 SSOR
+% (zef_transfer_matrix, not core.linalg.preconditioners).
 if not(isfield(zef,'preconditioner'));
     zef.preconditioner = 1;
 end;

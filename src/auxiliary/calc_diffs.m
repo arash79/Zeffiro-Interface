@@ -1,17 +1,23 @@
-% --- Zeffiro documentation header ---
-% ary_model — Ary model.
+%CALC_DIFFS  Lab one-off: MAG/RDM of one pallomalli_pem.mat vs ary_model.
 %
-% Purpose:
-%   Ary model.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Calls (project):
-%   zef_lead_field_eeg_multilayer_sphere
+%   Script, not a product workflow. Not on any Zeffiro menu. cwd-relative
+%   load data/ary_model/ary_model.mat then zeffiro_projects/pallomalli_pem.mat
+%   (expects zef_data in that file). Those paths are not in this repo.
+%   Extra numbered load blocks (%% 2–4) are commented; unlike
+%   calculate_differences this file does not average-reference L.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `ary_model` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   Local mag_rdm_fn: analytic sphere L from
+%   zef_lead_field_eeg_multilayer_sphere(sensors_attached_volume(:,1:3)/1000,
+%   source_positions/1000, [], ary_model) vs zef_data.L. Nested mag_fn /
+%   rdm_fn match src/auxiliary/mag_fn.m and rdm_fn.m. Leaves mag_v_1,
+%   rdm_v_1, s_p_1, plus La/Lfem from the last local call.
+%
+%   See also calculate_differences, mag_fn, rdm_fn.
 
 load data/ary_model/ary_model.mat;
 
@@ -46,23 +52,6 @@ s_p_1 = zef_data.source_positions;
 %% Function definitions
 
 function [mag, rdm, La, Lfem] = mag_rdm_fn(ary_model, zef_data)
-
-% Compare the FEM lead field Lfem (taken from zef_data) to an analytical
-% lead field La (produced from a given Ary model). Returns the MAG and RDM
-% over the columns of the lead fields.
-%
-% Input:
-%
-% - ary_model: the struct loaded from data → ary_model → ary_model.m,
-%              which can be used to calculate the analytical lead field
-%              for comparison purposes.
-%
-% - zef_data: the zef struct that contains the FEM-based lead field.
-%
-% Output:
-%
-% - The MAG and RDM difference measures between the lead fields.
-
 La = zef_lead_field_eeg_multilayer_sphere( ...
     zef_data.sensors_attached_volume(:,1:3) / 1000, ...
     zef_data.source_positions / 1000, ...

@@ -1,26 +1,19 @@
-% --- Zeffiro documentation header ---
-% examples.studies.decision_making.helpers.z_inverse_info = [z_inverse_info repmat({'Maximum point'}, size(z_inverse_info, 1), 1); z_inverse_info repmat({'Cluster centre'}, size(z_inverse_info, 1), 1)]; — Example or study script demonstrating z_inverse_info = [z_inverse_info repmat({'Maximum point'}, size(z_inverse_info, 1), 1); z_inverse_info repmat({'Cluster centre'}, size(z_inverse_info, 1), 1)];.
+%ZEF_FINAL_RECONSTRUCTION_FOCAL_EPILEPSY  Sum reconstructions in the winning cluster.
 %
-% Purpose:
-%   Example or study script demonstrating z_inverse_info = [z_inverse_info repmat({'Maximum point'}, size(z_inverse_info, 1), 1); z_inverse_info repmat({'Cluster centre'}, size(z_inverse_info, 1), 1)];.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMModel (read)
-%   zef.reconstruction (read)
-%   zef.source_positions (read)
+%   Script. Needs J_aux, GMModel, max_ind, z_inverse_results, z_inverse_info,
+%   z_ref_points, z_max_deviations, z_mean_deviations from
+%   zef_cluster_reconstructions_focal_epilepsy. Duplicates each method as
+%   'Maximum point' and 'Cluster centre', keeps J_aux rows, sums those
+%   reconstructions into z_final, then zef_rec_maximizer →
+%   z_final_max_point. Re-runs zef_cluster_reconstruction on the last
+%   kept reconstruction for z_final_*_deviation.
 %
-% Calls (project):
-%   zef_cluster_reconstruction
-%   zef_rec_maximizer
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `examples.studies.decision_making.helpers.z_inverse_info = [z_inverse_info repmat({'Maximum point'}, size(z_inverse_info, 1), 1); z_inverse_info repmat({'Cluster centre'}, size(z_inverse_info, 1), 1)];` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_show_results_focal_epilepsy.
 
 z_inverse_info = [z_inverse_info repmat({'Maximum point'}, size(z_inverse_info, 1), 1); z_inverse_info repmat({'Cluster centre'}, size(z_inverse_info, 1), 1)];
 z_inverse_results = [z_inverse_results z_inverse_results];

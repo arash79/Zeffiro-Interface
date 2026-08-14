@@ -1,43 +1,18 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_update_fss_legacy(zef)
-% --- Zeffiro documentation header ---
-% zef_update_fss_legacy — Syncs GUI control values into `zef` for fss_legacy.
+%ZEF_UPDATE_FSS_LEGACY  Ten widgets → zef.inv_synth_source; unit-normalize ori.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for fss_legacy.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_update_fss_legacy(zef)
 %
-% Outputs:
-%   zef
+%   Called from Plot source(s) and Create synthetic data. Columns:
+%   xyz, ori, amplitude, noise, visual size, color. Does not project
+%   through L.
 %
-% Zef fields (observed):
-%   zef.h_inv_synth_source_1 (read)
-%   zef.h_inv_synth_source_10 (read)
-%   zef.h_inv_synth_source_2 (read)
-%   zef.h_inv_synth_source_3 (read)
-%   zef.h_inv_synth_source_4 (read)
-%   zef.h_inv_synth_source_5 (read)
-%   zef.h_inv_synth_source_6 (read)
-%   zef.h_inv_synth_source_7 (read)
-%   zef.h_inv_synth_source_8 (read)
-%   zef.h_inv_synth_source_9 (read)
-%   zef.inv_synth_source (read, write)
-%
-% Calls (project):
-%   zef_update_fss_legacy
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_update_fss_legacy(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_find_source_legacy, zef_init_fss_legacy.
 
 zef.inv_synth_source = str2num(get(zef.h_inv_synth_source_1 ,'string'));
 zef.inv_synth_source = zef.inv_synth_source(:);

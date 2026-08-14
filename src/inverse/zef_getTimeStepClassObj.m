@@ -1,36 +1,32 @@
 function [f,t] = zef_getTimeStepClassObj(f_data, f_ind, zef, ClassObj)
-% --- Zeffiro documentation header ---
-% zef_getTimeStepClassObj — Zef get Time Step Class Obj.
+%ZEF_GETTIMESTEPCLASSOBJ  Extract and average one inversion frame via CommonInverseParameters.
 %
-% Purpose:
-%   Zef get Time Step Class Obj.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   f_data
-%   f_ind
-%   zef
-%   ClassObj
+%   Class-object version of zef_getTimeStep. Uses ClassObj.time_start,
+%   time_window, time_step, and sampling_frequency to select sample columns
+%   for frame f_ind when inv_data_mode is "filtered_temporal". Optionally
+%   averages over the interval when zef.inv_time_interval_averaging is set.
+%   Always column-means f when more than one sample remains. Raw mode selects
+%   f_data(:, f_ind).
 %
-% Outputs:
-%   f
-%   t
+%   [f, t] = zef_getTimeStepClassObj(f_data, f_ind, zef, ClassObj)
 %
-% Zef fields (observed):
-%   zef.inv_data_mode (read)
-%   zef.inv_time_interval_averaging (read)
+%   Inputs
+%     f_data   - filtered measurements (n_channels x n_samples).
+%     f_ind    - 1-based frame index.
+%     zef      - session struct (base workspace if omitted).
+%     ClassObj - inverse.CommonInverseParameters instance.
 %
-% Calls (project):
-%   zef_getTimeStepClassObj
+%   Outputs
+%     f        - n_channels x 1 column vector after any averaging.
+%     t        - sample times in seconds for the selected window (filtered mode).
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[f, t]] = zef_getTimeStepClassObj(f_data, f_ind, zef, ClassObj)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_getTimeStep, zef_getFilteredDataClassObj,
+%            zef_inverse_extract_bundle.
 
 if nargin < 3
 zef = evalin('base','zef');

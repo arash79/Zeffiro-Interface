@@ -1,34 +1,15 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'inv_synth_source')); — If not(isfield(zef,'inv synth source'));.
+%ZEF_INIT_FSS_LEGACY  Default inv_synth_source onto the ten legacy widgets.
 %
-% Purpose:
-%   If not(isfield(zef,'inv synth source'));.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_inv_synth_source_1 (read)
-%   zef.h_inv_synth_source_10 (read)
-%   zef.h_inv_synth_source_2 (read)
-%   zef.h_inv_synth_source_3 (read)
-%   zef.h_inv_synth_source_4 (read)
-%   zef.h_inv_synth_source_5 (read)
-%   zef.h_inv_synth_source_6 (read)
-%   zef.h_inv_synth_source_7 (read)
-%   zef.h_inv_synth_source_8 (read)
-%   zef.h_inv_synth_source_9 (read)
-%   zef.inv_synth_source (read, write)
+%   Script. Called from zef_find_synthetic_source_legacy_window.
+%   Default row [0 0 0 1 0 0 10 0 3 1] (xyz, ori, amp, noise, size,
+%   color). Does not invert or write measurements.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'inv_synth_source'));` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_fss_legacy.
 
 if not(isfield(zef,'inv_synth_source'));
     zef.inv_synth_source = [0 0 0 1 0 0 10 0 3 1];

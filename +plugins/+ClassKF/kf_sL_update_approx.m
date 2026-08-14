@@ -1,31 +1,18 @@
 function [m, P, K, D] = kf_sL_update_approx(m, P, y, H, R)
-% --- Zeffiro documentation header ---
-% plugins.ClassKF.kf_sL_update_approx — Kf s L update approx.
+%KF_SL_UPDATE_APPROX  Kalman update with approximate P^{1/2} for sLORETA D.
 %
-% Purpose:
-%   Kf s L update approx.
-%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   m
-%   P
-%   y
-%   H
-%   R
+%   [m, P, K, D] = kf_sL_update_approx(m, P, y, H, R)
 %
-% Outputs:
-%   m
-%   P
-%   K
-%   D
+%   Approximates a square-root factor of P with N=5 / M=1 Schulz iterations,
+%   then D = w .* P_sqrtm_right with the same sLORETA weights as kf_sL_update.
+%   Measurement update matches kf_update.
 %
-% Calls (project):
-%   plugins.ClassKF.kf_sL_update_approx
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[m, P, K]] = plugins.ClassKF.kf_sL_update_approx(m, P, y, H, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also plugins.ClassKF.kf_sL_update.
 
 N = 5; M_iter = 1;
     Z = eye(length(m));

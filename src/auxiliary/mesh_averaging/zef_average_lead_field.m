@@ -1,23 +1,17 @@
-% --- Zeffiro documentation header ---
-% L_1 = zef — L 1 = zef.
+%ZEF_AVERAGE_LEAD_FIELD  Lab script: coarsen zef.L onto a lattice (incomplete).
 %
-% Purpose:
-%   L 1 = zef.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.source_positions (read)
+%   Script. Needs workspace zef.L, zef.source_positions, and source_count.
+%   Calls zef_decompose_soure_space then accumulates columns into L_2.
+%   The loop also reads undeclared L and L_tes and later divides L (not
+%   L_2) by dof_count using M=n_sensors as if it were n_sources. Does not
+%   write zef.L. One-off / unfinished mesh-averaging helper.
 %
-% Calls (project):
-%   zef_decompose_soure_space
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `L_1 = zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_decompose_soure_space.
 
 L_1 = zef.L;
 source_positions = zef.source_positions;

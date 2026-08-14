@@ -1,55 +1,19 @@
-# +examples/+studies/+santtus_peeling_article/+helpers
+# Peeling-article helpers
 
-## Purpose of this folder
+Called from `examples.studies.santtus_peeling_article.main`. They are not standalone demos and not `zef_inverse_run`. Each Monte Carlo trial adds noise to measurements, runs a **legacy Inverse-tools plugin** (MNE tool or Dipole Scan), then scores localization error against a known synthetic source.
 
-Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
-
-## Contents
-
-MATLAB sources:
-- `zef_rec_diff.m` — **examples.studies.santtus_peeling_article.helpers.function [dist_vec, angle_vec, mag_vec, dispersion_vec] = zef_rec_diff( ...**: Example or study script demonstrating function [dist_vec, angle_vec, mag_vec, dispersion_vec] = zef_rec_diff( ....
-- `zef_sensitivity_map_dipoleScan.m` — **examples.studies.santtus_peeling_article.helpers.hauk_map**: Example or study script demonstrating hauk_map.
-- `zef_sensitivity_map_mne.m` — **examples.studies.santtus_peeling_article.helpers.sensitivity_map**: Example or study script demonstrating sensitivity_map.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+Parent study README: [../README.md](../README.md). Metrics are related to `utilities.sensitivity.compute_metrics` but these helpers drive the GUI solvers.
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+% Inside main(...): n_runs noisy inverses per method, then a difference map.
+zef_sensitivity_map_mne(project_struct, "sLORETA", n_runs, noise_db, diff_type, dispersion_radius);
+zef_sensitivity_map_dipoleScan(project_struct, ..., n_runs, noise_db, ...);
 ```
 
-Representative entry points in this folder:
-- ``examples.studies.santtus_peeling_article.helpers.function [dist_vec, angle_vec, mag_vec, dispersion_vec] = zef_rec_diff( ...(zef, inverse_method, noise_db, diff_type, …)` with project root and `src` on the path.`
-- ``examples.studies.santtus_peeling_article.helpers.hauk_map(project_struct, n_reconstructions, noise_level, diff_type, …)` with project root and `src` on the path.`
-- ``examples.studies.santtus_peeling_article.helpers.sensitivity_map(project_struct, weighting_type, n_reconstructions, noise_level, …)` with project root and `src` on the path.`
+| Function | Role |
+|----------|------|
+| `zef_sensitivity_map_mne(project_struct, inverse_method, n_runs, noise_db, diff_type, dispersion_radius)` | Monte Carlo for `"sLORETA"` / `"dSPM"` / `"MNE"` via **Minimum norm estimation tool** callbacks (`zef_minimum_norm_estimation`, `zef_find_mne_reconstruction`) |
+| `zef_sensitivity_map_dipoleScan(...)` | Same pattern for Inverse tools → **Dipole Scan** (`zef_dipoleScan`) |
+| `zef_rec_diff(zef, inverse_method, noise_db, diff_type, ...)` | Localization metrics on the current `zef.reconstruction` vs the true source (related to `utilities.sensitivity.compute_metrics`) |
 
-## Examples
-
-Run scripts directly after startup, e.g. `run('+examples/+studies/+santtus_peeling_article/+helpers/zef_rec_diff.m')`.
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Require those plugins on the path and a `zef` with `L`, interpolation, and a known synthetic source (the study’s `main` sets that up with `zef_eeg_lead_field`). `project_struct` is the session struct the study passes through, not a Brainstorm protocol.

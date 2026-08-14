@@ -1,31 +1,23 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 function [p] = B_prod(u,entry_ind,n,t,gpu_extended_memory)
-% --- Zeffiro documentation header ---
-% B_prod — B prod.
+%B_PROD  Discrete curl: H-component p from E-field u on tetra edges (leap-frog).
 %
-% Purpose:
-%   B prod.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Inputs:
-%   u
-%   entry_ind
-%   n
-%   t
-%   gpu_extended_memory
+%   entry_ind 1/2/3 selects the Cartesian component of curl (pairs [2 3],
+%   [3 1], [1 2]). Face areas come from cross products of edge vectors;
+%   u is divided by 6 (tetra volume factor). gpu_extended_memory: gather
+%   when in [0 2].
 %
-% Outputs:
-%   p
+%   p = B_prod(u, entry_ind, n, t, gpu_extended_memory)
 %
-% Side effects:
-%   - GPU
+%   Input: u nodal/edge field, n [n_nodes × 3], t tetra [n_tet × 4] uint32.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[p] = B_prod(u, entry_ind, n, t, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also B_T_prod, compute_data_gpu.
+
+
 
 
 u = gpuArray(single(u));
@@ -50,6 +42,8 @@ for i = 1 : 4
 
     %u_perm = u(t(:,i),:);
 
+% Face area of the tetra face opposite vertex i, in the (entry_ind) plane:
+% (1/6) u-weighted curl contribution (u already divided by 6 above).
     aux_vec = n(t(:,v_ind(i,2)),entry_ind_vec);
     v1 = n(t(:,v_ind(i,4)),entry_ind_vec);
     v1 = v1 - aux_vec;

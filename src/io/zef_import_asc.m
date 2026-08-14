@@ -1,28 +1,26 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [c_1] = zef_import_asc(c_0,varargin)
-% --- Zeffiro documentation header ---
-% zef_import_asc — Loads external data or a saved Zeffiro project into `zef`.
+%ZEF_IMPORT_ASC  Parse one line of FreeSurfer-style ASCII numeric data.
 %
-% Purpose:
-%   Loads external data or a saved Zeffiro project into `zef`.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   c_0
-%   varargin
+%   Converts a character line with str2num and returns columns 1:3 by
+%   default, or columns n_1:n_2 when two extra arguments are given.
 %
-% Outputs:
-%   c_1
+%   c_1 = zef_import_asc(c_0)
+%   c_1 = zef_import_asc(c_0, n_1, n_2)
 %
-% Calls (project):
-%   zef_import_asc
+%   Inputs
+%     c_0  - character vector or string from one file line.
+%     n_1  - first column index (optional).
+%     n_2  - last column index (optional).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[c_1] = zef_import_asc(c_0, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output
+%     c_1 - numeric matrix of selected columns.
+%
+%   See also zef_import_segmentation_legacy, zef_import_parcellation_points.
 
 c_1 = str2num(c_0);
 

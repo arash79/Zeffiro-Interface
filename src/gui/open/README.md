@@ -1,72 +1,20 @@
-# src/gui/open
+# Settings dialogs (`src/gui/open`)
 
-## Purpose of this folder
+`zef_open_*` **scripts** instantiate an App Designer options window, copy `h_*` onto `zef`, set `ValueChangedFcn` to the matching `zef_update_*`, and fill dropdowns. They expect workspace `zef`.
 
-Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+Menu labels are `Text=` on `uimenu` in `zef_menu_tool_app_exported`; `MenuSelectedFcn` is wired in `zef_menu_tool.m`.
 
-## Contents
+| Menu item | File | After open |
+|-----------|------|------------|
+| **Settings → Forward and inverse processing options** | `zef_open_forward_and_inverse_options` | then `zef_update`. Compartment lists via `zef_get_active_compartments` (**Active compartments** plus each tissue name). Labeling-priority menus → `zef_update_labeling_priority` |
+| **Settings → Graphics processing options** | `zef_open_graphics_options` | then `zef_update` |
+| **Settings → Hierarchical prior options** | `zef_open_gaussian_prior_options` | then `zef_update`. **Plot** → `zef_plot_hyperprior` |
+| **Settings → System settings (zeffiro_interface.ini)** | `zef_open_system_settings` | no `zef_update`. **Save** / **Apply** write the INI |
+| **Settings → Parameter profile** | `zef_open_parameter_profile` | **Save** / **Apply** write `zeffiro_parameters.ini` |
+| **Settings → Segmentation profile** | `zef_open_segmentation_profile` | **Save** writes `zeffiro_segmentation.ini` (what `zef_init_compartments` reads) |
+| **Settings → Pre-settings profile** | `zef_open_init_profile` | **Apply** → `zef_apply_init_profile` → `zef_init_init_profile` |
+| **Settings → Plugin settings** | `zef_open_plugin_settings` | **Apply** → `zef_save_plugin_settings; zef_plugin` (rebuilds plugin menus) |
 
-MATLAB sources:
-- `zef_open_init_profile.m` — **zef_data = zef_init_profile;**: Zef data = zef init profile;.
-- `zef_open_parameter_profile.m` — **zef_data = zef_parameter_profile;**: Zef data = zef parameter profile;.
-- `zef_open_plugin_settings.m` — **zef_data = zef_plugin_settings;**: Zef data = zef plugin settings;.
-- `zef_open_segmentation_profile.m` — **zef_data = zef_segmentation_profile;**: Zef data = zef segmentation profile;.
-- `zef_open_system_settings.m` — **zef_data = zef_system_settings;**: Zef data = zef system settings;.
-- `zef_open_forward_and_inverse_options.m` — **zef_init_forward_and_inverse_options;**: Initializes GUI widgets and default `zef` fields for forward_and_inverse_options;.
-- `zef_open_gaussian_prior_options.m` — **zef_init_gaussian_prior_options;**: Initializes GUI widgets and default `zef` fields for gaussian_prior_options;.
-- `zef_open_graphics_options.m` — **zef_init_graphics_options;**: Initializes GUI widgets and default `zef` fields for graphics_options;.
+Closing a dialog does not by itself write INI files; **system/plugin** (and the profile **Save** buttons) save when their save control is used.
 
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-- **zef_init_forward_and_inverse_options;**: GUI callback or dialog (`zef_init_forward_and_inverse_options;`).
-- **zef_init_gaussian_prior_options;**: GUI callback or dialog (`zef_init_gaussian_prior_options;`).
-- **zef_init_graphics_options;**: GUI callback or dialog (`zef_init_graphics_options;`).
-- **zef_data = zef_init_profile;**: GUI callback or dialog (`zef_data = zef_init_profile;`).
-- **zef_data = zef_parameter_profile;**: GUI callback or dialog (`zef_data = zef_parameter_profile;`).
-- **zef_data = zef_plugin_settings;**: GUI callback or dialog (`zef_data = zef_plugin_settings;`).
-- **zef_data = zef_segmentation_profile;**: GUI callback or dialog (`zef_data = zef_segmentation_profile;`).
-- **zef_data = zef_system_settings;**: GUI callback or dialog (`zef_data = zef_system_settings;`).
-
-## Programmatic usage
-
-From the project root:
-
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
-```
-
-Representative entry points in this folder:
-- `Call `zef_data = zef_init_profile;` from MATLAB with the project root on the path.`
-- `Call `zef_data = zef_parameter_profile;` from MATLAB with the project root on the path.`
-- `Call `zef_data = zef_plugin_settings;` from MATLAB with the project root on the path.`
-- `Call `zef_data = zef_segmentation_profile;` from MATLAB with the project root on the path.`
-- `Call `zef_data = zef_system_settings;` from MATLAB with the project root on the path.`
-- `Call `zef_init_forward_and_inverse_options;` from MATLAB with the project root on the path.`
-- `Call `zef_init_gaussian_prior_options;` from MATLAB with the project root on the path.`
-- `Call `zef_init_graphics_options;` from MATLAB with the project root on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Layout sources: `src/gui/apps/*.mlapp` (and a few non-exported app classes next to them).

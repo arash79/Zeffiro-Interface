@@ -1,38 +1,22 @@
 function contrast_val = zef_update_contrast(varargin)
-% --- Zeffiro documentation header ---
-% zef_update_contrast — Syncs GUI control values into `zef` for contrast.
+%ZEF_UPDATE_CONTRAST  Apply **Contrast:** alone (split helper; Figure tool does not call this).
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for contrast.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Reads zef.h_update_contrast.Value (or varargin{2}) and
+%   zef.update_brightness, rebuilds zef.h_axes1 (or varargin{1}) Colormap
+%   via zef_brightness_and_contrast / zef_colormap. The Figure-tool
+%   **Contrast:** / **Brightness:** Callbacks call
+%   zef_update_contrast_and_brightness instead.
 %
-% Outputs:
-%   contrast_val
+%   contrast_val = zef_update_contrast
+%   contrast_val = zef_update_contrast(h_axes)
+%   contrast_val = zef_update_contrast(h_axes, slider_value)
 %
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%   zef.h_update_colormap (read)
-%   zef.h_update_contrast (read)
-%   zef.update_brightness (read)
-%
-% Calls (project):
-%   zef_brightness_and_contrast
-%   zef_colormap
-%   zef_update_contrast
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[contrast_val] = zef_update_contrast(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_contrast_and_brightness, zef_update_brightness.
 slider_value_new = evalin('base','zef.h_update_contrast.Value');
 
 if not(isempty(varargin))

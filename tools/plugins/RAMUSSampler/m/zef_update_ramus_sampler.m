@@ -1,39 +1,14 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef.inv_multires_n_levels = str2num(get(zef — Zef.inv multires n levels = str2num(get(zef.
+%ZEF_UPDATE_RAMUS_SAMPLER  Sampler fig widgets → zef.inv_multires_* / n_sampler / burn-in.
 %
-% Purpose:
-%   Zef.inv multires n levels = str2num(get(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_inv_beta (read)
-%   zef.h_inv_data_segment (read)
-%   zef.h_inv_high_cut_frequency (read)
-%   zef.h_inv_hyperprior (read)
-%   zef.h_inv_likelihood_std (read)
-%   zef.h_inv_low_cut_frequency (read)
-%   zef.h_inv_multires_n_decompositions (read)
-%   zef.h_inv_multires_n_levels (read)
-%   zef.h_inv_multires_sparsity (read)
-%   zef.h_inv_n_burn_in (read)
-%   zef.h_inv_n_sampler (read)
-%   zef.h_inv_sampling_frequency (read)
-%   zef.h_inv_theta0 (read)
-%   zef.h_inv_time_1 (read)
-%   zef.h_inv_time_2 (read)
-%   … (21 more)
+%   Script. Start Callback (with ramus_sampling_process). Copies
+%   sparsity, n_levels, hyperprior, beta. Does not sample.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.inv_multires_n_levels = str2num(get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also ramus_sampling_process.
 
 zef.inv_multires_n_levels = str2num(get(zef.h_inv_multires_n_levels,'string'));
 zef.inv_multires_sparsity = str2num(get(zef.h_inv_multires_sparsity,'string'));

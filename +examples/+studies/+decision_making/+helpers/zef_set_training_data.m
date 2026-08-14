@@ -1,22 +1,19 @@
-% --- Zeffiro documentation header ---
-% examples.studies.decision_making.helpers.data_ind = 1; — Example or study script demonstrating data_ind = 1;.
+%ZEF_SET_TRAINING_DATA  Copy one training trial onto reconstruction databank nodes.
 %
-% Purpose:
-%   Example or study script demonstrating data_ind = 1;.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
-%   zef.resection_points (read, write)
+%   Script. Hard-codes data_ind=1, snr_ind=1, frame_number=1 and
+%   load(<this +helpers folder>/data/training_dataset_p1_10dB.mat)
+%   expecting variable training_data. Walks zef.dataBank.tree: each node
+%   with type 'reconstruction' gets
+%   training_data.z_inverse_results{1}{1}{rec_ind} at that frame.
+%   Sets zef.resection_points from training_data.dipole_positions{1}{1}.
+%   That data/ file is not in the repo; place it beside this helper.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `examples.studies.decision_making.helpers.data_ind = 1;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_create_training_data_focal_epilepsy.
 
 data_ind = 1;
 snr_ind = 1;
@@ -26,7 +23,8 @@ file_name = 'training_dataset_p1_10dB.mat';
 folder_name = [fileparts(mfilename('fullpath')) filesep 'data'];
 file_name = [folder_name filesep file_name];
 
-load(file_name);
+load(file_name)
+;
 
 data_tree = zef.dataBank.tree;
 rec_ind = 1;

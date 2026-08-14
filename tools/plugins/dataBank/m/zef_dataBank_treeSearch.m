@@ -1,27 +1,26 @@
 function [h_node_output, node_found] = zef_dataBank_treeSearch(h_node_input, node_name)
-% --- Zeffiro documentation header ---
-% zef_dataBank_treeSearch — Zef data Bank tree Search.
+%ZEF_DATABANK_TREESEARCH  Find a uitreenode whose Text equals node_name.
 %
-% Purpose:
-%   Zef data Bank tree Search.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   h_node_input
-%   node_name
+%   Used by zef_dataBank_add_data_item to select a parent before Add.
+%   Depth-first over Children; first Text match wins. Empty node_name
+%   matches nothing, so SelectedNodes stays empty and Add uses the root.
 %
-% Outputs:
-%   h_node_output
-%   node_found
+%   [h_node_output, node_found] = zef_dataBank_treeSearch(h_node_input, node_name)
 %
-% Calls (project):
-%   zef_dataBank_treeSearch
+%   Inputs
+%     h_node_input  - uitree or uitreenode (has .Children).
+%     node_name     - char compared with Children(i).Text, or [] .
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[h_node_output, node_found]] = zef_dataBank_treeSearch(h_node_input, node_name)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output
+%     h_node_output  - matching uitreenode, or [] if none.
+%     node_found     - 1 if a match was found, else 0.
+%
+%   See also zef_dataBank_add_data_item.
 
 node_found = 0;
 h_node_output = [];

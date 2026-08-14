@@ -1,40 +1,47 @@
 function [domain_labels, subcompartment_labeling_priority_vec, compartment_labeling_priority_vec] = zef_choose_domain_labels(zef, label_array, use_labeling_priority, ordinal_index)
-% --- Zeffiro documentation header ---
-% zef_choose_domain_labels — Zef choose domain labels.
+%ZEF_CHOOSE_DOMAIN_LABELS  Pick one domain label per tet from candidate columns.
 %
-% Purpose:
-%   Zef choose domain labels.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   label_array
-%   use_labeling_priority
-%   ordinal_index
+%   Builds a priority rank per submesh (and per compartment). If
+%   use_labeling_priority is true, starts from each
+%   zef.<tag>_labeling_priority (tag from compartment_tags{reuna_mesh_ind});
+%   zeros are replaced by reverse index n…1 offset by the max stored
+%   priority. If false, priority is only that reverse index.
 %
-% Outputs:
-%   domain_labels
-%   subcompartment_labeling_priority_vec
-%   compartment_labeling_priority_vec
+%   When label_array is nonempty (n_tet-by-k candidate submesh indices,
+%   typically the node labels of a tet's vertices), each row keeps the
+%   column with the smallest priority. ordinal_index > 1 NaNs out the
+%   first ordinal_index-1 minima before taking min (default 1). Empty
+%   label_array leaves domain_labels []. Returned priority vectors are
+%   then converted to ranks (1 = highest priority).
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.reuna_mesh_ind (read)
-%   zef.reuna_p (read)
-%   zef.reuna_submesh_ind (read)
+%   Callers: zef_mesh_labeling_step (initial labeling); zef_mesh_relabeling
+%   when use_labeling_priority; zef_update_labeling_priority (third output
+%   only, with empty label_array) for the Mesh-tool labeling-priority list.
+%   Callers always pass use_labeling_priority; nargin<3 only sets an unused
+%   local priority_mode.
 %
-% Calls (project):
-%   zef_choose_domain_labels
+%   [domain_labels, sub_pri, comp_pri] = zef_choose_domain_labels(zef, label_array, use_labeling_priority)
+%   [domain_labels, sub_pri, comp_pri] = zef_choose_domain_labels(zef, label_array, use_labeling_priority, ordinal_index)
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Inputs
+%     zef                    - session with reuna_p, reuna_submesh_ind,
+%                              reuna_mesh_ind, compartment_tags,
+%                              <tag>_labeling_priority.
+%     label_array            - n-by-k candidate labels, or [].
+%     use_labeling_priority  - logical; use stored *_labeling_priority.
+%     ordinal_index          - which min to take (default 1).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[domain_labels, subcompartment_labeling_priority_vec, compartment_labeling_priority_vec]] = zef_choose_domain_labels(zef, label_array, use_labeling_priority, ordinal_index)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   Outputs
+%     domain_labels                         - n-by-1 chosen labels, or [].
+%     subcompartment_labeling_priority_vec  - rank per submesh.
+%     compartment_labeling_priority_vec     - rank per reuna_mesh_ind entry.
+%
+%   See also zef_mesh_labeling_step, zef_mesh_relabeling, zef_update_labeling_priority.
 if nargin < 3
     priority_mode = 1; 
 end

@@ -1,110 +1,41 @@
-% Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-% See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-% TODO Documentation
-%
-% This function decomposes a given set of nodes and tetrahedra (degrees of
-% freedom or DOF) into
-%
-% Input:
-%
-% - nodes
-%
-%   The nodes that make up a finite element mesh.
-%
-% - tetrahedra
-%
-%   Quadruples of node indices that indicate which nodes participate in which
-%   tetrahedra.
-%
-% - brain_ind
-%
-%   Linear indices of tetrahedra that are in the brain and can contain brain
-%   activity.
-%
-% - varargin{1}
-%
-%   Source indices. If not set, these are assumed to be the same as brain_ind.
-%
-% - varargin{2}
-%
-%   Wanted number of sources. If not set, these are fetched from the global
-%   zef instance with evalin.
-%
-% - varargin{3}
-%
-%   DOF decomposition type. TODO. If not set, this is again fetched from the
-%   global zef instance with evalin.
-%
-% Output:
-%
-% - nearest_neighbour_inds
-%
-%   Can be used to index into below decomposition_source_inds to find out
-%   which tetra in the global mesh is closest to the tetrahedron corresponding
-%   to it. For example
-%
-%       decomposition_source_inds(nearest_neighbour_inds(1))
-%
-%   would produce the nearest neighbour of the tetrahedron indicated by
-%   brain_ind(1).
-%
-% - decomposition_count
-%
-%   The number of incidences of each (sorted) index in nearest_neighbour_inds,
-%   meaning how many times each nearest neghbour is the nearest neighbour of
-%   some tetrahedron. The main use of this is for normalizing results when the
-%   index sets are used.
-%
-% - dof_positions
-%
-%   An array of decomposition node positions in a Cartesian coordinate system.
-%   Depending on the current zef.dof_decomposition_type integer value, this
-%   might be just (1 or 3) the set of barycentra of the tetrahedra in the FE
-%   mesh, (2) a rectangular grid whose resolution is determined by the minimum
-%   and maximum values of the mesh coordinates + a lattice constant computed
-%   from these.
-%
-% - decomposition_source_inds
-%
-%   These can be used to index into the input brain_ind to determine which of
-%   them can be used as dipolar sources in a head model.
-% --- Zeffiro documentation header ---
-% function [ ... — Function [ .
-%
-% Purpose:
-%   Function [ ....
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Inputs:
-%   in_center_points
-%   in_lattice_res_x
-%   in_lattice_res_y
-%   in_lattice_res_z
-%
-% Zef fields (observed):
-%   zef.dof_decomposition_type (read)
-%   zef.n_sources (read)
-%
-% Calls (project):
-%   zef_decompose_dof_space
-%   zef_tetra_barycentra
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `function [ ...(in_center_points, in_lattice_res_x, in_lattice_res_y, in_lattice_res_z)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 function [ ...
     nearest_neighbour_inds, ...
     decomposition_count, ...
     dof_positions, ...
     decomposition_source_inds ...
     ] = zef_decompose_dof_space(nodes,tetrahedra,brain_ind,varargin)
+%ZEF_DECOMPOSE_DOF_SPACE  Map brain tetrahedra to a reduced source / DOF set.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Builds a source lattice from brain tetrahedra and, for each brain tetra,
+%   the nearest lattice site. Type comes from varargin{3} or
+%   zef.dof_decomposition_type in the base workspace:
+%     1  tetra barycentra of source_ind, KD-tree nearest neighbour
+%     2  rectangular lattice sized from n_sources and the brain bounding box
+%     3  identity: one DOF per brain tetra
+%
+%   Inputs
+%     nodes        - N-by-3 mesh nodes (project length unit, typically mm).
+%     tetrahedra   - T-by-4 node indices.
+%     brain_ind    - linear indices of tetrahedra that may hold activity.
+%     varargin{1}  - source tetra indices (default: brain_ind).
+%     varargin{2}  - wanted source count n_sources (default: zef.n_sources).
+%     varargin{3}  - dof_decomposition_type (default: zef.dof_decomposition_type).
+%
+%   Outputs
+%     nearest_neighbour_inds     - for each brain tetra, index into the
+%                                  reduced DOF set (and into
+%                                  decomposition_source_inds for types 1–2).
+%     decomposition_count        - how many brain tetra map to each DOF
+%                                  (for normalizing reconstructions).
+%     dof_positions              - Cartesian coordinates of the reduced DOFs.
+%     decomposition_source_inds  - indices into brain_ind usable as sources.
+%
+%   See also zef_tetra_barycentra, zef_lead_field_matrix.
 
 
 

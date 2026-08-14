@@ -1,28 +1,19 @@
 function [d] = zef_distance_to_resection(points, mesh_points, mesh_triangles)
-% --- Zeffiro documentation header ---
-% zef_distance_to_resection — Zef distance to resection.
+%ZEF_DISTANCE_TO_RESECTION  knnsearch to resection points; 0 if inside a mesh.
 %
-% Purpose:
-%   Zef distance to resection.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   points
-%   mesh_points
-%   mesh_triangles
+%   d = zef_distance_to_resection(points, mesh_points)
+%   d = zef_distance_to_resection(points, mesh_points, mesh_triangles)
 %
-% Outputs:
-%   d
+%   Two arguments: knnsearch(mesh_points, points). Three: points inside
+%   the triangle mesh (zef_tetra_in_compartment) get d=0; others knnsearch.
+%   Used by the epilepsy study helper zef_show_results_focal_epilepsy.
 %
-% Calls (project):
-%   zef_distance_to_resection
-%   zef_tetra_in_compartment
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[d] = zef_distance_to_resection(points, mesh_points, mesh_triangles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_distance_to_mesh, zef_tetra_in_compartment.
 
 if nargin == 2
     [~, d]=knnsearch(mesh_points, points);

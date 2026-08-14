@@ -1,32 +1,26 @@
 function zef = zef_dataBank_FunctionsDropDown(zef)
-% --- Zeffiro documentation header ---
-% zef_dataBank_FunctionsDropDown — Zef data Bank Functions Drop Down.
+%ZEF_DATABANK_FUNCTIONSDROPDOWN  Show the Combine or Import/Export panel.
 %
-% Purpose:
-%   Zef data Bank Functions Drop Down.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   FunctionsDropDown.ValueChangedFcn in zef_open_dataBank. Hides
+%   combinePanel, importPanel, and mag2gragPanel, then:
+%     'combine Lf'     → combinePanel Visible On
+%     'Import/Export'  → importPanel moved to combinePanel.Position, Visible On
+%     'mag2grad'       → empty case
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_FunctionsDropDown(zef)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef  - session with dataBank.app. nargin==0 → base.
 %
-% Calls (project):
-%   zef_dataBank_FunctionsDropDown
+%   Output
+%     zef  - panel visibility updated. nargout==0 → assignin base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dataBank_FunctionsDropDown(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_open_dataBank, zef_dataBank_combineLeadFields.
 
 if nargin == 0
     zef = evalin('base','zef');

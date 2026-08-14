@@ -1,28 +1,29 @@
 function [smoothed_nodes] = zef_smooth_surface(nodes,triangles,smoothing_parameter,n_smoothing)
-% --- Zeffiro documentation header ---
-% zef_smooth_surface — Zef smooth surface.
+%ZEF_SMOOTH_SURFACE  Taubin λ=1 / μ=−1 Laplacian smooth of a triangle mesh.
 %
-% Purpose:
-%   Zef smooth surface.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   triangles
-%   smoothing_parameter
-%   n_smoothing
+%   Builds the undirected adjacency of triangles, then for each iteration
+%   moves every referenced vertex toward (then away from) the mean of its
+%   neighbours: x ← x + λ s (Ax/deg − x), then the same with μ = −1.
+%   Vertices not used by any triangle are left unchanged. Called from
+%   zef_downsample_surfaces (s=1e-2, 1 step) and zef_import_segmentation_legacy.
 %
-% Outputs:
-%   smoothed_nodes
+%   smoothed_nodes = zef_smooth_surface(nodes, triangles, smoothing_parameter, n_smoothing)
 %
-% Calls (project):
-%   zef_smooth_surface
+%   Inputs
+%     nodes               - N×3. Empty N → empty output.
+%     triangles           - F×3 1-based indices.
+%     smoothing_parameter - scalar s (typically 1e-2 in the downsample path).
+%     n_smoothing         - number of λ/μ pairs.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[smoothed_nodes] = zef_smooth_surface(nodes, triangles, smoothing_parameter, n_smoothing)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output
+%     smoothed_nodes  - N×3, same size as nodes (or [] if N==0).
+%
+%   See also zef_inflate_surface, zef_downsample_surfaces.
 
 smoothing_param = smoothing_parameter;
 smoothing_steps_surf = n_smoothing;
@@ -47,6 +48,7 @@ if N > 0
     clear A_part;
     K = unique(triangles(:));
     A = spones(A);
+    % Restrict the Laplacian to vertices that actually appear in triangles.
     sum_A = full(sum(A(K,K)))';
 
     sum_A = sum_A(:,[1 1 1]);

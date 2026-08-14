@@ -1,49 +1,25 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_dpq_window(zef)
-% --- Zeffiro documentation header ---
-% zef_dpq_window — Zef dpq window.
+%ZEF_DPQ_WINDOW  Build the dynamical-plot-queue figure and wire its menus.
 %
-% Purpose:
-%   Zef dpq window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Called from zeffiro_interface_dynamical_plot_queue via zef_tool_start.
+%   Instantiates zeffiro_interface_dynamical_plot_queue_app, copies its
+%   handles onto zef, titles the figure 'ZEFFIRO Interface: Dynamical
+%   plot queue', and fills the bank list from
+%   dynamical_plot_queue_bank/*.m. Each file's help() with newlines
+%   stripped becomes the list description (and the List-menu row text).
 %
-% Outputs:
-%   zef
+%   zef = zef_dpq_window(zef)
 %
-% Zef fields (observed):
-%   zef.aux_field (read, write)
-%   zef.dpq_dir (read, write)
-%   zef.dpq_selected (read)
-%   zef.dynamica_plot_queue_description (read, write)
-%   zef.dynamical_plot_queue_current_size (read, write)
-%   zef.dynamical_plot_queue_description (read)
-%   zef.dynamical_plot_queue_list (read, write)
-%   zef.dynamical_plot_queue_table (read, write)
-%   zef.fieldnames (read, write)
-%   zef.font_size (read)
-%   zef.h_dynamical_plot_queue (read)
-%   zef.h_dynamical_plot_queue_description (read)
-%   zef.h_dynamical_plot_queue_list (read)
-%   zef.h_dynamical_plot_queue_menu_add (read)
-%   zef.h_dynamical_plot_queue_menu_delete (read)
-%   … (3 more)
+%   Does not draw overlays. Mesh visualization later calls zef_plot_dpq.
+%   Table columns: script, enabled, 'static'|'dynamical', description.
 %
-% Calls (project):
-%   zef_change_size_function
-%   zef_dpq_window
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_dpq_window(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dpq_add, zef_dpq_delete, zef_plot_dpq,
+%   zeffiro_interface_dynamical_plot_queue.
 
 zef_data=zeffiro_interface_dynamical_plot_queue_app;
 zef.fieldnames = fieldnames(zef_data);
@@ -67,6 +43,7 @@ for zef_i = 1 : length(zef.aux_field)
 end
 zef.dynamica_plot_queue_description = cell(0);
 for zef_i = 1 : length(zef.dynamical_plot_queue_list)
+    % List description is help() with newlines removed (copyright included).
     zef.dynamical_plot_queue_description{zef_i} = erase(help(zef.dynamical_plot_queue_list{zef_i}),char(10));
 end
 
@@ -82,6 +59,7 @@ set(zef.h_dynamical_plot_queue_table,'CellEditCallback','zef.dynamical_plot_queu
 set(zef.h_dynamical_plot_queue_table,'CellSelectionCallback',@zef_dpq_selection);
 
 set(zef.h_dynamical_plot_queue_menu_add,'MenuSelectedFcn','zef.h_dynamical_plot_queue_table.Data = zef_dpq_add;');
+% List appends the selected bank filename as an enabled static row.
 set(zef.h_dynamical_plot_queue_menu_list,'MenuSelectedFcn',['zef.h_dynamical_plot_queue_table.Data(end+1,:) = {zef.dynamical_plot_queue_list{zef.h_dynamical_plot_queue_list.Value}, ''true'', ''static'', zef.dynamical_plot_queue_description{zef.h_dynamical_plot_queue_list.Value}}; zef.dynamical_plot_queue_table = zef.h_dynamical_plot_queue_table.Data;']);
 set(zef.h_dynamical_plot_queue_menu_delete,'MenuSelectedFcn','zef.h_dynamical_plot_queue_table.Data = zef_dpq_delete;zef.dynamical_plot_queue_table = zef.h_dynamical_plot_queue_table.Data;');
 set(zef.h_dynamical_plot_queue_list,'ValueChangedFcn','zef.h_dynamical_plot_queue_description.Value = zef.dynamical_plot_queue_description{zef.h_dynamical_plot_queue_list.Value};');

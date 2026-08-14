@@ -1,27 +1,4 @@
 function [vertices, label, colortable] = Read_Brain_Annotation(filename)
-% --- Zeffiro documentation header ---
-% Read_Brain_Annotation — Read Brain Annotation.
-%
-% Purpose:
-%   Read Brain Annotation.
-%   Folder: Bundled sample projects, segmentations, and runtime data roots referenced by examples and default startup.
-%
-% Inputs:
-%   filename
-%
-% Outputs:
-%   vertices
-%   label
-%   colortable
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[vertices, label, colortable]] = Read_Brain_Annotation(filename)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 % [vertices, label, colortable] = Read_Brain_Annotation(annotfilename.annot)
 %
 % vertices expected to be simply from 0 to number of vertices - 1;

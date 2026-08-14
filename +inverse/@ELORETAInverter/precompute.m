@@ -1,29 +1,19 @@
 function self = precompute(self, L, procFile)
-% --- Zeffiro documentation header ---
-% inverse.ELORETAInverter.precompute — Precomputes cached operators before the per-frame inversion loop.
+%precompute  Fixed-point eLORETA iteration; cache inverse operator T = W*(L'*M^{-1}).
 %
-% Purpose:
-%   Precomputes cached operators before the per-frame inversion loop.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   L
-%   procFile
+%   Iterates W^{-1} from the eLORETA fixed-point rule with M = L*W^{-1}*L' + alpha*H,
+%   where H is average-reference (I - 11'/n) or identity. For 3-column dipole blocks,
+%   updates use per-source 3×3 eigendecompositions; fixed-orientation sources
+%   (procFile.s_ind_4) use scalar updates. Stores precomputed_inverse_operator and
+%   convergence diagnostics in n_iterations_used / final_residual.
 %
-% Outputs:
-%   self
-%
-% Calls (project):
-%   inverse.precompute
-%
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[self] = inverse.ELORETAInverter.precompute(self, L, procFile)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Inputs:  self, L, procFile (optional struct with s_ind_4 fixed sources).
+%   Output:  self with precomputed_inverse_operator set.
 
 arguments
     self (1,1) inverse.ELORETAInverter
@@ -61,12 +51,14 @@ free_source_inds = setdiff((1:n_sources)', fixed_source_inds);
 for k = 1:self.n_max_iterations
     n_iterations = k;
 
+    % M = L W^{-1} L' + alpha H; invert stably (Cholesky or pinv).
     M = L * W_inv * L' + alpha * H;
     Minv = i_stable_inverse(M);
 
     W_inv_new = zeros(n_cols, n_cols, "like", L);
 
     if has_triplets
+        % Per free source: block W^{-1} <- (L_i' M^{-1} L_i)^{-1/2} via eig.
         for i = free_source_inds'
             ind = 3*i - [2,1,0];
             A_i = L(:,ind)' * Minv * L(:,ind);

@@ -1,33 +1,18 @@
 function zef = zef_parcellation_roi_pick_color(zef)
-% --- Zeffiro documentation header ---
-% zef_parcellation_roi_pick_color — Zef parcellation roi pick color.
+%ZEF_PARCELLATION_ROI_PICK_COLOR  Choose ROI color via uisetcolor dialog.
 %
-% Purpose:
-%   Zef parcellation roi pick color.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Opens uisetcolor and, when not cancelled, updates
+%   zef.parcellation_roi_color for parcellation_roi_selected and the ROI
+%   color UI control background and string.
 %
-% Outputs:
-%   zef
+%   zef = zef_parcellation_roi_pick_color(zef)
 %
-% Zef fields (observed):
-%   zef.h_parcellation_roi_color (read)
-%   zef.parcellation_roi_color (read)
-%   zef.parcellation_roi_selected (read)
-%
-% Calls (project):
-%   zef_parcellation_roi_pick_color
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_parcellation_roi_pick_color(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_parcellation_roi_add.
 
 color_vec = uisetcolor;
 if not(isequal(color_vec,0))

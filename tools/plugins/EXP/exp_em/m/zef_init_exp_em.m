@@ -1,40 +1,17 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'exp_em_q')) — If not(isfield(zef,'exp em q')).
+%ZEF_INIT_EXP_EM  Default exp_em_* fields and copy them onto EXP EM widgets.
 %
-% Purpose:
-%   If not(isfield(zef,'exp em q')).
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.exp_em_beta (read, write)
-%   zef.exp_em_hyper_type (read, write)
-%   zef.exp_em_pcg_tol (read)
-%   zef.exp_em_q (read, write)
-%   zef.exp_em_theta0 (read, write)
-%   zef.h_exp_em_beta (read)
-%   zef.h_exp_em_data_segment (read)
-%   zef.h_exp_em_high_cut_frequency (read)
-%   zef.h_exp_em_hyper_type (read)
-%   zef.h_exp_em_low_cut_frequency (read)
-%   zef.h_exp_em_map_estimation (read)
-%   zef.h_exp_em_n_L1_iterations (read)
-%   zef.h_exp_em_n_map_iterations (read)
-%   zef.h_exp_em_normalize_data (read)
-%   zef.h_exp_em_number_of_frames (read)
-%   … (21 more)
+%   Script. Needs workspace zef with h_exp_em_* from the EM window.
+%   Defaults include exp_em_q=1, exp_em_hyper_type=2, exp_em_beta=1.5,
+%   exp_em_theta0=0.001, inv_n_map_iterations=25, inv_n_L1_iterations=5.
+%   Does not invert (that is exp_em_iteration). Siblings: zef_init_exp_ias,
+%   zef_init_exp_em_multires, zef_init_exp_ias_multires.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'exp_em_q'))` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_update_exp_em, exp_em_iteration.
 
 if not(isfield(zef,'exp_em_q'))
     zef.exp_em_q = 1;
@@ -100,7 +77,7 @@ else
 end
 clear zef_childs
 
-set(zef.h_exp_em_q ,'value',zef.exp_em_q);
+set(zef.h_exp_em_q ,'value',zef.exp_em_q)
 set(zef.h_exp_em_hyper_type ,'value',zef.exp_em_hyper_type);
 set(zef.h_exp_em_beta ,'string',num2str(zef.exp_em_beta));
 set(zef.h_exp_em_theta0 ,'string',num2str(zef.exp_em_theta0));

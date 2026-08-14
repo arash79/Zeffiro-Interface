@@ -1,28 +1,19 @@
 function pts_filename = save_volume_atlas_points(volume_data, voxel_to_ras, affine_matrix, out_folder, voxel_stride)
-% --- Zeffiro documentation header ---
-% utilities.sn2zef.save_volume_atlas_points — Save volume atlas points.
+%SAVE_VOLUME_ATLAS_POINTS  Subsampled labelled voxels → RAS sn_atlas_points.dat.
 %
-% Purpose:
-%   Save volume atlas points.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   volume_data
-%   voxel_to_ras
-%   affine_matrix
-%   out_folder
-%   voxel_stride
+%   Positive voxels of volume_data, strided by voxel_stride (default 4) on
+%   each axis. Voxel ijk (MATLAB i1,i2,i3) mapped as [i2 i1 i3 1] through
+%   4×4 voxel_to_ras, then optional affine_matrix (empty or 4×4). Rows:
+%   [linear_index_0based, x, y, z]. Called from export_segmentation_meshes
+%   when exporting from a volume atlas rather than tets.
 %
-% Outputs:
-%   pts_filename
-%
-% Calls (project):
-%   utilities.sn2zef.save_volume_atlas_points
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[pts_filename] = utilities.sn2zef.save_volume_atlas_points(volume_data, voxel_to_ras, affine_matrix, out_folder, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   pts_filename = save_volume_atlas_points(volume, voxel_to_ras, affine, out_folder)
+%   pts_filename = save_volume_atlas_points(..., voxel_stride)
 
     arguments
         volume_data { mustBeNumeric }
@@ -51,6 +42,7 @@ function pts_filename = save_volume_atlas_points(volume_data, voxel_to_ras, affi
         error('sn2zef:NoAtlasPoints', 'Volume contains no sampled non-zero voxels.');
     end
 
+    % Same (col, row, slice) reorder as STL vertices: MATLAB dim2, dim1, dim3.
     [i1, i2, i3] = ind2sub(size(volume_data), voxel_idx);
     pts_hom = [i2(:), i1(:), i3(:), ones(numel(voxel_idx), 1)];
     pts_ras = (voxel_to_ras * pts_hom.').';

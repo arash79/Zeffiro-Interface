@@ -1,25 +1,14 @@
-% --- Zeffiro documentation header ---
-% [zef.file,zef.file_path] = uigetfile({'*.dat;* — [zef.file,zef.file path] = uigetfile({'*.dat;*.
+%ZEF_IMPORT_RESECTION_POINTS  Load resection point coordinates from disk.
 %
-% Purpose:
-%   [zef.file,zef.file path] = uigetfile({'*.dat;*.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field_1 (read, write)
-%   zef.aux_field_2 (read, write)
-%   zef.file (read)
-%   zef.file_path (read)
-%   zef.resection_points (read, write)
+%   uigetfile for *.dat or *.mat. Numeric arrays load directly; struct
+%   files use the first field. Result is stored in zef.resection_points.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `[zef.file,zef.file_path] = uigetfile({'*.dat;*` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_import_parcellation_points.
 
 [zef.file,zef.file_path] = uigetfile({'*.dat;*.mat'});
 

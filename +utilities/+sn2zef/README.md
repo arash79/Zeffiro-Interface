@@ -1,69 +1,94 @@
-# +utilities/+sn2zef
+# `utilities.sn2zef` — SimNIBS tissues → Zeffiro STLs
 
-## Purpose of this folder
+Extracts **closed** compartment surfaces from SimNIBS `final_tissues.nii.gz` (voxel tetrahedral decomposition via Brainstorm-style `zef_bst_get_atlas_surfaces`), not from the Gmsh `.msh`. Public entry: `utilities.sn2zef.run`.
 
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+`meshLoadGmsh4.m` is **vendor code** (Thielscher / Antunes SimNIBS Gmsh reader), not a Zeffiro-authored parser. Keep its original license header. The volume pipeline does not call it; only `export_from_gmsh_mesh` does.
 
-## Contents
+## What must exist on disk
 
-Subfolders:
-- `+transforms/`
+| Requirement | Role |
+|-------------|------|
+| `SIMNIBS_HOME` | `run` looks for `SIMNIBS_HOME/m2m_<subject_id>/` |
+| `m2m_<id>/final_tissues.nii.gz` | Segmentation volume |
+| `m2m_<id>/final_tissues_LUT.txt` | Tissue names/colors (`readSNLUT`) |
+| `FREESURFER_HOME` | Needed by `export_segmentation_meshes` (`MRIread`, optional `mri_coreg`) |
+| FreeSurfer subject dir with `mri/orig.mgz` | `options.freesurfer_subject_folder`, or `$SUBJECTS_DIR/<subject_id>` |
+| A `zef` struct | Passed through for `zef_inflate_surface` fields (`inflate_strength`, GPU flags) |
 
-MATLAB sources:
-- `extract_SimNIBS_surfaces.m` — **utilities.sn2zef.atlas_surfaces**: Atlas surfaces.
-- `exportSegmentationSTLs.m` — **utilities.sn2zef.exportSegmentationSTLs**: Export Segmentation STLs.
-- `export_from_gmsh_mesh.m` — **utilities.sn2zef.export_from_gmsh_mesh**: Export from gmsh mesh.
-- `export_segmentation_meshes.m` — **utilities.sn2zef.export_segmentation_meshes**: Export segmentation meshes.
-- `meshLoadGmsh4.m` — **utilities.sn2zef.meshLoadGmsh4**: Mesh Load Gmsh4.
-- `readSNLUT.m` — **utilities.sn2zef.readSNLUT**: Read SNLUT.
-- `run.m` — **utilities.sn2zef.run**: Run.
-- `run_and_print_command.m` — **utilities.sn2zef.run_and_print_command**: Run and print command.
-- `save_atlas_points.m` — **utilities.sn2zef.save_atlas_points**: Save atlas points.
-- `save_volume_atlas_points.m` — **utilities.sn2zef.save_volume_atlas_points**: Save volume atlas points.
+`run` errors if `SIMNIBS_HOME` is empty (`sn2zef:NoSimnibsHome`), if the m2m folder or NIfTI is missing, or if the FreeSurfer subject folder is unset/missing.
 
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+## Public entry
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+zef = zeffiro_interface('start_mode', 'nodisplay');  % any session struct is enough
+opts = struct('verbose', true, 'include_atlas', true, 'atlas_voxel_stride', 4);
+utilities.sn2zef.run(zef, "subject01", "/output/sn2zef", 0, opts);
 ```
 
-Representative entry points in this folder:
-- `Call `utilities.sn2zef.atlas_surfaces` from MATLAB with the project root on the path.`
-- ``utilities.sn2zef.exportSegmentationSTLs(zef, inFolder, outFolder, inflation_parameter, …)` with project root and `src` on the path.`
-- ``[[meshStruct, tissueTable]] = utilities.sn2zef.export_from_gmsh_mesh(meshFile, tissueListingFile, kwargs)` with project root and `src` on the path.`
-- ``[[affine_matrix, vertex_transform]] = utilities.sn2zef.export_segmentation_meshes(zef, inFolder, outFolder, inflation_parameter, …)` with project root and `src` on the path.`
-- ``[m] = utilities.sn2zef.meshLoadGmsh4(fileName)` with project root and `src` on the path.`
-- ``[lut] = utilities.sn2zef.readSNLUT(folderPath)` with project root and `src` on the path.`
-- ``utilities.sn2zef.run(zef, subject_id, outFolder, inflation_parameter, …)` with project root and `src` on the path.`
-- ``utilities.sn2zef.run_and_print_command(cmd)` with project root and `src` on the path.`
+`inflation_parameter` is Taubin iterations per tissue (`0` to skip). Large values on a full SimNIBS grid are slow (`sn2zef:SlowInflation` if `> 40` and voxel count `> 1e6`).
 
-## Examples
+### Options struct on `run`
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+| Field | Default | Meaning |
+|-------|---------|---------|
+| `verbose` | false | Progress |
+| `include_atlas` | true | Write subsampled atlas points |
+| `atlas_voxel_stride` | 4 | Subsample factor |
+| `force_coreg` | false | Collected by `run` — **not** an option of `export_segmentation_meshes` (see Gaps) |
+| `freesurfer_subject_folder` | `$SUBJECTS_DIR/<id>` | Must contain `mri/orig.mgz` |
 
-## Dependencies and assumptions
+`run` has no return value. It writes files under `outFolder`.
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## Coordinate frames
 
-## Notes for developers
+Worker: `export_segmentation_meshes` (`alignment_mode` `'translation'` **default**, or `'coregistration'`).
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+| Mode | Volume meshed | Vertex transform `T` | Affine returned |
+|------|---------------|----------------------|-----------------|
+| `translation` | Native `final_tissues.nii.gz` | SimNIBS NIfTI `vox2ras` | 4×4 header map from `transforms.compute_simnibs_to_freesurfer_translation` (for Zeffiro `affine_transform`) |
+| `coregistration` | `mri_coreg` + `mri_vol2vol` → `final_tissues_aligned.nii.gz` | FS-style `Ttrans * vox2ras * coordSwap` (CRAS shift + dim swap) | `[]` (vertices already in FreeSurfer RAS) |
+
+`run` currently calls the worker **without** `alignment_mode`, so the default is **translation**. It also **discards** the returned `affine_matrix` (`[~, vertex_info] = ...`) and writes `import_segmentations.zef` **without** `affine_transform`. Vertices in the STLs are therefore whatever `T` the worker applied (SimNIBS RAS in the default mode), not automatically FreeSurfer tkr RAS unless you call `export_segmentation_meshes` yourself with `'coregistration'`.
+
+The wrapper `exportSegmentationSTLs` does pass `'coregistration'` (as a struct — see Gaps).
+
+## Output files (`run`)
+
+```
+<outFolder>/
+  <Tissue_Name>.stl          % one per LUT label except names containing "domain fill"
+  electrodes.dat             % copy of +fs2zef/data/electrodes.dat if present
+  sn_atlas_points.dat        % when include_atlas and write succeeded
+  import_segmentations.zef   % note the plural filename
+```
+
+Each segmentation row: `sigma=1.79` (CSF-like default for **every** SimNIBS tissue — not the fs2zef `compartment_mappings` table), `activity=0`, `inflate=0`, RGB from the LUT, `merge=1` if the name contains `rh` or `right`. Atlas path is appended when the points file exists. Edit conductivity in the Segmentation tool after import if you need tissue-specific σ.
+
+## Import into Zeffiro
+
+```matlab
+zef = zeffiro_interface('start_mode', 'nodisplay', ...
+    'import_to_new_project', fullfile(outFolder, 'import_segmentations.zef'));
+zef = zef_create_finite_element_mesh(zef);
+```
+
+Filenames in the `.zef` are **absolute** paths to the STLs. Electrodes line points at `<outFolder>/electrodes.dat` (EEG, filetype `points`).
+
+## Other functions
+
+| Function | Role |
+|----------|------|
+| `export_segmentation_meshes` | Volume → STL worker (use this if you need `alignment_mode` / affine) |
+| `exportSegmentationSTLs` | Wrapper intending coregistration mode |
+| `readSNLUT` | Parse `final_tissues_LUT.txt` |
+| `save_atlas_points` / `save_volume_atlas_points` | Parcellation point dumps |
+| `extract_SimNIBS_surfaces` | Lower-level volume-label surfaces (used internally / Brainstorm-style atlas) |
+| `export_from_gmsh_mesh` | Legacy Gmsh `.msh` sheets (open, single-sided). Prefer the volume pipeline |
+| `run_and_print_command` | `system` + echo for `mri_coreg` / `mri_vol2vol` |
+| `+transforms/compute_simnibs_to_freesurfer_translation` | Header RAS→RAS matrix for Zeffiro `affine_transform` |
+
+## Gaps
+
+- `run` help text still describes “always `mri_coreg`” and “no affine in the `.zef` because vertices are already tkr-RAS”. The call does not pass `alignment_mode` (default **translation**) and drops the affine.
+- `run` forwards `'force_coreg', ...` to `export_segmentation_meshes`, which has no such name-value (only `alignment_mode`, `verbose`, `include_atlas`, `atlas_voxel_stride`). MATLAB `arguments` will reject the extra name.
+- `exportSegmentationSTLs` passes a **struct** as the 6th positional argument; the worker expects name-value options, not a positional struct.

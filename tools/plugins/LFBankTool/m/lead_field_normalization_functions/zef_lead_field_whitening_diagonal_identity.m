@@ -1,38 +1,18 @@
 function [L, measurements] = zef_lead_field_whitening_diagonal_identity(lf_bank_index)
-% --- Zeffiro documentation header ---
-% zef_lead_field_whitening_diagonal_identity — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%ZEF_LEAD_FIELD_WHITENING_DIAGONAL_IDENTITY  Whiten after scaling noise cov to unit diagonal.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   lf_bank_index
+%   [L, measurements] = zef_lead_field_whitening_diagonal_identity(lf_bank_index)
 %
-% Outputs:
-%   L
-%   measurements
+%   D^{-1/2} cov D^{-1/2} then inv(sqrtm). Needs noise_data on the
+%   bank item. Does not assignin.
 %
-% Zef fields (observed):
-%   zef.lf_bank_storage (read)
-%
-% Calls (project):
-%   zef_lead_field_whitening_diagonal_identity
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[L, measurements]] = zef_lead_field_whitening_diagonal_identity(lf_bank_index)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%This function normalizes the lead field data for a given lead
-%field bank entry.
-%Description: Lead field whitening via noise data (diagonal set to identity)
+%   See also zef_lead_field_whitening.
+%   Description: Whitening diagonal identity.
 
 L = evalin('base',['zef.lf_bank_storage{' num2str(lf_bank_index) '}.L']);
 measurements = evalin('base',['zef.lf_bank_storage{' num2str(lf_bank_index) '}.measurements']);

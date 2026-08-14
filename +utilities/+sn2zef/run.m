@@ -1,112 +1,72 @@
-function run(zef, subject_id, outFolder, inflation_parameter, options) %#ok<INUSL>
-% --- Zeffiro documentation header ---
-% utilities.sn2zef.run — Run.
+function run(zef, subject_id, outFolder, inflation_parameter, options)
+%RUN  SimNIBS volume segmentation → STL meshes and import_segmentations.zef.
 %
-% Purpose:
-%   Run.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   subject_id
-%   outFolder
-%   inflation_parameter
-%   options
+%   run(zef, subject_id, outFolder, inflation_parameter, options)
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Calls (project):
-%   utilities.simnibsToZef.main
-%   utilities.sn2zef.meshLoadGmsh4
-%   utilities.sn2zef.readSNLUT
-%   utilities.sn2zef.run
-%   utilities.sn2zef.save_atlas_points
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `utilities.sn2zef.run(zef, subject_id, outFolder, inflation_parameter, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%
-% run - Mesh-based SimNIBS-to-ZEF pipeline
-%
-% Loads the SimNIBS Gmsh mesh (m2m_<subject_id>/<subject_id>.msh) and the
-% tissue lookup table (final_tissues_LUT.txt), splits the surface triangles
-% per tissue label into one STL each, builds parcellation points from the
-% tetrahedral mesh, and writes the
-% Zeffiro Interface import script.
-%
-% Orientation and scale are already correct: SimNIBS produces the mesh in
-% scanner RAS at 1 mm. The only thing that differs from the FreeSurfer surface
-% frame used by fs2zef is a translation. fs2zef calls mris_convert without
-% --to-scanner, so its surfaces stay in FreeSurfer **surface (tkr) RAS**, which
-% is related to scanner RAS by:
-%
-%   surface_RAS = scanner_RAS - cras_fs
-%
-% where cras_fs = [c_r; c_a; c_s] is the CRAS of the FreeSurfer T1 MGZ
-% (mri/T1.mgz or mri/orig.mgz of the same subject).  We read that CRAS once
-% and translate mesh.nodes by -cras_fs before writing STLs and computing
-% atlas tetra centers.  Both outputs end up in the surface RAS frame, so the
-% generated import_segmentations.zef can still omit affine_transform from
-% every row (m/zef_import_segmentation.m:124 defaults to identity).
-%
-% This is the smallest pipeline that follows the logic of the reference
-% example utilities.simnibsToZef.main (zeffiro_may_2026/+utilities/+simnibsToZef/main.m).
+% Extracts closed compartment surfaces from the SimNIBS segmentation volume
+% (final_tissues.nii.gz) via voxel tetrahedral decomposition and
+% zef_surface_mesh — not from the Gmsh .msh file. The Gmsh mesh stores each
+% surface triangle on exactly one tissue interface (label + 1000), which
+% yields open, single-sided sheets rather than watertight shells.
 %
 % Inputs:
 %
 % - zef (1,1) struct
 %
-%   Accepted for API back-compat. Not used by the mesh-based pipeline.
+%   ZEF context (required for surface inflation in zef_inflate_surface).
 %
 % - subject_id (1,1) string
 %
 %   Subject identifier. The SimNIBS folder is expected at
-%   SIMNIBS_HOME/m2m_<subject_id>/ and must contain a Gmsh .msh file
-%   (preferably <subject_id>.msh) and final_tissues_LUT.txt.
+%   SIMNIBS_HOME/m2m_<subject_id>/ with final_tissues.nii.gz and
+%   final_tissues_LUT.txt.
 %
 % - outFolder (1,1) string
 %
 %   Output directory for STL files, atlas point files, electrodes.dat, and
-%   import_segmentations.zef. Created if it does not exist.
+%   import_segmentations.zef.
 %
 % - inflation_parameter (1,1) double
 %
-%   Accepted for API back-compat. Not used by the mesh-based pipeline (the
-%   SimNIBS mesh is already smoothed at production time).
+%   Taubin inflation iterations per tissue (0 to skip).
 %
 % - options (1,1) struct (optional)
 %
-%   .verbose                  - Print progress (default: false).
-%   .include_atlas            - Write atlas_points_filename onto every
-%                               segmentation row (default: true).
-%   .stl_output_format        - 'binary' (default) or 'text' for stlwrite.
-%   .freesurfer_subject_folder - Path to the FreeSurfer subject folder used
-%                                to look up the surface-RAS translation
-%                                (mri/T1.mgz or mri/orig.mgz).  Defaults to
-%                                SUBJECTS_DIR/<subject_id>.  Pass "" to skip
-%                                the translation entirely (mesh stays in
-%                                scanner RAS).
+%   .verbose                   - Print progress (default: false).
+%   .include_atlas             - Write sn_atlas_points.dat (default: true).
+%   .atlas_voxel_stride        - Subsample atlas voxels (default: 4).
+%   .force_coreg               - Collected here and forwarded to
+%                                export_segmentation_meshes (that worker
+%                                does not declare this name; see README).
+%   .freesurfer_subject_folder - FreeSurfer subject dir (mri/orig.mgz).
+%                                Defaults to SUBJECTS_DIR/<subject_id>.
+%
+% Alignment is delegated to export_segmentation_meshes. This wrapper does
+% not pass alignment_mode, so the worker default is 'translation' (native
+% NIfTI vox2ras on vertices). The affine_matrix the worker returns is
+% discarded here ([~, vertex_info] = ...) and import_segmentations.zef is
+% written without affine_transform. options.force_coreg is forwarded as a
+% name-value; the worker currently accepts alignment_mode, not force_coreg.
+% For mri_coreg, call export_segmentation_meshes(..., 'alignment_mode',
+% 'coregistration') directly.
 %
 % Outputs:
 %
 %   None. Writes to outFolder:
 %     • <Tissue_Name>.stl         - one STL per tissue label
 %     • electrodes.dat            - copied from +fs2zef/data if available
-%     • sn_atlas_points.dat       - parcellation points    (when include_atlas)
+%     • sn_atlas_points.dat       - parcellation points (when include_atlas)
 %     • import_segmentations.zef  - ZEF import script
 %
-% See also: utilities.sn2zef.meshLoadGmsh4, utilities.sn2zef.readSNLUT,
-%           utilities.sn2zef.save_atlas_points, utilities.sn2zef.export_from_gmsh_mesh
+% See also: utilities.sn2zef.export_segmentation_meshes,
+%           utilities.sn2zef.readSNLUT
 %
 
-    % Parse optional arguments (keep loose to preserve old callers)
     if nargin < 5
         options = struct();
     end
@@ -116,8 +76,11 @@ function run(zef, subject_id, outFolder, inflation_parameter, options) %#ok<INUS
     if ~isfield(options, 'include_atlas')
         options.include_atlas = true;
     end
-    if ~isfield(options, 'stl_output_format')
-        options.stl_output_format = 'binary';
+    if ~isfield(options, 'atlas_voxel_stride')
+        options.atlas_voxel_stride = 4;
+    end
+    if ~isfield(options, 'force_coreg')
+        options.force_coreg = false;
     end
     if ~isfield(options, 'freesurfer_subject_folder')
         subjects_dir = getenv("SUBJECTS_DIR");
@@ -128,7 +91,7 @@ function run(zef, subject_id, outFolder, inflation_parameter, options) %#ok<INUS
         end
     end
 
-    %% Locate inputs
+    %% Locate SimNIBS m2m folder
 
     simnibs_home = getenv("SIMNIBS_HOME");
     if strlength(simnibs_home) == 0
@@ -142,7 +105,22 @@ function run(zef, subject_id, outFolder, inflation_parameter, options) %#ok<INUS
             inFolder);
     end
 
-    mesh_file = locate_mesh_file(inFolder, subject_id);
+    nii_path = fullfile(inFolder, 'final_tissues.nii.gz');
+    if ~isfile(nii_path)
+        error('sn2zef:NoVolume', ...
+            'SimNIBS segmentation volume not found: "%s".', nii_path);
+    end
+
+    fs_folder = char(options.freesurfer_subject_folder);
+    if strlength(fs_folder) == 0
+        error('sn2zef:NoFsSubjectFolder', ...
+            ['FreeSurfer subject folder is required (mri/orig.mgz). ' ...
+             'Set SUBJECTS_DIR or options.freesurfer_subject_folder.']);
+    end
+    if ~isfolder(fs_folder)
+        error('sn2zef:NoFsSubjectFolder', ...
+            'FreeSurfer subject folder not found: "%s".', fs_folder);
+    end
 
     %% Create output folder
 
@@ -150,61 +128,36 @@ function run(zef, subject_id, outFolder, inflation_parameter, options) %#ok<INUS
         mkdir(outFolder);
     end
 
-    %% Load mesh and tissue LUT
+    %% Extract closed surfaces from final_tissues.nii.gz
+
+    zef = ensure_inflation_fields(zef, inflation_parameter);
 
     if options.verbose
-        fprintf('sn2zef: loading mesh "%s"\n', mesh_file);
-    end
-    mesh = utilities.sn2zef.meshLoadGmsh4(mesh_file);
-    lut  = utilities.sn2zef.readSNLUT(inFolder);
-
-    %% Translate mesh nodes: scanner RAS -> FreeSurfer surface (tkr) RAS
-    %  Single header lookup; the SimNIBS mesh already has the correct
-    %  orientation and scale, only the surface-RAS shift is missing.
-
-    cras_fs = lookup_freesurfer_cras(options.freesurfer_subject_folder, options.verbose);
-    nodes   = double(mesh.nodes);
-    if ~isempty(cras_fs)
-        nodes = nodes - cras_fs(:).';
-        mesh.nodes = nodes;  % propagate to save_atlas_points via the same struct
-        if options.verbose
-            fprintf('sn2zef: applied surface-RAS translation t = [%.3f %.3f %.3f]\n', ...
-                -cras_fs(1), -cras_fs(2), -cras_fs(3));
-        end
+        fprintf('sn2zef: extracting surfaces from "%s"\n', nii_path);
     end
 
-    %% Export one STL per tissue label (translated nodes; no further transform)
-    %  SimNIBS encodes surface region IDs as tissue_label + 1000 (see e.g.
-    %  utilities.sn2zef.export_from_gmsh_mesh:145).
+    [~, vertex_info] = utilities.sn2zef.export_segmentation_meshes( ...
+        zef, inFolder, outFolder, inflation_parameter, fs_folder, ...
+        'verbose', logical(options.verbose), ...
+        'include_atlas', logical(options.include_atlas), ...
+        'atlas_voxel_stride', double(options.atlas_voxel_stride), ...
+        'force_coreg', logical(options.force_coreg));
 
-    tris   = double(mesh.triangles);
-    triLab = double(mesh.triangle_regions);
+    lut = vertex_info.lut;
 
-    nLut = numel(lut.No);
+    %% Collect STL outputs (skip auxiliary domain-fill mesh)
+
     stl_rows = struct('basename', {}, 'name', {}, 'rgb', {});
 
-    for ii = 1 : nLut
-        tissue_id     = double(lut.No(ii));
-        surface_region = tissue_id + 1000;
-        mask           = (triLab == surface_region);
-        if ~any(mask)
+    for ii = 1 : numel(lut.No)
+        name = strtrim(char(lut.Name{ii}));
+        if contains(lower(name), 'domain fill')
             continue;
         end
 
-        name     = strtrim(char(lut.Name{ii}));
-        safeName = make_safe_filename(name);
-        basename = [safeName '.stl'];
+        basename = [name '.stl'];
         stl_path = fullfile(outFolder, basename);
-
-        try
-            T = triangulation(tris(mask, :), nodes);
-            stlwrite(T, stl_path, options.stl_output_format);
-            if options.verbose
-                fprintf('  wrote %s\n', stl_path);
-            end
-        catch ME
-            warning('sn2zef:StlFailed', ...
-                'Could not write STL for tissue "%s": %s', name, ME.message);
+        if ~isfile(stl_path)
             continue;
         end
 
@@ -216,7 +169,7 @@ function run(zef, subject_id, outFolder, inflation_parameter, options) %#ok<INUS
 
     if isempty(stl_rows)
         warning('sn2zef:NoSTL', ...
-            'No STL files were generated from "%s". Aborting.', mesh_file);
+            'No STL files were generated from "%s". Aborting.', nii_path);
         return;
     end
 
@@ -224,7 +177,7 @@ function run(zef, subject_id, outFolder, inflation_parameter, options) %#ok<INUS
 
     thisDir = fileparts(mfilename('fullpath'));
     electrodesSource = fullfile(thisDir, '..', '+fs2zef', 'data', 'electrodes.dat');
-    if exist(electrodesSource, 'file')
+    if isfile(electrodesSource)
         copyfile(electrodesSource, fullfile(outFolder, 'electrodes.dat'));
     else
         warning('sn2zef:NoElectrodes', ...
@@ -232,31 +185,19 @@ function run(zef, subject_id, outFolder, inflation_parameter, options) %#ok<INUS
             electrodesSource);
     end
 
-    %% Build atlas point file
-    %  Atlas points are tetra centers in the same coordinate frame as the
-    %  STLs, so no transformation is required at any stage.
+    %% Atlas points (written by the worker when include_atlas). Vertices use
+    % the worker's T (SimNIBS vox2ras in the default translation mode), not
+    % automatically FreeSurfer tkr-RAS. run discards affine_matrix above.
 
     have_atlas_points = false;
     atlas_pts_path = '';
-
-    if options.include_atlas
-        try
-            pts_fname = utilities.sn2zef.save_atlas_points(mesh, outFolder);
-            atlas_pts_path = char(fullfile(outFolder, pts_fname));
-            have_atlas_points = true;
-            if options.verbose
-                fprintf('sn2zef: atlas point file written (%s)\n', pts_fname);
-            end
-        catch ME
-            warning('sn2zef:AtlasFailed', ...
-                'Atlas point generation failed: %s\nContinuing without atlas data.', ...
-                ME.message);
-        end
+    if options.include_atlas && isfield(vertex_info, 'atlas_points_filename') ...
+            && strlength(string(vertex_info.atlas_points_filename)) > 0
+        atlas_pts_path = char(fullfile(outFolder, vertex_info.atlas_points_filename));
+        have_atlas_points = isfile(atlas_pts_path);
     end
 
     %% Build header and segmentation lines for the .zef script
-    %  No affine_transform is written; the importer treats absence as identity
-    %  (m/zef_import_segmentation.m:124).
 
     hdrLines = { ...
         sprintf('type,sensors,name,Electrodes,filename,%s,filetype,points,modality,EEG', ...
@@ -272,9 +213,15 @@ function run(zef, subject_id, outFolder, inflation_parameter, options) %#ok<INUS
         absPath = fullfile(outFolder, row.basename);
         merge_val = right_hemisphere_merge_flag(row.name);
 
+        % sigma=1.79 is the CSF-like default this converter writes for every
+        % SimNIBS tissue (not the fs2zef compartment_mappings table). Edit
+        % the .zef or the Segmentation-tool table after import if you need
+        % tissue-specific conductivity.
+
         segLines{k} = sprintf( ...
             ['type,segmentation,name,%s,filename,%s,merge,%d,' ...
-             'parameter_name,sigma,parameter_value,1.79,activity,0,color,%s,inflate,0'], ...
+             'parameter_name,sigma,parameter_value,1.79,activity,0,' ...
+             'color,%s,inflate,0'], ...
             row.name, absPath, merge_val, mat2str(row.rgb));
 
         if have_atlas_points
@@ -322,34 +269,7 @@ end % function
 
 %% Local helpers
 
-function mesh_file = locate_mesh_file(m2m_dir, subject_id)
-    % Prefer <subject_id>.msh; fall back to any single .msh in m2m folder.
-    preferred = fullfile(char(m2m_dir), [char(subject_id) '.msh']);
-    if isfile(preferred)
-        mesh_file = preferred;
-        return;
-    end
-    candidates = dir(fullfile(m2m_dir, '*.msh'));
-    if isempty(candidates)
-        error('sn2zef:NoMesh', ...
-            'No Gmsh .msh file found in "%s".', m2m_dir);
-    end
-    if numel(candidates) > 1
-        names = strjoin({candidates.name}, ', ');
-        error('sn2zef:AmbiguousMesh', ...
-            'Multiple .msh files in "%s" (%s). Rename one to %s.msh.', ...
-            char(m2m_dir), names, char(subject_id));
-    end
-    mesh_file = fullfile(candidates(1).folder, candidates(1).name);
-end % function
-
-function safe = make_safe_filename(name)
-    % Replace filesystem-hostile characters with underscores.
-    safe = strrep(strrep(strrep(strrep(strrep(name, ' ', '_'), '/', '_'), '\', '_'), ':', '_'), '*', '_');
-end % function
-
 function merge_val = right_hemisphere_merge_flag(name)
-    % Right-hemisphere labels usually contain 'rh' or 'right' in their name.
     lname = lower(name);
     if contains(lname, 'rh') || contains(lname, 'right')
         merge_val = 1;
@@ -358,84 +278,21 @@ function merge_val = right_hemisphere_merge_flag(name)
     end
 end % function
 
-function cras = lookup_freesurfer_cras(fs_subject_folder, verbose)
-% Return [c_r; c_a; c_s] from the FreeSurfer T1 MGZ of the subject, or [] if
-% the lookup is skipped or fails.  The CRAS is the offset between scanner RAS
-% (SimNIBS mesh frame) and FreeSurfer surface (tkr) RAS:
-%
-%   surface_RAS = scanner_RAS - cras
-%
-% Prefers mri/T1.mgz; falls back to mri/orig.mgz.
-
-    cras = [];
-
-    if isempty(fs_subject_folder) || strlength(fs_subject_folder) == 0
-        if verbose
-            fprintf('sn2zef: no FreeSurfer subject folder provided; skipping surface-RAS translation.\n');
-        end
-        return;
+function zef = ensure_inflation_fields(zef, inflation_parameter)
+    % zef_inflate_surface reads zef.inflate_strength from the caller workspace.
+    if ~isfield(zef, 'inflate_strength')
+        zef.inflate_strength = 0.8;
     end
-    if ~isfolder(fs_subject_folder)
-        warning('sn2zef:NoFsSubjectFolder', ...
-            'FreeSurfer subject folder "%s" not found; skipping surface-RAS translation.', ...
-            char(fs_subject_folder));
-        return;
+    if ~isfield(zef, 'inflate_n_iterations')
+        zef.inflate_n_iterations = max(0, round(inflation_parameter));
     end
-
-    candidates = { ...
-        fullfile(char(fs_subject_folder), 'mri', 'T1.mgz'); ...
-        fullfile(char(fs_subject_folder), 'mri', 'orig.mgz') ...
-    };
-    mgz_path = '';
-    for k = 1 : numel(candidates)
-        if isfile(candidates{k})
-            mgz_path = candidates{k};
-            break;
-        end
+    if ~isfield(zef, 'gpu_count')
+        zef.gpu_count = 0;
     end
-    if isempty(mgz_path)
-        warning('sn2zef:NoFsT1', ...
-            'Neither mri/T1.mgz nor mri/orig.mgz found in "%s"; skipping surface-RAS translation.', ...
-            char(fs_subject_folder));
-        return;
+    if ~isfield(zef, 'use_gpu')
+        zef.use_gpu = false;
     end
-
-    % Ensure MRIread is on path
-    fs_home = getenv('FREESURFER_HOME');
-    if strlength(fs_home) > 0
-        fs_matlab = fullfile(fs_home, 'matlab');
-        if isfolder(fs_matlab) && ~contains(path, fs_matlab)
-            addpath(fs_matlab);
-        end
-    end
-
-    if exist('MRIread', 'file') ~= 2
-        warning('sn2zef:NoMRIread', ...
-            'MRIread is not on the MATLAB path; cannot read "%s". Skipping surface-RAS translation.', mgz_path);
-        return;
-    end
-
-    try
-        mri = MRIread(mgz_path);
-    catch ME
-        warning('sn2zef:ReadMgzFailed', ...
-            'Failed to read "%s": %s. Skipping surface-RAS translation.', mgz_path, ME.message);
-        return;
-    end
-
-    if isfield(mri, 'c_r') && isfield(mri, 'c_a') && isfield(mri, 'c_s')
-        cras = [double(mri.c_r); double(mri.c_a); double(mri.c_s)];
-    elseif isfield(mri, 'vox2ras') && isfield(mri, 'tkrvox2ras')
-        % Fallback: derive cras from the two vox2ras matrices.
-        cras = mri.vox2ras(1:3, 4) - mri.tkrvox2ras(1:3, 4);
-    else
-        warning('sn2zef:NoCras', ...
-            'CRAS fields not present in MRIread output for "%s"; skipping surface-RAS translation.', mgz_path);
-        return;
-    end
-
-    if verbose
-        fprintf('sn2zef: read CRAS from %s -> [%.4f %.4f %.4f]\n', ...
-            mgz_path, cras(1), cras(2), cras(3));
+    if ~isfield(zef, 'use_gpu_graphic')
+        zef.use_gpu_graphic = false;
     end
 end % function

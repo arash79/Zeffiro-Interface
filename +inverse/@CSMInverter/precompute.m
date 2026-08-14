@@ -1,28 +1,26 @@
 function self = precompute(self, L)
-% --- Zeffiro documentation header ---
-% inverse.CSMInverter.precompute — Precomputes cached operators before the per-frame inversion loop.
+%precompute  Cache P = L'/(L*L'+S) and dSPM/sLORETA standardization vector d.
 %
-% Purpose:
-%   Precomputes cached operators before the per-frame inversion loop.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   L
+%   Called from utilities.inverse.run_frame_loop when the inverter has a
+%   precompute method. invert reuses precomputed_P and precomputed_d so
+%   each frame is a matrix–vector product.
 %
-% Outputs:
-%   self
+%   Only method_type "dSPM" and "sLORETA" run this body. "sLORETA 3D" and
+%   "SBL" clear the caches and return. S = (10^(-SNR/20)^2 / theta0) I.
+%   dSPM: d_i = 1/sqrt(sum((P S).*P, 2)) i.e. 1/sqrt((P S P')_ii).
+%   sLORETA: d = 1./sqrt(sum(P.'.*L,1))' (diagonal of P L).
 %
-% Calls (project):
-%   inverse.precompute
+%   Input
+%     L  - n_sensors×n_dof lead field after zef_processLeadfields (same
+%          matrix invert will see).
 %
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[self] = inverse.CSMInverter.precompute(self, L)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     self with precomputed_P, precomputed_d set or emptied.
 
 arguments
     self (1,1) inverse.CSMInverter

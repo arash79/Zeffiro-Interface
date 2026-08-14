@@ -1,29 +1,21 @@
 function [m, P, K, D] = kf_sL_update_approx(m,P,y,H,R,standardization_exponent)
-% --- Zeffiro documentation header ---
-% kf_sL_update_approx — Kf s L update approx.
+%KF_SL_UPDATE_APPROX  Approximate sLORETA Kalman update using a Newton square-root of P.
 %
-% Purpose:
-%   Kf s L update approx.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   m
-%   P
-%   y
-%   H
-%   R
-%   standardization_exponent
+%   [m, P, K, D] = kf_sL_update_approx(m, P, y, H, R, standardization_exponent)
 %
-% Outputs:
-%   m
-%   P
-%   K
-%   D
+%   Same role as kf_sL_update but avoids a full sqrtm (N=5, M=1 Newton
+%   iterations). Not selected from the Kalman window; available for
+%   scripted calls. No zef fields.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[m, P, K]] = kf_sL_update_approx(m, P, y, H, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Inputs / outputs match kf_sL_update.
+%
+%   See also kf_sL_update.
+%
 
     N = 5; M = 1;
     Z = eye(length(m));

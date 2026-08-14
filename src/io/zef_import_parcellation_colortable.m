@@ -1,46 +1,31 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_import_parcellation_colortable(zef,varargin)
-% --- Zeffiro documentation header ---
-% zef_import_parcellation_colortable — Loads external data or a saved Zeffiro project into `zef`.
+%ZEF_IMPORT_PARCELLATION_COLORTABLE  Import a FreeSurfer-style parcellation colortable.
 %
-% Purpose:
-%   Loads external data or a saved Zeffiro project into `zef`.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   varargin
+%   Loads a MAT file with vertices, label, and colortable fields, appends
+%   a parcellation entry to zef.parcellation_colortable, optionally tags
+%   rows with compartment_tag, clears zef.parcellation_selected, and
+%   refreshes the parcellation list UI when present.
 %
-% Outputs:
-%   zef
+%   zef = zef_import_parcellation_colortable(zef)
+%   zef = zef_import_parcellation_colortable(zef, filename)
+%   zef = zef_import_parcellation_colortable(zef, filename, compartment_tag)
+%   zef = zef_import_parcellation_colortable(zef, filename, compartment_tag, parcellation_merge)
 %
-% Zef fields (observed):
-%   zef.file_path (read)
-%   zef.h_parcellation_list (read)
-%   zef.parcellation_colortable (read, write)
-%   zef.parcellation_interp_ind (read, write)
-%   zef.parcellation_merge (read)
-%   zef.parcellation_segment (read)
-%   zef.parcellation_selected (read, write)
-%   zef.save_file_path (read)
+%   Inputs
+%     zef                 - session struct.
+%     filename            - optional path to colortable MAT file.
+%     compartment_tag     - optional compartment tag for row metadata.
+%     parcellation_merge  - optional; when false, clears existing tables.
 %
-% Calls (project):
-%   zef_import_parcellation_colortable
-%   zef_is_absolute_path
-%   zef_resolve_import_file
-%   zef_update_parcellation
+%   Output
+%     zef - session with updated parcellation_colortable.
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_import_parcellation_colortable(zef, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_import_parcellation_points, zef_update_parcellation.
 
 if nargin==0
 
@@ -151,16 +136,13 @@ if not ( strlength ( filename ) == 0 )
 
     end
 
-
     zef.parcellation_selected = [];
 
     if eval('isfield(zef,''h_parcellation_list'')')
 
         if isvalid(zef.h_parcellation_list)
 
-            h_parcellation_list = zef.h_parcellation_list;
-
-            set(h_parcellation_list,'value',[]);
+            zef_colored_list('value', zef.h_parcellation_list, []);
 
             zef = zef_update_parcellation(zef);
 

@@ -1,58 +1,60 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_postprocess_fem_mesh(zef)
-% --- Zeffiro documentation header ---
-% zef_postprocess_fem_mesh — Zef postprocess fem mesh.
+%ZEF_POSTPROCESS_FEM_MESH  Smooth, optionally re-refine, and index a volume mesh.
 %
-% Purpose:
-%   Zef postprocess fem mesh.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Runs after zef_create_fem_mesh. It does not rebuild the lattice. It
+%   (1) Laplacian-smooths nodes if zef.mesh_smoothing_on (script
+%   zef_smoothing_step, which may also inflate FEM surfaces toward the
+%   segmentation), (2) optional second-pass surface/volume refinement
+%   using the *_2 Mesh-tool flags, (3) flips inverted tets then
+%   zef_tetra_turn, (4) maps subdomain labels back to compartment
+%   indices, (5) optionally strips the outer box, (6) extracts per-
+%   compartment surface triangles, and (7) writes source-region index
+%   lists and zef.sigma (and other Segmentation/Scalar parameters).
 %
-% Outputs:
-%   zef
+%   Callers
+%     zef_create_finite_element_mesh (always, after create_fem_mesh)
+%     zef_postprocess_finite_element_mesh (Mesh tool **Postprocess FEM mesh**)
 %
-% Zef fields (observed):
-%   zef.active_compartment_ind (read, write)
-%   zef.brain_ind (read, write)
-%   zef.compartment_tags (read)
-%   zef.condition_number (read, write)
-%   zef.domain_labels (read, write)
-%   zef.domain_labels_with_subdomains (read, write)
-%   zef.exclude_box (read)
-%   zef.mesh_optimization_parameter (read)
-%   zef.nodes (read, write)
-%   zef.non_source_ind (read, write)
-%   zef.parameter_profile (read)
-%   zef.refinement_surface_number_2 (read)
-%   zef.refinement_surface_on_2 (read)
-%   zef.refinement_volume_compartments_2 (read)
-%   zef.refinement_volume_number_2 (read)
-%   … (7 more)
+%   GUI: Mesh tool **Postprocess FEM mesh** → zef_postprocess_finite_element_mesh
+%   then zef_update (verified ButtonPushedFcn on zef.h_pushbutton34).
+%   The same window's **Mesh smoothing** checkbox is zef.mesh_smoothing_on.
+%   Second-pass refinement uses zef.refinement_surface_on_2 /
+%   refinement_volume_on_2, not the flags create_fem_mesh already used.
 %
-% Calls (project):
-%   zef_compartment_to_subcompartment
-%   zef_condition_number
-%   zef_find_active_compartment_ind
-%   zef_find_subdomain_ind
-%   zef_fix_negatives
-%   zef_mesh_refinement
-%   zef_postprocess_fem_mesh
-%   zef_surface_mesh
-%   zef_tetra_turn
-%   zef_waitbar
+%   zef = zef_postprocess_fem_mesh(zef)
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Input
+%     zef  - session with nodes (V×3), tetra (T×4), domain_labels_with_subdomains
+%            (T×1 subdomain IDs), reuna_p, reuna_submesh_ind, reuna_distance_vec,
+%            compartment_tags, parameter_profile. If omitted or empty, read
+%            from base.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_postprocess_fem_mesh(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Fields written
+%     nodes, tetra                     - possibly smoothed / reindexed (V×3, T×4)
+%     domain_labels                    - T×1 compartment index (not subdomain)
+%     domain_labels_with_subdomains    - T×1 finer IDs used during refinement
+%     brain_ind, active_compartment_ind
+%         - indices of tets in source-capable compartments (_sources in {1,2})
+%     non_source_ind  - tets that touch the outer surface in more than 2 vertices
+%     surface_triangles - cell, one triangle list per unique domain label:
+%                         faces of the union of tets with domain_labels <= that id
+%     submesh_ind     - subdomain index of each active tet
+%     condition_number - from zef_condition_number (quality diagnostic)
+%     reuna_distance_vec
+%     zef.<param>     - for each parameter_profile row that is Segmentation /
+%                       Scalar / On: [value_at_tet, domain_label] (includes
+%                       sigma when that profile row is enabled)
+%
+%   Side effects
+%     Waitbar. If nargout==0, assignin('base','zef',zef).
+%
+%   See also zef_create_fem_mesh, zef_tetra_turn, zef_mesh_refinement,
+%            zef_smoothing_step, zef_postprocess_finite_element_mesh.
 
 if nargin==0
     zef = evalin('base','zef');
@@ -64,6 +66,7 @@ end
 
 h = zef_waitbar(0,1,'Mesh post-processing');
 
+% Profile rows that are Segmentation / Scalar / On become per-compartment vectors.
 parameter_profile = eval('zef.parameter_profile');
 
 for zef_j = 1 : size(parameter_profile,1)
@@ -160,8 +163,10 @@ tetra_aux = zef.tetra;
 tetra = tetra_aux;
 N = size(nodes, 1);
 
+% Script: Laplacian smooth of surface/volume nodes when mesh_smoothing_on.
 zef_smoothing_step;
 
+% refinement_flag 2 is the convention zef_refinement_step uses in this pass.
 refinement_flag = 2;
 
 surface_refinement_on = eval('zef.refinement_surface_on_2');
@@ -214,6 +219,8 @@ if eval('zef.refinement_volume_on_2');
 
     end
 
+    % Interior tets of the inner union that expose ≥3 faces are relabelled
+    % to the outermost domain (fills holes left by the split).
     max_domain_labels = max(domain_labels);
     I_5 = 0;
     while not(isempty(I_5))
@@ -227,6 +234,7 @@ if eval('zef.refinement_volume_on_2');
 
 end
 
+% Invert-then-flip: fix_negatives moves nodes; tetra_turn swaps shared faces.
 [nodes,optimizer_flag] = zef_fix_negatives(zef,nodes, tetra);
 if optimizer_flag == 1
     [tetra, optimizer_flag] = zef_tetra_turn(zef,nodes, tetra, thresh_val);
@@ -240,7 +248,7 @@ domain_labels_with_subdomains = domain_labels;
 active_compartment_ind = zef_find_active_compartment_ind(zef,domain_labels);
 
 if eval('zef.exclude_box')
- 
+    % Drop the outermost domain (largest label), usually the PML/air box.
    %I = find(not(ismember(domain_labels,find(pml_vec,1))));
 I = find(not(ismember(domain_labels,max(domain_labels,[],'all'))));
     I_2 = zeros(size(tetra,1),1);
@@ -270,6 +278,7 @@ for zef_j = 1 : size(parameter_profile,1)
     end
 end
 
+% Tets with more than two vertices on the global outer skin cannot hold sources.
 J = unique(zef_surface_mesh(tetra));
 tetra_vec = sum(ismember(tetra,J),2);
 non_source_ind = find(tetra_vec > 2);

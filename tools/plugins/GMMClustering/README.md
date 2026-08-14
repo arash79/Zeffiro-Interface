@@ -1,62 +1,53 @@
-# tools/plugins/GMMClustering
+# GMMClustering
 
-## Purpose of this folder
+Gaussian-mixture clustering of an **existing** reconstruction (JL app). Same job as GMModel (SP): fit components, optional plot/export. Not an inverse solver.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+`plugins.ClassGMM` is unused from this GUI.
 
-## Contents
+## Menu
 
-Subfolders:
-- `GMModeling App (JL)/`
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **Gaussian Mixture Model (JL)** |
+| `_legacy`, `_nse` | Inverse tools → **Gaussian Mixture Model (JL)** |
+| asteroid_radar / asteroid_gravity | Inverse tools → **GMM App** |
 
-MATLAB sources:
-- `zef_GMMcluster.m` — **function [GMModel,GMModelDipoles] = zef_GMMcluster**: Function [GMModel,GMModel Dipoles] = zef GMMcluster.
-- `zef_PlotGMMcluster.m` — **function zef_PlotGMMcluster**: Function zef Plot GMMcluster.
-- `zef_init_GMMPlotOpts.m` — **if ~isfield(zef,'GMM_comp_ord')**: If ~isfield(zef,'GMM comp ord').
+INI callback: `GMModelApp_start` (script under `GMModeling App (JL)/m/BasicGMM/`).
 
-Other files:
-- `GMMclustering_PlotOpt_app.mlapp`
-- `GMMclustering_app.mlapp`
-- `README`
+Window title: `ZEFFIRO Interface: Gaussian Mixature Model`.
 
-## How this folder fits into the overall workflow
+`GMMclustering_app.mlapp` and `zef_GMMcluster.m` at the plugin root are **not** referenced by any `zeffiro_plugins.ini`. Call `zef_GMMcluster` from MATLAB if you need that older entry.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+## Run clustering
 
-## GUI usage
-
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
-
-## Programmatic usage
-
-From the project root:
+**StartButton** `ButtonPushedFcn`:
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+if ~strcmp(zef.GMM.parameters.Values{zef.GMM.meta{1}+1},'1') || ~strcmp(zef.GMM.parameters.Values{zef.GMM.meta{1}+2},'1')
+    [zef.GMM.model,zef.GMM.dipoles,zef.GMM.amplitudes,zef.GMM.time_variables] = zef_AdvGMModeling;
+else
+    [zef.GMM.model,zef.GMM.dipoles,zef.GMM.amplitudes,zef.GMM.time_variables] = zef_GMModeling_K;
+end
 ```
 
-Representative entry points in this folder:
-- `Call `function [GMModel,GMModelDipoles] = zef_GMMcluster` from MATLAB with the project root on the path.`
-- `Call `function zef_PlotGMMcluster` from MATLAB with the project root on the path.`
-- `Call `if ~isfield(zef,'GMM_comp_ord')` from MATLAB with the project root on the path.`
+**PlotModelButton** / **PlotAmpButton** call `zef_PlotGMModel` / `zef_plot_GMM_amplitudes` after `zef_update_GMMPlotOpts`. They do not fit a new model.
 
-## Examples
+Vendor MathWorks helpers under `m/AdvancedGMM/` (`estep`, `FitAdvGMM`, `EstepWeight`, …) are not first-party solvers; do not treat them as Zeffiro APIs.
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+## Needs
 
-## Dependencies and assumptions
+- `zef.reconstruction` (empty reconstruction warns and does nothing useful)
+- `zef.source_positions`; optional parcellation when domain parameter is 2
+- Options in `zef.GMM.parameters` (component count, covariance type, frames, threshold, …)
+- Statistics Toolbox (`fitgmdist` path)
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## Writes
 
-## Notes for developers
+- `zef.GMM.model`, `zef.GMM.dipoles`, `zef.GMM.amplitudes`, `zef.GMM.time_variables`
+- Does **not** overwrite `zef.reconstruction`
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## Files
+
+- Start: `GMModeling App (JL)/m/BasicGMM/GMModelApp_start.m`
+- Solvers: `zef_GMModeling_K.m`, `zef_AdvGMModeling.m`
+- Layout: `GMModeling App (JL)/mlapp/GMModelApp.mlapp`

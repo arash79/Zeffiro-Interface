@@ -1,32 +1,15 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% set(zef.h_inv_roi_sphere_1 ,'string',num2str(zef — Set(zef.h inv roi sphere 1 ,'string',num2str(zef.
+%ZEF_INIT_FIND_SYNTHETIC_EIT_DATA  Fill synthetic-EIT ROI widgets from zef (script).
 %
-% Purpose:
-%   Set(zef.h inv roi sphere 1 ,'string',num2str(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_inv_eit_noise (read)
-%   zef.h_inv_roi_perturbation (read)
-%   zef.h_inv_roi_sphere_2 (read)
-%   zef.h_inv_roi_sphere_3 (read)
-%   zef.h_inv_roi_sphere_4 (read)
-%   zef.inv_eit_noise (read)
-%   zef.inv_roi_perturbation (read)
-%   zef.inv_roi_sphere (read)
+%   Script. Inverse of zef_update_find_synthetic_eit_data: writes
+%   inv_roi_sphere columns to h_inv_roi_sphere_1..4 and perturbation /
+%   noise to their edits. Multi-tools → Generate synthetic EIT data.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `set(zef.h_inv_roi_sphere_1 ,'string',num2str(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_update_find_synthetic_eit_data, zef_plot_roi.
 set(zef.h_inv_roi_sphere_1 ,'string',num2str(zef.inv_roi_sphere(:,1)'));
 set(zef.h_inv_roi_sphere_2 ,'string',num2str(zef.inv_roi_sphere(:,2)'));
 set(zef.h_inv_roi_sphere_3 ,'string',num2str(zef.inv_roi_sphere(:,3)'));

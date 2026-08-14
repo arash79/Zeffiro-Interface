@@ -1,35 +1,19 @@
 function [v_mag, v_dir, v_vec] = zef_nse_mean_velocity_roi(zef,nse_field)
-% --- Zeffiro documentation header ---
-% zef_nse_mean_velocity_roi — Zef nse mean velocity roi.
+%ZEF_NSE_MEAN_VELOCITY_ROI  Mean vessel velocity vector in the ROI from bv_vessels_1/2/3.
 %
-% Purpose:
-%   Zef nse mean velocity roi.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nse_field
+%   Used by plot_roi (arrow). Averages bv_vessels_* over frames and ROI
+%   nodes from zef_nse_roi_ind. Wave separation uses zef_nse_vel_dir
+%   instead (the mean_velocity call there is commented out).
 %
-% Outputs:
-%   v_mag
-%   v_dir
-%   v_vec
+%   [v_mag, v_dir, v_vec] = zef_nse_mean_velocity_roi(zef, nse_field)
 %
-% Zef fields (observed):
-%   zef.nse_field (read)
+%   See also zef_nse_plot_roi, zef_nse_roi_ind.
 %
-% Calls (project):
-%   zef_nse_mean_velocity_roi
-%   zef_nse_roi_ind
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[v_mag, v_dir, v_vec]] = zef_nse_mean_velocity_roi(zef, nse_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 roi_ind = zef_nse_roi_ind(zef,nse_field);
 v_1 = 0; 

@@ -1,32 +1,25 @@
 function zef = zef_dataBank_update(zef)
-% --- Zeffiro documentation header ---
-% zef_dataBank_update — Zef data Bank update.
+%ZEF_DATABANK_UPDATE  Copy Combine-panel spinners onto zef.dataBank.var_*.
 %
-% Purpose:
-%   Zef data Bank update.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   ValueChangedFcn of StarttimeSpinner, EndtimeSpinner, and SfreqSpinner
+%   in zef_open_dataBank. combineButton reads those var_* fields when it
+%   calls combineLeadFields. Does not invert or touch the tree.
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_update(zef)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef  - session with the three spinners. nargin==0 → base.
 %
-% Calls (project):
-%   zef_dataBank_update
+%   Output
+%     zef  - var_starttime, var_endtime, var_sampling_frequency set.
+%            nargout==0 → assignin base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dataBank_update(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_init, zef_dataBank_combineLeadFields.
 
 if nargin == 0
     zef = evalin('base','zef')

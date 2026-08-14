@@ -1,63 +1,102 @@
-# +utilities/+fs2zef
+# `utilities.fs2zef` — FreeSurfer volumes → Zeffiro surfaces
 
-## Purpose of this folder
+Converts FreeSurfer `mri/*.mgz` labels (and optional `surf/` meshes) into ASCII/STL surfaces plus `import_segmentation.zef`. Call as `utilities.fs2zef.run` after `addpath` of the project root. Do not `addpath('+fs2zef')`.
 
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+This package does **not** mesh or build a lead field. After conversion, import the `.zef` into a Zeffiro session, then mesh as usual.
 
-## Contents
+## What must exist on disk
 
-Subfolders:
-- `+config/`
-- `+environment/`
-- `+generators/`
-- `+readers/`
-- `+scripts/`
-- `+transforms/`
-- `data/`
+| Requirement | Role |
+|-------------|------|
+| `FREESURFER_HOME` | Installation root; `run` errors if unset (`fs2zef:NoFreeSurferHome`) |
+| `SUBJECTS_DIR/<subject_id>/` | Subject folder; must contain `mri/` |
+| `SUBJECTS_DIR/<subject_id>/mri/<seg>.mgz` | Each file in `segmentation_files` |
+| FreeSurfer binaries on PATH | `run` sources `SetUpFreeSurfer.sh` then calls `+scripts/makeParcellation.sh` (`mri_segstats`, `mri_mc`, `mris_convert`) |
+| Optional `surf/lh.pial`, `rh.pial`, `lh.white`, `rh.white` | Copied when `include_surfaces` is true |
+| Optional `mri/orig.mgz` | Default reference for CRAS translation (`compute_transforms`) |
 
-MATLAB sources:
-- `FREESURFER_ENV_VARS.m` — **utilities.fs2zef.FREESURFER_ENV_VARS**: FREESURFER ENV VARS.
-- `run.m` — **utilities.fs2zef.run**: Run.
-- `test_unified_pipeline.m` — **utilities.fs2zef.test_unified_pipeline**: Automated test: test_unified_pipeline.
+`run` also calls `environment.setup_freesurfer_env` then `validate_environment`. Missing `mri_mc` / `mri_segstats` / `mris_convert` fails validation.
 
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+## Public entry
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+setenv('FREESURFER_HOME', '/usr/local/freesurfer');
+setenv('SUBJECTS_DIR', '/path/to/subjects');
+
+out = utilities.fs2zef.run("subject01", "aseg.mgz", "/output/fs2zef");
+
+% Extra volumes (e.g. thalamic nuclei):
+out = utilities.fs2zef.run("subject01", ...
+    ["aseg.mgz"; "ThalamicNuclei.v13.T1.FSvoxelSpace.mgz"], ...
+    "/output/fs2zef", ...
+    "output_format", "stl", ...
+    "merge_left_right", true);
 ```
 
-Representative entry points in this folder:
-- ``[ENV_VARS] = utilities.fs2zef.FREESURFER_ENV_VARS(ENV_VARS)` with project root and `src` on the path.`
-- ``[output_info] = utilities.fs2zef.run(subject_id, segmentation_files, output_dir, options)` with project root and `src` on the path.`
-- `Call `utilities.fs2zef.test_unified_pipeline` from MATLAB with the project root on the path.`
+### Arguments (`run`)
 
-## Examples
+| Argument | Meaning |
+|----------|---------|
+| `subject_id` | Folder name under `$SUBJECTS_DIR` |
+| `segmentation_files` | Column string array of `.mgz` **filenames** in `mri/` (not full paths) |
+| `output_dir` | Created if missing |
+| `output_format` | `'ascii'`, `'stl'`, or `'both'` (default `'both'`) |
+| `compute_transforms` | CRAS translation vs `reference_volume` (default true) |
+| `reference_volume` | `.mgz` in `mri/` (default `'orig.mgz'`) |
+| `include_surfaces` | Convert `lh/rh.pial` and `lh/rh.white` (default true). White is written as `*.wm` |
+| `include_skull_skin` | Declared (default true) — **not read** by `run` (see Gaps) |
+| `electrode_file` | Copied to `ascii/` and `mesh/` as `electrodes.dat`. Empty → `+fs2zef/data/electrodes.dat` |
+| `merge_left_right` | true: display name is the base, `merge=0/1` for L/R; false: names keep L/R, `merge=0` |
+| `verbose` | Progress prints (default true) |
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+Returns `output_info` with `meshes_created`, `zef_import_file` (cell of paths), `warnings`, `elapsed_time`.
 
-## Dependencies and assumptions
+## Coordinate frame
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+Surfaces from `mri_mc` / `mris_convert` are FreeSurfer **surface (tkr) RAS**, millimetres. Specialized volumes (e.g. thalamic nuclei) may not share `orig.mgz` CRAS. When `compute_transforms` is true, `generators.generate_zef_import` writes a 4×4 **translation-only** `affine_transform` on each segmentation line (`transforms.compute_affine_transform`: `dx = source_c_r - target_c_r`, same for S/A). That is not a full RAS-to-RAS rotation.
 
-## Notes for developers
+Zeffiro applies `affine_transform` at mesh processing (`zef_process_meshes`). Do not also rotate the ASCII/STL files.
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## Output layout
+
+```
+<output_dir>/
+  ascii/*.asc              % if ascii or both
+  ascii/electrodes.dat
+  ascii/import_segmentation.zef
+  mesh/*.stl               % if stl or both
+  mesh/electrodes.dat
+  mesh/import_segmentation.zef
+```
+
+Each `.zef` is a CSV of `type,sensors` / `type,box` / `type,segmentation,...` rows. Sigma/activity/color come from FreeSurfer LUT + `config.compartment_mappings`. Right-hemisphere rows get `merge=1` when `merge_left_right` is true.
+
+`run`’s verbose “next step” prints `zef = zef_import(...)`. That helper is **not** the segmentation importer. Use:
+
+```matlab
+zef = zeffiro_interface('start_mode', 'nodisplay', ...
+    'import_to_new_project', out.zef_import_file{1});
+% or, into an already-open session:
+zef = zeffiro_interface('import_to_existing_project', out.zef_import_file{1});
+zef = zef_create_finite_element_mesh(zef);
+```
+
+`import_to_new_project` calls `zef_start_new_project` then `zef_import_segmentation` + `zef_build_compartment_table`. Paths inside the `.zef` are prefixed with `./<output_dir>/ascii` or `./<output_dir>/mesh` relative to the **current working directory**.
+
+## Subpackages
+
+| Folder | Role |
+|--------|------|
+| `+config/` | `compartment_mappings` (sigma/activity keywords); `default_config` / `parcellation_schemes` used by `test_unified_pipeline`, not by `run` |
+| `+environment/` | `setup_freesurfer_env`, `validate_environment` |
+| `+generators/` | `generate_zef_import` writes the `.zef`; `save_dats` / `save_color_tables` for atlas extras |
+| `+readers/` | LUT, aseg stats, ASCII mesh/label, `mri_info` centers |
+| `+scripts/` | `makeParcellation.sh` — one `.mgz` → one surface per label |
+| `+transforms/` | CRAS translation matrix; apply to a mesh file |
+| `data/` | Built-in `electrodes.dat` and an unused template `.zef` |
+
+## Gaps
+
+- `include_skull_skin` is in `run`’s `arguments` block and help, but the body never branches on it. Skull/skin appear only if those labels exist in the chosen `.mgz` (or you add surfaces some other way).
+- `config.default_config` fields (`parcellation_schemes`, `recon_all_flags`, retries, …) are **not** consumed by `run`.
+- Verbose next-step still recommends `zef_import`, which is a tetrahedral-mesh importer in `src/gui/helpers`, not this `.zef` pipeline.

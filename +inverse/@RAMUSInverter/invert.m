@@ -1,39 +1,30 @@
 function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
-% --- Zeffiro documentation header ---
-% inverse.RAMUSInverter.invert — Runs one inverse reconstruction step for a single measurement frame.
+%invert  Average IAS reconstructions over RAMUS decompositions and resolution levels.
 %
-% Purpose:
-%   Runs one inverse reconstruction step for a single measurement frame.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   f
-%   L
-%   procFile
-%   source_direction_mode
-%   source_positions
-%   opts
+%   Called from utilities.inverse.run_frame_loop. Inverse tools → RAMUS
+%   uses zef_ramus_iteration, not this method.
 %
-% Outputs:
-%   z_vec
-%   self
+%   Requires nonempty multiresolution_dec (self.make_multires_dec, or
+%   zef_sensitivity_run preflight hook ramus_decomposition). Errors with
+%   inverse:RAMUSInverter:NoMultiresDec otherwise.
 %
-% Calls (project):
-%   inverse.invert
-%   zef_find_g_hyperprior
-%   zef_find_ig_hyperprior
-%   zef_sensitivity_run
-%   zef_waitbar
+%   For each decomposition and resolution level, runs n_map_iterations(mr_ind)
+%   IAS-style MAP updates on the coarse lead-field columns, then scatters
+%   the result onto the full grid with multires_ind. The accumulator is
+%   divided by n_decompositions * n_levels * scaling_vec.
 %
-% Side effects:
-%   - GPU
-%   - waitbar progress UI
+%   Inputs
+%     f, L - frame and full-resolution processed lead field.
+%     procFile, source_direction_mode, source_positions - unused here.
+%     opts.use_gpu / normalize_data - GPU for inner solves; normalize unused.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z_vec, self]] = inverse.RAMUSInverter.invert(self, f, L, procFile, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Outputs
+%     z_vec - n_dof×1 averaged RAMUS reconstruction for this frame.
 
     arguments
 
@@ -176,6 +167,7 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
         z_vec = z_vec + z_vec_sub(multires_ind);
     end %multires loop
     end % dec loop
+    % Average over decompositions × levels, weighted by sparsity_factor.^[0:n_levels-1]
     z_vec = z_vec/(double(self.number_of_decompositions*self.number_of_multiresolution_levels)*sum(scaling_vec));
 end % function
 

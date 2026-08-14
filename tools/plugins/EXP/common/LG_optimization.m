@@ -1,27 +1,19 @@
 function x = LG_optimization(A,sigma,y,gamma,x,maxiter,estimation_type)
-% --- Zeffiro documentation header ---
-% LG_optimization — LG optimization.
+%LG_OPTIMIZATION  Group-L2 (3-component) inner loop for EXP.
 %
-% Purpose:
-%   LG optimization.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   A
-%   sigma
-%   y
-%   gamma
-%   x
-%   maxiter
-%   estimation_type
+%   x = LG_optimization(A, sigma, y, gamma, x, maxiter, estimation_type)
 %
-% Outputs:
-%   x
+%   Same linear solve as L1_optimization but D uses
+%   repelem(sqrt(sum(reshape(x.^2,3,[]))),3) so each dipole's three
+%   components share a weight. estimation_type==3 adds FOCUSS T_scale.
+%   Else also tracks a dual gap (reltol 1e-4).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[x] = LG_optimization(A, sigma, y, gamma, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also L1_optimization, exp_iteration.
 
 dualObj = -Inf;
 reltol = 1e-4;

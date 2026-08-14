@@ -1,29 +1,32 @@
 function [nodes_new, triangles_new, nodes_ind, triangles_ind] = zef_minimal_mesh(nodes, triangles)
-% --- Zeffiro documentation header ---
-% zef_minimal_mesh — Zef minimal mesh.
+%ZEF_MINIMAL_MESH  Drop unused vertices when a patch is sparse vs its node array.
 %
-% Purpose:
-%   Zef minimal mesh.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   triangles
+%   If F < 0.01 N, unique(triangles) becomes the kept vertex list and
+%   faces are remapped. Otherwise the inputs are returned unchanged
+%   (plotting path: most head surfaces are denser than that). Used by
+%   zef_plot_meshes / zef_plot_volume / zef_print_meshes to shrink
+%   patches before patch().
 %
-% Outputs:
-%   nodes_new
-%   triangles_new
-%   nodes_ind
-%   triangles_ind
+%   [nodes_new, triangles_new, nodes_ind, triangles_ind] = zef_minimal_mesh(nodes, triangles)
 %
-% Calls (project):
-%   zef_minimal_mesh
+%   Inputs
+%     nodes      - N×3.
+%     triangles  - F×3 1-based indices into nodes (or any F×k index array;
+%                  reshape uses size(triangles)).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[nodes_new, triangles_new, nodes_ind]] = zef_minimal_mesh(nodes, triangles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Outputs
+%     nodes_new, triangles_new - compacted or original.
+%     nodes_ind      - indices into the original nodes of the kept vertices
+%                      (1:N when the heuristic does not fire).
+%     triangles_ind  - in the compact branch this is unique's third output
+%                      (flattened remapped indices), not 1:F.
+%
+%   See also zef_plot_meshes, zef_surface_mesh.
 
 if size(triangles,1) >= 0.01*size(nodes,1)
     triangles_new = triangles;

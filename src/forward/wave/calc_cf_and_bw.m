@@ -1,26 +1,18 @@
 function [cf, bw, hf] = calc_cf_and_bw(t_vec, pulse_vec,varargin)
-% --- Zeffiro documentation header ---
-% calc_cf_and_bw — Calc cf and bw.
-%
-% Purpose:
-%   Calc cf and bw.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
-%
-% Inputs:
-%   t_vec
-%   pulse_vec
-%   varargin
-%
-% Outputs:
-%   cf
-%   bw
-%   hf
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[cf, bw, hf]] = calc_cf_and_bw(t_vec, pulse_vec, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%CALC_CF_AND_BW  Center frequency, bandwidth, and half-width of a pulse FFT.
+%
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
+%
+%   Optional varargin{1} is the dB threshold (default -20).
+%
+%   [cf, bw, hf] = calc_cf_and_bw(t_vec, pulse_vec, varargin)
+%
+%   See also bh_window.
 
 if isempty(varargin)
     signal_threshold = -20;

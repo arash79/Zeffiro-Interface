@@ -1,53 +1,20 @@
 function [h_cone_field, h_streamline, h_colorbar] = zef_plot_cone_field(zef, h_axes, varargin)
-% --- Zeffiro documentation header ---
-% zef_plot_cone_field — Renders or updates a plot_cone_field figure from current `zef` state.
+%ZEF_PLOT_CONE_FIELD  Coneplot / streamlines of zef.reconstruction on h_axes.
 %
-% Purpose:
-%   Renders or updates a plot_cone_field figure from current `zef` state.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   h_axes
-%   varargin
+%   Function. No-op unless zef.cone_draw or zef.streamline_draw.
+%   Interpolates the 3-component reconstruction onto a lattice of
+%   zef.cone_lattice_resolution, clipped by cp/cp2/cp3. coneplot objects
+%   get Tag='cones' (Figure **Transp. cones:**). Streamlines use
+%   zef.n_streamline seeds and zef.streamline_*. varargin{1} is the
+%   reconstruction cell index; varargin{2} is colorbar position case.
+%   Called from zef_plot_volume.
 %
-% Outputs:
-%   h_cone_field
-%   h_streamline
-%   h_colorbar
-%
-% Zef fields (observed):
-%   zef.colormap_size (read)
-%   zef.colortune_param (read)
-%   zef.cone_alpha (read)
-%   zef.cone_draw (read)
-%   zef.cone_lattice_resolution (read)
-%   zef.cone_scale (read)
-%   zef.cp2_a (read)
-%   zef.cp2_b (read)
-%   zef.cp2_c (read)
-%   zef.cp2_d (read)
-%   zef.cp2_on (read)
-%   zef.cp3_a (read)
-%   zef.cp3_b (read)
-%   zef.cp3_c (read)
-%   zef.cp3_d (read)
-%   … (15 more)
-%
-% Calls (project):
-%   zef_blue_brain_1_colormap
-%   zef_clipping_plane
-%   zef_plot_cone_field
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[h_cone_field, h_streamline, h_colorbar]] = zef_plot_cone_field(zef, h_axes, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_plot_volume, zef_update_transparency_cones.
 if eval('zef.cone_draw') || eval('zef.streamline_draw')
 
     rec_ind = 1;
@@ -166,6 +133,8 @@ if eval('zef.cone_draw') || eval('zef.streamline_draw')
     Z_field = zeros(size(Z_lattice));
     C_field = X_lattice;
 
+    % Bin each clipped source into the lattice (ceil of normalized xyz).
+    % Several sources can land in one voxel; later writes overwrite.
     lattice_ind_aux = [max(1,ceil(lattice_res_x*(s_p(:,1)-min(s_p(:,1)))./(max(s_p(:,1))-min(s_p(:,1))))) ...
         max(1,ceil(lattice_res_y*(s_p(:,2)-min(s_p(:,2)))./(max(s_p(:,2))-min(s_p(:,2)))))...
         max(1,ceil(lattice_res_z*(s_p(:,3)-min(s_p(:,3)))./(max(s_p(:,3))-min(s_p(:,3)))))];

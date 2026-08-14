@@ -1,25 +1,19 @@
 function [current_score] = zef_ES_score_sys(y, rwnnz)
-% --- Zeffiro documentation header ---
-% zef_ES_score_sys — Zef ES score sys.
+%ZEF_ES_SCORE_SYS  Count how many sorted |y| entries reach fraction rwnnz of ||y||_1.
 %
-% Purpose:
-%   Zef ES score sys.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   y
-%   rwnnz
+%   Not a wrapper on zef_ES_rwnnz and not bound in zef_ES_optimization_window.
+%   Converts a table y to an array if needed, then find(cumsum(sort(|y|))/||y||_1 >= rwnnz, 1).
+%   Does not zero entries. No zef fields.
 %
-% Outputs:
-%   current_score
+%   k = zef_ES_score_sys(y, rwnnz)
 %
-% Calls (project):
-%   zef_ES_score_sys
+%   See also zef_ES_rwnnz.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[current_score] = zef_ES_score_sys(y, rwnnz)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 if istable(y)
     y = table2array(y);

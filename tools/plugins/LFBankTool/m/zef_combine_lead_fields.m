@@ -1,40 +1,14 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef.lf_item_selected = get(zef — Zef.lf item selected = get(zef.
+%ZEF_COMBINE_LEAD_FIELDS  Stack selected lf_bank_storage items into zef.L.
 %
-% Purpose:
-%   Zef.lf item selected = get(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.L (read, write)
-%   zef.L_aux (read)
-%   zef.aux_field (read, write)
-%   zef.h_mesh_tool (read)
-%   zef.imaging_method (read, write)
-%   zef.imaging_method_cell (read)
-%   zef.lf_bank_storage (read)
-%   zef.lf_item_selected (read)
-%   zef.lf_n_aux (read, write)
-%   zef.lf_normalization (read, write)
-%   zef.lf_normalization_functions_file_list (read)
-%   zef.lf_size_aux (read, write)
-%   zef.measurements (read, write)
-%   zef.measurements_aux (read)
-%   zef.parcellation_interp_ind (read, write)
-%   … (14 more)
+%   Script. Vertical concat of normalized L and measurements. First item
+%   supplies sensors, imaging_method, interpolation. zef.lf_normalization
+%   indexes m/lead_field_normalization_functions.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.lf_item_selected = get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
 
 zef.lf_item_selected = get(zef.h_lf_item_list,'value');
 zef.L = [];
@@ -46,6 +20,9 @@ zef_delete_original_field;
 zef.lf_n_aux = 0;
 zef.lf_size_aux = 0;
 zef_jj = 0;
+% Vertical concat: each selected item is normalized, then stacked as extra
+% sensor rows. The first selected item (sorted index) supplies sensors,
+% imaging_method, and interpolation; later items do not replace those.
 for zef_ii = sort(zef.lf_item_selected)
     zef_jj = zef_jj + 1;
     zef.lf_n_aux = zef.lf_n_aux + norm(zef.lf_bank_storage{zef_ii}.L,'fro').^2;
@@ -85,6 +62,8 @@ for zef_ii = sort(zef.lf_item_selected)
 end
 
 if zef.lf_normalization == 2
+    % Sorted Description index 2 is "Normalize Frobenius" with the shipped
+    % files. Re-scale the stacked L so ||L||_F matches sqrt(sum_i ||L_i||_F^2).
     zef.aux_field = norm(zef.L,'fro');
     zef.measurements = sqrt(zef.lf_n_aux)*zef.measurements/norm(zef.L,'fro');
     zef.L = sqrt(zef.lf_n_aux)*zef.L/norm(zef.L,'fro');

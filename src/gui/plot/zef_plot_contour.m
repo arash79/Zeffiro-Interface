@@ -1,45 +1,19 @@
 function [h_contour,h_text] = zef_plot_contour(zef,rel_val,surf_func,triangles,nodes,varargin)
-% --- Zeffiro documentation header ---
-% zef_plot_contour — Renders or updates a plot_contour figure from current `zef` state.
+%ZEF_PLOT_CONTOUR  Isolines on a reconstruction patch (Tag='contour').
 %
-% Purpose:
-%   Renders or updates a plot_contour figure from current `zef` state.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   rel_val
-%   surf_func
-%   triangles
-%   nodes
-%   varargin
+%   Function. Called from zef_update_contour for each Tag='reconstruction'
+%   patch. rel_val is zef.contour_set (relative levels in CLim).
+%   Thresholds FaceVertexCData, extracts boundary edges, plots lines on
+%   gcf axes1 with Tag='contour'. Optional Tag='contour_text' if
+%   zef.show_contour_text. Smoothing iterations from
+%   zef.contour_n_smoothing; width from zef.contour_line_width.
 %
-% Outputs:
-%   h_contour
-%   h_text
-%
-% Zef fields (observed):
-%   zef.colormap_cell (read)
-%   zef.colormap_size (read)
-%   zef.colortune_param (read)
-%   zef.contour_line_width (read)
-%   zef.contour_n_smoothing (read)
-%   zef.h_axes1 (read)
-%   zef.inv_colormap (read)
-%   zef.show_contour_text (read)
-%
-% Calls (project):
-%   zef_plot_contour
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[h_contour, h_text]] = zef_plot_contour(zef, rel_val, surf_func, triangles, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_contour.
 if not(eval('zef.show_contour_text'))
     h_text = [];
 end

@@ -1,20 +1,15 @@
-% --- Zeffiro documentation header ---
-% h_axes = gca; — H axes = gca;.
+%ZEF_NSE_DIR_V_NODE  Apply dir_v button: DataTips → nse_field.dir_v_x/y/z.
 %
-% Purpose:
-%   H axes = gca;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.nse_field (read)
+%   ButtonPushedFcn of h_apply_dir_v. Script. The toward-point used by
+%   zef_nse_vel_dir for wave-separation direction.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   See also zef_nse_vel_dir, zef_nse_separate_waves_roi.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `h_axes = gca;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 h_axes = gca;
 if isempty(findobj(allchild(h_axes),'Type','DataTip'))~=1

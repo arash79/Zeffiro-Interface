@@ -1,35 +1,16 @@
 function F = synthesize_measurements(L, source_indices, amp, noise_db, opts)
-% --- Zeffiro documentation header ---
-% utilities.sensitivity.synthesize_measurements — Synthesize measurements.
+%SYNTHESIZE_MEASUREMENTS  Forward-model dipole probes with optional AWGN.
 %
-% Purpose:
-%   Synthesize measurements.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   L
-%   source_indices
-%   amp
-%   noise_db
-%   opts
+%   F = synthesize_measurements(L, source_indices, amp, noise_db, opts)
 %
-% Outputs:
-%   F
-%
-% Zef fields (observed):
-%   zef.L (read)
-%
-% Calls (project):
-%   utilities.sensitivity.synthesize_measurements
-%
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[F] = utilities.sensitivity.synthesize_measurements(L, source_indices, amp, noise_db, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   L must have 3 columns per source (x,y,z). Builds unit or fixed-orientation
+%   probes per opts.SourceDirectionMode (1=3 dirs, 2=normal, 3=intrinsic from
+%   opts.SourceDirections), scales by amp, adds noise at noise_db dB SNR.
 
 arguments
     L (:,:) {mustBeA(L, ["double", "gpuArray"])}

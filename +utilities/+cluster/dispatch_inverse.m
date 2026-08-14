@@ -1,32 +1,25 @@
 function result = dispatch_inverse(bundle)
-% --- Zeffiro documentation header ---
-% utilities.cluster.dispatch_inverse — Dispatch inverse.
+%DISPATCH_INVERSE  Run one cluster inverse job from a pre-built bundle struct.
 %
-% Purpose:
-%   Dispatch inverse.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   bundle
+%   result = dispatch_inverse(bundle)
 %
-% Outputs:
-%   result
+%   bundle must contain method_id, method_info (from inverse_method_registry),
+%   measurements (F), lead field (L), procFile, source geometry, GPU flags, and
+%   common_inverse_parameters / method_params for class-based inverters. Legacy
+%   methods additionally require bundle.legacy_zef.
 %
-% Calls (project):
-%   utilities.cluster.dispatch_inverse
-%   utilities.cluster.with_zef_in_base
-%   utilities.inverse.run_frame_loop
-%   zef_postProcessInverseClassObj
-%   zef_waitbar
+%   Class path: builds the inverter object, runs utilities.inverse.run_frame_loop,
+%   optional smoother/terminateComputation, optional reconstruction normalization,
+%   then zef_postProcessInverseClassObj. Legacy path: feval on legacy_function,
+%   using with_zef_in_base when the legacy routine reads base workspace zef.
 %
-% Side effects:
-%   - parallel/cluster
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[result] = utilities.cluster.dispatch_inverse(bundle)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Returns result with fields method_id, z_inverse, reconstruction, and
+%   reconstruction_information. Opens a waitbar during class-based inversion.
 
 arguments
     bundle (1,1) struct

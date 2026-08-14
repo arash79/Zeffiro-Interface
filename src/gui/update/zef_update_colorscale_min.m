@@ -1,34 +1,25 @@
 function slider_value_new = zef_update_colorscale_min(varargin)
-% --- Zeffiro documentation header ---
-% zef_update_colorscale_min — Syncs GUI control values into `zef` for colorscale_min.
+%ZEF_UPDATE_COLORSCALE_MIN  Figure-tool **Color min:** slider.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for colorscale_min.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Finds the slider Tag='colorscale_min_slider' on the Figure tool
+%   (or on varargin{1} if a popped-out figure was passed) and multiplies
+%   axes1 CLim(1) by 10^(slider Value). Slider range is [-1, 1]; 0 is
+%   identity. Unlike **Color max:**, this uses the absolute slider Value,
+%   not a delta against UserData (UserData is still stored for callers).
 %
-% Outputs:
-%   slider_value_new
+%   Then calls zef_update_contour so contour levels follow the new CLim.
+%   The Figure-tool Callback writes the returned value to
+%   zef.colorscale_min_slider when gca is parented to h_zeffiro.
 %
-% Zef fields (observed):
-%   zef.h_zeffiro (read)
+%   slider_value_new = zef_update_colorscale_min
+%   slider_value_new = zef_update_colorscale_min(h_figure)
 %
-% Calls (project):
-%   zef_update_colorscale_min
-%   zef_update_contour
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[slider_value_new] = zef_update_colorscale_min(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_colorscale_max, zef_update_colorscale, zef_update_contour.
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');
 else
@@ -59,6 +50,7 @@ end
 h_object.UserData = slider_value_new;
 
 clim_vec = h.CLim;
+% Decade shift of the lower CLim bound: CLim(1) *= 10^Value (absolute, not delta).
 clim_vec(1) = clim_vec(1)*10^(slider_value_new);
 h.CLim = clim_vec;
 

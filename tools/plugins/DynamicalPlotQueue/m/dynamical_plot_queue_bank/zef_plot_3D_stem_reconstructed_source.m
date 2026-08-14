@@ -1,33 +1,21 @@
 function zef_plot_3D_stem_reconstructed_source(varargin)
-% --- Zeffiro documentation header ---
-% zef_plot_3D_stem_reconstructed_source — Renders or updates a plot_3d_stem_reconstructed_source figure from current `zef` state.
+%ZEF_PLOT_3D_STEM_RECONSTRUCTED_SOURCE  Queue renderer: stem arrows at inv_rec_source.
 %
-% Purpose:
-%   Renders or updates a plot_3d_stem_reconstructed_source figure from current `zef` state.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Same caller zef.inv_rec_source layout as the cone-arrow renderer, but
+%   default arrow_type is 1 (sphere head / stem) and color is column 9
+%   (the reconstructed-source color slot). Deletes Tag
+%   'additional: reconstructed source' first. Scale is 3*|ori|*s(1,8).
+%   zef_plot_SESAME_dipoles builds inv_rec_source then calls this.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.inv_rec_source (read)
-%
-% Calls (project):
-%   zef_plot_3D_arrow
 %   zef_plot_3D_stem_reconstructed_source
+%   zef_plot_3D_stem_reconstructed_source(scale, type, color, shape, length, head, npoly)
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_plot_3D_stem_reconstructed_source(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_plot_3D_arrow_reconstructed_source, zef_plot_SESAME_dipoles.
 
 arrow_scale = 100;
 arrow_type = 1;

@@ -1,42 +1,28 @@
 classdef KalmanInverter < inverse.CommonInverseParameters
-% --- Zeffiro documentation header ---
-% inverse.KalmanInverter.KalmanInverter — Inverse solver class implementing Kalman reconstruction.
+%KalmanInverter  Dynamical EEG/MEG inversion with Kalman-family filters.
 %
-% Purpose:
-%   Inverse solver class implementing Kalman reconstruction.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   args
+%   Implements Basic KF, Standardized KF (sKF), approximate sKF, and EnKF for
+%   sequential source tracking. Evolution prior Q is built from measurement
+%   dynamics and lead-field sensitivity (several evolution_prior_model options).
+%   Optional RTS / Sample RTS smoothing via smoother(z_inverse, L).
 %
-% Calls (project):
-%   inverse.CommonInverseParameters
+%   Reference: Lahtinen et al., Clinical Neurophysiology 168 (2024),
+%   DOI 10.1016/j.clinph.2024.09.021.
 %
-% Side effects:
-%   - filesystem I/O
+%   See also plugins.ClassKF, inverse.HALpRInverter.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `inverse.KalmanInverter.KalmanInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
-
-    %
-    % KalmanInverter, Copyright © 2025- Joonas Lahtinen
-    %
-    % A class which defines the properties needed by the Kalma filter / Standardized Kalman filter inversion method,
-    % and the method itself.
-    % The method is based on the article:
-    % "Standardized Kalman filtering for dynamical source localization of concurrent subcortical and cortical brain activity"
-    % In: Clinical neurophysiology 168 (2024),
-    % DOI: https://doi.org/10.1016/j.clinph.2024.09.021.
-    %
 
     properties
 
         %
-        %The inverse algorithm used. The options are: dSPM, sLORETA,
-        %sLORETA's 3D implementation and Sparse Bayesian learning
+        % Filter family. Strings must match invert.m branches:
+        % "Basic Kalman filter", "Standardized Kalman filter",
+        % "Approximated Standardized Kalman filter", "Ensembled Kalman filter".
         %
         method_type (1,1) string { mustBeMember(method_type, ["Basic Kalman filter", "Standardized Kalman filter", "Approximated Standardized Kalman filter", "Ensembled Kalman filter"]) } = "Basic Kalman filter"
 
@@ -141,6 +127,7 @@ classdef KalmanInverter < inverse.CommonInverseParameters
         %set the use_smoothing to a logical value. Set simultaneously the
         %smoother type to "None" when use_smoothing set to false
         function obj = set.use_smoothing(obj,val)
+            %set.use_smoothing  Coerce numeric to logical; does not change smoother_type.
             if islogical(val)
                 obj.use_smoothing = val;
             elseif isnumeric(val)
@@ -154,6 +141,10 @@ classdef KalmanInverter < inverse.CommonInverseParameters
         %setter to set the use_smoothing to true, when smoothing is used
         %and visa versa
         function obj = set.smoother_type(obj,val)
+            %set.smoother_type  Set use_smoothing from val; does not assign smoother_type.
+            %
+            %   "None" → use_smoothing false, otherwise true. The property
+            %   smoother_type itself is not written here.
             if strcmp(val,"None")
                 obj.use_smoothing = false;
             else
@@ -163,12 +154,14 @@ classdef KalmanInverter < inverse.CommonInverseParameters
 
 
         function self = KalmanInverter(args)
-
+            %KalmanInverter  Construct a Kalman-family inverter.
             %
-            % KalmanInverter
-            %
-            % The constructor for this class.
-            %
+            %   Name-value arguments match class properties: method_type,
+            %   evolution_prior_model, evolution_cov (Q), evolution_prior_db,
+            %   number_of_ensembles, use_smoothing, smoother_type,
+            %   number_of_noise_steps, initial_prior_steering_db, theta0,
+            %   noise_cov, state_transition_model_A, plus CommonInverseParameters
+            %   band/frame/SNR fields. Prints a one-shot citation banner.
 
             arguments
 
@@ -280,13 +273,14 @@ classdef KalmanInverter < inverse.CommonInverseParameters
         % Declare the inverse method defined in the file invert, in this same
         % folder.
 
-        self = initialize(self)
+        self = initialize(self, L, f_data)
 
-        [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode)
+        [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
 
         [reconstruction, self] = smoother(self, z_inverse, L)
 
         function self = terminateComputation(self)
+            %terminateComputation  Drop the dynamic evolution_var property after a run.
             evolution_var = findprop(self,'evolution_var');
             delete(evolution_var);
         end
@@ -295,7 +289,7 @@ classdef KalmanInverter < inverse.CommonInverseParameters
 
     methods (Static)
         function InitialStatement
-            % Print the citation banner at most once per MATLAB session.
+            %InitialStatement  Print the Kalman citation banner once per MATLAB session.
             % The Kalman inverter is reconstructed on every dispatch and
             % the sensitivity pipeline triggers many dispatches per
             % method run (one per (source, direction) probe), which used

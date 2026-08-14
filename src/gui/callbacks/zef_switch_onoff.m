@@ -1,40 +1,22 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if zef — If zef.
+%ZEF_SWITCH_ONOFF  Enable or disable legacy GUIDE compartment widgets from *_on flags.
 %
-% Purpose:
-%   If zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.c_on (read)
-%   zef.d10_on (read)
-%   zef.d11_on (read)
-%   zef.d12_on (read)
-%   zef.d13_on (read)
-%   zef.d14_on (read)
-%   zef.d15_on (read)
-%   zef.d16_on (read)
-%   zef.d17_on (read)
-%   zef.d18_on (read)
-%   zef.d19_on (read)
-%   zef.d1_on (read)
-%   zef.d20_on (read)
-%   zef.d21_on (read)
-%   zef.d22_on (read)
-%   … (278 more)
+%   Unused from menus. Only caller is zef_pushbutton_switch (legacy GUIDE
+%   path), which itself has no first-party callers. The mlapp Segmentation
+%   tool uses the compartment UITable instead of h_w_on / h_pushbutton1 / …
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Script. For each hard-coded tag w, g, c, sk, sc, d1–d22: zef.enable_str
+%   is 'on' or 'off' from zef.<tag>_on, then set Enable on that tag's
+%   scaling/sigma/priority edits, sources/visible/merge/invert, and
+%   pushbuttons. When zef.mlapp is not 1, a second pushbutton per tag is
+%   included. d1–d4 also set h_dN_name backgroundcolor twice (0.92 then
+%   0.93). Does not call zef_update.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_switch_color, zef_pushbutton_switch.
 if zef.w_on
     zef.enable_str = 'on';
 else

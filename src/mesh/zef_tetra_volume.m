@@ -1,26 +1,32 @@
 function V = zef_tetra_volume(nodes, tetrahedra, take_absolute_value)
-% --- Zeffiro documentation header ---
-% zef_tetra_volume — Zef tetra volume.
+%ZEF_TETRA_VOLUME  Signed (or absolute) volume of each tetrahedron.
 %
-% Purpose:
-%   Zef tetra volume.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetrahedra
-%   take_absolute_value
+%   V = (1/6) det([v1-v4, v2-v4, v3-v4]). Positive when (v1,v2,v3) is
+%   right-handed as seen from v4. Lead-field assembly always passes
+%   take_absolute_value=true so inverted tets still contribute positive
+%   measure to zef_stiffness_matrix (the 9V conversion uses this V).
 %
-% Outputs:
-%   V
+%   Callers: zef_lead_field_eeg_fem / meg_fem / tes_fem, gravity FEM,
+%   and a few plugins. Same triple-product as zef_volume_barycentric's
+%   det (there volume = abs(det)/6).
 %
-% Calls (project):
-%   zef_tetra_volume
+%   V = zef_tetra_volume(nodes, tetrahedra, take_absolute_value)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[V] = zef_tetra_volume(nodes, tetrahedra, take_absolute_value)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Inputs
+%     nodes               - N×3 coordinates (same unit as the mesh; lead
+%                           fields convert to metres first).
+%     tetrahedra          - T×4 1-based indices into nodes.
+%     take_absolute_value - logical. true → |V|.
+%
+%   Output
+%     V  - 1×T row of volumes (unit^3). Empty tetrahedra → empty V.
+%
+%   See also zef_stiffness_matrix, zef_volume_barycentric, zef_tetra_turn.
 
 arguments
     nodes (:,3) double {mustBeNonNan}
@@ -28,7 +34,8 @@ arguments
     take_absolute_value (1,1) logical
 end
 
-% Directed edges from 4th vertex of each tetrahedron.
+% Edges from vertex 4 stacked as a 9×T matrix: rows 1:3 = v1-v4, 4:6 = v2-v4,
+% 7:9 = v3-v4. ind_m picks the 3×3 for the scalar triple product.
 
 edges = [
     nodes(tetrahedra(:,1),:)';

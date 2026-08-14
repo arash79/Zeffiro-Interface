@@ -1,37 +1,18 @@
 function [processed_data] = zef_simple_ica_cleaning(f, ica_reference_channels)
-% --- Zeffiro documentation header ---
-% zef_simple_ica_cleaning — Zef simple ica cleaning.
+%ZEF_SIMPLE_ICA_CLEANING  Pipeline stage: rica on channels, drop components matching reference indices.
 %
-% Purpose:
-%   Zef simple ica cleaning.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   f
-%   ica_reference_channels
+%   Add Input: ICA reference channel indices. Writes cleaned f'.
 %
-% Outputs:
-%   processed_data
-%
-% Calls (project):
-%   zef_simple_ica_cleaning
-%   zef_waitbar
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[processed_data] = zef_simple_ica_cleaning(f, ica_reference_channels)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%This function processes the N-by-M data array f for N channels and M time
-%steps. The other arguments can be controlled via the ZI user interface.
-%The desctiption and argument definitions shown in ZI are listed below.
 %Description: Simple ICA for data cleaning
 %Input: 1 ICA reference channel indices [Default: ]
 %Output: Data cleaned via ICA.
+%
 
-%Conversion between string and numeric data types.
 if isstr(ica_reference_channels)
     ica_reference_channels = str2num(ica_reference_channels);
 end

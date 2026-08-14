@@ -1,24 +1,14 @@
-% --- Zeffiro documentation header ---
-% warning('off'); — Warning('off');.
+%ZEF_MEG_MAGNETOMETERS_MAKE_ALL  One-shot script: mesh, MEG magnetometer type 2, interpolate.
 %
-% Purpose:
-%   Warning('off');.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_source_interpolation_on (read)
-%   zef.lead_field_type (read, write)
-%   zef.n_sources_mod (read, write)
-%   zef.source_ind (read, write)
-%   zef.source_interpolation_on (read, write)
+%   Script. Same mesh+LF sequence as zef_eeg_make_all with lead_field_type=2
+%   and zef_meg_magnetometers_lead_field. Not bound to a Mesh-tool button.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `warning('off');` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_meg_magnetometers_lead_field, zef_create_finite_element_mesh.
 
 warning('off');
 zef.lead_field_type = 2;

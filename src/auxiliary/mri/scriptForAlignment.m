@@ -1,22 +1,17 @@
-% --- Zeffiro documentation header ---
-% T=[-0.9995  -0.0280  -0.0112   133 — T=[-0.9995  -0.0280  -0.0112   133.
+%SCRIPTFORALIGNMENT  Lab script: FreeSurfer voxel-to-RAS vs zef.source_positions.
 %
-% Purpose:
-%   T=[-0.9995  -0.0280  -0.0112   133.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.reconstruction_information (read)
-%   zef.source_positions (read)
+%   Script. Hard-coded 4×4 T / Trot / Tmove for patients p1 and p2.
+%   Needs workspace source_grid, zef.source_positions, and optionally
+%   pointList / sources_free. load('./media/datadisk/perepi/p1/res_zef')
+%   and saveas under ./presentation/. Those paths are not in this repo.
+%   Cell-by-cell MATLAB sections; run pieces, not the whole file.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `T=[-0.9995  -0.0280  -0.0112   133` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also myAffine3d.
 
 %%
 
@@ -46,7 +41,8 @@ T=Trot*Tmove;
 
 sources=source_grid;
 sources=myAffine3d(sources, Tmove);
-sources(:,1)=sources(:,1);
+sources(:,1)
+=sources(:,1);
 sources=myAffine3d(sources, Trot);
 
 figure;

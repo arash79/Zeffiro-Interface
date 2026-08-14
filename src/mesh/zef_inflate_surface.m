@@ -1,38 +1,34 @@
 function [nodes] = zef_inflate_surface(zef,nodes,surface_triangles,varargin)
-% --- Zeffiro documentation header ---
-% zef_inflate_surface — Zef inflate surface.
+%ZEF_INFLATE_SURFACE  Taubin λ/μ steps on a triangle mesh (source-surface inflate).
 %
-% Purpose:
-%   Zef inflate surface.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nodes
-%   surface_triangles
-%   varargin
+%   Same Laplacian as zef_smooth_surface, but λ = 1, μ = −1, scaled by
+%   zef.inflate_strength, for zef.inflate_n_iterations steps (or the
+%   optional 4th argument). Vertices not referenced by surface_triangles
+%   get an identity row in the adjacency so they stay put. Used by
+%   zef_downsample_surfaces to build <tag>_points_inf (sources slightly
+%   inside tissue), and by segmentation import / SimNIBS / Brainstorm
+%   converters. Not the same as zef_inflate_surfaces (FEM-node snap).
 %
-% Outputs:
-%   nodes
+%   nodes = zef_inflate_surface(zef, nodes, surface_triangles)
+%   nodes = zef_inflate_surface(zef, nodes, surface_triangles, n_iterations)
 %
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.inflate_n_iterations (read)
-%   zef.inflate_strength (read)
-%   zef.use_gpu (read)
+%   Inputs
+%     zef                - session: inflate_n_iterations, inflate_strength,
+%                          use_gpu, gpu_count. If GPU is on, A and nodes
+%                          are gathered back to CPU at the end.
+%     nodes              - N×3. Isolated vertices are unchanged.
+%     surface_triangles  - F×3 1-based indices into nodes.
+%     n_iterations       - optional override of inflate_n_iterations.
 %
-% Calls (project):
-%   zef_inflate_surface
+%   Output
+%     nodes  - N×3, same rows as input (gather'ed if GPU was used).
 %
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[nodes] = zef_inflate_surface(zef, nodes, surface_triangles, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_smooth_surface, zef_inflate_surfaces, zef_downsample_surfaces.
 
 N = size(nodes,1);
 if not(isempty(varargin))
@@ -43,6 +39,7 @@ end
 smoothing_param = eval('zef.inflate_strength');
 
 A = sparse(N, N, 0);
+% Isolated vertices (not on the surface) get a 1 on the diagonal.
 diag_ind_aux = unique(surface_triangles);
 diag_aux = ones(N,1);
 diag_aux(diag_ind_aux) = 0;
@@ -64,6 +61,7 @@ A = A + spdiags(diag_aux,0,N,N);
 A = spones(A);
 sum_A = full(sum(A))';
 sum_A = sum_A(:,[1 1 1]);
+% Taubin: expand (λ>0) then contract (μ<0) to limit shrinkage.
 taubin_lambda = 1;
 taubin_mu = -1;
 

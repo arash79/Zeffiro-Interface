@@ -1,38 +1,16 @@
 function zef_3D_plot_specs(h)
-% --- Zeffiro documentation header ---
-% zef_3D_plot_specs — Zef 3D plot specs.
+%ZEF_3D_PLOT_SPECS  Camera, ticks, and axis limits for a 3-D axes.
 %
-% Purpose:
-%   Zef 3D plot specs.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   h
+%   Used by plot_meshes_proto. Reads zef.azimuth, elevation, cam_va,
+%   axes_visible.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_3D_plot_specs(h)
 %
-% Zef fields (observed):
-%   zef.axes_visible (read)
-%   zef.azimuth (read)
-%   zef.cam_va (read)
-%   zef.compartment_tags (read)
-%   zef.elevation (read)
-%   zef.h_zeffiro (read)
-%   zef.reuna_p (read)
-%
-% Calls (project):
-%   zef_3D_plot_specs
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_3D_plot_specs(h)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 head2axes_ratio = 1.0255;   %percentual empty space between surface and coordinate limits
 tick_number_limit = 8;      %maximum number of ticks on visualization

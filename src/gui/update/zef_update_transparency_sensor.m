@@ -1,33 +1,27 @@
 function slider_value_new = zef_update_transparency_sensor(varargin)
-% --- Zeffiro documentation header ---
-% zef_update_transparency_sensor — Syncs GUI control values into `zef` for transparency_sensor.
+%ZEF_UPDATE_TRANSPARENCY_SENSOR  Figure-tool **Transp. sens.:** slider.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for transparency_sensor.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Finds the slider Tag='transparency_sensor_slider' on the Figure
+%   tool (or on varargin{1} if a popped-out figure was passed), then sets
+%   FaceAlpha on every patch Tag='sensor' in axes1 (electrodes / coils
+%   from zef_plot_volume / zef_plot_meshes).
 %
-% Outputs:
-%   slider_value_new
+%   Alpha is 1.05^(-100*slider). Slider 0 → opaque; larger values fade
+%   sensors. The Figure-tool Callback writes the returned value to
+%   zef.update_transparency_sensor when gca is parented to h_zeffiro.
 %
-% Zef fields (observed):
-%   zef.h_zeffiro (read)
+%   Sibling sliders: zef_update_transparency_reconstruction / _surface /
+%   _cones / _additional. Wired as Callback strings from zef_figure_tool.
 %
-% Calls (project):
-%   zef_update_transparency_sensor
+%   slider_value_new = zef_update_transparency_sensor
+%   slider_value_new = zef_update_transparency_sensor(h_figure)
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[slider_value_new] = zef_update_transparency_sensor(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_transparency_reconstruction, zef_figure_tool.
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');
 else
@@ -51,6 +45,7 @@ slider_value_new = h_object.Value;
 
 h = findobj(h,'Tag','sensor');
 
+% Same kappa as reconstruction: FaceAlpha = min(1, 1.05^(-100*slider)).
 kappa = 1.05.^(-100*(slider_value_new));
 
 for i = 1 : length(h)

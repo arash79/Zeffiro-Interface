@@ -1,17 +1,18 @@
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst — Zef bst.
+%ZEF_BST_INIT  Script: assign factory fields on workspace variable zef_bst.
 %
-% Purpose:
-%   Zef bst.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Side effects:
-%   - waitbar progress UI
+%   Not a function. zef_bst_get_settings runs this so a zef_bst struct
+%   exists before overlaying settings/*.m. Fields include subject_struct
+%   (empty → bst_get('Subject')), compartment_list, mesh_resolution (3),
+%   unit_conversion (1000 m→mm), electrical_conductivity and dof_space
+%   key/value cells, use_gpu, parallel_processes (10). Does not touch zef.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `utilities.brainstorm2zef.zef_bst` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_get_settings, zef_bst_default.
+
 
 zef_bst.subject_struct = struct;      % Brainstorm subject structure (empty = use current)
 zef_bst.subject_folder = "";         % Path to Brainstorm subject folder (empty = use protocol default)

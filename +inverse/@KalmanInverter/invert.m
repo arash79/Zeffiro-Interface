@@ -1,39 +1,42 @@
-%% Copyright © 2025- Joonas Lahtinen
 function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
-% --- Zeffiro documentation header ---
-% inverse.KalmanInverter.invert — Runs one inverse reconstruction step for a single measurement frame.
+%invert  One Kalman predict-update step; output is filtered (or standardized) source estimate.
 %
-% Purpose:
-%   Runs one inverse reconstruction step for a single measurement frame.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   f
-%   L
-%   procFile
-%   source_direction_mode
-%   source_positions
-%   opts
+%   Called once per frame by utilities.inverse.run_frame_loop. Inverse
+%   tools → Kalman uses tools/plugins/Kalman/m/zef_KF.m instead (that
+%   plugin is also where DTI structural Q lives).
 %
-% Outputs:
-%   z_vec
-%   self
+%   State carried on self: prev_step_reconstruction, prev_step_posterior_cov
+%   (initialized from theta0 on the first frame). Optional evolution_var
+%   consumes one column per frame into evolution_cov. If use_smoothing,
+%   posterior_covs grows by one gathered P per frame for smoother().
 %
-% Calls (project):
-%   inverse.invert
-%   plugins.ClassKF.class_kf_predict
-%   plugins.ClassKF.kf_sL_update
-%   plugins.ClassKF.kf_sL_update_approx
-%   plugins.ClassKF.kf_update
+%   method_type (mustBeMember on the class):
+%     "Basic Kalman filter" — ClassKF predict + kf_update; z = x.
+%     "Standardized Kalman filter" — kf_sL_update; z = D*x.
+%     "Approximated Standardized Kalman filter" — kf_sL_update_approx; z = D*x.
+%     "Ensembled Kalman filter" — ensemble forecast, corrcoef localization
+%       (|ρ|<0.05 zeroed), Kalman gain; z = D*mean(ensemble) with D = I
+%       in the live branch (method = '3').
 %
-% Side effects:
-%   - GPU
+%   [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, ...
+%       source_positions, opts)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z_vec, self]] = inverse.KalmanInverter.invert(self, f, L, procFile, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Inputs
+%     f     - n_sensors×1 current frame (filtered).
+%     L     - n_sensors×n_dof observation model (lead field).
+%     procFile, source_direction_mode, source_positions - common invert
+%             signature; unused in this method.
+%     opts.use_gpu - move covariances to gpuArray when a device exists.
+%     opts.normalize_data - unused here.
+%
+%   Outputs
+%     z_vec - n_dof×1 filtered (or standardized) estimate.
+%     self  - updated x, P, optional posterior_covs.
 
     arguments
 
@@ -81,6 +84,7 @@ if isempty(self.prev_step_reconstruction)
 end
 
 if not(isempty(self.evolution_var))
+    % Time-varying diagonal Q: consume one column of evolution_var per frame.
     self.evolution_cov = diag(self.evolution_var(:,1));
     self.evolution_var(:,1) = [];
 end
@@ -91,6 +95,13 @@ if opts.use_gpu && gpuDeviceCount > 0
     self.prev_step_posterior_cov = gpuArray(self.prev_step_posterior_cov);
 end
 %% KALMAN FILTER
+% Basic KF: x̂, P from ClassKF predict then kf_update; z = x.
+% Standardized: same predict, kf_sL_update, z = D x (sLORETA scale).
+% Approx sKF: kf_sL_update_approx. EnKF: ensemble forecast + localization.
+% sel.fsmoother_type is as written (not self.smoother_type). Standardized
+% methods therefore take this Basic-KF branch only if a variable sel with
+% that field exists in the caller; otherwise MATLAB errors. Documented,
+% not patched.
 if strcmp(self.method_type,"Basic Kalman filter") || ((strcmp(self.method_type,"Standardized Kalman filter") || strcmp(self.method_type,"Approximated Standardized Kalman filter")) && strcmp(sel.fsmoother_type,"RTS"))
     % Prediction
     [x, P] = plugins.ClassKF.class_kf_predict(self);

@@ -1,41 +1,32 @@
-# tools/plugins/EITSensitivityTool
+# EIT Sensitivity Tool
 
-## Purpose of this folder
+Compares conductivity interpolants and lead fields for **EIT vs EEG** sensitivity metrics, and can bypass live `zef.sigma` (`zef.sigma_bypass`). **Substitute** writes a chosen distribution into `zef.reconstruction` (and sometimes `zef.sigma` or `zef.L`).
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+**Not in the default profile INI.** Call `zef_eit_sensitivity_tool_start` from MATLAB.
 
-## Contents
+## How to open it
 
-Subfolders:
-- `m/`
-- `mlapp/`
+```matlab
+zef_eit_sensitivity_tool_start;   % script
+```
 
-## How this folder fits into the overall workflow
+Title: **ZEFFIRO Interface: EIT Sensitivity Tool**. Typical inputs: two interpolation `.mat` files (`eit_sensitivity_tool_data` / `_data_2` with `.avg` and often `.covK`), `zef.L`, `zef.inv_bg_data`, `zef.source_interpolation_ind`, `zef.brain_ind`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+## Buttons (`ButtonPushedFcn` in `m/zef_eit_sensitivity_tool_start.m`)
 
-## GUI usage
+| Handle | Action |
+|--------|--------|
+| **Activate** | toggle `zef.sigma_bypass` and `zef.eit_sensitivity_tool_active` (label Inactive / Active, font color) |
+| **Import** / **Import 2** | load `.mat` → `zef.eit_sensitivity_tool_data` / `_data_2` and file path widgets |
+| **Substitute** | `zef_eit_sensitivity_tool_substitute` — huge switch on the distribution dropdown |
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+Dropdown items (wired in start): Sigma 1/2 (optionally excluding outer layers) → interpolate `.avg` onto `zef.sigma(brain_ind,1)` and `zef.reconstruction`; EIT sensitivity (parallel / MAG / orthogonal / RDM) and relative/difference variants vs `zef.inv_bg_data`; EEG lead-field difference between stored `L_EEG_1` and `L_EEG_2`; amplitudes; **Store** / **Use** EIT or EEG lead fields (`zef.eit_sensitivity_tool_L_*`). Quantile widgets clip `zef.reconstruction`.
 
-## Programmatic usage
+Volume weights: `zef_eit_sensitivity_tool_volume`.
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+## Scripting
 
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+```matlab
+zef_eit_sensitivity_tool_import;
+zef_eit_sensitivity_tool_substitute;
+```

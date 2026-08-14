@@ -1,42 +1,14 @@
-% --- Zeffiro documentation header ---
-% loadCarstenData = true; — Load Carsten Data = true;.
+%RUNKALMANSCRIPT  Batch script: synth data, dataBank lead fields, KF and MNE, store recs.
 %
-% Purpose:
-%   Load Carsten Data = true;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.KF (read)
-%   zef.dataBank (read)
-%   zef.find_synth_source (read)
-%   zef.fss_bg_noise (read, write)
-%   zef.h_mne_high_cut_frequency (read)
-%   zef.h_mne_low_cut_frequency (read)
-%   zef.h_mne_normalize_data (read)
-%   zef.h_mne_number_of_frames (read)
-%   zef.h_mne_prior (read)
-%   zef.h_mne_sampling_frequency (read)
-%   zef.h_mne_time_1 (read)
-%   zef.h_mne_time_2 (read)
-%   zef.h_mne_time_3 (read)
-%   zef.h_mne_type (read)
-%   zef.h_parcellation_interpolation (read)
-%   … (17 more)
+%   Opens zef_kf_start / dataBank / FSS / parcellation. Writes
+%   zef.measurements, reconstruction, reconstruction_information. Not a menu
+%   callback.
 %
-% Calls (project):
-%   zef_find_mne_reconstruction
-%   zef_parcellation_interpolation
-%   zef_parcellation_time_series
-%   zef_plot_parcellation_time_series
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `loadCarstenData = true;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 loadCarstenData = true;
 loadAuditoryData = false;
@@ -179,8 +151,8 @@ zef.h_parcellation_plot_type.Value = 20;
 zef.h_time_series_tools_list.Value = 21;
 
 % Take sg006 and lh023
-zef.h_parcellation_list.Value = [23, 77, 110];
-zef.parcellation_selected = get(zef.h_parcellation_list,'value');
+zef_colored_list('value', zef.h_parcellation_list, [23, 77, 110]);
+zef.parcellation_selected = zef_colored_list('value', zef.h_parcellation_list);
 
 
 [zef.parcellation_interp_ind] = zef_parcellation_interpolation(zef); zef_update_parcellation; set(zef.h_parcellation_interpolation,'foregroundcolor',[0 0 0]);

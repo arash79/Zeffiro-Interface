@@ -1,26 +1,20 @@
 classdef MNEInverter < inverse.CommonInverseParameters & handle
-% --- Zeffiro documentation header ---
-% inverse.MNEInverter.MNEInverter — Inverse solver class implementing MNE reconstruction.
+%MNEInverter  Minimum-norm estimate (MNE / weighted MNE) source inverter.
 %
-% Purpose:
-%   Inverse solver class implementing MNE reconstruction.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   args
+%   Weighted MNE with diagonal prior theta and noise covariance C:
+%     z = (theta.*L)' * ((theta.*L)*L' + C) \ f
+%   or z = W*f when W is precomputed in precompute(L).
 %
-% Calls (project):
-%   inverse.CommonInverseParameters
-%   zef_waitbar
+%   initialize estimates theta from SNR and lead-field sensitivity; noise_cov
+%   from data when unset. SetObservable theta/noise_cov track user overrides.
 %
-% Side effects:
-%   - GPU
-%   - waitbar progress UI
+%   See also inverse.ELORETAInverter, inverse.CSMInverter.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `inverse.MNEInverter.MNEInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
 
     properties
 
@@ -74,12 +68,12 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
     methods
 
         function self = MNEInverter(args)
-
+            %MNEInverter  Construct a weighted minimum-norm inverter.
             %
-            % MNEInverter
-            %
-            % The constructor for this class.
-            %
+            %   Name-value: theta, noise_cov, initial_prior_steering_db,
+            %   thetaSetted, noise_covSetted, plus CommonInverseParameters
+            %   band/frame/SNR fields. Empty theta/noise_cov are estimated in
+            %   initialize from SNR and data.
 
             arguments
 
@@ -154,32 +148,10 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
         % inversion is calculated. This allows us to compute and set
         % parameters that do not change between time steps.
         function self = initialize(self,L,f_data)
+        %initialize  Estimate MNE prior variance theta and noise covariance from data.
         %
-        % initialization function
-        %
-        % Initialize recursively updated variables before the computation of
-        % the first time step.
-        %
-        % Inputs:
-        %
-        % - self
-        %
-        %   An instance of MNEInverter with the method-specific parameters.
-        %
-        % - L
-        % The lead field matrix
-        %
-        % - f_data 
-        % The measurement vector that is in the matrix format 
-        % <# of challels> x <# of time steps>
-        % 
-        %
-        % Outputs:
-        %
-        % - self
-        %
-        %   Recursive variables initialized
-        %
+        %   noise_cov: sample covariance if multiple frames, else SNR-scaled identity.
+        %   theta: per-DOF prior from data power, SNR, and column norms of L.
     
         arguments
     
@@ -215,6 +187,7 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
         end
         data_power = max(data_power, data_floor);
 
+        % Per-source prior: θ ∝ (1-p²) 10^(steer_dB/10) data_power / ‖L_triplet‖²
         self.theta = mean( ...
             (1-noise_p2) * 10.^(self.initial_prior_steering_db/10) * data_power ...
             ./ repelem(sum(reshape(sum(L.^2),3,[])),3));
@@ -223,6 +196,7 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
         %- - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
         function self = precompute(self, L)
+            %precompute  Cache W = (theta.*L)' / ((theta.*L)*L' + noise_cov).
             arguments
                 self (1,1) inverse.MNEInverter
                 L (:,:) {mustBeA(L,["double","gpuArray"])}
@@ -238,48 +212,17 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
         % folder.
 
         function [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
-            % invert
+            %invert  Minimum-norm reconstruction for one frame: z = W*f or direct formula.
             %
-            % Builds a reconstruction of source dipoles from a given lead field with
-            % the Minimum norm estimate method.
+            %   Called from utilities.inverse.run_frame_loop. Inverse tools →
+            %   Minimum norm estimation uses zef_find_mne_reconstruction.
+            %   Registry ids mne and wmne both select this class; weighting
+            %   is always theta (there is no unweighted branch).
             %
-            % Inputs:
-            %
-            % - self
-            %
-            %   An instance of MNEInverter with the method-specific parameters.
-            %
-            % - f
-            %
-            %   Some vector.
-            %
-            % - L
-            %
-            %   The lead field that is being inverted.
-            %
-            % - procFile
-            %
-            %   A struct with source space indices.
-            %
-            % - source_direction_mode
-            %
-            %   The way the orientations of the sources should be interpreted.
-            %
-            % - opts.use_gpu = false
-            %
-            %   A logical flag for choosing whether a GPU will be used in
-            %   computations, if available.
-            %
-            % Outputs:
-            %
-            % - reconstruction
-            %
-            %   The reconstrution of the dipoles.
-            %
-            % - MNEInverter
-            %
-            % An instance of possibly modified inverter.
-            %
+            %   If precompute stored W, z = W*f. Otherwise L_modified = L.*theta
+            %   (column scaling) and z solves the weighted normal equations
+            %   with noise_cov. procFile / source_direction_mode /
+            %   source_positions unused. opts.use_gpu gathers the result.
         
             arguments
         
@@ -336,6 +279,7 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
             end
 
             % Compute the reconstruction
+            % Weighted MNE: z = L_θ' (L_θ L' + C)^{-1} f  with L_θ = L .* θ
             reconstruction = L_modified'*((L_modified*L'+C)\f);
 
             % As the output of inversion will be in gpuArray class, change
@@ -354,8 +298,9 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
         % computing process
 
         function self = terminateComputation(self)
-            % Function to reset the values that are changed during
-            %inverse computations
+            %terminateComputation  Clear auto-estimated theta, noise_cov, and cached W.
+            %
+            %   User-set theta/noise_cov (thetaSetted / noise_covSetted) are kept.
 
             %If the user has not given their own inversion parameters, we
             %reset the automatically computed parameters because the user 
@@ -377,6 +322,7 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
         % The function set the respective *Setted property value true when 
         % value is changed.
         function setEventsFlags(src,evnt,self) %two first inputs must be there and have these dedicated roles. The third 'self' is an extra variable.
+        %setEventsFlags  PostSet listener: mark theta/noise_cov as user-set when not computing.
          if not(self.computing_parameters)
           switch src.Name
              case 'theta'

@@ -1,28 +1,26 @@
 function x = zef_l2_l1_optimizer(L, y, reg_param, options)
-% --- Zeffiro documentation header ---
-% zef_l2_l1_optimizer — Zef l2 l1 optimizer.
+%ZEF_L2_L1_OPTIMIZER  quadprog L2-L1 (Lasso) inner step for sL1.
 %
-% Purpose:
-%   Zef l2 l1 optimizer.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   L
-%   y
-%   reg_param
-%   options
+%   x = zef_l2_l1_optimizer(L, y, reg_param, options)
 %
-% Outputs:
-%   x
+%   Called from zef_sl1_iteration. quadprog on the lifted [source; |source|]
+%   variable; returns the source half. No zef I/O.
 %
-% Calls (project):
-%   zef_l2_l1_optimizer
+%   Inputs
+%     L         - lead field
+%     y         - measurement
+%     reg_param - L1 weights (std_lhood^2 ./ theta)
+%     options   - quadprog options (interior-point-convex)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[x] = zef_l2_l1_optimizer(L, y, reg_param, options)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output
+%     x - source coefficients (first size(L,2) entries of the QP solution)
+%
+%   See also zef_sl1_iteration.
 
 H = [ L'*L zeros(size(L,2), size(L,2)) ; zeros(size(L,2), 2*size(L,2)) ];
 f = [ - L'*y ; reg_param ];

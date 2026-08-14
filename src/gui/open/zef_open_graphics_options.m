@@ -1,39 +1,18 @@
-% --- Zeffiro documentation header ---
-% zef_init_graphics_options; — Initializes GUI widgets and default `zef` fields for graphics_options;.
+%ZEF_OPEN_GRAPHICS_OPTIONS  Settings → **Graphics processing options**.
 %
-% Purpose:
-%   Initializes GUI widgets and default `zef` fields for graphics_options;.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.colormap_size (read)
-%   zef.colortune_param (read)
-%   zef.cone_alpha (read)
-%   zef.cone_lattice_resolution (read)
-%   zef.cone_scale (read)
-%   zef.contour_line_width (read)
-%   zef.contour_n_smoothing (read)
-%   zef.fieldnames (read, write)
-%   zef.font_size (read)
-%   zef.graphics_options_current_size (read, write)
-%   zef.h_colormap_size (read)
-%   zef.h_colortune_param (read)
-%   zef.h_cone_alpha (read)
-%   zef.h_cone_lattice_resolution (read)
-%   zef.h_cone_scale (read)
-%   … (19 more)
+%   Script. MenuSelectedFcn of h_menu_graphics_options (then zef_update).
+%   zef_init_graphics_options, instantiates zef_graphics_processing_options,
+%   ValueChangedFcn → zef_update_graphics_options. Pushes current cone /
+%   streamline / contour / colortune / GPU-graphic values onto widgets
+%   (cone alpha shown as 1 - zef.cone_alpha). Window name 'ZEFFIRO
+%   Interface: Graphics processing options'. DeleteFcn zef_closereq.
 %
-% Calls (project):
-%   zef_change_size_function
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_init_graphics_options;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_update_graphics_options, zef_menu_tool.
 zef_init_graphics_options;
 
 zef_data = zef_graphics_processing_options;

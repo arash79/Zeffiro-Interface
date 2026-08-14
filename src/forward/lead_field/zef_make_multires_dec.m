@@ -1,44 +1,30 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [multires_dec, multires_ind, multires_count] = zef_make_multires_dec(varargin)
-% --- Zeffiro documentation header ---
-% zef_make_multires_dec — Zef make multires dec.
-%
-% Purpose:
-%   Zef make multires dec.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Inputs:
-%   varargin
-%
-% Outputs:
-%   multires_dec
-%   multires_ind
-%   multires_count
-%
-% Zef fields (observed):
-%   zef.gpu_num (read)
-%   zef.inv_multires_n_decompositions (read)
-%   zef.inv_multires_n_levels (read)
-%   zef.inv_multires_sparsity (read)
-%   zef.parallel_vectors (read)
-%   zef.source_interpolation_ind (read)
-%   zef.source_positions (read)
-%   zef.use_gpu (read)
-%
-% Calls (project):
-%   zef_make_multires_dec
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[multires_dec, multires_ind, multires_count]] = zef_make_multires_dec(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%ZEF_MAKE_MULTIRES_DEC  Nested source-space index maps for multiresolution inverse.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Reads unique source_interpolation_ind{1} and source_positions from the
+%   base workspace unless varargin supplies (n_decompositions, n_levels,
+%   multires_sparsity). Otherwise uses zef.inv_multires_n_decompositions,
+%   inv_multires_n_levels, inv_multires_sparsity. Each decomposition draws a
+%   random coarse subset at every level k < n_levels of size
+%   floor(n / sparsity^(n_levels-k)), then knnsearch maps all sources onto
+%   that subset. Finest level is the identity.
+%
+%   [multires_dec, multires_ind, multires_count] = zef_make_multires_dec(...)
+%
+%   Output (each {rep}{level})
+%     multires_dec   - indices of the coarse source subset
+%     multires_ind   - nearest coarse index for every fine source
+%     multires_count - occupancy of each coarse source
+%
+%   See also zef_source_interpolation, zef_kron_reduction.
 
 if not(isempty(varargin))
     n_decompositions = varargin{1};

@@ -1,31 +1,14 @@
-% --- Zeffiro documentation header ---
-% zef.create_dipolar_pair_x = zef.h_create_dipolar_pair_table — Zef.create dipolar pair x = zef.h create dipolar pair table.
+%ZEF_CREATE_DIPOLAR_PAIR_UPDATE_STRUCT  Table column 2 → zef.create_dipolar_pair_*.
 %
-% Purpose:
-%   Zef.create dipolar pair x = zef.h create dipolar pair table.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.create_dipolar_pair_color (read, write)
-%   zef.create_dipolar_pair_impedance (read, write)
-%   zef.create_dipolar_pair_length (read, write)
-%   zef.create_dipolar_pair_ori_x (read, write)
-%   zef.create_dipolar_pair_ori_y (read, write)
-%   zef.create_dipolar_pair_ori_z (read, write)
-%   zef.create_dipolar_pair_separation (read, write)
-%   zef.create_dipolar_pair_strength (read, write)
-%   zef.create_dipolar_pair_tag (read, write)
-%   zef.create_dipolar_pair_y (read, write)
-%   zef.create_dipolar_pair_z (read, write)
-%   zef.h_create_dipolar_pair_table (read)
+%   Script. xyz, ori, strength, separation, impedance, color, length,
+%   tag. Called from plot/add. Does not write sensors.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.create_dipolar_pair_x = zef.h_create_dipolar_pair_table` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_create_dipolar_pair_update_table.
 
 zef.create_dipolar_pair_x = zef.h_create_dipolar_pair_table.Data{1,2};
 zef.create_dipolar_pair_y = zef.h_create_dipolar_pair_table.Data{2,2};

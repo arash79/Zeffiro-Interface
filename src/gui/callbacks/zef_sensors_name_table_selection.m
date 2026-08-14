@@ -1,35 +1,24 @@
 function zef_sensors_name_table_selection(hObject,eventdata,handles)
-% --- Zeffiro documentation header ---
-% zef_sensors_name_table_selection — Zef sensors name table selection.
+%ZEF_SENSORS_NAME_TABLE_SELECTION  CellSelectionCallback for the Sensors name UITable.
 %
-% Purpose:
-%   Zef sensors name table selection.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   hObject
-%   eventdata
-%   handles
+%   Wired from zef_segmentation_tool onto h_sensors_name_table.
+%   evalin('base',...).
 %
-% Outputs:
-%   See function signature and code below.
+%   First selected row → zef.current_sensor_name (1-based). Then
+%   zef_init_sensor_parameters fills the parameters table for that
+%   sensor. Unique selected row indices go to zef.sensors_selected for
+%   **Delete sensor(s)**.
 %
-% Zef fields (observed):
-%   zef.current_sensor_name (read, write)
-%   zef.sensors_selected (read, write)
+%   Inputs (MATLAB UITable CellSelectionCallback)
+%     hObject, handles  - unused.
+%     eventdata.Indices - N-by-2 [row, column] of the selection.
 %
-% Calls (project):
-%   zef_sensors_name_table_selection
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `zef_sensors_name_table_selection(hObject, eventdata, handles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_delete_sensors, zef_add_sensor_name.
 
 sensors_selected = eventdata.Indices(1);
 

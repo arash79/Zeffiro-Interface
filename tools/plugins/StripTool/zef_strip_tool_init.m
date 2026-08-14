@@ -1,32 +1,20 @@
 function zef = zef_strip_tool_init(zef)
-% --- Zeffiro documentation header ---
-% zef_strip_tool_init — Zef strip tool init.
+%ZEF_STRIP_TOOL_INIT  Default current-strip fields onto the Strip tool widgets.
 %
-% Purpose:
-%   Zef strip tool init.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_strip_tool_init(zef)
 %
-% Outputs:
-%   zef
+%   Ensures zef.<current_sensors>_strip_cell{current_strip} exists.
+%   Defaults tip [0 0 0], orientation [0 0 1], length 80 mm,
+%   impedance 1000, conductivity 1e-15, encapsulation on 0.5 mm /
+%   0.33 S/m. Disables geometry edits when strip_status is Embedded.
+%   Called from open/add/delete. Does not embed.
 %
-% Zef fields (observed):
-%   zef.current_sensors (read)
-%   zef.strip_tool (read, write)
-%
-% Calls (project):
-%   zef_strip_tool_init
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_strip_tool_init(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_strip_tool_update.
 
 if not(isfield(zef.strip_tool,'current_strip'))
 zef.strip_tool.current_strip = 1;
@@ -47,6 +35,8 @@ end
 
 struct_aux = zef.([zef.current_sensors '_strip_cell']){zef.strip_tool.current_strip};
 
+% Copy stored geometry onto GUIDE String widgets. Missing fields get
+% the defaults in the help (tip origin, +z orientation, 80 mm, …).
 if not(isfield(struct_aux,'tip_point'))
 zef.strip_tool.h_tip_point_1.String = num2str(0); 
 zef.strip_tool.h_tip_point_2.String = num2str(0); 
@@ -154,6 +144,8 @@ zef.strip_tool.h_strip_angle.String = num2str(struct_aux.strip_angle);
 end
 
 if isfield(struct_aux,'strip_status')
+    % After Embed the strip is a real compartment; freeze geometry widgets
+    % so the user cannot edit tip/orientation without deleting first.
     if isequal(struct_aux.strip_status,'Embedded')
        zef.strip_tool.h_tip_point_1.Enable = 'off';
                         zef.strip_tool.h_tip_point_2.Enable = 'off';

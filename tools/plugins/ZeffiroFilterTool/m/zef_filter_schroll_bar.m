@@ -1,27 +1,18 @@
-% --- Zeffiro documentation header ---
-% if isfield(zef,'h_scroll_bar') — If isfield(zef,'h scroll bar').
+%ZEF_FILTER_SCHROLL_BAR  Time-axis slider under h_axes1 using zef.filter_zoom.
 %
-% Purpose:
-%   If isfield(zef,'h scroll bar').
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.filter_sampling_rate (read)
-%   zef.filter_zoom (read)
-%   zef.h_axes1 (read)
-%   zef.h_scroll_bar (read, write)
-%   zef.h_zeffiro (read)
-%   zef.processed_data (read)
+%   Script. First step of the Plot button. Deletes an existing
+%   h_scroll_bar if present, then uicontrol slider on zef.h_zeffiro
+%   just below h_axes1. Callback sets h_axes1 XLim from
+%   (1-filter_zoom)*N/fs * slider + [0 filter_zoom*N/fs] using
+%   processed_data width and filter_sampling_rate. Filename is
+%   schroll (not scroll).
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if isfield(zef,'h_scroll_bar')` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_filter_plot_data.
 if isfield(zef,'h_scroll_bar')
     delete(zef.h_scroll_bar);
 end

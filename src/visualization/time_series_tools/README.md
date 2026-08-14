@@ -1,78 +1,44 @@
-# src/visualization/time_series_tools
+# Parcellation Plot transforms (`time_series_tools`)
 
-## Purpose of this folder
-
-Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
-
-## Contents
-
-MATLAB sources:
-- `zef_corr_max_scaling.m` — **zef_corr_max_scaling**: Zef corr max scaling.
-- `zef_corr_max_scaling_max_weighting.m` — **zef_corr_max_scaling_max_weighting**: Zef corr max scaling max weighting.
-- `zef_corr_mean_scaling.m` — **zef_corr_mean_scaling**: Zef corr mean scaling.
-- `zef_corr_mean_scaling_mean_weighting.m` — **zef_corr_mean_scaling_mean_weighting**: Zef corr mean scaling mean weighting.
-- `zef_corr_no_scaling.m` — **zef_corr_no_scaling**: Zef corr no scaling.
-- `zef_cov_max_scaling.m` — **zef_cov_max_scaling**: Zef cov max scaling.
-- `zef_cov_mean_scaling.m` — **zef_cov_mean_scaling**: Zef cov mean scaling.
-- `zef_cov_no_scaling.m` — **zef_cov_no_scaling**: Zef cov no scaling.
-- `zef_dtw_max_scaling.m` — **zef_dtw_max_scaling**: Zef dtw max scaling.
-- `zef_dtw_mean_scaling.m` — **zef_dtw_mean_scaling**: Zef dtw mean scaling.
-- `zef_dtw_no_scaling.m` — **zef_dtw_no_scaling**: Zef dtw no scaling.
-- `zef_max_energy_max_scaling.m` — **zef_max_energy_max_scaling**: Zef max energy max scaling.
-- `zef_max_energy_mean_scaling.m` — **zef_max_energy_mean_scaling**: Zef max energy mean scaling.
-- `zef_max_energy_no_scaling.m` — **zef_max_energy_no_scaling**: Zef max energy no scaling.
-- `zef_mean_energy_max_scaling.m` — **zef_mean_energy_max_scaling**: Zef mean energy max scaling.
-- `zef_mean_energy_mean_scaling.m` — **zef_mean_energy_mean_scaling**: Zef mean energy mean scaling.
-- `zef_mean_energy_no_scaling.m` — **zef_mean_energy_no_scaling**: Zef mean energy no scaling.
-- `zef_parcellation_boxplot_amplitude.m` — **zef_parcellation_boxplot_amplitude**: Zef parcellation boxplot amplitude.
-- `zef_std_mean_scaling.m` — **zef_std_mean_scaling**: Zef std mean scaling.
-- `zef_std_max_scaling.m` — **zef_std_no_scaling**: Zef std no scaling.
-- `zef_std_no_scaling.m` — **zef_std_no_scaling**: Zef std no scaling.
-- `zef_time_series_plot.m` — **zef_time_series_plot**: Zef time series plot.
-- `zef_time_series_plot_sqrt.m` — **zef_time_series_plot_sqrt**: Zef time series plot sqrt.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+Each file here is a small function
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+[y_vals, plot_mode] = zef_<name>(time_series)
 ```
 
-Representative entry points in this folder:
-- ``[[y_vals, plot_mode]] = zef_corr_max_scaling(time_series)` with project root and `src` on the path.`
-- ``[[y_vals, plot_mode]] = zef_corr_max_scaling_max_weighting(time_series)` with project root and `src` on the path.`
-- ``[[y_vals, plot_mode]] = zef_corr_mean_scaling(time_series)` with project root and `src` on the path.`
-- ``[[y_vals, plot_mode]] = zef_corr_mean_scaling_mean_weighting(time_series)` with project root and `src` on the path.`
-- ``[[y_vals, plot_mode]] = zef_corr_no_scaling(time_series)` with project root and `src` on the path.`
-- ``[[y_vals, plot_mode]] = zef_cov_max_scaling(time_series)` with project root and `src` on the path.`
-- ``[[y_vals, plot_mode]] = zef_cov_mean_scaling(time_series)` with project root and `src` on the path.`
-- ``[[y_vals, plot_mode]] = zef_cov_no_scaling(time_series)` with project root and `src` on the path.`
+used by **Parcellation tool → Plot**. The plotter (`zef_plot_parcellation_time_series`) reads `zef.parcellation_time_series` (ROI × time, or a cell of samples) and `feval`s the selected file. These functions **do not open figures**; they only return arrays.
 
-## Examples
+## How a user reaches this
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+1. Build a reconstruction (`zef.reconstruction`) and interpolate it onto parcels so `zef.parcellation_time_series` exists.
+2. Open **Parcellation tool**.
+3. The **time-series tools list** (`h_time_series_tools_list`) is filled at init from every `.m` in this folder. The visible label is the `Description:` line in that file’s MATLAB help (`zef_init_parcellation` searches `help`, then `strfind(...,'Description:')`, then `strtrim` of the rest). **If you omit `Description:`, the list entry is blank.**
+4. Click **Plot**. That uses the list, **not** the **Plot type:** popup. The popup only stores `zef.parcellation_plot_type`.
 
-## Dependencies and assumptions
+## `plot_mode`
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+| Value | What the plotter draws |
+|-------|------------------------|
+| 1 | One number per ROI (bar / stem) |
+| 2 | ROI × ROI matrix (`imagesc`-style) |
+| 3 | Full time courses |
+| 4 | Cell of samples per ROI (boxplot); only `zef_parcellation_boxplot_amplitude` |
 
-## Notes for developers
+## Filename vs formula
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Several file names do not match the computation. **Do not trust the name.** The table of what each file actually computes is in the parent [../README.md](../README.md) (traced from the function bodies). Examples: `zef_cov_no_scaling` is DTW; `zef_std_no_scaling` is mean-scale then `corr`; `zef_mean_energy_no_scaling` is mean-scale then `std`.
+
+## Adding a tool
+
+1. Add `zef_my_summary.m` in this folder with a complete `function` signature, then help that includes a line `Description: My summary`.
+2. Return `[y_vals, plot_mode]` as above.
+3. Re-open or re-init the Parcellation tool so `dir` picks up the file.
+
+Keep the `Description:` line. Other documentation in the help is fine; that one line is what the GUI parses.
+
+## Scripting
+
+```matlab
+ts = zef_parcellation_time_series(zef);
+[y, mode] = zef_max_energy_no_scaling(ts);   % max over time, plot_mode 1
+```

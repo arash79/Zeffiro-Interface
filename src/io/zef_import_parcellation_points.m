@@ -1,44 +1,29 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_import_parcellation_points(zef, varargin)
-% --- Zeffiro documentation header ---
-% zef_import_parcellation_points — Loads external data or a saved Zeffiro project into `zef`.
+%ZEF_IMPORT_PARCELLATION_POINTS  Import atlas parcellation point clouds.
 %
-% Purpose:
-%   Loads external data or a saved Zeffiro project into `zef`.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   varargin
+%   Loads FreeSurfer-style *.asc (four columns via zef_import_asc) or
+%   numeric *.dat into zef.parcellation_points cell array. Resolves relative
+%   paths against zef.file_path. When parcellation_merge is false, existing
+%   points are cleared first.
 %
-% Outputs:
-%   zef
+%   zef = zef_import_parcellation_points(zef)
+%   zef = zef_import_parcellation_points(zef, filename)
+%   zef = zef_import_parcellation_points(zef, filename, parcellation_merge)
 %
-% Zef fields (observed):
-%   zef.file_path (read)
-%   zef.h_zef_import_parcellation_points (read)
-%   zef.parcellation_merge (read)
-%   zef.parcellation_points (read, write)
-%   zef.save_file_path (read)
+%   Inputs
+%     zef                 - session struct.
+%     filename            - optional path to *.asc or *.dat.
+%     parcellation_merge  - optional logical; defaults to zef.parcellation_merge.
 %
-% Calls (project):
-%   zef_import_asc
-%   zef_import_parcellation_points
-%   zef_is_absolute_path
-%   zef_j
-%   zef_resolve_import_file
+%   Output
+%     zef - session with zef.parcellation_points appended or replaced.
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_import_parcellation_points(zef, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_import_parcellation_colortable, zef_import_asc.
 
 if nargin == 0
     zef = evalin('base','zef');
@@ -72,7 +57,6 @@ if isempty(filename)
     end
     filename = [file_path file];
 end
-
 
 [~,~,file_type_aux] = fileparts(filename);
 
@@ -110,8 +94,6 @@ if not(isempty(filename))
     if file_type == 2
         [zef.parcellation_points{length(zef.parcellation_points)+1}] = load(filePath);
     end
-
-
 
     if isfield(zef,'h_zef_import_parcellation_points')
         if isvalid(zef.h_zef_import_parcellation_points)

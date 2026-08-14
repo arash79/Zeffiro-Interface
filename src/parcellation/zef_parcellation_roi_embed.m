@@ -1,42 +1,21 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [c_table,c_points] = zef_parcellation_roi_embed(zef)
-% --- Zeffiro documentation header ---
-% zef_parcellation_roi_embed — Zef parcellation roi embed.
+%ZEF_PARCELLATION_ROI_EMBED  Build parcellation tables from spherical ROIs on the source grid.
 %
-% Purpose:
-%   Zef parcellation roi embed.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Optionally merges existing parcellation data, then appends an 'ROI'
+%   atlas whose points are zef.source_positions within each ROI sphere
+%   (center and radius from parcellation_roi_* fields).
 %
-% Outputs:
-%   c_table
-%   c_points
+%   [c_table, c_points] = zef_parcellation_roi_embed(zef)
 %
-% Zef fields (observed):
-%   zef.parcellation_colortable (read)
-%   zef.parcellation_merge (read)
-%   zef.parcellation_points (read)
-%   zef.parcellation_roi_center (read)
-%   zef.parcellation_roi_color (read)
-%   zef.parcellation_roi_name (read)
-%   zef.parcellation_roi_radius (read)
-%   zef.parcellation_selected (read, write)
-%   zef.source_positions (read)
+%   Outputs
+%     c_table, c_points - colortable and points cells including ROI entry.
 %
-% Calls (project):
-%   zef_parcellation_roi_embed
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[c_table, c_points]] = zef_parcellation_roi_embed(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_parcellation_default, zef_parcellation_roi_add.
 
 c_table = cell(0);
 c_points = cell(0);

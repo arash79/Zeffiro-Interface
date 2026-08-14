@@ -1,48 +1,31 @@
 function zef = zef_nse_tool_window(zef)
-% --- Zeffiro documentation header ---
-% zef_nse_tool_window — Zef nse tool window.
+%ZEF_NSE_TOOL_WINDOW  Create the NSE uifigure, copy widgets onto zef.nse_field.h_*, bind buttons.
 %
-% Purpose:
-%   Zef nse tool window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Called from zef_nse_tool_start (INI: Multi tools → NSE tool).
+%   Instantiates zef_nse_app (mlapp/), zef_nse_tool_init, then ValueChangedFcn
+%   → zef_nse_tool_update. Does not run the PDE.
 %
-% Outputs:
-%   zef
+%   ButtonPushedFcn
+%     h_solve_system            zef_nse_run_solver (src/forward/nse)
+%     h_parse_reconstruction    zef_nse_reconstruction → zef.reconstruction
+%     h_interpolate             zef_nse_interpolate
+%     h_nse_sigma               zef_nse_sigma → zef.nse_sigma
+%     h_plot_sphere / h_plot_roi / h_plot_graph
+%     h_apply_roi / h_apply_source_coordinates / h_apply_dir_v
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.domain_labels (read)
-%   zef.inv_time_1 (read, write)
-%   zef.inv_time_2 (read, write)
-%   zef.inv_time_3 (read, write)
-%   zef.nodes (read)
-%   zef.nse_field (read)
-%   zef.nse_sigma (read, write)
-%   zef.reconstruction (read)
-%   zef.reconstruction_information (read)
-%   zef.sigma (read)
-%   zef.source_interpolation_ind (read)
-%   zef.tetra (read)
+%   solver_type Items: 1 Poisson, 2 Poisson+microcirculation, 3 Poisson+
+%   microcirculation+haemodynamic response (plugin solver), 4–7 dynamic
+%   Stokes / Navier–Stokes ± microcirculation.
 %
-% Calls (project):
-%   zef_nse_interpolate
-%   zef_nse_reconstruction
-%   zef_nse_sigma
-%   zef_nse_tool_init
-%   zef_nse_tool_update
-%   zef_nse_tool_window
+%   zef = zef_nse_tool_window(zef)
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   See also zef_nse_tool_update, zef_nse_run_solver.
 %
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_nse_tool_window(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 zef_data = zef_nse_app;
 
@@ -50,6 +33,7 @@ zef = zef_nse_tool_init(zef);
 
 zef.nse_field.reconstruction_type_list = cell(0); 
 
+% List {1}: artery reconstruction types; {2}: microcirculation types (interpolate).
 zef.nse_field.reconstruction_type_list{1} = [1 2 3 6 7 8 9 10 11 12 13 14];
 zef.nse_field.reconstruction_type_list{2} = [4 5 15 16 17];
 
@@ -347,6 +331,7 @@ zef.nse_field.h_time_integration.Items = {'Euler','Trapezoid','Runge-Kutta'};
 zef.nse_field.h_time_integration.ItemsData = [1 : length(zef.nse_field.h_time_integration.Items)];
 zef.nse_field.h_time_integration.Value = zef.nse_field.time_integration;
 
+% Solve / reconstruct / interpolate / conductivity / plot / DataTip apply.
 zef.nse_field.h_solve_system.ButtonPushedFcn = 'zef_nse_run_solver';
 zef.nse_field.h_parse_reconstruction.ButtonPushedFcn = 'zef.inv_time_1 = zef.nse_field.inv_time_1; zef.inv_time_2 = zef.nse_field.inv_time_2; zef.inv_time_3 = zef.nse_field.inv_time_3; [zef.reconstruction, zef.reconstruction_information] = zef_nse_reconstruction(zef.nse_field,zef.nse_field.h_reconstruction_type.Value);';
 zef.nse_field.h_interpolate.ButtonPushedFcn = 'zef = zef_nse_interpolate(zef,zef.nse_field.h_reconstruction_type.Value);';

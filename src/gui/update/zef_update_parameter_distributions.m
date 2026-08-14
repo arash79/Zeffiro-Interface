@@ -1,34 +1,19 @@
 function zef = zef_update_parameter_distributions(zef)
-% --- Zeffiro documentation header ---
-% zef_update_parameter_distributions — Syncs GUI control values into `zef` for parameter_distributions.
+%ZEF_UPDATE_PARAMETER_DISTRIBUTIONS  Expand per-compartment scalars onto tetra labels.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for parameter_distributions.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Function. For each parameter_profile row with type Segmentation,
+%   Scalar, and column 6 On, allocates zef.<param> as n_tetra-by-2:
+%   column 2 = zef.domain_labels, column 1 = that compartment's
+%   zef.<tag>_<param> on matching labels. Used by Visualize volume when
+%   volumetric_distribution_mode is a profile parameter (2/3). Does not
+%   plot.
 %
-% Outputs:
-%   zef
-%
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.domain_labels (read, write)
-%   zef.parameter_profile (read)
-%
-% Calls (project):
-%   zef_update_parameter_distributions
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_update_parameter_distributions(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_parameter_profile, zef_plot_volume.
 parameter_profile = eval('zef.parameter_profile');
 
 for zef_j = 1 : size(parameter_profile,1)

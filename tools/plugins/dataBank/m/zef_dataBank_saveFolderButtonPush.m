@@ -1,32 +1,25 @@
 function zef = zef_dataBank_saveFolderButtonPush(zef)
-% --- Zeffiro documentation header ---
-% zef_dataBank_saveFolderButtonPush — Zef data Bank save Folder Button Push.
+%ZEF_DATABANK_SAVEFOLDERBUTTONPUSH  Choose the folder used when save-to-disk is On.
 %
-% Purpose:
-%   Zef data Bank save Folder Button Push.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   selectfolderButton.ButtonPushedFcn in zef_open_dataBank. uigetdir with
+%   title 'select folder for the databank', appends filesep, maps '\' to
+%   '/', writes zef.dataBank.folder, sets DataFolder.Text, and enables
+%   savetodiskSwitch. Does not save nodes until the switch turns On.
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_saveFolderButtonPush(zef)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef  - session with dataBank.app. nargin==0 → base.
 %
-% Calls (project):
-%   zef_dataBank_saveFolderButtonPush
+%   Output
+%     zef  - folder and UI updated. nargout==0 → assignin base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_dataBank_saveFolderButtonPush(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_saveTreeNodeSwitchChange.
 
 if nargin == 0
     zef = evalin('base','zef')

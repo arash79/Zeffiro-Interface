@@ -1,0 +1,12 @@
+**************************************************************************
+ZEFFIRO Interface 6, Date: 25-May-2026 18:12:09
+**************************************************************************
+Path: /Users/hsc476/Projects/MainZeffiroProject
+**************************************************************************
+Task ID; 1; Progress; 0; File; zef_import_segmentation.m; Message; Importing.; Workspace size; 0; Task time; 0; CPU usage; 167; Ready; ; Total CPU time; 16.55;
+Task ID; 1; Progress; 64; File; zef_import_segmentation.m; Message; Importing 7/11.; Workspace size; 0; Task time; 5; CPU usage; 233; Ready; 25-May-2026 18:12:27; Total CPU time; 29.46;
+Task ID; 2; Progress; 0; File; zef_import_segmentation.m; Message; Importing.; Workspace size; 0; Task time; 0; CPU usage; 326; Ready; ; Total CPU time; 71.7;
+Task ID; 2; Progress; 21; File; zef_import_segmentation.m; Message; Importing 38/178.; Workspace size; 0; Task time; 5; CPU usage; 333; Ready; 25-May-2026 18:19:44; Total CPU time; 88.39;
+Task ID; 2; Progress; 48; File; zef_import_segmentation.m; Message; Importing 86/178.; Workspace size; 0; Task time; 10; CPU usage; 337; Ready; 25-May-2026 18:19:42; Total CPU time; 106.08;
+Task ID; 2; Progress; 66; File; zef_import_segmentation.m; Message; Importing 118/178.; Workspace size; 0; Task time; 15; CPU usage; 310; Ready; 25-May-2026 18:19:44; Total CPU time; 121.84;
+Task ID; 2; Progress; 92; File; zef_import_segmentation.m; Message; Importing 164/178.; Workspace size; 0; Task time; 20; CPU usage; 309; Ready; 25-May-2026 18:19:43; Total CPU time; 137.29;

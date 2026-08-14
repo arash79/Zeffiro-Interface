@@ -1,48 +1,18 @@
 function zef = zef_sl1_map_estimation_window(zef)
-% --- Zeffiro documentation header ---
-% zef_sl1_map_estimation_window — Zef sl1 map estimation window.
+%ZEF_SL1_MAP_ESTIMATION_WINDOW  GUIDE figure dump: sL1 MAP widgets.
 %
-% Purpose:
-%   Zef sl1 map estimation window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_sl1_map_estimation_window(zef)
 %
-% Outputs:
-%   zef
+%   Layout only. Dump Start is zef_update_sl1; zef.reconstruction =
+%   sl1_iteration(zef) (no such function). Live Start is set in
+%   zef_init_sl1 to zef_sl1_iteration. Title set there too.
 %
-% Zef fields (observed):
-%   zef.h_sl1_apply (read, write)
-%   zef.h_sl1_cancel (read, write)
-%   zef.h_sl1_high_cut_frequency (read, write)
-%   zef.h_sl1_hyperprior (read, write)
-%   zef.h_sl1_low_cut_frequency (read, write)
-%   zef.h_sl1_map_estimation (read, write)
-%   zef.h_sl1_n_map_iterations (read, write)
-%   zef.h_sl1_normalize_data (read, write)
-%   zef.h_sl1_number_of_frames (read, write)
-%   zef.h_sl1_sampling_frequency (read, write)
-%   zef.h_sl1_snr (read, write)
-%   zef.h_sl1_start (read, write)
-%   zef.h_sl1_time_1 (read, write)
-%   zef.h_sl1_time_2 (read, write)
-%   zef.h_sl1_time_3 (read, write)
-%   … (14 more)
-%
-% Calls (project):
-%   zef_sl1_map_estimation_window
-%
-% Side effects:
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_sl1_map_estimation_window(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_sl1.
 
 h1 = figure(...
     'PaperUnits',get(0,'defaultfigurePaperUnits'),...

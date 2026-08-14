@@ -1,30 +1,23 @@
 function M = zef_volume_scalar_matrix_DD(nodes, tetra, g_i_ind, g_j_ind, scalar_field, weighting)
-% --- Zeffiro documentation header ---
-% zef_volume_scalar_matrix_DD — Zef volume scalar matrix DD.
+%ZEF_VOLUME_SCALAR_MATRIX_DD  Volume matrix ∫ φ (∇ψ_i)_α (∇ψ_j)_β dV (G·G).
 %
-% Purpose:
-%   Zef volume scalar matrix DD.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   g_i_ind
-%   g_j_ind
-%   scalar_field
-%   weighting
+%   Stiffness-like product of two gradient components. NSE builds the
+%   vector Laplacian as GG(1,1)+GG(2,2)+GG(3,3) with weight 1 via
+%   zef_volume_scalar_matrix_GG.
 %
-% Outputs:
-%   M
+%   M = zef_volume_scalar_matrix_DD(nodes, tetra, g_i_ind, g_j_ind, scalar_field, weighting)
 %
-% Calls (project):
-%   zef_volume_barycentric
-%   zef_volume_scalar_matrix_DD
+%   Inputs: g_i_ind, g_j_ind in {1,2,3}; scalar_field T×1 default 1;
+%   weighting scalar or 1×2 default 1. Off-diagonals i<j add A+A'.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_volume_scalar_matrix_DD(nodes, tetra, g_i_ind, g_j_ind, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output: N×N sparse.
+%
+%   See also zef_volume_scalar_matrix_GG, zef_volume_barycentric.
 
 N = size(nodes,1);
 K = size(tetra,1);

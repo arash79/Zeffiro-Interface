@@ -1,23 +1,16 @@
-% --- Zeffiro documentation header ---
-% for zef_j = 1 : size(zef — For zef j = 1 : size(zef.
+%ZEF_INIT_SENSORS_PARAMETER_PROFILE  Pad per-sensor profile arrays to point count (script).
 %
-% Purpose:
-%   For zef j = 1 : size(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.current_sensors (read)
-%   zef.parameter_profile (read)
+%   Script. For enabled Sensors parameter_profile rows, if
+%   zef.<current_sensors>_<param> row count ≠ *_points, fills the array
+%   with profile default (column 4) via evalin on base zef. Called from
+%   zef_init_sensor_parameters before building the parameters table.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `for zef_j = 1 : size(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_init_sensor_parameters, zef_init_parameter_profile.
 for zef_j = 1 : size(zef.parameter_profile,1)
     if isequal(zef.parameter_profile{zef_j,8},'Sensors') && isequal(zef.parameter_profile{zef_j,6},'On') && isequal(zef.parameter_profile{zef_j,7},'On')
         if not(isequal(evalin('base', ['size(zef.' zef.current_sensors '_points,1)']),evalin('base', ['size(zef.' zef.current_sensors '_' zef.parameter_profile{zef_j,2} ',1)'])))

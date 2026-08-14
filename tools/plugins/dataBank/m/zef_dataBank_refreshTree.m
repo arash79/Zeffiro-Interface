@@ -1,33 +1,24 @@
 function zef = zef_dataBank_refreshTree(zef)
-% --- Zeffiro documentation header ---
-% zef_dataBank_refreshTree — Zef data Bank refresh Tree.
+%ZEF_DATABANK_REFRESHTREE  Wipe uitree children and rebuild from the tree struct.
 %
-% Purpose:
-%   Zef data Bank refresh Tree.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   RefreshButton.ButtonPushedFcn in zef_open_dataBank. Also called after
+%   delete, import, and from add_data_item. Deletes all Tree.Children then
+%   zef_dataBank_hash2tree.
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_refreshTree(zef)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef  - session with dataBank.app.Tree and dataBank.tree. nargin==0 → base.
 %
-% Calls (project):
-%   zef_dataBank_hash2tree
-%   zef_dataBank_refreshTree
+%   Output
+%     zef  - uitree rebuilt. nargout==0 → assignin base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dataBank_refreshTree(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_hash2tree.
 
 if nargin == 0
     zef = evalin('base','zef');

@@ -1,31 +1,19 @@
 function [P_s_store, m_s_store, G_store] = RTS_smoother_standardized(P_store, D_store, z_inverse, A, Q, number_of_frames)
-% --- Zeffiro documentation header ---
-% RTS_smoother_standardized — RTS smoother standardized.
+%RTS_SMOOTHER_STANDARDIZED  RTS that applies stored sLORETA D_store to P while smoothing.
 %
-% Purpose:
-%   RTS smoother standardized.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   P_store
-%   D_store
-%   z_inverse
-%   A
-%   Q
-%   number_of_frames
+%   [P_s_store, m_s_store, G_store] = RTS_smoother_standardized(P_store, D_store, z_inverse, A, Q, number_of_frames)
 %
-% Outputs:
-%   P_s_store
-%   m_s_store
-%   G_store
+%   Not called from zef_KF (plain RTS_smoother is). Helper if D_store was
+%   saved during a standardized filter. Inputs match RTS_smoother plus
+%   D_store (cell of sLORETA D per frame).
 %
-% Calls (project):
-%   zef_waitbar
+%   See also RTS_smoother, kf_sL_update.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[P_s_store, m_s_store, G_store]] = RTS_smoother_standardized(P_store, D_store, z_inverse, A, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 P_s_store = cell(0);
 m_s_store = cell(0);

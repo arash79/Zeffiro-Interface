@@ -1,32 +1,21 @@
-% --- Zeffiro documentation header ---
-% function [GMModel,GMModelDipoles,GMModelAmplitudes,GMModelTimeVariables] = zef_GMModeling_K — Function [GMModel,GMModel Dipoles,GMModel Amplitudes,GMModel Time Variables] = zef GMModeling K.
-%
-% Purpose:
-%   Function [GMModel,GMModel Dipoles,GMModel Amplitudes,GMModel Time Variables] = zef GMModeling K.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.parcellation_interp_ind (read)
-%   zef.parcellation_selected (read)
-%   zef.reconstruction (read)
-%   zef.reconstruction_information (read)
-%   zef.source_interpolation_ind (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   zef_GMModeling_K
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [GMModel,GMModelDipoles,GMModelAmplitudes,GMModelTimeVariables] = zef_GMModeling_K` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [GMModel,GMModelDipoles,GMModelAmplitudes,GMModelTimeVariables] = zef_GMModeling_K
+%ZEF_GMMODELING_K  Basic GMM fit on an existing reconstruction (JL app).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   [GMModel, GMModelDipoles, GMModelAmplitudes, GMModelTimeVariables]
+%       = zef_GMModeling_K
+%
+%   Called from GMModelApp StartButton when advanced flags are off.
+%   Needs zef.reconstruction and zef.source_positions in base. Options
+%   in zef.GMM.parameters (K, covariance type, MaxIter, frames).
+%   fitgmdist; amplitudes via GMM2amplitude. Does not invert L or write
+%   zef.reconstruction. Not plugins.ClassGMM.
+%
+%   See also zef_AdvGMModeling, zef_PlotGMModel.
 
 h = zef_waitbar(0,1,['Gaussian mixature model.']);
 GMModelTimeVariables = [];
@@ -115,7 +104,8 @@ if length(K) < T
     K = [K,K(end)*ones(1,T-length(K))];
 end
 
-zef_waitbar(0,1,h,['Step 1 of ',num2str(T),'. Please wait.']);
+zef_waitbar(0,1,h,['Step 1 of ',num2str(T)
+,'. Please wait.']);
 tic;
 for t=t_start:T
     if T > 1

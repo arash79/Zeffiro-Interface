@@ -1,55 +1,18 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,reconstruction_information] = zef_relax_iteration(void)
-% --- Zeffiro documentation header ---
-% zef_relax_iteration — Zef relax iteration.
+%ZEF_RELAX_ITERATION  Core iteration loop for Relax inverse reconstruction.
 %
-% Purpose:
-%   Zef relax iteration.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   void
+%   Called from Start iteration after Find preconditioner (legacy_relax).
+%   Needs zef.L, measurements, zef.relax_preconditioner and
+%   relax_preconditioner_permutation. Frames: zef.relax_number_of_frames.
+%   SNR: zef.relax_snr; stop tol 10^(-(relax_snr-relax_tolerance)/20);
+%   step gamma = 10^(-relax_db/20). Reads base workspace. Returns z and
+%   reconstruction_information (tag Relaxation). No inverse.*Inverter.
 %
-% Outputs:
-%   z
-%   reconstruction_information
-%
-% Zef fields (observed):
-%   zef.relax_db (read)
-%   zef.relax_high_cut_frequency (read)
-%   zef.relax_iteration_type (read)
-%   zef.relax_low_cut_frequency (read)
-%   zef.relax_multires_n_decompositions (read)
-%   zef.relax_multires_n_iter (read)
-%   zef.relax_multires_n_levels (read)
-%   zef.relax_multires_sparsity (read)
-%   zef.relax_number_of_frames (read)
-%   zef.relax_preconditioner (read)
-%   zef.relax_preconditioner_permutation (read)
-%   zef.relax_sampling_frequency (read)
-%   zef.relax_snr (read)
-%   zef.relax_time_1 (read)
-%   zef.relax_time_2 (read)
-%   … (4 more)
-%
-% Calls (project):
-%   zef_getTimeStep
-%   zef_normalizeInverseReconstruction
-%   zef_postProcessInverse
-%   zef_processLeadfields
-%   zef_relax_iteration
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z, reconstruction_information]] = zef_relax_iteration(void)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 h = zef_waitbar(0,1,['Relaxation iteration.']);
 n_multires = evalin('base','zef.relax_multires_n_levels');
@@ -114,6 +77,10 @@ for f_ind = 1 : number_of_frames
 
         L = L_aux(:,perm_vec{n_rep}{1});
 
+        % Type 1 Landweber: one explicit step z = γ M\L' f, then the
+        % inner loop Richardson-updates. Type 2 PCG: initialize residual
+        % r = L'f (normal equations). M{n_rep} is the stored preconditioner
+        % for this RAMUS decomposition / identity.
         if isequal(evalin('base','zef.relax_iteration_type'),1)
 
             L_aux_2 = M{n_rep}\L';
@@ -137,6 +104,8 @@ for f_ind = 1 : number_of_frames
                 zef_waitbar((n_rep*(n_iter-1)+1),(length(M)*n_iter),h,['Iterative relaxation. Dec. ' int2str(n_rep) ' of ' int2str(length(M)) ', Time step ' int2str(f_ind) ' of ' int2str(number_of_frames) '.' ]);
             end;
 
+            % Landweber: residual in sensor space, apply M\L' once per step.
+            % PCG: the local `gamma` is the CG β coefficient, not relax_db.
             if isequal(evalin('base','zef.relax_iteration_type'),1)
 
                 z_vec = z_vec + gamma*L_aux_2*(f - L*z_vec);

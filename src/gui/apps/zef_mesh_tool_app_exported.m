@@ -1,40 +1,14 @@
-%ZEF_MESH_TOOL_APP_EXPORTED ZEFFIRO Interface mesh tool (exported App Designer).
-%
-%   This class implements the Mesh Tool window for the ZEFFIRO Interface.
-%   It provides controls for FEM mesh creation and postprocessing, surface
-%   and field resampling, source interpolation, mesh smoothing, refinement,
-%   and forward simulation script management (profile load/save and run).
-%   Inflating parameters, mesh resolution, and solver tolerance are also
-%   configurable. The UI is built with MATLAB App Designer and exported to
-%   this standalone class.
-%
-%   The app follows a singleton pattern: only one instance runs at a time.
-%
-%   Source: Exported from zef_mesh_tool_app.mlapp (MATLAB App Designer).
-%
-%   See also matlab.apps.AppBase, zef_mesh_tool_app.
-
 classdef zef_mesh_tool_app_exported < matlab.apps.AppBase
-% --- Zeffiro documentation header ---
-% zef_mesh_tool_app_exported — Zef mesh tool app exported.
+%ZEF_MESH_TOOL_APP_EXPORTED  App Designer export: FEM mesh tool UIFigure.
 %
-% Purpose:
-%   Zef mesh tool app exported.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
-%
-% Side effects:
-%   - creates/updates figures
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_mesh_tool_app_exported(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
-    properties (Access = public)
+%   Generated from the matching .mlapp; layout only—wire callbacks in src/gui/tools.
+%   Tool scripts copy h_* properties into zef and attach MenuSelectedFcn/ButtonPushedFcn.
+properties (Access = public)
         h_mesh_tool                   matlab.ui.Figure
         h_forward_simulation_update_from_profile  matlab.ui.control.Button
         h_forward_simulation_script   matlab.ui.control.TextArea

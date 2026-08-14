@@ -1,38 +1,21 @@
 function brightness_val = zef_update_brightness(varargin)
-% --- Zeffiro documentation header ---
-% zef_update_brightness — Syncs GUI control values into `zef` for brightness.
+%ZEF_UPDATE_BRIGHTNESS  Apply **Brightness:** alone (split helper; Figure tool does not call this).
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for brightness.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Reads zef.h_update_brightness.Value and zef.update_contrast, rebuilds
+%   zef.h_axes1 (or varargin{1}) Colormap via zef_brightness_and_contrast
+%   / zef_colormap. If two varargin are passed, the first is treated as
+%   the slider value (not an axes handle) — that branch is historical.
+%   The Figure-tool sliders call zef_update_contrast_and_brightness.
 %
-% Outputs:
-%   brightness_val
+%   brightness_val = zef_update_brightness
+%   brightness_val = zef_update_brightness(h_axes)
 %
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%   zef.h_update_brightness (read)
-%   zef.h_update_colormap (read)
-%   zef.update_contrast (read)
-%
-% Calls (project):
-%   zef_brightness_and_contrast
-%   zef_colormap
-%   zef_update_brightness
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[brightness_val] = zef_update_brightness(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_contrast_and_brightness, zef_update_contrast.
 slider_value_new = evalin('base','zef.h_update_brightness.Value');
 
 if not(isempty(varargin))

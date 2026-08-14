@@ -1,32 +1,16 @@
 function [submissions, bundles] = kalman_workflow(zef_inputs, cluster_profile, opts)
-% --- Zeffiro documentation header ---
-% utilities.cluster.examples.kalman_workflow — Example or study script demonstrating kalman_workflow.
+%KALMAN_WORKFLOW  Build Kalman-filter bundles and submit cluster inverse jobs.
 %
-% Purpose:
-%   Example or study script demonstrating kalman_workflow.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef_inputs
-%   cluster_profile
-%   opts
+%   [submissions, bundles] = kalman_workflow(zef_inputs, cluster_profile, opts)
 %
-% Outputs:
-%   submissions
-%   bundles
-%
-% Calls (project):
-%   utilities.cluster.examples.kalman_workflow
-%   utilities.cluster.submit_inverse_jobs
-%   zef_inverse_extract_bundle
-%
-% Side effects:
-%   - parallel/cluster
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[submissions, bundles]] = utilities.cluster.examples.kalman_workflow(zef_inputs, cluster_profile, opts)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   zef_inputs is a struct array or cell of zef structs. Each entry is passed
+%   to zef_inverse_extract_bundle with opts.MethodId (default "kalman") and
+%   opts.MethodParams, then batch-submitted via submit_inverse_jobs.
 
 arguments
     zef_inputs

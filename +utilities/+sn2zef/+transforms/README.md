@@ -1,50 +1,38 @@
-# +utilities/+sn2zef/+transforms
+# `+transforms` — SimNIBS RAS → FreeSurfer RAS (header affine)
 
-## Purpose of this folder
+SimNIBS `final_tissues.nii.gz` and FreeSurfer `mri/orig.mgz` are often the same anatomy in **different RAS frames** (NIfTI orientation vs FreeSurfer). Closed STL vertices from `export_segmentation_meshes` in **translation** mode are written in SimNIBS `vox2ras`. Zeffiro can still place them on the FreeSurfer anatomy if a 4×4 `affine_transform` is stored on each `.zef` segmentation row and applied later in `zef_process_meshes` (post-multiply mesh rows).
 
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+This folder builds that matrix from **volume headers only** (`MRIread` `vox2ras` + CRAS). It does not run `mri_coreg` and does not rewrite STL files.
 
-## Contents
+## When you need it
 
-MATLAB sources:
-- `compute_simnibs_to_freesurfer_translation.m` — **utilities.sn2zef.transforms.compute_simnibs_to_freesurfer_translation**: Compute simnibs to freesurfer translation.
+- You called `export_segmentation_meshes(..., 'alignment_mode','translation')` (the worker default) and you want Zeffiro to apply the SimNIBS→FS map at mesh time.
+- `utilities.sn2zef.run` currently **discards** the returned affine (`[~, vertex_info] = …`) and writes `import_segmentations.zef` **without** `affine_transform`. If you import that folder as-is, surfaces stay in the STL vertex frame (SimNIBS RAS). To get FreeSurfer RAS via this matrix, call the worker yourself and put the 4×4 into the `.zef`, or use `'alignment_mode','coregistration'` so vertices are already in FS space (`affine_matrix` is then `[]`).
 
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+## Function
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+A = utilities.sn2zef.transforms.compute_simnibs_to_freesurfer_translation( ...
+    simnibs_nii, freesurfer_mgz, 'verbose', true);
 ```
 
-Representative entry points in this folder:
-- ``[affine_matrix] = utilities.sn2zef.transforms.compute_simnibs_to_freesurfer_translation(simnibs_nii, freesurfer_mgz, options)` with project root and `src` on the path.`
+| Argument | Meaning |
+|----------|---------|
+| `simnibs_nii` | Path to `final_tissues.nii.gz` (`mustBeFile`) |
+| `freesurfer_mgz` | Path to `mri/orig.mgz` |
+| `'verbose'` | Print CRAS and the 4×4 (default false) |
 
-## Examples
+Requires `FREESURFER_HOME` so `MRIread` is on the path (same `matlab/` / `fsfast/toolbox` addpath as the STL worker).
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+### What the 4×4 is
 
-## Dependencies and assumptions
+From the two `vox2ras` linear parts \(R_\mathrm{sim}\), \(R_\mathrm{fs}\) and CRAS centres:
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+\[
+R = R_\mathrm{fs}\, R_\mathrm{sim}^{-1},\qquad
+t = c_\mathrm{fs} - R\, c_\mathrm{sim}.
+\]
 
-## Notes for developers
+If \(R_\mathrm{sim}\) is ill-conditioned (`cond > 1e8`) or the divide throws, the function falls back to a **pure translation** \(t = c_\mathrm{fs} - c_\mathrm{sim}\) (legacy centre shift). That fallback does not correct a relative rotation.
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+`export_segmentation_meshes` calls this only in translation mode. Atlas points (`save_volume_atlas_points`) can apply the same matrix after voxel→RAS. Parent pipeline: [`../README.md`](../README.md). Applied at mesh time: [`../../../src/mesh/README.md`](../../../src/mesh/README.md) (`zef_process_meshes`).

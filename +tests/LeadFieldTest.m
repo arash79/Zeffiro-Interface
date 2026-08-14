@@ -1,19 +1,14 @@
 classdef LeadFieldTest < matlab.unittest.TestCase
-% --- Zeffiro documentation header ---
-% tests.LeadFieldTest — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%LEADFIELDTEST  Placeholder — no Test methods (TODO).
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: MATLAB unit and integration tests for refactored inverse dispatch, lead fields, cluster jobs, and legacy/class parity.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
+%   Does not assert lead-field behaviour. Inverse tests use
+%   createSyntheticInverseZef instead of a real L.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `tests.LeadFieldTest(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
     methods (Test)
 
         % TODO

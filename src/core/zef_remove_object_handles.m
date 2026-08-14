@@ -1,29 +1,37 @@
 function zef = zef_remove_object_handles(zef, node_name, h_list)
-% --- Zeffiro documentation header ---
-% zef_remove_object_handles — Zef remove object handles.
+%ZEF_REMOVE_OBJECT_HANDLES  Strip graphics/object handles from a struct tree.
 %
-% Purpose:
-%   Zef remove object handles.
-%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   node_name
-%   h_list
+%   Used before saving a project so .mat files do not store live figure
+%   handles. Fields whose value isvalid() as an object are rmfield'd
+%   (matlab.io.MatFile is skipped). Nested structs are walked recursively;
+%   struct arrays longer than 1000 entries are skipped with a warning.
 %
-% Outputs:
-%   zef
+%   zef = zef_remove_object_handles(zef)
+%   zef = zef_remove_object_handles(zef, node_name)
+%   zef = zef_remove_object_handles(zef, node_name, h_list)
 %
-% Calls (project):
-%   zef_remove_object_handles
+%   Inputs
+%     zef        - struct to clean (often zef_data). With one argument the
+%                  struct is processed directly.
+%     node_name  - dotted eval path into the caller workspace (e.g. 'zef'
+%                  or 'zef.foo(2)'). Empty/omitted uses the one-arg path.
+%     h_list     - optional handle list; when nonempty, only matching
+%                  handles are removed.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Output
+%     zef  - struct with handle fields removed. The two-arg form also
+%            eval's assignments back into node_name in this workspace.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_remove_object_handles(zef, node_name, h_list)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Notes
+%     The node_name path uses eval; it exists for historical save code that
+%     walks zef.field names as strings. Prefer the one-arg form for new code.
+%
+%   See also zef_save.
 
 
 skip_class_list = {'matlab.io.MatFile'};

@@ -1,68 +1,16 @@
-# tools/plugins/LFBankTool/m
+# Multi lead field tool — MATLAB files (`m/`)
 
-## Purpose of this folder
+These are the functions the **Multi lead field tool** window actually calls. GUI paths, storage layout (`zef.lf_bank_storage`), and button table: parent [../README.md](../README.md). Layout: `mlapp/` (if present) plus widgets created in `zef_lf_bank_tool`.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+| File | Role |
+|------|------|
+| `zef_lf_bank_tool.m` | **script** start: build the window, wire buttons. INI callback. |
+| `zef_init_lf_bank_tool.m` | Seed widgets from `zef.lf_bank_*`. |
+| `zef_update_lf_bank_tool.m` | Copy widgets back onto `zef`. |
+| `zef_add_lf_item.m` | Snapshot live `L`, sensors, measurements, noise, interpolation into the bank. |
+| `zef_delete_lf_item.m` | Drop selected bank entries. |
+| `zef_combine_lead_fields.m` | Vertical concat of normalized `L` and measurements (Merge). |
+| `zef_lf_bank_compute_lead_fields.m` | Restore each item’s sensors, remesh-attach, `zef_lead_field_matrix`, write `L` back. |
+| `zef_lf_bank_update_measurements.m` / `zef_lf_bank_update_noise_data.m` | Copy live measurements / noise onto selected items. |
 
-## Contents
-
-Subfolders:
-- `lead_field_normalization_functions/`
-
-MATLAB sources:
-- `zef_lf_bank_update_noise_data.m` — **for zef_i = 1:length(zef**: For zef i = 1:length(zef.
-- `zef_update_lf_bank_tool.m` — **if isfield(zef,'h_lf_bank_tool')**: If isfield(zef,'h lf bank tool').
-- `zef_add_lf_item.m` — **if not(isempty(zef**: If not(isempty(zef.
-- `zef_init_lf_bank_tool.m` — **if not(isfield(zef,'lf_bank_scaling_factor'));**: If not(isfield(zef,'lf bank scaling factor'));.
-- `zef_combine_lead_fields.m` — **zef.lf_item_selected = get(zef**: Zef.lf item selected = get(zef.
-- `zef_delete_lf_item.m` — **zef.lf_item_selected = get(zef**: Zef.lf item selected = get(zef.
-- `zef_lf_bank_compute_lead_fields.m` — **zef.lf_item_selected = get(zef**: Zef.lf item selected = get(zef.
-- `zef_lf_bank_update_measurements.m` — **zef.lf_item_selected = get(zef**: Zef.lf item selected = get(zef.
-- `zef_lf_bank_tool.m` — **zef_data = zeffiro_interface_lf_bank_tool;**: Zef data = zeffiro interface lf bank tool;.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-- **zef_data = zeffiro_interface_lf_bank_tool;**: GUI callback or dialog (`zef_data = zeffiro_interface_lf_bank_tool;`).
-
-## Programmatic usage
-
-From the project root:
-
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
-```
-
-Representative entry points in this folder:
-- `Call `for zef_i = 1:length(zef` from MATLAB with the project root on the path.`
-- `Call `if isfield(zef,'h_lf_bank_tool')` from MATLAB with the project root on the path.`
-- `Call `if not(isempty(zef` from MATLAB with the project root on the path.`
-- `Call `if not(isfield(zef,'lf_bank_scaling_factor'));` from MATLAB with the project root on the path.`
-- `Call `zef.lf_item_selected = get(zef` from MATLAB with the project root on the path.`
-- `Call `zef.lf_item_selected = get(zef` from MATLAB with the project root on the path.`
-- `Call `zef.lf_item_selected = get(zef` from MATLAB with the project root on the path.`
-- `Call `zef.lf_item_selected = get(zef` from MATLAB with the project root on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Normalization maps used at merge time: [lead_field_normalization_functions/README.md](lead_field_normalization_functions/README.md).

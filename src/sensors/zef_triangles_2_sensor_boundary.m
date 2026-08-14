@@ -1,35 +1,26 @@
 function [triangles_out] = zef_triangles_2_sensor_boundary(zef,compartment_tag,triangles_in)
-% --- Zeffiro documentation header ---
-% zef_triangles_2_sensor_boundary — Zef triangles 2 sensor boundary.
+%ZEF_TRIANGLES_2_SENSOR_BOUND  Offset triangle indices onto a sensor boundary mesh stack.
 %
-% Purpose:
-%   Zef triangles 2 sensor boundary.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   compartment_tag
-%   triangles_in
+%   Uses zef.<current_sensors>_boundary_cell to locate compartment_tag in
+%   the stacked reuna_p surfaces and adds the cumulative vertex offset for
+%   that boundary layer to triangles_in.
 %
-% Outputs:
-%   triangles_out
+%   triangles_out = zef_triangles_2_sensor_boundary(zef, compartment_tag, triangles_in)
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.current_sensors (read)
-%   zef.reuna_p (read)
+%   Inputs
+%     zef             - session with boundary_cell and reuna_p.
+%     compartment_tag - tag present in boundary_cell.
+%     triangles_in    - triangle index array to rebase.
 %
-% Calls (project):
-%   zef_triangles_2_sensor_boundary
+%   Output
+%     triangles_out - offset triangles, or [] when compartment not in boundary_cell.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[triangles_out] = zef_triangles_2_sensor_boundary(zef, compartment_tag, triangles_in)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_attach_sensors_volume.
 
 triangles_out = [];
     points_ind = []; 

@@ -1,31 +1,18 @@
 function [P_s_store, m_s_store, G_store] = sample_RTS_smoother(P_store, D_store, z_inverse, A, number_of_frames, filter_type)
-% --- Zeffiro documentation header ---
-% sample_RTS_smoother — Sample RTS smoother.
+%SAMPLE_RTS_SMOOTHER  RTS that estimates Q from consecutive filtered samples.
 %
-% Purpose:
-%   Sample RTS smoother.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   P_store
-%   D_store
-%   z_inverse
-%   A
-%   number_of_frames
-%   filter_type
+%   [P_s_store, m_s_store, G_store] = sample_RTS_smoother(P_store, D_store, z_inverse, A, number_of_frames, filter_type)
 %
-% Outputs:
-%   P_s_store
-%   m_s_store
-%   G_store
+%   Not called from zef_KF. Q = cov of successive z_inverse columns.
+%   filter_type 1 uses P_store; otherwise D_store*P*D'.
 %
-% Calls (project):
-%   zef_waitbar
+%   See also RTS_smoother.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[P_s_store, m_s_store, G_store]] = sample_RTS_smoother(P_store, D_store, z_inverse, A, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 P_s_store = cell(0);
 m_s_store = cell(0);

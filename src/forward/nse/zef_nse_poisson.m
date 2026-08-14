@@ -1,44 +1,31 @@
 function nse_field = zef_nse_poisson(nse_field,nodes,tetra,domain_labels,mvd_length)
-% --- Zeffiro documentation header ---
-% zef_nse_poisson — Zef nse poisson.
+
+
+%ZEF_NSE_POISSON  Steady Poisson hemodynamic pressure solver on vessel submeshes.
 %
-% Purpose:
-%   Zef nse poisson.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nse_field
-%   nodes
-%   tetra
-%   domain_labels
-%   mvd_length
+%   Builds artery/capillary submeshes, assembles surface/volume barycentric
+%   matrices (FF, FG, GG), applies pulse-driven boundary conditions, and solves
+%   coupled pressure fields stored in nse_field vessel cell arrays.
 %
-% Outputs:
-%   nse_field
+%   nse_field = zef_nse_poisson(nse_field, nodes, tetra, domain_labels, mvd_length)
 %
-% Calls (project):
-%   zef_find_adjacent_tetra
-%   zef_get_submesh
-%   zef_nse_poisson
-%   zef_nse_signal_pulse
-%   zef_surface_mesh
-%   zef_surface_scalar_matrix_FF
-%   zef_surface_scalar_vector_F
-%   zef_surface_scalar_vector_Fn
-%   zef_volume_barycentric
-%   zef_volume_scalar_matrix_FF
-%   zef_volume_scalar_matrix_FG
-%   zef_volume_scalar_matrix_GG
-%   … (2 more)
+%   Input
+%     nse_field     - NSE-tool struct (artery/capillary domain inds, diameters,
+%                     pulse_amplitude mmHg, mu, gravity_*, capillary_arteriole_total_area_ratio)
+%     nodes         - [n × 3] millimetres (converted ×0.001 internally)
+%     tetra         - [n_tet × 4]
+%     domain_labels - [n_tet × 1] compartment ids
+%     mvd_length    - per-tetra microvessel density; first column used, ×1e6
 %
-% Side effects:
-%   - filesystem I/O
-%   - waitbar progress UI
+%   Output: nse_field with bp_vessels, bv_vessels_1/2/3, mu_vessels,
+%   bf_capillaries cell arrays (pressure / velocity / viscosity / capillary flow).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[nse_field] = zef_nse_poisson(nse_field, nodes, tetra, domain_labels, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_nse_poisson_dynamic, zef_nse_signal_pulse.
 
 nse_field.bp_vessels = cell(0);
 nse_field.bv_vessels_1 = cell(0);

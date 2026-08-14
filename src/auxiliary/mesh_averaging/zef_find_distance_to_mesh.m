@@ -1,29 +1,17 @@
-% --- Zeffiro documentation header ---
-% number_of_points = 10000; — Number of points = 10000;.
+%ZEF_FIND_DISTANCE_TO_MESH  Lab script: hist of grey-matter node distances.
 %
-% Purpose:
-%   Number of points = 10000;.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.nodes (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.sigma (read)
-%   zef.tetra (read)
+%   Script. Needs workspace zef (tetra, sigma(:,2), nodes, reuna_t/p) and
+%   compartment_ind. Samples ~10000 unique surface nodes of label 15,
+%   zef_distance_to_mesh to the union of reuna compartments
+%   compartment_ind-1 and compartment_ind. Figures 1 (hist 0–3) and 2
+%   (cdf). One-off mesh-quality helper.
 %
-% Calls (project):
-%   zef_distance_to_mesh
-%   zef_get_surface_triangles
-%
-% Side effects:
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `number_of_points = 10000;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_get_surface_triangles, zef_distance_to_mesh.
 
 number_of_points = 10000;
 grey_matter_ind = 15;
@@ -45,5 +33,6 @@ surface_nodes_wg = [surface_nodes_w; surface_nodes_g];
 
 d  =  zef_distance_to_mesh(zef.nodes(nodes_ind_aux,:), surface_nodes_wg, surface_triangles_wg);
 
-figure(1); [a, b] = hist(d,1000); set(gca,'xlim',[0 3]);
+figure(1)
+; [a, b] = hist(d,1000); set(gca,'xlim',[0 3]);
 figure(2); c = cumsum(a); plot(b,c./max(c)); set(gca,'xlim',[0 3],'xgrid','on','ygrid','on')

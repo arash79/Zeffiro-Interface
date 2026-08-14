@@ -1,30 +1,16 @@
-% --- Zeffiro documentation header ---
-% zef = zef_process_meshes(zef,zef — Zef = zef process meshes(zef,zef.
+%ZEF_VISUALIZE_SURFACES  Mesh visualization → **Visualize surfaces** (script).
 %
-% Purpose:
-%   Zef = zef process meshes(zef,zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.frame_start (read, write)
-%   zef.frame_stop (read, write)
-%   zef.h_frame_start (read)
-%   zef.h_frame_stop (read)
-%   zef.h_stop_movie (read)
-%   zef.on_screen (read, write)
-%   zef.stop_movie (read, write)
+%   Script. ButtonPushedFcn of h_pushbutton20 (Text='Visualize surfaces').
+%   zef_process_meshes, zef.on_screen=2 (Details: Visualization: Surfaces),
+%   zef_update_fig_details, zef_plot_meshes([]) into zef.h_axes1. Also
+%   copies h_frame_start / h_frame_stop into zef.frame_*. Clears Stop.
 %
-% Calls (project):
-%   zef_plot_meshes
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef = zef_process_meshes(zef,zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_plot_meshes, zef_visualize_volume.
 zef = zef_process_meshes(zef,zef.explode_everything);
 zef.on_screen = 2;
 zef_update_fig_details;zef_plot_meshes([]);

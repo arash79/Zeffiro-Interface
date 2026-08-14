@@ -1,87 +1,87 @@
-# src/inverse
+# src/inverse — inverse orchestration
 
-## Folder purpose
+This folder does **not** recover sources. The inverse problem `L x ≈ y` is solved in `+inverse/@*Inverter` (class path) or `tools/plugins` (GUI / legacy). Files here prepare `zef.L` and `zef.measurements`, loop frames, scatter results onto the full source grid, and expose `zef_inverse_run`.
 
-**Inverse orchestration** between the `zef` project struct and solvers. This folder does **not** implement reconstruction algorithms (those live in `+inverse/@*Inverter` and `tools/plugins/*`). It prepares lead fields, filters measurements, runs the class-based frame loop, extracts cluster bundles, and maps results back to `zef.reconstruction`.
+## Two tracks (same as `+inverse/README.md`)
 
-## Main contents
+1. **GUI Inverse tools** — plugin `*_iteration` functions. They typically call `zef_processLeadfields`, `zef_getFilteredData`, `zef_getTimeStep`, then `zef_postProcessInverse`. They do **not** call `zef_inverse_run` or `computeInversionWithZI`.
+2. **Programmatic class path** — `zef_inverse_run` → `zef_inverse_extract_bundle` → `utilities.cluster.dispatch_inverse` → `utilities.inverse.run_frame_loop` → class `initialize` / `precompute` / `invert` → `zef_postProcessInverseClassObj` → `zef.reconstruction`.
+
+In-process class alternative: `zef_process_inversion` (from `CommonInverseParameters.computeInversionWithZI`).
+
+## `zef_inverse_run`
+
+```matlab
+[zef, run_result] = zef_inverse_run(zef, method_id)
+[zef, run_result] = zef_inverse_run(zef, method_id, Name, Value, ...)
+```
+
+Name-value options: `execution` (`"local"` default or `"cluster"`), `MethodParams` (struct copied onto inverter properties), `ClusterProfile` (required for cluster), `WorkDir`, `BundleDir`, `ResultDir`.
+
+**Class ids** (from `utilities.cluster.inverse_method_registry`; aliases listed together). The id selects the class; pass `MethodParams.method_type` when the class default is not the algorithm you want:
+
+| method_id | Class |
+|-----------|--------|
+| `csm`, `dspm`, `sloreta`, `sloreta3d`, `sbl` | `inverse.CSMInverter` (default `method_type` `"dSPM"`) |
+| `mne`, `wmne` | `inverse.MNEInverter` |
+| `eloreta` | `inverse.ELORETAInverter` |
+| `kalman`, `kf` | `inverse.KalmanInverter` |
+| `beamformer` | `inverse.BeamformerInverter` |
+| `dipolescan`, `dipole_scan` | `inverse.DipoleScanInverter` |
+| `ias` | `inverse.IASInverter` |
+| `ramus` | `inverse.RAMUSInverter` |
+| `grouplasso`, `group_lasso` | `inverse.GroupLassoInverter` |
+| `halpr` | `inverse.HALpRInverter` |
+
+Legacy ids (`legacy_csm`, `legacy_mne`, `legacy_kalman`, …) are listed in `+utilities/+cluster/inverse_method_registry.m` and call plugin functions.
+
+Writes `zef.reconstruction` and `zef.reconstruction_information` from `run_result`.
+
+## Required `zef` fields / outputs
+
+See `+inverse/README.md`. This folder additionally requires `zef.source_interpolation_ind` (error in `zef_processLeadfields` if missing). Noise enters as `zef.inv_snr` (dB), not a dedicated noise matrix, unless a class property `noise_cov` / `error_cov` is set via `MethodParams`.
+
+## Files
 
 | File | Role |
 |------|------|
-| `zef_processLeadfields.m` | Subset/reorient `zef.L` using `source_interpolation_ind` and `source_direction_mode`; build `procFile` index bundle |
-| `zef_getFilteredData.m` / `zef_getFilteredDataClassObj.m` | Band-pass filter and normalize `zef.measurements` |
-| `zef_getTimeStep.m` / `zef_getTimeStepClassObj.m` | Extract per-frame measurement column(s); class path always `mean` over window |
-| `zef_process_inversion.m` | Full in-process class pipeline → `utilities.inverse.run_frame_loop` → post-process |
-| `zef_postProcessInverse.m` | Legacy: scatter frame vectors to full lead-field column layout |
-| `zef_postProcessInverseClassObj.m` | Class path post-process using `procFile.s_ind_0` triplet layout |
-| `zef_normalizeInverseReconstruction.m` | Max-norm scaling across frames |
-| `zef_inverse_extract_bundle.m` | Serialize `L`, `F`, `procFile`, params for cluster/local dispatch |
-| `zef_inverse_run.m` | One-line wrapper: bundle → `utilities.cluster.dispatch_inverse` |
-| `zef_inverse_pipeline_run.m` | Multi-method batch driver + optional sensitivity |
-| `zef_compute_measurements.m` | Synthetic `zef.measurements = L * s` for testing |
-| `zef_inverse_gamma_gpu.m` | Inverse-gamma PDF helper for hyperprior GUIs |
+| `zef_inverse_run.m` | Bundle + local `dispatch_inverse` or cluster submit/collect |
+| `zef_inverse_extract_bundle.m` | Serialize `L`, framed `F`, `procFile`, common params, `MethodParams` |
+| `zef_processLeadfields.m` | Subset/reorient `zef.L`; build `procFile` (`s_ind_0`…`s_ind_4`, `n_interp`, `sizeL2`) |
+| `zef_getFilteredData.m` | Legacy band-pass from `zef.inv_*` |
+| `zef_getFilteredDataClassObj.m` | Same using `CommonInverseParameters` properties |
+| `zef_getTimeStep.m` | Legacy per-frame columns |
+| `zef_getTimeStepClassObj.m` | Class path: **always** `mean` over remaining columns in the window |
+| `zef_process_inversion.m` | Full in-process class pipeline + optional Kalman smoother |
+| `zef_postProcessInverse.m` | Legacy scatter using `procFile.s_ind_1` |
+| `zef_postProcessInverseClassObj.m` | Class scatter using interleaved triplets from `s_ind_0` |
+| `zef_normalizeInverseReconstruction.m` | Peak vector-norm scaling across frames |
+| `zef_inverse_pipeline_run.m` | Batch `zef_inverse_run` / `zef_sensitivity_run` from a methods table |
+| `zef_compute_measurements.m` | Synthetic `zef.measurements = L * s` (+ optional noise) |
+| `zef_inverse_gamma_gpu.m` | Inverse-gamma PDF via `zef_gamma_gpu` |
 
-## Code functionality
+## Bundle vs in-process filtering
 
-**Shared gate:** almost every inverse path starts with `zef_processLeadfields`, which requires a prior forward lead field (`zef.L`) and `zef.source_interpolation_ind` from `zef_source_interpolation`.
+`zef_inverse_extract_bundle` filters and frames using the **project** `zef.inv_data_mode`, then `dispatch_inverse` builds a shim with `inv_data_mode = 'raw'` and `measurements = F` (already one column per frame). `zef_process_inversion` keeps the original `zef.inv_data_mode` and lets `run_frame_loop` filter again.
 
-**Class pipeline:**
-```
-zef_processLeadfields → run_frame_loop (utilities.inverse)
-  → initialize / precompute / invert per frame
-  → zef_postProcessInverseClassObj → zef.reconstruction
-```
+For `source_direction_mode` 1 or 2, both extract_bundle and `zef_process_inversion` reorder `L` to node-wise `(x,y,z)` triplets before the inverter sees it.
 
-**Legacy plugin pipeline** (dominant in GUI today):
-```
-zef_processLeadfields → zef_getFilteredData → zef_getTimeStep (per frame)
-  → plugin *_iteration → zef_postProcessInverse → zef.reconstruction
-```
-
-**Cluster/programmatic:**
-```matlab
-[zef, result] = zef_inverse_run(zef, "eloreta", "execution", "local");
-```
-
-Registry IDs and class/legacy mapping live in `+utilities/+cluster/inverse_method_registry.m`.
-
-## Workflow context
-
-| Consumer | Functions used |
-|----------|----------------|
-| `+inverse` classes via `computeInversionWithZI` | `zef_process_inversion` |
-| `+utilities/+cluster/dispatch_inverse` | bundle fields from `zef_inverse_extract_bundle` |
-| `+tests/*`, `+examples`, sensitivity | `zef_inverse_run`, `zef_inverse_pipeline_run` |
-| GUI plugins (MNE, IAS, RAMUS, CSM, …) | `zef_processLeadfields`, `zef_getFilteredData`, `zef_getTimeStep`, `zef_postProcessInverse` |
-
-`zeffiro_interface.m` does **not** call this folder directly; inversion runs after mesh + lead field + measurement import.
-
-## Usage instructions
+## Usage
 
 ```matlab
-% Programmatic class inverse (after zef.L and measurements exist)
 [zef, out] = zef_inverse_run(zef, "mne", "execution", "local");
 
-% Direct class object
 inv = inverse.ELORETAInverter();
 inv = inv.withPropertiesFromZef(zef);
 [zef, inv] = inv.computeInversionWithZI(zef);
 
-% Synthetic data for testing
-zef = zef_compute_measurements(zef);
+zef = zef_compute_measurements(zef, "sources", src, "sampling_frequency", 1000);
 [zef, r] = zef_inverse_run(zef, "dspm");
 ```
 
-## Important notes
+## Developer notes
 
-- **Two parallel architectures:** legacy plugins vs class dispatch; `ClassVsLegacyTest` verifies parity for CSM.
-- **`zef_getTimeStepClassObj` differs from `zef_getTimeStep`:** class path always averages columns in the time window.
-- **`computeInversionWithZI`** on `inverse.CommonInverseParameters` has no GUI callers yet — plugins still use legacy `*_iteration` functions.
-- RAMUS/GroupLasso/HALpR need multiresolution decomposition (`zef_make_multires_dec`) before inversion.
-
-## Developer guidance
-
-- New inverse methods: implement in `+inverse`, register in `inverse_method_registry`, call via `zef_inverse_run` — do not add another per-frame loop here.
-- Changes to `procFile` layout must update both `zef_postProcessInverse` and `zef_postProcessInverseClassObj`.
-- Keep `zef_inverse_extract_bundle` in sync with cluster worker `run_inverse_job.m`.
-- When migrating a plugin to the class API, add a `ClassVsLegacyTest`-style check before removing the legacy entry.
+- New algorithms go in `+inverse` + the registry, not a new frame loop here.
+- `procFile` layout changes must update both post-process functions.
+- `zef_getTimeStepClassObj` always averages; `zef_getTimeStep` only averages when `inv_time_interval_averaging` is true.
+- RAMUS/GroupLasso/HALpR still need a multiresolution decomposition before invert.

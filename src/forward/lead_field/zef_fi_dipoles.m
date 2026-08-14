@@ -1,22 +1,3 @@
-% --- Zeffiro documentation header ---
-% function [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_tetra] = zef_fi_dipoles( ... — Function [stensil, signs, source moments, source directions, source locations, n of adj tetra] = zef fi dipoles( .
-%
-% Purpose:
-%   Function [stensil, signs, source moments, source directions, source locations, n of adj tetra] = zef fi dipoles( ....
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Inputs:
-%   node_ind
-%
-% Calls (project):
-%   zef_L2_norm
-%   zef_fi_dipoles
-%   zef_waitbar
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `function [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_tetra] = zef_fi_dipoles( ...(node_ind)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 function [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_tetra] = zef_fi_dipoles( ...
     nodes      ...
     ,              ...
@@ -24,6 +5,38 @@ function [stensil, signs, source_moments, source_directions, source_locations, n
     ,              ...
     brain_ind  ...
     )
+
+%ZEF_FI_DIPOLES  Face-interior dipole stencils for H(div) sources.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Finds pairs of brain tetrahedra that share a face. Each pair defines a
+%   face-interior dipole: location at the midpoint of the two opposite
+%   vertices, direction along that segment, moment equal to the segment
+%   length. zef_lead_field_matrix uses the stencil to keep only tetrahedra
+%   with four neighbours (interior, not on the cortex surface).
+%
+%   [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_tetra] = ...
+%       zef_fi_dipoles(nodes, tetrahedra, brain_ind)
+%
+%   Input
+%     nodes       - [n_nodes × 3]
+%     tetrahedra  - [n_tet × 4]
+%     brain_ind   - tetra indices treated as source-capable
+%
+%   Output
+%     stensil            - sparse [n_pairs × n_tet], ones on the two tets of each pair
+%     signs              - sparse [n_nodes × n_pairs], ±1/moment at the two vertices
+%     source_moments     - [n_pairs × 1] edge lengths
+%     source_directions  - [n_pairs × 3] unit vectors
+%     source_locations   - [n_pairs × 3] midpoints
+%     n_of_adj_tetra     - n_pairs
+%
+%   See also zef_ew_dipoles, zef_lead_field_matrix.
+
 
 wb = zef_waitbar(0,1,'Face intersecting dipoles.');
 

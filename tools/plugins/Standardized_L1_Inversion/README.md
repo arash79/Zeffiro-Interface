@@ -1,40 +1,45 @@
-# tools/plugins/Standardized_L1_Inversion
+# Standardized_L1_Inversion
 
-## Purpose of this folder
+Hierarchical L1 MAP with `quadprog` (interior-point). Use it for sparse reconstructions when you want an L1 source prior and MATLAB Optimization Toolbox, as opposed to the EXP Lasso app.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+Related class id `halpr` (`inverse.HALpRInverter`) is a **different** track — this Start button calls `zef_sl1_iteration`, not `+inverse`. Registry id `legacy_sl1` dispatches the plugin function.
 
-## Contents
+## Menu
 
-Subfolders:
-- `m/`
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **Standardized Hierarchical L1 MAP Inversion (quadprog)** |
+| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | **not in those INIs** |
 
-## How this folder fits into the overall workflow
+INI callback: `zef_sl1_map_estimation` (file `m/zef_sl1_map_estimation.m`).
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Window title: `ZEFFIRO Interface: Standardized Hierarchical L1 MAP estimation`.
 
-## GUI usage
+## Run the solver
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+**Start** (`zef.h_sl1_start`) Callback, set in `zef_init_sl1` (overrides the window constructor’s `sl1_iteration` string):
 
-## Programmatic usage
+```matlab
+zef_update_sl1; [zef.reconstruction, zef.reconstruction_information] = zef_sl1_iteration(zef);
+```
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+Type popup: `None`; `sLORETA`; `Column maximum` → `zef.sl1_type` 1–3. Type 1 leaves the L1 iterate as `zef_l2_l1_optimizer` returned it. Type 2 multiplies by `1./sqrt(diag(R))` with `R = (p L') (L p L' + σ² I)^{-1} L` and `p = 0.5 |z| θ` (sLORETA-style). Type 3 divides by `max(|L|)'` per column. Hyperprior: spatially balanced / constant (`zef.sl1_hyperprior`). Each MAP step updates `θ = (θ0 + |z|) / β` then re-solves the L1 QP (`quadprog` interior-point-convex, max iterations `ceil(2*sqrt(n_sources))`).
 
-## Examples
+## Needs
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+- `zef.L`, interpolation, `zef.source_direction_mode`
+- `zef.measurements`
+- SNR: `zef.sl1_snr` → `10^(-sl1_snr/20)`
+- Frames: `zef.sl1_number_of_frames`, `sl1_time_*`, band edges
+- MAP iterations: `zef.sl1_n_map_iterations`
+- Optimization Toolbox (`quadprog` / `linprog`)
 
-## Dependencies and assumptions
+## Writes
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+- `zef.reconstruction` after post-process / peak-norm
+- `zef.reconstruction_information` with tag `sl1`
 
-## Notes for developers
+## Files
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+- Start: `m/zef_sl1_map_estimation.m` → `zef_init_sl1`
+- Solver: `m/zef_sl1_iteration.m`

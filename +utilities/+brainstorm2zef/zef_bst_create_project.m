@@ -1,64 +1,28 @@
 function zef = zef_bst_create_project(settings_file_name, project_file_name, run_type, input_mode, zef_bst, zef)
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst_create_project — Zef bst create project.
+%ZEF_BST_CREATE_PROJECT  Brainstorm surfaces → zef compartments (no mesh).
 %
-% Purpose:
-%   Zef bst create project.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   settings_file_name
-%   project_file_name
-%   run_type
-%   input_mode
-%   zef_bst
-%   zef
+%   zef = zef_bst_create_project(settings_file_name, project_file_name, ...
+%       run_type, input_mode, zef_bst, zef)
 %
-% Outputs:
-%   zef
+%   Defaults: zef=struct, zef_bst=struct, input_mode=1, run_type=1,
+%   project_file_name=''. Merges settings via zef_bst_get_settings. Empty
+%   zef starts zeffiro_interface nodisplay (may zef_close_all base zef).
+%   input_mode 2 clears compartment_files. run_type 1: create_compartment_data
+%   and dump <settings>_compartment_settings.dat + _surface_meshes.mat
+%   beside the settings file (pwd if no path). run_type 2: reload those.
+%   run_type 3 errors (use zef_bst_edit_project). Then zef_add_compartment
+%   per surface (triangle winding flipped), mesh flags from zef_bst,
+%   optional run(import_settings), zef_turn_compartment_onoff,
+%   zef_process_meshes. If project_file_name non-empty: zef_save then
+%   zef_close_all. Does not call zef_create_finite_element_mesh (run.m does).
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.distance_smoothing_exp (read, write)
-%   zef.distance_smoothing_on (read, write)
-%   zef.extensive_relabeling (read, write)
-%   zef.fem_mesh_inflation_strength (read, write)
-%   zef.max_surface_face_count (read, write)
-%   zef.mesh_resolution (read, write)
-%   zef.mesh_smoothing_on (read, write)
-%   zef.priority_mode (read, write)
-%   zef.refinement_on (read, write)
-%   zef.refinement_surface_compartments (read, write)
-%   zef.refinement_surface_mode (read, write)
-%   zef.refinement_surface_number (read, write)
-%   zef.refinement_surface_on (read, write)
-%   zef.refinement_volume_compartments (read, write)
-%   … (7 more)
-%
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_create_compartment_data
-%   utilities.brainstorm2zef.zef_bst_create_project
-%   utilities.brainstorm2zef.zef_bst_get_settings
-%   utilities.brainstorm2zef.zef_bst_validate_environment
-%   zef_add_bounding_box
-%   zef_add_compartment
-%   zef_bst_create_project
-%   zef_bst_edit_project
-%   zef_build_compartment_table
-%   zef_close_all
-%   zef_process_meshes
-%   zef_save
-%   … (3 more)
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = utilities.brainstorm2zef.zef_bst_create_project(settings_file_name, project_file_name, run_type, input_mode, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also run, zef_bst_create_compartment_data, zef_bst_default_fem_mesh_create.
+
 
 if nargin < 6
     zef = struct;

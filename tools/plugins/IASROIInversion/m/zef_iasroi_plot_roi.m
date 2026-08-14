@@ -1,40 +1,17 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [iasroi_roi_sphere,h_roi_sphere] = zef_iasroi_plot_roi(zef)
-% --- Zeffiro documentation header ---
-% zef_iasroi_plot_roi — Zef iasroi plot roi.
+%ZEF_IASROI_PLOT_ROI  Draw the IAS ROI sphere(s) on h_axes1.
 %
-% Purpose:
-%   Zef iasroi plot roi.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   [iasroi_roi_sphere, h_roi_sphere] = zef_iasroi_plot_roi(zef)
 %
-% Outputs:
-%   iasroi_roi_sphere
-%   h_roi_sphere
+%   Plot-ROI button. Reads the four sphere edits; sphere() mesh.
+%   nargin 0 uses eval('base','zef') as written (not evalin). Does not invert.
 %
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%   zef.h_iasroi_roi_sphere_1 (read)
-%   zef.h_iasroi_roi_sphere_2 (read)
-%   zef.h_iasroi_roi_sphere_3 (read)
-%   zef.h_iasroi_roi_sphere_4 (read)
-%   zef.h_roi_sphere (read)
-%
-% Calls (project):
-%   zef_iasroi_plot_roi
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[iasroi_roi_sphere, h_roi_sphere]] = zef_iasroi_plot_roi(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_switch_roi_mode.
 
 if nargin == 0
     zef = eval('base','zef');

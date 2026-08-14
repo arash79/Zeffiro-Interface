@@ -1,26 +1,18 @@
 classdef InverseDispatchTest < matlab.unittest.TestCase
-% --- Zeffiro documentation header ---
-% tests.InverseDispatchTest — Automated test: InverseDispatchTest.
+%INVERSEDISPATCHTEST  Registry ids mne and legacy_mne both produce reconstructions.
 %
-% Purpose:
-%   Automated test: InverseDispatchTest.
-%   Folder: MATLAB unit and integration tests for refactored inverse dispatch, lead fields, cluster jobs, and legacy/class parity.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
+%   Synthetic session via tests.createSyntheticInverseZef.
+%   testDispatchClassPath: zef_inverse_extract_bundle(..., "mne") then
+%   dispatch_inverse — class inverse.MNEInverter.
+%   testDispatchLegacyPath: id "legacy_mne" — plugin zef_find_mne_reconstruction.
+%   Asserts result.reconstruction (and information on the class path) exist
+%   and are nonempty.
 %
-% Calls (project):
-%   utilities.cluster.dispatch_inverse
-%   zef_inverse_extract_bundle
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `tests.InverseDispatchTest(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
 
     methods (Test)
         function testDispatchClassPath(testCase)

@@ -1,30 +1,22 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef_switch_color('s_on','pushbutton16','s_points'); — Zef switch color('s on','pushbutton16','s points');.
+%ZEF_PUSHBUTTON_SWITCH  Script: color/enable old GUIDE compartment import buttons.
 %
-% Purpose:
-%   Zef switch color('s on','pushbutton16','s points');.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.imaging_method (read, write)
-%   zef.mlapp (read)
+%   Script, not a function. Needs zef in the caller workspace with GUIDE
+%   handles h_pushbutton* / h_d*_button_* and flags s_on, w_on, g_on,
+%   c_on, sk_on, sc_on, d1_on … d22_on. For each tag calls
+%   zef_switch_color(<tag>_on, <button>, <tag>_points) and
+%   zef_color_label(tag); sensors also color s_directions when
+%   zef.imaging_method==2. Interleaves zef_switch_onoff (enable/disable
+%   widgets from *_on). If zef.mlapp is not 1, repeats zef_switch_color
+%   for the matching *_triangles buttons.
 %
-% Calls (project):
-%   zef_color_label
-%   zef_switch_color
+%   No first-party callers in this tree (Segmentation tool is App Designer).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef_switch_color('s_on','pushbutton16','s_points');` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_switch_color, zef_switch_onoff, zef_color_label.
 zef_switch_color('s_on','pushbutton16','s_points');
 if zef.imaging_method==2
     zef_switch_color('s_on','pushbutton17','s_directions');

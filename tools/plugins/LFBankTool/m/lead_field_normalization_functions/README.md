@@ -1,63 +1,33 @@
-# tools/plugins/LFBankTool/m/lead_field_normalization_functions
+# Lead-field normalization maps (merge time)
 
-## Purpose of this folder
+Each file is `(L, measurements) = f(lf_bank_index)`. **Merge selected** (`zef_combine_lead_fields`) does `str2func` of the selected file and runs it on each selected bank index. The functions `evalin('base', ...)` the item `zef.lf_bank_storage{index}` and return scaled copies. They do **not** assemble a new lead field and they do **not** `assignin`.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+## Dropdown labels
 
-## Contents
+`zef_init_lf_bank_tool` `dir`s this folder, then for each file takes MATLAB `help`, finds `Description:`, and uses `strtrim` of the remainder as the list label. **Keep a `Description:` line** or the dropdown entry is empty. Labels are then **sorted alphabetically**, so `zef.lf_normalization` is an index into that sorted list, not a stable enum.
 
-MATLAB sources:
-- `zef_lead_field_no_normalization.m` — **zef_lead_field_no_normalization**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_lead_field_normalize_frobenius.m` — **zef_lead_field_normalize_frobenius**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_lead_field_normalize_maximum_data.m` — **zef_lead_field_normalize_maximum_data**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_lead_field_normalize_mean_data.m` — **zef_lead_field_normalize_mean_data**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_lead_field_scaling.m` — **zef_lead_field_scaling**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_lead_field_whitening.m` — **zef_lead_field_whitening**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-- `zef_lead_field_whitening_diagonal_identity.m` — **zef_lead_field_whitening_diagonal_identity**: Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+With the current Description strings the sorted order is:
 
-## How this folder fits into the overall workflow
+1. No normalization
+2. Normalize Frobenius
+3. Normalize maximum data
+4. Normalize mean data
+5. Scaling
+6. Whitening
+7. Whitening diagonal identity
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+After stacking, `zef_combine_lead_fields` additionally rescales the concatenated `L` and measurements by `sqrt(sum_i ||L_i||_F^2) / ||L||_F` when `zef.lf_normalization == 2` (that is, when the sorted selection is **Normalize Frobenius**).
 
-## GUI usage
+## What each file computes
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+| File | `Description:` | Body |
+|------|----------------|------|
+| `zef_lead_field_no_normalization` | No normalization | Return `L` and measurements unchanged. |
+| `zef_lead_field_normalize_frobenius` | Normalize Frobenius | `sqrt(n_sensors)*L / ||L||_F` (same factor on measurements). |
+| `zef_lead_field_normalize_maximum_data` | Normalize maximum data | Scale by `max(L,'fro')`. |
+| `zef_lead_field_normalize_mean_data` | Normalize mean data | `sqrt(n_sensors) / mean(column 2-norms)`. |
+| `zef_lead_field_scaling` | Scaling | Multiply by the item’s `scaling_factor` (set when adding to the bank). |
+| `zef_lead_field_whitening` | Whitening | Left-multiply by `inv(sqrtm(cov(noise_data')))`. Needs `noise_data`. |
+| `zef_lead_field_whitening_diagonal_identity` | Whitening diagonal identity | Same after scaling the noise covariance to unit diagonal. |
 
-## Programmatic usage
-
-From the project root:
-
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
-```
-
-Representative entry points in this folder:
-- ``[[L, measurements]] = zef_lead_field_no_normalization(lf_bank_index)` with project root and `src` on the path.`
-- ``[[L, measurements]] = zef_lead_field_normalize_frobenius(lf_bank_index)` with project root and `src` on the path.`
-- ``[[L, measurements]] = zef_lead_field_normalize_maximum_data(lf_bank_index)` with project root and `src` on the path.`
-- ``[[L, measurements]] = zef_lead_field_normalize_mean_data(lf_bank_index)` with project root and `src` on the path.`
-- ``[[L, measurements]] = zef_lead_field_scaling(lf_bank_index)` with project root and `src` on the path.`
-- ``[[L, measurements]] = zef_lead_field_whitening(lf_bank_index)` with project root and `src` on the path.`
-- ``[[L, measurements]] = zef_lead_field_whitening_diagonal_identity(lf_bank_index)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-Programmatic: populate mesh and sensors, then `zef_lead_field_matrix(zef, ...)` or modality-specific `zef_*_make_all`.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Parent merge semantics (first selected item wins sensors / imaging method): [../../README.md](../../README.md).

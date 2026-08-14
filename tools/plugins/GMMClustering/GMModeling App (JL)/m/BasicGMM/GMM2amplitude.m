@@ -1,40 +1,20 @@
-%Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [amp] = GMM2amplitude(dipoles,ind,frame,type)
-% --- Zeffiro documentation header ---
-% GMM2amplitude — GMM2amplitude.
+%GMM2AMPLITUDE  Estimate GMM-component amplitudes from L and a time frame.
 %
-% Purpose:
-%   GMM2amplitude.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   dipoles
-%   ind
-%   frame
-%   type
+%   amp = GMM2amplitude(dipoles, ind, frame, type)
 %
-% Outputs:
-%   amp
+%   Reads zef.L from base; zef_getFilteredData / zef_getTimeStep.
+%   type==2: SNR-weighted prior (inv_snr / reconstruction_information);
+%   else pinv then lsqlin nonneg. Called from the JL GMM fit.
+%   Does not write zef.GMM.
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.inv_snr (read)
-%   zef.reconstruction_information (read)
-%
-% Calls (project):
-%   zef_getTimeStep
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[amp] = GMM2amplitude(dipoles, ind, frame, type)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_GMModeling.
 
-amp = ones(size(dipoles,1),1);
 L = evalin('base','zef.L');
 f = zef_getFilteredData;
 

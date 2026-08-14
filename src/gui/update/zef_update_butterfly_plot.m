@@ -1,36 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef.bf_sampling_frequency = str2num(get(zef — Zef.bf sampling frequency = str2num(get(zef.
+%ZEF_UPDATE_BUTTERFLY_PLOT  Butterfly-plot **Plot** / **Apply** widget copy (script).
 %
-% Purpose:
-%   Zef.bf sampling frequency = str2num(get(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.bf_data_segment (read, write)
-%   zef.bf_high_cut_frequency (read, write)
-%   zef.bf_low_cut_frequency (read, write)
-%   zef.bf_normalize_data (read, write)
-%   zef.bf_time_1 (read, write)
-%   zef.bf_time_2 (read, write)
-%   zef.h_bf_data_segment (read)
-%   zef.h_bf_high_cut_frequency (read)
-%   zef.h_bf_low_cut_frequency (read)
-%   zef.h_bf_normalize_data (read)
-%   zef.h_bf_time_1 (read)
-%   zef.h_bf_time_2 (read)
+%   Script. Copies h_bf_sampling_frequency, low/high-cut, data segment,
+%   time_1/time_2, and h_bf_normalize_data into zef.bf_*. Called from the
+%   **Plot** button Callback before zef_make_butterfly_plot. Does not
+%   itself draw; the butterfly window is Forward tools → Butterfly plot.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.bf_sampling_frequency = str2num(get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_init_butterfly_plot, zef_butterfly_plot.
 zef.bf_sampling_frequency = str2num(get(zef.h_bf_sampling_frequency,'string'));
 zef.bf_low_cut_frequency = str2num(get(zef.h_bf_low_cut_frequency,'string'));
 zef.bf_high_cut_frequency = str2num(get(zef.h_bf_high_cut_frequency,'string'));

@@ -1,53 +1,33 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_DTI_STREAMLINES
-%
-%Generates DTI streamlines from principal directions and fractional anisotropy.
-%This function is generic and works with any DTI data format, including
-%FreeSurfer dt_recon outputs (v1.nii.gz for directions, fa.nii.gz for anisotropy).
-%
-%Inputs:
-%   dti_directions - [nx×ny×nz×3] Principal eigenvector directions (normalized)
-%   dti_anisotropy - [nx×ny×nz] Fractional anisotropy values
-%   seed_point     - [1×3] Seed point in voxel coordinates
-%   roi_radius     - Radius for initial direction sphere (default: 15)
-%   n_dir          - Number of streamlines to generate (default: 10000)
-%   step_size      - Step size in voxels (default: 1)
-%   max_steps      - Maximum steps per streamline (default: 1000)
-%   fa_thresh      - FA threshold for stopping (default: 0.15)
-%
-%Outputs:
-%   dti_streamlines - Cell array of streamlines, each [N×3] points in voxel space
-
 function dti_streamlines = zef_dti_streamlines(dti_directions,dti_anisotropy,seed_point,roi_radius,n_dir,step_size,max_steps,fa_thresh);
-% --- Zeffiro documentation header ---
-% zef_dti_streamlines — Zef dti streamlines.
+%ZEF_DTI_STREAMLINES  Trace DTI streamlines from a seed in a voxel direction field.
 %
-% Purpose:
-%   Zef dti streamlines.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2024- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   dti_directions
-%   dti_anisotropy
-%   seed_point
-%   roi_radius
-%   n_dir
-%   step_size
-%   max_steps
-%   fa_thresh
+%   Fibonacci-sphere directions around the seed, then Euler integration
+%   aligned with the local principal direction while FA (dti_anisotropy)
+%   stays above fa_thresh. Visualization helper; not on the lead-field path.
 %
-% Outputs:
-%   dti_streamlines
+%   dti_streamlines = zef_dti_streamlines(dti_directions, dti_anisotropy, ...
+%       seed_point, roi_radius, n_dir, step_size, max_steps, fa_thresh)
 %
-% Calls (project):
-%   zef_dti_streamlines
+%   Input
+%     dti_directions  - [nx ny nz 3]
+%     dti_anisotropy  - [nx ny nz] FA
+%     seed_point      - [1 × 3] voxel coordinates
+%     roi_radius      - default 15 (sphere radius for launch directions)
+%     n_dir           - default 10000
+%     step_size       - default 1 voxel
+%     max_steps       - default 1000
+%     fa_thresh       - default 0.15
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[dti_streamlines] = zef_dti_streamlines(dti_directions, dti_anisotropy, seed_point, roi_radius, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output: cell n_dir × 1 of [n_steps × 3] traces.
+%
+%   See also zef_visualize_nii_slices.
+
+
 
 
 if nargin < 4

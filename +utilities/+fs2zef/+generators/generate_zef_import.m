@@ -1,34 +1,12 @@
 function zef_file = generate_zef_import(output_dir, options)
-% --- Zeffiro documentation header ---
-% utilities.fs2zef.generators.generate_zef_import — Generate zef import.
+%GENERATE_ZEF_IMPORT  Build import_segmentation.zef from meshes in output_dir.
 %
-% Purpose:
-%   Generate zef import.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   output_dir
-%   options
-%
-% Outputs:
-%   zef_file
-%
-% Calls (project):
-%   utilities.fs2zef.config.compartment_mappings
-%   utilities.fs2zef.generators.generate_zef_import
-%   utilities.fs2zef.readers.readFSLUT
-%   utilities.fs2zef.transforms.compute_affine_transform
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef_file] = utilities.fs2zef.generators.generate_zef_import(output_dir, options)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%
-% generate_zef_import - Dynamically generate ZEF import file
+%   zef_file = generate_zef_import(output_dir, options)
 %
 % This is the unified replacement for both:
 %   - fs2zef's static import_segmentation.zef template

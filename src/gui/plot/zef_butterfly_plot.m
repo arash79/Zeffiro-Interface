@@ -1,31 +1,19 @@
 function zef = zef_butterfly_plot(zef)
-% --- Zeffiro documentation header ---
-% zef_butterfly_plot — Zef butterfly plot.
+%ZEF_BUTTERFLY_PLOT  Multi-tools → **Butterfly plot**.
 %
-% Purpose:
-%   Zef butterfly plot.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Function. MenuSelectedFcn of h_menu_butterfly_plot (Text='Butterfly
+%   plot' under Forward tools). zef_tool_start(...,
+%   'zef_butterfly_plot_start', 1/4, 0) opens the butterfly window.
+%   nargout==0 → assignin base. Does not itself plot time series; the
+%   window **Plot** button does zef_update_butterfly_plot then
+%   zef_make_butterfly_plot.
 %
-% Outputs:
-%   zef
-%
-% Calls (project):
-%   zef_butterfly_plot
-%   zef_tool_start
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_butterfly_plot(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_butterfly_plot_start, zef_update_butterfly_plot.
 if nargin == 0
     zef = evalin('base','zef');
 end

@@ -1,24 +1,16 @@
 function lf_tag = lf_tag_from_lf_type( lf_type )
-% --- Zeffiro documentation header ---
-% utilities.leadfield.lf_tag_from_lf_type — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%LF_TAG_FROM_LF_TYPE  Map isotropic lead_field_type 1–5 to a sensor tag.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   lf_type
+%   1 EEG, 2 MEG, 3 gMEG, 4 EIT, 5 tES. mustBeMember rejects 6–10
+%   (anisotropic twins of 1–5) and any other code. No first-party caller;
+%   src/forward uses numeric zef.lead_field_type directly.
 %
-% Outputs:
-%   lf_tag
-%
-% Calls (project):
-%   utilities.leadfield.lf_tag_from_lf_type
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[lf_tag] = utilities.leadfield.lf_tag_from_lf_type(lf_type)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   lf_tag = lf_tag_from_lf_type(lf_type)
 
 arguments
 

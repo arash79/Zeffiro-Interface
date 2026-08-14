@@ -1,36 +1,18 @@
 function zef = zef_parcellation_roi_delete(zef)
-% --- Zeffiro documentation header ---
-% zef_parcellation_roi_delete — Zef parcellation roi delete.
+%ZEF_PARCELLATION_ROI_DELETE  Remove selected ROIs or reset to a single default ROI.
 %
-% Purpose:
-%   Zef parcellation roi delete.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Deletes rows indexed by zef.parcellation_roi_selected from ROI center,
+%   color, radius, and name arrays. When all rows would be removed, resets
+%   to one default ROI. Calls zef_update_parcellation.
 %
-% Outputs:
-%   zef
+%   zef = zef_parcellation_roi_delete(zef)
 %
-% Zef fields (observed):
-%   zef.parcellation_roi_center (read, write)
-%   zef.parcellation_roi_color (read, write)
-%   zef.parcellation_roi_name (read, write)
-%   zef.parcellation_roi_radius (read, write)
-%   zef.parcellation_roi_selected (read, write)
-%
-% Calls (project):
-%   zef_parcellation_roi_delete
-%   zef_update_parcellation
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_parcellation_roi_delete(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_parcellation_roi_add.
 
 I = [1 : size(zef.parcellation_roi_center,1)];
 I = setdiff(I,zef.parcellation_roi_selected);

@@ -1,29 +1,29 @@
-%% Copyright © 2025- Joonas Lahtinen
 function [reconstruction, self] = smoother(self, z_inverse, L)
-% --- Zeffiro documentation header ---
-% inverse.KalmanInverter.smoother — Smoother.
+%smoother  Rauch–Tung–Striebel backward pass over stored posterior covariances.
 %
-% Purpose:
-%   Smoother.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   z_inverse
-%   L
+%   Run after the frame loop when use_smoothing is true so invert stored
+%   posterior_covs{f}. State transition A is identity of length(z_inverse{1}).
+%   Process noise Q is self.evolution_cov.
 %
-% Outputs:
-%   reconstruction
-%   self
+%   smoother_type "RTS": standard RTS, G = P / (P+Q) when A = I, then
+%   m_s = m + G (m_s - A m) backward. Filter-type-specific
+%   standardization is reapplied on the backward pass in the rest of this
+%   file. "Sample RTS": estimates Q from consecutive filtered states.
 %
-% Calls (project):
-%   inverse.smoother
-%   zef_waitbar
+%   Inputs
+%     z_inverse - cell, one n_dof×1 filtered vector per frame (same order
+%                 as invert).
+%     L         - lead field; used when a standardized smoother rebuilds D.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[reconstruction, self]] = inverse.KalmanInverter.smoother(self, z_inverse, L)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Outputs
+%     reconstruction - cell of smoothed frames, same length as z_inverse.
+%     self           - posterior_covs still present; filter state otherwise
+%                      as left by invert.
 
     arguments
 
@@ -40,9 +40,8 @@ Q = self.evolution_cov;
 
 h = zef_waitbar(0,'Smoothing');
 if strcmp(self.smoother_type,"RTS")
-    %P_s_store = cell(0);
+    % RTS: P_ = A P A' + Q, G = P A' / P_, m_s = m + G (m_s - A m) backward in time.
     reconstruction = cell(0);
-    %G_store = cell(0);
     for f_ind = self.number_of_frames:-1:1
         zef_waitbar(1 - f_ind/self.number_of_frames,h, ['Smoothing ' int2str(self.number_of_frames -f_ind) ' of ' int2str(self.number_of_frames) '.']);
     

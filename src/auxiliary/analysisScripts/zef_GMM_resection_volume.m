@@ -1,32 +1,19 @@
 function [V, V_and, V_or] = zef_GMM_resection_volume(res_zef, FB,D, GMM,GMM_ind)
-% --- Zeffiro documentation header ---
-% zef_GMM_resection_volume — Zef GMM resection volume.
+%ZEF_GMM_RESECTION_VOLUME  Tet volumes of GMM ellipsoid vs resection mesh.
 %
-% Purpose:
-%   Zef GMM resection volume.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   res_zef
-%   FB
-%   D
-%   GMM
-%   GMM_ind
+%   [V, V_and, V_or] = zef_GMM_resection_volume(res_zef, FB, D, GMM, GMM_ind)
 %
-% Outputs:
-%   V
-%   V_and
-%   V_or
+%   D.Points / D.ConnectivityList are tetrahedra. Tet centroids tested
+%   with zef_insideGMM(...,inf) column GMM_ind. V = volume of tets in the
+%   ellipsoid; V_and / V_or mix ellipsoid volume 4/3 π abc with resection
+%   (zef_distance_to_resection==0). Lab overlap metric.
 %
-% Calls (project):
-%   zef_GMM_resection_volume
-%   zef_distance_to_resection
-%   zef_insideGMM
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[V, V_and, V_or]] = zef_GMM_resection_volume(res_zef, FB, D, GMM, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_insideGMM, zef_distance_to_resection.
 
 nodes = D.Points;
 tetrahedra = D.ConnectivityList;

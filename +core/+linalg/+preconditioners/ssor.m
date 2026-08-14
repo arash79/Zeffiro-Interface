@@ -1,25 +1,20 @@
 function prec = ssor ( A, kwargs )
-% --- Zeffiro documentation header ---
-% core.linalg.preconditioners.ssor — Ssor.
+%SSOR  Symmetric successive over-relaxation preconditioner matrix.
 %
-% Purpose:
-%   Ssor.
-%   Folder: Builds Jacobi and SSOR preconditioner matrices for sparse systems; not yet wired into legacy lead-field PCG loops.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   A
-%   kwargs
+%   M = (D + ω L) D^{-1} (D + ω U) with L = tril(A), U = triu(A),
+%   D = diag(A), and ω = kwargs.coeff in [0, 2] (default 1, which is SSOR
+%   with unit relaxation / symmetric Gauss–Seidel). Not yet wired into
+%   src/forward lead-field PCG.
 %
-% Outputs:
-%   prec
+%   prec = core.linalg.preconditioners.ssor(A)
+%   prec = core.linalg.preconditioners.ssor(A, "coeff", 1)
 %
-% Calls (project):
-%   core.linalg.preconditioners.ssor
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[prec] = core.linalg.preconditioners.ssor(A, kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also core.linalg.preconditioners.jacobi.
 
     arguments
         A (:,:)

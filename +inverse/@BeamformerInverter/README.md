@@ -1,55 +1,30 @@
-# +inverse/@BeamformerInverter
+# inverse.BeamformerInverter
 
-## Purpose of this folder
+Per-source spatial filters for `L x ≈ f`. Registry id: `beamformer`. GUI beamformer is `legacy_beamformer` → `zef_beamformer`, not this class.
 
-Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+Scans `procFile.s_ind_4` (fixed orientation, one column) then free-orientation triplets. If `error_cov` is set, uses Mahalanobis whitening `L_mod = C \ L` with Tikhonov `λ_cov * tr(C)/m` on `C`.
 
-## Contents
+## `method_type`
 
-MATLAB sources:
-- `BeamformerInverter.m` — **inverse.BeamformerInverter.BeamformerInverter**: Inverse solver class implementing Beamformer reconstruction.
-- `initialize.m` — **inverse.BeamformerInverter.initialize**: Estimates priors, noise covariance, or regularization from multi-frame data.
-- `invert.m` — **inverse.BeamformerInverter.invert**: Runs one inverse reconstruction step for a single measurement frame.
+- `"Linearly constrained minimum variance (LCMV) beamformer"` — weights = 1
+- `"Unit noise gain (UNG) beamformer"` — `sqrtm(L_mod' L_mod) \ (L' L_mod)`
+- `"Unit-gain constrained beamformer"` — optimal orientation from `eigs(L'*L,1)`, then scalar UNG-style weights
 
-## How this folder fits into the overall workflow
+## Other parameters
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+- `cov_reg_parameter` (0.05) — regularizes `error_cov`
+- `leadfield_reg_parameter` (0.001), `leadfield_reg_type` `"Basic"` \| `"Pseudoinverse"`
+- `leadfield_normalization` `"None"` \| `"Matrix norm"` \| `"Column norm"` \| `"Row norm"`
+- `error_cov` — optional; `initialize` fills demeaned sample covariance if empty
 
-## GUI usage
+Constructor name-value `reg_type` maps to property `leadfield_reg_type`.
 
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+## Call
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+[zef, r] = zef_inverse_run(zef, "beamformer", "execution", "local", ...
+    "MethodParams", struct("method_type", ...
+    "Linearly constrained minimum variance (LCMV) beamformer"));
 ```
 
-Representative entry points in this folder:
-- ``inverse.BeamformerInverter.BeamformerInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.`
-- ``[self] = inverse.BeamformerInverter.initialize(self, L, f_data)` with project root and `src` on the path.`
-- ``[[z_vec, self]] = inverse.BeamformerInverter.invert(self, f, L, procFile, …)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-Programmatic: `zef_inverse_run(zef, 'eloreta')` or `inverse.ELORETAInverter().computeInversionWithZI(zef)`.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+No `precompute`. `invert` loops sources every frame.

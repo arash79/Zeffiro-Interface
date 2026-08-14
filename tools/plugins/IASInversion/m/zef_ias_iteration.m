@@ -1,58 +1,23 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,reconstruction_information] = zef_ias_iteration(zef)
-% --- Zeffiro documentation header ---
-% zef_ias_iteration — Zef ias iteration.
+%ZEF_IAS_ITERATION  Core iteration loop for IAS MAP reconstruction.
 %
-% Purpose:
-%   Zef ias iteration.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   [z, reconstruction_information] = zef_ias_iteration(zef)
 %
-% Outputs:
-%   z
-%   reconstruction_information
+%   Called from IAS Start (not inverse.IASInverter). Needs zef.L and
+%   zef.measurements. Frames: zef.ias_number_of_frames, ias_time_*.
+%   SNR: zef.ias_snr (dB) → std_lhood = 10^(-ias_snr/20). MAP loops
+%   zef.ias_n_map_iterations. Optional GPU on L. Writes reconstruction
+%   via zef_postProcessInverse / peak-norm; tag IAS.
+%   As written, both ias_type 2 branches are isequal(ias_type,2)
+%   (sLORETA each step, then a second identical test).
 %
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.ias_high_cut_frequency (read)
-%   zef.ias_hyperprior (read)
-%   zef.ias_low_cut_frequency (read)
-%   zef.ias_n_map_iterations (read)
-%   zef.ias_normalize_data (read)
-%   zef.ias_number_of_frames (read)
-%   zef.ias_sampling_frequency (read)
-%   zef.ias_snr (read)
-%   zef.ias_time_1 (read)
-%   zef.ias_time_2 (read)
-%   zef.ias_time_3 (read)
-%   zef.ias_type (read)
-%   zef.inv_amplitude_db (read)
-%   zef.inv_hyperprior (read)
-%   … (7 more)
+%   See also ias_map_estimation, zef_init_ias.
 %
-% Calls (project):
-%   zef_find_g_hyperprior
-%   zef_find_ig_hyperprior
-%   zef_getFilteredData
-%   zef_getTimeStep
-%   zef_ias_iteration
-%   zef_normalizeInverseReconstruction
-%   zef_postProcessInverse
-%   zef_processLeadfields
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z, reconstruction_information]] = zef_ias_iteration(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 inverse_gamma_ind = [1:4];
 gamma_ind = [5:10];
@@ -176,16 +141,17 @@ for f_ind = 1 : number_of_frames
             d_sqrt = gpuArray(d_sqrt);
         end     
         L = L_aux .* repmat( d_sqrt' , size(L_aux,1), 1);
+        % Weighted MNE operator: √θ L' (L θ L' + σ² I)⁻¹, stored back in L.
         L = d_sqrt.*( L' * inv( L * L' + S_mat ) );
 
         if isequal(ias_type,2)
-            % sLORETA
+            % sLORETA each step (popup value 2)
 
             sloreta_vec = sqrt(sum(L.*L_aux', 2));
             L = L./sloreta_vec(:,ones(size(L,2),1));
 
         elseif isequal(ias_type,2)
-            % sLORETA
+            % Second isequal(ias_type,2) as written (same test; intended last-step sLORETA).
 
             if i == n_ias_map_iter
                 sloreta_vec = sqrt(sum(L.*L_aux', 2));
@@ -193,14 +159,14 @@ for f_ind = 1 : number_of_frames
             end
 
         elseif isequal(ias_type, 4)
-            % dSPM
+            % dSPM each step
 
             dspm_vec = sum(L.^2, 2);
             dspm_vec = sqrt(dspm_vec);
             L = L./dspm_vec;
 
         elseif isequal(ias_type, 5)
-            % dSPM
+            % dSPM last step
 
             if i == n_ias_map_iter
                 dspm_vec = sum(L.^2, 2);

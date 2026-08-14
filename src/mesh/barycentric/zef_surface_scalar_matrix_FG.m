@@ -1,29 +1,14 @@
 function M = zef_surface_scalar_matrix_FG(nodes,tetra,g_i_ind,scalar_field)
-% --- Zeffiro documentation header ---
-% zef_surface_scalar_matrix_FG — Zef surface scalar matrix FG.
+%ZEF_SURFACE_SCALAR_MATRIX_FG  Surface G·F with weight 1/3. No first-party caller.
 %
-% Purpose:
-%   Zef surface scalar matrix FG.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   g_i_ind
-%   scalar_field
+%   M = zef_surface_scalar_matrix_FG(nodes, tetra, g_i_ind, scalar_field)
 %
-% Outputs:
-%   M
-%
-% Calls (project):
-%   zef_barycentric_weighting
-%   zef_surface_scalar_matrix_D
-%   zef_surface_scalar_matrix_FG
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_surface_scalar_matrix_FG(nodes, tetra, g_i_ind, scalar_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_surface_scalar_matrix_D.
 
 weighting = zef_barycentric_weighting('surface_FG');
 M = zef_surface_scalar_matrix_D(nodes, tetra, g_i_ind, scalar_field, weighting);

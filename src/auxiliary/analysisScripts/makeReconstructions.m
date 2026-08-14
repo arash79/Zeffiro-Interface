@@ -1,26 +1,15 @@
-% --- Zeffiro documentation header ---
-% [zef.reconstruction, zef — [zef.reconstruction, zef.
+%MAKERECONSTRUCTIONS  Lab script: MNE/CSM/RAMUS/dipole/beamformer → databank.
 %
-% Purpose:
-%   [zef.reconstruction, zef.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.beamformer (read)
-%   zef.bf_var_loc (read)
-%   zef.reconstruction (read)
-%   zef.reconstruction_information (read)
+%   Script. Runs those inverse functions on the current zef (L +
+%   measurements already set) and zef_dataBank_addButtonPress after each.
+%   Beamformer branch uses zef.beamformer.estimation_attr.Value. One-off
+%   paper helper; plugins must already be initialized.
 %
-% Calls (project):
-%   zef_ramus_iteration
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `[zef.reconstruction, zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 [zef.reconstruction, zef.reconstruction_information]=zef_find_mne_reconstruction;
 zef_dataBank_addButtonPress;

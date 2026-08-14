@@ -1,51 +1,21 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z] = ramus_sampling_process(void)
-% --- Zeffiro documentation header ---
-% ramus_sampling_process — Ramus sampling process.
+%RAMUS_SAMPLING_PROCESS  Metropolized RAMUS posterior sampling.
 %
-% Purpose:
-%   Ramus sampling process.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   void
+%   z = ramus_sampling_process(void)
 %
-% Outputs:
-%   z
+%   Called from RAMUSSampler Start in ramus_sampler.fig. Argument void is
+%   unused; reads base workspace zef: L, measurements, number_of_frames.
+%   Likelihood std is zef.inv_likelihood_std (not inv_snr). Sampler:
+%   inv_n_sampler, inv_n_burn_in plus inv_multires_*. Returns z only (no
+%   reconstruction_information). No inverse.*Inverter.
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.compartment_tags (read)
-%   zef.gpu_count (read)
-%   zef.inv_beta (read)
-%   zef.inv_data_segment (read)
-%   zef.inv_high_cut_frequency (read)
-%   zef.inv_hyperprior (read)
-%   zef.inv_init_guess_mode (read)
-%   zef.inv_likelihood_std (read)
-%   zef.inv_low_cut_frequency (read)
-%   zef.inv_multires_dec (read)
-%   zef.inv_multires_ind (read)
-%   zef.inv_multires_n_decompositions (read)
-%   zef.inv_multires_n_iter (read)
-%   zef.inv_multires_n_levels (read)
-%   … (18 more)
+%   See also ramus_sampler, zef_update_ramus_sampler.
 %
-% Calls (project):
-%   zef_smooth_field
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[z] = ramus_sampling_process(void)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 h = zef_waitbar(0,1,['RAMUS Sampler.']);
 [s_ind_1] = unique(evalin('base','zef.source_interpolation_ind{1}'));
@@ -266,6 +236,8 @@ for f_ind = 1 : number_of_frames
     acceptance_counter = 0;
     iter_counter = 0;
 
+    % Metropolis–Hastings on a random RAMUS level/decomposition each draw.
+    % Accept if Δ log-posterior ≥ log U(0,1). Average z after n_burn_in.
     for iter_ind = 1 : n_iterations
 
         n_rep = randperm(n_decompositions,1);
@@ -302,6 +274,9 @@ for f_ind = 1 : number_of_frames
         end
 
         for i = 1 : n_iter(j)
+            % Inner IAS MAP on the chosen coarse lattice: same
+            % z = D^{1/2} L'(LL'+S)^{-1}f update as zef_ias_iteration,
+            % then MH accept/reject uses the log-posterior of that draw.
             if f_ind > 1;
                 zef_waitbar(iter_ind,n_iterations,h,['Time step ' int2str(f_ind) ' of ' int2str(number_of_frames) '. Ready: ' date_str '.' ]);
             else
@@ -329,6 +304,9 @@ for f_ind = 1 : number_of_frames
         z_vec = z_vec(mr_ind);
 
         resid_vec = f - L_aux*z_vec;
+        % Log-posterior (up to a constant): Gaussian likelihood plus
+        % inv-gamma (hyperprior 1) or gamma (2) on theta. MH accepts if
+        % Δ ≥ log U(0,1).
         if evalin('base','zef.inv_hyperprior') == 1;
             exp_arg_new = - 0.5*resid_vec'*resid_vec/(std_lhood.^2) - 0.5*z_vec'*(z_vec./theta) - sum(theta./theta0) + (kappa-3)*sum(log(theta));
         else

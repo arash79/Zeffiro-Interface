@@ -1,26 +1,19 @@
 function strip_struct = zef_electrode_strip(position, orientation)
-% --- Zeffiro documentation header ---
-% zef_electrode_strip — Zef electrode strip.
+%ZEF_ELECTRODE_STRIP  One Medtronic-style 40-contact DBS probe (no zef window).
 %
-% Purpose:
-%   Zef electrode strip.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   position
-%   orientation
+%   strip_struct = zef_electrode_strip(position, orientation)
 %
-% Outputs:
-%   strip_struct
+%   Programmatic constructor: 8 angular rings × 5 contacts, radius
+%   0.635, impedance 1200. Returns electrode_data and a cylinder
+%   mesh. Not wired to the DBS window (that uses the multiple-probe
+%   variants). Does not write zef.
 %
-% Calls (project):
-%   zef_electrode_strip
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[strip_struct] = zef_electrode_strip(position, orientation)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_electrode_strip_multiple_probe.
 
 orientation = 1/norm(orientation)*orientation;
 center_point = position + 4*orientation;

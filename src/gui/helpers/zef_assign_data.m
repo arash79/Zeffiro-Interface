@@ -1,30 +1,16 @@
 function zef = zef_assign_data(zef, zef_data)
-% --- Zeffiro documentation header ---
-% zef_assign_data — Zef assign data.
+%ZEF_ASSIGN_DATA  Copy every field of an App-export struct onto zef.
 %
-% Purpose:
-%   Zef assign data.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   zef_data
+%   Function. Used by zef_mesh_tool after zef_mesh_tool_app_exported.
+%   No-arg mode: evalin base zef_data (and zef if present); nargout==0
+%   assignin('base','zef',zef) and clear zef_data in base.
 %
-% Outputs:
-%   zef
-%
-% Calls (project):
-%   zef_assign_data
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_assign_data(zef, zef_data)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   zef = zef_assign_data(zef, zef_data)
 if nargin == 0
     zef_data = evalin('base','zef_data');
     if not(isempty(evalin('base','whos(''zef'')')))

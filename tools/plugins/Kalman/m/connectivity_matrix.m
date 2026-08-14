@@ -1,23 +1,27 @@
 function [A] = connectivity_matrix(source_positions, K, weighted_avg)
-% --- Zeffiro documentation header ---
-% connectivity_matrix — Connectivity matrix.
+%CONNECTIVITY_MATRIX  Sparse K-NN averaging matrix on source_positions, kron'd with I_3.
 %
-% Purpose:
-%   Connectivity matrix.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   source_positions
-%   K
-%   weighted_avg
+%   A = connectivity_matrix(source_positions, K)
+%   A = connectivity_matrix(source_positions, K, weighted_avg)
 %
-% Outputs:
-%   A
+%   Not called from zef_KF. Builds A for a graph prior on xyz components
+%   (kron(A, I_3)). weighted_avg is accepted but unused.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[A] = connectivity_matrix(source_positions, K, weighted_avg)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Inputs
+%     source_positions  - N x 3 source locations
+%     K                 - number of nearest neighbors
+%     weighted_avg      - unused (default false)
+%
+%   Output
+%     A - sparse 3N x 3N averaging matrix
+%
+%   See also zef_dti_fa_covariance.
+%
 
 if nargin < 3
     weighted_avg = false;

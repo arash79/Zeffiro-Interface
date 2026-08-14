@@ -1,27 +1,17 @@
 function v = zef_volume_scalar_vector_F(nodes, tetra, scalar_field)
-% --- Zeffiro documentation header ---
-% zef_volume_scalar_vector_F — Zef volume scalar vector F.
+%ZEF_VOLUME_SCALAR_VECTOR_F  Volume load ∫ φ ψ_i dV with weight 1/4 per vertex.
 %
-% Purpose:
-%   Zef volume scalar vector F.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   scalar_field
+%   Exact for constant φ (four hats partition unity). NSE gravity loads
+%   g_1..g_3 and volume weights w_1, c_vec, w_4.
 %
-% Outputs:
-%   v
+%   v = zef_volume_scalar_vector_F(nodes, tetra, scalar_field)
 %
-% Calls (project):
-%   zef_volume_barycentric
-%   zef_volume_scalar_vector_F
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[v] = zef_volume_scalar_vector_F(nodes, tetra, scalar_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_volume_scalar_vector, zef_nse_poisson.
 
 N = size(nodes,1);
 

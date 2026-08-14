@@ -1,44 +1,18 @@
 function h1 = zef_mne_tool_export()
-% --- Zeffiro documentation header ---
-% zef_mne_tool_export — Zef mne tool export.
+%ZEF_MNE_TOOL_EXPORT  GUIDE export of the MNE figure (not the live start path).
 %
-% Purpose:
-%   Zef mne tool export.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Outputs:
-%   h1
+%   h1 = zef_mne_tool_export
 %
-% Zef fields (observed):
-%   zef.h_mne_apply (read, write)
-%   zef.h_mne_cancel (read, write)
-%   zef.h_mne_high_cut_frequency (read, write)
-%   zef.h_mne_low_cut_frequency (read, write)
-%   zef.h_mne_map_estimation (read)
-%   zef.h_mne_normalize_data (read, write)
-%   zef.h_mne_number_of_frames (read, write)
-%   zef.h_mne_prior (read, write)
-%   zef.h_mne_sampling_frequency (read, write)
-%   zef.h_mne_start (read, write)
-%   zef.h_mne_time_1 (read, write)
-%   zef.h_mne_time_2 (read, write)
-%   zef.h_mne_time_3 (read, write)
-%   zef.h_mne_type (read, write)
-%   zef.mne_high_cut_frequency (read, write)
-%   … (11 more)
+%   Returns the figure handle only (no zef). Menu callback uses
+%   zef_minimum_norm_estimation → zef_mne_tool_start → zef_mne_tool_window.
+%   Keep this file as a layout dump; do not call it from scripts.
 %
-% Calls (project):
-%   zef_find_mne_reconstruction
-%   zef_mne_tool_export
-%
-% Side effects:
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_mne_tool_export` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_mne_tool_window, zef_mne_tool_start.
 
 appdata = [];
 appdata.GUIDEOptions = struct(...
@@ -104,7 +78,7 @@ h1 = figure(...
     'DeleteFcn',blanks(0),...
     'Tag','figure1',...
     'UserData',[],...
-    'WindowStyle',get(0,'defaultfigureWindowStyle'),...
+    'WindowStyle','normal',......
     'DockControls',get(0,'defaultfigureDockControls'),...
     'Resize',get(0,'defaultfigureResize'),...
     'PaperPosition',get(0,'defaultfigurePaperPosition'),...

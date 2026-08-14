@@ -1,49 +1,30 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function  [sensors_attached_volume] = zef_attach_sensors_volume(zef,sensors,varargin)
-% --- Zeffiro documentation header ---
-% zef_attach_sensors_volume — Zef attach sensors volume.
+%ZEF_ATTACH_SENSORS_VOLUME  Attach EEG/ECoG sensors to volume or surface geometry.
 %
-% Purpose:
-%   Zef attach sensors volume.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   sensors
-%   varargin
+%   For imaging_method in [1, 4, 5], projects sensors onto nodes or scalp
+%   triangles, evaluates optional per-sensor get_functions, and builds
+%   sensors_attached_volume rows describing tetra barycentric weights,
+%   nearest nodes, or annular triangle patches for concentric sphere models.
+%   attach_type selects 'mesh' vs 'geometry' attachment; varargin can override
+%   nodes, tetra, surface_triangles, get_functions, and bypass_functions.
 %
-% Outputs:
-%   sensors_attached_volume
+%   sensors_attached_volume = zef_attach_sensors_volume(zef, sensors)
+%   sensors_attached_volume = zef_attach_sensors_volume(zef, sensors, attach_type, ...)
 %
-% Zef fields (observed):
-%   zef.current_sensors (read)
-%   zef.imaging_method (read)
-%   zef.nodes (read, write)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.reuna_type (read)
-%   zef.surface_triangles (read, write)
-%   zef.tetra (read, write)
-%   zef.use_depth_electrodes (read)
-%   zef.use_gpu (read)
+%   Inputs
+%     zef     - session struct (read from base when empty).
+%     sensors - N-by-3 or N-by-6 sensor coordinate table.
 %
-% Calls (project):
-%   zef_attach_sensors_volume
-%   zef_determinant
-%   zef_fix_sensors_get_functions_array_size
-%   zef_sensor_get_function_eval
+%   Output
+%     sensors_attached_volume - attachment table consumed by forward solvers;
+%                               empty when imaging_method is not supported.
 %
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[sensors_attached_volume] = zef_attach_sensors_volume(zef, sensors, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_sensor_get_function_eval, zef_fix_sensors_get_functions_array_size.
 
 if isempty(zef)
     zef = evalin('base','zef');

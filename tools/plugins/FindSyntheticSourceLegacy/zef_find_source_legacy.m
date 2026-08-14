@@ -1,31 +1,20 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [meas_data] = find_source(zef)
-% --- Zeffiro documentation header ---
-% find_source — Find source.
+%FIND_SOURCE  Legacy dipoles through L (linear noise fraction).
 %
-% Purpose:
-%   Find source.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   meas_data = find_source(zef)
 %
-% Outputs:
-%   meas_data
+%   File zef_find_source_legacy.m; function name find_source (callers
+%   use zef_find_source_legacy). Nearest source point; moment
+%   1e-3*amp*ori. Noise is a linear fraction inv_synth_source(1,8) of
+%   max(abs(meas)), not dB. One column. nargin required (no base
+%   fallback).
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.inv_synth_source (read)
-%   zef.source_positions (read)
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[meas_data] = find_source(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_update_fss_legacy, zef_find_synthetic_source_legacy.
 
 source_positions = eval('zef.source_positions');
 noise_level = eval('zef.inv_synth_source(1,8)');

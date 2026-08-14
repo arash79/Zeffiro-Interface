@@ -1,36 +1,18 @@
-% --- Zeffiro documentation header ---
-% zef — Zef.
+%CSM_APP_START  Entry point that opens the Classical sparse methods plugin.
 %
-% Purpose:
-%   Zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.CSM (read)
-%   zef.CSM_csm_n_iter (read)
-%   zef.csm_n_iter (read, write)
-%   zef.csm_type (read, write)
-%   zef.font_size (read)
-%   zef.inv_data_segment (read, write)
-%   zef.inv_high_cut_frequency (read, write)
-%   zef.inv_low_cut_frequency (read, write)
-%   zef.inv_sampling_frequency (read, write)
-%   zef.inv_time_1 (read, write)
-%   zef.inv_time_2 (read, write)
-%   zef.inv_time_3 (read, write)
-%   zef.normalize_data (read, write)
-%   zef.number_of_frames (read, write)
-%   zef.reconstruction (read)
-%   … (1 more)
+%   Script. INI callback (Inverse tools → Classical Sparse Methods). Constructs
+%   CSM_app (title ZEFFIRO Interface: Classical Sparse Methods) and sets
+%   StartButton to [zef.reconstruction,zef.reconstruction_information] =
+%   zef_CSM_iteration. Reads/writes base-workspace zef. Does not invert
+%   until Start. Does not call inverse.CSMInverter.
+%   As written, zef.CSM_csm_n_iter (underscore) is used for the default
+%   Value and ValueChangedFcn; Enable uses zef.CSM.csm_n_iter.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 zef.CSM = CSM_app;
 
@@ -51,7 +33,7 @@ end
 clear zef_csm_names
 
 %_ Initial values _
-zef.CSM_csm_n_iter.Value = '10';
+zef.CSM_csm_n_iter.Value = '10';  % as written (widget is zef.CSM.csm_n_iter)
 zef.CSM.inv_sampling_frequency.Value = '1025';
 zef.CSM.inv_low_cut_frequency.Value = '7';
 zef.CSM.inv_high_cut_frequency.Value = '9';
@@ -97,4 +79,5 @@ zef.CSM.StartButton.ButtonPushedFcn = '[zef.reconstruction,zef.reconstruction_in
 zef.CSM.CloseButton.ButtonPushedFcn = 'delete(zef.CSM);';
 
 %set fonts
-set(findobj(zef.CSM.UIFigure.Children,'-property','FontSize'),'FontSize',zef.font_size);
+set(findobj(zef.CSM.UIFigure.Children,'-property','FontSize')
+,'FontSize',zef.font_size);

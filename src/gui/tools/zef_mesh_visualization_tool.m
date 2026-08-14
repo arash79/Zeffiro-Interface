@@ -1,42 +1,18 @@
-% --- Zeffiro documentation header ---
-% if isfield(zef,'h_mesh_visualization_tool') — If isfield(zef,'h mesh visualization tool').
+%ZEF_MESH_VISUALIZATION_TOOL  Open Mesh visualization tool; wire plot/camera controls.
 %
-% Purpose:
-%   If isfield(zef,'h mesh visualization tool').
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.attach_electrodes (read)
-%   zef.axes_visible (read)
-%   zef.azimuth (read)
-%   zef.brain_transparency (read)
-%   zef.cam_va (read)
-%   zef.colormap_items (read)
-%   zef.cone_draw (read)
-%   zef.contour_set (read, write)
-%   zef.contour_set_text (read)
-%   zef.cp2_a (read)
-%   zef.cp2_b (read)
-%   zef.cp2_c (read)
-%   zef.cp2_d (read)
-%   zef.cp2_on (read)
-%   zef.cp3_a (read)
-%   … (90 more)
+%   Script (not a function). Instantiates zef_mesh_visualization_tool_app_exported.
+%   Every ValueChangedFcn is zef_update_mesh_visualization_tool.
+%   Buttons (App Designer Text=): Visualize volume, Visualize surfaces,
+%   Frame / Movie, Axes pop-up, Plot graph, Visualize DTI streamlines.
+%   Visualization type items: Domain labels, Distribution (volume/surface),
+%   Parcellation, Topography.
 %
-% Calls (project):
-%   zef_change_size_function
-%   zef_get_profile_parameters
-%   zef_set_size_change_function
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `if isfield(zef,'h_mesh_visualization_tool')` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_visualize_volume, zef_plot_volume.
 if isfield(zef,'h_mesh_visualization_tool')
     if isvalid(zef.h_mesh_visualization_tool)
         delete(zef.h_mesh_visualization_tool)
@@ -189,6 +165,7 @@ width_aux = relative_size*zef.segmentation_tool_default_position(3);
         vertical_aux = zef.segmentation_tool_default_position(2)+zef.segmentation_tool_default_position(4)-height_aux;
         horizontal_aux = zef.segmentation_tool_default_position(1)+zef.segmentation_tool_default_position(3)-width_aux;
         zef.h_mesh_visualization_tool.Position = [horizontal_aux vertical_aux width_aux height_aux]; 
+zef_window_manager('standalone', zef.h_mesh_visualization_tool); 
 
 set(findobj(zef.h_mesh_visualization_tool.Children,'-property','FontSize'),'FontSize',zef.font_size);
 

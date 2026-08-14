@@ -1,36 +1,21 @@
-% --- Zeffiro documentation header ---
-% zef — Zef.
+%MUSIC_APP_START  Open Inverse tools → MUSIC (MUSIC_app).
 %
-% Purpose:
-%   Zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.MUSIC (read)
-%   zef.MUSIC_L_reg_type (read, write)
-%   zef.MUSIC_leadfield_lambda (read, write)
-%   zef.MUSIC_type (read, write)
-%   zef.font_size (read)
-%   zef.inv_data_segment (read, write)
-%   zef.inv_high_cut_frequency (read, write)
-%   zef.inv_low_cut_frequency (read, write)
-%   zef.inv_sampling_frequency (read, write)
-%   zef.inv_snr (read, write)
-%   zef.inv_time_1 (read, write)
-%   zef.inv_time_2 (read, write)
-%   zef.inv_time_3 (read, write)
-%   zef.normalize_data (read, write)
-%   zef.number_of_frames (read, write)
-%   … (1 more)
+%   Script. INI callback in every default/asteroid profile. Constructs
+%   MUSIC_app, fills type Items (1 source projection / 2 noise
+%   out-projection) and L-reg Items (1 Basic / 2 Pseudoinverse). Default
+%   MUSIC_leadfield_lambda 1e-3; copies inv_snr, band, inv_time_*,
+%   number_of_frames, inv_data_segment from zef. Pseudoinverse disables
+%   the lambda edit (ValueChangedFcn also tests type==3, which has no
+%   Item). StartButton: zef.reconstruction = MUSIC_iteration (discards
+%   Var_loc; no reconstruction_information). CloseButton deletes the app.
+%   Needs zef.L and zef.measurements in base. No inverse.*Inverter.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also MUSIC_iteration.
 
 zef.MUSIC = MUSIC_app;
 
@@ -105,4 +90,5 @@ zef.MUSIC.StartButton.ButtonPushedFcn = 'zef.reconstruction = MUSIC_iteration;';
 zef.MUSIC.CloseButton.ButtonPushedFcn = 'delete(zef.MUSIC);';
 
 %set fonts
-set(findobj(zef.MUSIC.UIFigure.Children,'-property','FontSize'),'FontSize',zef.font_size);
+set(findobj(zef.MUSIC.UIFigure.Children,'-property','FontSize')
+,'FontSize',zef.font_size);

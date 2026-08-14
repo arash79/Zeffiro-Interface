@@ -1,25 +1,19 @@
 function pts_filename = save_atlas_points(mesh, out_folder)
-% --- Zeffiro documentation header ---
-% utilities.sn2zef.save_atlas_points — Save atlas points.
+%SAVE_ATLAS_POINTS  Tetra barycentres of labelled tets → sn_atlas_points.dat.
 %
-% Purpose:
-%   Save atlas points.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   mesh
-%   out_folder
+%   mesh.nodes, .tetrahedra, .tetrahedron_regions required. Non-zero region
+%   tets only. Each row is [tet_index_0based, x, y, z] (mean of four
+%   vertices), written with dlmwrite precision 6. Blocks of 250000 tets.
+%   out_folder must exist. Used when a tetra mesh is already in memory.
 %
-% Outputs:
-%   pts_filename
+%   pts_filename = save_atlas_points(mesh, out_folder)  % always sn_atlas_points.dat
 %
-% Calls (project):
-%   utilities.sn2zef.save_atlas_points
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[pts_filename] = utilities.sn2zef.save_atlas_points(mesh, out_folder)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also save_volume_atlas_points.
 
     arguments
         mesh       (1,1) struct

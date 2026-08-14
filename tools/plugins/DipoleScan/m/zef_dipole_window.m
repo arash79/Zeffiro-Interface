@@ -1,51 +1,20 @@
-%This is the startup script for dipole_app app. One must add this as launch
-%script to zeffiro_plugins file:
-%dipoleScan, inverse_tools, zef_dipole_start
 function zef = zef_dipole_window(zef)
-% --- Zeffiro documentation header ---
-% zef_dipole_window — Zef dipole window.
+%ZEF_DIPOLE_WINDOW  Construct the Dipole Scan App Designer window.
 %
-% Purpose:
-%   Zef dipole window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_dipole_window(zef)
 %
-% Outputs:
-%   zef
+%   Called from zef_dipole_start (INI: Inverse tools → Dipole Scan).
+%   Instantiates dipole_app, sets the window title, and assigns
+%   StartButton.ButtonPushedFcn to zef_dipoleScan. Does not invert.
+%   Menu row is Dipole Scan, inverse_tools, zef_dipole_start.
 %
-% Zef fields (observed):
-%   zef.L_reg_type (read, write)
-%   zef.beamformer (read)
-%   zef.dipole (read)
-%   zef.dipole_app (read, write)
-%   zef.dipole_type (read, write)
-%   zef.font_size (read)
-%   zef.inv_data_segment (read, write)
-%   zef.inv_default (read, write)
-%   zef.inv_high_cut_frequency (read, write)
-%   zef.inv_leadfield_lambda (read, write)
-%   zef.inv_low_cut_frequency (read, write)
-%   zef.inv_names (read, write)
-%   zef.inv_sampling_frequency (read, write)
-%   zef.inv_snr (read, write)
-%   zef.inv_time_1 (read, write)
-%   … (7 more)
+%   See also zef_dipole_start, zef_dipoleScan.
 %
-% Calls (project):
-%   zef_dipoleScan
-%   zef_dipole_window
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_dipole_window(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 zef.dipole_app = dipole_app;
 appName='dipole_app';

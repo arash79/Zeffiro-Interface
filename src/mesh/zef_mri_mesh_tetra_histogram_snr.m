@@ -1,118 +1,60 @@
-%Copyright © 2026 ZI Development Team
-%
-%ZEF_MRI_MESH_TETRA_HISTOGRAM_SNR
-%
-%Maps FEM tetrahedron centres to MRI voxel indices, samples a scalar volume,
-%groups samples by zef.domain_labels, estimates background ("air") power from
-%voxels not covered by the mesh sampling footprint, and reports histograms,
-%mean squared power, SNR, and the rescale factor r = 1 - 10^(-SNR/20).
-%
-%Typical workflow (mesh already built in Zeffiro):
-%   1) tetra_c = mean of the four corner nodes of each tetra (lab / mesh mm).
-%   2) Map lab -> voxel indices (your affine A,b or a 4x4 NIfTI-style matrix).
-%   3) Read intensity at each voxel; attach to compartment via domain_labels.
-%   4) Air / noise: voxels inside a padded bounding box around sampled voxels
-%      that are not hit by any tetra centre mapping (tissue was meshed; these
-%      voxels approximate exterior / air). Optional user-supplied air_mask.
-%   5) P_tissue = mean(I.^2) over all tetra samples; P_noise = mean(I.^2) over air.
-%      SNR = 10*log10(P_tissue / P_noise);  r = 1 - 10^(-SNR/20).
-%
-%Coordinate conventions:
-%   - zef.nodes is Nx3, zef.tetra is Mx4 (node indices per row).
-%   - For 3x3 A and 3x1 b with lab coordinates as ROWS [x y z]:
-%         voxel_row = ceil( tetra_lab * A.' + b(:).' );
-%     which matches A * (tetra_c.') + b when tetra_c is 3 x M (column points).
-%
-%NIfTI / Zeffiro slice overlay convention (same as zef_visualize_nii_slices):
-%   lab_row (1x4) = vox_row (1x4) * T,  with vox_row = [i j k 1].
-%   Hence vox_row = lab_row * inv(T).  Pass this T as 'T_voxel_to_lab'.
-%
-%Inputs:
-%   zef        - Struct with .nodes, .tetra, .domain_labels (and optionally
-%                .compartment_tags for names in the output table).
-%   mri_volume - 3-D numeric array [nx ny nz], same indexing as (i,j,k) from
-%                the affine, OR a char/string path to .nii / .nii.gz (uses
-%                niftiread; optional transform must then be supplied or taken
-%                from niftiinfo if 'use_nifti_transform' is true).
-%
-%Name-value pairs:
-%   'A','b'                  - 3x3 and 3x1 (or 1x3) lab->voxel linear map + shift
-%                              (mutually exclusive with T_voxel_to_lab).
-%   'T_voxel_to_lab'         - 4x4: voxel row [i j k 1] maps to lab [x y z 1].
-%   'use_nifti_transform'    - If mri_volume is a file path and this is true
-%                              (default for path input), T is taken from
-%                              niftiinfo (Transform.T, double). You may still
-%                              need freesurfer-style c_ras handling for FS meshes;
-%                              see zef_visualize_nii_slices.
-%   'freesurfer_coords'      - If true and using NIfTI transform, subtract c_ras
-%                              from translation row like zef_visualize_nii_slices.
-%                              Default false.
-%   'index_origin'           - 0 or 1 (default 1). Added to voxel indices after
-%                              ceil/round so 0-based affines map into MATLAB arrays.
-%   'round_voxel'            - @ceil (default), @floor, @round.
-%   'air_definition'         - 'uncovered_bbox' (default), 'uncovered_full',
-%                              or 'mask' (requires air_mask).
-%   'bbox_padding'           - Integer voxel margin around covered voxels for
-%                              'uncovered_bbox'. Default 12.
-%   'air_mask'               - Logical [nx ny nz], true = air voxels for P_noise.
-%   'num_histogram_bins'     - Default 64.
-%   'plot'                   - If true, figure with histograms per domain.
-%                              Default false.
-%
-%Outputs:
-%   out - Struct: tetra_centres, voxel_indices, intensities, domain_labels,
-%         compartment_names, P_mean_sq_per_domain, P_mean_sq_tissue_total,
-%         P_mean_sq_air, SNR_total_dB, SNR_per_domain_dB, r_total, r_per_domain,
-%         histogram_edges, histogram_counts_per_domain, air_voxel_count, ...
-%
-%Example:
-%   V = niftiread('T1.nii.gz');
-%   info = niftiinfo('T1.nii.gz');
-%   T = double(info.Transform.T);
-%   out = zef_mri_mesh_tetra_histogram_snr(zef, V, 'T_voxel_to_lab', T, ...
-%       'freesurfer_coords', true, 'plot', true);
-%
-%   If you already have T_mesh2voxel from zef_dti_get_mesh2voxel (mesh row -> voxel
-%   row, homogeneous), then lab_row * T_mesh2voxel = vox_row implies
-%       T_voxel_to_lab = inv(T_mesh2voxel)
-%   for use with the NIfTI row convention above.
-%
-%See also: zef_visualize_nii_slices, zef_dti_get_mesh2voxel
-
 function out = zef_mri_mesh_tetra_histogram_snr(zef, mri_volume, varargin)
-% --- Zeffiro documentation header ---
-% zef_mri_mesh_tetra_histogram_snr — Zef mri mesh tetra histogram snr.
+%ZEF_MRI_MESH_TETRA_HISTOGRAM_SNR  Sample an MRI at tet centroids; SNR by domain.
 %
-% Purpose:
-%   Zef mri mesh tetra histogram snr.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2026 ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   mri_volume
-%   varargin
+%   Maps each FEM tet centre (mean of four vertices) to a voxel, reads a
+%   scalar MRI, groups samples by zef.domain_labels, and estimates noise
+%   power from "air" voxels that the mesh does not cover. Reports
+%   histograms, mean-square intensity, SNR in dB, and r = 1 − 10^(−SNR/20).
 %
-% Outputs:
-%   out
+%   No first-party caller in this tree (analysis helper). Needs Image
+%   Processing Toolbox niftiread/niftiinfo if mri_volume is a file path.
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.domain_labels (read)
-%   zef.nodes (read)
-%   zef.tetra (read)
+%   out = zef_mri_mesh_tetra_histogram_snr(zef, mri_volume)
+%   out = zef_mri_mesh_tetra_histogram_snr(zef, mri_volume, Name, Value, ...)
 %
-% Calls (project):
-%   zef_mri_mesh_tetra_histogram_snr
+%   Inputs
+%     zef         - session with nodes (V×3 lab frame), tetra (T×4),
+%                   domain_labels (T×1). Optional compartment_tags for names.
+%     mri_volume  - 3-D numeric array, or path to a NIfTI file.
 %
-% Side effects:
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
+%   Name-value pairs
+%     'T_voxel_to_lab'     - 4×4, voxel row (homogeneous) → lab. From
+%                            niftiinfo.Transform.T when a file is passed
+%                            and use_nifti_transform is not 0.
+%     'A','b'              - 3×3 and 1×3, lab row → voxel:
+%                            round_voxel(nc*A.' + b) + index_origin.
+%                            Mutually exclusive with T_voxel_to_lab.
+%     'use_nifti_transform'- [] (default: true when reading a file), 0, or 1.
+%     'freesurfer_coords'  - if true, subtract the NIfTI world coordinate of
+%                            the volume centre voxel from T(4,1:3) (c_ras).
+%     'index_origin'       - added after rounding, default 1 (MATLAB 1-based).
+%     'round_voxel'        - function handle, default @ceil.
+%     'air_definition'     - 'uncovered_bbox' (default): air = bbox of
+%                            covered voxels padded by bbox_padding, minus
+%                            covered voxels. 'uncovered_full': all uncovered.
+%                            'mask': use air_mask.
+%     'bbox_padding'       - voxels, default 12.
+%     'air_mask'           - logical 3-D, same size as the volume.
+%     'num_histogram_bins' - default 64; shared edges from the first domain.
+%     'plot'               - if true, one histogram tile per domain.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[out] = zef_mri_mesh_tetra_histogram_snr(zef, mri_volume, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output struct
+%     tetra_centres, voxel_indices, intensities, domain_labels,
+%     compartment_names (cell, index = domain id), domain_index_list,
+%     P_mean_sq_per_domain, P_mean_sq_tissue_total, P_mean_sq_air,
+%     SNR_total_dB, SNR_per_domain_dB, r_total, r_per_domain,
+%     histogram_edges, histogram_counts_per_domain, air_voxel_count, air_mask.
+%
+%   Transform convention: T_voxel_to_lab is applied as [vox 1]*T (row
+%   vectors). Inverse maps lab centres to voxel. Out-of-bounds centres are
+%   clamped with a warning.
+%
+%   See also zef_visualize_nii_slices, zef_dti_get_mesh2voxel.
 
 p = inputParser;
 addParameter(p, 'A', [], @(x) isnumeric(x) && (isempty(x) || isequal(size(x), [3 3])));
@@ -337,6 +279,7 @@ end
 
 %% ------------------------------------------------------------------------
 function w = local_vox2world_row(vox_row, T)
+%LOCAL_VOX2WORLD_ROW  Apply 4×4 T as [vox 1]*T and drop the homogeneous 1.
     pts = double(vox_row);
     if size(pts, 2) ~= 3
         error('internal');
@@ -347,6 +290,11 @@ function w = local_vox2world_row(vox_row, T)
 end
 
 function names = local_domain_index_to_names(zef, max_label)
+%LOCAL_DOMAIN_INDEX_TO_NAMES  Map domain id 1..max_label to compartment tags.
+%
+%   Default names are domain_k. Active (_on) compartment_tags are assigned
+%   in on-order to ids 1,2,... which matches how create/postprocess number
+%   domain_labels for compartments without submeshes.
     n = max_label;
     names = cell(n, 1);
     for i = 1:n

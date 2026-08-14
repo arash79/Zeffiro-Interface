@@ -1,32 +1,20 @@
 function [z_inverse] = EnKF(m, A, P, Q, L, R, timeSteps, number_of_frames, n_ensembles)
-% --- Zeffiro documentation header ---
-% EnKF — En KF.
+%ENKF  Ensemble Kalman filter (n_ensembles samples of the source state).
 %
-% Purpose:
-%   En KF.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   m
-%   A
-%   P
-%   Q
-%   L
-%   R
-%   timeSteps
-%   number_of_frames
-%   n_ensembles
+%   z_inverse = EnKF(m, A, P, Q, L, R, timeSteps, number_of_frames, n_ensembles)
 %
-% Outputs:
-%   z_inverse
+%   zef_KF filter_type 2. Ensemble count from zef.KF.number_of_ensembles.
+%   Forecast with process noise Q, correlation localization (abs(T)<0.05
+%   zeroed), then K = C L' / (L C L' + R). Live path uses method = '3'
+%   (D = I). Writes cell z_inverse; no RTS.
 %
-% Calls (project):
-%   zef_waitbar
+%   See also zef_KF, kalman_filter.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[z_inverse] = EnKF(m, A, P, Q, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 P_full = P;
 Q_full = Q;
@@ -54,7 +42,7 @@ for f_ind = 1:number_of_frames
     end
     v = mvnrnd(zeros(size(R,1),1), R, n_ensembles);
 
-    % method to calculate resolution D
+    % Live path: method = '3' → D = I (sLORETA branches 1–2 unused).
     method = '3';
     if(method == '1')
         P_sqrtm = sqrtm(C);

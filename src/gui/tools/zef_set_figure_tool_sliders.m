@@ -1,50 +1,36 @@
 function zef = zef_set_figure_tool_sliders(zef, varargin)
-% --- Zeffiro documentation header ---
-% zef_set_figure_tool_sliders — Zef set figure tool sliders.
+%ZEF_SET_FIGURE_TOOL_SLIDERS  Push colormap/slider state onto Figure-tool widgets.
 %
-% Purpose:
-%   Zef set figure tool sliders.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   varargin
+%   Callers: Figure-tool **Reset**
+%     zef = zef_set_figure_tool_sliders(zef, 0);
+%   and zef_load after recreating sensors/compartments
+%     zef = zef_set_figure_tool_sliders(zef);   % set_mode defaults to 1
 %
-% Outputs:
-%   zef
+%   No-op unless zef.h_axes1 exists and isvalid. Both modes then run the
+%   zef_update_* helpers (colormap, colorscale, lights, transparencies,
+%   zoom, colorscale min/max) so widget Values are written back onto zef.
 %
-% Zef fields (observed):
-%   zef.colorscale_max_slider (read, write)
-%   zef.colorscale_min_slider (read, write)
-%   zef.h_axes1 (read)
-%   zef.h_colorscale_max_slider (read)
-%   zef.h_colorscale_min_slider (read)
-%   zef.h_update_ambience (read)
-%   zef.h_update_brightness (read)
-%   zef.h_update_colormap (read)
-%   zef.h_update_colorscale (read)
-%   zef.h_update_contrast (read)
-%   zef.h_update_diffusion (read)
-%   zef.h_update_lights (read)
-%   zef.h_update_specular (read)
-%   zef.h_update_transparency_additional (read)
-%   zef.h_update_transparency_cones (read)
-%   … (19 more)
+%   set_mode == 0 (**Reset**): factory widgets — colormap from
+%   zef.inv_colormap, colorscale 1 (Linear), zoom 7, all transparencies 0,
+%   brightness/contrast 0, ambience/diffusion 0.8, specular 0.1,
+%   colorscale sliders 0, lights 1 — then axis auto/tight/equal on the
+%   axes tagged 'axes1'.
 %
-% Calls (project):
-%   zef_colormap
-%   zef_set_figure_tool_sliders
-%   zef_set_lights
+%   set_mode ~= 0 (load / default): copy zef.update_colormap,
+%   update_colorscale, update_zoom, update_transparency_*, update_ambience,
+%   update_diffusion, update_specular, colorscale_*_slider onto the
+%   matching h_* controls. Contrast and brightness come from
+%   zef_update_contrast_and_brightness (not raw zef.update_* fields).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   zef = zef_set_figure_tool_sliders(zef)
+%   zef = zef_set_figure_tool_sliders(zef, set_mode)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_set_figure_tool_sliders(zef, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_figure_tool, zef_load, zef_reset_color_sliders.
 set_mode = 1;
 
 if not(isempty(varargin))
@@ -55,6 +41,7 @@ if eval('isfield(zef,''h_axes1'');')
     if isvalid(eval('zef.h_axes1'))
 
         if set_mode == 0
+            % Figure-tool Reset: factory widget values, then axis auto/tight/equal.
 
             eval('zef.h_update_colormap.Value = zef.inv_colormap;');
             eval('zef.h_update_colorscale.Value = 1;');
@@ -82,6 +69,7 @@ if eval('isfield(zef,''h_axes1'');')
             axis(h_axes,'equal');
             
         else
+            % zef_load / default: copy zef.update_* onto the widgets.
 
             eval('zef.h_update_colormap.Value = zef.update_colormap;');
             eval('zef.h_update_colorscale.Value = zef.update_colorscale;');

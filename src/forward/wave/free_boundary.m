@@ -1,26 +1,21 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 
 function [boundary_triangles, boundary_tetra_ind] = free_boundary(tetra)
-% --- Zeffiro documentation header ---
-% free_boundary — Free boundary.
+%FREE_BOUNDARY  Unique exterior triangles of a tetrahedral mesh.
 %
-% Purpose:
-%   Free boundary.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Inputs:
-%   tetra
+%   Faces that appear once (not shared) are the free boundary.
 %
-% Outputs:
-%   boundary_triangles
-%   boundary_tetra_ind
+%   [boundary_triangles, boundary_tetra_ind] = free_boundary(tetra)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[boundary_triangles, boundary_tetra_ind]] = free_boundary(tetra)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   tetra may include a 5th domain-label column; only columns 1:4 are faces.
+%
+%   See also create_system, tetra_in_compartment.
+
+
 
 
 ind_m = [ 2 4 3 ;

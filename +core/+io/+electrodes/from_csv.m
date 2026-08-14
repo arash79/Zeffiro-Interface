@@ -1,26 +1,56 @@
 function [electrode_data, electrode_labels] = from_csv(file, kwargs)
-% --- Zeffiro documentation header ---
-% core.io.electrodes.from_csv — Parses electrode file format and returns positions, optional CEM columns, and labels.
+%FROM_CSV  Read electrode positions (and optional CEM columns) from a CSV file.
 %
-% Purpose:
-%   Parses electrode file format and returns positions, optional CEM columns, and labels.
-%   Folder: Parses electrode positions (and optional CEM columns) from `.csv` and `.dat` files; returns numeric data and label strings.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   file
-%   kwargs
+%   Parser used by Import → Import electrodes when the chosen file has
+%   extension .csv. It is also safe to call from scripts with no GUI.
+%   The callback that wires the menu is
+%   core.gui.menu_tool.import_electrodes_callback, which writes the
+%   numeric matrix to zef.sensors and to <prefix>_points (prefix is
+%   zef.current_sensors, usually "s") plus labels to <prefix>_name_list.
 %
-% Outputs:
-%   electrode_data
-%   electrode_labels
+%   Column names are matched case-sensitively as MATLAB readtable
+%   VariableNames. Required: x, y, z. Optional: label. Complete electrode
+%   model (CEM) columns inner_radius, outer_radius, and impedance are
+%   used only when all three exist; a partial set is ignored with a
+%   warning. Coordinates and radii are not converted — they must already
+%   be in the project length unit (typically millimetres). Impedance is
+%   in ohms.
 %
-% Calls (project):
-%   core.io.electrodes.from_csv
+%   Point-electrode files return N-by-3. CEM files return N-by-6:
+%   [x y z inner_radius outer_radius impedance]. inner_radius is the
+%   metal disc; outer_radius is the gel/contact patch. Lead-field
+%   assembly (zef_build_electrodes) treats 6-column sensors as CEM.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[electrode_data, electrode_labels]] = core.io.electrodes.from_csv(file, kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   [data, labels] = core.io.electrodes.from_csv(file)
+%   [data, labels] = core.io.electrodes.from_csv(file, "MISSING_LABEL", "S")
+%
+%   Inputs
+%     file           - existing file path (mustBeFile).
+%     MISSING_LABEL  - prefix for default labels S1, S2, … when there is
+%                      no label column. Default "S".
+%
+%   Outputs
+%     electrode_data    - N-by-3 or N-by-6 double, one row per electrode.
+%     electrode_labels  - N-by-1 string. From the label column if present,
+%                         otherwise MISSING_LABEL concatenated with 1:N.
+%
+%   Failure
+%     Errors if x, y, or z is missing; if a CEM value is NaN; if
+%     inner_radius < 0; if impedance < 0; or if inner_radius >= outer_radius.
+%
+%   Example
+%     [pos, names] = core.io.electrodes.from_csv("electrodes.csv");
+%     zef.sensors = pos;
+%     zef.s_points = pos;
+%     zef.s_name_list = names;
+%     zef = zef_update(zef);
+%
+%   See also core.io.electrodes.from_dat, core.gui.menu_tool.import_electrodes_callback.
 
     arguments
 

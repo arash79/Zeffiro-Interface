@@ -1,42 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef_data = zeffiro_interface_lf_bank_tool; — Zef data = zeffiro interface lf bank tool;.
+%ZEF_LF_BANK_TOOL  Open Multi tools → Multi lead field tool.
 %
-% Purpose:
-%   Zef data = zeffiro interface lf bank tool;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.fieldnames (read, write)
-%   zef.h_add_lf_item (read)
-%   zef.h_delete_selected (read)
-%   zef.h_lf_bank_compute_lead_fields (read)
-%   zef.h_lf_bank_make_all (read)
-%   zef.h_lf_bank_scaling_factor (read)
-%   zef.h_lf_bank_tool (read)
-%   zef.h_lf_bank_update_measurements (read)
-%   zef.h_lf_bank_update_noise_data (read)
-%   zef.h_lf_item_list (read)
-%   zef.h_lf_normalization (read)
-%   zef.h_lf_tag (read)
-%   zef.h_merge_lead_fields (read)
-%   zef.h_source_interpolation_on (read)
-%   zef.lf_bank_scaling_factor (read, write)
-%   … (8 more)
+%   Default-profile menu callback (script). Bank is zef.lf_bank_storage.
+%   Merge selected → zef_combine_lead_fields (zef.L, zef.measurements).
+%   Re-calculate → zef_lf_bank_compute_lead_fields (zef_lead_field_matrix).
 %
-% Calls (project):
-%   zef_change_size_function
+%   See also zef_add_lf_item, zef_combine_lead_fields.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_data = zeffiro_interface_lf_bank_tool;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
 
 zef_data = zeffiro_interface_lf_bank_tool;
 zef.fieldnames = fieldnames(zef_data);
@@ -44,7 +18,7 @@ for zef_i = 1:length(zef.fieldnames)
     zef.(zef.fieldnames{zef_i}) = zef_data.(zef.fieldnames{zef_i});
 end
 clear zef_i zef_data;
-set(zef.h_lf_bank_tool,'Name','ZEFFIRO Interface: Multi lead field tool');
+set(zef.h_lf_bank_tool,'Name','ZEFFIRO Interface: Multi lead field tool')
 set(findobj(zef.h_lf_bank_tool.Children,'-property','FontUnits'),'FontUnits','pixels')
 set(findobj(zef.h_lf_bank_tool.Children,'-property','FontSize'),'FontSize',9);
 zef.h_lf_item_list.ValueChangedFcn = 'zef.lf_item_selected = get(zef.h_lf_item_list,''value'');';

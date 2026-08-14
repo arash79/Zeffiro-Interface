@@ -1,35 +1,19 @@
-% --- Zeffiro documentation header ---
-% zef — Zef.
+%RAPMUSIC_START  Open RAP-MUSIC app (not in any zeffiro_plugins.ini).
 %
-% Purpose:
-%   Zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.RAPMUSIC (read)
-%   zef.RAPMUSIC_leadfield_lambda (read, write)
-%   zef.RAPMUSIC_n_dipoles (read, write)
-%   zef.font_size (read)
-%   zef.inv_high_cut_frequency (read, write)
-%   zef.inv_hyperprior (read, write)
-%   zef.inv_low_cut_frequency (read, write)
-%   zef.inv_sampling_frequency (read, write)
-%   zef.inv_snr (read, write)
-%   zef.inv_time_1 (read, write)
-%   zef.inv_time_2 (read, write)
-%   zef.inv_time_3 (read, write)
-%   zef.normalize_data (read, write)
-%   zef.number_of_frames (read, write)
-%   zef.reconstruction (read, write)
+%   Script. Call from MATLAB or cluster registry id legacy_rap_music.
+%   Constructs RAPMUSIC_app. Defaults RAPMUSIC_leadfield_lambda 1e-3,
+%   RAPMUSIC_n_dipoles 8, inv_snr widget '30'. Copies band / inv_time_*
+%   / number_of_frames from zef. StartButton:
+%   zef.reconstruction = RAP_MUSIC_iteration (discards Var_loc and
+%   reconstruction_information). Needs zef.L and zef.measurements in
+%   base. No inverse.*Inverter.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also RAP_MUSIC_iteration, zef_subspace_corr.
 
 zef.RAPMUSIC = RAPMUSIC_app;
 
@@ -79,4 +63,5 @@ zef.RAPMUSIC.StartButton.ButtonPushedFcn = 'zef.reconstruction = RAP_MUSIC_itera
 zef.RAPMUSIC.CloseButton.ButtonPushedFcn = 'delete(zef.RAPMUSIC);';
 
 %set fonts
-set(findobj(zef.RAPMUSIC.UIFigure.Children,'-property','FontSize'),'FontSize',zef.font_size);
+set(findobj(zef.RAPMUSIC.UIFigure.Children,'-property','FontSize')
+,'FontSize',zef.font_size);

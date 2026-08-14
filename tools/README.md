@@ -1,61 +1,29 @@
-# tools
+# `tools` — optional GUI plugins
 
-## Folder purpose
+The only first-party tree under `tools/` is **`plugins/`**. At startup, `zeffiro_interface` puts that folder on the MATLAB path with `addpath(genpath(.../tools/plugins))`. Plugin functions are then called by the short names in `profile/<name>/zeffiro_plugins.ini` (`zef_kf_start`, `ias_map_estimation`, …).
 
-Hosts **Zeffiro plugins** and other tooling that extends the interface beyond `src/`. At startup, `zeffiro_interface.m` runs `addpath(genpath(fullfile(program_path, 'tools', 'plugins')))`, making all plugin functions callable from menu callbacks.
+This is **not** a MATLAB package (`+tools`). It is also not the core runtime: mesh, lead field, figure windows, and `zef_*` session scripts live under `src/`. Class inverse solvers live under `+inverse` and are **not** what most Inverse-tools buttons construct.
 
-## Main contents
+## Why this folder exists
 
-| Path | Role |
-|------|------|
-| `plugins/` | 39 top-level plugin packages (inverse GUIs, data bank, Kalman, SESAME, ES workbench, …) |
-| *(future)* | Additional non-plugin tooling could live alongside `plugins/` |
+A GUI user needs extra windows (Kalman, Filter tool, Data Bank, DTI, NSE, tES optimization, …) that would clutter `src/` if they were always compiled into the main figure. Each plugin is a self-contained start function plus algorithm files. The active **profile** decides which of them appear on **Inverse tools**, **Forward tools**, **Multi tools**, and **Settings**.
 
-Each plugin typically contains:
-- A **start** script (`zef_*_start.m`, `*_app_start.m`) opened from `zeffiro_plugins.ini`
-- An **App Designer** `.mlapp` or legacy `.fig` window
-- An **`m/`** folder with iteration/solver functions
-- Optional `fig/`, `Scripts/`, `clusterScripts/`
+## How to use it
 
-## Code functionality
+1. Start Zeffiro (`zeffiro_interface`). The default profile is `multicompartment_head`.
+2. Open a plugin from the menu bar. The exact labels and callbacks are listed in [plugins/README.md](plugins/README.md).
+3. Or call the start function from MATLAB (the folder is already on the path), for example `zef_kf_start`.
 
-**Registration:** `src/core/zef_plugin.m` reads CSV rows from `profile/<profile_name>/zeffiro_plugins.ini`:
-```
-Menu label, parent_menu_tag, callback_script
-```
-Parent tags: `inverse_tools`, `forward_tools`, `multi_tools`, `settings`.
+A plugin directory that is **not** listed in the profile INI is still on the path; it just has no menu row.
 
-**Inverse plugins** usually implement `zef_*_iteration(zef)` that:
-1. Calls `zef_processLeadfields`
-2. Loops frames with `zef_getFilteredData` / `zef_getTimeStep`
-3. Writes `zef.reconstruction` and `reconstruction_information`
+## Related trees
 
-**Modern class inverses** (`+inverse`) are invoked via `zef_inverse_run` — most GUI buttons still call **legacy** plugin iterations. Registry mapping: `+utilities/+cluster/inverse_method_registry.m`.
+| Location | Role |
+|----------|------|
+| `tools/plugins/` | This tree — GUI modules |
+| `profile/*/zeffiro_plugins.ini` | Which plugins appear on which menu |
+| `src/` | Core session, mesh, forward, figure tools |
+| `+inverse` | Class solvers for `zef_inverse_run` / cluster |
+| `+plugins` | MATLAB-package helpers some plugins call (ClassKF, ClassGMM) |
 
-## Workflow context
-
-```
-zef_menu_tool → zef_plugin → uimenu(callback → plugin_start → plugin_window)
-  → user clicks Start → *_iteration(zef) → zef.reconstruction
-```
-
-`+tests/ClassVsLegacyTest` compares class dispatch vs legacy for selected methods.
-
-## Usage instructions
-
-Enable plugins by choosing a **profile** (`zef.profile_name` from `profile/zeffiro_interface.ini`). Switch profile in segmentation tool dropdown; re-run `zef_plugin` after `zef_load`.
-
-Plugins **not** in any profile INI (manual only): CreateDipolarPair, DBS_tool, EITSensitivityTool, StripTool, RAP-MUSIC, PlotMeshesProto, etc.
-
-## Important notes
-
-- Plugin callback names in INI must match an on-path function (e.g. `ias_map_estimation_roi` vs function name `ias_map_estimation` in IASROIInversion — verify before relying on menu entry).
-- Duplicate algorithm code exists in `+plugins` (ClassKF, ClassGMM) vs `tools/plugins` (Kalman, GMMClustering).
-- `tools/plugins` is on the path as **flat functions**, not as a MATLAB package.
-
-## Developer guidance
-
-- New plugin: create folder under `plugins/`, add start + window + iteration, register in **every** profile INI that should expose it.
-- Prefer migrating solvers to `+inverse` + `zef_inverse_run` over copying frame loops.
-- See `tools/plugins/README.md` for the full per-plugin catalog.
-- Keep plugin callbacks ending with `zef_update` when they change shared tables (menu tool adds this automatically for INI entries).
+Read **[plugins/README.md](plugins/README.md)** next for the default Inverse/Forward/Multi tools list, what you need before Start, and how that differs from `zef_inverse_run`.

@@ -1,26 +1,16 @@
 function [filling_vec] = zef_wireframe_filling_vec(eps_vec_1, eps_vec_2)
-% --- Zeffiro documentation header ---
-% zef_wireframe_filling_vec — Zef wireframe filling vec.
+%ZEF_WIREFRAME_FILLING_VEC  Maxwell-Garnett filling fraction from two permittivities.
 %
-% Purpose:
-%   Zef wireframe filling vec.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2019- Sampsa Pursiainen, Liisa-Ida Sorsa, Christelle Eyraud, Jean-Michel Geffrin.
+%   GPU-ToRRe-3D wireframe modeling package.
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   eps_vec_1
-%   eps_vec_2
+%   filling_vec = zef_wireframe_filling_vec(eps_vec_1, eps_vec_2)
 %
-% Outputs:
-%   filling_vec
+%   Real parts only. Called from wireframe generation. No zef I/O.
 %
-% Calls (project):
-%   zef_wireframe_filling_vec
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[filling_vec] = zef_wireframe_filling_vec(eps_vec_1, eps_vec_2)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_wireframe_permittivity_vec, wireframe.
 
 filling_vec = - (real(eps_vec_2) - real(eps_vec_1).*(real(eps_vec_2) + 2) + 2)./(2.*real(eps_vec_2) + real(eps_vec_1).*(real(eps_vec_2) - 1) - 2);
 

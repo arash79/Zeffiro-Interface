@@ -1,35 +1,18 @@
 function zef = zef_strip_tool_delete(zef)
-% --- Zeffiro documentation header ---
-% zef_strip_tool_delete — Zef strip tool delete.
+%ZEF_STRIP_TOOL_DELETE  Remove the selected strip and clear matching get_functions.
 %
-% Purpose:
-%   Zef strip tool delete.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_strip_tool_delete(zef)
 %
-% Outputs:
-%   zef
+%   Delete button. Drops strip_cell{current_strip}; blanks sensor
+%   get_functions whose sensor_info.strip_id matches. Then init/update
+%   with current_strip=1. Does not remove already-embedded compartments.
 %
-% Zef fields (observed):
-%   zef.current_sensors (read)
-%   zef.strip_tool (read)
-%
-% Calls (project):
-%   zef_sensor_get_function_eval
-%   zef_strip_tool_delete
-%   zef_strip_tool_init
-%   zef_strip_tool_update
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_strip_tool_delete(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_strip_tool_add.
 
 struct_aux_1 = cell(0);
 struct_aux_2 = zef.([zef.current_sensors '_strip_cell']);
@@ -56,7 +39,7 @@ end
 zef.([zef.current_sensors '_strip_cell']) = struct_aux_1;
 
 zef.strip_tool.current_strip = 1;
-zef.strip_tool.h_strip_list.Value = 1;
+zef_colored_list('value', zef.strip_tool.h_strip_list, 1);
 
 zef = zef_strip_tool_init(zef);
 zef = zef_strip_tool_update(zef);

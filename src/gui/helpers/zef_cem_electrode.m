@@ -1,32 +1,23 @@
 function s_points = zef_cem_electrode(zef,s_points)
-% --- Zeffiro documentation header ---
-% zef_cem_electrode — Zef cem electrode.
+%ZEF_CEM_ELECTRODE  Append CEM radii and impedance columns to sensor xyz.
 %
-% Purpose:
-%   Zef cem electrode.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   s_points
+%   Registered in profile/*/zeffiro_init.ini as
+%     "CEM electrode creation", @zef_cem_electrode, create_patch_sensor
+%   zef_process_meshes calls zef.create_patch_sensor(zef, s_points) when
+%   imaging_method==1 (EEG) and the handle is non-empty.
 %
-% Outputs:
-%   s_points
+%   Reads zef.<current_sensors>_electrode_outer_radius, _inner_radius,
+%   _electrode_impedance (scalars are replicated to N rows). Returns
+%   [x y z outer_radius inner_radius impedance]. Empty s_points → [].
 %
-% Zef fields (observed):
-%   zef.current_sensors (read)
+%   s_points = zef_cem_electrode(zef, s_points)
 %
-% Calls (project):
-%   zef_cem_electrode
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[s_points] = zef_cem_electrode(zef, s_points)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_process_meshes, zef_pem2cem.
 
 if isempty(s_points)
     s_points = [];

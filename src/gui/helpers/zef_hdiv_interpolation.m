@@ -1,34 +1,3 @@
-% --- Zeffiro documentation header ---
-% function [G, interpolation_positions] = zef_hdiv_interpolation( ... — Function [G, interpolation positions] = zef hdiv interpolation( .
-%
-% Purpose:
-%   Function [G, interpolation positions] = zef hdiv interpolation( ....
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Inputs:
-%   p_nodes
-%   p_tetrahedra
-%   p_brain_inds
-%   p_intended_source_inds
-%   p_nearest_neighbour_inds
-%   p_optimization_system_type
-%   mustBeText
-%   mustBeMember
-%
-% Calls (project):
-%   zef_ew_dipoles
-%   zef_fi_dipoles
-%   zef_hdiv_interpolation
-%   zef_hdiv_interpolation_discrete_local
-%   zef_mpo_system
-%   zef_pbo_system
-%   zef_tetra_barycentra
-%   zef_waitbar
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `function [G, interpolation_positions] = zef_hdiv_interpolation( ...(p_nodes, p_tetrahedra, p_brain_inds, p_intended_source_inds, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 function [G, interpolation_positions] = zef_hdiv_interpolation( ...
     p_nodes, ...
     p_tetrahedra, ...
@@ -37,6 +6,34 @@ function [G, interpolation_positions] = zef_hdiv_interpolation( ...
     p_nearest_neighbour_inds, ...
     p_optimization_system_type ...
     )
+%ZEF_HDIV_INTERPOLATION  H(div) source interpolation matrix G.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Called from zef_lead_field_interpolation for ZefSourceModel.Hdiv and
+%   ContinuousHdiv. Combines face-intersecting (FI) and edge-Whitney (EW)
+%   dipoles so the interpolant can represent H(div) sources.
+%
+%   [G, interpolation_positions] = zef_hdiv_interpolation(nodes, tetra, ...
+%       brain_inds, intended_source_inds, nearest_neighbour_inds, ...
+%       optimization_system_type)
+%
+%   If nearest_neighbour_inds is empty, this file calls the nested
+%   zef_hdiv_interpolation_discrete_local (only dipoles that touch the
+%   selected tets — the full FI/EW matrices are too large on million-tet
+%   meshes). Otherwise it builds global zef_fi_dipoles and zef_ew_dipoles,
+%   unions T_fi / T_ew columns over the continuous neighbourhood, stacks
+%   [FI; EW] locations and directions, and solves PBO or MPO
+%   ('pbo'/'mpo' required).
+%
+%   interpolation_positions are barycentra of tetra(intended_source_inds,:).
+%   G = G_fi * S_fi + G_ew * S_ew, size n_nodes × 3*n_sources.
+%
+%   See also zef_whitney_interpolation, zef_pbo_system, zef_mpo_system,
+%            zef_lead_field_interpolation, zef_fi_dipoles, zef_ew_dipoles.
 
 arguments
     p_nodes (:,3) double {mustBeNonNan}
@@ -325,10 +322,10 @@ function [G, interpolation_positions] = zef_hdiv_interpolation_discrete_local( .
     p_intended_source_inds, ...
     p_optimization_system_type ...
     )
-
-% Build only the H(div) dipoles that touch the selected tetrahedra. The
-% global FI/EW dipole matrices are too large for discrete million-tetra
-% meshes when only a small source subset is interpolated.
+% Nested: H(div) interpolation without global FI/EW dipole matrices.
+% Same G size as the parent (n_nodes × 3*n_sources). Only dipoles that
+% touch the selected tetrahedra are assembled — used when
+% nearest_neighbour_inds is empty.
 
 valid_source_inds = p_intended_source_inds;
 source_tetra = p_tetrahedra(valid_source_inds,:);

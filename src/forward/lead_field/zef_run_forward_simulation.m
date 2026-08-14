@@ -1,22 +1,27 @@
-% --- Zeffiro documentation header ---
-% try — Try.
+%ZEF_RUN_FORWARD_SIMULATION  Mesh-tool "Run script": eval the selected table Script cell.
 %
-% Purpose:
-%   Try.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.forward_simulation_selected (read)
-%   zef.h_forward_simulation_table (read)
+%   Script (not a function). Bound to Mesh tool button h_run_forward_simulation
+%   ("Run script"). Evaluates
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
+%     zef.h_forward_simulation_table.Data{zef.forward_simulation_selected(1), 3}
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `try` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   that is, column 3 (Script) of the currently selected row. The table is
+%   loaded from profile/<profile_name>/zeffiro_forward_simulation.ini
+%   (Name, Description, Script). Default head profiles call wrappers such as
+%   zef_eeg_lead_field_isotropic; asteroid profiles call gravity scripts.
+%
+%   On error, zef_delete_waitbar is attempted so a failed FEM waitbar does not
+%   linger, then the original exception is rethrown.
+%
+%   Side effects: whatever the Script cell does (typically writes zef.L in the
+%   base workspace). This file does not set lead_field_type itself.
+%
+%   See also zef_mesh_tool, zef_lead_field_matrix, zef_eeg_lead_field_isotropic.
 
 try
     eval(zef.h_forward_simulation_table.Data{zef.forward_simulation_selected(1),3});

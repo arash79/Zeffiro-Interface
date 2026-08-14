@@ -1,40 +1,47 @@
-# tools/plugins/RAMUSInversion
+# RAMUSInversion
 
-## Purpose of this folder
+RAMUS (randomized multiresolution source space) hierarchical Bayes: IAS-style updates on several sparse coarsenings of the source grid, then combine. Use it for focal sources when single-resolution IAS is too smooth.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+This plugin does **not** construct `inverse.RAMUSInverter`. Class id `ramus` (and `legacy_ramus`) is a separate `zef_inverse_run` track. The class path still needs a multiresolution decomposition (`zef_make_multires_dec`) first.
 
-## Contents
+## Menu
 
-Subfolders:
-- `m/`
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **RAMUS Inversion** |
+| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
 
-## How this folder fits into the overall workflow
+INI callback: `zef_ramus_inversion_tool`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Window title: `ZEFFIRO Interface: RAMUS Inversion`.
 
-## GUI usage
+## Run the solver
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+**Start** (`zef.h_ramus_start`) Callback:
 
-## Programmatic usage
+```matlab
+zef_update_ramus_inversion_tool; [zef.reconstruction, zef.reconstruction_information] = zef_ramus_iteration(zef);
+```
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+**Create multiresolution decomposition** (`zef.h_ramus_make_multires_dec`) builds `zef.ramus_multires_dec` / `_ind` / `_count` via `zef_make_multires_dec` — run that before Start if those fields are empty.
 
-## Examples
+Each frame runs IAS MAP on every pair `(decomposition, level)`. Coarse lead-field columns are `L(:, mr_dec)` (xyz stacked when direction mode is 1 or 2). After `n_iter(j)` IAS steps the coarse `z` is scattered back with `mr_ind` and **summed**. The frame is then divided by `n_multires * n_decompositions * sum(sparsity_factor.^[0:n_multires-1])`. A level with `n_iter(j)==0` contributes zeros and zeros that level’s weight. `ramus_init_guess_mode == 2` (or the first decomposition) rebuilds `θ` from the hyperprior; otherwise `θ` is indexed from the previous coarsening.
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+## Needs
 
-## Dependencies and assumptions
+- `zef.L`, interpolation, `zef.source_direction_mode`
+- `zef.measurements`
+- SNR: `zef.ramus_snr` → `10^(-ramus_snr/20)`
+- Frames: `zef.ramus_number_of_frames`, `ramus_time_*`, `ramus_sampling_frequency`, band edges (solver copies them onto `zef.inv_*`)
+- Multires: `zef.ramus_multires_n_levels`, `ramus_multires_sparsity`, `ramus_multires_n_decompositions`, `ramus_multires_n_iter`
+- Hyperprior: `zef.ramus_hyperprior` plus `zef.inv_prior_over_measurement_db`
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## Writes
 
-## Notes for developers
+- `zef.reconstruction` after post-process / peak-norm
+- `zef.reconstruction_information` with tag `RAMUS`
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## Files
+
+- Start: `m/zef_ramus_inversion_tool.m` → `zef_ramus_window`
+- Solver: `m/zef_ramus_iteration.m`

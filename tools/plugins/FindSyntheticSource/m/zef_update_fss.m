@@ -1,42 +1,19 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_update_fss(zef)
-% --- Zeffiro documentation header ---
-% zef_update_fss — Syncs GUI control values into `zef` for fss.
+%ZEF_UPDATE_FSS  Pack synth_source_data parameters into inv_synth_source and pulse cells.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for fss.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_update_fss(zef)
 %
-% Outputs:
-%   zef
+%   Called before create-data / plot / time-sequence. If plot_switch==1,
+%   only selected_source rows; else all. Columns 1–8,15–16 →
+%   inv_synth_source; 9–14 → sampling/pulse/oscillation cells.
+%   Skips work when synth_source_updated_true. nargin 0 → base zef.
 %
-% Zef fields (observed):
-%   zef.find_synth_source (read)
-%   zef.inv_oscillation_frequency (read, write)
-%   zef.inv_oscillation_phase (read, write)
-%   zef.inv_pulse_amplitude (read, write)
-%   zef.inv_pulse_length (read, write)
-%   zef.inv_pulse_peak_time (read, write)
-%   zef.inv_synth_sampling_frequency (read, write)
-%   zef.inv_synth_source (read, write)
-%   zef.synth_source_data (read)
-%   zef.synth_source_updated_true (read, write)
-%
-% Calls (project):
-%   zef_update_fss
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_update_fss(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_find_source, add_synthetic_source.
 
 if nargin == 0
     zef = evalin('base','zef');

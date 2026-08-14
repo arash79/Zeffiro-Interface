@@ -1,40 +1,24 @@
-% --- Zeffiro documentation header ---
-% zef_data = zef_additional_options_app; — Zef data = zef additional options app;.
+%ZEF_ADDITIONAL_OPTIONS  Script: open the legacy Options App Designer window.
 %
-% Purpose:
-%   Zef data = zef additional options app;.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.additional_options_current_size (read, write)
-%   zef.colormap_size (read)
-%   zef.colortune_param (read)
-%   zef.cone_alpha (read)
-%   zef.cone_lattice_resolution (read)
-%   zef.cone_scale (read)
-%   zef.fieldnames (read, write)
-%   zef.font_size (read)
-%   zef.gpu_num (read)
-%   zef.h_additional_options (read)
-%   zef.h_as_opt_1 (read)
-%   zef.h_as_opt_2 (read)
-%   zef.h_as_opt_3 (read)
-%   zef.h_as_opt_4 (read)
-%   zef.h_as_opt_5 (read)
-%   … (56 more)
+%   Script, not a function. Instantiates zef_additional_options_app,
+%   copies its fields onto zef, and sets ValueChangedFcn to
+%   zef_update_options. Fills preconditioner, smoothing, GPU, hyperprior,
+%   source_model, parcellation, colormap, streamline, and mesh-labeling
+%   controls from the matching zef fields. Window Name is
+%   'ZEFFIRO Interface: Options'. Plot-hyperprior button is
+%   zef_plot_hyperprior. SizeChangedFcn is zef_change_size_function.
 %
-% Calls (project):
-%   core.types.ZefSourceModel.from
-%   zef_change_size_function
+%   No first-party callers. Settings → Forward and inverse processing
+%   options runs zef_open_forward_and_inverse_options instead (that
+%   script uses zef_forward_and_inverse_processing_options and
+%   zef_update_forward_and_inverse_options).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_data = zef_additional_options_app;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_open_forward_and_inverse_options, zef_update_options.
 zef_data = zef_additional_options_app;
 
 zef.fieldnames = fieldnames(zef_data);

@@ -1,40 +1,23 @@
-% ZEF_FIND_SYNTHETIC_EIT_DATA  Open and initialize the Find synthetic EIT data tool GUI.
+%ZEF_FIND_SYNTHETIC_EIT_DATA  Open the Find synthetic EIT data figure.
 %
-% Loads the figure template from fig/tools/zef_find_synthetic_eit_data.fig
-% (with fig/ on the MATLAB path), sets the window title and font scaling,
-% runs the tool-specific initializer, and brings key controls to the front.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% The GUI is used to define synthetic EIT (electrical impedance tomography)
-% data: ROI spheres, perturbation settings, and options to compute and plot
-% the synthetic data.
+%   Script (not a function). Unused from menus: Forward tools →
+%   **Generate synthetic EIT data** is wired to find_synthetic_eit_data
+%   (no first-party .m of that name). This script is the opener for
+%   assets/fig/tools/zef_find_synthetic_eit_data.fig. Call it as
+%   zef_find_synthetic_eit_data with zef in the workspace.
 %
-% Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-% See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if ismac — If ismac.
+%   Opens the fig into zef.h_find_synthetic_source (mac/pc/else branches
+%   are identical), sets Name to "ZEFFIRO Interface: Find synthetic EIT
+%   data", scales FontSize to zef.font_size, runs
+%   zef_init_find_synthetic_eit_data, and uistacks ROI / compute / plot
+%   controls to the top.
 %
-% Purpose:
-%   If ismac.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_find_synthetic_source (read, write)
-%   zef.h_inv_compute_data (read)
-%   zef.h_inv_plot_roi (read)
-%   zef.h_inv_roi_perturbation (read)
-%   zef.h_inv_roi_sphere_1 (read)
-%   zef.h_inv_roi_sphere_2 (read)
-%   zef.h_inv_roi_sphere_3 (read)
-%   zef.h_inv_roi_sphere_4 (read)
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if ismac` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_init_find_synthetic_eit_data, zef_update_find_synthetic_eit_data.
 
 % Load the .fig template from fig/tools/ (path added at startup in zeffiro_interface.m).
 

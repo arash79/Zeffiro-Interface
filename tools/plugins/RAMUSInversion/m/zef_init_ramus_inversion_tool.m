@@ -1,39 +1,14 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'ramus_multires_dec')); — If not(isfield(zef,'ramus multires dec'));.
+%ZEF_INIT_RAMUS_INVERSION_TOOL  Default ramus_multires_* fields onto RAMUS widgets.
 %
-% Purpose:
-%   If not(isfield(zef,'ramus multires dec'));.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_ramus_high_cut_frequency (read)
-%   zef.h_ramus_hyperprior (read)
-%   zef.h_ramus_init_guess_mode (read)
-%   zef.h_ramus_low_cut_frequency (read)
-%   zef.h_ramus_multires_n_decompositions (read)
-%   zef.h_ramus_multires_n_iter (read)
-%   zef.h_ramus_multires_n_levels (read)
-%   zef.h_ramus_multires_sparsity (read)
-%   zef.h_ramus_normalize_data (read)
-%   zef.h_ramus_number_of_frames (read)
-%   zef.h_ramus_sampling_frequency (read)
-%   zef.h_ramus_snr (read)
-%   zef.h_ramus_time_1 (read)
-%   zef.h_ramus_time_2 (read)
-%   zef.h_ramus_time_3 (read)
-%   … (30 more)
+%   Script. Called from zef_ramus_window. Defaults n_decompositions=20,
+%   empty dec/ind/count. Does not invert (Start → zef_ramus_iteration).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'ramus_multires_dec'));` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_ramus_inversion_tool, zef_ramus_window.
 
 if not(isfield(zef,'ramus_multires_dec'));
     zef.ramus_multires_dec = [];
@@ -93,7 +68,8 @@ zef.ramus_number_of_frames = zef.number_of_frames;
 
 zef.ramus_snr = zef.inv_snr;
 
-set(zef.h_ramus_multires_n_levels ,'string',num2str(zef.ramus_multires_n_levels));
+set(zef.h_ramus_multires_n_levels ,'string',num2str(zef.ramus_multires_n_levels)
+);
 set(zef.h_ramus_multires_n_decompositions ,'string',num2str(zef.ramus_multires_n_decompositions));
 set(zef.h_ramus_multires_sparsity,'string',num2str(zef.ramus_multires_sparsity));
 set(zef.h_ramus_snr,'string',num2str(zef.ramus_snr));

@@ -1,20 +1,15 @@
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'strip_struct')) — If not(isfield(zef,'strip struct')).
+%ZEF_DBS_STRIP_STRUCT_INIT  Default two-probe center_point/dir_vec onto edits.
 %
-% Purpose:
-%   If not(isfield(zef,'strip struct')).
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.strip_struct (read, write)
+%   Script. Needs workspace zef and strip_struct.h_center_point* /
+%   h_dir_vec* handles. Defaults center_point [0 0 0; 0 0 0], dir_vec
+%   [0 0 1; 0 0 1], strip_type=1, probe_num=1.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'strip_struct'))` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_DBS_strip_struct_update, zef_DBS_strip_struct_start.
 
 if not(isfield(zef,'strip_struct'))
 zef.strip_struct = struct;

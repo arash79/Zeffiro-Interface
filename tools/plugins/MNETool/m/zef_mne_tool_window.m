@@ -1,48 +1,18 @@
 function zef = zef_mne_tool_window(zef)
-% --- Zeffiro documentation header ---
-% zef_mne_tool_window — Zef mne tool window.
+%ZEF_MNE_TOOL_WINDOW  GUIDE figure dump: Minimum norm estimate tool widgets.
 %
-% Purpose:
-%   Zef mne tool window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_mne_tool_window(zef)
 %
-% Outputs:
-%   zef
+%   Builds figure1 and stores handles h_mne_type, h_mne_prior,
+%   h_mne_start, … on zef. Layout only; zef_mne_tool_start names the
+%   window and runs zef_init_mne. Sibling dump: zef_mne_tool_export.
 %
-% Zef fields (observed):
-%   zef.h_mne_apply (read, write)
-%   zef.h_mne_cancel (read, write)
-%   zef.h_mne_high_cut_frequency (read, write)
-%   zef.h_mne_low_cut_frequency (read, write)
-%   zef.h_mne_map_estimation (read)
-%   zef.h_mne_normalize_data (read, write)
-%   zef.h_mne_number_of_frames (read, write)
-%   zef.h_mne_prior (read, write)
-%   zef.h_mne_sampling_frequency (read, write)
-%   zef.h_mne_start (read, write)
-%   zef.h_mne_time_1 (read, write)
-%   zef.h_mne_time_2 (read, write)
-%   zef.h_mne_time_3 (read, write)
-%   zef.h_mne_type (read, write)
-%   zef.h_zef_mne_tool (read, write)
-%   … (12 more)
-%
-% Calls (project):
-%   zef_find_mne_reconstruction
-%   zef_mne_tool_window
-%
-% Side effects:
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_mne_tool_window(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_mne_tool_start, zef_mne_tool_export.
 
 h1 = figure(...
     'PaperUnits',get(0,'defaultfigurePaperUnits'),...
@@ -79,7 +49,7 @@ h1 = figure(...
     'DeleteFcn',blanks(0),...
     'Tag','figure1',...
     'UserData',[],...
-    'WindowStyle',get(0,'defaultfigureWindowStyle'),...
+    'WindowStyle','normal',......
     'DockControls',get(0,'defaultfigureDockControls'),...
     'Resize',get(0,'defaultfigureResize'),...
     'PaperPosition',get(0,'defaultfigurePaperPosition'),...

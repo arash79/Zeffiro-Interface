@@ -1,5 +1,18 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
+function [fa_sources, v1_sources] = zef_dti_interpolate_to_sources(zef, source_positions)
+%ZEF_DTI_INTERPOLATE_TO_SOURCES  Trilinear FA and v1 from the DTI volume onto source_positions.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   [fa_sources, v1_sources] = zef_dti_interpolate_to_sources(zef, source_positions)
+%
+%   Called from zef_dti_structural_Q on the legacy Kalman plugin path only
+%   (not inverse.KalmanInverter). Reads zef.freesurfer_fa_data, optional
+%   zef.freesurfer_v1_data, and the mesh-to-voxel affine.
+%
+
 %
 %ZEF_DTI_INTERPOLATE_TO_SOURCES
 %
@@ -36,42 +49,7 @@
 %
 %See also: zef_dti_get_mesh2voxel, zef_dti_fa_covariance,
 %          zef_dti_tractography_covariance
-
-function [fa_sources, v1_sources] = zef_dti_interpolate_to_sources(zef, source_positions)
-% --- Zeffiro documentation header ---
-% zef_dti_interpolate_to_sources — Zef dti interpolate to sources.
 %
-% Purpose:
-%   Zef dti interpolate to sources.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Inputs:
-%   zef
-%   source_positions
-%
-% Outputs:
-%   fa_sources
-%   v1_sources
-%
-% Zef fields (observed):
-%   zef.freesurfer_fa_data (read)
-%   zef.freesurfer_fa_info (read)
-%   zef.freesurfer_v1_data (read)
-%
-% Calls (project):
-%   zef_dti_get_mesh2voxel
-%   zef_dti_interpolate_to_sources
-%   zef_freesurfer_load_fa
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[fa_sources, v1_sources]] = zef_dti_interpolate_to_sources(zef, source_positions)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
 arguments
     zef (1,1) struct
     source_positions (:,3) double

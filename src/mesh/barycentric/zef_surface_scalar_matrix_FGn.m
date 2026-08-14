@@ -1,30 +1,17 @@
 function M = zef_surface_scalar_matrix_FGn(nodes,tetra,g_i_ind,n_ind,scalar_field)
-% --- Zeffiro documentation header ---
-% zef_surface_scalar_matrix_FGn — Zef surface scalar matrix FGn.
+%ZEF_SURFACE_SCALAR_MATRIX_FGN  Surface F·G·n with weight 1/3.
 %
-% Purpose:
-%   Zef surface scalar matrix FGn.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   g_i_ind
-%   n_ind
-%   scalar_field
+%   Wrapper → zef_surface_scalar_matrix_Dn. Only appears in commented NSE
+%   lines (zef_nse_poisson_dynamic).
 %
-% Outputs:
-%   M
+%   M = zef_surface_scalar_matrix_FGn(nodes, tetra, g_i_ind, n_ind, scalar_field)
 %
-% Calls (project):
-%   zef_barycentric_weighting
-%   zef_surface_scalar_matrix_Dn
-%   zef_surface_scalar_matrix_FGn
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_surface_scalar_matrix_FGn(nodes, tetra, g_i_ind, n_ind, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_surface_scalar_matrix_Dn.
 
 weighting = zef_barycentric_weighting('surface_FG');
 M = zef_surface_scalar_matrix_Dn(nodes, tetra, g_i_ind, n_ind, scalar_field, weighting);

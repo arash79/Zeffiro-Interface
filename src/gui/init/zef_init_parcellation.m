@@ -1,40 +1,17 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'parcellation_name')); — If not(isfield(zef,'parcellation name'));.
+%ZEF_INIT_PARCELLATION  Parcellation-tool defaults and time-series tool list (script).
 %
-% Purpose:
-%   If not(isfield(zef,'parcellation name'));.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field (read, write)
-%   zef.parcellation_colortable (read, write)
-%   zef.parcellation_merge (read, write)
-%   zef.parcellation_name (read, write)
-%   zef.parcellation_plot_type (read, write)
-%   zef.parcellation_points (read, write)
-%   zef.parcellation_roi_center (read, write)
-%   zef.parcellation_roi_color (read, write)
-%   zef.parcellation_roi_name (read)
-%   zef.parcellation_roi_radius (read, write)
-%   zef.parcellation_roi_selected (read, write)
-%   zef.parcellation_segment (read, write)
-%   zef.parcellation_time_series_mode (read, write)
-%   zef.time_series_tools_dir (read, write)
-%   zef.time_series_tools_file_list (read, write)
-%   … (2 more)
+%   Script. Missing-field defaults (name, plot type, colortable, ROI
+%   name/center/radius/color, merge, use_parcellation). Then dir() of
+%   the folder that contains zef_time_series_plot.m. List labels are the
+%   help text after "Description:" (chars 13:end-1). Without that marker
+%   the Parcellation tool list entry is empty. Does not open the tool.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'parcellation_name'));` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
+%   See also zef_update_parcellation, zef_plot_parcellation_time_series.
 if not(isfield(zef,'parcellation_name'));
     zef.parcellation_name = '';
 end;
@@ -102,6 +79,7 @@ end
 zef.time_series_tools_file_list = setdiff(zef.time_series_tools_file_list,[{'.'} {''}]);
 for zef_i = 1 : length(zef.time_series_tools_file_list)
     zef.aux_field = help(zef.time_series_tools_file_list{zef_i});
+    % Label is the rest of the help after "Description:" (see file H1 blocks).
     zef.aux_field = zef.aux_field(strfind(zef.aux_field,'Description:'):end);
     zef.time_series_tools_name_list{zef_i} = strtrim(zef.aux_field(13:end-1));
 end

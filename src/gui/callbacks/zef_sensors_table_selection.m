@@ -1,43 +1,26 @@
 function zef_sensors_table_selection(hObject,eventdata,handles)
-% --- Zeffiro documentation header ---
-% zef_sensors_table_selection — Zef sensors table selection.
+%ZEF_SENSORS_TABLE_SELECTION  CellSelectionCallback for the Sensor sets UITable.
 %
-% Purpose:
-%   Zef sensors table selection.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   hObject
-%   eventdata
-%   handles
+%   Wired from zef_segmentation_tool onto h_sensors_table. Unlike the
+%   compartment table, sensor-set rows match zef.sensor_tags in the same
+%   order (zef_build_sensors_table). evalin('base',...).
 %
-% Outputs:
-%   See function signature and code below.
+%   Sets zef.current_sensors and zef.current_tag to sensor_tags{row},
+%   zef.imaging_method from imaging_method_cell vs that set's
+%   _imaging_method_name, clears h_parameters_table, then run zef_update,
+%   zef_init_transform, zef_init_sensors_name_table. Unique selected row
+%   indices go to zef.sensor_sets_selected for **Delete sensor set(s)**.
 %
-% Zef fields (observed):
-%   zef.current_sensors (read, write)
-%   zef.current_tag (read, write)
-%   zef.default_impedance_value (read)
-%   zef.h_parameters_table (read)
-%   zef.imaging_method (read, write)
-%   zef.imaging_method_cell (read)
-%   zef.sensor_sets_selected (read, write)
-%   zef.sensor_tags (read)
-%   zef.use_cem (read)
-%   zef.use_depth_electrodes (read)
+%   Inputs (MATLAB UITable CellSelectionCallback)
+%     hObject, handles  - unused.
+%     eventdata.Indices - N-by-2 [row, column] of the selection.
 %
-% Calls (project):
-%   zef_sensors_table_selection
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `zef_sensors_table_selection(hObject, eventdata, handles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_delete_sensor_sets, zef_add_sensors.
 
 sensors_selected = eventdata.Indices(1);
 sensor_tags = evalin('base','zef.sensor_tags');

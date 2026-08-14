@@ -1,34 +1,20 @@
 function zef_nse_plot_pulse(zef,nse_field,type)
-% --- Zeffiro documentation header ---
-% zef_nse_plot_pulse — Zef nse plot pulse.
-%
-% Purpose:
-%   Zef nse plot pulse.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
-%
-% Inputs:
-%   zef
-%   nse_field
-%   type
-%
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%
-% Calls (project):
-%   zef_nse_plot_pulse
-%   zef_nse_signal_pulse
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_nse_plot_pulse(zef, nse_field, type)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%ZEF_NSE_PLOT_PULSE  Plot the NSE pulse on zef.h_axes1 (NSE tool).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   type 'single_pulse' (default): one cycle_length. 'full_data':
+%   0:time_step_length:time_length. Calls zef_nse_signal_pulse.
+%
+%   zef_nse_plot_pulse(zef, nse_field, type)
+%
+%   See also zef_nse_signal_pulse.
 
 if nargin < 3
     type = 'single_pulse';

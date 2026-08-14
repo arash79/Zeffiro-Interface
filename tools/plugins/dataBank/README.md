@@ -1,59 +1,36 @@
-# tools/plugins/dataBank
+# Data Bank
 
-## Purpose of this folder
+A tree of named snapshots (lead field, measurements, noise, reconstruction, GMM, custom, import). Use it to keep several `L` / data sets in one project and load one back onto `zef`, or combine selected lead fields into the current `zef.L` / `zef.measurements`.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+**Combine** does **not** use the tree selection. First **Modify** selected nodes into the working-hash table (`zef.dataBank.workingHashes`), then Combine stacks those hashes. Combine menu `Value` is `'frobenius'` (default, `||L||_F / n_sensors`), `'fuchs'` (`diag(std(y))` on the time window), or `'whitening'` (`chol(cov(y))`). After stacking, `L` and `y` are rescaled so `max|L|` matches the pre-stack maximum.
 
-## Contents
+MATLAB dispatches Combine by **filename** `zef_dataBank_combineLeadFields.m`; the `function` line inside is `zef_dataBank_combineLeadFieLds`. Tree selection uses filename `zef_dataBank_getHashForMenu.m` with in-file name `zef_dataBank_getHasForMenu`. Callers use the filenames. Do not patch those names.
 
-Subfolders:
-- `m/`
+## How to open it
 
-MATLAB sources:
-- `zef_open_dataBank.m` — **zef_open_dataBank**: Opens the databank options dialog.
-- `zef_start_dataBank.m` — **zef_start_dataBank**: Zef start data Bank.
+**Multi tools → Data Bank** (default profile). Callback: `zef_start_dataBank` → `zef_tool_start(..., 'zef_open_dataBank', ...)`.
 
-Other files:
-- `zef_dataBank_app.mlapp`
-- `zef_dataBank_nameChange_app.mlapp`
+## Buttons (`ButtonPushedFcn` in `zef_open_dataBank.m`)
 
-## How this folder fits into the overall workflow
+| Control | Action |
+|---------|--------|
+| **Add** | `zef_dataBank_addButtonPress` — snapshot `zef` fields matching Entry type onto the selected tree node (`zef_dataBank_getData`) |
+| **Combine** | `[zef.L, zef.measurements] = zef_dataBank_combineLeadFields(...)` on **working hashes** (not the tree highlight), plus combine menu, start/end time, sampling frequency |
+| **Show** / **Show current** | fill the tables from the tree / from live `zef` |
+| **Refresh** | `zef_dataBank_refreshTree` |
+| **Select folder** | disk folder for optional save-to-disk |
+| **Import** / **Export** | node file I/O |
+| **Show working hashes** | working-space table |
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Tree context menu: Load, Load with parents (`zef_dataBank_setData` → copies stored fields onto `zef`), Delete, Modify (hash → working space), Change name. Entry types: `data`, `noisedata`, `leadfield`, `reconstruction`, `gmm`, `custom`, `import`.
 
-## GUI usage
+Optional `zef.dataBank.save2disk` writes node payloads next to `zef.dataBank.folder`.
 
-- **zef_open_dataBank**: GUI callback or dialog (`zef_open_dataBank`).
-
-## Programmatic usage
-
-From the project root:
+## Scripting
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+zef = zef_start_dataBank(zef);
+% after selecting a node:
+zef.dataBank.loadParents = false;
+zef_dataBank_setData;
 ```
-
-Representative entry points in this folder:
-- ``[zef] = zef_open_dataBank(zef)` with project root and `src` on the path.`
-- ``[zef] = zef_start_dataBank(zef)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

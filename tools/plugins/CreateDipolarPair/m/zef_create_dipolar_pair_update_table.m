@@ -1,32 +1,13 @@
-% --- Zeffiro documentation header ---
-% zef.h_create_dipolar_pair_table — Zef.h create dipolar pair table.
+%ZEF_CREATE_DIPOLAR_PAIR_UPDATE_TABLE  zef.create_dipolar_pair_* → the parameter table.
 %
-% Purpose:
-%   Zef.h create dipolar pair table.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.create_dipolar_pair_color (read)
-%   zef.create_dipolar_pair_impedance (read)
-%   zef.create_dipolar_pair_length (read)
-%   zef.create_dipolar_pair_ori_x (read)
-%   zef.create_dipolar_pair_ori_y (read)
-%   zef.create_dipolar_pair_ori_z (read)
-%   zef.create_dipolar_pair_separation (read)
-%   zef.create_dipolar_pair_strength (read)
-%   zef.create_dipolar_pair_tag (read)
-%   zef.create_dipolar_pair_x (read)
-%   zef.create_dipolar_pair_y (read)
-%   zef.create_dipolar_pair_z (read)
-%   zef.h_create_dipolar_pair_table (read)
+%   Script. Called from init. Labels plus current numeric/tag values.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.h_create_dipolar_pair_table` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_create_dipolar_pair_init.
 
 zef.h_create_dipolar_pair_table.Data = cell(0);
 zef.h_create_dipolar_pair_table.Data{1,1} = 'x coordinate';

@@ -1,58 +1,21 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,reconstruction_information] = zef_ramus_iteration(zef)
-% --- Zeffiro documentation header ---
-% zef_ramus_iteration — Zef ramus iteration.
+%ZEF_RAMUS_ITERATION  Core iteration loop for RAMUS inverse reconstruction.
 %
-% Purpose:
-%   Zef ramus iteration.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   [z, reconstruction_information] = zef_ramus_iteration(zef)
 %
-% Outputs:
-%   z
-%   reconstruction_information
+%   Called from RAMUS Start (not inverse.RAMUSInverter). Needs zef.L,
+%   measurements, and ramus_multires_* (run Create decomposition first).
+%   Frames: copies ramus_* time/filter fields onto zef.inv_* /
+%   number_of_frames. SNR: zef.ramus_snr (dB) → 10^(-ramus_snr/20).
+%   Returns post-processed z and reconstruction_information (tag RAMUS).
 %
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.inv_amplitude_db (read)
-%   zef.inv_high_cut_frequency (read, write)
-%   zef.inv_hyperprior (read)
-%   zef.inv_hyperprior_tail_length_db (read)
-%   zef.inv_hyperprior_weight (read)
-%   zef.inv_low_cut_frequency (read, write)
-%   zef.inv_prior_over_measurement_db (read)
-%   zef.inv_sampling_frequency (read, write)
-%   zef.number_of_frames (read, write)
-%   zef.ramus_high_cut_frequency (read)
-%   zef.ramus_hyperprior (read)
-%   zef.ramus_init_guess_mode (read)
-%   zef.ramus_low_cut_frequency (read)
-%   zef.ramus_multires_count (read)
-%   … (18 more)
+%   See also zef_ramus_inversion_tool, zef_ramus_window.
 %
-% Calls (project):
-%   zef_find_g_hyperprior
-%   zef_find_ig_hyperprior
-%   zef_getFilteredData
-%   zef_getTimeStep
-%   zef_normalizeInverseReconstruction
-%   zef_postProcessInverse
-%   zef_processLeadfields
-%   zef_ramus_iteration
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z, reconstruction_information]] = zef_ramus_iteration(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 h = zef_waitbar([0 0 0], [1 1 1],['RAMUS iteration.']);
 [s_ind_1] = unique(eval('zef.source_interpolation_ind{1}'));
@@ -146,6 +109,8 @@ for f_ind = 1 : zef.number_of_frames
     iter_ind = 0;
     source_count_aux = 0;
 
+    % Nested loops: n_decompositions × n_multires levels; IAS MAP on each
+    % coarsened lead-field block, then average into z_vec_aux.
     for n_rep = 1 : n_decompositions
 
         for j = 1 : n_multires
@@ -168,6 +133,9 @@ for f_ind = 1 : zef.number_of_frames
                 mr_ind = mr_ind(:);
             end
 
+            % Coarsen L to this decomposition/level: mr_dec indexes columns
+            % of L_aux (xyz stacked when direction_mode is 1 or 2). IAS MAP
+            % n_iter(j) times on L_aux_2, then scatter back with mr_ind.
             if n_iter(j) > 0
                 L_aux_2 = L_aux(:,mr_dec);
                 if source_count_aux == 0

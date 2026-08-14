@@ -1,30 +1,19 @@
 function M = zef_surface_scalar_matrix_n(nodes, tetra, n_ind, scalar_field, weighting)
-% --- Zeffiro documentation header ---
-% zef_surface_scalar_matrix_n — Zef surface scalar matrix n.
+%ZEF_SURFACE_SCALAR_MATRIX_N  Boundary mass times unit-normal component n_ind.
 %
-% Purpose:
-%   Zef surface scalar matrix n.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   n_ind
-%   scalar_field
-%   weighting
+%   n = −∇ψ_f / ||∇ψ_f|| on each skin face (outward relative to the
+%   opposite vertex). All 3×3 face vertex pairs are accumulated (not
+%   symmetrized). Wrapper FFn is unused; NSE uses the vector form
+%   zef_surface_scalar_vector_Fn instead.
 %
-% Outputs:
-%   M
+%   M = zef_surface_scalar_matrix_n(nodes, tetra, n_ind, scalar_field, weighting)
 %
-% Calls (project):
-%   zef_surface_mesh
-%   zef_surface_scalar_matrix_n
-%   zef_volume_barycentric
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_surface_scalar_matrix_n(nodes, tetra, n_ind, scalar_field, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_surface_scalar_matrix_FFn, zef_surface_mesh.
 
 ind_m = [ 2 4 3 ;
     1 3 4 ;

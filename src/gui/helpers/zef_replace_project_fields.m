@@ -1,27 +1,16 @@
-% --- Zeffiro documentation header ---
-% if zef.current_version <= 2 — If zef.current version <= 2.
+%ZEF_REPLACE_PROJECT_FIELDS  Rename legacy project fields after load (script).
 %
-% Purpose:
-%   If zef.current version <= 2.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.active_compartment_ind (read, write)
-%   zef.brain_ind (read)
-%   zef.current_version (read)
-%   zef.d (read)
-%   zef.domain_labels (read, write)
-%   zef.domain_labels_raw (read, write)
-%   zef.sigma (read)
-%   zef.sigma_ind (read)
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if zef.current_version <= 2` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   Script on zef in the caller workspace.
+%     current_version <= 2.2: d1..d22_priority = 27..6
+%     current_version < 4: active_compartment_ind from brain_ind;
+%       domain_labels_raw from sigma_ind; domain_labels from sigma(:,2);
+%       drop nodes_b and tetra_aux if present
+%   Called from the project-load path so old .mat files match current names.
 
 if zef.current_version <= 2.2
     for zef_i = 1 : 22

@@ -1,45 +1,26 @@
 function zef = zef_eeg_lead_field_isotropic(zef)
-% --- Zeffiro documentation header ---
-% zef_eeg_lead_field_isotropic — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Inputs:
-%   zef
-%
-% Outputs:
-%   zef
-%
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.imaging_method (read, write)
-%   zef.lead_field_filter_quantile (read)
-%   zef.lead_field_type (read, write)
-%   zef.sensors (read)
-%   zef.sensors_attached_volume (read, write)
-%   zef.source_directions (read)
-%   zef.source_interpolation_on (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   zef_attach_sensors_volume
-%   zef_eeg_lead_field_isotropic
-%   zef_lead_field_filter
-%   zef_lead_field_matrix
-%   zef_process_meshes
-%   zef_source_interpolation
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_eeg_lead_field_isotropic(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%ZEF_EEG_LEAD_FIELD_ISOTROPIC  EEG isotropic lead field (type 1); default Mesh-tool Script.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   This is the Script cell in profile/multicompartment_head/zeffiro_forward_simulation.ini
+%   ("EEG lead field with isotropic electrical conductivity"). Mesh tool →
+%   Run script evals this name. Requires an existing FEM mesh and zef.sensors;
+%   uses zef.sigma(:,1). Same body as zef_eeg_lead_field.
+%
+%   zef = zef_eeg_lead_field_isotropic(zef)
+%
+%   Input / output
+%     zef  - session struct. If omitted, read from base; if nargout is 0,
+%            assigned back to base.
+%
+%   See also zef_lead_field_matrix, zef_run_forward_simulation, zef_eeg_lead_field_anisotropic.
 
 if nargin == 0
     zef = evalin('base','zef');

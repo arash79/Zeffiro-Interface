@@ -1,21 +1,16 @@
-% --- Zeffiro documentation header ---
-% zeffiro_interface — Zeffiro interface.
+%ZEF_SAVE_SYSTEM_SETTINGS  Persist system settings table to profile INI.
 %
-% Purpose:
-%   Zeffiro interface.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_system_settings_table (read)
+%   Writes zef.h_system_settings_table.Data to
+%   profile/zeffiro_interface.ini under zef.program_path, then copies each
+%   row's value onto the matching zef field in the base workspace via
+%   evalin.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Primary startup: paths, `zef` struct, optional CLI import/save/export.
-%   Programmatic: Call `zeffiro_interface` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_save_plugin_settings, zef_apply_system_settings.
 
 writecell(zef.h_system_settings_table.Data,[zef.program_path '/profile/zeffiro_interface.ini'],'FileType','text');
 for zef_i = 1 : size(zef.h_system_settings_table.Data,1)

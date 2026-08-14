@@ -1,33 +1,18 @@
 function [P_s_store, m_s_store, G_store] = RTS_smoother_normal2standardized(P_store, z_inverse, A, Q, H, R, standardization_exponent, number_of_frames)
-% --- Zeffiro documentation header ---
-% RTS_smoother_normal2standardized — RTS smoother normal2standardized.
+%RTS_SMOOTHER_NORMAL2STANDARDIZED  RTS then sLORETA-weight the smoothed mean with H, R.
 %
-% Purpose:
-%   RTS smoother normal2standardized.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   P_store
-%   z_inverse
-%   A
-%   Q
-%   H
-%   R
-%   standardization_exponent
-%   number_of_frames
+%   [P_s_store, m_s_store, G_store] = RTS_smoother_normal2standardized(P_store, z_inverse, A, Q, H, R, standardization_exponent, number_of_frames)
 %
-% Outputs:
-%   P_s_store
-%   m_s_store
-%   G_store
+%   Not called from zef_KF. After each backward step, builds w_t from sqrtm
+%   of the RTS residual covariance (P - G*P_*G') and H, R.
 %
-% Calls (project):
-%   zef_waitbar
+%   See also RTS_smoother, kf_sL_update.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[P_s_store, m_s_store, G_store]] = RTS_smoother_normal2standardized(P_store, z_inverse, A, Q, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 P_s_store = cell(0);
 m_s_store = cell(0);

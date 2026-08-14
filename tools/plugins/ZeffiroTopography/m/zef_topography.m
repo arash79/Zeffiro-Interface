@@ -1,48 +1,19 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_topography(zef)
-% --- Zeffiro documentation header ---
-% zef_topography — Zef topography.
+%ZEF_TOPOGRAPHY  Open Forward tools → Topography tool.
 %
-% Purpose:
-%   Zef topography.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Menu callback (label "Topography tool", parent forward_tools).
+%   Builds the window (zef_topography_app), inits from zef.inv_* times/band.
+%   Start button: zef.top_reconstruction = zef_evaluate_topography(zef).
 %
-% Outputs:
-%   zef
+%   zef = zef_topography(zef)
 %
-% Zef fields (observed):
-%   zef.h_top_apply (read)
-%   zef.h_top_cancel (read)
-%   zef.h_top_data_segment (read)
-%   zef.h_top_high_cut_frequency (read)
-%   zef.h_top_low_cut_frequency (read)
-%   zef.h_top_normalize_data (read)
-%   zef.h_top_number_of_frames (read)
-%   zef.h_top_regularization_parameter (read)
-%   zef.h_top_sampling_frequency (read)
-%   zef.h_top_start (read)
-%   zef.h_top_time_1 (read)
-%   zef.h_top_time_2 (read)
-%   zef.h_top_time_3 (read)
-%   zef.h_topography (read)
-%   zef.measurements (read)
+%   See also zef_evaluate_topography, zef_update_topography.
 %
-% Calls (project):
-%   zef_topography
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_topography(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
 zef = evalin('base','zef');

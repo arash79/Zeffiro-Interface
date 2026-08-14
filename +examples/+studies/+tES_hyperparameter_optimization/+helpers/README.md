@@ -1,50 +1,10 @@
-# +examples/+studies/+tES_hyperparameter_optimization/+helpers
+# tES recursive-search helper
 
-## Purpose of this folder
-
-Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
-
-## Contents
-
-MATLAB sources:
-- `zef_ES_centralize_recursive_search.m` — **examples.studies.tES_hyperparameter_optimization.helpers.zef_ES_centralize_recursive_search**: Example or study script demonstrating zef_ES_centralize_recursive_search.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+`zef_ES_centralize_recursive_search` is the only file here. `zef_ES_recursive_search` calls it each pass to shrink the alpha/epsilon lattice about the current best indices `(sr, sc)` and then `zef_ES_find_parameters` rebuilds the grid.
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+[alpha_psi, epsilon_psi] = helpers.zef_ES_centralize_recursive_search( ...
+    alpha, epsilon, sr, sc, original_window, s_alpha, s_epsilon, non_floating_flag)
 ```
 
-Representative entry points in this folder:
-- ``[[alpha_psi, epsilon_psi]] = examples.studies.tES_hyperparameter_optimization.helpers.zef_ES_centralize_recursive_search(alpha, epsilon, sr, sc, …)` with project root and `src` on the path.`
-
-## Examples
-
-Run scripts directly after startup, e.g. `run('+examples/+studies/+tES_hyperparameter_optimization/+helpers/zef_ES_centralize_recursive_search.m')`.
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Eighth argument `0`: allow the window to leave the original `[min,max]` range. Default (omitted or `1`) clamps. `s_alpha` / `s_epsilon` are shrinkage factors from the parent search. Not a GUI button. Parent: [../README.md](../README.md).

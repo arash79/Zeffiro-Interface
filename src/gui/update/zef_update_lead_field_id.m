@@ -1,29 +1,23 @@
 function [lead_field_id,lead_field_id_max] = zef_update_lead_field_id(lead_field_id,lead_field_id_max,varargin)
-% --- Zeffiro documentation header ---
-% zef_update_lead_field_id — Syncs GUI control values into `zef` for lead_field_id.
+%ZEF_UPDATE_LEAD_FIELD_ID  Bump lead-field bank counters (no GUI widget).
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for lead_field_id.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   lead_field_id
-%   lead_field_id_max
-%   varargin
+%   Function. Third argument is the event string (default 'create'):
+%     'create'        — id_max += 1; id = id_max (new lead field)
+%     'bank_oldData'  — id_max += 1 (keep current id)
+%     'bank_apply'    — id_max += 1 (keep current id)
+%     'bank_add' / 'bank_replace' — no change
+%   Otherwise errors. Does not plot or write zef; callers assign the
+%   returned pair.
 %
-% Outputs:
-%   lead_field_id
-%   lead_field_id_max
+%   [id, id_max] = zef_update_lead_field_id(id, id_max)
+%   [id, id_max] = zef_update_lead_field_id(id, id_max, 'create')
 %
-% Calls (project):
-%   zef_update_lead_field_id
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[lead_field_id, lead_field_id_max]] = zef_update_lead_field_id(lead_field_id, lead_field_id_max, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_lead_field_matrix.
 lead_field_event = 'create'; %'' would be better, or lead_field_event instead of varargin
 if not(isempty(varargin))
     lead_field_event = varargin{1};

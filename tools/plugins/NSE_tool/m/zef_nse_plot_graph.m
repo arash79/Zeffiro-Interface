@@ -1,47 +1,21 @@
 function zef_nse_plot_graph(zef, nse_field)
-% --- Zeffiro documentation header ---
-% zef_nse_plot_graph — Zef nse plot graph.
+%ZEF_NSE_PLOT_GRAPH  Plot graph button: switch on nse_field.graph_type (pressure, waves, perfusion, Hb, pulse).
 %
-% Purpose:
-%   Zef nse plot graph.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nse_field
+%   ButtonPushedFcn of h_plot_graph. Draws on zef.h_axes1. graph_type
+%   matches the Items in zef_nse_tool_window (1 pressure full … 23 Hb peak
+%   radius). ROI series use zef_nse_roi_ind on bp_vessels / bv_vessels_* /
+%   mu_vessels / bf_capillaries. Does not write zef.L.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_nse_plot_graph()
+%   zef_nse_plot_graph(zef, nse_field)
 %
-% Zef fields (observed):
-%   zef.domain_labels (read)
-%   zef.mvd_length (read)
-%   zef.nodes (read)
-%   zef.nse_field (read)
-%   zef.tetra (read)
+%   See also zef_nse_plot_full, zef_nse_plot_epoched, zef_nse_separate_waves_roi.
 %
-% Calls (project):
-%   zef_nse_calculate_perfusion
-%   zef_nse_mean_velocity_roi
-%   zef_nse_plot_epoched
-%   zef_nse_plot_full
-%   zef_nse_plot_graph
-%   zef_nse_plot_histogram
-%   zef_nse_plot_signal_pulse
-%   zef_nse_roi_ind
-%   zef_nse_separate_waves_roi
-%   zef_nse_signal_pulse
-%   zef_nse_vel_dir
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_nse_plot_graph(zef, nse_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     zef = evalin('base','zef');
@@ -171,7 +145,8 @@ end
 
 if zef.nse_field.graph_type == 16
 plot_vec = zef_nse_calculate_perfusion(zef.nse_field,zef.nodes,zef.tetra,zef.domain_labels,zef.mvd_length);
-zef_nse_plot_full(zef,zef.nse_field,plot_vec,'Perfusion (ml / min)');
+zef_nse_plot_full(zef,zef.nse_field,plot_vec,'Perfusion (ml / min)
+');
 end
 
 if zef.nse_field.graph_type == 17
@@ -180,6 +155,8 @@ zef_nse_plot_epoched(zef,zef.nse_field,plot_vec,'Perfusion (ml / min)',[]);
 end
 
 if zef.nse_field.graph_type == 18
+% Call order is (zef, nse_field, plot_vec, label); zef_nse_plot_histogram
+% expects (zef, plot_vec, x_label). Left as implemented.
 plot_vec = zef_nse_calculate_perfusion(zef.nse_field,zef.nodes,zef.tetra,zef.domain_labels,zef.mvd_length);
 zef_nse_plot_histogram(zef,zef.nse_field,plot_vec,'Perfusion (ml / min)');
 end

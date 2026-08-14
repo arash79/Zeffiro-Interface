@@ -1,25 +1,17 @@
-% --- Zeffiro documentation header ---
-% function []=zef_callbackstop(src,~) — GUI callback for function []=zefstop(src,~) actions.
-%
-% Purpose:
-%   GUI callback for function []=zefstop(src,~) actions.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Zef fields (observed):
-%   zef.stop_movie (read, write)
-%
-% Calls (project):
-%   zef_callbackstop
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `function []=zef_callbackstop(src,~)` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function []=zef_callbackstop(src,~)
+%ZEF_CALLBACKSTOP  Figure-tool **Stop** togglebutton callback.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   zef_figure_tool sets h_stop_movie Callback to @zef_callbackstop.
+%   When the toggle is on (Value true), writes zef.stop_movie=1 in the
+%   base workspace (zef_play_cdata aborts on that flag) and shows red
+%   'Stopped'. When off, evalin 0; in base and restores black 'Stop'.
+%
+%   See also zef_play_cdata, zef_figure_tool.
 
 
 if ~src.Value

@@ -1,49 +1,21 @@
 %Copyright (c) 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function project_struct = zef_meshing_example ( kwargs )
-% --- Zeffiro documentation header ---
-% examples.meshing.zef_meshing_example — Example or study script demonstrating zef_meshing_example.
+%ZEF_MESHING_EXAMPLE  Nodisplay FEM mesh from the bundled head segmentation.
 %
-% Purpose:
-%   Example or study script demonstrating zef_meshing_example.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   kwargs
+%   project_struct = zef_meshing_example(kwargs)
 %
-% Outputs:
-%   project_struct
+%   Requires data/segmentations/multicompartment_head_project/import_segmentation.zef
+%   (or kwargs.input_project_path). Starts zeffiro_interface with
+%   import_to_existing_project, copy_fields of meshing kwargs, then
+%   zef_create_finite_element_mesh and zef_save to data/meshing_example.mat
+%   (output_project_dir / output_project_file). Default mesh_resolution 4.5.
 %
-% Calls (project):
-%   utilities.structs.copy_fields
-%   zef_create_finite_element_mesh
-%   zef_meshing_example
-%   zef_save
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[project_struct] = examples.meshing.zef_meshing_example(kwargs)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%
-% examples.meshing.zef_meshing_example ( kwargs )
-%
-% This is a code snip to serve as an example for generating the
-% multi-compartment head model accordingly to the paper:
-%
-% "Multi-compartment head modeling in EEG: unstructured boundary-fitted tetra meshing with subcortical structures"
-% https://doi.org/10.48550/arXiv.2203.10000
-%
-% See the wiki page https://github.com/sampsapursiainen/zeffiro_interface/wiki/Finite-Element-Mesh-generation
-% for what the different keyword arguments mean.
-%
-% NOTE: The compartment values for the compartment surfaces being refined (inner-most to outer-most)
-% can be found in the script that was used in importing a segmentation from FreeSurfer:
-% scripts_for_importing/multicompartment_head_project/import_segmentation.zef.
-% Example: [1] = Ventricle, [10] = Cingulate Cortex, [17] = Skull, [18] = Scalp.
-%
-
-% Specify possible input keyword arguments, their restrictions and default values.
 
 arguments
     kwargs.start_mode = "nodisplay"

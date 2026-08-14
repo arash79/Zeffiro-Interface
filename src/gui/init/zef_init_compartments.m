@@ -1,31 +1,17 @@
-% --- Zeffiro documentation header ---
-% zef.h_compartment_table — Zef.h compartment table.
+%ZEF_INIT_COMPARTMENTS  Seed compartments from zeffiro_segmentation.ini (script).
 %
-% Purpose:
-%   Zef.h compartment table.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.compartment_structure_aux (read, write)
-%   zef.compartment_tags (read, write)
-%   zef.compartment_tags_aux (read, write)
-%   zef.compartment_transform_name (read, write)
-%   zef.new_empty_project (read)
-%   zef.profile_name (read)
-%   zef.program_path (read)
-%   zef.segmentation_profile_aux (read, write)
+%   Script. Clears h_compartment_table.Data and compartment_tags. Unless
+%   zef.new_empty_project, reads profile/<profile_name>/zeffiro_segmentation.ini,
+%   finds the compartment_tags row, and zef_create_compartment for each
+%   tag with the other INI rows as field defaults. Does not open a
+%   window (zef_open_segmentation_profile edits the INI).
 %
-% Calls (project):
-%   zef_create_compartment
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.h_compartment_table` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_open_segmentation_profile, zef_create_compartment.
 zef.h_compartment_table.Data = [];
 
 zef.compartment_tags = cell(0);

@@ -1,41 +1,20 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function h_source = zef_plot_source(zef, source_type)
-% --- Zeffiro documentation header ---
-% zef_plot_source — Renders or updates a plot_source figure from current `zef` state.
+%ZEF_PLOT_SOURCE  3-D arrows for legacy synthetic (type 1) or reconstructed dipoles.
 %
-% Purpose:
-%   Renders or updates a plot_source figure from current `zef` state.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   source_type
+%   h_source = zef_plot_source(zef, source_type)
 %
-% Outputs:
-%   h_source
+%   File zef_plot_source_legacy.m; function name zef_plot_source (the
+%   Plot button calls zef_plot_source_legacy). Type 1: inv_synth_source
+%   (visual size/color from row 1, columns 9–10); type 2:
+%   inv_rec_source. Draws on h_axes1 via zef_plot_3D_arrow. Does not
+%   write measurements.
 %
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%   zef.h_rec_source (read)
-%   zef.h_synth_source (read)
-%   zef.inv_rec_source (read)
-%   zef.inv_synth_source (read)
-%
-% Calls (project):
-%   zef_plot_3D_arrow
-%   zef_plot_source
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[h_source] = zef_plot_source(zef, source_type)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_find_source_legacy, zef_update_fss_legacy.
 
 arrow_scale = 1;
 arrow_type = 1;

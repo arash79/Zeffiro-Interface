@@ -1,35 +1,24 @@
 
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 
 
 function zef = zef_minimum_norm_estimation(zef)
-% --- Zeffiro documentation header ---
-% zef_minimum_norm_estimation — Zef minimum norm estimation.
+%ZEF_MINIMUM_NORM_ESTIMATION  Minimum-norm (MNE) inverse mapping plugin.
 %
-% Purpose:
-%   Zef minimum norm estimation.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_minimum_norm_estimation
+%   zef = zef_minimum_norm_estimation(zef)
 %
-% Outputs:
-%   zef
+%   INI callback (Inverse tools → Minimum norm estimation tool). Opens the
+%   MNE window via zef_tool_start → zef_mne_tool_start. Does not invert.
+%   Solver is zef_find_mne_reconstruction (Start in the window dump). Needs
+%   zef.L and zef.measurements already on zef. Does not call inverse.MNEInverter.
 %
-% Calls (project):
-%   zef_minimum_norm_estimation
-%   zef_tool_start
+%   See also zef_mne_tool_start, zef_find_mne_reconstruction.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_minimum_norm_estimation(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     zef = evalin('base','zef');

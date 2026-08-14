@@ -1,28 +1,28 @@
 function M = zef_volume_scalar_matrix(nodes, tetra, scalar_field, weighting)
-% --- Zeffiro documentation header ---
-% zef_volume_scalar_matrix — Zef volume scalar matrix.
+%ZEF_VOLUME_SCALAR_MATRIX  Volume mass matrix ∫ φ ψ_i ψ_j dV (F·F).
 %
-% Purpose:
-%   Zef volume scalar matrix.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   scalar_field
-%   weighting
+%   F = P1 hat on tet vertices. φ is a per-tet scalar (T×1). Default
+%   weighting 1 on every vertex pair; zef_volume_scalar_matrix_FF passes
+%   [1/10 1/20]. NSE uses the FF wrapper for mass C and viscosity M.
 %
-% Outputs:
-%   M
+%   M = zef_volume_scalar_matrix(nodes, tetra, scalar_field, weighting)
 %
-% Calls (project):
-%   zef_volume_barycentric
-%   zef_volume_scalar_matrix
+%   Inputs
+%     nodes         - N×3.
+%     tetra         - T×4.
+%     scalar_field  - T×1, default ones. Multiplies every tet's contribution.
+%     weighting     - scalar (used for both i=j and i≠j) or 1×2
+%                     [w_diag w_off], default 1.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_volume_scalar_matrix(nodes, tetra, scalar_field, weighting)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     M  - N×N sparse. sparse(tetra(:,i),tetra(:,j), φ V w); i≠j adds transpose.
+%
+%   See also zef_volume_scalar_matrix_FF, zef_barycentric_weighting.
 
 N = size(nodes,1);
 K = size(tetra,1);

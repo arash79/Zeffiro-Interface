@@ -1,33 +1,21 @@
 function [x, function_val, flag_val] = zef_cvx_linprog(z,A,b,Aeq,beq,lb,ub,varargin)
-% --- Zeffiro documentation header ---
-% zef_cvx_linprog — Zef cvx linprog.
+%ZEF_CVX_LINPROG  CVX linear program used when ES_opt_solver is SDPT3 or SeDuMi (LP).
 %
-% Purpose:
-%   Zef cvx linprog.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   z
-%   A
-%   b
-%   Aeq
-%   beq
-%   lb
-%   ub
-%   varargin
+%   Called from zef_ES_optimize_current search_method 1 when the solver
+%   package is 'sdpt3' or 'sedumi' (ES_opt_solver_list entries 2–3). linprog
+%   signature: minimize z'*x s.t. A x <= b, Aeq x = beq, lb <= x <= ub.
+%   Optional last argument is an opts struct (solver, TolFun, Display).
+%   flag_val = 1 if cvx_status is Solved.
 %
-% Outputs:
-%   x
-%   function_val
-%   flag_val
+%   [x, fval, flag] = zef_cvx_linprog(z, A, b, Aeq, beq, lb, ub, opts)
 %
-% Calls (project):
-%   zef_cvx_linprog
+%   See also zef_ES_optimize_current, zef_cvx_quadprog.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[x, function_val, flag_val]] = zef_cvx_linprog(z, A, b, Aeq, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 opts = [];
 solver_package = 'sdpt3';

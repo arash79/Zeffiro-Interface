@@ -1,94 +1,35 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_DTI_APPLY_TO_SIGMA
-%
-%MAIN INTEGRATION FUNCTION: Applies FreeSurfer DTI-derived anisotropic conductivity
-%to zef.sigma. This function uses FreeSurfer's dt_recon outputs (fa.nii.gz) and
-%register.dat transformation file.
-%
-%WHY THIS IS NEEDED:
-%This function:
-%1. Converts FreeSurfer FA → conductivity (using zef_freesurfer_fa_to_conductivity)
-%2. Interpolates conductivity to mesh using KD-Tree algorithm (in mesh space)
-%3. Updates zef.sigma with anisotropic values
-%4. Handles compartment-specific application
-%5. Triggers necessary updates
-%
-%FreeSurfer Integration:
-%  - Uses fa.nii.gz from dt_recon output (no need to compute DTI tensor)
-%  - Uses register.dat transformation: transforms FA data TO mesh space (direct transformation)
-%  - Interpolation happens directly in mesh space (no coordinate transformation needed)
-%
-%Inputs:
-%   zef - Zeffiro struct (optional, reads from base workspace if not provided)
-%
-%Outputs:
-%   zef - Updated Zeffiro struct with anisotropic conductivity in zef.sigma
-%
-%Process:
-%   1. Validate prerequisites (FreeSurfer FA loaded, mesh exists, register.dat available)
-%   2. Convert FA → conductivity tensor
-%   3. Compute tetrahedron centroids
-%   4. Interpolate conductivity to mesh using KD-Tree (in mesh space)
-%   5. Apply to selected compartments
-%   6. Update zef.sigma_anisotropy
-%   7. Clear sigma_bypass to force recomputation
-
 function zef = zef_dti_apply_to_sigma(zef, varargin)
-% --- Zeffiro documentation header ---
-% zef_dti_apply_to_sigma — Zef dti apply to sigma.
+%ZEF_DTI_APPLY_TO_SIGMA  Apply FreeSurfer DTI conductivity to zef.sigma.
 %
-% Purpose:
-%   Zef dti apply to sigma.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2024- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   varargin
+%   GUI: DTI Conductivity Tool → Apply (zef_dti_conductivity_apply_button_callback).
+%   Requires zef.freesurfer_fa_data, zef.freesurfer_register_transform, and a
+%   FEM mesh. Writes zef.sigma_anisotropy [n_tet × 6] as
+%   [σ11 σ22 σ33 σ12 σ13 σ23]; zef_sigma concatenates that into
+%   zef.sigma(:,3:8) for lead_field_type 6–10.
 %
-% Outputs:
-%   zef
+%   Name-value / zef fields
+%     dti_conductivity_model     - 1 volume-fraction (default), 2 Tuch effective
+%                                  medium, 3 direct scaling
+%     dti_volume_fraction        - default 0.7
+%     dti_extra_conductivity     - default 1.0 S/m
+%     dti_intra_conductivity     - default 0.6 S/m
+%     dti_interpolation_mode     - 'radius_average' (default) or 'nearest'
+%     dti_interpolation_radius   - mm, default 2
+%     dti_conductivity_scale     - isotropic fallback, default 0.33
+%     dti_mean_diffusivity       - μm²/ms for model 2, default 0.7
+%     dti_anisotropy_threshold   - min FA, default 0.2
+%     apply_to_compartments      - cell of compartment tags, or all tetra
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.domain_labels (read, write)
-%   zef.dti_anisotropy_threshold (read)
-%   zef.dti_applied (read, write)
-%   zef.dti_applied_time (read, write)
-%   zef.dti_apply_to_compartments (read)
-%   zef.dti_conductivity_metadata (read, write)
-%   zef.dti_conductivity_model (read)
-%   zef.dti_conductivity_scale (read)
-%   zef.dti_extra_conductivity (read)
-%   zef.dti_interpolation_mode (read)
-%   zef.dti_interpolation_radius (read)
-%   zef.dti_intra_conductivity (read)
-%   zef.dti_mean_diffusivity (read)
-%   zef.dti_volume_fraction (read)
-%   … (8 more)
+%   zef = zef_dti_apply_to_sigma(zef, varargin)
 %
-% Calls (project):
-%   zef_create_fem_mesh
-%   zef_dti_apply_to_sigma
-%   zef_dti_print_anisotropy_report
-%   zef_dti_tensor_interpolate_mesh_space
-%   zef_freesurfer_fa_to_conductivity
-%   zef_freesurfer_load_fa
-%   zef_freesurfer_read_register_dat
-%   zef_sigma
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dti_apply_to_sigma(zef, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_dti_get_mesh2voxel, zef_nii_conductivity_to_sigma.
+
+
 
 
 arguments

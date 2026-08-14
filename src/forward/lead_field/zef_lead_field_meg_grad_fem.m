@@ -1,35 +1,3 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_grad_fem( ... — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.parallel_processes (read)
-%   zef.processes_per_core (read)
-%   zef.source_model (read)
-%   zef.surface_sources (read)
-%   zef.use_gpu (read)
-%
-% Calls (project):
-%   core.types.ZefSourceModel.from
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - filesystem I/O
-%   - parallel/cluster
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_grad_fem( ...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_grad_fem( ...
     zef, ...
     nodes, ...
@@ -39,6 +7,25 @@ function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_grad_fem(
     p_nearest_neighbour_inds, ...
     varargin ...
     )
+
+%LEAD_FIELD_MEG_GRAD_FEM  FEM MEG gradiometer lead field (types 3, 8).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Called as zef_lead_field_meg_grad_fem. Same conductivity FEM and G
+%   interpolation as magnetometers, but each sensor row is a gradiometer:
+%   positions(:,1:3), first coil(:,4:6), optional second coil(:,7:9).
+%   Nodes and sensors in metres. sigma isotropic 1-col or anisotropic 6-col.
+%
+%   [L_meg, dipole_locations, dipole_directions] = zef_lead_field_meg_grad_fem( ...
+%       zef, nodes, elements, sigma, sensors, p_nearest_neighbour_inds, ...
+%       brain_ind, source_ind, lf_param)
+%
+%   See also zef_lead_field_meg_fem, zef_lead_field_matrix.
+
 
 
 N = size(nodes,1);
@@ -171,6 +158,8 @@ ind_m = [ 2 3 4 ;
 h=zef_waitbar(0,1,'MEG load vectors.');
 waitbar_ind = 0;
 
+% Same Biot–Savart nodal load B as magnetometers, but each sensor has two
+% orientations: columns 4:6 and 7:9 (planar gradiometer). tetra_c = tet centroid.
 B = zeros(N,L);
 tetra_c = (1/4)*(nodes(tetrahedra(:,1),:)+nodes(tetrahedra(:,2),:)+nodes(tetrahedra(:,3),:)+nodes(tetrahedra(:,4),:))';
 
@@ -302,6 +291,8 @@ A = A_aux;
 clear A_aux;
 
 
+% Face-interior stencil (same construction as zef_fi_dipoles): G_fi maps
+% nodal potentials to FI dipole strengths; T_fi marks the two adjacent tets.
 %Form G_fi and T_fi
 %*******************************
 %*******************************
@@ -414,6 +405,9 @@ if not(isequal(lower(direction_mode),'cartesian') || isequal(lower(direction_mod
 end
 %%
 
+% Primary field for a planar gradiometer: dipole direction × (r_coil−r_src),
+% then (n2 − 3 (e_r·n2) e_r) / |r|^3 with n2 = sensors(7:9,:). Secondary
+% field from PCG is added later (x'*G). Scale 1/(4π) after mean-zero.
 L_meg_fi = zeros(L,M_fi);
 for j = 1 : L
     sensor_mat_aux = cross(fi_source_directions', repmat(sensors(1:3,j),1,M_fi) - fi_source_locations');

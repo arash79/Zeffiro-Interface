@@ -1,60 +1,18 @@
 function zef_set_sliders_print(mode,h_axes_image)
-% --- Zeffiro documentation header ---
-% zef_set_sliders_print — Zef set sliders print.
+%ZEF_SET_SLIDERS_PRINT  Re-apply Figure-tool sliders on a print/export figure.
 %
-% Purpose:
-%   Zef set sliders print.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   mode
-%   h_axes_image
+%   Function. Same chain as zef_set_sliders_plot but passes
+%   h_axes_image.Parent so popped-out / print figures (from
+%   zef_print_meshes) get transparency, ColorScale, lights, etc. Mode 2
+%   is the reconstruction-transparency-only path. Sensor transparency
+%   is called with extra unused arguments (historical).
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.brain_transparency (read)
-%   zef.cam_va (read)
-%   zef.colorscale_max_slider (read)
-%   zef.colorscale_min_slider (read)
-%   zef.h_update_colormap (read)
-%   zef.update_brightness (read)
-%   zef.update_contrast (read)
-%   zef.update_lights (read)
-%   zef.update_transparency_additional (read)
-%   zef.update_transparency_cones (read)
-%   zef.update_transparency_reconstruction (read)
-%   zef.update_transparency_sensor (read)
-%   zef.update_transparency_surface (read)
-%   zef.update_zoom (read)
-%   zef.use_parcellation (read)
-%
-% Calls (project):
-%   zef_colormap
-%   zef_set_lights
-%   zef_set_sliders_print
-%   zef_update_ambience
-%   zef_update_colorscale
-%   zef_update_colorscale_max
-%   zef_update_colorscale_min
-%   zef_update_contrast_and_brightness
-%   zef_update_diffusion
-%   zef_update_specular
-%   zef_update_transparency_additional
-%   zef_update_transparency_cones
-%   … (4 more)
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_set_sliders_print(mode, h_axes_image)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_set_sliders_plot, zef_print_meshes.
 h_figure = h_axes_image.Parent;
 
 if mode == 1

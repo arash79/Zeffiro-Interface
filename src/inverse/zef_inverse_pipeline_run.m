@@ -1,39 +1,33 @@
 function [zef, output] = zef_inverse_pipeline_run(zef, cfg)
-% --- Zeffiro documentation header ---
-% zef_inverse_pipeline_run — Zef inverse pipeline run.
+%ZEF_INVERSE_PIPELINE_RUN  Batch inverse and sensitivity analysis over method table.
 %
-% Purpose:
-%   Zef inverse pipeline run.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   cfg
+%   Programmatic driver matching legacy run_inverse_script.m: optionally runs
+%   multiple registered inverters via zef_inverse_run and/or sensitivity probes
+%   via zef_sensitivity_run, collecting per-method results in output.inverse and
+%   output.sensitivity. Sets zef.inv_snr and zef.number_of_frames from cfg.
 %
-% Outputs:
-%   zef
-%   output
+%   [zef, output] = zef_inverse_pipeline_run(zef)
+%   [zef, output] = zef_inverse_pipeline_run(zef, cfg)
 %
-% Zef fields (observed):
-%   zef.inv_snr (read, write)
-%   zef.measurements (read)
-%   zef.number_of_frames (read, write)
-%   zef.source_positions (read)
+%   cfg fields (defaults via i_apply_defaults)
+%     execution ("local"|"cluster"), run_inverse, run_sensitivity,
+%     methods (Nx3 cell: {key, registry_id, methodParams}), inv_snr_db,
+%     number_of_frames, sensitivity.*, cluster.*.
 %
-% Calls (project):
-%   utilities.cluster.configure_cluster_profile
-%   zef_inverse_pipeline_run
-%   zef_inverse_run
-%   zef_sensitivity_run
+%   Output
+%     zef    - may be updated by successful inverse runs stored in output.
+%     output - struct with config, timestamp, inverse.(key), sensitivity.(key)
+%              per method; failed methods store err message instead of results.
 %
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
+%   Requires nonempty zef.measurements. Validates reconstruction frame count
+%   and sensitivity statistic fields when runs succeed.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[zef, output]] = zef_inverse_pipeline_run(zef, cfg)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_inverse_run, zef_sensitivity_run, zef_compute_measurements.
 
 arguments
     zef (1,1) struct

@@ -1,55 +1,25 @@
-# +inverse/@IASInverter
+# inverse.IASInverter
 
-## Purpose of this folder
+Iterative alternating sequential MAP for a conditionally Gaussian model with inverse-gamma or gamma hyperpriors (Calvetti–Somersalo). Registry id: `ias`. GUI: `legacy_ias` → `zef_ias_iteration`.
 
-Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+Each MAP step: `W = diag(d) L' (L diag(d²) L' + C)^{-1}`, `z = W f`, then update `d` from the hyperposterior. Optional post-hoc dSPM/sLORETA row scaling via `method_type`.
 
-## Contents
+## Parameters
 
-MATLAB sources:
-- `IASInverter.m` — **inverse.IASInverter.IASInverter**: Inverse solver class implementing IAS reconstruction.
-- `initialize.m` — **inverse.IASInverter.initialize**: Estimates priors, noise covariance, or regularization from multi-frame data.
-- `invert.m` — **inverse.IASInverter.invert**: Runs one inverse reconstruction step for a single measurement frame.
+- `hyperprior`: `"Inverse gamma"` (default) \| `"Gamma"`
+- `hyperprior_mode`: `"Constant"` \| `"Balanced"` (spatial balance in `zef_find_ig_hyperprior` / `zef_find_g_hyperprior`)
+- `n_map_iterations` (25)
+- `hyperprior_tail_length_db` (10), `hyperprior_weight` (0)
+- `amplitude_db` (20), `prior_over_measurement_db` (20) — enter `modified_SNR = SNR - prior_over_measurement_db + amplitude_db`
+- `method_type`: `"None"` \| `"sLORETA last step"` \| `"dSPM each step"` \| `"dSPM last step"`
 
-## How this folder fits into the overall workflow
+`initialize` adds dynamic props `theta0`, `beta`, `d_sqrt`, `noise_cov` (`C = 10^(-SNR/10) I`). `terminateComputation` deletes them.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Last-step dSPM/sLORETA branches compare `i == self.n_n_map_iterations` (property is actually `n_map_iterations`) — those branches never run as written.
 
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+## Call
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+[zef, r] = zef_inverse_run(zef, "ias", "execution", "local", ...
+    "MethodParams", struct("n_map_iterations", 25, "hyperprior", "Inverse gamma"));
 ```
-
-Representative entry points in this folder:
-- ``inverse.IASInverter.IASInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.`
-- ``[self] = inverse.IASInverter.initialize(self, L, f_data)` with project root and `src` on the path.`
-- ``[[z_vec, self]] = inverse.IASInverter.invert(self, f, L, procFile, …)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-Programmatic: `zef_inverse_run(zef, 'eloreta')` or `inverse.ELORETAInverter().computeInversionWithZI(zef)`.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

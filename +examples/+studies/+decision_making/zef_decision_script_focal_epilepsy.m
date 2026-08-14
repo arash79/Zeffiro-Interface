@@ -1,20 +1,21 @@
-% --- Zeffiro documentation header ---
-% examples.studies.decision_making.examples.studies.decision_making — Example or study script demonstrating examples.studies.decision_making.
+%ZEF_DECISION_SCRIPT_FOCAL_EPILEPSY  Cluster live databank reconstructions and plot.
 %
-% Purpose:
-%   Example or study script demonstrating examples.studies.decision_making.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Calls (project):
-%   zef_dataBank_get_reconstructions
+%   Script. zef_parameters_focal_epilepsy then
+%   [z_inverse_results, z_inverse_info] =
+%   zef_dataBank_get_reconstructions(zef, frame_number). Then helpers
+%   zef_cluster_reconstructions_focal_epilepsy,
+%   zef_final_reconstruction_focal_epilepsy,
+%   zef_show_results_focal_epilepsy. Needs workspace zef with a populated
+%   dataBank and (if supervised_clustering is 'on') the credibility .mat
+%   named by credibility_data_file_name.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `examples.studies.decision_making.examples.studies.decision_making` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_find_reconstructions_focal_epilepsy,
+%   zef_cluster_reconstructions_focal_epilepsy.
 
 examples.studies.decision_making.zef_parameters_focal_epilepsy;
 [z_inverse_results, z_inverse_info] = zef_dataBank_get_reconstructions(zef, frame_number);

@@ -1,27 +1,18 @@
 function [surface_triangles] = zef_get_surface_triangles(tetra,labels,compartment_ind)
-% --- Zeffiro documentation header ---
-% zef_get_surface_triangles — Zef get surface triangles.
+%ZEF_GET_SURFACE_TRIANGLES  Faces of tetrahedra with labels==compartment_ind.
 %
-% Purpose:
-%   Zef get surface triangles.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tetra
-%   labels
-%   compartment_ind
+%   surface_triangles = zef_get_surface_triangles(tetra, labels, compartment_ind)
 %
-% Outputs:
-%   surface_triangles
+%   Keeps tets where labels==compartment_ind. Faces that appear once
+%   (sorted vertex triples) are the surface. Used by zef_find_distance_to_mesh
+%   with zef.sigma(:,2) as labels.
 %
-% Calls (project):
-%   zef_get_surface_triangles
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[surface_triangles] = zef_get_surface_triangles(tetra, labels, compartment_ind)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_plot_surface_triangles, zef_surface_mesh.
 
 I = find(labels==compartment_ind);
 tetra = tetra(I,:);

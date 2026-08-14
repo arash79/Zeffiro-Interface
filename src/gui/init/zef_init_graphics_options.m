@@ -1,32 +1,18 @@
-% --- Zeffiro documentation header ---
-% if not(isfield(zef,'streamline_draw')) — If not(isfield(zef,'streamline draw')).
+%ZEF_INIT_GRAPHICS_OPTIONS  Defaults for Settings → Graphics processing options (script).
 %
-% Purpose:
-%   If not(isfield(zef,'streamline draw')).
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.colortune_param (read, write)
-%   zef.cone_alpha (read, write)
-%   zef.cone_field_lattice_resolution (read, write)
-%   zef.cone_scale (read, write)
-%   zef.contour_line_width (read, write)
-%   zef.contour_n_smoothing (read, write)
-%   zef.parcellation_quantile (read, write)
-%   zef.parcellation_type (read, write)
-%   zef.sensors_visual_size (read, write)
-%   zef.streamline_draw (read, write)
-%   zef.streamline_linestyle (read, write)
-%   zef.use_gpu_graphic (read, write)
+%   Script. isfield-guarded defaults for streamlines, cones, contours,
+%   parcellation, GPU graphic, colortune_param, sensors_visual_size.
+%   Note: the cone_lattice_resolution guard writes
+%   zef.cone_field_lattice_resolution (different field name) when
+%   cone_lattice_resolution is missing. Run from
+%   zef_open_graphics_options. Does not open the dialog.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isfield(zef,'streamline_draw'))` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_open_graphics_options.
 if not(isfield(zef,'streamline_draw'))
     zef.streamline_draw = 0;
 end

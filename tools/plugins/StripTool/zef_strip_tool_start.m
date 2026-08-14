@@ -1,30 +1,18 @@
 function zef = zef_strip_tool_start(zef)
-% --- Zeffiro documentation header ---
-% zef_strip_tool_start — Zef strip tool start.
+%ZEF_STRIP_TOOL_START  Open Strip tool (no default menu).
 %
-% Purpose:
-%   Zef strip tool start.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Not in the default profile INI. Embed adds strip (and optional
+%   encapsulation) compartments via zef_add_compartment.
 %
-% Outputs:
-%   zef
+%   zef = zef_strip_tool_start(zef)
 %
-% Calls (project):
-%   zef_strip_tool_start
-%   zef_tool_start
+%   See also zef_strip_tool_embed, zef_create_strip.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_strip_tool_start(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
 zef = evalin('base','zef');

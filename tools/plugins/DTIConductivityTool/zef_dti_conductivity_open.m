@@ -1,46 +1,22 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_DTI_CONDUCTIVITY_OPEN
-%
-%Plugin entry point for DTI Conductivity Tool.
-%Follows standard Zeffiro plugin pattern:
-%  1. Create/update GUI window
-%  2. Initialize plugin-specific fields
-%  3. Update GUI from zef struct
-%
-%WHY THIS IS NEEDED:
-%Provides user-friendly interface for DTI-to-conductivity workflow.
-%Without this, users would need to manually call functions and set
-%parameters, which is error-prone and not user-friendly.
-
 function zef = zef_dti_conductivity_open(zef)
-% --- Zeffiro documentation header ---
-% zef_dti_conductivity_open — Zef dti conductivity open.
+%ZEF_DTI_CONDUCTIVITY_OPEN  Open Forward tools → DTI Conductivity Tool.
 %
-% Purpose:
-%   Zef dti conductivity open.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Menu callback from profile/multicompartment_head/zeffiro_plugins.ini
+%   (label "DTI Conductivity Tool", parent forward_tools). Creates the
+%   uifigure "ZEFFIRO Interface: DTI Conductivity Tool", initializes
+%   plugin fields, and copies zef DTI state onto the widgets.
 %
-% Outputs:
-%   zef
+%   Apply to Mesh (in this window) calls zef_dti_apply_to_sigma in
+%   src/forward/dti. This function only opens the UI.
 %
-% Calls (project):
-%   zef_dti_conductivity_open
-%   zef_dti_conductivity_update
-%   zef_dti_conductivity_window
+%   zef = zef_dti_conductivity_open(zef)
 %
-% Side effects:
-%   - base/caller workspace
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dti_conductivity_open(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dti_conductivity_window, zef_dti_apply_to_sigma.
 
 if nargin == 0
     try

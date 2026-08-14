@@ -1,33 +1,30 @@
 function zef = zef_create_compartment(zef,compartment_tag, varargin)
-% --- Zeffiro documentation header ---
-% zef_create_compartment — Zef create compartment.
+%ZEF_CREATE_COMPARTMENT  Ensure default fields exist for one compartment tag.
 %
-% Purpose:
-%   Zef create compartment.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   compartment_tag
-%   varargin
+%   Initializes missing zef.<tag>_* fields (on, color, sigma, mesh arrays,
+%   transforms, etc.) from built-in defaults, optionally writing into an
+%   alternate struct name via varargin. Appends compartment_tag to
+%   zef.compartment_tags when not already present.
 %
-% Outputs:
-%   zef
+%   zef = zef_create_compartment(zef, compartment_tag)
+%   zef = zef_create_compartment(zef, compartment_tag, zef_struct_name)
+%   zef = zef_create_compartment(zef, compartment_tag, zef_struct_name, field_cell_update)
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
+%   Inputs
+%     zef               - session struct (or name in varargin).
+%     compartment_tag   - short tag string (e.g. 'c1').
+%     zef_struct_name   - optional struct name for eval targets.
+%     field_cell_update - optional {{name, expr}, ...} overrides.
 %
-% Calls (project):
-%   zef_create_compartment
+%   Output
+%     zef - session with compartment fields defined.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_create_compartment(zef, compartment_tag, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_build_compartment_table, zef_compartment_tag.
 
 n_compartments = eval('length(zef.compartment_tags)');
 color_default = [ 0.3984    0.7615    0.4435 ;
@@ -36,7 +33,6 @@ color_default = [ 0.3984    0.7615    0.4435 ;
     0.4200    0.4800    0.4200 ;
     0.3500    0.3500    0.3500 ;
     0.8000    0.8000    0.8000];
-
 
 rng('default');
 rng(n_compartments);

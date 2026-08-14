@@ -1,58 +1,66 @@
-# tools/plugins/Beamformer
+# Beamformer
 
-## Purpose of this folder
+Spatial filters (LCMV, unit-noise-gain, unit-gain, scalar UNG) that scan the source grid. Use it when you want a covariance-based localization rather than a distributed Tikhonov map.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+This plugin does **not** construct `inverse.BeamformerInverter`. Class id `beamformer` (and `legacy_beamformer`) is a separate `zef_inverse_run` track.
 
-## Contents
+## Menu
 
-MATLAB sources:
-- `zef_beamformer.m` — **zef_beamformer**: Zef beamformer.
-- `zef_beamformer_start.m` — **zef_beamformer_start**: Zef beamformer start.
-- `zef_beamformer_window.m` — **zef_beamformer_window**: Zef beamformer window.
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **Beamformer** |
+| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
 
-Other files:
-- `README`
-- `zef_beamformer_app.mlapp`
+INI callback: `zef_beamformer_start`.
 
-## How this folder fits into the overall workflow
+Window title: `ZEFFIRO Interface: Beamformer`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+## Run the solver
 
-## GUI usage
-
-- **zef_beamformer_window**: GUI callback or dialog (`zef_beamformer_window`).
-
-## Programmatic usage
-
-From the project root:
+**StartButton** `ButtonPushedFcn` (depends on `estimation_attr`):
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+if strcmp(zef.beamformer.estimation_attr.Value,'1')
+    [zef.reconstruction,~, zef.reconstruction_information] = zef_beamformer(zef);
+elseif strcmp(zef.beamformer.estimation_attr.Value,'2')
+    [~,zef.reconstruction, zef.reconstruction_information] = zef_beamformer(zef);
+else
+    [zef.reconstruction,zef.bf_var_loc, zef.reconstruction_information] = zef_beamformer(zef);
+end
 ```
 
-Representative entry points in this folder:
-- ``[[z, Var_loc, reconstruction_information]] = zef_beamformer(zef)` with project root and `src` on the path.`
-- ``[zef] = zef_beamformer_start(zef)` with project root and `src` on the path.`
-- ``[zef] = zef_beamformer_window(zef)` with project root and `src` on the path.`
+Outputs of `zef_beamformer` are `[z, Var_loc, reconstruction_information]`. Value `'1'` stores power `z`; `'2'` stores location variance `Var_loc` as the reconstruction; otherwise both `z` and `zef.bf_var_loc`.
 
-## Examples
+Types (wired in `zef_beamformer_window`): LCMV, Unit noise gain, Unit-gain constraint, Unit noise gain scalar → `zef.bf_type` 1–4. (The scalar label in the window is spelled `Unit nosie gain scalar beamformer`.)
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+Covariance dropdown (`zef.cov_type`):
 
-## Dependencies and assumptions
+| Value | Label | When `C` is built |
+|-------|-------|-------------------|
+| 1 | Full data, measurement based | Once, from all of `f_data`; ridge `λ·trace(C)/n_sensors · I` |
+| 2 | Full data, basic | Once, from all of `f_data`; ridge `λ I` |
+| 3 | Pointwise, measurement based | **Per frame** from that window; same trace ridge as 1 |
+| 4 | Pointwise, basic | **Per frame**; ridge `λ I` |
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+`λ` is `zef.inv_cov_lambda`. The ValueChangedFcn disables the λ box when `cov_type==0`, which is not a listed item.
 
-## Notes for developers
+Lead-field regularization: Basic / Pseudoinverse (`zef.L_reg_type` 1/2). Normalization of `L` columns: Matrix / Column / Row / None.
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## Needs
+
+- `zef.L`, interpolation, `zef.source_direction_mode`
+- `zef.measurements`
+- SNR: `zef.inv_snr` → `10^(-inv_snr/20)`
+- Covariance: `zef.cov_type`, `zef.inv_cov_lambda`; lead-field ridge `zef.inv_leadfield_lambda` / `zef.L_reg_type`
+- Frames: `zef.number_of_frames`, `inv_time_*`, band edges
+
+## Writes
+
+- `zef.reconstruction` and `zef.reconstruction_information` (tags `Beamformer/LCMV`, `/UNG`, `/UG`, `/UNGsc`)
+- Optionally `zef.bf_var_loc`
+
+## Files
+
+- Start: `zef_beamformer_start.m` → `zef_beamformer_window`
+- Solver: `zef_beamformer.m`
+- Layout: `zef_beamformer_app.mlapp`

@@ -1,33 +1,3 @@
-% --- Zeffiro documentation header ---
-% function [G, dipole_locations] =  zef_lead_field_interpolation( ... — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
-%
-% Inputs:
-%   p_nodes
-%   p_tetrahedra
-%   p_brain_inds
-%   p_source_model
-%   p_intended_source_inds
-%   p_nearest_neighbour_inds
-%   p_optimization_system_type
-%   mustBeText
-%   mustBeMember
-%   p_regparam
-%
-% Calls (project):
-%   core.types.ZefSourceModel.from
-%   zef_hdiv_interpolation
-%   zef_lead_field_interpolation
-%   zef_st_venant_interpolation
-%   zef_whitney_interpolation
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `function [G, dipole_locations] =  zef_lead_field_interpolation( ...(p_nodes, p_tetrahedra, p_brain_inds, p_source_model, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 function [G, dipole_locations] =  zef_lead_field_interpolation( ...
     p_nodes, ...
     p_tetrahedra, ...
@@ -38,6 +8,42 @@ function [G, dipole_locations] =  zef_lead_field_interpolation( ...
     p_optimization_system_type, ...
     p_regparam ...
     )
+
+%ZEF_LEAD_FIELD_INTERPOLATION  Source-to-column interpolation matrix G.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Used inside the FEM assemblers (not from the Mesh tool). Maps intended
+%   source tetrahedra to nodal columns before the Schur product L = Schur \
+%   (T'*G). Dispatches on core.types.ZefSourceModel.from(p_source_model):
+%     Whitney / ContinuousWhitney     → zef_whitney_interpolation
+%     Hdiv / ContinuousHdiv           → zef_hdiv_interpolation
+%     StVenant / ContinuousStVenant   → zef_st_venant_interpolation (uses p_regparam)
+%
+%   [G, dipole_locations] = zef_lead_field_interpolation( ...
+%       p_nodes, p_tetrahedra, p_brain_inds, p_source_model, ...
+%       p_intended_source_inds, p_nearest_neighbour_inds, ...
+%       p_optimization_system_type, p_regparam)
+%
+%   Input
+%     p_nodes                    - [n_nodes × 3] (metres in the FEM call)
+%     p_tetrahedra               - [n_tet × 4] node indices
+%     p_brain_inds               - tetra indices allowed as sources
+%     p_source_model             - enum, numeric 1–6, or string
+%     p_intended_source_inds     - source tetra indices
+%     p_nearest_neighbour_inds   - continuous-source neighbours (required by arguments)
+%     p_optimization_system_type - 'pbo', 'mpo', or 'none'
+%     p_regparam                 - St. Venant regularizer (EEG FEM uses 1e-6)
+%
+%   Output
+%     G                 - sparse [n_nodes × n_source_columns]
+%     dipole_locations  - [n × 3] corresponding source points
+%
+%   See also zef_lead_field_eeg_fem, core.types.ZefSourceModel.
+
 
 arguments
     p_nodes (:,3) double {mustBeNonNan}

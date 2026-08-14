@@ -1,33 +1,28 @@
 function zef = zef_dataBank_startNameChange(zef)
-% --- Zeffiro documentation header ---
-% zef_dataBank_startNameChange — Zef data Bank start Name Change.
+%ZEF_DATABANK_STARTNAMECHANGE  Dialog that writes tree.(hash).name and uitree Text.
 %
-% Purpose:
-%   Zef data Bank start Name Change.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   changeNameMenu.MenuSelectedFcn in zef_open_dataBank. Disables the
+%   uitree, forces selectMultiple false, getHashForMenu, then opens
+%   zef_dataBank_nameChange_app. Label_oldName / Label_node show the
+%   current name and hash. OkButton copies NameField.Value onto
+%   tree.(hash).name and SelectedNodes.Text, re-enables the tree, and
+%   deletes the dialog. CancelButton only re-enables and deletes.
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_startNameChange(zef)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef  - session with a selected tree node. nargin==0 → base.
 %
-% Calls (project):
-%   zef_dataBank_getHashForMenu
-%   zef_dataBank_startNameChange
+%   Output
+%     zef  - nameChangeapp attached; name is written when OkButton runs.
+%            nargout==0 → assignin base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_dataBank_startNameChange(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_getHashForMenu.
 
 if nargin == 0
     zef = evalin('base','zef');

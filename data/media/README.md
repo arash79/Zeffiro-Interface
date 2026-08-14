@@ -1,54 +1,5 @@
-# data/media
+# `data/media`
 
-## Purpose of this folder
+Screenshots and a short demo movie used in papers and docs. **Not** loaded by `zeffiro_interface`.
 
-Bundled sample projects, segmentations, and runtime data roots referenced by examples and default startup.
-
-## Contents
-
-Other files:
-- `aivokuva.png`
-- `cem_electrodes.png`
-- `eit_model.png`
-- `eit_reconstruction.png`
-- `high_res_meshes.png`
-- `parcellation_brain.png`
-- `parcellation_correlation.png`
-- `parcellation_tool.png`
-- `rec_1_surf.png`
-- `rec_1_surf_2.png`
-- `rec_1_surf_3.png`
-- `rec_1_vol_cut.png`
-- `surface_meshes.png`
-- `time_lapse.avi`
-- `volume_mesh.png`
-- `volume_mesh_with_edges.png`
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Includes mesh/parcellation/EIT stills (`volume_mesh.png`, `parcellation_tool.png`, `eit_reconstruction.png`, …), CEM electrode photo (`cem_electrodes.png`), and `time_lapse.avi`. Keep filenames if external documents already cite them.

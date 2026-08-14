@@ -1,29 +1,17 @@
 function zef_set_timepointline(h_axes)
-% --- Zeffiro documentation header ---
-% zef_set_timepointline — Zef set timepointline.
+%ZEF_SET_TIMEPOINTLINE  Vertical time marker on a 2-D time-series axes.
 %
-% Purpose:
-%   Zef set timepointline.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   h_axes
+%   Function. Deletes any child Tag='timepointline', draws a gray line
+%   at h_axes.CurrentPoint(1) spanning YLim, and sets Title to
+%   'Time value = <x>'. Used on butterfly / parcellation time axes, not
+%   on Figure-tool h_axes1.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Calls (project):
-%   zef_set_timepointline
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_set_timepointline(h_axes)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_butterfly_plot.
 h_line = findobj(h_axes.Children,'Tag','timepointline');
 delete(h_line);
 h_line = line(h_axes.CurrentPoint([1 1]),[h_axes.YLim]);

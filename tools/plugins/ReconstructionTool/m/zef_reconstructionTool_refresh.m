@@ -1,23 +1,18 @@
-% --- Zeffiro documentation header ---
-% zef.reconstructionTool — Zef.reconstruction Tool.
+%ZEF_RECONSTRUCTIONTOOL_REFRESH  Fill the live-reconstruction row from zef.reconstruction.
 %
-% Purpose:
-%   Zef.reconstruction Tool.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.lead_field_id (read)
-%   zef.reconstruction (read)
-%   zef.reconstructionTool (read)
-%   zef.reconstruction_information (read)
+%   Script. RefreshButton and start-up. currentInfo columns: tag, type,
+%   modality, n_frames, n_sources, lead_field_id. Cell reconstructions
+%   use size(...,1) as n_frames and size({1},1) as n_sources; a non-cell
+%   uses size(...,2) and size(...,1). Missing tag/type/modality become
+%   'tag' / '' / ''; missing lead_field_id becomes 'no ID'. Writes
+%   app.current.Data. Does not touch the bank table.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.reconstructionTool` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_reconstructionTool_addCurrent2bank, zef_reconstructionTool_start.
 
 zef.reconstructionTool.currentInfo=cell(1,6);
 

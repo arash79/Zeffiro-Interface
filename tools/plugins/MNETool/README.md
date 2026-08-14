@@ -1,40 +1,56 @@
-# tools/plugins/MNETool
+# MNETool
 
-## Purpose of this folder
+Tikhonov minimum-norm source imaging (MNE) plus dSPM, sLORETA, and weighted MNE. Use it when you want a fast linear inverse of the whole source grid rather than a sparse or sequential method.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+This plugin does **not** construct `inverse.MNEInverter`. Class ids `mne` / `wmne` (and `legacy_mne`) are a separate `zef_inverse_run` track.
 
-## Contents
+## Menu
 
-Subfolders:
-- `m/`
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **Minimum norm estimation tool** |
+| `multicompartment_head_legacy`, `_nse` | same |
+| asteroid_radar / asteroid_gravity | Inverse tools → **Minimum norm estimation tool** |
 
-## How this folder fits into the overall workflow
+INI callback: `zef_minimum_norm_estimation`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Window title: `ZEFFIRO Interface: Minimum norm estimate tool`.
 
-## GUI usage
+## Run the solver
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+**Start** (`zef.h_mne_start`) Callback:
 
-## Programmatic usage
+```matlab
+zef_update_mne; [zef.reconstruction, zef.reconstruction_information] = zef_find_mne_reconstruction(zef);
+```
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+Type popup (`zef.h_mne_type`): `MNE`, `dSPM`, `sLORETA`, `wMNE` → `zef.mne_type` 1–4.
 
-## Examples
+All four start from the same Tikhonov operator `L_inv = √θ L' (LθL' + σ²I)⁻¹` with Gaussian prior `θ` from `zef_find_gaussian_prior`. Then:
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+| Value | Label | Extra scaling |
+|-------|-------|----------------|
+| 1 | MNE | none |
+| 2 | dSPM | divide rows by `sqrt(sum(L_inv.^2,2))` |
+| 3 | sLORETA | divide by `sqrt(sum(L_inv.*L',2))` |
+| 4 | wMNE | before the solve, `√θ` is divided by `(∑_xyz ‖L_i‖²)^{0.5·0.6}` (`mne_exponent` is hardcoded `0.6` in the solver) |
 
-## Dependencies and assumptions
+Prior popup spatially balanced vs constant is `zef.mne_prior` (same `balance_spatially` flag as IAS).
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## Needs
 
-## Notes for developers
+- `zef.L`, `zef.source_interpolation_ind`, `zef.source_direction_mode`
+- `zef.measurements` (band-pass via `zef_getFilteredData` / `zef_getTimeStep`)
+- SNR: copies `zef.inv_snr` into the run; likelihood std is `10^(-inv_snr/20)`
+- Frames: `zef.mne_time_1/2/3`, `zef.mne_number_of_frames` (copied onto `zef.inv_*` / `number_of_frames` inside the solver)
+- Filters: `zef.mne_sampling_frequency`, `mne_low_cut_frequency`, `mne_high_cut_frequency`
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## Writes
+
+- `zef.reconstruction` — cell of source vectors after `zef_postProcessInverse` / peak-norm
+- `zef.reconstruction_information` — tag `mne_type`, SNR, type, prior, frame metadata
+
+## Files
+
+- Start: `m/zef_minimum_norm_estimation.m` → `zef_mne_tool_start` → `zef_mne_tool_window`
+- Solver: `m/zef_find_mne_reconstruction.m`

@@ -1,34 +1,31 @@
 function [brain_ind, brain_compartments] = zef_find_active_compartment_ind(zef,domain_labels)
-% --- Zeffiro documentation header ---
-% zef_find_active_compartment_ind — Zef find active compartment ind.
+%ZEF_FIND_ACTIVE_COMPARTMENT_IND  Tetra indices whose domain is a source tissue.
 %
-% Purpose:
-%   Zef find active compartment ind.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   domain_labels
+%   Unused from menus. Callers: zef_lead_field_matrix (zef.brain_ind),
+%   zef_postprocess_fem_mesh, zef_refinement_step. Source tissues are
+%   compartments with *_on and *_sources in {1,2}. Domain IDs packed into
+%   domain_labels are 1..n_on in compartment_tags order (same packing as
+%   zef_process_meshes reuna_*).
 %
-% Outputs:
-%   brain_ind
-%   brain_compartments
+%   [brain_ind, brain_compartments] = zef_find_active_compartment_ind(zef)
+%   [brain_ind, brain_compartments] = zef_find_active_compartment_ind(zef, domain_labels)
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.domain_labels (read)
+%   Inputs
+%     zef            - session (compartment_tags, <tag>_on, <tag>_sources).
+%     domain_labels  - N×1 tetra labels. Default zef.domain_labels.
 %
-% Calls (project):
-%   zef_find_active_compartment_ind
+%   Outputs
+%     brain_ind          - tetra indices (column) in those source domains.
+%                          If no compartment is on, find(domain_labels)
+%                          (all non-zero labels).
+%     brain_compartments - packed domain IDs (1..n_on) that are sources.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[brain_ind, brain_compartments]] = zef_find_active_compartment_ind(zef, domain_labels)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_find_subdomain_ind, zef_lead_field_matrix.
 
 if nargin < 2
     domain_labels = zef.domain_labels;

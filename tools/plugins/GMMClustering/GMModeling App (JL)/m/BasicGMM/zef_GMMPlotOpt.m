@@ -1,35 +1,15 @@
-%Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if isfield(zef.GMM — If isfield(zef.GMM.
+%ZEF_GMMPLOTOPT  Open advanced GMM plot-options window (GMM_PlotOpt).
 %
-% Purpose:
-%   If isfield(zef.GMM.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.GMM_colors (read)
-%   zef.font_size (read)
+%   Script. Closes an existing PlotOpt app, docks it beside main.
+%   Then zef_update_GMMPlotOpts and copies GMM.parameters onto the
+%   widgets. Called from the main GMM app plot-options control.
+%   Does not draw ellipsoids (PlotModelButton → zef_PlotGMModel).
 %
-% Calls (project):
-%   zef_aux_mat
-%   zef_aux_str
-%   zef_temp_screen_size
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `if isfield(zef.GMM` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-%This is script for opening advanced GMM plot options.
-
-
-
+%   See also zef_update_GMMPlotOpts, zef_PlotGMModel.
 
 if isfield(zef.GMM.apps,'PlotOpt')
     if isvalid(zef.GMM.apps.PlotOpt)

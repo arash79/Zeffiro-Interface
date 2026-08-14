@@ -1,54 +1,25 @@
-# +examples/+studies/+santtus_peeling_article
+# Santtu peeling-article sensitivity study
 
-## Purpose of this folder
-
-Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
-
-## Contents
-
-Subfolders:
-- `+helpers/`
-
-MATLAB sources:
-- `main.m` — **examples.studies.santtus_peeling_article.function [ sensitivities_with_statistics, L ] = main ( ...**: Example or study script demonstrating function [ sensitivities_with_statistics, L ] = main ( ....
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+Function entry (not a script):
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+addpath(fileparts(which('zeffiro_interface')));
+
+[stats, L] = examples.studies.santtus_peeling_article.main( ...
+    "path/to/project.mat", ...   % or '' if you pass zef=
+    "sLORETA", ...               % "sLORETA" | "dSPM" | "MNE" | "Dipole Scan"
+    10, ...                      % n_of_runs
+    -30, ...                     % noise_level_db (≤ 0)
+    "L2", ...                    % "L2" | "minabs"
+    30, ...                      % dispersion_radius
+    "use_gpu", false, ...
+    "build_mesh", false, ...
+    "build_lead_field", true, ...
+    "n_of_sources", 10000);
 ```
 
-Representative entry points in this folder:
-- ``examples.studies.santtus_peeling_article.function [ sensitivities_with_statistics, L ] = main ( ...(project_path, inverse_method, n_of_runs, noise_level_db, …)` with project root and `src` on the path.`
+If `project_path` is empty you must pass name-value `zef=` with a non-empty struct (`MissingProject` otherwise). Opening a path uses `zeffiro_interface(..., 'open_project', project_path)`.
 
-## Examples
+When `build_lead_field` is true it calls **`zef_eeg_lead_field`** (EEG only), not the generic `zef_lead_field_matrix`. Reconstructions go through `zef_minimum_norm_estimation` then helpers `zef_sensitivity_map_mne` or `zef_sensitivity_map_dipoleScan` (legacy tools). In-memory `zef=` is `assignin('base','zef',...)` because those tools read base `zef`.
 
-Run scripts directly after startup, e.g. `run('+examples/+studies/+santtus_peeling_article/main.m')`.
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Helpers: `zef_rec_diff` (distance/angle/magnitude/dispersion vs true sources), plus the two sensitivity-map wrappers.

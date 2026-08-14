@@ -1,35 +1,13 @@
 function [processed_data] = zef_threshold_epoching(f, threshold_value, number_of_epochs, start_time, end_time, sampling_frequency)
-% --- Zeffiro documentation header ---
-% zef_threshold_epoching — Zef threshold epoching.
+%ZEF_THRESHOLD_EPOCHING  Pipeline stage: find threshold crossings and average those epochs.
 %
-% Purpose:
-%   Zef threshold epoching.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   f
-%   threshold_value
-%   number_of_epochs
-%   start_time
-%   end_time
-%   sampling_frequency
+%   Add Input: threshold dB, number of epochs, start/end, fs.
 %
-% Outputs:
-%   processed_data
-%
-% Calls (project):
-%   zef_threshold_epoching
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[processed_data] = zef_threshold_epoching(f, threshold_value, number_of_epochs, start_time, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%This function processes the N-by-M data array f for N channels and M time
-%steps. The other arguments can be controlled via the ZI user interface.
-%The desctiption and argument definitions shown in ZI are listed below.
 %Description: Averaging over epochs obtained via thresholding
 %Input: 1 Threshold value (db) [Default: -6],
 %2 Number of epochs [Default: ],
@@ -37,8 +15,8 @@ function [processed_data] = zef_threshold_epoching(f, threshold_value, number_of
 %4 End time w.r.t. point (s) [Default: 0.18],
 %5 Sampling frequency (Hz) [Default: filter_sampling_rate]
 %Output: Averaged data for epochs obtained via thresholding.
+%
 
-%Conversion between string and numeric data types.
 if isstr(threshold_value)
     threshold_value = str2num(threshold_value);
 end

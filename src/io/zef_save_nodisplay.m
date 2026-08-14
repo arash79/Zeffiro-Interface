@@ -1,43 +1,17 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if zef — If zef.
+%ZEF_SAVE_NODISPLAY  Headless save/export script driven by zef.save_switch.
 %
-% Purpose:
-%   If zef.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.brain_ind (read)
-%   zef.file (read)
-%   zef.file_index (read, write)
-%   zef.file_path (read)
-%   zef.h_fig_aux (read, write)
-%   zef.h_zeffiro (read)
-%   zef.imaging_method (read, write)
-%   zef.min_ind (read)
-%   zef.min_val (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.save_file (read, write)
-%   zef.save_file_path (read, write)
-%   zef.save_switch (read, write)
-%   zef.sensors (read)
-%   … (8 more)
+%   Non-interactive counterpart to zef_save for nodisplay startup. Expects
+%   zef.file, zef.file_path, and zef.save_switch already set (no uiputfile).
+%   Modes 1 and 7 save the project after stripping h_* fields; modes 2–8
+%   export L, source positions/directions, surface/volume meshes, or
+%   reconstruction; modes 9–10 save or print figures using zef.h_zeffiro.
 %
-% Calls (project):
-%   zef_sigma
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_save, zeffiro_interface.
 
 if zef.save_switch == 1
     if not(isequal(zef.file,0));

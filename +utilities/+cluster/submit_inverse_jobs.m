@@ -1,30 +1,24 @@
 function submissions = submit_inverse_jobs(cluster_profile, bundles, opts)
-% --- Zeffiro documentation header ---
-% utilities.cluster.submit_inverse_jobs — Submit inverse jobs.
+%SUBMIT_INVERSE_JOBS  Serialize bundles and submit parallel.batch inverse jobs.
 %
-% Purpose:
-%   Submit inverse jobs.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   cluster_profile
-%   bundles
-%   opts
+%   submissions = submit_inverse_jobs(cluster_profile, bundles, opts)
 %
-% Outputs:
-%   submissions
+%   bundles is a cell array or struct array of inverse bundle structs. Each
+%   bundle is saved under opts.BundleDir (created if needed) and a batch job
+%   targeting run_inverse_job is queued on cluster_profile. opts.ResultDir
+%   receives inverse_result_*.mat outputs.
 %
-% Calls (project):
-%   utilities.cluster.submit_inverse_jobs
+%   opts defaults: WorkDir=pwd, BundleDir=WorkDir/cluster_bundles,
+%   ResultDir=WorkDir/cluster_results, AutoAddClientPath=false,
+%   CaptureDiary=true, Pool=0.
 %
-% Side effects:
-%   - filesystem I/O
-%   - parallel/cluster
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[submissions] = utilities.cluster.submit_inverse_jobs(cluster_profile, bundles, opts)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Returns submissions struct array with fields job, bundle_path, result_path.
+%   Creates BundleDir and ResultDir when missing.
 
 arguments
     cluster_profile (1,1) parallel.Cluster

@@ -1,31 +1,30 @@
-%Copyright © 2019- Sampsa Pursiainen & GPU-ToRRe Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre
-
 function [nodes,triangles,interp_vec] = zef_triangular_mesh_refinement(nodes,triangles)
-% --- Zeffiro documentation header ---
-% zef_triangular_mesh_refinement — Zef triangular mesh refinement.
+%ZEF_TRIANGULAR_MESH_REFINEMENT  4-to-1 split of every triangle (mid-edge nodes).
 %
-% Purpose:
-%   Zef triangular mesh refinement.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   GPU-ToRRe / Zeffiro Interface.
+%   Copyright © 2019- Sampsa Pursiainen & GPU-ToRRe Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   triangles
+%   Appends three midpoint blocks (edges 12, 23, 31), replaces each face
+%   with four children (three corners + one midpoint triangle), then merges
+%   coincident vertices with unique(round(nodes,15),'rows'). Called from
+%   zef_set_surface_resolution when a compartment needs *more* faces than
+%   it currently has (the downsample path uses reducepatch the other way).
 %
-% Outputs:
-%   nodes
-%   triangles
-%   interp_vec
+%   [nodes, triangles, interp_vec] = zef_triangular_mesh_refinement(nodes, triangles)
 %
-% Calls (project):
-%   zef_triangular_mesh_refinement
+%   Inputs
+%     nodes      - N×3.
+%     triangles  - F×3 1-based indices.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[nodes, triangles, interp_vec]] = zef_triangular_mesh_refinement(nodes, triangles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Outputs
+%     nodes       - compacted vertices (midpoints included).
+%     triangles   - (4F)×3 remapped into the compacted nodes.
+%     interp_vec  - (4F)×1 parent face index (1:F repeated four times).
+%                   Unused by zef_set_surface_resolution (two outputs).
+%
+%   See also zef_set_surface_resolution, zef_downsample_surfaces, zef_mesh_refinement.
 
 eps_val = 15;
 
@@ -44,6 +43,7 @@ interp_vec = interp_vec(:);
 t_aux_1 = triangles(:,1);
 t_aux_2 = triangles(:,2);
 t_aux_3 = triangles(:,3);
+% Midpoints occupy three contiguous blocks after the original N vertices.
 t_aux_4 = n_nodes+[1:n_triangles]';
 t_aux_5 = n_nodes+n_triangles+[1:n_triangles]';
 t_aux_6 = n_nodes+2*n_triangles+[1:n_triangles]';

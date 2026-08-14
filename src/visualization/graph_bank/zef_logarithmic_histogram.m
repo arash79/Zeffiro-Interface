@@ -1,33 +1,17 @@
 function zef_logarithmic_distribution(parameter_vec)
-% --- Zeffiro documentation header ---
-% zef_logarithmic_distribution — Zef logarithmic distribution.
+%ZEF_LOGARITHMIC_DISTRIBUTION  Histogram of log10(parameter_vec) with log y-axis.
 %
-% Purpose:
-%   Zef logarithmic distribution.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   parameter_vec
-%
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%
-% Calls (project):
-%   zef_logarithmic_distribution
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_logarithmic_distribution(parameter_vec)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   File zef_logarithmic_histogram.m; first function is named
+%   zef_logarithmic_distribution. MATLAB calls it by filename.
+%   Mesh visualization → Plot graph. Draws on zef.h_axes1 (base).
 
-axes(evalin('base','zef.h_axes1'));
+axes(evalin('base','zef.h_axes1')
+);
 
 h_axes = evalin('base','zef.h_axes1');
 cla(h_axes,'reset');

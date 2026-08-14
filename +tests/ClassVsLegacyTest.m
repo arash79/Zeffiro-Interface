@@ -1,26 +1,17 @@
 classdef ClassVsLegacyTest < matlab.unittest.TestCase
-% --- Zeffiro documentation header ---
-% tests.ClassVsLegacyTest — Automated test: ClassVsLegacyTest.
+%CLASSVSLEGACYTEST  dSPM class inverter and legacy CSM plugin both return a reconstruction.
 %
-% Purpose:
-%   Automated test: ClassVsLegacyTest.
-%   Folder: MATLAB unit and integration tests for refactored inverse dispatch, lead fields, cluster jobs, and legacy/class parity.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
+%   Synthetic zef from tests.createSyntheticInverseZef (tiny random L).
+%   Dispatches registry id "dspm" (inverse.CSMInverter) and "legacy_csm"
+%   (tools/plugins CSM iteration) via utilities.cluster.dispatch_inverse.
+%   Asserts both result.reconstruction are nonempty. Does not compare
+%   numerical equality of the two tracks.
 %
-% Calls (project):
-%   utilities.cluster.dispatch_inverse
-%   zef_inverse_extract_bundle
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `tests.ClassVsLegacyTest(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
 
     methods (Test)
         function testCsmClassAndLegacyBothRun(testCase)

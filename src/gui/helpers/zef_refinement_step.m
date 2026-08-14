@@ -1,35 +1,31 @@
-% --- Zeffiro documentation header ---
-% if ismember(refinement_flag, [1, 3]) — If ismember(refinement flag, [1, 3]).
+%ZEF_REFINEMENT_STEP  Surface-refinement pass on the FEM tet mesh (script).
 %
-% Purpose:
-%   If ismember(refinement flag, [1, 3]).
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.refinement_on (read)
-%   zef.refinement_surface_compartments (read)
-%   zef.refinement_surface_compartments_2 (read)
-%   zef.refinement_surface_compartments_3 (read)
-%   zef.refinement_surface_mode (read)
-%   zef.refinement_surface_mode_2 (read)
-%   zef.refinement_surface_mode_3 (read)
-%   zef.refinement_surface_on (read)
-%   zef.refinement_surface_on_2 (read)
-%   zef.refinement_surface_on_3 (read)
+%   Script, not a function. Mutates caller-workspace nodes, tetra,
+%   domain_labels, distance_vec. Requires zef, refinement_flag, h
+%   (waitbar), and the meshing workspace from zef_create_fem_mesh /
+%   zef_postprocess_fem_mesh.
 %
-% Calls (project):
-%   zef_compartment_to_subcompartment
-%   zef_find_active_compartment_ind
-%   zef_waitbar
+%   Runs only if zef.refinement_on. Surface on-flag:
+%     refinement_flag==1 → zef.refinement_surface_on (create-mesh pass)
+%     refinement_flag==2 → zef.refinement_surface_on_2 (postprocess)
+%   Compartment list −1 means all source compartments
+%   (zef_find_active_compartment_ind). surface_refinement_mode 1 unions
+%   those tets; mode 2 refines each listed compartment in turn.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Algorithm: collect faces of the selected tets that appear once
+%   (boundary), gather tets that share those nodes, insert edge
+%   midpoints, and split (8-tet stencil on fully marked tets; 2- and
+%   3-node-on-surface tets get matching local splits). Negative volumes
+%   swap vertices 1–2. Volume / adaptive refinement is *not* this
+%   script — see zef_mesh_refinement and zef_get_tetra_to_refine in
+%   zef_create_fem_mesh.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if ismember(refinement_flag, [1, 3])` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_create_fem_mesh, zef_mesh_refinement.
 if ismember(refinement_flag, [1, 3])
     tetra_aux = tetra;
 end
@@ -208,6 +204,9 @@ if eval('zef.refinement_on')
 
         t_ind_2 = [tetra(J,:) edge_mat(1:length(J),:)];
 
+        % Fully marked tets: 4 original corners + 6 edge midpoints (10
+        % nodes). t_ind_1 is the 8-tet stencil; tet J is overwritten with
+        % the 8th child, the other seven are appended.
         tetra_new = [];
 
         clear J_aux;

@@ -1,49 +1,23 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% function [z,reconstruction_information] = zef_CSM_iteration — Function [z,reconstruction information] = zef CSM iteration.
-%
-% Purpose:
-%   Function [z,reconstruction information] = zef CSM iteration.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Zef fields (observed):
-%   zef.csm_n_iter (read)
-%   zef.csm_type (read)
-%   zef.inv_amplitude_db (read)
-%   zef.inv_high_cut_frequency (read)
-%   zef.inv_low_cut_frequency (read)
-%   zef.inv_prior_over_measurement_db (read)
-%   zef.inv_sampling_frequency (read)
-%   zef.inv_snr (read)
-%   zef.inv_time_1 (read)
-%   zef.inv_time_2 (read)
-%   zef.inv_time_3 (read)
-%   zef.number_of_frames (read)
-%   zef.source_direction_mode (read)
-%   zef.source_directions (read)
-%   zef.source_interpolation_ind (read)
-%   … (1 more)
-%
-% Calls (project):
-%   zef_CSM_iteration
-%   zef_getTimeStep
-%   zef_normalizeInverseReconstruction
-%   zef_postProcessInverse
-%   zef_processLeadfields
-%
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [z,reconstruction_information] = zef_CSM_iteration` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [z,reconstruction_information] = zef_CSM_iteration
-
+%ZEF_CSM_ITERATION  dSPM / sLORETA / 3D sLORETA / SBL on the processed lead field.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   [z, reconstruction_information] = zef_CSM_iteration
+%
+%   Called from CSM StartButton (not inverse.CSMInverter). No input
+%   arguments: reads base workspace zef via evalin. L via
+%   zef_processLeadfields(source_direction_mode) (numeric first arg, so
+%   that helper loads zef from base). Frames: zef.number_of_frames.
+%   SNR: zef.inv_snr (dB) → std_lhood = 10^(-inv_snr/20); SBL also uses
+%   inv_prior_over_measurement_db. Method zef.csm_type 1–4. Returns z
+%   (post-processed reconstruction) and reconstruction_information.
+%
+%   See also CSM_app_start.
+%
 
 h = waitbar(0,['CSM MAP iteration.']);
 [s_ind_1] = unique(evalin('base','zef.source_interpolation_ind{1}'));
@@ -130,8 +104,8 @@ for f_ind = 1 : number_of_frames
             f = mean(f,2);
         end
 
-        %__ dSPM __
-        %Source covariance
+        %__ dSPM (csm_type 1): noise-normalized MNE; sLORETA (2): diag(PL)^{-1/2};
+        %   3D sLORETA (3): 3x3 sqrtm per source (or scalar on normals).
         P = L'/(L*L'+S_mat);
         if method_type == 1
             %d = 1./sqrt(diag(P*S_mat*P'));
@@ -193,7 +167,8 @@ for f_ind = 1 : number_of_frames
         if evalin('base','zef.use_gpu') == 1 && gpuDeviceCount > 0
             S_mat = gpuArray(S_mat);
         end
-        %__ Sparse Bayesian Learning _
+        %__ Sparse Bayesian Learning (csm_type 4): iterate gamma n_iter times,
+        %   then z = Re(gamma .* (L'*(C_data\f))). n_iter from zef.csm_n_iter.
         n_iter = evalin('base','zef.csm_n_iter');
         C_data = cov(f');
         if det(C_data) < eps
@@ -208,6 +183,7 @@ for f_ind = 1 : number_of_frames
         end
 
         for i = 1:size(L,2)
+            % Rank of L(:,i)L(:,i)' is 1 for a nonzero column, so const ≈ 1/n_times.
             const(i) = 1/(rank(L(:,i)*L(:,i)')*size(f,2));
         end
         if evalin('base','zef.use_gpu') == 1 & gpuDeviceCount > 0
@@ -245,5 +221,6 @@ end
 z = zef_postProcessInverse(z, procFile);
 z = zef_normalizeInverseReconstruction(z);
 
-close(h);
+close(h)
+;
 end

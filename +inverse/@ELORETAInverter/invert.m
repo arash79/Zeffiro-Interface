@@ -1,35 +1,29 @@
 function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
-% --- Zeffiro documentation header ---
-% inverse.ELORETAInverter.invert — Runs one inverse reconstruction step for a single measurement frame.
+%invert  Apply cached eLORETA operator: z = T*f for one measurement frame.
 %
-% Purpose:
-%   Runs one inverse reconstruction step for a single measurement frame.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   f
-%   L
-%   procFile
-%   source_direction_mode
-%   source_positions
-%   opts
+%   Called from utilities.inverse.run_frame_loop. There is no default-profile
+%   Inverse-tools button that constructs ELORETAInverter; use
+%   zef_inverse_run(zef, "eloreta", "execution", "local") or this class
+%   directly. If precomputed_inverse_operator is empty, calls precompute
+%   (fixed-point W^{-1}, then T = W^{-1} L' M^{-1}).
 %
-% Outputs:
-%   z_vec
-%   self
+%   Inputs
+%     f     - n_sensors×1 filtered frame.
+%     L     - processed lead field (needed only when T is not yet cached).
+%     procFile - passed through to precompute (s_ind_4 = fixed-orientation
+%             sources under direction mode 2). Unused once T exists.
+%     source_direction_mode, source_positions - unused here.
+%     opts.use_gpu - upload T and f, then gather z.
+%     opts.normalize_data - unused here.
 %
-% Calls (project):
-%   inverse.invert
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z_vec, self]] = inverse.ELORETAInverter.invert(self, f, L, procFile, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Outputs
+%     z_vec - n_dof×1 eLORETA estimate T*f.
+%     self  - T cached on precomputed_inverse_operator.
 
 arguments
     self (1,1) inverse.ELORETAInverter

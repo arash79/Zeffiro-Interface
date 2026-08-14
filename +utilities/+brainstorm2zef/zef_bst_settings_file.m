@@ -1,18 +1,18 @@
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.function zef_bst_settings_file — Function zef bst settings file.
-%
-% Purpose:
-%   Function zef bst settings file.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
-%
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_settings_file
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `utilities.brainstorm2zef.function zef_bst_settings_file` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function zef_bst_settings_file
+%ZEF_BST_SETTINGS_FILE  uigetfile('*.m') → figure settings_file_name.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   zef_bst_settings_file
+%
+%   Callback for the plugin "Settings file" button. Parent of gcbo must
+%   have folder_name and settings_subfolder_name. Stores the chosen file
+%   name (not full path) on the figure and on Tag='settings_file' text.
+%
+%   See also zef_bst_plugin_start, zef_bst_get_settings_file_name.
 
 h_parent = get(gcbo,'Parent');
 h_text_1 = findobj(h_parent.Children,'Tag','settings_file');

@@ -1,29 +1,3 @@
-% --- Zeffiro documentation header ---
-% function [G, interpolation_positions] = zef_st_venant_interpolation( ... — Function [G, interpolation positions] = zef st venant interpolation( .
-%
-% Purpose:
-%   Function [G, interpolation positions] = zef st venant interpolation( ....
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Inputs:
-%   p_nodes
-%   p_tetrahedra
-%   p_brain_inds
-%   p_intended_source_inds
-%   p_nearest_neighbour_inds
-%   p_regparam
-%
-% Calls (project):
-%   zef_L2_norm
-%   zef_adjacency_matrix
-%   zef_st_venant_interpolation
-%   zef_tetra_barycentra
-%   zef_waitbar
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `function [G, interpolation_positions] = zef_st_venant_interpolation( ...(p_nodes, p_tetrahedra, p_brain_inds, p_intended_source_inds, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 function [G, interpolation_positions] = zef_st_venant_interpolation( ...
     p_nodes, ...
     p_tetrahedra, ...
@@ -32,6 +6,38 @@ function [G, interpolation_positions] = zef_st_venant_interpolation( ...
     p_nearest_neighbour_inds, ...
     p_regparam ...
     )
+%ZEF_ST_VENANT_INTERPOLATION  St. Venant monopolar source interpolation G.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Called from zef_lead_field_interpolation for ZefSourceModel.StVenant
+%   and ContinuousStVenant. Does not use PBO/MPO; the 6th argument is the
+%   Tikhonov parameter p_regparam (EEG FEM passes 1e-6).
+%
+%   [G, interpolation_positions] = zef_st_venant_interpolation(nodes, tetra, ...
+%       brain_inds, intended_source_inds, nearest_neighbour_inds, regparam)
+%
+%   For each intended source tet:
+%     1. interpolation position = tet barycentre; nearest mesh node via
+%        KDTreeSearcher.
+%     2. Neighbours = nonzero rows of zef_adjacency_matrix on brain tets
+%        (the centre node is dropped). Empty neighbour set → skip.
+%     3. Moments = neighbour_diffs / longest_edge. Restriction P is 9 ×
+%        n_neighbours: rows 1,4,7 ones (charge); 2,5,8 dipole moments;
+%        3,6,9 squared moments. b is 9×3 with I_3/longest_edge on the
+%        dipole rows. D = diag(sum(dists.^2,2)).
+%     4. Monopolar loads m = (P'P + α D)^{-1} P' b, written into the
+%        three columns of G at the neighbour nodes.
+%
+%   Continuous neighbourhood (nonempty nearest_neighbour_inds) is a
+%   TODO in this file and does not expand the stencil. G is negated at
+%   the end (sign convention vs the Schur complement; see in-file TODO).
+%   Nodes with no neighbours contribute nothing.
+%
+%   See also zef_adjacency_matrix, zef_L2_norm, zef_lead_field_interpolation.
 
 arguments
     p_nodes (:,3) double {mustBeNonNan}

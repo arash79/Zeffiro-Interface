@@ -1,24 +1,17 @@
 function out = is_eof ( in )
-% --- Zeffiro documentation header ---
-% utilities.io.is_eof — Is eof.
+%IS_EOF  True iff the token is the ASCII "-1" end-of-file sentinel.
 %
-% Purpose:
-%   Is eof.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   in
+%   FreeSurfer ASCII surfaces/labels in fs2zef readers terminate counts with
+%   a line "-1". in is a scalar string.
 %
-% Outputs:
-%   out
+%   out = is_eof(in)
 %
-% Calls (project):
-%   utilities.io.is_eof
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[out] = utilities.io.is_eof(in)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also read_ascii_segmentation_file, float_is_int.
 
     arguments
 

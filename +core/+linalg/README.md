@@ -1,40 +1,16 @@
-# +core/+linalg
+# `core.linalg` — shared preconditioner matrices
 
-## Purpose of this folder
+Dense left-preconditioner matrices for iterative linear solvers:
 
-Linear-algebra helpers for solvers (preconditioners).
+```matlab
+M = core.linalg.preconditioners.jacobi(A);             % M = D^{-1}, D = diag(A)
+M = core.linalg.preconditioners.ssor(A, "coeff", 1);    % ω ∈ [0, 2], default 1
+```
 
-## Contents
+Both require a square `A` (sparse or dense) and return a **dense** matrix the same size. They are not opened from any Zeffiro menu.
 
-Subfolders:
-- `+preconditioners/`
+## Where this sits in Zeffiro
 
-## How this folder fits into the overall workflow
+EEG/MEG/EIT/TES lead fields assemble a sparse stiffness matrix and PCG-solve the transfer with `zef_transfer_matrix` (`src/gui/helpers`). That path still builds its own SSOR / incomplete-Cholesky factors from `zef.preconditioner` (`1` Cholinc, `2` SSOR). **`core.linalg.preconditioners` is not that call site yet.** Use this package when writing new solvers that want a dense `M` you can left-multiply or factor yourself.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Formulas and arguments: [+preconditioners/README.md](+preconditioners/README.md). Parent overview: [../README.md](../README.md).

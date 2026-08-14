@@ -1,44 +1,17 @@
-%Copyright © 2018, Sampsa Pursiainen
 function [eit_data_vec] = zef_compute_gravity_data(nodes,elements,rho,electrodes,varargin)
-% --- Zeffiro documentation header ---
-% zef_compute_gravity_data — Zef compute gravity data.
+%ZEF_COMPUTE_GRAVITY_DATA  Forward gravity/EIT-style data vector from density and stations.
 %
-% Purpose:
-%   Zef compute gravity data.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018, Sampsa Pursiainen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
 %
-% Inputs:
-%   nodes
-%   elements
-%   rho
-%   electrodes
-%   varargin
+%   Synthesizes a measurement vector from nodes, tetrahedra (or {tetra,prisms}),
+%   density rho, and electrode/station coordinates. Companion to the gravity
+%   lead-field assemblers when you need data rather than L.
 %
-% Outputs:
-%   eit_data_vec
+%   eit_data_vec = zef_compute_gravity_data(nodes, elements, rho, electrodes, varargin)
 %
-% Zef fields (observed):
-%   zef.imaging_method (read)
-%   zef.inv_bg_data (read)
-%   zef.inv_eit_noise (read)
-%   zef.inv_roi_perturbation (read)
-%   zef.inv_roi_sphere (read)
-%   zef.sensors (read)
-%
-% Calls (project):
-%   zef_compute_gravity_data
-%   zef_tetra_volume
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[eit_data_vec] = zef_compute_gravity_data(nodes, elements, rho, electrodes, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_lead_field_gravity, zef_lead_field_gravity_grad.
 
 N = size(nodes,1);
 L = size(electrodes,1);

@@ -1,31 +1,23 @@
 function zef = zef_fix_sensors_get_functions_array_size(zef)
-% --- Zeffiro documentation header ---
-% zef_fix_sensors_get_functions_array_size — Zef fix sensors get functions array size.
+%ZEF_FIX_SENSORS_GET_FUNCTIONS_ARRAY_SIZE  Resize sensor get_functions cell to match sensor count.
 %
-% Purpose:
-%   Zef fix sensors get functions array size.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Sets zef.<current_sensors>_get_functions to length n_sensors (minimum 1),
+%   preserving non-empty entries and dropping empty trailing cells.
 %
-% Outputs:
-%   zef
+%   zef = zef_fix_sensors_get_functions_array_size(zef)
 %
-% Zef fields (observed):
-%   zef.current_sensors (read)
+%   Input
+%     zef - session with current_sensors and _points populated.
 %
-% Calls (project):
-%   zef_fix_sensors_get_functions_array_size
+%   Output
+%     zef - session with normalized _get_functions cell array.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_fix_sensors_get_functions_array_size(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_attach_sensors_volume, zef_create_sensors.
 
 n_sensors = size(zef.([zef.current_sensors '_points']),1);
 if isequal(n_sensors,0)

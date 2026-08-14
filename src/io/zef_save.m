@@ -1,59 +1,44 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_save(zef,file_name,path_name,save_switch)
-% --- Zeffiro documentation header ---
-% zef_save — Writes project, mesh, or reconstruction data to disk.
+%ZEF_SAVE  Save project data or export selected Zeffiro fields to disk.
 %
-% Purpose:
-%   Writes project, mesh, or reconstruction data to disk.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   file_name
-%   path_name
-%   save_switch
+%   Dispatches on zef.save_switch (menu wiring in zef_menu_tool):
+%     1  Project → Save as...          full project
+%     2  Export → Export lead field    L
+%     3  Export → Export source space  source_positions, source_directions
+%     4  Export → Export sensors       <current_sensors>_points/_directions
+%     5  Export → Export segmentation data
+%     6  Export → Export volume data
+%     7  Project → Save                overwrite path, else Save as...
+%     8  Export → Export reconstruction
+%     9  Project → Save figures as...
+%    10  Project → Print figure to file as...
+%   Project saves strip handles, close tools/figs, then reopen mesh tools.
 %
-% Outputs:
-%   zef
+%   zef = zef_save(zef)
+%   zef = zef_save(zef, file_name, path_name)
+%   zef = zef_save(zef, file_name, path_name, save_switch)
 %
-% Zef fields (observed):
-%   zef.brain_ind (read)
-%   zef.current_sensors (read)
-%   zef.file (read, write)
-%   zef.file_index (read, write)
-%   zef.file_path (read, write)
-%   zef.h_fig_aux (read, write)
-%   zef.imaging_method (read, write)
-%   zef.min_ind (read)
-%   zef.min_val (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.save_file (read, write)
-%   zef.save_file_path (read, write)
-%   zef.save_switch (read, write)
-%   zef.sensors (read)
-%   … (10 more)
+%   Inputs
+%     zef          - session struct; uses zef.save_switch when save_switch
+%                    is omitted (default 1 for three-argument calls).
+%     file_name    - optional output file name (no dialog when given with
+%                    path_name).
+%     path_name    - optional folder for file_name.
+%     save_switch  - integer mode selector (1–10); see body for exported
+%                    field subsets per mode.
 %
-% Calls (project):
-%   zef_attach_sensors_volume
-%   zef_postprocess_fem_mesh
-%   zef_process_meshes
-%   zef_remove_object_handles
-%   zef_save
-%   zef_update
+%   Output
+%     zef - updated session with file, file_path, save_file, and
+%           save_file_path set after a successful save dialog or path.
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
+%   See also zef_load, zef_remove_object_handles, zef_process_meshes,
+%            zef_attach_sensors_volume.
 %
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_save(zef, file_name, path_name, save_switch)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
 if nargin == 0
     zef = evalin('base','zef');
 end

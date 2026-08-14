@@ -1,40 +1,21 @@
 function zef_export_fem_mesh_as(zef)
-% --- Zeffiro documentation header ---
-% zef_export_fem_mesh_as — Writes project, mesh, or reconstruction data to disk.
+%ZEF_EXPORT_FEM_MESH_AS  Export volume FEM mesh arrays to a MAT file.
 %
-% Purpose:
-%   Writes project, mesh, or reconstruction data to disk.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Prompts with uiputfile when zef.use_display is true, otherwise uses
+%   zef.file and zef.file_path, and saves nodes, tetra, domain_labels, and
+%   name_tags from the current session.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_export_fem_mesh_as(zef)
 %
-% Zef fields (observed):
-%   zef.domain_labels (read)
-%   zef.file (read)
-%   zef.file_path (read)
-%   zef.name_tags (read)
-%   zef.nodes (read)
-%   zef.save_file_path (read)
-%   zef.tetra (read)
-%   zef.use_display (read)
+%   Input
+%     zef - session struct with tetrahedral mesh fields populated.
 %
-% Calls (project):
-%   zef_export_fem_mesh_as
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `zef_export_fem_mesh_as(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_save, zef_import_segmentation.
 
 if nargin == 0
     zef = evalin('base','zef');
@@ -54,6 +35,5 @@ if not(isequal(file,0))
     domain_labels = eval('zef.domain_labels');
     name_tags = eval('zef.name_tags');
     save([path '/' file],'-v7.3','nodes','tetra','domain_labels','name_tags');
-
 
 end

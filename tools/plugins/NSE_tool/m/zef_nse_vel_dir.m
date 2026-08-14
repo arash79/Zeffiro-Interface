@@ -1,35 +1,19 @@
 function direction = zef_nse_vel_dir(zef,nse_field)
-% --- Zeffiro documentation header ---
-% zef_nse_vel_dir — Zef nse vel dir.
+%ZEF_NSE_VEL_DIR  Unit direction from ROI node toward dir_v_* on the artery submesh.
 %
-% Purpose:
-%   Zef nse vel dir.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nse_field
+%   Used by zef_nse_separate_waves_roi. ROI centre is read from the widget
+%   strings h_roi_x/y/z; toward-point is nse_field.dir_v_*. Artery submesh
+%   via zef_get_submesh.
 %
-% Outputs:
-%   direction
+%   direction = zef_nse_vel_dir(zef, nse_field)
 %
-% Zef fields (observed):
-%   zef.domain_labels (read)
-%   zef.nodes (read)
-%   zef.source_positions (read)
-%   zef.tetra (read)
+%   See also zef_nse_dir_v_node, zef_nse_separate_waves_roi.
 %
-% Calls (project):
-%   zef_get_submesh
-%   zef_nse_vel_dir
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[direction] = zef_nse_vel_dir(zef, nse_field)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 roi_ind = find(sqrt(sum((zef.source_positions - repmat([str2double(nse_field.h_roi_x.Value) str2double(nse_field.h_roi_y.Value) str2double(nse_field.h_roi_z.Value)],size(zef.source_positions,1),1)).^2,2))<= nse_field.roi_radius);
 towards = [nse_field.dir_v_x nse_field.dir_v_y nse_field.dir_v_z];

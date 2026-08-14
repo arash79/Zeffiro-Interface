@@ -1,22 +1,17 @@
 function mag = mag_fn(La, Lfem)
-% --- Zeffiro documentation header ---
-% mag_fn — Mag fn.
+%MAG_FN  Magnitude error 1 - ||Lfem|| / ||La|| per column.
 %
-% Purpose:
-%   Mag fn.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   La
-%   Lfem
+%   mag = mag_fn(La, Lfem)
 %
-% Outputs:
-%   mag
+%   Column Euclidean norms; no scaling of the matrices first. Typical
+%   pair: analytic La vs FEM Lfem. Not on the menu.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[mag] = mag_fn(La, Lfem)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also rdm_fn, zef_lead_field_eeg_multilayer_sphere.
 
 mag = 1 - sqrt(sum(Lfem.^2))' ./ sqrt(sum(La.^2))';
 end

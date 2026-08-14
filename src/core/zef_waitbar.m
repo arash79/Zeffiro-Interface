@@ -1,905 +1,827 @@
 function h_waitbar = zef_waitbar(varargin)
-% --- Zeffiro documentation header ---
-% zef_waitbar — Zef waitbar.
+%ZEF_WAITBAR  Create or update the Zeffiro progress window.
 %
-% Purpose:
-%   Zef waitbar.
-%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
-%   float
+%   Progress UI for mesh, lead-field, and inverse work. The public calling
+%   conventions match the historical zef_waitbar API used throughout the
+%   project. The window is a compact standalone uifigure with labels and a
+%   filled progress bar (not MATLAB waitbar, not linear uigauge). That
+%   avoids the pre-R2025a figure/uicontrol/axes/barh mix, which is unstable
+%   on MATLAB's WebGL graphics stack, and also avoids the analog-gauge
+%   ruler that App Designer uses for uigauge('linear').
 %
-% Outputs:
-%   h_waitbar
+%   h = zef_waitbar(current_iter, max_iter, message)
+%   h = zef_waitbar(current_iter, max_iter, h_waitbar)
+%   h = zef_waitbar(current_iter, max_iter, h_waitbar, message)
+%   h = zef_waitbar(ratio, h_waitbar)
+%   h = zef_waitbar(ratio, h_waitbar, message)
+%   h = zef_waitbar(ratio, message)
 %
-% Calls (project):
-%   zef_eval_entry
-%   zef_waitbar
+%   close(h) and delete(h) both destroy the window. A new initialize call
+%   reuses the existing singleton figure so nested processes keep a valid
+%   handle. Updating a deleted handle recreates it. Redraws smaller than
+%   about 1% are skipped except at 0%, 100%, or when the message changes.
 %
-% Side effects:
-%   - base/caller workspace
-%   - creates/updates figures
-%   - filesystem I/O
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[h_waitbar] = zef_waitbar(varargin, float)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-h_waitbar = [];
+%   See also zef_delete_waitbar, uifigure, zef_window_manager.
 
 if nargin < 2 || nargin > 4
-    error("zef_waitbar needs 2, 3, or 4 arguments")
+    error('zef_waitbar:InvalidNargin', 'zef_waitbar needs 2, 3, or 4 arguments.');
 end
 
-if not(isa(varargin{2}, "matlab.graphics.Graphics"))
-current_iter = double ( varargin { 1 } ) ;
-max_iter = double ( varargin { 2 } ) ;
-progress_ratio = current_iter ./ max_iter ;
-progress_threshold = max(1, ceil ( max_iter / 100 )) ;
-else 
-    progress_ratio = varargin{1};
-    progress_threshold = 0.01;
-    current_iter = progress_ratio;
-end
+[action, ratio, h_in, msg, current_iter] = local_parse(varargin{:});
 
-% Set our plan of action. Start by setting constants.
-
-INITIALIZING = "{{initializing}}";
-PROGRESSING = "{{progressing}}";
-PROGRESSING_WITH_CHANGED_TEXT = "{{progressing with text}}";
-plan_of_action = INITIALIZING;
-
-if nargin == 3
-
-    third = varargin{3};
-    second = varargin{2};
-
-    if isa(third, "matlab.graphics.Graphics")
-
-        try
-            if isvalid(third)
-                h_waitbar = third ;
-                plan_of_action = PROGRESSING;
-
-                try
-                    if not(isprop(varargin{3},'ZefWaitbarCurrentProgress'))
-                        addprop(varargin{3},'ZefWaitbarCurrentProgress');
-                        varargin{3}.ZefWaitbarCurrentProgress = 1;
-                    end
-
-                    if abs(current_iter - varargin{3}.ZefWaitbarCurrentProgress) < progress_threshold
-                        return
-                    else
-                        varargin{3}.ZefWaitbarCurrentProgress = current_iter ;
-                    end
-                catch
-                    % If property handling fails, continue anyway
-                end
-
-            else
-
-                plan_of_action = INITIALIZING;
-                
-            end
-        catch
-            plan_of_action = INITIALIZING;
-        end
-
-    elseif isa(third, "string") || isa(third, "char")
-
-        plan_of_action = INITIALIZING;
-
+if ~strcmp(action, 'init') && local_is_valid(h_in)
+    if local_should_skip(h_in, ratio, msg)
+        h_waitbar = h_in;
+        return
     end
-    
-     if isa(second, "matlab.graphics.Graphics")
-        
-      try
-          h_waitbar = second ; 
-          plan_of_action = PROGRESSING;
-          progress_ratio = varargin{1};
-          progress_bar_text = varargin{3};
-          progress_threshold = 0.01;
-
-          try
-              if not(isprop(varargin{2},'ZefWaitbarCurrentProgress'))
-                  addprop(varargin{2},'ZefWaitbarCurrentProgress');
-                  varargin{2}.ZefWaitbarCurrentProgress = 0;
-              end
-
-              if abs(varargin{1} - varargin{2}.ZefWaitbarCurrentProgress) < progress_threshold
-                  return
-              else
-                  varargin{2}.ZefWaitbarCurrentProgress = varargin{1};
-              end
-          catch
-              % If property handling fails, continue anyway
-          end
-      catch
-          % If graphics handle access fails, skip this path
-      end
-         
-     end
-    
-
-elseif nargin == 4 && ( isa(varargin{4}, "string") || isa(varargin{4}, "char") )
-
-    try
-        if isvalid(varargin{3})
-
-            h_waitbar = varargin{3};
-
-            plan_of_action = PROGRESSING_WITH_CHANGED_TEXT;
-
-            try
-                if abs(current_iter - h_waitbar.ZefWaitbarCurrentProgress) < progress_threshold
-                    return
-                else
-                    h_waitbar.ZefWaitbarCurrentProgress = current_iter ;
-                end
-            catch
-                % If property access fails, continue anyway
-            end
-
-        else
-
-            plan_of_action = INITIALIZING;
-
-        end
-    catch
-        plan_of_action = INITIALIZING;
-    end
-
-elseif nargin == 2
-
-     progress_ratio = varargin{1};
-    progress_bar_text = varargin{2};
-    progress_threshold = 1;
-    plan_of_action = INITIALIZING;
+    local_set_progress_prop(h_in, current_iter);
 end
 
+menu = local_find_menu();
+opts = local_menu_options(menu);
+opts.caller = local_caller_name();
 
-% Safe handle finding with timeout protection
-try
-    h_zeffiro_menu = findall(groot,'ZefTool','zef_menu_tool');
-catch ME
-    % If findall fails or hangs, treat as empty
-    h_zeffiro_menu = [];
-    warning('Failed to find Zeffiro menu: %s', ME.message);
+if strcmp(action, 'init') || ~local_is_valid(h_in)
+    h_waitbar = local_create(opts, msg, menu);
+    local_set_progress_prop(h_waitbar, current_iter);
+    local_paint(h_waitbar, ratio, msg, opts, true);
+else
+    h_waitbar = h_in;
+    local_paint(h_waitbar, ratio, msg, opts, false);
 end
 
-% Handle missing menu (e.g. after restart, or Mac window manager timing).
-% Must check isempty BEFORE any property access to avoid crash.
-if isempty(h_zeffiro_menu)
+end
 
-    if plan_of_action == INITIALIZING
+%% Argument parsing
 
-        try
-            % Use visible=1 so user sees waitbar when Zeffiro menu not found
-            h_waitbar = init_figure([0.375 0.35 0.2 0.2], 1, -1, []);
-            h_waitbar.ZefWaitbarStartTime = now;
-        catch ME
-            warning('Failed to initialize waitbar: %s', ME.message);
-            h_waitbar = [];
-        end
+function [action, ratio, h, msg, current_iter] = local_parse(varargin)
 
-    elseif plan_of_action == PROGRESSING || plan_of_action == PROGRESSING_WITH_CHANGED_TEXT
+h = [];
+msg = '';
+nums = {};
 
-        if nargin >= 3 && (isa(varargin{3}, "matlab.graphics.Graphics"))
-            try
-                if isvalid(varargin{3})
-                    h_waitbar = varargin{3};
-                    % Minimal update: set progress text if 4-arg form
-                    if nargin == 4 && (isa(varargin{4}, "string") || isa(varargin{4}, "char"))
-                        h_t = findobj(h_waitbar.Children,'Tag','progress_bar_text');
-                        if ~isempty(h_t), h_t.String = varargin{4}; end
-                    end
-                else
-                    h_waitbar = [];
-                end
-            catch
-                h_waitbar = [];
-            end
-        else
-            h_waitbar = [];
-        end
-
+for k = 1:nargin
+    a = varargin{k};
+    if local_looks_like_handle(a)
+        h = a;
+    elseif ischar(a) || isstring(a)
+        msg = char(string(a));
+    elseif isnumeric(a)
+        nums{end+1} = double(a); %#ok<AGROW>
     else
-
-        h_waitbar = [];
-
+        error('zef_waitbar:InvalidArgument', ...
+            'Argument %d must be numeric, text, or a graphics handle.', k);
     end
+end
 
+if isempty(nums)
+    error('zef_waitbar:MissingProgress', 'zef_waitbar needs a numeric progress value.');
+end
+
+if numel(nums) >= 2
+    % Nested waitbars pass vectors (e.g. [i j n_rep f_ind] vs max of each
+    % loop). Ratio is elementwise current./max, then clamped to [0,1];
+    % the gauge uses max(ratio(:)).
+    current_iter = nums{1};
+    max_iter = nums{2};
+    if isempty(max_iter) || ~all(isfinite(max_iter(:))) || max(abs(max_iter(:))) == 0
+        ratio = 0;
+    else
+        ratio = current_iter ./ max_iter;
+    end
+else
+    current_iter = nums{1};
+    ratio = current_iter;
+end
+
+if isempty(ratio)
+    ratio = 0;
+else
+    ratio = max(0, min(1, max(ratio(:))));
+end
+
+if isempty(current_iter)
+    current_iter = 0;
+else
+    current_iter = current_iter(1);
+end
+
+if ~local_is_valid(h)
+    action = 'init';
+elseif strlength(string(msg)) > 0
+    action = 'progress_text';
+else
+    action = 'progress';
+end
+
+end
+
+function tf = local_looks_like_handle(h)
+% Numeric 0 is groot (isgraphics(0) is true). Never treat doubles as waitbar handles.
+tf = ~isempty(h) && isscalar(h) && ~isnumeric(h) ...
+    && (isgraphics(h) || isa(h, 'matlab.ui.Figure'));
+if tf
+    try
+        tf = ~isequal(h, groot);
+    catch
+    end
+end
+end
+
+function tf = local_is_valid(h)
+tf = local_looks_like_handle(h);
+if tf
+    try
+        tf = isvalid(h);
+    catch
+        tf = false;
+    end
+end
+end
+
+function tf = local_should_skip(h, ratio, msg)
+% Never skip a reset (0) or completion (1). Never skip a changed message.
+% Skip redraws smaller than 1% in ratio space.
+if ratio <= 0 || ratio >= 1
+    tf = false;
     return
-
-end % if isempty(h_zeffiro_menu)
-
-% From here, h_zeffiro_menu is non-empty; take first if array
-h_zeffiro_menu = h_zeffiro_menu(1);
-
-if not(exist('h_waitbar','var'))
-
+end
+if strlength(string(msg)) > 0
     try
-        h_waitbar = h_zeffiro_menu.ZefWaitbarHandle;
-
-        if not(isempty(h_waitbar))
-
-            try
-                if isvalid(h_waitbar)
-
-                    h_waitbar = h_waitbar(1);
-
-                else
-
-                    h_waitbar = [];
-
-                end
-            catch
-                h_waitbar = [];
+        ud = h.UserData;
+        if isstruct(ud) && isfield(ud, 'msgLabel') && isvalid(ud.msgLabel)
+            if ~strcmp(char(string(ud.msgLabel.Text)), char(string(msg)))
+                tf = false;
+                return
             end
-
         end
     catch
-        h_waitbar = [];
-    end
-
-end
-
-
-try
-    if not(h_zeffiro_menu.ZefUseWaitbar)
-        h_waitbar = [];
-        return;
-    end
-catch
-    % If property access fails, assume waitbar should not be used
-    h_waitbar = [];
-    return;
-end
-
-% Cache numcores at first use to avoid repeated expensive calls
-if ~isprop(h_zeffiro_menu, 'ZefNumCoresCached')
-    try
-        addprop(h_zeffiro_menu, 'ZefNumCoresCached');
-        h_zeffiro_menu.ZefNumCoresCached = max(1, feature('numcores'));
-    catch
-        h_zeffiro_menu.ZefNumCoresCached = 4;  % Conservative default
     end
 end
-
+tf = false;
 try
-    position_vec_0 = h_zeffiro_menu.Position;
-    position_vec_1 = h_zeffiro_menu.ZefWaitbarSize;
-    s_h = zef_eval_entry(get(groot,'ScreenSize'),3);
-    s_v = zef_eval_entry(get(groot,'ScreenSize'),4);
-    position_vec_0([1 3]) = position_vec_0([1 3])/s_h;
-    position_vec_0([2 4]) = position_vec_0([2 4])/s_v;
-    position_vec_1(1) = position_vec_1(1)*position_vec_0(3);
-    position_vec_1(2) = position_vec_1(2)*position_vec_0(3)*s_h/s_v;
-    position_vec = [position_vec_0(1) position_vec_0(2)-position_vec_1(2) position_vec_1(1) position_vec_1(2)];
+    ud = h.UserData;
+    if isstruct(ud) && isfield(ud, 'lastRatio')
+        tf = abs(ratio - ud.lastRatio) < 0.01;
+    end
 catch
-    % If position calculation fails, use default
-    position_vec = [0.375 0.35 0.2 0.2];
+    tf = false;
+end
 end
 
-log_frequency = 5;
-first_step = 0;
-progress_value = double ( progress_ratio );
-progress_value = min(1,progress_value(:));
-progress_value = max(0,progress_value(:));
-% Waitbar rendering expects a scalar progress value.
-if ~isempty(progress_value)
-    progress_value = max(progress_value);
-else
-    progress_value = 0;
+function local_set_progress_prop(h, current_iter)
+if ~local_is_valid(h)
+    return
 end
-
 try
-    visible_value = or(h_zeffiro_menu.Visible,h_zeffiro_menu.ZefAlwaysShowWaitbar);
-    font_size = h_zeffiro_menu.ZefFontSize;
-    verbose_mode = h_zeffiro_menu.ZefVerboseMode;
-    use_waitbar = h_zeffiro_menu.ZefUseWaitbar;
-    use_log = h_zeffiro_menu.ZefUseLog;
-    current_log_file = h_zeffiro_menu.ZefCurrentLogFile;
-    task_id = h_zeffiro_menu.ZefTaskId;
-    restart_time = h_zeffiro_menu.ZefRestartTime;
+    if ~isprop(h, 'ZefWaitbarCurrentProgress')
+        addprop(h, 'ZefWaitbarCurrentProgress');
+    end
+    h.ZefWaitbarCurrentProgress = current_iter;
 catch
-    % If property access fails, use defaults
-    visible_value = true;
-    font_size = 10;
-    verbose_mode = false;
-    use_waitbar = true;
-    use_log = false;
-    current_log_file = '';
-    task_id = 0;
-    restart_time = now;
+end
 end
 
-if use_log
+%% Menu / options
 
-    try
-        fid = fopen(current_log_file,'a');
-        if fid == -1
-            use_log = false;
-            warning('Could not open log file: %s', current_log_file);
+function menu = local_find_menu()
+menu = [];
+try
+    found = findall(groot, 'ZefTool', 'zef_menu_tool');
+    if ~isempty(found)
+        menu = found(1);
+        if ~isvalid(menu)
+            menu = [];
         end
-    catch ME
-        use_log = false;
-        warning('Error opening log file: %s', ME.message);
-    end
-
-end
-
-if not(use_waitbar)
-
-    visible_value = 0;
-
-end
-
-% Choose whether to update and existing waitbar or an new one.
-
-if plan_of_action == INITIALIZING
-
-    first_step = 1;
-
-    task_id = task_id + 1;
-
-    h_waitbar = init_figure(position_vec, 0, task_id, h_waitbar);
-
-    try
-        h_zeffiro_menu.ZefTaskId = h_zeffiro_menu.ZefTaskId + 1;
-    catch
-        % If task ID update fails, continue
-    end
-
-    try
-        h_waitbar.ZefWaitbarStartTime = now;
-    catch
-        % If property setting fails, continue
-    end
-
-    try
-        h_zeffiro_menu.ZefWaitbarHandle = h_waitbar;
-    catch
-        % If handle assignment fails, continue
-    end
-
-    try
-        caller_stack = dbstack(1);
-        if ~isempty(caller_stack)
-            caller_file_name = caller_stack(1).file;
-        else
-            caller_file_name = 'no caller file';
-        end
-    catch
-        caller_file_name = 'no caller file';
-    end
-
-    progress_bar_text = varargin{end};
-
-
-elseif plan_of_action == PROGRESSING
-
-    try
-        if   isa(second, "matlab.graphics.Graphics")
-            h_waitbar = varargin{2};
-        elseif isa(third, "matlab.graphics.Graphics")
-            h_waitbar = varargin{3};
-        end
-    catch
-        h_waitbar = [];
-    end
-    
-    try
-        h_text = findobj(h_waitbar.Children,'Tag','progress_bar_text');
-        h_text_ready = findobj(h_waitbar.Children,'Tag','progress_bar_ready_text');
-
-        if ~isempty(h_text)
-            progress_bar_text = h_text.String;
-        else
-            progress_bar_text = 'Progress';
-        end
-
-        if ~isempty(h_text_ready)
-            progress_bar_ready_text = h_text_ready.String;
-        else
-            progress_bar_ready_text = '';
-        end
-    catch
-        progress_bar_text = 'Progress';
-        progress_bar_ready_text = '';
-    end
-
-elseif plan_of_action == PROGRESSING_WITH_CHANGED_TEXT
-
-    h_waitbar = varargin{3};
-
-    progress_bar_text = varargin{end};
-
-else
-
-    error("zef_waitbar encountered an invalid plan of action. You gave the wrong number of arguments in the wrong order")
-
-end
-
-% Create bar elements on first run.
-
-if plan_of_action == INITIALIZING
-
-    initial_time = now * 86400 ;
-
-    h_waitbar.UserData = [cputime initial_time initial_time];
-
-    h_caller_file_name = uicontrol('Tag','caller_file_name','Style','text','FontWeight','bold','Parent',h_waitbar,'Units','normalized','String',caller_file_name,'HorizontalAlignment','center','Position',[0.1 0.78 0.8 0.15]);
-
-    h_text_1 = uicontrol('Tag','progress_bar_text','Style','text','Parent',h_waitbar,'Units','normalized','String',progress_bar_text,'HorizontalAlignment','center','Position',[0.1 0.70 0.8 0.15]);
-
-    h_text_2 = uicontrol('Tag','progress_bar_ready_text','Style','text','Parent',h_waitbar,'Units','normalized','String',progress_bar_text,'HorizontalAlignment','center','Position',[0.1 0.02 0.8 0.08]);
-
-    h_text_3 = uicontrol('Tag','auxiliary_text_1','Style','text','Parent',h_waitbar,'Units','normalized','String','Workspace size (MB)','HorizontalAlignment','center','Position',[0.08 0.1 0.2 0.15]);
-
-    h_text_4 = uicontrol('Tag','auxiliary_text_2','Style','text','Parent',h_waitbar,'Units','normalized','String','Time (s)','HorizontalAlignment','center','Position',[0.28 0.1 0.2 0.15]);
-
-    h_text_5 = uicontrol('Tag','auxiliary_text_3','Style','text','Parent',h_waitbar,'Units','normalized','String','CPU usage (%)','HorizontalAlignment','center','Position',[0.48 0.1 0.2 0.15]);
-
-    uistack(h_text_1,'bottom');
-    uistack(h_text_2,'bottom');
-    uistack(h_text_3,'bottom');
-    uistack(h_text_4,'bottom');
-    uistack(h_text_5,'bottom');
-
-    font_size = h_zeffiro_menu.ZefFontSize;
-
-    set(findobj(h_waitbar.Children,'-property','FontUnits'),'FontUnits','pixels');
-
-    set(findobj(h_waitbar.Children,'-property','FontSize'),'FontSize',font_size);
-
-end
-
-% Either create or use existing axes.
-
-if plan_of_action == INITIALIZING
-
-    h_axes = axes(h_waitbar,'Position',[0.1 0.50 0.8 0.25]);
-    h_axes_2 = axes(h_waitbar,'Position',[0.08 0.3 0.2 0.17]);
-    h_axes_3 = axes(h_waitbar,'Position',[0.28 0.3 0.2 0.17]);
-    h_axes_4 = axes(h_waitbar,'Position',[0.48 0.3 0.2 0.17]);
-
-else
-
-    try
-        h_axes = findobj(h_waitbar.Children,'Tag','progress_bar_main_axes');
-        h_axes_2 = findobj(h_waitbar.Children,'Tag','progress_bar_auxiliary_axes_1');
-        h_axes_3 = findobj(h_waitbar.Children,'Tag','progress_bar_auxiliary_axes_2');
-        h_axes_4 = findobj(h_waitbar.Children,'Tag','progress_bar_auxiliary_axes_3');
-    catch ME
-        % If finding axes fails, reinitialize
-        warning('Failed to find waitbar axes, reinitializing: %s', ME.message);
-        h_axes = axes(h_waitbar,'Position',[0.1 0.50 0.8 0.25]);
-        h_axes_2 = axes(h_waitbar,'Position',[0.08 0.3 0.2 0.17]);
-        h_axes_3 = axes(h_waitbar,'Position',[0.28 0.3 0.2 0.17]);
-        h_axes_4 = axes(h_waitbar,'Position',[0.48 0.3 0.2 0.17]);
-    end
-
-end
-
-try
-    h_text = findobj(h_waitbar.Children,'Tag','progress_bar_text');
-    if ~isempty(h_text)
-        h_text.String = progress_bar_text;
     end
 catch
-    % If text update fails, continue
+    menu = [];
+end
 end
 
-try
-    h_text_ready = findobj(h_waitbar.Children,'Tag','progress_bar_ready_text');
-catch
-    h_text_ready = [];
-end
+function opts = local_menu_options(menu)
 
-try
-    h_axes.Visible = 'off';
-    h_axes.Tag= 'progress_bar_main_axes';
-catch
-end
+opts = struct();
+opts.visible = true;
+opts.font_size = 12;
+opts.verbose = false;
+opts.use_log = false;
+opts.log_file = '';
+opts.task_id = 0;
+opts.restart_time = now;
+opts.position = [100 80 460 118];
 
-try
-    h_axes_2.Visible = 'off';
-    h_axes_2.Tag= 'progress_bar_auxiliary_axes_1';
-catch
-end
-
-try
-    h_axes_3.Visible = 'off';
-    h_axes_3.Tag= 'progress_bar_auxiliary_axes_2';
-catch
-end
-
-try
-    h_axes_4.Visible = 'off';
-    h_axes_4.Tag= 'progress_bar_auxiliary_axes_3';
-catch
-end
-
-try
-    set(h_axes,'Layer', 'Bottom');
-    set(h_axes_2,'Layer', 'Bottom');
-    set(h_axes_3,'Layer', 'Bottom');
-    set(h_axes_4,'Layer', 'Bottom');
-catch
-end
-
-if isempty(h_waitbar) || ~isa(h_waitbar, "matlab.graphics.Graphics") || ~isvalid(h_waitbar)
+if isempty(menu) || ~isvalid(menu)
     return
 end
 
-h_waitbar.Colormap = [[ 0 1 1]; [ 0.145   0.624    0.631]];
-
-% Ensure UserData has the expected shape even if caller reused a figure.
-if ~isnumeric(h_waitbar.UserData) || numel(h_waitbar.UserData) < 3
-    initial_time = now * 86400;
-    h_waitbar.UserData = [cputime initial_time initial_time];
-end
-
-% Enforce monotonic progress per waitbar instance to prevent visual regression
-% and downstream state glitches when callers use mixed denominators.
 try
-    if ~isprop(h_waitbar, 'ZefWaitbarMaxProgress')
-        addprop(h_waitbar, 'ZefWaitbarMaxProgress');
-        h_waitbar.ZefWaitbarMaxProgress = 0;
-    end
-    progress_value = max(progress_value, h_waitbar.ZefWaitbarMaxProgress);
-    h_waitbar.ZefWaitbarMaxProgress = progress_value;
-catch
-    % If dynamic property access fails, continue with unclamped progress.
-end
-
-detail_condition = or((86400*now - h_waitbar.UserData(2)) >= log_frequency,first_step);
-
-if detail_condition
-
-    % CRITICAL FIX: Skip workspace size calculation entirely
-    % The evalin('caller','whos()') call can HANG indefinitely with large workspaces
-    % This is the primary cause of pipeline collapse during source interpolation
-    var_1 = 0;  % Disable workspace size display
-    var_1_max = 6;
-    progress_value_1 = 0;  % Keep pie chart minimal
-    
-    var_2 = round(86400*now - h_waitbar.UserData(3));
-    var_2_max = 6;
-    progress_value_2 = min(max(0,log10(max(var_2,1)))/var_2_max,1);
-    
-    % Use cached numcores value to avoid repeated expensive calls
-    try
-        var_3_max = 100*h_zeffiro_menu.ZefNumCoresCached;
-    catch
-        var_3_max = 400;  % Conservative default (4 cores * 100)
-    end
-    
-    var_3 = round(100*(cputime - h_waitbar.UserData(1))/(now*86400 - h_waitbar.UserData(2)));
-    h_waitbar.UserData(1:2) = [cputime now*86400];
-    progress_value_3 = min(1,var_3/var_3_max);
-
-    if progress_value(1) > 0
-
-        try
-            time_in_seconds = now + ((1-progress_value(end))/progress_value(end))*(now - h_waitbar.ZefWaitbarStartTime);
-            progress_bar_ready_text = datestr(time_in_seconds);
-            h_text_ready.String = ['Ready: ' progress_bar_ready_text];
-        catch
-            % If time calculation fails, show empty
-            progress_bar_ready_text = '';
-            h_text_ready.String = progress_bar_ready_text;
-        end
-    
+    if isprop(menu, 'ZefUseWaitbar') && ~menu.ZefUseWaitbar
+        opts.visible = false;
     else
-
-        progress_bar_ready_text = '';
-        h_text_ready.String = progress_bar_ready_text;
-
+        menu_vis = true;
+        if isprop(menu, 'Visible')
+            menu_vis = strcmpi(char(string(menu.Visible)), 'on');
+        end
+        always = false;
+        if isprop(menu, 'ZefAlwaysShowWaitbar')
+            always = logical(menu.ZefAlwaysShowWaitbar);
+        end
+        opts.visible = menu_vis || always;
     end
+catch
+end
 
-end % if
+try
+    if isprop(menu, 'ZefFontSize') && ~isempty(menu.ZefFontSize)
+        opts.font_size = double(menu.ZefFontSize);
+    end
+catch
+end
 
-if strcmpi(string(h_waitbar.Visible), "on")
+try
+    if isprop(menu, 'ZefVerboseMode')
+        opts.verbose = logical(menu.ZefVerboseMode);
+    end
+catch
+end
+
+try
+    if isprop(menu, 'ZefUseLog')
+        opts.use_log = logical(menu.ZefUseLog);
+    end
+    if isprop(menu, 'ZefCurrentLogFile')
+        opts.log_file = char(string(menu.ZefCurrentLogFile));
+    end
+catch
+end
+
+try
+    if isprop(menu, 'ZefTaskId')
+        opts.task_id = double(menu.ZefTaskId);
+    end
+    if isprop(menu, 'ZefRestartTime')
+        opts.restart_time = menu.ZefRestartTime;
+    end
+catch
+end
+
+try
+    mp = menu.Position;
+    if numel(mp) == 4
+        width = min(520, max(440, mp(3)));
+        height = 118;
+        opts.position = [mp(1), max(30, mp(2) - height - 12), width, height];
+    end
+catch
+end
+
+end
+
+function name = local_caller_name()
+name = 'unknown';
+try
+    st = dbstack('-completenames');
+    for i = 1:numel(st)
+        if ~strcmp(st(i).name, 'zef_waitbar') && ~startsWith(st(i).name, 'local_')
+            [~, name, ext] = fileparts(st(i).file);
+            name = [name ext]; %#ok<AGROW>
+            return
+        end
+    end
+catch
+end
+end
+
+%% Create / paint
+
+function fig = local_create(opts, msg, menu)
+
+existing = local_find_existing();
+if local_is_valid(existing) && local_has_ui(existing)
+    fig = local_reset(existing, opts, msg);
+else
+    if ~isempty(existing)
+        zef_delete_waitbar;
+    end
+    fig = local_build(opts, msg);
+end
+
+try
+    zef_window_manager('standalone', fig);
+catch
+end
+
+if ~isempty(menu) && isvalid(menu)
+    try
+        if isprop(menu, 'ZefWaitbarHandle')
+            menu.ZefWaitbarHandle = fig;
+        end
+        if isprop(menu, 'ZefTaskId')
+            menu.ZefTaskId = menu.ZefTaskId + 1;
+        end
+    catch
+    end
+end
+
+if opts.visible
+    fig.Visible = 'on';
+else
+    fig.Visible = 'off';
+end
+
+end
+
+function fig = local_find_existing()
+fig = [];
+found = findall(groot, '-property', 'ZefWaitbarStartTime');
+if isempty(found)
+    found = findall(groot, 'Tag', 'progress_bar');
+end
+keep = false(size(found));
+for i = 1:numel(found)
+    keep(i) = isgraphics(found(i)) && isvalid(found(i));
+end
+found = found(keep);
+if isempty(found)
+    return
+end
+fig = found(1);
+if numel(found) > 1
+    extra = found(2:end);
+    try
+        set(extra, 'CloseRequestFcn', '');
+        set(extra, 'DeleteFcn', '');
+        delete(extra);
+    catch
+    end
+end
+end
+
+function tf = local_has_ui(fig)
+tf = false;
+try
+    ud = fig.UserData;
+    tf = isstruct(ud) && isfield(ud, 'msgLabel') && local_is_valid(ud.msgLabel) ...
+        && isfield(ud, 'pctLabel') && local_is_valid(ud.pctLabel);
+    if tf
+        has_html = isfield(ud, 'htmlBar') && local_is_valid(ud.htmlBar);
+        has_native = isfield(ud, 'barGrid') && local_is_valid(ud.barGrid);
+        tf = has_html || has_native;
+    end
+catch
+    tf = false;
+end
+end
+
+function fig = local_reset(fig, opts, msg)
+fig.Name = local_task_name(opts.task_id);
+fig.Tag = 'progress_bar';
+fig.CloseRequestFcn = @(src, ~) local_on_close(src);
+fig.DeleteFcn = '';
+fig.ZefWaitbarStartTime = now;
+fig.ZefWaitbarCurrentProgress = 0;
+local_set_value_prop(fig, 0);
+
+ud = fig.UserData;
+theme = local_theme();
+ud.msgLabel.Text = local_default_msg(msg);
+ud.fileLabel.Text = opts.caller;
+ud.readyLabel.Text = '';
+ud.pctLabel.Text = '0%';
+local_set_bar(ud, 0, theme);
+ud.startTime = now;
+ud.lastDetailTime = 0;
+ud.cpuMark = cputime;
+ud.wallMark = now * 86400;
+ud.wallStart = now * 86400;
+ud.lastRatio = -1;
+fig.UserData = ud;
+end
+
+function fig = local_build(opts, msg)
+% Compact uifigure Tag='progress_bar', HandleVisibility off. Title row
+% (message + percent), meta row (caller / ETA / CPU%), then the bar from
+% local_make_bar (uihtml Data=0–100, or two uilabel cells).
+
+theme = local_theme();
+font_size = max(11, double(opts.font_size));
+meta_size = max(10, font_size - 1);
+
+fig = uifigure( ...
+    'WindowStyle', 'normal', ...
+    'Units', 'pixels', ...
+    'Position', opts.position, ...
+    'Visible', 'off', ...
+    'Name', local_task_name(opts.task_id), ...
+    'NumberTitle', 'off', ...
+    'IntegerHandle', 'off', ...
+    'HandleVisibility', 'off', ...
+    'Tag', 'progress_bar', ...
+    'Color', theme.bg, ...
+    'Resize', 'on', ...
+    'AutoResizeChildren', 'on');
+
+try
+    if isprop(fig, 'DockControls')
+        fig.DockControls = 'off';
+    end
+catch
+end
+
+try
+    icon_file = which('zeffiro_small_logo.png');
+    if isempty(icon_file)
+        icon_file = which('zeffiro_logo_compass.png');
+    end
+    if ~isempty(icon_file) && isprop(fig, 'Icon')
+        fig.Icon = icon_file;
+    end
+catch
+end
+
+local_addprop(fig, 'ZefWaitbarStartTime');
+local_addprop(fig, 'ZefWaitbarCurrentProgress');
+local_addprop(fig, 'ZefWaitbarValue');
+fig.ZefWaitbarStartTime = now;
+fig.ZefWaitbarCurrentProgress = 0;
+fig.ZefWaitbarValue = 0;
+fig.CloseRequestFcn = @(src, ~) local_on_close(src);
+fig.DeleteFcn = '';
+
+gl = uigridlayout(fig, [3 1]);
+gl.RowHeight = {24, 14, 18};
+gl.Padding = [18 16 18 16];
+gl.RowSpacing = 6;
+gl.ColumnSpacing = 0;
+try
+    gl.BackgroundColor = theme.bg;
+catch
+end
+
+title_row = uigridlayout(gl, [1 2]);
+title_row.ColumnWidth = {'1x', 'fit'};
+title_row.ColumnSpacing = 8;
+title_row.Padding = [0 0 0 0];
+title_row.RowSpacing = 0;
+try
+    title_row.BackgroundColor = theme.bg;
+catch
+end
+
+msg_label = uilabel(title_row, ...
+    'Text', local_default_msg(msg), ...
+    'HorizontalAlignment', 'left', ...
+    'FontWeight', 'bold', ...
+    'FontSize', font_size, ...
+    'FontColor', theme.text, ...
+    'Tag', 'progress_bar_text');
+
+pct_label = uilabel(title_row, ...
+    'Text', '0%', ...
+    'HorizontalAlignment', 'right', ...
+    'VerticalAlignment', 'center', ...
+    'FontWeight', 'bold', ...
+    'FontSize', font_size, ...
+    'FontColor', theme.fill, ...
+    'Tag', 'progress_bar_percent');
+
+[html_bar, track, fill_bar, empty_bar] = local_make_bar(gl, theme);
+
+meta_row = uigridlayout(gl, [1 2]);
+meta_row.ColumnWidth = {'1x', 'fit'};
+meta_row.ColumnSpacing = 12;
+meta_row.Padding = [0 0 0 0];
+meta_row.RowSpacing = 0;
+try
+    meta_row.BackgroundColor = theme.bg;
+catch
+end
+
+file_label = uilabel(meta_row, ...
+    'Text', opts.caller, ...
+    'HorizontalAlignment', 'left', ...
+    'FontSize', meta_size, ...
+    'FontColor', theme.muted, ...
+    'Tag', 'caller_file_name');
+
+ready_label = uilabel(meta_row, ...
+    'Text', '', ...
+    'HorizontalAlignment', 'right', ...
+    'FontSize', meta_size, ...
+    'FontColor', theme.muted, ...
+    'Tag', 'progress_bar_ready_text');
+
+ud = struct();
+ud.msgLabel = msg_label;
+ud.htmlBar = html_bar;
+ud.barGrid = track;
+ud.fillBar = fill_bar;
+ud.emptyBar = empty_bar;
+ud.pctLabel = pct_label;
+ud.fileLabel = file_label;
+ud.readyLabel = ready_label;
+if local_is_valid(html_bar)
+    ud.gauge = html_bar;
+else
+    ud.gauge = fill_bar;
+end
+ud.startTime = now;
+ud.lastDetailTime = 0;
+ud.cpuMark = cputime;
+ud.wallMark = now * 86400;
+ud.wallStart = now * 86400;
+ud.lastRatio = -1;
+fig.UserData = ud;
+
+end
+
+function theme = local_theme()
+theme = struct();
+theme.bg = [0.97 0.975 0.978];
+theme.text = [0.14 0.18 0.22];
+theme.muted = [0.42 0.47 0.51];
+theme.track = [0.82 0.87 0.88];
+theme.fill = [0.12 0.52 0.55];
+end
+
+function [html_bar, track, fill_bar, empty_bar] = local_make_bar(parent, theme)
+% Prefer a uihtml rounded bar (Data = 0–100). If uihtml is unavailable,
+% two uilabel cells in a 1×2 grid approximate the fill (not uigauge).
+html_bar = [];
+track = [];
+fill_bar = [];
+empty_bar = [];
+
+try
+    html_bar = uihtml(parent);
+    html_bar.Tag = 'progress_bar_gauge';
+    html_bar.HTMLSource = local_bar_html(theme);
+    html_bar.Data = 0;
+    return
+catch
+    html_bar = [];
+end
+
+track = uigridlayout(parent, [1 2]);
+track.ColumnWidth = {'0.0001x', '1x'};
+track.ColumnSpacing = 0;
+track.RowSpacing = 0;
+track.Padding = [0 0 0 0];
+try
+    track.BackgroundColor = theme.track;
+catch
+end
+fill_bar = uilabel(track, ...
+    'Text', '', ...
+    'BackgroundColor', theme.fill, ...
+    'Tag', 'progress_bar_gauge');
+empty_bar = uilabel(track, ...
+    'Text', '', ...
+    'BackgroundColor', theme.track);
+end
+
+function src = local_bar_html(theme)
+src = [ ...
+    '<!DOCTYPE html><html><head><meta charset="utf-8"><style>' ...
+    'html,body{margin:0;padding:0;width:100%;height:100%;background:transparent;}' ...
+    '.wrap{width:100%;height:100%;display:flex;align-items:center;}' ...
+    '.track{width:100%;height:12px;background:' local_hex(theme.track) ';' ...
+    'border-radius:999px;overflow:hidden;}' ...
+    '.fill{height:100%;width:0%;background:' local_hex(theme.fill) ';' ...
+    'border-radius:999px;}' ...
+    '</style></head><body><div class="wrap"><div class="track">' ...
+    '<div class="fill" id="f"></div></div></div><script>' ...
+    'function setup(htmlComponent){window.cc=htmlComponent;' ...
+    'htmlComponent.addEventListener("DataChanged",paint);paint();}' ...
+    'function paint(){var v=window.cc&&window.cc.Data;' ...
+    'if(v&&typeof v==="object"&&v.value!=null)v=v.value;' ...
+    'v=Math.max(0,Math.min(100,Number(v)||0));' ...
+    'var el=document.getElementById("f");if(el)el.style.width=v+"%";}' ...
+    '</script></body></html>'];
+end
+
+function hex = local_hex(rgb)
+hex = sprintf('#%02x%02x%02x', round(255 * rgb(1)), round(255 * rgb(2)), round(255 * rgb(3)));
+end
+
+function local_addprop(h, name)
+if ~isprop(h, name)
+    addprop(h, name);
+end
+end
+
+function local_set_value_prop(fig, value)
+try
+    if ~isprop(fig, 'ZefWaitbarValue')
+        addprop(fig, 'ZefWaitbarValue');
+    end
+    fig.ZefWaitbarValue = value;
+catch
+end
+end
+
+function local_set_bar(ud, ratio, theme)
+ratio = max(0, min(1, ratio));
+pct = 100 * ratio;
+if isfield(ud, 'htmlBar') && local_is_valid(ud.htmlBar)
+    try
+        ud.htmlBar.Data = pct;
+    catch
+    end
+elseif isfield(ud, 'barGrid') && local_is_valid(ud.barGrid)
+    try
+        ud.barGrid.ColumnWidth = {local_weight(ratio), local_weight(1 - ratio)};
+    catch
+    end
+    try
+        ud.fillBar.BackgroundColor = theme.fill;
+        ud.emptyBar.BackgroundColor = theme.track;
+    catch
+    end
+end
+try
+    ud.pctLabel.Text = sprintf('%.0f%%', pct);
+    ud.pctLabel.FontColor = theme.fill;
+catch
+end
+end
+
+function w = local_weight(x)
+w = sprintf('%.4fx', max(x, 1e-4));
+end
+
+function name = local_task_name(task_id)
+task_str = '';
+if task_id > 0
+    task_str = num2str(task_id + 1);
+end
+name = ['ZEFFIRO Interface: Task ' task_str];
+end
+
+function local_on_close(src)
+% Clear CloseRequestFcn / DeleteFcn first so delete does not re-enter
+% (same pattern as zef_close_all on ZEFFIRO figures).
+try
+    if isvalid(src)
+        src.CloseRequestFcn = '';
+        src.DeleteFcn = '';
+        delete(src);
+    end
+catch
+end
+end
+
+function local_paint(fig, ratio, msg, opts, first_step)
+% ratio is already a scalar in [0,1] (max of nested current./max).
+% Bar width and percent label update every call; ETA / CPU% every 5 s.
+
+if ~local_is_valid(fig)
+    return
+end
+
+ud = fig.UserData;
+if ~isstruct(ud) || ~isfield(ud, 'pctLabel') || ~local_is_valid(ud.pctLabel)
+    return
+end
+
+theme = local_theme();
+local_set_bar(ud, ratio, theme);
+local_set_value_prop(fig, 100 * ratio);
+ud.lastRatio = ratio;
+
+if strlength(string(msg)) > 0
+    try
+        ud.msgLabel.Text = char(string(msg));
+    catch
+    end
+end
+
+detail_dt = 5;
+now_days = now;
+do_detail = first_step || ((now_days - ud.lastDetailTime) * 86400 >= detail_dt);
+
+ready_text = '';
+var_2 = 0;
+var_3 = 0;
+if do_detail
+    ud.lastDetailTime = now_days;
+    var_2 = round(now_days * 86400 - ud.wallStart);
+    dt = max(now_days * 86400 - ud.wallMark, eps);
+    var_3 = round(100 * (cputime - ud.cpuMark) / dt);
+    ud.cpuMark = cputime;
+    ud.wallMark = now_days * 86400;
 
     try
-        % Use simpler bar chart to avoid hang/crash issues
-        if isempty(findobj(h_axes,'Type','bar'))
-            % First time: create bar chart
-            h_bar = barh(h_axes,[progress_value 1-progress_value; 0 0],'barlayout','stacked','showbaseline','off','edgecolor','none');
-            h_bar(1).FaceColor = [0 1 1];
-            h_bar(2).FaceColor = [0.145   0.624    0.631];
-        else
-            % Update existing bar data (faster than recreating)
-            try
-                h_bar = findobj(h_axes,'Type','bar');
-                if ~isempty(h_bar)
-                    % Keep progress moving left->right regardless of handle order.
-                    progress_color = [0 1 1];
-                    if numel(h_bar) >= 2
-                        progress_ind = [];
-                        for kk = 1:numel(h_bar)
-                            if all(abs(double(h_bar(kk).FaceColor) - progress_color) < 1e-12)
-                                progress_ind = kk;
-                                break;
-                            end
-                        end
-                        if isempty(progress_ind)
-                            progress_ind = 1;
-                        end
-                        remainder_ind = setdiff(1:numel(h_bar), progress_ind);
-                        h_bar(progress_ind).YData = progress_value;
-                        h_bar(remainder_ind(1)).YData = 1-progress_value;
-                    else
-                        h_bar(1).YData = progress_value;
-                    end
-                end
-            catch
-                % If update fails, skip it
-            end
-        end
-        h_axes.Visible = 'off';
-        h_axes.XDir = 'normal';
-        if exist('h_text','var') && ~isempty(h_text), uistack(h_text,'top'); end
-        if exist('h_text_ready','var') && ~isempty(h_text_ready), uistack(h_text_ready,'top'); end
-    catch ME
-        % If bar chart fails, continue without crashing
-        % Do not warn here to avoid spamming output
+        ud.fileLabel.Text = opts.caller;
+    catch
     end
 
-    if detail_condition
-
+    if ratio <= 0
+        ready_text = '';
         try
-            caller_stack = dbstack(1);
-            if ~isempty(caller_stack)
-                caller_file_name = caller_stack(1).file;
+            ud.readyLabel.Text = '';
+        catch
+        end
+    elseif ratio >= 1
+        ready_text = 'Done';
+        try
+            ud.readyLabel.Text = 'Done';
+        catch
+        end
+    elseif isprop(fig, 'ZefWaitbarStartTime')
+        try
+            elapsed = max(0, (now_days - fig.ZefWaitbarStartTime) * 86400);
+            remaining = ((1 - ratio) / max(ratio, eps)) * elapsed;
+            if elapsed < 2.5 || ratio < 0.05
+                ready_text = '';
+                ud.readyLabel.Text = '';
             else
-                caller_file_name = 'no caller file';
+                ready_text = local_eta_text(remaining, ratio);
+                ud.readyLabel.Text = ready_text;
             end
         catch
-            caller_file_name = 'no caller file';
+            ud.readyLabel.Text = '';
         end
-
-        % CRITICAL FIX: Skip pie chart updates
-        % These can hang or cause crashes, especially with graphics handle issues
-        % The information they display is not critical for progress tracking
-        % Just ensure axes are invisible so they don't interfere
-        try
-            h_axes_2.Visible = 'off';
-            h_axes_3.Visible = 'off';
-            h_axes_4.Visible = 'off';
-        catch
-            % If axes cannot be hidden, continue anyway
-        end
-
-    end % if
-
-    try
-        drawnow limitrate  % Use limitrate instead of pause to prevent excessive updates
-    catch
-        % If graphics queue flush fails, skip instead of crashing caller.
-    end
-
-    try
-        h_axes.Tag= 'progress_bar_main_axes';
-        h_axes_2.Tag= 'progress_bar_auxiliary_axes_1';
-        h_axes_3.Tag= 'progress_bar_auxiliary_axes_2';
-        h_axes_4.Tag= 'progress_bar_auxiliary_axes_3';
-        h_text.Tag= 'progress_bar_text';
-        if ~isempty(h_text_ready)
-            h_text_ready.Tag= 'progress_bar_ready_text';
-        end
-        h_waitbar.Tag ='progress_bar';
-    catch
-        % If tag setting fails, continue
-    end
-
-end % if
-
-if detail_condition
-
-    try
-        caller_stack = dbstack(1);
-        if ~isempty(caller_stack)
-            caller_file_name = caller_stack(1).file;
-        else
-            caller_file_name = 'no caller file';
-        end
-    catch
-        caller_file_name = 'no caller file';
-    end
-
-    try
-        h_caller_file_name = findobj(h_waitbar.Children,'Tag','caller_file_name');
-        if ~isempty(h_caller_file_name)
-            h_caller_file_name.String = ['File: ' caller_file_name];
-        end
-    catch
-        % If updating caller file name fails, skip it
-    end
-
-    total_cpu_time_val = cputime - restart_time;
-    % Parallel pool workers report process-local cputime; ZefRestartTime is
-    % copied from the client (zeffiro_interface), so the difference is negative.
-    if total_cpu_time_val < 0
-        total_cpu_time_val = cputime;
-    end
-
-    output_line = ['Task ID; ' num2str(task_id) '; Progress; ' num2str(round(100*progress_value(:)')) '; File; ' caller_file_name '; Message; ' progress_bar_text '; Workspace size; ' num2str(var_1) '; Task time; ' num2str(var_2) '; CPU usage; ' num2str(var_3) '; Ready; ' progress_bar_ready_text '; Total CPU time; ' sprintf('%g',total_cpu_time_val) ';'];
-
-    if use_log
-
-        try
-            fprintf(fid,'%s',[output_line newline]);
-        catch ME
-            % If logging fails, just skip it
-            warning('Failed to write to log file: %s', ME.message);
-        end
-
-    end
-
-    if and(verbose_mode,not(visible_value))
-
-        disp(output_line)
-
-    end
-
-end % if
-
-if plan_of_action == INITIALIZING
-
-
-    h_axes = findobj(h_waitbar.Children,'Tag','waitbar_axes_1');
-
-    if isempty(h_axes)
-        try
-            h_axes = uiaxes('Parent',h_waitbar,'visible','off','Units','normalized','Position',[0.63 0.272 0.315 0.225],'FontSize',0.587962962962963,'Tag','waitbar_axes_1');
-            imagesc(h_axes,imread('zeffiro_symbol_compass.png', 'BackgroundColor', [0.94 0.94 0.94]));
-            axis(h_axes,'equal');
-
-            h_axes = uiaxes('Parent',h_waitbar,'visible','off','Units','normalized','Position',[0.01 0.01 0.98 0.98],'FontSize',0.587962962962963,'Tag','waitbar_axes_2');
-            imagesc(h_axes,imread('zeffiro_symbol_mesh.png', 'BackgroundColor', [0.94 0.94 0.94]));
-            axis(h_axes,'equal');
-            alpha(h_axes,0.1);
-            set(h_axes,'Layer', 'Top');
-        catch
-            % If image loading fails, skip the decorative images
-            warning('Could not load waitbar decorative images');
-        end
-    end
-
-        h_waitbar.Visible = visible_value;
-end
-
-if use_log
-    try
-        fclose(fid);
-    catch
-        % Ignore close errors
     end
 end
 
-end % function
+fig.UserData = ud;
 
-%% Local helper functions.
+if opts.visible
+    try
+        drawnow limitrate
+    catch
+    end
+end
 
-function fig = init_figure(position, visible, task_id, fig)
+if do_detail
+    local_log(opts, ratio, msg, var_2, var_3, ready_text);
+end
 
-%Note: here it is difficult to define any class-based argument list,
-%because it is absolutely necessary to distinguish between two cases (1) when
-%fig is not a figure (when there is no figure yet) and (2) when it is a figure.
-%The first incoming figure variable needs to be empty. Otherwise there will
-%be confusion in deciding, whether there is a figure open or not.
+end
 
-if task_id < 0
-
-    task_number_str = "";
-
+function txt = local_eta_text(remaining_sec, ratio)
+if nargin < 2
+    ratio = 0;
+end
+if ~isfinite(remaining_sec) || remaining_sec < 0
+    txt = '';
+    return
+end
+remaining_sec = round(remaining_sec);
+if remaining_sec < 2 && ratio >= 0.9
+    txt = 'Almost done';
+elseif remaining_sec < 2
+    txt = '';
+elseif remaining_sec < 60
+    txt = sprintf('%d s left', remaining_sec);
+elseif remaining_sec < 3600
+    m = floor(remaining_sec / 60);
+    s = rem(remaining_sec, 60);
+    txt = sprintf('%d min %d s left', m, s);
 else
-
-    task_number_str = string(task_id);
-
+    h = floor(remaining_sec / 3600);
+    m = floor(rem(remaining_sec, 3600) / 60);
+    txt = sprintf('%d h %d min left', h, m);
+end
 end
 
-if not(isempty(fig))
-
-    if isvalid(fig)
-
-        clf(fig);
-
-        set(fig,...
-            'PaperUnits',get(0,'defaultfigurePaperUnits'),...
-            'Units','normalized',...
-            'Position', position,...
-            'Renderer',get(0,'defaultfigureRenderer'),...
-            'Visible', visible,...
-            'Color',get(0,'defaultfigureColor'),...
-            'CurrentAxesMode','manual',...
-            'IntegerHandle','off',...
-            'NextPlot',get(0,'defaultfigureNextPlot'),...
-            'DoubleBuffer','off',...
-            'MenuBar','none',...
-            'ToolBar','none',...
-            'Name', "ZEFFIRO Interface: Task " + task_number_str,...
-            'NumberTitle','off',...
-            'HandleVisibility','off',...
-            'Tag','progress_bar',...
-            'UserData',[],...
-            'WindowStyle',get(0,'defaultfigureWindowStyle'),...
-            'Resize',get(0,'defaultfigureResize'),...
-            'PaperPosition',get(0,'defaultfigurePaperPosition'),...
-            'PaperSize',[20.99999864 29.69999902],...
-            'PaperType',get(0,'defaultfigurePaperType'),...
-            'InvertHardcopy',get(0,'defaultfigureInvertHardcopy'),...
-            'ScreenPixelsPerInchMode','manual' ...
-            );
-
-
-        fig.CloseRequestFcn = 'set(gcbo,''Visible'',''off'');';
-        fig.DeleteFcn = '';
-        fig.ZefWaitbarStartTime = now;
-        fig.ZefWaitbarCurrentProgress = 0;
-
-    end
-
+function msg = local_default_msg(msg)
+if strlength(string(msg)) == 0
+    msg = 'Working...';
 else
+    msg = char(string(msg));
+end
+end
 
-    zef_delete_waitbar;
-    fig = figure( ...
-        'PaperUnits',get(0,'defaultfigurePaperUnits'),...
-        'Units','normalized',...
-        'Position', position,...
-        'Renderer',get(0,'defaultfigureRenderer'),...
-        'Visible', visible,...
-        'Color',get(0,'defaultfigureColor'),...
-        'CurrentAxesMode','manual',...
-        'IntegerHandle','off',...
-        'NextPlot',get(0,'defaultfigureNextPlot'),...
-        'DoubleBuffer','off',...
-        'MenuBar','none',...
-        'ToolBar','none',...
-        'Name', "ZEFFIRO Interface: Task " + task_number_str,...
-        'NumberTitle','off',...
-        'HandleVisibility','off',...
-        'Tag','progress_bar',...
-        'UserData',[],...
-        'WindowStyle',get(0,'defaultfigureWindowStyle'),...
-        'Resize',get(0,'defaultfigureResize'),...
-        'PaperPosition',get(0,'defaultfigurePaperPosition'),...
-        'PaperSize',[20.99999864 29.69999902],...
-        'PaperType',get(0,'defaultfigurePaperType'),...
-        'InvertHardcopy',get(0,'defaultfigureInvertHardcopy'),...
-        'ScreenPixelsPerInchMode','manual' ...
-        );
+function local_log(opts, ratio, msg, task_time, cpu_usage, ready_text)
 
-    addprop(fig,'ZefWaitbarStartTime');
-    addprop(fig,'ZefWaitbarCurrentProgress');
-    fig.ZefWaitbarStartTime = now;
-    fig.ZefWaitbarCurrentProgress = 0;
-    fig.CloseRequestFcn = 'set(gcbo,''Visible'',''off'');';
-    fig.DeleteFcn = '';
+output_line = sprintf([ ...
+    'Task ID; %s; Progress; %s; File; %s; Message; %s; Workspace size; 0; ', ...
+    'Task time; %s; CPU usage; %s; Ready; %s; Total CPU time; %g;'], ...
+    num2str(opts.task_id), num2str(round(100 * ratio)), opts.caller, ...
+    char(string(msg)), num2str(task_time), num2str(cpu_usage), ready_text, ...
+    max(0, cputime - opts.restart_time));
 
-end % if
-
-end % function
-
-function result = is_integer(float)
-%
-% is_integer
-%
-% Checks whether a floating point number is an integer, up to the accuracy of
-% machine epsilon eps.
-%
-
-    arguments
-
-        float (:,:) double
+if opts.use_log && ~isempty(opts.log_file)
+    try
+        fid = fopen(opts.log_file, 'a');
+        if fid ~= -1
+            fprintf(fid, '%s\n', output_line);
+            fclose(fid);
+        end
+    catch
     end
+end
 
-    result = float == round ( float ) ;
+if opts.verbose && ~opts.visible
+    disp(output_line);
+end
 
-end % function
+end

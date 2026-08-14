@@ -1,29 +1,40 @@
 function [b_coord, det] = zef_volume_barycentric(nodes,tetra,p_ind,det)
-% --- Zeffiro documentation header ---
-% zef_volume_barycentric — Zef volume barycentric.
+%ZEF_VOLUME_BARYCENTRIC  Affine hats ψ and ∇ψ on linear tetrahedra.
 %
-% Purpose:
-%   Zef volume barycentric.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   p_ind
-%   det
+%   For each tet, ψ_k(x) = b·[x y z 1] with ψ_k=1 at local vertex k.
+%   Columns 1:3 of b_coord are ∇ψ_k (constant on the tet); column 4 is
+%   the constant term. det is the scalar triple product of (v1-v4, v2-v4,
+%   v3-v4), so volume = abs(det)/6 (same as zef_tetra_volume).
 %
-% Outputs:
-%   b_coord
-%   det
+%   Primary consumers: barycentric volume/surface assemblers in this
+%   folder, and src/forward/nse (zef_nse_poisson*). Also zef_3by3_solver
+%   is the batched Cramer kernel.
 %
-% Calls (project):
-%   zef_3by3_solver
-%   zef_volume_barycentric
+%   [b_coord, det] = zef_volume_barycentric(nodes, tetra)
+%   [b_coord, det] = zef_volume_barycentric(nodes, tetra, p_ind)
+%   [b_coord, det] = zef_volume_barycentric(nodes, tetra, p_ind, det)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[b_coord, det]] = zef_volume_barycentric(nodes, tetra, p_ind, det)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Inputs
+%     nodes  - N×3.
+%     tetra  - T×4 1-based indices.
+%     p_ind  - omitted: only det is computed (b_coord=[]).
+%              scalar 1..4: hat of that local vertex on every tet.
+%              T×1: hat of local vertex p_ind(t) on tet t. Rows with
+%              p_ind==4 are solved in a rotated vertex order because the
+%              3×3 uses vertices 1:3 relative to vertex 4.
+%     det    - optional T×1 from a previous call (avoids recomputing D).
+%
+%   Outputs
+%     b_coord - T×4, or [] when nargin==2.
+%     det     - T×1 signed 6V. When p_ind mixes 4 and not-4, det is
+%               stitched from the two batches only if both computed D.
+%
+%   See also zef_3by3_solver, zef_volume_scalar_matrix_D, zef_tetra_volume.
 
 b_coord = [];
 det_1 = [];
@@ -49,6 +60,7 @@ else
             J_2 = [];
             p_val(:,p_ind) = 1;
             if isequal(p_ind,4)
+                % Vertex 4 is the origin of the 3×3; cycle so it is last.
                 I = [4 1 2 3];
             end
         else
@@ -76,6 +88,7 @@ else
                 p_val(:,I(1:3)),det);
         end
 
+        % [∇ψ_x ∇ψ_y ∇ψ_z, ψ(0)-∇ψ·v_origin] so ψ(x)= b·[x y z 1].
         b_coord = [x y z p_val(:,I(4))-x.*nodes(tetra(:,I(4)),1)-y.*nodes(tetra(:,I(4)),2)-z.*nodes(tetra(:,I(4)),3)];
 
 

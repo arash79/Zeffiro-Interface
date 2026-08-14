@@ -1,27 +1,15 @@
-% --- Zeffiro documentation header ---
-% if not(isequal(zef — If not(isequal(zef.
+%ZEF_PLOT_VOLUME  Leftover filename zef_plot_volume.m.m; not the volume plotter.
 %
-% Purpose:
-%   If not(isequal(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field (read, write)
-%   zef.current_sensors (read)
-%   zef.file (read)
-%   zef.file_path (read)
+%   Script. MATLAB does not execute .m.m files. Body: if zef.file is not
+%   0, zef_get_mesh(..., current_sensors, 'points') into
+%   zef.<current_sensors>_points. Volume drawing is zef_plot_volume.m.
 %
-% Calls (project):
-%   zef_get_mesh
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isequal(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_plot_volume.
 if not(isequal(zef.file,0));
     zef.aux_field = zef_get_mesh(zef,[zef.file_path zef.file],zef.current_sensors,'points');
     eval(['zef.' zef.current_sensors '_points = zef.aux_field;']);

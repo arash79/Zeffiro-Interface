@@ -1,41 +1,48 @@
-# tools/plugins/HBSampler
+# HBSampler
 
-## Purpose of this folder
+Hierarchical Bayes MCMC / Gibbs sampler on source variances (same gamma / inverse-gamma family as IAS, but posterior samples instead of a MAP point). Use it when you want a Monte Carlo reconstruction rather than IAS iterations.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+There is **no** `inverse.*Inverter`. Registry ids `legacy_hb` / `legacy_mcmc` dispatch `zef_mcmc`.
 
-## Contents
+## Menu
 
-Subfolders:
-- `fig/`
-- `m/`
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **Hierarchical Bayesian Sampler** |
+| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
 
-## How this folder fits into the overall workflow
+INI callback: `hb_sampler`.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Window title (live, from `zef_open_mcmc` / `zef_mcmc_window`): `ZEFFIRO Interface: Hierarchical Bayesian MCMC sampler`.
 
-## GUI usage
+The leftover GUIDE file `fig/hb_sampler.fig` is **not** opened by `hb_sampler.m`. Its saved Start string (`mcmc_sampler`) is not the live callback.
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+## Run the solver
 
-## Programmatic usage
+**Start** (`zef.h_mcmc_start`) Callback, set in `zef_open_mcmc`:
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+```matlab
+zef_update_mcmc; [zef.reconstruction, zef.reconstruction_information] = zef_mcmc(zef);
+```
 
-## Examples
+The window constructor also has a one-output form (`zef.reconstruction = zef_mcmc(zef)`); init overrides it to keep `reconstruction_information`.
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+## Needs
 
-## Dependencies and assumptions
+- `zef.L`, interpolation, `zef.source_direction_mode`
+- `zef.measurements`
+- SNR: `zef.inv_snr` → `10^(-inv_snr/20)`
+- Frames: solver reads `zef.inv_number_of_frames` (the window widget writes `zef.number_of_frames` — keep those consistent)
+- Sample size / burn-in: `zef.inv_sample_size`, `zef.inv_n_burn_in`
+- Hyperprior: `zef.inv_hyperprior` plus `inv_prior_over_measurement_db`
+- Parallel chains: `zef.parallel_processes` (opens or resizes a `parpool`). Outer loop is `ceil(inv_sample_size / parallel_processes)` Gibbs steps per chain (`zef_gibbs_sampler_step`). Burn-in is compared to that **outer index** `i`, not to the total sample count. The mean then divides by `n_iter_process*parallel_processes - n_burn_in`, which is **not** equal to the number of added vectors `(n_iter_process - n_burn_in)*parallel_processes`.
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
+## Writes
 
-## Notes for developers
+- `zef.reconstruction` after post-process / peak-norm
+- `zef.reconstruction_information` with tag `MCMC`
 
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+## Files
+
+- Start: `m/hb_sampler.m` → `zef_open_mcmc` → `zef_mcmc_window`
+- Solver: `m/zef_mcmc.m`

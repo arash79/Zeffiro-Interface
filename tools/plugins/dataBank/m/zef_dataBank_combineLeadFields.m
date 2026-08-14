@@ -1,28 +1,42 @@
 function [L, y] = zef_dataBank_combineLeadFieLds(tree, workingHashes, varargin)
-% --- Zeffiro documentation header ---
-% zef_dataBank_combineLeadFieLds — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%ZEF_DATABANK_COMBINELEADFIELDS  Vertcat working-hash lead fields and measurements.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tree
-%   workingHashes
-%   varargin
+%   combineButton.ButtonPushedFcn in zef_open_dataBank:
+%     [zef.L, zef.measurements] = zef_dataBank_combineLeadFields(tree,
+%     workingHashes, combineMenu.Value, var_starttime, var_endtime,
+%     var_sampling_frequency)
+%   Working hashes come from modifyMenu → hashToWorkingSpace. Each hash is
+%   classified by .data.type: data → measurements, noisedata → noise,
+%   leadfield → L. Rows of L and y are stacked after a per-block scale
+%   (approach). Default approach is frobenius (||L||_F / n_sensors).
+%   fuchs uses diag(std(y)) on the time window; whitening uses chol(cov(y)).
+%   After stacking, L and y are rescaled so max|L| matches the pre-stack
+%   maximum. Filename is zef_dataBank_combineLeadFields.m; the function
+%   symbol is zef_dataBank_combineLeadFieLds (MATLAB dispatches by filename).
 %
-% Outputs:
-%   L
-%   y
+%   [L, y] = zef_dataBank_combineLeadFields(tree, workingHashes)
+%   [L, y] = zef_dataBank_combineLeadFields(tree, workingHashes, approach, t0, t1, fs)
 %
-% Calls (project):
-%   zef_dataBank_combineLeadFieLds
+%   Inputs
+%     tree           - zef.dataBank.tree.
+%     workingHashes  - cellstr of hashes (zef.dataBank.workingHashes).
+%     approach       - optional; combineMenu.Value: 'frobenius' (default),
+%                      'fuchs', or 'whitening'.
+%     t0, t1, fs     - optional start/end time and sampling frequency used
+%                      to index the measurement window when fs is nonempty.
+%                      If the window start index is 0, uses the full noise
+%                      (or measurement) width.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[L, y]] = zef_dataBank_combineLeadFieLds(tree, workingHashes, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output
+%     L  - stacked lead field, size sum(n_sensors_i)-by-n_sources.
+%     y  - stacked measurements, same row partition as L.
+%
+%   See also zef_dataBank_hashToWorkingSpace, zef_dataBank_update.
 
 L_aux = cell(0);
 y_aux = cell(0);
@@ -62,6 +76,7 @@ if not(isempty(varargin))
 
 end
 
+% Classify working hashes into measurement, noise, and lead-field stacks.
 for i = 1 : length(workingHashes)
 
     if isequal(tree.(workingHashes{i}).data.type,'data')
@@ -90,6 +105,7 @@ fro_L_aux = cell(0);
 amp_L_aux = zeros(length(L_aux),1);
 size_L_aux = zeros(length(L_aux),1);
 
+% Per-block scale (frobenius / fuchs / whitening) and row counts for the stack.
 for i = 1 : length(L_aux)
 
     if isequal(approach,'fuchs')
@@ -109,6 +125,7 @@ y = zeros(sum(size_L_aux), size(y_aux{1},2));
 subs_ind = 0;
 max_amp_L_aux = max(amp_L_aux);
 
+% Apply the scale, vertcat blocks, then restore the global max |L| amplitude.
 for i = 1 : length(L_aux)
 
     L_aux{i} = fro_L_aux{i}\L_aux{i};

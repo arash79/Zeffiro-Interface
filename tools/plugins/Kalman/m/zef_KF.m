@@ -1,53 +1,35 @@
 function [zef] = zef_KF(zef, q_value)
-% --- Zeffiro documentation header ---
-% zef_KF — Zef KF.
+%ZEF_KF  Kalman-filter source reconstruction with optional DTI structural Q.
 %
-% Purpose:
-%   Zef KF.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   q_value
+%   Legacy GUI plugin path (not inverse.KalmanInverter). Processes lead
+%   fields, band-pass filters measurements, then runs a discrete-time KF
+%   with A = I, P0 = theta0 I, and process-noise Q either diagonal or
+%   DTI-informed. Filter type is zef.filter_type: 1 no standardization,
+%   2 EnKF, 3 spatiotemporal sLORETA, 4 spatial standardization, 5–9
+%   double/triple block Kalman. Optional RTS when zef.kf_smoothing > 1.
 %
-% Outputs:
-%   zef
+%   zef = zef_KF(zef)
+%   zef = zef_KF(zef, q_value)
 %
-% Zef fields (observed):
-%   zef.KF (read)
-%   zef.filter_type (read)
-%   zef.inv_amplitude_db (read)
-%   zef.inv_evolution_prior (read)
-%   zef.inv_high_cut_frequency (read)
-%   zef.inv_low_cut_frequency (read)
-%   zef.inv_prior_over_measurement_db (read)
-%   zef.inv_sampling_frequency (read)
-%   zef.inv_snr (read)
-%   zef.inv_time_1 (read)
-%   zef.inv_time_2 (read)
-%   zef.inv_time_3 (read)
-%   zef.kf_burn_in (read)
-%   zef.kf_smoothing (read)
-%   zef.kf_structural_Q_type (read)
-%   … (8 more)
+%   Inputs
+%     zef      - session with zef.L, measurements, inv_snr (dB),
+%                inv_prior_over_measurement_db, inv_evolution_prior,
+%                filter_type, kf_smoothing, optional kf_structural_Q_type
+%                (0 diagonal, 1 FA, 2 tractography). Frames:
+%                number_of_frames, inv_time_*. SNR → R = (10^(-inv_snr/20))^2 I.
+%     q_value  - optional scalar process-noise scale. If omitted, computed
+%                from inv_evolution_prior via find_evolution_prior.
 %
-% Calls (project):
-%   zef_KF
-%   zef_dti_structural_Q
-%   zef_find_gaussian_prior
-%   zef_getFilteredData
-%   zef_getTimeStep
-%   zef_normalizeInverseReconstruction
-%   zef_postProcessInverse
-%   zef_processLeadfields
+%   Output
+%     zef  - reconstruction and reconstruction_information filled.
+%            If nargout is 0, assigned into the base workspace.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_KF(zef, q_value)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also inverse.KalmanInverter, zef_processLeadfields, zef_dti_structural_Q.
 
 snr_val = zef.inv_snr;
 pm_val = zef.inv_prior_over_measurement_db;
@@ -149,25 +131,34 @@ Q_Store = cell(0);
 invert_order=0;
 
 %% KALMAN FILTER
+% filter_type 1–9 from zef.KF.filter_type (legacy plugin only; DTI Q
+% above is this path, not inverse.KalmanInverter).
 if invert_order==1
     timeSteps=flip(timeSteps);
 end
 sL=0;
 filter_type = zef.filter_type;
 smoothing = zef.kf_smoothing;
+% filter_type ItemsData 1–9 from zef_kf_open_window. Each branch may
+% cap kf_smoothing (EnKF has no RTS; double/triple allow 2- or 3-block).
+% sL is the sLORETA block depth passed into double/triple and ext_sL.
 if filter_type == 1
+    % No standardization: plain KF (A = I).
     smoothing=min(smoothing,2);
     sL=5;
     [P_store, z_inverse] = kalman_filter(m,P,A,Q,L,R,timeSteps, number_of_frames, smoothing);
 elseif filter_type == 2
+    % Ensemble Kalman (EnKF). Ensemble count from the app widget.
     smoothing=min(smoothing,1);
     n_ensembles = str2double(zef.KF.number_of_ensembles.Value);
     z_inverse = EnKF(m,A,P,Q,L,R,timeSteps,number_of_frames, n_ensembles);
 elseif filter_type == 3
+    % Spatiotemporal sLORETA inside the KF update (kalman_filter_sLORETA).
     smoothing=min(smoothing,2);
     sL=1;
     [P_store, z_inverse] = kalman_filter_sLORETA(m,P,A,Q,L,R,timeSteps, number_of_frames, smoothing,standardization_exponent);
 elseif filter_type == 4
+    % Spatial standardization after a plain KF: diagonal sLORETA weights W.
     sL=1;
     smoothing=min(smoothing,2);
     [P_store, z_inverse] = kalman_filter(m,P,A,Q,L,R,timeSteps, number_of_frames, smoothing);
@@ -176,14 +167,17 @@ elseif filter_type == 4
     W = inv((diag(diag(H'*inv(H*H' + R)*H))).^standardization_exponent);
     z_inverse = cellfun(@(x) W*x, z_inverse, 'UniformOutput', false);
 elseif filter_type == 5
+    % Double-block Kalman, sLORETA depth 1.
     sL=1;
     smoothing=min(smoothing,3);
     [P_store, z_inverse] = double_kf_sL(m,P,A,Q,L,R,timeSteps, number_of_frames, smoothing,sL,standardization_exponent,burn_in);
 elseif filter_type == 6
+    % Double-block Kalman, sLORETA depth 2.
     sL=2;
     smoothing=min(smoothing,3);
     [P_store, z_inverse] = double_kf_sL(m,P,A,Q,L,R,timeSteps, number_of_frames, smoothing,sL,standardization_exponent,burn_in);
 elseif filter_type == 7
+    % Triple-block Kalman, sLORETA depth 1.
     sL=1;
     [P_store, z_inverse] = triple_kf_sL(m,P,A,Q,L,R,timeSteps, number_of_frames, smoothing,sL,standardization_exponent,burn_in);
 elseif filter_type == 8
@@ -196,7 +190,8 @@ end
 
 
 %% RTS SMOOTHING
-
+% kf_smoothing ItemsData: 1 none (skip), 2 RTS, 3 2-block RTS, 4 3-block RTS.
+% EnKF already capped smoothing at 1 so this block is skipped for type 2.
 if (smoothing == 2)
     [P_s_store, m_s_store, ~] = RTS_smoother(P_store, z_inverse, A, Q, number_of_frames);
     z_inverse = m_s_store;
@@ -209,6 +204,8 @@ elseif (smoothing == 4)
 end
 
 if sL<smoothing-1
+    % Extra sLORETA pass when the chosen smoother is deeper than the
+    % filter's own sL (e.g. triple-block with sL=1 plus 3-block RTS).
     [z_inverse] = ext_sL(z_inverse,P_s_store,L,R, number_of_frames, smoothing, sL,standardization_exponent);
 end
 if invert_order==1

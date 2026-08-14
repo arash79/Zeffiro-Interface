@@ -1,31 +1,18 @@
 function tilavuus_vec = zef_eit_sensitivity_tool_volume
-% --- Zeffiro documentation header ---
-% tilavuus_vec — Tilavuus vec.
+%ZEF_EIT_SENSITIVITY_TOOL_VOLUME  Tetra volumes accumulated on EIT source indices.
 %
-% Purpose:
-%   Tilavuus vec.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.brain_ind (read)
-%   zef.eit_count (read)
-%   zef.eit_ind (read)
-%   zef.nodes (read)
-%   zef.tetra (read)
+%   tilavuus_vec = zef_eit_sensitivity_tool_volume
 %
-% Calls (project):
-%   zef_eit_sensitivity_tool_volume
-%   zef_tetra_volume
+%   Reads zef.nodes, tetra, eit_ind, brain_ind, eit_count from base.
+%   zef_tetra_volume then accumarray. Used when substituting a
+%   volume-weighted sensitivity. Does not write reconstruction.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `tilavuus_vec` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_eit_sensitivity_tool_substitute.
 
 nodes = evalin('base','zef.nodes');
 tetrahedra = evalin('base','zef.tetra');

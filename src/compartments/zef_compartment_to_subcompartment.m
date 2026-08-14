@@ -1,33 +1,25 @@
 function subcompartment_ind = zef_compartment_to_subcompartment(zef,compartment_ind)
-% --- Zeffiro documentation header ---
-% zef_compartment_to_subcompartment — Zef compartment to subcompartment.
+%ZEF_COMPARTMENT_TO_SUBCOMPARTMENT  Map compartment indices to submesh index ranges.
 %
-% Purpose:
-%   Zef compartment to subcompartment.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   compartment_ind
+%   For each ON compartment in tag order, accumulates submesh_ind lengths
+%   and returns the subcompartment index rows corresponding to the requested
+%   compartment_ind vector.
 %
-% Outputs:
-%   subcompartment_ind
+%   subcompartment_ind = zef_compartment_to_subcompartment(zef, compartment_ind)
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
+%   Inputs
+%     zef              - session struct (read from base when empty).
+%     compartment_ind  - compartment ordinal indices among ON compartments.
 %
-% Calls (project):
-%   zef_compartment_to_subcompartment
+%   Output
+%     subcompartment_ind - column vector of submesh row indices.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[subcompartment_ind] = zef_compartment_to_subcompartment(zef, compartment_ind)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_process_meshes.
 
 if isempty(zef)
     zef = evalin('base','zef');
@@ -53,6 +45,5 @@ for i = 1 : length(compartment_tags)
         subcompartment_counter = subcompartment_counter + length(submesh_ind);
     end
 end
-
 
 end

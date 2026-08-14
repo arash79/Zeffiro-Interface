@@ -1,24 +1,21 @@
-% --- Zeffiro documentation header ---
-% full_address = 'exportImage'; — Full address = 'export Image';.
+%PLOT_PARCELLATION  Script: copy axes1, add auditory xlines, export parcellation PNG/FIG.
 %
-% Purpose:
-%   Full address = 'export Image';.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Side effects:
-%   - creates/updates figures
+%   Hard-coded filename parcellation_plot_real_auditoryRH. Not a plugin
+%   button.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `full_address = 'exportImage';` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 full_address = 'exportImage';
 file_name = 'parcellation_plot_real_auditoryRH';
 
 f1 = gcf;
 f2 = figure();
-copyobj(findobj(f1.Children, 'tag','axes1'), f2);
+copyobj(findobj(f1.Children, 'tag','axes1')
+, f2);
 
 f2.Children.Position(2) = 40; 
 f2.Children.Box = 0;

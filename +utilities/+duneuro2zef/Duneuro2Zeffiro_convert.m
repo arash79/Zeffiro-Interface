@@ -27,37 +27,21 @@
 % See also: run.m, get_default_config.m, import_duneuro_project.m, Duneuro2Zeffiro_import.zef
 
 function results = Duneuro2Zeffiro_convert(config)
-% --- Zeffiro documentation header ---
-% utilities.duneuro2zef.Duneuro2Zeffiro_convert — Duneuro2Zeffiro convert.
+%DUNEURO2ZEFFIRO_CONVERT  Same conversion as run; skip if outputs already exist.
 %
-% Purpose:
-%   Duneuro2Zeffiro convert.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   config
+%   results = Duneuro2Zeffiro_convert(config)
 %
-% Outputs:
-%   results
+%   Invoked as a script line from Duneuro2Zeffiro_import.zef. If tetra_mesh,
+%   source_space, and requested L_*.mat already exist under
+%   config.output_folder (relative to pwd), returns without reconverting.
+%   Otherwise calls run(config). nargout==0 surfaces errors as warnings.
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
-%
-% Calls (project):
-%   utilities.duneuro2zef.Duneuro2Zeffiro_convert
-%   utilities.duneuro2zef.get_default_config
-%   utilities.duneuro2zef.run
-%   zef_start_dataBank
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[results] = utilities.duneuro2zef.Duneuro2Zeffiro_convert(config)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+
 
     if nargin < 1 || isempty(config)
         config = utilities.duneuro2zef.get_default_config();

@@ -1,28 +1,29 @@
 function [tree] = zef_dataBank_loadTreeNodes(tree)
-% --- Zeffiro documentation header ---
-% zef_dataBank_loadTreeNodes — Zef data Bank load Tree Nodes.
+%ZEF_DATABANK_LOADTREENODES  Load node .mat files into memory and delete them.
 %
-% Purpose:
-%   Zef data Bank load Tree Nodes.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tree
+%   Inverse of saveTreeNodes, used when savetodiskSwitch turns Off.
+%   Folder is taken from the first node's matfile Source (strip through
+%   'node_'). Each .data is replaced by load(Source). Then delete(folder
+%   + 'node_*') removes the files. Assumes every node currently holds a
+%   matfile (tree nonempty).
 %
-% Outputs:
-%   tree
+%   tree = zef_dataBank_loadTreeNodes(tree)
 %
-% Calls (project):
-%   zef_dataBank_loadTreeNodes
+%   Inputs
+%     tree  - zef.dataBank.tree with .data matfile handles.
 %
-% Side effects:
-%   - filesystem I/O
+%   Output
+%     tree  - .data is an in-memory struct per node; matching files deleted.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[tree] = zef_dataBank_loadTreeNodes(tree)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_dataBank_saveTreeNodes.
 
+%changes the data in the tree nodes from matFileObject to struct by loading
+%the files
 dbFieldNames=fieldnames(tree);
 
 folder=extractBefore(tree.(dbFieldNames{1}).data.Properties.Source, 'node_');

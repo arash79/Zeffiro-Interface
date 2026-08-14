@@ -1,31 +1,12 @@
 function save_color_tables(in_dir, out_dir)
-% --- Zeffiro documentation header ---
-% utilities.fs2zef.generators.save_color_tables — Save color tables.
+%SAVE_COLOR_TABLES  Export .annot parcellation colormaps to .mat for Zeffiro.
 %
-% Purpose:
-%   Save color tables.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   in_dir
-%   out_dir
-%
-% Outputs:
-%   See function signature and code below.
-%
-% Calls (project):
-%   utilities.fs2zef.generators.save_color_tables
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `utilities.fs2zef.generators.save_color_tables(in_dir, out_dir)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%
-% save_color_tables
+%   save_color_tables(in_dir, out_dir)
 %
 % Extracts color tables from FreeSurfer annotation files and saves them as
 % MATLAB .mat files for use in Zeffiro Interface. The color tables contain

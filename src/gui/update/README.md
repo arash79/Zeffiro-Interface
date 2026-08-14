@@ -1,92 +1,59 @@
-# src/gui/update
+# Widget → `zef` (`src/gui/update`)
 
-## Purpose of this folder
+Copy a control family into `zef` and, for Figure-tool sliders, mutate the live `axes1` patches. Labels below are `String=` on `uicontrol` in `zef_figure_tool.m` (not App Designer). Settings dialogs are opened from `zef_menu_tool.m`. Mesh visualization lives in `zef_mesh_visualization_tool.m`.
 
-Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+Most files here are **scripts** (workspace `zef`). Slider helpers and a few table rebuilders are **functions**. Converting a script to a function requires updating every string Callback that currently relies on base `zef`.
 
-## Contents
+## Figure-tool sliders
 
-MATLAB sources:
-- `zef_update_options.m` — **if zef**: If zef.
-- `zef_update_parameters.m` — **zef.aux_field_1 = zef.h_parameters_table**: Zef.aux field 1 = zef.h parameters table.
-- `zef_update_transform_parameters.m` — **zef.aux_field_1 = zef.h_parameters_table**: Zef.aux field 1 = zef.h parameters table.
-- `zef_update_sensors_name_table.m` — **zef.aux_field_1 = zef.h_sensors_name_table**: Zef.aux field 1 = zef.h sensors name table.
-- `zef_update_butterfly_plot.m` — **zef.bf_sampling_frequency = str2num(get(zef**: Zef.bf sampling frequency = str2num(get(zef.
-- `zef_update_gaussian_prior_options.m` — **zef.inv_hyperprior_weight = str2num(get(zef**: Zef.inv hyperprior weight = str2num(get(zef.
-- `zef_update_find_synthetic_eit_data.m` — **zef.inv_roi_sphere(:,1) = str2num(get(zef**: Zef.inv roi sphere(:,1) = str2num(get(zef.
-- `zef_update_forward_and_inverse_options.m` — **zef.preconditioner = get(zef**: Zef.preconditioner = get(zef.
-- `zef_update_graphics_options.m` — **zef.use_gpu_graphic = get(zef**: Zef.use gpu graphic = get(zef.
-- `zef_update_ambience.m` — **zef_update_ambience**: Syncs GUI control values into `zef` for ambience.
-- `zef_update_brightness.m` — **zef_update_brightness**: Syncs GUI control values into `zef` for brightness.
-- `zef_update_colormap.m` — **zef_update_colormap**: Syncs GUI control values into `zef` for colormap.
-- `zef_update_colorscale.m` — **zef_update_colorscale**: Syncs GUI control values into `zef` for colorscale.
-- `zef_update_colorscale_max.m` — **zef_update_colorscale_max**: Syncs GUI control values into `zef` for colorscale_max.
-- `zef_update_colorscale_min.m` — **zef_update_colorscale_min**: Syncs GUI control values into `zef` for colorscale_min.
-- `zef_update_compartment_table_data.m` — **zef_update_compartment_table_data**: Syncs GUI control values into `zef` for compartment_table_data.
-- `zef_update_contour.m` — **zef_update_contour**: Syncs GUI control values into `zef` for contour.
-- `zef_update_contrast.m` — **zef_update_contrast**: Syncs GUI control values into `zef` for contrast.
-- `zef_update_contrast_and_brightness.m` — **zef_update_contrast**: Syncs GUI control values into `zef` for contrast.
-- `zef_update_diffusion.m` — **zef_update_diffusion**: Syncs GUI control values into `zef` for diffusion.
-- `zef_update_fig_details.m` — **zef_update_fig_details**: Syncs GUI control values into `zef` for fig_details.
-- `zef_update_labeling_priority.m` — **zef_update_labeling_priority**: Syncs GUI control values into `zef` for labeling_priority.
-- `zef_update_lead_field_id.m` — **zef_update_lead_field_id**: Syncs GUI control values into `zef` for lead_field_id.
-- `zef_update_lights.m` — **zef_update_lights**: Syncs GUI control values into `zef` for lights.
-- `zef_update_parameter_distributions.m` — **zef_update_parameter_distributions**: Syncs GUI control values into `zef` for parameter_distributions.
-- `zef_update_parcellation.m` — **zef_update_parcellation**: Syncs GUI control values into `zef` for parcellation.
-- `zef_update_source_positions.m` — **zef_update_source_positions**: Syncs GUI control values into `zef` for source_positions.
-- `zef_update_specular.m` — **zef_update_specular**: Syncs GUI control values into `zef` for specular.
-- `zef_update_transform.m` — **zef_update_transform**: Syncs GUI control values into `zef` for transform.
-- `zef_update_transparency_additional.m` — **zef_update_transparency_additional**: Syncs GUI control values into `zef` for transparency_additional.
-- `zef_update_transparency_cones.m` — **zef_update_transparency_cones**: Syncs GUI control values into `zef` for transparency_cones.
-- `zef_update_transparency_reconstruction.m` — **zef_update_transparency_reconstruction**: Syncs GUI control values into `zef` for transparency_reconstruction.
-- `zef_update_transparency_sensor.m` — **zef_update_transparency_sensor**: Syncs GUI control values into `zef` for transparency_sensor.
-- `zef_update_transparency_surface.m` — **zef_update_transparency_surface**: Syncs GUI control values into `zef` for transparency_surface.
-- `zef_update_zoom.m` — **zef_update_zoom**: Syncs GUI control values into `zef` for zoom.
+Each slider Callback writes the matching `zef.update_*` / `zef.colorscale_*` field when `gca` is parented to `h_zeffiro`; otherwise it passes `gcf` so a popped-out axes still updates.
 
-## How this folder fits into the overall workflow
+| Label | Tag | `zef` field | What is redrawn |
+|-------|-----|-------------|-----------------|
+| **Color min:** | `colorscale_min_slider` | `colorscale_min_slider` | `axes1` `CLim(1) *= 10^Value`, then contours |
+| **Color max:** | `colorscale_max_slider` | `colorscale_max_slider` | `CLim(2) *= 10^(new-old)`, then contours |
+| **Colormap:** | `colormapselection` | `update_colormap` | LUT via `zef_colormap` then contrast/brightness |
+| Linear / Logarithmic | `colorscaleselection` | `update_colorscale` | `axes1.ColorScale` (`'linear'`/`'log'`). Separate from `zef.inv_scale` (20*log10 of reconstruction in `zef_plot_volume`) |
+| **Distance:** | `update_zoom_slider` | `update_zoom` | `CameraViewAngle` |
+| **Transp. rec.:** | `transparency_reconstruction_slider` | `update_transparency_reconstruction` | `FaceAlpha` on Tag=`reconstruction`. κ = `1.05^(-100*slider)` |
+| **Transp. surf.:** | `transparency_surface_slider` | `update_transparency_surface` | Tag=`surface` |
+| **Transp. sens.:** | `transparency_sensor_slider` | `update_transparency_sensor` | Tag=`sensor` |
+| **Transp. cones:** | `transparency_cones_slider` | `update_transparency_cones` | Tag=`cones` |
+| **Transp. add.:** | `transparency_additional_slider` | `update_transparency_additional` | regexp Tag `additional*` |
+| **Brightness:** / **Contrast:** | `update_brightness_slider` / `update_contrast_slider` | both `update_*` | `Colormap` via `((x+b)/(1+b))^(1+c)`. Callbacks call `zef_update_contrast_and_brightness` (filename), not the split helpers |
+| **Ambience:** | `update_ambience_slider` | `update_ambience` | `AmbientStrength` on patch children |
+| **Diffusion:** | `update_diffusion_slider` | `update_diffusion` | `DiffuseStrength` (lighting, not conductivity) |
+| **Specular exp.:** | `update_specular_slider` | `update_specular` | `SpecularStrength` (not SpecularExponent) |
+| **Lights:** | `lightsselection` | `update_lights` | Light objects on `axes1` (1 reset ±z, 2 off, 3–5 add ±x/y/z, 6 headlight) |
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+`zef_update_fig_details` refreshes the **Compartments:** / **Sensors:** / **Details:** list boxes at the bottom (`zef_figure_tool` calls it at the end). Clicking the lists runs `zef_set_*_color` in `src/gui/set`.
 
-## GUI usage
+`zef_update_contour` redraws Tag=`contour` on reconstruction patches when `zef.show_contour` (Mesh visualization tool). Also called after Color min/max.
 
-- **zef_update_compartment_table_data**: GUI callback or dialog (`zef_update_compartment_table_data`).
+## Segmentation / options dialogs
 
-## Programmatic usage
+| File | Kind | Trigger | Writes |
+|------|------|---------|--------|
+| `zef_update_compartment_table_data` | function | `zef_update` | rebuilds `h_compartment_table` (flips `compartment_tags` L–R while filling). Needs `zef_i`, `zef_j`, `aux_field_1` inside the called init script |
+| `zef_update_sensors_name_table` | script | name-table `CellEditCallback` | `*_name_list`, `*_visible_list`, permutes points/directions; then `zef_update` |
+| `zef_update_parameters` | script | parameters table | transform slot or sensor row, keyed by `current_parameters` |
+| `zef_update_transform` | function | transform table | `current_tag` transform arrays; reruns `zef_init_transform` |
+| `zef_update_transform_parameters` | script | same table, `evalin` base | transform slot |
+| `zef_update_options` | script | legacy options panel | historical catch-all (`mlapp` vs uicontrol) |
+| `zef_update_forward_and_inverse_options` | script | **Settings → Forward and inverse processing options** `ValueChangedFcn` | meshing / PML / GPU / `source_model` |
+| `zef_update_graphics_options` | script | **Settings → Graphics processing options** | cones / streamlines / `colortune_param` (`cone_alpha` stored as 1−widget) |
+| `zef_update_gaussian_prior_options` | script | **Settings → Hierarchical prior options** | `inv_*` (`inv_amplitude_db` negated) |
+| `zef_update_parcellation` | function | Parcellation tool | **pushes** `zef` onto widgets (HTML list), not the other way |
+| `zef_update_find_synthetic_eit_data` | script | Generate synthetic EIT data | `inv_roi_sphere`, perturbation, noise |
+| `zef_update_butterfly_plot` | script | Butterfly **Plot** / **Apply** | `bf_*` |
+| `zef_update_source_positions` | function | unit change | returns rescaled positions (mm/cm/m) |
+| `zef_update_lead_field_id` | function | lead-field bank events | id / id_max counters (no widget) |
+| `zef_update_labeling_priority` | function | Forward/inverse **Labeling priority** menus | `*_labeling_priority` |
+| `zef_update_parameter_distributions` | function | after profile apply | tetra-wise `zef.<param>` from compartment scalars |
 
-From the project root:
+Do not call a slider updater without the matching `h_*` handle (Figure tool must exist).
 
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
-```
+## Developer notes
 
-Representative entry points in this folder:
-- `Call `if zef` from MATLAB with the project root on the path.`
-- `Call `zef.aux_field_1 = zef.h_parameters_table` from MATLAB with the project root on the path.`
-- `Call `zef.aux_field_1 = zef.h_parameters_table` from MATLAB with the project root on the path.`
-- `Call `zef.aux_field_1 = zef.h_sensors_name_table` from MATLAB with the project root on the path.`
-- `Call `zef.bf_sampling_frequency = str2num(get(zef` from MATLAB with the project root on the path.`
-- `Call `zef.inv_hyperprior_weight = str2num(get(zef` from MATLAB with the project root on the path.`
-- `Call `zef.inv_roi_sphere(:,1) = str2num(get(zef` from MATLAB with the project root on the path.`
-- `Call `zef.preconditioner = get(zef` from MATLAB with the project root on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+- New slider: `h_*` in `zef_figure_tool`, default in `zef_init`, updater here, **Reset** path in `zef_set_figure_tool_sliders`.
+- `zef_update_contrast_and_brightness.m` contains a primary function named `zef_update_contrast`; MATLAB still dispatches on the filename. The split files `zef_update_contrast.m` / `zef_update_brightness.m` are unused by the Figure tool.

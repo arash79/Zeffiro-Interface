@@ -1,53 +1,29 @@
-% ZEF_IMPORT_FIGURE  Load a MATLAB .fig file into a new figure and integrate with Zeffiro.
-%
-% ZEF = ZEF_IMPORT_FIGURE(ZEF)  Uses ZEF.file and ZEF.file_path (e.g. from
-%   zeffiro_interface startup) to open a .fig file when no display is available,
-%   or prompts the user with uigetfile when ZEF.use_display is true.
-%
-% ZEF = ZEF_IMPORT_FIGURE(ZEF, FILE_NAME, FOLDER_NAME)  Opens the specified
-%   .fig file from FOLDER_NAME. The default folder for figure files is fig/
-%   (see zeffiro_interface.m).
-%
-% The opened figure is normalized, given the standard menu bar, and optionally
-% scaled/positioned. Used for loading saved GUI templates (e.g. from fig/tools/).
-%
-% Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-% See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_import_figure(zef,varargin)
-% --- Zeffiro documentation header ---
-% zef_import_figure — Loads external data or a saved Zeffiro project into `zef`.
+%ZEF_IMPORT_FIGURE  Open a MATLAB .fig and integrate it with Zeffiro.
 %
-% Purpose:
-%   Loads external data or a saved Zeffiro project into `zef`.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   varargin
+%   Loads a saved figure, clears tool callbacks, normalizes child layout,
+%   assigns a figure-tool tag and size-changed handler, and records the
+%   file name in the system-information listbox when present. Resolves the
+%   file from arguments, uigetfile when zef.use_display is true, or
+%   zef.file and zef.file_path in nodisplay mode.
 %
-% Outputs:
-%   zef
+%   zef = zef_import_figure(zef)
+%   zef = zef_import_figure(zef, file_name, folder_name)
 %
-% Zef fields (observed):
-%   zef.file (read)
-%   zef.file_path (read)
-%   zef.save_file_path (read)
-%   zef.use_display (read)
-%   zef.zeffiro_current_size (read, write)
-%   zef.zeffiro_current_size_aux (read, write)
+%   Inputs
+%     zef         - session struct.
+%     file_name   - optional .fig file name.
+%     folder_name - optional folder containing file_name.
 %
-% Calls (project):
-%   zef_import_figure
+%   Output
+%     zef - session with zef.zeffiro_current_size updated for the new figure.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_import_figure(zef, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zeffiro_interface, zef_set_figure_current_size.
 
 if isempty(zef)
     zef = evalin('base','zef');

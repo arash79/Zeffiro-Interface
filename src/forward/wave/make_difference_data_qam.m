@@ -1,23 +1,12 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
-% --- Zeffiro documentation header ---
-% signal_configuration — Signal configuration.
+%MAKE_DIFFERENCE_DATA_QAM  QAM difference data: baseline vs perturbation.
 %
-% Purpose:
-%   Signal configuration.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Side effects:
-%   - filesystem I/O
+%   Script. Saves difference_data_qam.mat. Sibling of make_difference_data_amp.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `signal_configuration` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
-
-
+%   See also make_difference_data_amp, qam_demod.
 
 load([torre_dir '/system_data/signal_configuration.mat']);
 load([torre_dir '/system_data/mesh_1.mat']);

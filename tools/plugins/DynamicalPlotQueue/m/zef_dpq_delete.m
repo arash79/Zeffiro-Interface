@@ -1,35 +1,24 @@
 function data_table = zef_dpq_delete(zef)
-% --- Zeffiro documentation header ---
-% zef_dpq_delete — Zef dpq delete.
+%ZEF_DPQ_DELETE  Drop the selected dynamical-plot-queue rows.
 %
-% Purpose:
-%   Zef dpq delete.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   MenuSelectedFcn of h_dynamical_plot_queue_menu_delete. Removes rows
+%   whose indices are in zef.dpq_selected (set by zef_dpq_selection) and
+%   returns the remaining table. The menu then copies Data into
+%   zef.dynamical_plot_queue_table.
 %
-% Outputs:
-%   data_table
+%   data_table = zef_dpq_delete
+%   data_table = zef_dpq_delete(zef)
 %
-% Zef fields (observed):
-%   zef.dpq_selected (read)
-%   zef.h_dynamical_plot_queue_description (read)
-%   zef.h_dynamical_plot_queue_script (read)
-%   zef.h_dynamical_plot_queue_table (read)
+%   After the drop, tries to point the script and description boxes at a
+%   remaining row using the pre-delete remaining-index vector. Empty
+%   table clears those boxes. No-arg form reads zef from base.
 %
-% Calls (project):
-%   zef_dpq_delete
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[data_table] = zef_dpq_delete(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dpq_add, zef_dpq_selection, zef_dpq_window.
 
 if nargin == 0
     zef = evalin('base','zef');
@@ -42,6 +31,7 @@ aux_ind = setdiff([1 : size(data_table,1)]', selected_ind);
 
 data_table = data_table(aux_ind,:);
 
+% Refresh the script/description boxes from a leftover row when possible.
 if size(data_table,1) >= aux_ind
     eval(['zef.h_dynamical_plot_queue_script.Value = ''' data_table{aux_ind,1} ''';']);
     eval(['zef.h_dynamical_plot_queue_description.Value = ''' data_table{aux_ind,4} ''';']);

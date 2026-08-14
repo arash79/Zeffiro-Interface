@@ -1,23 +1,17 @@
-% --- Zeffiro documentation header ---
-% zef_process_meshes(zef,zef — Zef process meshes(zef,zef.
+%ZEF_VISUALIZE_VOLUME  Mesh visualization → **Visualize volume** (script).
 %
-% Purpose:
-%   Zef process meshes(zef,zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_stop_movie (read)
-%   zef.on_screen (read, write)
-%   zef.stop_movie (read, write)
+%   Script. ButtonPushedFcn of h_pushbutton31 (App Designer Text=
+%   'Visualize volume') in zef_mesh_visualization_tool. Runs
+%   zef_process_meshes(zef, zef.explode_everything), sets zef.on_screen=1
+%   (Details: Visualization: Volume), zef_update_fig_details, then
+%   zef_plot_volume into zef.h_axes1. Clears Stop.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef_process_meshes(zef,zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_plot_volume, zef_visualize_surfaces.
 zef_process_meshes(zef,zef.explode_everything);
 zef.on_screen = 1;
 zef_update_fig_details;

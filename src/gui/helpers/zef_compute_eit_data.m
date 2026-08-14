@@ -1,46 +1,45 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [eit_data_vec] = zef_compute_eit_data(nodes,elements,sigma,electrodes,varargin)
-% --- Zeffiro documentation header ---
-% zef_compute_eit_data — Zef compute eit data.
+%ZEF_COMPUTE_EIT_DATA  Synthetic EIT voltages with ROI conductivity bumps.
 %
-% Purpose:
-%   Zef compute eit data.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   elements
-%   sigma
-%   electrodes
-%   varargin
+%   FEM EIT forward: stiffness on (nodes, tetrahedra), PCG transfer per
+%   electrode, then CEM Schur block Aux_mat \ zef.current_pattern. Rows are
+%   mean-zeroed, zef.inv_bg_data is subtracted, and zef.inv_eit_noise *
+%   randn is added. ROI spheres zef.inv_roi_sphere (mm → m via /1000) add
+%   zef.inv_roi_perturbation to the diagonal of sigma on tets whose
+%   barycentre lies in the ball.
 %
-% Outputs:
-%   eit_data_vec
+%   No first-party .m caller. The Find synthetic EIT data figure
+%   (zef_find_synthetic_eit_data) exposes Compute; the menu item
+%   **Generate synthetic EIT data** is wired to find_synthetic_eit_data
+%   (no first-party file of that name). Call this function from MATLAB
+%   after setting current_pattern, inv_roi_sphere, inv_roi_perturbation,
+%   inv_bg_data, inv_eit_noise on base zef.
 %
-% Zef fields (observed):
-%   zef.current_pattern (read)
-%   zef.gpu_count (read)
-%   zef.inv_bg_data (read)
-%   zef.inv_eit_noise (read)
-%   zef.inv_roi_perturbation (read)
-%   zef.inv_roi_sphere (read)
-%   zef.use_gpu (read)
+%   Electrodes: 4 columns → CEM (same convention as EEG FEM); otherwise PEM
+%   (nearest node per xyz). The return path uses Aux_mat \ Current_pattern
+%   only in the CEM branch.
 %
-% Calls (project):
-%   zef_compute_eit_data
-%   zef_waitbar
+%   eit_data_vec = zef_compute_eit_data(nodes, elements, sigma, electrodes)
+%   eit_data_vec = zef_compute_eit_data(..., brain_ind, source_ind, lf_param)
 %
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Input
+%     nodes, elements, sigma  - same conventions as zef_lead_field_eeg_fem
+%     electrodes              - PEM N×3 or CEM N×4 (metres)
+%     brain_ind, source_ind   - optional index vectors (defaults: all tets)
+%     lf_param                - optional struct: pcg_tol, maxit, precond,
+%                               impedances (CEM), permutation, …
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[eit_data_vec] = zef_compute_eit_data(nodes, elements, sigma, electrodes, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output
+%     eit_data_vec - vectorized mean-zero voltages minus background plus noise
+%
+%   See also zef_find_synthetic_eit_data, zef_lead_field_eeg_fem.
 
 N = size(nodes,1);
 
@@ -173,6 +172,8 @@ clear Aux_mat;
 
 roi_ind_vec = [];
 
+% ROI spheres are stored in millimetres on the Find-synthetic-EIT dialog;
+% FEM nodes are metres, so divide by 1000 before the barycentre test.
 roi_sphere = evalin('base', 'zef.inv_roi_sphere');
 roi_perturbation = evalin('base', 'zef.inv_roi_perturbation');
 center_points = (nodes(tetrahedra(:,1),:) + nodes(tetrahedra(:,2),:) + nodes(tetrahedra(:,3),:)+ nodes(tetrahedra(:,4),:))/4;
@@ -182,6 +183,7 @@ c_roi = (roi_sphere(:,1:3)/1000)';
 for j = 1 : size(roi_sphere,1)
 
     r_aux = find(sqrt(sum((center_points'-c_roi(:,j*ones(1,size(center_points,1)))).^2))<=r_roi(j));
+    % Perturbation is added only to the three diagonal σ entries, not shear.
     sigma_tetrahedra(1:3,r_aux) =  sigma_tetrahedra(1:3,r_aux) + roi_perturbation(j);
 
 end
@@ -194,6 +196,9 @@ ind_m = [ 2 3 4 ;
 h=zef_waitbar(0,1,'System matrices.');
 waitbar_ind = 0;
 
+% FEM stiffness A_ij = σ ∇ψ_i·∇ψ_j / (9V) accumulated on tet corners
+% (same 9V convention as zef_stiffness_matrix). D_A stores the
+% unweighted ∇ψ·∇ψ / (9V) on brain_ind for the EIT Jacobian path.
 D_A_count = 0;
 for i = 1 : 4
 
@@ -653,6 +658,8 @@ close(h);
 
 Current_pattern = evalin('base','zef.current_pattern');
 
+% CEM: electrode-block voltages for each injection column of current_pattern.
+% Then mean-zero rows, subtract inv_bg_data, add inv_eit_noise * randn.
 if isequal(electrode_model,'CEM')
     eit_data_vec = Aux_mat \ Current_pattern;
 end

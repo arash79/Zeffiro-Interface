@@ -1,33 +1,21 @@
 function zef_simple_plot_sphere_max(varargin)
-% --- Zeffiro documentation header ---
-% zef_simple_plot_sphere_max — Zef simple plot sphere max.
+%ZEF_SIMPLE_PLOT_SPHERE_MAX  Queue renderer: sphere at max |reconstruction|.
 %
-% Purpose:
-%   Zef simple plot sphere max.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Reads base zef.reconstruction and zef.source_positions. For a cell
+%   reconstruction uses caller f_ind; otherwise the whole vector. Argmax
+%   is over sum of squared xyz components per source. Default radius 10,
+%   color [1 0 0]. Tag: 'additional: max sphere' on caller h_axes_image.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.reconstruction (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
 %   zef_simple_plot_sphere_max
+%   zef_simple_plot_sphere_max(radius)
+%   zef_simple_plot_sphere_max(radius, color)
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_simple_plot_sphere_max(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_simple_plot_sphere_min, zef_plot_dpq.
 
 if not(isempty(varargin))
     radius_val = varargin{1};
@@ -47,7 +35,8 @@ h_axes = evalin('caller','h_axes_image');
 %axes(h_axes);
 
 f_ind = evalin('caller','f_ind');
-delete(findobj(h_axes,'Tag','additional: max sphere'));
+delete(findobj(h_axes,'Tag','additional: max sphere')
+);
 r = evalin('base','zef.reconstruction');
 p = evalin('base','zef.source_positions');
 if iscell(r)

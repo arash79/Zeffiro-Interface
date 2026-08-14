@@ -1,46 +1,20 @@
-% process_source_space.m
-%
-% Processes source space grid positions from Duneuro export.
-%
-% Input:
-%   config - Configuration structure
-%
-% Output:
-%   success - Logical indicating success
-%   error_msg - Error message if failed (empty if successful)
-%
-% Usage:
-%   [success, error_msg] = utilities.duneuro2zef.process_source_space(config);
-%
-% See also: run.m, get_default_config.m
-
 function [success, error_msg] = process_source_space(config)
-% --- Zeffiro documentation header ---
-% utilities.duneuro2zef.process_source_space — Process source space.
+%PROCESS_SOURCE_SPACE  Duneuro source grid .mat → source_positions.mat.
 %
-% Purpose:
-%   Process source space.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   config
+%   find_files(config.files.source_space, input_folder, source_space.priority)
+%   ('smallest'/'largest'/'first' by file size when the pattern matches
+%   several). Accepts variables source_grid, source_positions, positions, or
+%   the first numeric N×3 field. No unit conversion. Saves
+%   output.source_space as source_positions (-v7.3).
 %
-% Outputs:
-%   success
-%   error_msg
+%   [success, error_msg] = process_source_space(config)
 %
-% Calls (project):
-%   utilities.duneuro2zef.find_files
-%   utilities.duneuro2zef.process_source_space
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[success, error_msg]] = utilities.duneuro2zef.process_source_space(config)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also find_files, run.
 
     success = false;
     error_msg = '';

@@ -1,24 +1,14 @@
-% --- Zeffiro documentation header ---
-% tree.all=zef.dataBank — Tree.all=zef.data Bank.
+%GMM_SUBPLOT  Lab script: rebuild GMM databank nodes then subplot figures.
 %
-% Purpose:
-%   Tree.all=zef.data Bank.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Script. For typ in Prob/Comp/kmeans, deletes GMM nodes whose name
+%   does not contain typ, then plots. Needs zef.dataBank. Pair with
+%   p_outputNew.
 %
-% Calls (project):
-%   zef_dataBank_delete
-%   zef_dataBank_uiTreeDeleteHash
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `tree.all=zef.dataBank` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 tree.all=zef.dataBank.tree;
 

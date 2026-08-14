@@ -1,30 +1,32 @@
 function [sensor_positions, sensor_orientations, sensor_ind, sensor_tag_cell] = zef_bst_2_zef_sensors(varargin)
-% --- Zeffiro documentation header ---
-% zef_bst_2_zef_sensors — Zef bst 2 zef sensors.
+%ZEF_BST_2_ZEF_SENSORS  Import Brainstorm channel locations into Zeffiro coordinates.
 %
-% Purpose:
-%   Zef bst 2 zef sensors.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Loads the current or specified study Channel MAT file, filters channels
+%   by optional sensor_type (e.g. 'EEG'), and returns positions scaled from
+%   meters to millimeters. Orientations are included when present on each
+%   channel.
 %
-% Outputs:
-%   sensor_positions
-%   sensor_orientations
-%   sensor_ind
-%   sensor_tag_cell
+%   [sensor_positions, sensor_orientations, sensor_ind, sensor_tag_cell] = ...
+%       zef_bst_2_zef_sensors()
+%   [...] = zef_bst_2_zef_sensors(sensor_type)
+%   [...] = zef_bst_2_zef_sensors(sensor_type, istudy)
 %
-% Calls (project):
-%   zef_bst_2_zef_sensors
+%   Inputs
+%     sensor_type - channel Type filter (optional; empty loads all types).
+%     istudy      - Brainstorm study index (optional).
 %
-% Side effects:
-%   - filesystem I/O
+%   Outputs
+%     sensor_positions    - N-by-3 positions in mm.
+%     sensor_orientations - N-by-3 orientations when available.
+%     sensor_ind          - channel group index per row.
+%     sensor_tag_cell     - channel Type string per row.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[sensor_positions, sensor_orientations, sensor_ind]] = zef_bst_2_zef_sensors(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_2_zef_surface, zef_import_segmentation.
 
 sensor_counter = 0;
 sensor_num = 0;

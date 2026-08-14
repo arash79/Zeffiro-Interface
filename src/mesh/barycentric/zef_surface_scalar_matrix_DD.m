@@ -1,30 +1,18 @@
 function M = zef_surface_scalar_matrix_DD(nodes, tetra, g_i_ind, g_j_ind, scalar_field, weighting)
-% --- Zeffiro documentation header ---
-% zef_surface_scalar_matrix_DD — Zef surface scalar matrix DD.
+%ZEF_SURFACE_SCALAR_MATRIX_DD  Intended surface G·G; uses t_ind/f_ind before they exist.
 %
-% Purpose:
-%   Zef surface scalar matrix DD.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   g_i_ind
-%   g_j_ind
-%   scalar_field
-%   weighting
+%   Unlike zef_surface_scalar_matrix_D this never calls zef_surface_mesh,
+%   loops all four tet vertices, and indexes tetra(t_ind,:) / f_ind which
+%   are undefined. No first-party caller. Do not use.
 %
-% Outputs:
-%   M
+%   M = zef_surface_scalar_matrix_DD(nodes, tetra, g_i_ind, g_j_ind, scalar_field, weighting)
 %
-% Calls (project):
-%   zef_surface_scalar_matrix_DD
-%   zef_volume_barycentric
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_surface_scalar_matrix_DD(nodes, tetra, g_i_ind, g_j_ind, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_surface_scalar_matrix_D, zef_volume_scalar_matrix_DD.
 
 N = size(nodes,1);
 K = size(tetra,1);

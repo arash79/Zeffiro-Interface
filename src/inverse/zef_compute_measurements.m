@@ -1,44 +1,38 @@
 function zef = zef_compute_measurements(zef, opts)
-% --- Zeffiro documentation header ---
-% zef_compute_measurements — Zef compute measurements.
+%ZEF_COMPUTE_MEASUREMENTS  Synthesize zef.measurements from dipolar sources and zef.L.
 %
-% Purpose:
-%   Zef compute measurements.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   opts
+%   For each source in opts.sources, finds the nearest active brain mesh node,
+%   extracts the corresponding (x,y,z) lead-field triplet from raw zef.L via
+%   zef_processLeadfields index maps, and accumulates L_k * orientation *
+%   amplitude * time_series. Optional white Gaussian noise is added per channel
+%   at opts.snr_db. Writes measurements and inversion metadata back onto zef.
 %
-% Outputs:
-%   zef
+%   zef = zef_compute_measurements(zef, opts)
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.inv_data_mode (read, write)
-%   zef.inv_high_cut_frequency (read, write)
-%   zef.inv_low_cut_frequency (read, write)
-%   zef.inv_sampling_frequency (read, write)
-%   zef.inv_synth_source (read, write)
-%   zef.inv_time_1 (read, write)
-%   zef.inv_time_2 (read, write)
-%   zef.inv_time_3 (read, write)
-%   zef.measurements (read, write)
-%   zef.normalize_data (read, write)
-%   zef.source_direction_mode (read, write)
-%   zef.source_positions (read)
+%   Required opts fields
+%     sources              - struct array with position (1x3), orientation (1x3),
+%                            amplitude (scalar), time_series (numeric 1xT,
+%                            function_handle(t), or preset string).
+%     sampling_frequency   - Hz (positive).
 %
-% Calls (project):
-%   zef_compute_measurements
-%   zef_processLeadfields
+%   Optional opts (defaults in arguments block)
+%     time, duration, snr_db, noise_type ("gaussian"|"none"), lead_field_unit_scale
+%     (default 1e-6), inv_data_mode, band-pass fields, normalize_data (1–4),
+%     record_inv_synth_source, rng_seed.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Output zef fields: measurements, inv_sampling_frequency, inv_data_mode,
+%   inv_low/high_cut_frequency, inv_time_1/2/3, normalize_data, and optionally
+%   inv_synth_source (n_sources x 10 table for plotting).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_compute_measurements(zef, opts)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Requires nonempty zef.L and zef.source_positions. Errors if lead field or
+%   Cartesian column map length is inconsistent with source_direction_mode.
+%
+%   See also zef_processLeadfields, zef_getFilteredData, zef_inverse_pipeline_run.
 
 arguments
     zef (1,1) struct

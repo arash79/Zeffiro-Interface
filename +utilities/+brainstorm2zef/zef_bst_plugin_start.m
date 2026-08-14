@@ -1,39 +1,25 @@
 function varargout = zef_bst_plugin_start(folder_name, zef_bst, open_dialog)
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst_plugin_start — Zef bst plugin start.
+%ZEF_BST_PLUGIN_START  Figure UI that runs a zef_bst_*_fem_mesh_create script.
 %
-% Purpose:
-%   Zef bst plugin start.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   folder_name
-%   zef_bst
-%   open_dialog
+%   varargout = zef_bst_plugin_start(folder_name)
+%   varargout = zef_bst_plugin_start(folder_name, zef_bst, open_dialog)
 %
-% Outputs:
-%   varargout
+%   folder_name is the Zeffiro program_path (project root). zef_bst default
+%   struct, stored as figure user_settings. open_dialog default 1 (Visible;
+%   waitfor Run). Discovers zef_bst_*_fem_mesh_create.m in this package.
+%   Settings live in +utilities/+brainstorm2zef/settings; projects in
+%   .../projects. Side effect: addpath(folder_name/m). Tag zeffiro_bst_plugin.
+%   Run evaluates the selected mesh-create function with popup run_type
+%   and input_mode; cancel passes (0,0,...). Buttons: Settings file,
+%   Create project, Edit project, Edit settings, Run.
 %
-% Zef fields (observed):
-%   zef.program_path (read, write)
-%   zef.segmentation_tool_default_position (read)
-%
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_create_project
-%   utilities.brainstorm2zef.zef_bst_edit_project
-%   utilities.brainstorm2zef.zef_bst_get_project_file_name
-%   utilities.brainstorm2zef.zef_bst_get_settings_file_name
-%   utilities.brainstorm2zef.zef_bst_plugin_start
-%   zef_apply_system_settings
-%
-% Side effects:
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[varargout] = utilities.brainstorm2zef.zef_bst_plugin_start(folder_name, zef_bst, open_dialog)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_default_fem_mesh_create, zef_bst_settings_file.
+
 
 if nargin < 2
     zef_bst = struct;

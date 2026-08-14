@@ -1,51 +1,29 @@
-# +utilities/+inverse
+# `utilities.inverse` — time-frame loop for class inverters
 
-## Purpose of this folder
-
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
-
-## Contents
-
-MATLAB sources:
-- `run_frame_loop.m` — **utilities.inverse.function [z_inverse, MethodClassObj] = run_frame_loop( ...**: Function [z inverse, Method Class Obj] = run frame loop( ....
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+Single function: `run_frame_loop`. `dispatch_inverse` (and therefore `zef_inverse_run`) uses it for every `execution_kind == "class"` method. Do not duplicate this loop in plugins.
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+[z_inverse, MethodClassObj] = utilities.inverse.run_frame_loop( ...
+    zef, MethodClassObj, L, procFile, ...
+    source_direction_mode, source_positions, ...
+    waitbar_handle, waitbar_title);
 ```
 
-Representative entry points in this folder:
-- ``utilities.inverse.function [z_inverse, MethodClassObj] = run_frame_loop( ...(zef, MethodClassObj, L, procFile, …)` with project root and `src` on the path.`
+## Arguments
 
-## Examples
+| Argument | Role |
+|----------|------|
+| `zef` | Must supply measurements via `zef_getFilteredDataClassObj` (`inv_data_mode`). Cluster shim sets `inv_data_mode='raw'` and `measurements = bundle.F` |
+| `MethodClassObj` | Any `inverse.CommonInverseParameters.isAnInverter` object |
+| `L`, `procFile`, `source_direction_mode`, `source_positions` | From `zef_processLeadfields` / the bundle |
+| `waitbar_handle`, `waitbar_title` | Progress + ETA |
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+## Behaviour
 
-## Dependencies and assumptions
+1. `z_inverse = cell(1, MethodClassObj.number_of_frames)`.
+2. Errors `EmptyData` if filtered data is empty; `FrameCountExceedsData` if `number_of_frames` > columns of `f_data`.
+3. If the class defines `initialize`: uses `zef.inverse_initialization_measurements` when that field is non-empty, otherwise concatenates all frame time-steps.
+4. If `precompute` exists: tries `precompute(L, procFile)`, falls back to `precompute(L)` only on “too many inputs”.
+5. Each frame: `zef_getTimeStepClassObj` → optional `gpuArray` when `zef.use_gpu && zef.gpu_count > 0` → `invert(..., "use_gpu", ..., "normalize_data", zef.normalize_data)`.
 
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Returns the cell of source vectors and the (possibly updated) inverter object. Does not write `zef.reconstruction`; `dispatch_inverse` / `zef_postProcessInverseClassObj` do that.

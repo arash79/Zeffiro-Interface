@@ -1,39 +1,17 @@
-% --- Zeffiro documentation header ---
-% for zef_LeadFieldProcessingTool_index=1:zef.LeadFieldProcessingTool — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%ZEF_LEADFIELDPROCESSINGTOOL_AUX2CURRENT  Replace-button: first checked row → live zef.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.L (read, write)
-%   zef.LeadFieldProcessingTool (read)
-%   zef.compartment_tags (read, write)
-%   zef.imaging_method (read, write)
-%   zef.imaging_method_cell (read)
-%   zef.lead_field_id (read)
-%   zef.lead_field_id_max (read)
-%   zef.lf_bank_scaling_factor (read, write)
-%   zef.lf_tag (read, write)
-%   zef.measurements (read, write)
-%   zef.noise_data (read, write)
-%   zef.parcellation_interp_ind (read, write)
-%   zef.sensors (read, write)
-%   zef.source_directions (read, write)
-%   zef.source_interpolation_ind (read, write)
-%   … (1 more)
+%   Script. replaceButton. Copies that bank item's L, sensors,
+%   measurements, noise_data, interpolation, imaging_method, lf_tag, and
+%   compartment sources onto zef; zef_update_lead_field_id('bank_replace');
+%   updates currentLeadfield. Stops at the first checked column-6 box.
+%   Then zef_update.
 %
-% Calls (project):
-%   zef_update_lead_field_id
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `for zef_LeadFieldProcessingTool_index=1:zef.LeadFieldProcessingTool` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_LeadfieldProcessingTool_bank2aux_bank2auxIndex.
 
 for zef_LeadFieldProcessingTool_index=1:zef.LeadFieldProcessingTool.bankSize
 

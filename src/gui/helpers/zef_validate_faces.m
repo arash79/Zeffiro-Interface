@@ -1,27 +1,27 @@
 function [faces, faces_count] = zef_validate_faces(tetra)
-% --- Zeffiro documentation header ---
-% zef_validate_faces — Zef validate faces.
+%ZEF_VALIDATE_FACES  Unique sorted faces of a tet mesh, with occurrence counts.
 %
-% Purpose:
-%   Zef validate faces.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tetra
+%   Builds the four faces of every tet (vertex triples sorted, plus a
+%   local face id 1–4 and the tet row), then unique(...,'rows') on the
+%   triples. faces_count is accumarray of how often each unique triple
+%   appears (1 = boundary face, 2 = interior). Does not repair geometry.
 %
-% Outputs:
-%   faces
-%   faces_count
+%   No first-party callers in this tree.
 %
-% Calls (project):
-%   zef_validate_faces
+%   [faces, faces_count] = zef_validate_faces(tetra)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[faces, faces_count]] = zef_validate_faces(tetra)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   Inputs
+%     tetra - T-by-4 1-based vertex indices.
+%
+%   Outputs
+%     faces       - F-by-4: sorted vertex triple plus the face id of the
+%                   first occurrence.
+%     faces_count - F-by-1 occurrence counts aligned with faces.
 faces = [[sort(tetra(:,[2 4 3]),2) ones(size(tetra,1),1) [1:size(tetra,1)]'];
     [sort(tetra(:,[1 3 4]),2) 2*ones(size(tetra,1),1)  [1:size(tetra,1)]'];
     [sort(tetra(:,[1 4 2]),2) 3*ones(size(tetra,1),1)  [1:size(tetra,1)]'];

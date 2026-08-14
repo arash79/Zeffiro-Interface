@@ -1,45 +1,33 @@
 function [data] = zef_dataBank_getData(zef, type)
-% --- Zeffiro documentation header ---
-% zef_dataBank_getData — Zef data Bank get Data.
+%ZEF_DATABANK_GETDATA  Copy selected zef fields into a node payload by type.
 %
-% Purpose:
-%   Zef data Bank get Data.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   type
+%   Used by Add (addButton / add_data_item). Does not write the tree.
+%   Entrytype.Items in zef_open_dataBank are data, noisedata, leadfield,
+%   reconstruction, gmm, custom, import. Only the first five have cases
+%   here; custom and import yield a struct with .type only.
 %
-% Outputs:
-%   data
+%   data = zef_dataBank_getData(zef, type)
 %
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.L (read)
-%   zef.compartment_tags (read)
-%   zef.imaging_method (read)
-%   zef.lf_tag (read)
-%   zef.measurements (read)
-%   zef.noise_data (read)
-%   zef.parcellation_interp_ind (read)
-%   zef.reconstruction (read)
-%   zef.reconstruction_information (read)
-%   zef.sensors (read)
-%   zef.source_directions (read)
-%   zef.source_interpolation_ind (read)
-%   zef.source_positions (read)
+%   Inputs
+%     zef   - session whose live fields are copied.
+%     type  - char matching a case below (usually Entrytype.Value).
 %
-% Calls (project):
-%   zef_dataBank_getData
+%   Output
+%     data  - struct with .type and type-specific fields:
+%       data            - .measurements (zef.measurements)
+%       noisedata       - .noisedata (zef.noise_data)
+%       reconstruction  - .reconstruction as a cell, .reconstruction_information
+%       leadfield       - L, sensors, imaging_method, noise_data, lf_tag,
+%                         source_positions/directions, interpolants,
+%                         source_structure{k} = zef.(compartment_tags{k}_sources)
+%       gmm             - zef.GMM.model, dipoles, amplitudes, time_variables, parameters
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[data] = zef_dataBank_getData(zef, type)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_setData, zef_dataBank_addButtonPress.
 
 data=[];
 data.type=type;

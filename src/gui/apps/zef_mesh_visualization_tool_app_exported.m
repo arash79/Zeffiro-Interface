@@ -1,42 +1,14 @@
-%ZEF_MESH_VISUALIZATION_TOOL_APP_EXPORTED ZEFFIRO mesh visualization tool (exported).
-%
-%   This class implements the Mesh Visualization Tool window for the ZEFFIRO
-%   Interface. It provides controls for visualizing volume data, surfaces,
-%   frame/movie generation, and DTI streamlines. Options include clipping
-%   planes (up to three), plot scale/colormap/threshold, reconstruction type,
-%   distribution mode, transparency, submesh selection, contour display,
-%   cone field and streamline drawing, inflated surfaces, and axes pop-up.
-%   Parameter and graph listboxes with "Plot graph" support time-series or
-%   graph visualization. The UI is built with MATLAB App Designer and
-%   exported to this standalone class.
-%
-%   The app follows a singleton pattern: only one instance runs at a time.
-%
-%   Source: Exported from zef_mesh_visualization_tool_app.mlapp (App Designer).
-%
-%   See also matlab.apps.AppBase, zef_mesh_visualization_tool_app.
-
 classdef zef_mesh_visualization_tool_app_exported < matlab.apps.AppBase
-% --- Zeffiro documentation header ---
-% zef_mesh_visualization_tool_app_exported — Zef mesh visualization tool app exported.
+%ZEF_MESH_VISUALIZATION_TOOL_APP_EXPORTED  App Designer export: mesh visualization panel UIFigure.
 %
-% Purpose:
-%   Zef mesh visualization tool app exported.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
-%
-% Side effects:
-%   - creates/updates figures
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_mesh_visualization_tool_app_exported(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
-    properties (Access = public)
+%   Generated from the matching .mlapp; layout only—wire callbacks in src/gui/tools.
+%   Tool scripts copy h_* properties into zef and attach MenuSelectedFcn/ButtonPushedFcn.
+properties (Access = public)
         h_mesh_visualization_tool       matlab.ui.Figure
         h_pushbutton31                  matlab.ui.control.Button
         h_pushbutton20                  matlab.ui.control.Button

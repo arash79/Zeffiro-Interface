@@ -1,29 +1,21 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 
 function [bh_vec, d_bh_vec] = bh_window(t, T, carrier_cycles_per_pulse_cycle, carrier_mode)
-% --- Zeffiro documentation header ---
-% bh_window — Bh window.
+%BH_WINDOW  Blackman–Harris pulse envelope (and derivative) on [0, T].
 %
-% Purpose:
-%   Bh window.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Inputs:
-%   t
-%   T
-%   carrier_cycles_per_pulse_cycle
-%   carrier_mode
+%   Coefficients a0=0.35875, a1=0.48829, a2=0.14128, a3=0.01168. Zero outside
+%   [0, T]. carrier_cycles_per_pulse_cycle==0 is envelope-only; otherwise
+%   mixed with a cosine/sine carrier (carrier_mode).
 %
-% Outputs:
-%   bh_vec
-%   d_bh_vec
+%   [bh_vec, d_bh_vec] = bh_window(t, T, carrier_cycles_per_pulse_cycle, carrier_mode)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[bh_vec, d_bh_vec]] = bh_window(t, T, carrier_cycles_per_pulse_cycle, carrier_mode)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also mh_window, qam_demod.
+
+
 
 
 ones_vec = ones(size(t));

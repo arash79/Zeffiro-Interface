@@ -1,67 +1,52 @@
-# +utilities/+cluster
+# `utilities.cluster` — class/legacy inverse dispatch and batch jobs
 
-## Folder purpose
+Router between `zef_inverse_run` / `zef_inverse_extract_bundle` and `+inverse` inverter classes (or legacy `zef_*` plugin functions). Local path is what the GUI inverse run uses; cluster path serializes bundles and `batch`es `run_inverse_job`.
 
-**Distributed and local inverse execution**: serialize a minimal `bundle` from `zef`, dispatch to `+inverse` classes or legacy plugin functions, run batch/cluster jobs, and collect results. Bridges `zef_inverse_run` in `src/inverse` with Parallel Computing Toolbox workflows.
+See parent `+utilities/README.md` for the call graph. Bundle field list: `SCHEMA.md`.
 
-## Main contents
-
-| File | Role |
-|------|------|
-| `dispatch_inverse.m` | Core router: class path → `utilities.inverse.run_frame_loop`; legacy → `with_zef_in_base` + plugin func |
-| `inverse_method_registry.m` | Maps `method_id` → class name, legacy function, `execution_kind` |
-| `run_inverse_job.m` | Worker: load bundle `.mat`, run dispatch, save `result.mat` |
-| `submit_inverse_jobs.m` / `collect_inverse_results.m` | Batch submit and gather |
-| `configure_cluster_profile.m` | Set CSC cluster `AdditionalProperties` |
-| `create_batch_job.m` | Job array helper |
-| `with_zef_in_base.m` | Temporarily assign `legacy_zef` to base for legacy solvers |
-| `example_workflow.m` / `run_cluster_job_example.m` | Developer demos |
-| `+examples/` | `eloreta_workflow.m`, `kalman_workflow.m`, `parameter_sweep.m` |
-| `SCHEMA.md` | Bundle struct field documentation |
-
-## Code functionality
-
-**Bundle** (from `zef_inverse_extract_bundle`): `L`, `F`, `procFile`, `source_positions`, `source_direction_mode`, `common_inverse_parameters`, optional `legacy_zef`, GPU flags.
-
-**Class dispatch:** instantiate `inverse.*Inverter`, `withPropertiesFromZef`, `run_frame_loop`.
-
-**Legacy dispatch:** requires `bundle.legacy_zef` embedded full struct; calls e.g. `zef_CSM_iteration` in base workspace.
-
-**Errors:** `utilities.cluster:UnknownInverseMethod`, `MissingLegacyZef` (see `InverseFailureModesTest`).
-
-## Workflow context
-
-```
-zef_inverse_run → zef_inverse_extract_bundle → dispatch_inverse
-  → local: immediate result
-  → cluster: submit_inverse_jobs → run_inverse_job on workers
-```
-
-`+tests` extensively covers dispatch; `+examples/+studies` may use sensitivity batching.
-
-## Usage instructions
+## Local dispatch
 
 ```matlab
-[zef, result] = zef_inverse_run(zef, 'eloreta', 'execution', 'local');
-
-% Cluster (after configure_cluster_profile)
-jobs = utilities.cluster.submit_inverse_jobs(jobSpecs, profile);
-utilities.cluster.collect_inverse_results(jobs, outDir);
-
-% Examples
-run('+utilities/+cluster/+examples/eloreta_workflow.m');
+bundle = zef_inverse_extract_bundle(zef, "eloreta");  % src/inverse
+result = utilities.cluster.dispatch_inverse(bundle);
+% result.method_id, .z_inverse, .reconstruction, .reconstruction_information
 ```
 
-## Important notes
+`dispatch_inverse` requires `bundle.method_info` from `inverse_method_registry`. Class path: construct `inverse.*Inverter`, `utilities.inverse.run_frame_loop`, optional smoother/terminate, `zef_postProcessInverseClassObj`. Legacy path: `with_zef_in_base` + `feval(legacy_function)`.
 
-- Legacy cluster jobs need full `zef` in bundle — large files.
-- Registry must list both `method_id` and `legacy_*` for parity testing.
-- `parameter_sweep.m` assumes CSC `parcluster` — not portable to all HPC sites.
-- Class methods share `run_frame_loop` — do not duplicate frame logic in cluster code.
+Errors: `utilities.cluster:UnknownInverseMethod`, `MissingLegacyZef`, `UnsupportedExecutionKind`.
 
-## Developer guidance
+## Registry ids (`inverse_method_registry`)
 
-- Register every new `+inverse` class in `inverse_method_registry.m` with `execution_kind = "class"`.
-- Keep bundle schema backward compatible or version the struct.
-- Test with `runtests('tests.InverseDispatchTest')` after registry edits.
-- Document new method IDs in `+inverse/README.md` and relevant plugin README.
+Case-insensitive. Class: `csm`/`dspm`/`sloreta`/`sloreta3d`/`sbl`, `mne`/`wmne`, `eloreta`, `kalman`/`kf`, `beamformer`, `dipolescan`/`dipole_scan`, `ias`, `ramus`, `grouplasso`/`group_lasso`, `halpr`.
+
+Legacy: `legacy_csm`, `legacy_mne`, `legacy_kalman`, `legacy_ias`, `legacy_ramus`, `legacy_dipolescan`, `legacy_beamformer`, `legacy_sl1`, `legacy_relax`, `legacy_sesame`, `legacy_hb`/`legacy_mcmc`, `legacy_music`, `legacy_rap_music`, `legacy_exp`.
+
+## Cluster batch
+
+Needs Parallel Computing Toolbox. `configure_cluster_profile` is **CSC Puhti / `configCluster` specific** (`AdditionalProperties.ComputingProject`, `MemPerCPU`, `WallTime`, …). It is not a Zeffiro INI profile.
+
+```matlab
+cluster = utilities.cluster.configure_cluster_profile("project_XXXX", ...
+    "MemPerCPU", "8g", "WallTime", "24:00:00", "Partition", "small");
+
+submissions = utilities.cluster.submit_inverse_jobs(cluster, {bundle}, ...
+    "BundleDir", fullfile(pwd, "cluster_bundles"), ...
+    "ResultDir", fullfile(pwd, "cluster_results"));
+% writes inverse_bundle_*.mat and queues @run_inverse_job
+
+[results, summary] = utilities.cluster.collect_inverse_results(submissions);
+```
+
+`run_inverse_job(bundle_path, result_path)` loads variable `bundle`, calls `dispatch_inverse`, saves `result` (`-v7.3`). On failure it still writes `result` then rethrows. `opts.EnableProfiler` stores `profilerInfo`.
+
+`create_batch_job` is a generic `parallel.batch` wrapper (any function handle). `run_cluster_job_example` is a deprecated alias of `run_inverse_job`.
+
+`example_workflow.m` is a script (not a function): expects `zef` in base and a live Puhti-style profile.
+
+## Side effects
+
+- Class dispatch opens a `zef_waitbar`.
+- `with_zef_in_base` temporarily overwrites base `zef`.
+- `submit_inverse_jobs` creates `BundleDir` / `ResultDir` and writes MAT-files.
+- `configure_cluster_profile` `saveProfile`s as `opts.ProfileName` (default `"CSCPuhti"`).

@@ -1,56 +1,29 @@
 function [z, info] = zef_find_mne_reconstruction(zef,data_mode)
-% --- Zeffiro documentation header ---
-% zef_find_mne_reconstruction — Zef find mne reconstruction.
+%ZEF_FIND_MNE_RECONSTRUCTION  MNE / dSPM / sLORETA / wMNE reconstruction plugin.
 %
-% Purpose:
-%   Zef find mne reconstruction.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   data_mode
+%   Legacy GUI path (not inverse.MNEInverter). Reads zef.mne_* options,
+%   copies them onto inv_* time/filter fields, processes lead fields, and
+%   loops frames. zef.mne_type selects the estimator; mne_prior 1 uses
+%   spatially balanced theta0. Likelihood covariance is
+%   (10^(-inv_snr/20))^2 I. Optional GPU on L and S_mat.
 %
-% Outputs:
-%   z
-%   info
+%   [z, info] = zef_find_mne_reconstruction(zef)
+%   [z, info] = zef_find_mne_reconstruction(zef, data_mode)
 %
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.inv_amplitude_db (read)
-%   zef.inv_high_pass (read, write)
-%   zef.inv_low_pass (read, write)
-%   zef.inv_prior_over_measurement_db (read)
-%   zef.inv_sampling_frequency (read, write)
-%   zef.inv_snr (read)
-%   zef.inv_time_1 (read, write)
-%   zef.inv_time_2 (read, write)
-%   zef.inv_time_3 (read, write)
-%   zef.mne_high_cut_frequency (read)
-%   zef.mne_low_cut_frequency (read)
-%   zef.mne_normalize_data (read)
-%   zef.mne_number_of_frames (read)
-%   zef.mne_prior (read)
-%   … (10 more)
+%   Inputs
+%     zef        - session with lead field and mne_* settings.
+%     data_mode  - passed through to filtering; default 'filtered'.
 %
-% Calls (project):
-%   zef_find_gaussian_prior
-%   zef_find_mne_reconstruction
-%   zef_getFilteredData
-%   zef_getTimeStep
-%   zef_normalizeInverseReconstruction
-%   zef_postProcessInverse
-%   zef_processLeadfields
-%   zef_waitbar
+%   Outputs
+%     z     - reconstruction (vector or cell of frames).
+%     info  - reconstruction_information struct (tag, snr, mne_type, …).
 %
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z, info]] = zef_find_mne_reconstruction(zef, data_mode)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also inverse.MNEInverter, zef_minimum_norm_estimation, zef_processLeadfields.
 
 if nargin < 2
     data_mode = 'filtered';
@@ -191,6 +164,7 @@ for f_ind = 1 : zef.number_of_frames
     L_inv = L.*repmat(d_sqrt',size(L,1),1);
     L_inv = d_sqrt.*(L_inv'*(inv(L_inv*L_inv' + S_mat)));
 
+    % Tikhonov MNE (mne_type 1): L_inv * f. wMNE (4) already scaled d_sqrt.
     if isequal(mne_type,2)
         % dSPM
         aux_vec = sum(L_inv.^2, 2);
@@ -198,7 +172,7 @@ for f_ind = 1 : zef.number_of_frames
         L_inv = L_inv./aux_vec;
 
     elseif isequal(mne_type, 3)
-        %'sLORETA'
+        % sLORETA
 
         aux_vec = sqrt(sum(L_inv.*L', 2));
         L_inv = L_inv./aux_vec;

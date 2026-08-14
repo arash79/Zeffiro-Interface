@@ -1,27 +1,20 @@
 function srsc = zef_ES_centralize_recursive_search_window(adapt_window, original_window, param_aux, s_opt)
-% --- Zeffiro documentation header ---
-% zef_ES_centralize_recursive_search_window — Zef ES centralize recursive search window.
+%ZEF_ES_CENTRALIZE_RECURSIVE_SEARCH_WINDOW  Clamp a sliding index window to [1, length(param)].
 %
-% Purpose:
-%   Zef ES centralize recursive search window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   adapt_window
-%   original_window
-%   param_aux
-%   s_opt
+%   Index arithmetic only — not a GUI window despite the name. Not called
+%   from zef_ES_optimization_window or from zef_ES_centralize_recursive_search
+%   (that function uses zef_ES_find_parameters instead).
 %
-% Outputs:
-%   srsc
+%   srsc = zef_ES_centralize_recursive_search_window(adapt_window, ...
+%       original_window, param_aux, s_opt)
 %
-% Calls (project):
-%   zef_ES_centralize_recursive_search_window
+%   See also zef_ES_centralize_recursive_search.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[srsc] = zef_ES_centralize_recursive_search_window(adapt_window, original_window, param_aux, s_opt)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 if adapt_window < length(param_aux)
     if any(s_opt + (-floor(adapt_window/2):floor(adapt_window/2)) >= length(param_aux)) %&& ~any(s_opt + (-floor(adapt_window/2):floor(adapt_window/2)) >= original_window)

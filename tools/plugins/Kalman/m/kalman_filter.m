@@ -1,33 +1,35 @@
 function [P_store,z_inverse] = kalman_filter(m,P,A,Q,L,R, timeSteps ,number_of_frames, smoothing)
-% --- Zeffiro documentation header ---
-% kalman_filter — Kalman filter.
+%KALMAN_FILTER  Per-frame kf_predict + kf_update over timeSteps.
 %
-% Purpose:
-%   Kalman filter.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   m
-%   P
-%   A
-%   Q
-%   L
-%   R
-%   timeSteps
-%   number_of_frames
-%   smoothing
+%   [P_store, z_inverse] = kalman_filter(m, P, A, Q, L, R, timeSteps, number_of_frames, smoothing)
 %
-% Outputs:
-%   P_store
-%   z_inverse
+%   Called from zef_KF (legacy Kalman plugin, not inverse.KalmanInverter)
+%   for filter_type 1 (no standardization) and type 4 (spatial
+%   standardization applied after this loop). If smoothing == 2, stores
+%   P_store for RTS_smoother. Waitbar only; no zef I/O.
 %
-% Calls (project):
-%   zef_waitbar
+%   Inputs
+%     m                 - prior mean (n_sources x 1)
+%     P                 - prior covariance
+%     A                 - transition (identity in zef_KF)
+%     Q                 - process noise (diagonal or DTI structural Q)
+%     L                 - processed lead field (H)
+%     R                 - measurement noise (std_lhood^2 I)
+%     timeSteps         - cell of measurement vectors, one per frame
+%     number_of_frames  - length of timeSteps
+%     smoothing         - if 2, keep P_store for RTS
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[P_store, z_inverse]] = kalman_filter(m, P, A, Q, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Outputs
+%     P_store    - cell of P per frame (empty unless smoothing == 2)
+%     z_inverse  - cell of filtered means
+%
+%   See also zef_KF, kf_predict, kf_update, RTS_smoother.
+%
 
 P_store = cell(0);
 z_inverse = cell(0);

@@ -1,41 +1,19 @@
-% --- Zeffiro documentation header ---
-% zef_data = zef_wireframe_creator_app; — Zef data = zef wireframe creator app;.
+%ZEF_WIREFRAME_CREATOR_START  Open Wireframe creator tool (asteroid profiles).
 %
-% Purpose:
-%   Zef data = zef wireframe creator app;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2019- Sampsa Pursiainen, Liisa-Ida Sorsa, Christelle Eyraud, Jean-Michel Geffrin.
+%   GPU-ToRRe-3D wireframe modeling package.
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.domain_labels (read)
-%   zef.epsilon (read)
-%   zef.font_size (read)
-%   zef.h_wireframe_create (read)
-%   zef.h_wireframe_creator (read)
-%   zef.h_wireframe_edge_threshold (read)
-%   zef.h_wireframe_n_iter (read)
-%   zef.h_wireframe_plot (read)
-%   zef.h_wireframe_printer_resolution (read)
-%   zef.h_wireframe_regularization_parameter (read)
-%   zef.h_wireframe_relative_permittivity (read)
-%   zef.h_wireframe_tolerance (read)
-%   zef.nodes (read)
-%   zef.tetra (read)
-%   zef.wireframe_creator_current_size (read, write)
-%   … (13 more)
+%   Script. Asteroid INI callback (Multi tools → Wireframe creator tool;
+%   not in multicompartment_head). Constructs zef_wireframe_creator_app.
+%   Defaults wireframe_edge_threshold 1.2, printer_resolution 0.15,
+%   relative_permittivity 6.5. Create: filling_vec from zef.epsilon via
+%   zef_wireframe_filling_vec then wireframe(...) →
+%   zef.wireframe_triangles/nodes. Needs tetra, nodes, domain_labels,
+%   epsilon.
 %
-% Calls (project):
-%   zef_change_size_function
-%   zef_wireframe_filling_vec
-%   zef_wireframe_permittivity_vec
-%   zef_wireframe_plot
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_data = zef_wireframe_creator_app;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also wireframe, zef_wireframe_plot.
 
 zef_data = zef_wireframe_creator_app;
 zef_assign_data;

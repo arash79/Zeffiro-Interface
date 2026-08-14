@@ -1,35 +1,19 @@
 function zef_set_lights(lights_vec,varargin)
-% --- Zeffiro documentation header ---
-% zef_set_lights — Zef set lights.
+%ZEF_SET_LIGHTS  Push zef.update_lights onto an axes (no popup read).
 %
-% Purpose:
-%   Zef set lights.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   lights_vec
-%   varargin
+%   Function. Inverse of zef_update_lights: deletes existing Light
+%   objects on varargin{1} (default zef.h_axes1) and recreates them from
+%   the code vector (1 = ±z, 3 = ±x, 4 = ±y, 5 = ±z again, 6 =
+%   camlight headlight). Called from zef_set_sliders_plot / _print after
+%   a redraw so the new patches get the stored lighting. Code 2 (lights
+%   off) is a no-op here because lights were already deleted.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%
-% Calls (project):
-%   zef_set_lights
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_set_lights(lights_vec, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_update_lights, zef_set_sliders_plot.
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');
 else

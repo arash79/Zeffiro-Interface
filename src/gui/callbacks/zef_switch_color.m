@@ -1,37 +1,28 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [void] = zef_switch_color(tag_str_1,tag_str_2,variable_name)
-% --- Zeffiro documentation header ---
-% zef_switch_color — Zef switch color.
+%ZEF_SWITCH_COLOR  Red/black a linked control from a checkbox and a zef field.
 %
-% Purpose:
-%   Zef switch color.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tag_str_1
-%   tag_str_2
-%   variable_name
+%   Unused from menus. Only caller is zef_pushbutton_switch (legacy GUIDE
+%   compartment pushbuttons), which itself has no first-party callers.
+%   The mlapp Segmentation tool does not use these h_pushbutton* widgets.
 %
-% Outputs:
-%   void
+%   [void] = zef_switch_color(tag_str_1, tag_str_2, variable_name)
 %
-% Zef fields (observed):
-%   zef.h_ (read)
-%   zef.mlapp (read)
+%   Inputs
+%     tag_str_1      - suffix of zef.h_<tag_str_1> (checkbox Value).
+%     tag_str_2      - suffix of zef.h_<tag_str_2> (color target).
+%     variable_name  - zef field name; empty while the switch is on → red.
 %
-% Calls (project):
-%   zef_switch_color
+%   Output
+%     void  - always [].
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Uses fontcolor when zef.mlapp==1, else foregroundcolor. evalin base.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[void] = zef_switch_color(tag_str_1, tag_str_2, variable_name)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_switch_onoff, zef_pushbutton_switch.
 
 void = [];
 

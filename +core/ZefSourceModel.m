@@ -1,46 +1,37 @@
 classdef ZefSourceModel
-% --- Zeffiro documentation header ---
-% core.ZefSourceModel — Zef Source Model.
+%ZEFSOURCEMODEL  Legacy enumeration stored in older Zeffiro .mat projects.
 %
-% Purpose:
-%   Zef Source Model.
-%   Folder: Refactored MATLAB package at the project root: typed source models (`core.types.ZefSourceModel`), electrode I/O (`core.io.electrodes`), one menu callback for electrode import, and optional preconditioner builders (`core.linalg.preconditioners`). Loaded when the project root is on the path.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   obj_or_struct
+%   Older projects saved source models as core.ZefSourceModel. MATLAB can
+%   load those files as enumerations only if this class remains an
+%   enumeration with the original member names. The live type is
+%   core.types.ZefSourceModel; loadobj and ZefSourceModel.from convert.
 %
-% Calls (project):
-%   core.types.ZefSourceModel.from
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `core.ZefSourceModel(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
+%   See also core.types.ZefSourceModel.
+
+    enumeration
+        Hdiv
+        Whitney
+        StVenant
+        ContinuousHdiv
+        ContinuousWhitney
+        ContinuousStVenant
+        Error
+    end
 
     methods (Static)
 
         function self = loadobj(obj_or_struct)
-        % loadobj — Map legacy saved values to core.types.ZefSourceModel.
-        %
-        % Input:
-        %   obj_or_struct — Struct from MATLAB when the original enum class
-        %       is missing (typically has field ValueNames), or any saved value.
-        %
-        % Output:
-        %   self (1,1) core.types.ZefSourceModel — Restored enumeration member.
+        % loadobj — Map a saved core.ZefSourceModel onto core.types.ZefSourceModel.
 
-            arguments
-                obj_or_struct (1,1)
+            self = core.types.ZefSourceModel.from(obj_or_struct);
+            if self == core.types.ZefSourceModel.Error
+                self = core.types.ZefSourceModel.Hdiv;
             end
-
-            self = core.types.ZefSourceModel.Hdiv;
-
-            if isstruct(obj_or_struct) && isfield(obj_or_struct, "ValueNames")
-                self = core.types.ZefSourceModel.from(obj_or_struct.ValueNames);
-            elseif isenum(obj_or_struct)
-                self = core.types.ZefSourceModel.from(obj_or_struct);
-            end
-
         end
 
     end

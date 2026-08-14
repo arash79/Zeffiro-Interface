@@ -1,25 +1,17 @@
-% --- Zeffiro documentation header ---
-% nodes_old = zef — Nodes old = zef.
+%ZEF_SMOOTH_ELECTRODES  Taubin smooth of CEM patch nodes on zef.nodes.
 %
-% Purpose:
-%   Nodes old = zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.nodes (read, write)
-%   zef.sensors (read)
-%   zef.sensors_attached_volume (read)
+%   Script. Re-attaches sensors (zef_attach_sensors_volume), builds per-
+%   electrode edge Laplacian from zef_electrode_struct (note: this script
+%   calls zef_electrode_struct with no argument; the function requires
+%   sensors_attached_volume), then 100 λ/μ steps (λ=1, μ=-1, dt=0.25).
+%   Writes zef.nodes. No first-party menu caller.
 %
-% Calls (project):
-%   zef_attach_sensors_volume
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `nodes_old = zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_electrode_struct, zef_attach_sensors_volume.
 
 nodes_old = zef.nodes;
 nodes = zef.nodes;

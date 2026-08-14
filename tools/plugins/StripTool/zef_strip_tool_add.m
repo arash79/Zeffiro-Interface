@@ -1,34 +1,17 @@
 function zef = zef_strip_tool_add(zef)
-% --- Zeffiro documentation header ---
-% zef_strip_tool_add — Zef strip tool add.
+%ZEF_STRIP_TOOL_ADD  Append a new tentative strip (next strip_current_id).
 %
-% Purpose:
-%   Zef strip tool add.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_strip_tool_add(zef)
 %
-% Outputs:
-%   zef
+%   Add button. current_strip = length(strip_cell)+1; then init/update.
+%   Does not add contacts or compartments.
 %
-% Zef fields (observed):
-%   zef.current_sensors (read)
-%   zef.strip_tool (read)
-%
-% Calls (project):
-%   zef_strip_tool_add
-%   zef_strip_tool_init
-%   zef_strip_tool_update
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_strip_tool_add(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_strip_tool_delete.
 
 zef.strip_tool.strip_current_id = zef.strip_tool.strip_current_id + 1; 
 

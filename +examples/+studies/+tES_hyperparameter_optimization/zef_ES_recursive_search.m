@@ -1,37 +1,18 @@
 function zef = zef_ES_recursive_search(zef, num_lattice)
-% --- Zeffiro documentation header ---
-% examples.studies.tES_hyperparameter_optimization.zef_ES_recursive_search — Example or study script demonstrating zef_ES_recursive_search.
+%ZEF_ES_RECURSIVE_SEARCH  Refine tES alpha/epsilon grid around the current best.
 %
-% Purpose:
-%   Example or study script demonstrating zef_ES_recursive_search.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   num_lattice
+%   zef = zef_ES_recursive_search(zef, num_lattice)
 %
-% Outputs:
-%   zef
+%   Requires an ES-workbench session (zef_ES_find_currents,
+%   zef_ES_find_parameters, zef_ES_objective_function). Sets ES_step_size
+%   to num_lattice, runs that many refinement passes, stores cell
+%   zef.adapted_y_ES. Not zef_inverse_run.
 %
-% Zef fields (observed):
-%   zef.ES_step_size (read, write)
-%   zef.adapted_y_ES (read, write)
-%   zef.y_ES_interval (read)
-%
-% Calls (project):
-%   zef_ES_centralize_recursive_search
-%   zef_ES_find_currents
-%   zef_ES_find_parameters
-%   zef_ES_objective_function
-%   zef_ES_recursive_search
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = examples.studies.tES_hyperparameter_optimization.zef_ES_recursive_search(zef, num_lattice)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
     zef.ES_step_size = num_lattice;
     zef_ES_find_currents;

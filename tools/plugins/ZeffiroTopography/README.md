@@ -1,41 +1,31 @@
-# tools/plugins/ZeffiroTopography
+# Topography tool
 
-## Purpose of this folder
+Maps filtered sensor time series onto the **outer** surface mesh (`zef.reuna_p{end-1}`, `zef.reuna_t{end-1}`) with a regularized inverse-distance sum. It does **not** invert a lead field. Output is `zef.top_reconstruction` (vector, or a cell of frames). Mesh visualization type 5 plots that field.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+## How to open it
 
-## Contents
+**Forward tools → Topography tool** (default profile). Callback: `zef_topography`. Window title: **ZEFFIRO Interface: Topography tool**.
 
-Subfolders:
-- `fig/`
-- `m/`
+Need `zef.sensors`, surface meshes (`zef.reuna_*`), and `zef.measurements`. Time/band widgets seed from inverse settings (`zef.inv_*`) on init.
 
-## How this folder fits into the overall workflow
+## Buttons (`Callback` in `m/zef_topography_app.m`)
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+| Label | Action |
+|-------|--------|
+| **Apply** | `zef_update_topography` — copy widgets into `zef.top_*` and also into `zef.inv_sampling_frequency`, band, times, `zef.number_of_frames`, `zef.normalize_data` |
+| **Start** | Apply, then `zef.top_reconstruction = zef_evaluate_topography(zef)` |
+| **Close** | close the window |
 
-## GUI usage
+**Start** calls `zef_getFilteredData` / `zef_getTimeStep` with the topography time/band fields, then for each sensor adds `f(sensor) / (top_regularization_parameter + dist/min_dist)` at every surface vertex and L∞-normalizes.
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+## Scripting
 
-## Programmatic usage
+```matlab
+zef = zef_topography(zef);           % open window
+zef_update_topography;
+zef.top_reconstruction = zef_evaluate_topography(zef);
+```
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+## Files here
 
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Start `m/zef_topography.m`, algorithm `m/zef_evaluate_topography.m`, widgets `m/zef_topography_app.m`. `fig/` is unused layout leftover.

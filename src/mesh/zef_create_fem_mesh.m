@@ -1,63 +1,56 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_create_fem_mesh(zef)
-% --- Zeffiro documentation header ---
-% zef_create_fem_mesh — Zef create fem mesh.
+%ZEF_CREATE_FEM_MESH  Build a labeled tetrahedral volume from compartment surfaces.
 %
-% Purpose:
-%   Zef create fem mesh.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   This is the volume-mesh builder. It does not import surfaces: those
+%   must already sit on zef.reuna_p / zef.reuna_t from zef_process_meshes.
+%   The GUI button "Create FEM mesh" does not call this function directly;
+%   it runs zef_create_finite_element_mesh, which optionally downsamples
+%   surfaces, then process_meshes, then this function, then postprocess.
 %
-% Outputs:
-%   zef
+%   Pipeline
+%     1. zef_segmentation_counter_step (script) injects mesh_res, reuna_type,
+%        pml_ind_aux, submesh_cell, aux_active_compartment_ind, name_tags.
+%        A compartment with <tag>_sources == -1 is treated as PML.
+%     2. Axis-aligned bounding box of all non-PML surfaces. Regular grid
+%        with spacing mesh_res, or zef_pml_mesh if a PML compartment exists.
+%     3. Split each cube into 5 tets (initial_mesh_mode 1, parity-dependent
+%        stencils so faces match) or 6 tets (mode 2, one stencil).
+%     4. zef_mesh_labeling_step assigns tissue IDs by solid-angle tests
+%        against the surfaces and drops exterior tetrahedra.
+%     5. Optional surface, volume, and adaptive refinement, each followed
+%        by relabeling when zef.mesh_relabeling is true.
 %
-% Zef fields (observed):
-%   zef.adaptive_refinement_compartments (read)
-%   zef.adaptive_refinement_k_param (read)
-%   zef.adaptive_refinement_number (read)
-%   zef.adaptive_refinement_on (read)
-%   zef.adaptive_refinement_thresh_val (read)
-%   zef.domain_labels (read, write)
-%   zef.domain_labels_with_subdomains (read, write)
-%   zef.initial_mesh_mode (read)
-%   zef.mesh_labeling_approach (read)
-%   zef.mesh_relabeling (read)
-%   zef.name_tags (read, write)
-%   zef.nodes (read, write)
-%   zef.parallel_processes (read)
-%   zef.pml_max_size (read)
-%   zef.pml_max_size_unit (read)
-%   … (15 more)
+%   GUI: Mesh tool → Create FEM mesh (wrapper) or Postprocess FEM mesh
+%   (zef_postprocess_finite_element_mesh). Mesh resolution, refinement,
+%   and smoothing checkboxes are on the same window.
 %
-% Calls (project):
-%   zef_compartment_to_subcompartment
-%   zef_create_fem_mesh
-%   zef_get_tetra_to_refine
-%   zef_mesh_refinement
-%   zef_pml_mesh
-%   zef_waitbar
+%   zef = zef_create_fem_mesh(zef)
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - parallel/cluster
-%   - reads/updates `zef` struct fields
+%   Input / output
+%     zef  - session struct. If omitted, read from the base workspace.
+%            If nargout is 0, assigned back to base.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_create_fem_mesh(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Fields written
+%     nodes, tetra, domain_labels, name_tags, domain_labels_with_subdomains,
+%     reuna_distance_vec.
+%
+%   See also zef_create_finite_element_mesh, zef_process_meshes,
+%            zef_postprocess_fem_mesh, zef_mesh_refinement, zef_pml_mesh.
 
 if nargin == 0
     zef = evalin('base','zef');
 end
 
+% Script: writes mesh_res, reuna_type, pml_ind_aux, submesh_cell, name_tags,
+% aux_active_compartment_ind into this workspace (not as zef fields).
 zef_segmentation_counter_step;
 
+% Bounding box of non-PML surfaces (reuna_type == -1 is skipped).
 x_lim = [0 0];
 y_lim = [0 0];
 z_lim = [0 0];
@@ -73,6 +66,7 @@ for k = 1 : length(zef.reuna_p)
 end
 
 if isempty(pml_ind_aux)
+    % Uniform Cartesian lattice with spacing mesh_res (Mesh tool "Mesh resolution").
     x_vec = [x_lim(1):mesh_res:x_lim(2)];
     y_vec = [y_lim(1):mesh_res:y_lim(2)];
     z_vec = [z_lim(1):mesh_res:z_lim(2)];
@@ -80,6 +74,9 @@ if isempty(pml_ind_aux)
     n_cubes = (length(x_vec)-1)*(length(y_vec)-1)*(length(z_vec)-1);
 else
 
+    % PML: grow a graded outer lattice beyond the inner bounding radius.
+    % pml_outer_radius_unit / pml_max_size_unit == 1 means "relative to
+    % inner radius / mesh_res"; otherwise the stored values are absolute.
     pml_inner_radius = max(abs([x_lim(:); y_lim(:); z_lim(:)]));
     pml_outer_radius_unit = eval('zef.pml_outer_radius_unit');
     pml_outer_radius = eval('zef.pml_outer_radius');
@@ -106,6 +103,8 @@ h = zef_waitbar(0,1,'Initial mesh.');
 
 if isequal(eval('zef.initial_mesh_mode'),1)
 
+    % Five tets per cube. Stencil depends on (i_x,i_y,i_z) parity so
+    % neighbouring cubes share the same diagonal on a common face.
     ind_mat_1{1}{2}{1} = [2 5 6 7; 7 5 4 2;  2 3 4 7; 1 2 4 5 ; 4 7 8 5];
     ind_mat_1{1}{2}{2} = [6 2 1 3; 1 3 8 6; 8 7 6 3;  5 8 6 1; 3 8 4 1 ];
     ind_mat_1{2}{2}{2} = [5 2 1 4; 4 2 7 5; 5 8 7 4;  5 7 6 2;  3 7 4 2];
@@ -129,6 +128,7 @@ if isequal(eval('zef.initial_mesh_mode'),1)
         for i_y = 1 : size(X,1) - 1
             for i_z = 1 : size(X,3) - 1
 
+                % Cube corners in the usual 1–4 bottom, 5–8 top order.
                 x_ind = [i_x   i_x+1  i_x+1  i_x    i_x    i_x+1  i_x+1  i_x]';
                 y_ind = [i_y   i_y    i_y+1  i_y+1  i_y    i_y    i_y+1  i_y+1]';
                 z_ind = [i_z   i_z    i_z    i_z    i_z+1  i_z+1  i_z+1  i_z+1]';
@@ -150,6 +150,7 @@ if isequal(eval('zef.initial_mesh_mode'),1)
 
 elseif isequal(eval('zef.initial_mesh_mode'),2)
 
+    % Six tets per cube; one stencil for every cube (no parity flip).
     ind_mat_1 = [     3     4     1     7 ;
         2     3     1     7 ;
         1     2     7     6 ;
@@ -194,6 +195,8 @@ end
 
 clear X Y Z;
 
+% Labeling and later refinement use parfor when GPU is off; size the pool
+% to zef.parallel_processes (Mesh tool / system settings).
 if not(zef.use_gpu)
 n_parallel = zef.parallel_processes;
     if isempty(gcp('nocreate'))
@@ -216,6 +219,7 @@ refinement_volume_compartments = zef.refinement_volume_compartments;
 
 refinement_flag = 1;
 
+% labeling_flag 1 = initial solid-angle labeling (drops exterior tets).
 labeling_flag = 1;
 zef_mesh_labeling_step;
 
@@ -231,6 +235,8 @@ refinement_compartments = [refinement_compartments ; refinement_compartments_aux
 
 if eval('zef.refinement_on')
 
+    % Surface refinement: zef_refinement_step (script) splits tets that
+    % meet selected compartment surfaces. -1 means all source compartments.
     if refinement_surface_on
         if length(n_surface_refinement) == 1
 
@@ -281,6 +287,8 @@ end
 if eval('zef.refinement_on')
     if refinement_volume_on
 
+        % Uniform 4-to-1 splits of tets whose domain_labels match the
+        % selected compartments (again -1 = all source compartments).
         n_refinement = n_volume_refinement;
         refinement_compartments_aux = refinement_volume_compartments;
 
@@ -342,6 +350,8 @@ if eval('zef.refinement_on')
 end
 
     %*********************
+    % Adaptive: only split tets that zef_get_tetra_to_refine marks as
+    % too far from the compartment surfaces (thresh_val, k_param).
     if eval('zef.adaptive_refinement_on')
 
         n_refinement = eval('zef.adaptive_refinement_number');
@@ -420,6 +430,7 @@ if isequal(zef.priority_mode,3)
 end
 
 
+% Volume mesh consumed by postprocess (smoothing, sigma) and lead fields.
 zef.nodes = nodes;
 zef.tetra = double(tetra);
 zef.domain_labels = double(domain_labels);

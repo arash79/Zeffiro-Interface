@@ -1,25 +1,18 @@
 function x = EM_Lasso(L,sigma,y,gamma,x0)
-% --- Zeffiro documentation header ---
-% EM_Lasso — EM Lasso.
+%EM_LASSO  EM updates for a Laplace-weighted Lasso (max 10 iters).
 %
-% Purpose:
-%   EM Lasso.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   L
-%   sigma
-%   y
-%   gamma
-%   x0
+%   x = EM_Lasso(L, sigma, y, gamma, x0)
 %
-% Outputs:
-%   x
+%   A=L/sigma, b=y/sigma. invD = 0.5*|x|/gamma; x = (invD.*A')*(A invD A'+I)^{-1} b
+%   until |log_new-log_old| < 1e-6 or 10 iters. Laplace log-prob uses
+%   gamma.*abs(x). Used by EXP EM estimation_type.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[x] = EM_Lasso(L, sigma, y, gamma, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also L1_optimization, exp_em_iteration.
 
 [m,~]=size(L);
 A = 1/sigma*L;

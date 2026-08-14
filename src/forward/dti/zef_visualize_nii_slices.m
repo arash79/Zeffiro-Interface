@@ -1,95 +1,21 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_VISUALIZE_NII_SLICES
-%
-%Loads a NIfTI file and overlays three orthogonal (axial, coronal, sagittal)
-%slices onto the Zeffiro figure-tool axes so you can visually check whether
-%the NIfTI world-coordinate system aligns with the mesh.
-%
-%The figure-tool axes (zef.h_axes1) display mesh surfaces in the same
-%physical / world-coordinate space as the NIfTI file, so no additional
-%registration is needed — the surfaces and the slices should coincide if
-%the coordinate systems already match.
-%
-%Inputs (positional):
-%   nii_file     - Path to .nii or .nii.gz file (string)
-%
-%Inputs (name-value pairs):
-%   zef          - Zeffiro struct (default: read from base workspace).
-%                  Only needed to locate the figure-tool axes and mesh centre.
-%   slice_world  - [1×3] world-space [x y z] coordinate at which to cut the
-%                  three planes (default: centre of zef.nodes bounding box),
-%                  specified in the SAME coordinate system as zef.nodes.
-%   alpha        - Transparency of the slices, 0 (invisible) to 1 (opaque).
-%                  Default: 0.6.
-%   colormap_name- Colormap string for the NIfTI image (default: 'gray').
-%   axes_handle  - Target axes handle. Default: zef.h_axes1 (figure tool).
-%   freesurfer_coords - Logical (default: true).
-%                  When true the function converts the NIfTI world coordinates
-%                  from FreeSurfer scanner-RAS to tkRAS (surface RAS) by
-%                  subtracting the c_ras vector — the scanner-RAS position of
-%                  the centre voxel of the volume.
-%
-%                  Zeffiro builds its mesh from FreeSurfer surfaces, which
-%                  are stored in tkRAS.  NIfTI sform/qform headers store
-%                  scanner RAS.  The two differ by c_ras, which for typical
-%                  FreeSurfer subjects is on the order of tens of mm, so the
-%                  slices appear shifted even though the voxel-to-RAS matrices
-%                  look identical.
-%
-%                  Set to false only if your NIfTI is already in tkRAS/mesh
-%                  space (e.g. written by code that already applied -c_ras).
-%
-%Outputs:
-%   h  - Struct with fields .axial, .coronal, .sagittal — surf handles for
-%        each overlay plane. Delete them with structfun(@delete, h) to clean up.
-%
-%Usage examples:
-%   % Basic (FreeSurfer NIfTI + Zeffiro mesh — default, corrects c_ras):
-%   h = zef_visualize_nii_slices('FA.nii.gz');
-%
-%   % NIfTI already in tkRAS / mesh space (no c_ras correction needed):
-%   h = zef_visualize_nii_slices('already_in_mesh_space.nii.gz', ...
-%       'freesurfer_coords', false);
-%
-%   % Custom slice position (mesh / tkRAS mm), transparency and colormap
-%   h = zef_visualize_nii_slices('conductivity.nii.gz', ...
-%       'slice_world', [0 0 50], ...
-%       'alpha', 0.7, ...
-%       'colormap_name', 'jet');
-%
-%   % Remove the overlay later
-%   structfun(@delete, h);
-%
-%See also: zef_nii_conductivity_to_sigma, zef_freesurfer_load_fa
-
 function h = zef_visualize_nii_slices(nii_file, varargin)
-% --- Zeffiro documentation header ---
-% zef_visualize_nii_slices — Renders or updates a visualize_nii_slices figure from current `zef` state.
+%ZEF_VISUALIZE_NII_SLICES  Orthogonal NIfTI slices in a MATLAB figure.
 %
-% Purpose:
-%   Renders or updates a visualize_nii_slices figure from current `zef` state.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2024- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nii_file
-%   varargin
+%   Used from the DTI tool to inspect FA or conductivity volumes. Affine
+%   follows niftiinfo Transform; freesurfer_coords true uses tkRAS.
 %
-% Outputs:
-%   h
+%   h = zef_visualize_nii_slices(nii_file, 'zef', zef, 'slice_world', [x y z], ...
+%       'alpha', 0.6, 'colormap_name', 'gray', 'axes_handle', [], ...
+%       'freesurfer_coords', true)
 %
-% Calls (project):
-%   zef_visualize_nii_slices
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[h] = zef_visualize_nii_slices(nii_file, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_nii_conductivity_to_sigma.
+
+
 
 
 arguments

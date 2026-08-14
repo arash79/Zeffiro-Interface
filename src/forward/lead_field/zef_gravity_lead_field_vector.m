@@ -1,29 +1,14 @@
-% --- Zeffiro documentation header ---
-% warning('off'); — Warning('off');.
+%ZEF_GRAVITY_LEAD_FIELD_VECTOR  Asteroid-profile script: vector gravity (type 4).
 %
-% Purpose:
-%   Warning('off');.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018, Sampsa Pursiainen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.active_compartment_ind (read)
-%   zef.bg_data (read)
-%   zef.gravity_field_type (read, write)
-%   zef.nodes (read)
-%   zef.rho (read)
-%   zef.sensors (read)
-%   zef.source_directions (read)
-%   zef.source_positions (read)
-%   zef.tetra (read)
+%   Script. Same as zef_gravity_lead_field_scalar with gravity_field_type=4.
+%   Still calls lead_field_gravity (the vector vs scalar distinction is the
+%   type flag stored on zef, not a different FEM file).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `warning('off');` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_lead_field_gravity, zef_gravity_lead_field_scalar.
 
 warning('off');
 zef.gravity_field_type = 4;

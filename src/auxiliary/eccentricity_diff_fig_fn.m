@@ -1,30 +1,3 @@
-% --- Zeffiro documentation header ---
-% function [mag_fig, rdm_fig] = eccentricity_diff_fig_fn( ... — Function [mag fig, rdm fig] = eccentricity diff fig fn( .
-%
-% Purpose:
-%   Function [mag fig, rdm fig] = eccentricity diff fig fn( ....
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
-%
-% Inputs:
-%   source_points
-%   mags
-%   rdms
-%   legend_labels
-%   n_intervals
-%   x_scale
-%   min_ecc
-%   mustBeGreaterThanOrEqual
-%   mustBeLessThan
-%   mag_handle_num
-%   rdm_handle_num
-%
-% Side effects:
-%   - creates/updates figures
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `function [mag_fig, rdm_fig] = eccentricity_diff_fig_fn( ...(source_points, mags, rdms, legend_labels, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 function [mag_fig, rdm_fig] = eccentricity_diff_fig_fn( ...
     source_points, ...
     mags, ...
@@ -36,6 +9,23 @@ function [mag_fig, rdm_fig] = eccentricity_diff_fig_fn( ...
     mag_handle_num, ...
     rdm_handle_num ...
     )
+%ECCENTRICITY_DIFF_FIG_FN  Boxcharts of log10 MAG/RDM vs radial eccentricity.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   [mag_fig, rdm_fig] = eccentricity_diff_fig_fn(source_points, mags, rdms, legend_labels)
+%   [mag_fig, rdm_fig] = eccentricity_diff_fig_fn(..., n_intervals, x_scale, min_ecc, mag_h, rdm_h)
+%
+%   Cell vectors of equal length: source_points{i} must have row count
+%   divisible by 3; mags/rdms are column vectors from mag_fn/rdm_fn.
+%   Bins ||source||/max into n_intervals (default 5) from min_ecc (0).
+%   Figures 101 (MAG) and 100 (RDM); mag_handle_num/rdm_handle_num args
+%   are accepted but the bodies always use 101/100. Lab plot helper.
+%
+%   See also mag_fn, rdm_fn, comparison_all_eccentricities.
 
 arguments
 

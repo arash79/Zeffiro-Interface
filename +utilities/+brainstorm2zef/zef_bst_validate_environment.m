@@ -1,22 +1,17 @@
 function [is_valid, error_msg] = zef_bst_validate_environment()
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst_validate_environment — Zef bst validate environment.
+%ZEF_BST_VALIDATE_ENVIRONMENT  exist('bst_get') and a live ProtocolInfo.SUBJECTS.
 %
-% Purpose:
-%   Zef bst validate environment.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Outputs:
-%   is_valid
-%   error_msg
+%   [is_valid, error_msg] = zef_bst_validate_environment
 %
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_validate_environment
+%   Fails if bst_get is not on the path, or bst_get('ProtocolInfo') errors,
+%   is empty, or has no SUBJECTS field. Does not start Brainstorm.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `utilities.brainstorm2zef.zef_bst_validate_environment` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also run, zef_bst_create_project.
 
 is_valid = true;
 error_msg = '';

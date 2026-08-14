@@ -1,26 +1,12 @@
 function lut = readFSLUT()
-% --- Zeffiro documentation header ---
-% utilities.fs2zef.readers.readFSLUT — Read FSLUT.
+%READFSLUT  Load FreeSurferColorLUT.txt into a struct of label IDs and RGBA.
 %
-% Purpose:
-%   Read FSLUT.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Outputs:
-%   lut
-%
-% Calls (project):
-%   utilities.fs2zef.readers.readFSLUT
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `utilities.fs2zef.readers.readFSLUT` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-%readFSLUT Read FreeSurfer color lookup table (LUT) from FreeSurferColorLUT.txt
+%   lut = readFSLUT()
 %
 %   LUT = readFSLUT() reads the FreeSurfer color lookup table from
 %   $FREESURFER_HOME/FreeSurferColorLUT.txt, parses the table of label

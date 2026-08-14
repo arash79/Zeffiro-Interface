@@ -1,31 +1,17 @@
 function M = zef_surface_scalar_matrix_Dn(nodes, tetra, g_i_ind, n_ind, scalar_field, weighting)
-% --- Zeffiro documentation header ---
-% zef_surface_scalar_matrix_Dn — Zef surface scalar matrix Dn.
+%ZEF_SURFACE_SCALAR_MATRIX_DN  Boundary ∫ φ (∇ψ_i)_α n_β ψ_j dS.
 %
-% Purpose:
-%   Zef surface scalar matrix Dn.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
-%   g_i_ind
-%   n_ind
-%   scalar_field
-%   weighting
+%   Combines surface_D with the unit normal of matrix_n. Wrapper FGn is
+%   only mentioned in commented NSE lines. No live first-party caller.
 %
-% Outputs:
-%   M
+%   M = zef_surface_scalar_matrix_Dn(nodes, tetra, g_i_ind, n_ind, scalar_field, weighting)
 %
-% Calls (project):
-%   zef_surface_mesh
-%   zef_surface_scalar_matrix_Dn
-%   zef_volume_barycentric
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_surface_scalar_matrix_Dn(nodes, tetra, g_i_ind, n_ind, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_surface_scalar_matrix_FGn, zef_surface_scalar_matrix_D.
 
 N = size(nodes,1);
 K = size(tetra,1);

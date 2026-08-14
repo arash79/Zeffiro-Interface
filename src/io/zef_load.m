@@ -1,62 +1,34 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_load(zef,file_name,path_name)
-% --- Zeffiro documentation header ---
-% zef_load — Loads external data or a saved Zeffiro project into `zef`.
+%ZEF_LOAD  Load a saved Zeffiro project from a MAT-file into the session.
 %
-% Purpose:
-%   Loads external data or a saved Zeffiro project into `zef`.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   file_name
-%   path_name
+%   Opens a *.mat project (uigetfile when file_name and path_name are
+%   omitted), loads fields in batches with a waitbar (small fields first,
+%   then fields larger than 100 MB), merges them into zef, applies system
+%   settings and profile initialization, recreates sensor and compartment
+%   defaults, and starts the main GUI tools. Legacy single-variable MAT
+%   files are converted to struct form on load.
 %
-% Outputs:
-%   zef
+%   zef = zef_load(zef)
+%   zef = zef_load(zef, file_name, path_name)
 %
-% Zef fields (observed):
-%   zef.aux_field_1 (read, write)
-%   zef.code_path (read)
-%   zef.compartment_tags (read, write)
-%   zef.current_sensors (read, write)
-%   zef.current_version (read, write)
-%   zef.fieldnames (read, write)
-%   zef.h_compartment_visible_color (read)
-%   zef.h_sensor_visible_color (read)
-%   zef.h_sensors_table (read)
-%   zef.h_zeffiro (read)
-%   zef.profile_name (read, write)
-%   zef.program_path (read)
-%   zef.save_file (read, write)
-%   zef.save_file_path (read, write)
-%   zef.sensor_tags (read, write)
-%   … (2 more)
+%   Inputs
+%     zef        - current session struct (read from base workspace when
+%                  called with no output and no inputs).
+%     file_name  - MAT file name; uigetfile when omitted with path_name.
+%     path_name  - folder containing file_name.
 %
-% Calls (project):
-%   zef_apply_system_settings
-%   zef_create_compartment
-%   zef_create_sensors
-%   zef_load
-%   zef_set_figure_tool_sliders
-%   zef_update
-%   zef_update_fig_details
-%   zef_waitbar
+%   Output
+%     zef - session populated from the project file, with save_file and
+%           save_file_path updated.
 %
-% Side effects:
-%   - base/caller workspace
-%   - creates/updates figures
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
+%   See also zef_save, zef_start_new_project, zef_apply_system_settings,
+%            zef_create_sensors, zef_create_compartment.
 %
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_load(zef, file_name, path_name)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
 if nargin == 0
     zef = evalin('base','zef');
 end
@@ -152,6 +124,9 @@ if not(isequal(file_name,0))
     zef = rmfield(zef,'fieldnames');
 
     zef = zef_apply_system_settings(zef);
+    if isfield(zef, 'source_model')
+        zef.source_model = core.types.ZefSourceModel.from(zef.source_model);
+    end
     
     % CRITICAL FIX: Skip zef_remove_object_handles entirely - it's not needed since zef_data
     % is cleared right after (line 141), and this function can hang indefinitely on large projects.

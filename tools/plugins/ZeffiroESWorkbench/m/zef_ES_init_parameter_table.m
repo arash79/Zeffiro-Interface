@@ -1,35 +1,18 @@
-% --- Zeffiro documentation header ---
-% zef.h_ES_parameter_table — Zef.h ES parameter table.
+%ZEF_ES_INIT_PARAMETER_TABLE  Fill h_ES_parameter_table from current ES_alpha, epsilon, current caps.
 %
-% Purpose:
-%   Zef.h ES parameter table.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.ES_acceptable_threshold (read)
-%   zef.ES_alpha (read)
-%   zef.ES_alpha_max (read)
-%   zef.ES_boundary_color_limit (read)
-%   zef.ES_constraint_tolerance (read)
-%   zef.ES_display (read)
-%   zef.ES_epsilon (read)
-%   zef.ES_epsilon_min (read)
-%   zef.ES_max_current_channel (read)
-%   zef.ES_max_n_iterations (read)
-%   zef.ES_max_time (read)
-%   zef.ES_opt_algorithm_list (read)
-%   zef.ES_opt_method (read)
-%   zef.ES_opt_method_list (read)
-%   zef.ES_opt_solver (read)
-%   … (11 more)
+%   Script (local function assign_common_parameters). Called from the
+%   window constructor and from zef_ES_optimization_update. Restricts
+%   method/algorithm dropdown Items by ES_opt_solver (1 Matlab … 5 Gurobi),
+%   then fills α/ε (dB), current caps, lattice size, tolerances. Solver 1
+%   with method 4 (backpropagation) uses a 6-row table.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   See also zef_ES_update_parameter_values.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.h_ES_parameter_table` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 zef.h_ES_parameter_table.Data = cell(0);
 
@@ -102,6 +85,7 @@ if ismember(zef.ES_opt_solver, 5)
 end
 
 function zef = assign_common_parameters(zef)
+%ASSIGN_COMMON_PARAMETERS  Rows 1–17 of the parameter table (α/ε, caps, lattice).
 zef.h_ES_parameter_table.Data{1,1} = 'Alpha minimum (dB)';
 zef.h_ES_parameter_table.Data{1,2} = num2str(db(zef.ES_alpha));
 zef.h_ES_parameter_table.Data{2,1} = 'Alpha maximum (dB)';

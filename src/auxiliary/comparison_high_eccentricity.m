@@ -1,17 +1,15 @@
-% --- Zeffiro documentation header ---
-% n_intervals = 5; — N intervals = 5;.
+%COMPARISON_HIGH_ECCENTRICITY  Lab script: MAG/RDM boxcharts, ecc ≥ 0.95.
 %
-% Purpose:
-%   N intervals = 5;.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Side effects:
-%   - creates/updates figures
+%   Script. Same workspace inputs as comparison_all_eccentricities
+%   (s_p_*, rdm_v_*, mag_v_*). n_intervals=5, ecc_min=0.95. Figures 1–2.
+%   Run after calculate_differences.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `n_intervals = 5;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also comparison_all_eccentricities, eccentricity_diff_fig_fn.
 
 n_intervals = 5;
 x_scale = 1.5;
@@ -67,7 +65,8 @@ group_vec = [ones(size(index_vec_1)) ; 2*ones(size(index_vec_2)); 3*ones(size(in
 
 group_vec = categorical(group_vec);
 
-figure(1); set(gcf,'renderer','painters');
+figure(1)
+; set(gcf,'renderer','painters');
 h_rdm = boxchart(x_scale*[index_vec_1; index_vec_2; index_vec_3; index_vec_4],log10([rdm_v_1; rdm_v_2; rdm_v_3; rdm_v_4]),'GroupByColor',group_vec, 'MarkerSize', 12);
 %set(gca,'yscale','log')
 for i = 1 : length(h_rdm)

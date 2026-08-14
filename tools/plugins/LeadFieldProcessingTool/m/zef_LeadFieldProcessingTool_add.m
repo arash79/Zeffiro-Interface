@@ -1,33 +1,18 @@
-% --- Zeffiro documentation header ---
-% zef.LeadFieldProcessingTool.auxData.source_interpolation_ind = zef — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%ZEF_LEADFIELDPROCESSINGTOOL_ADD  Copy live L/sensors into auxData, then aux2bank.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.LeadFieldProcessingTool (read)
-%   zef.compartment_tags (read)
-%   zef.imaging_method (read)
-%   zef.imaging_method_cell (read)
-%   zef.lf_bank_scaling_factor (read)
-%   zef.lf_tag (read)
-%   zef.measurements (read)
-%   zef.noise_data (read)
-%   zef.parcellation_interp_ind (read)
-%   zef.sensors (read)
-%   zef.source_directions (read)
-%   zef.source_positions (read)
+%   Script. Snapshot of source_interpolation_ind, parcellation_interp_ind,
+%   source_positions/directions, L, sensors, imaging_method name,
+%   measurements, noise_data, lf_bank_scaling_factor, lf_tag, and each
+%   <tag>_sources into zef.LeadFieldProcessingTool.auxData. Then calls
+%   zef_LeadFieldProcessingTool_aux2bank (not the Add button; that uses
+%   zef_LeadFieldProcessingTool_addCurrentData2bank).
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.LeadFieldProcessingTool.auxData.source_interpolation_ind = zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_LeadFieldProcessingTool_addCurrentData2bank.
 
 zef.LeadFieldProcessingTool.auxData.source_interpolation_ind = zef.source_interpolation_ind;
 zef.LeadFieldProcessingTool.auxData.parcellation_interp_ind = zef.parcellation_interp_ind;

@@ -1,35 +1,6 @@
-%%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% function [L_eeg, dipole_locations, dipole_directions] = lead_field_eeg_fem( ... — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Zef fields (observed):
-%   zef.lf_param (read)
-%   zef.sigma (read)
-%   zef.source_model (read)
-%   zef.use_gpu (read, write)
-%
-% Calls (project):
-%   core.types.ZefSourceModel.from
-%   zef_build_electrodes
-%   zef_lead_field_interpolation
-%   zef_pem2cem
-%   zef_stiffness_matrix
-%   zef_tetra_volume
-%   zef_transfer_matrix
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [L_eeg, dipole_locations, dipole_directions] = lead_field_eeg_fem( ...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [L_eeg, dipole_locations, dipole_directions] = lead_field_eeg_fem( ...
+
+
     zef, ...
     nodes, ...
     elements, ...
@@ -39,6 +10,51 @@ function [L_eeg, dipole_locations, dipole_directions] = lead_field_eeg_fem( ...
     optimization_system_type, ...
     varargin ...
     )
+
+%LEAD_FIELD_EEG_FEM  FEM EEG lead field via stiffness, PCG transfer, G, and Schur.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Called as zef_lead_field_eeg_fem from zef_lead_field_matrix (types 1 and 6).
+%   The first function name in this file is the historical lead_field_eeg_fem.
+%
+%   Pipeline: tetra volumes → zef_stiffness_matrix → zef_build_electrodes
+%   (PEM if electrodes have 3 columns, CEM if 4) → zef_transfer_matrix PCG
+%   per electrode → zef_lead_field_interpolation G → L = Schur \ (T'*G)
+%   with mean-zero rows. Nodes must already be metres. sigma is a cell
+%   {tetra_sigma, prism_sigma} or a matrix: 1 column isotropic (expanded to
+%   diagonal tensor) or 6 columns anisotropic [σ11 σ22 σ33 σ12 σ13 σ23].
+%
+%   [L_eeg, dipole_locations, dipole_directions] = zef_lead_field_eeg_fem( ...
+%       zef, nodes, elements, sigma, electrodes, p_nearest_neighbour_inds, ...
+%       optimization_system_type, brain_ind, source_ind, lf_param)
+%
+%   Input
+%     zef                       - session (source_model, waitbars, GPU flags)
+%     nodes                     - [n_nodes × 3] metres
+%     elements                  - tetra [n_tet × 4] or {tetra, prisms}
+%     sigma                     - conductivity, see above
+%     electrodes                - PEM [n_el × 3] or CEM [n_el × 4] metres
+%     p_nearest_neighbour_inds  - continuous-source neighbours, or []
+%     optimization_system_type  - 'pbo' (default), 'mpo', or 'none'
+%     varargin                  - brain_ind, source_ind, then lf_param struct:
+%                                 pcg_tol (default 1e-6 here if missing),
+%                                 maxit, precond ('cholinc'|'ssor'),
+%                                 direction_mode, dipole_mode, impedances,
+%                                 cholinc_tol, permutation ('symamd')
+%
+%   Output
+%     L_eeg              - [n_electrodes × n_source_columns]
+%     dipole_locations   - [n × 3] metres (from G)
+%     dipole_directions  - [] in cartesian/normal mode
+%
+%   Errors if PCG returns empty T (typical: non-SPD DTI tensors).
+%
+%   See also zef_lead_field_matrix, zef_transfer_matrix, zef_lead_field_interpolation.
+
 
 n_of_nodes = size(nodes,1);
 source_model = eval('zef.source_model');

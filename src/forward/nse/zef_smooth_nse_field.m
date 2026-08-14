@@ -1,28 +1,21 @@
 function nse_field = zef_smooth_nse_field(nse_field, n_smoothing, s_mode)
-% --- Zeffiro documentation header ---
-% zef_smooth_nse_field — Zef smooth nse field.
-%
-% Purpose:
-%   Zef smooth nse field.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
-%
-% Inputs:
-%   nse_field
-%   n_smoothing
-%   s_mode
-%
-% Outputs:
-%   nse_field
-%
-% Calls (project):
-%   zef_averaging_matrix
-%   zef_smooth_nse_field
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[nse_field] = zef_smooth_nse_field(nse_field, n_smoothing, s_mode)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%ZEF_SMOOTH_NSE_FIELD  Laplacian-style smoothing of NSE nodal fields.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   s_mode 1 (default): apply zef_averaging_matrix n_smoothing times to
+%   u_1/u_2/u_3_field and p_field. Other s_mode values use the vessel-cell
+%   arrays. n_smoothing is the iteration count.
+%
+%   nse_field = zef_smooth_nse_field(nse_field, n_smoothing, s_mode)
+%
+%   See also zef_averaging_matrix.
 
 if nargin < 3
 

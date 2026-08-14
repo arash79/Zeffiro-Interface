@@ -1,33 +1,19 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% function [inv_roi_sphere,h_roi_sphere] = zef_plot_roi — Function [inv roi sphere,h roi sphere] = zef plot roi.
-%
-% Purpose:
-%   Function [inv roi sphere,h roi sphere] = zef plot roi.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%   zef.h_inv_roi_sphere_1 (read)
-%   zef.h_inv_roi_sphere_2 (read)
-%   zef.h_inv_roi_sphere_3 (read)
-%   zef.h_inv_roi_sphere_4 (read)
-%   zef.h_roi_sphere (read)
-%
-% Calls (project):
-%   zef_plot_roi
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [inv_roi_sphere,h_roi_sphere] = zef_plot_roi` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [inv_roi_sphere,h_roi_sphere] = zef_plot_roi
+%ZEF_PLOT_ROI  Inverse ROI spheres on Figure-tool axes1.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Function. Reads h_inv_roi_sphere_1..4 strings into an N-by-4 matrix
+%   [x y z radius], deletes prior zef.h_roi_sphere, and surf() each
+%   sphere on zef.h_axes1 (facealpha 0.6, gray). Used by Find synthetic
+%   source / Generate synthetic EIT data. Returns the matrix and handles.
+%
+%   See also zef_update_find_synthetic_eit_data.
 
 h_inv_roi_sphere_1 = evalin('base','zef.h_inv_roi_sphere_1');
 h_inv_roi_sphere_2 = evalin('base','zef.h_inv_roi_sphere_2');

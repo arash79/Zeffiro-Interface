@@ -1,20 +1,19 @@
 function project_struct = zef_import_example
-% --- Zeffiro documentation header ---
-% examples.importing.project_struct — Example or study script demonstrating project_struct.
+%ZEF_IMPORT_EXAMPLE  Nodisplay import of the scripts/ head segmentation.
 %
-% Purpose:
-%   Example or study script demonstrating project_struct.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Calls (project):
-%   zef_import_example
+%   project_struct = zef_import_example()
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `examples.importing.project_struct` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   zeffiro_interface start_mode nodisplay, import_to_existing_project
+%   scripts/scripts_for_importing/multicompartment_head_project/
+%   import_segmentation.zef. No meshing. That path is not data/segmentations/.
+%
 
-    project_struct = zeffiro_interface( ...
+project_struct = zeffiro_interface( ...
         'start_mode', 'nodisplay', ...
         'import_to_existing_project', ...
         'scripts/scripts_for_importing/multicompartment_head_project/import_segmentation.zef' ...

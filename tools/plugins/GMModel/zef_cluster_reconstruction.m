@@ -1,38 +1,17 @@
 function [cluster_centres, dipole_moments, index_vec, GMModel, MahalanobisD] = zef_cluster_reconstruction(zef)
-% --- Zeffiro documentation header ---
-% zef_cluster_reconstruction — Zef cluster reconstruction.
+%ZEF_CLUSTER_RECONSTRUCTION  Gaussian-mixture clustering on reconstructions.
 %
-% Purpose:
-%   Zef cluster reconstruction.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Called from GMModel Run (not an inverse solver). Needs
+%   zef.reconstruction and zef.source_positions. Uses GMModel.max_n_clusters,
+%   frame_number (if reconstruction is a cell), credibility, n_dynamic_levels,
+%   reg_param, max_n_iter, tol_val. Does not read L or measurements. Does
+%   not overwrite zef.reconstruction.
 %
-% Outputs:
-%   cluster_centres
-%   dipole_moments
-%   index_vec
-%   GMModel
-%   MahalanobisD
-%
-% Zef fields (observed):
-%   zef.GMModel (read)
-%   zef.reconstruction (read)
-%   zef.source_positions (read)
-%
-% Calls (project):
-%   zef_cluster_reconstruction
-%   zef_find_clusters
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[cluster_centres, dipole_moments, index_vec]] = zef_cluster_reconstruction(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 n_clusters = zef.GMModel.max_n_clusters;
 if iscell(zef.reconstruction)
@@ -52,6 +31,8 @@ rec_aux = reshape(rec_vec,3,numel(rec_vec)/3)';
 rec_amp = sum(rec_aux.^2,2);
 rec_amp = rec_amp/max(rec_amp);
 
+% Lowest amplitude band is excluded from clustering (J). Remaining
+% sources are stacked as [xyz, dipole_xyz] in n_dynamic_levels slices.
 J = find(rec_amp <= 1/n_dynamic_levels);
 
 for i = 2 : n_dynamic_levels+1
@@ -75,6 +56,7 @@ aux_array_3 =  accumarray(index_vec,cluster_data(:,6));
 
 dipole_moments = [aux_array_1 aux_array_2 aux_array_3];
 
+% Cluster centre = mean xyz of assigned sources; empty clusters → NaN.
 aux_array_0 =  accumarray(index_vec,ones(size(index_vec)));
 aux_array_1 =  accumarray(index_vec,cluster_data(:,1));
 aux_array_2 =  accumarray(index_vec,cluster_data(:,2));

@@ -1,32 +1,12 @@
 function test_unified_pipeline()
-% --- Zeffiro documentation header ---
-% utilities.fs2zef.test_unified_pipeline — Automated test: test_unified_pipeline.
+%TEST_UNIFIED_PIPELINE  Smoke-test fs2zef config, readers, transforms, and import generation.
 %
-% Purpose:
-%   Automated test: test_unified_pipeline.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Calls (project):
-%   utilities.fs2zef.config.compartment_mappings
-%   utilities.fs2zef.config.default_config
-%   utilities.fs2zef.config.parcellation_schemes
-%   utilities.fs2zef.environment.validate_environment
-%   utilities.fs2zef.generators.generate_zef_import
-%   utilities.fs2zef.readers.get_volume_centers
-%   utilities.fs2zef.readers.readFSLUT
-%   utilities.fs2zef.test_unified_pipeline
-%   utilities.fs2zef.transforms.compute_affine_transform
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `utilities.fs2zef.test_unified_pipeline` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+
 
 %
 % test_unified_pipeline - Test the unified fs2zef pipeline components

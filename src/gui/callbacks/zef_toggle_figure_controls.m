@@ -1,22 +1,22 @@
-% --- Zeffiro documentation header ---
-% function zef_toggle_figure_controls — Function zef toggle figure controls.
-%
-% Purpose:
-%   Function zef toggle figure controls.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Calls (project):
-%   zef_toggle_figure_controls
-%
-% Side effects:
-%   - base/caller workspace
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_toggle_figure_controls` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function zef_toggle_figure_controls
-
+%ZEF_TOGGLE_FIGURE_CONTROLS  Show or hide Figure-tool sliders and widen the axes.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Figure tool button **Toggle controls** (h_toggle_controls;
+%   Callback "zef_toggle_figure_controls;"). Function with no arguments;
+%   uses gcf / CurrentAxes (also evalin base for the same handles).
+%
+%   Toggles Visible on children whose Tag contains slidertext, slider, or
+%   toggleedgesbutton. Flips togglecontrolsbutton UserData between 1 and
+%   2 (empty → treat as 1, then store 2). Scales that button's normalized
+%   x-position by 83/68 or 68/83, and axes1 plus rightColorbar x-position
+%   by 8769/6000 or the reciprocal, matching the slider strip width.
+%
+%   See also zef_toggle_edges, zef_figure_tool.
 
 toggle_mode = 'unlocked';
 current_figure = gcf;

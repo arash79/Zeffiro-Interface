@@ -1,39 +1,16 @@
 function [affine_matrix, vertex_transform] = export_segmentation_meshes(zef, inFolder, outFolder, inflation_parameter, freesurfer_subject_folder, options)
-% --- Zeffiro documentation header ---
-% utilities.sn2zef.export_segmentation_meshes — Export segmentation meshes.
+%EXPORT_SEGMENTATION_MESHES  Volume-based SimNIBS tissues → STL in FreeSurfer tkr-RAS.
 %
-% Purpose:
-%   Export segmentation meshes.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   inFolder
-%   outFolder
-%   inflation_parameter
-%   freesurfer_subject_folder
-%   options
+%   [affine_matrix, vertex_transform] = export_segmentation_meshes(...)
 %
-% Outputs:
-%   affine_matrix
-%   vertex_transform
-%
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_get_atlas_surfaces
-%   utilities.sn2zef.export_segmentation_meshes
-%   utilities.sn2zef.readSNLUT
-%   utilities.sn2zef.run_and_print_command
-%   utilities.sn2zef.save_volume_atlas_points
-%   utilities.sn2zef.transforms.compute_simnibs_to_freesurfer_translation
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[affine_matrix, vertex_transform]] = utilities.sn2zef.export_segmentation_meshes(zef, inFolder, outFolder, inflation_parameter, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Segments final_tissues.nii.gz per label (not Gmsh .msh sheets). Aligns via
+%   mri_coreg/LTA or header translation; writes STLs and optional atlas points.
+%   affine_matrix is [] when vertices are already in FS tkr-RAS.
 
 %
 % export_segmentation_meshes
@@ -286,6 +263,8 @@ function [affine_matrix, vertex_transform] = export_segmentation_meshes(zef, inF
             pts_ras = (T * pts_hom')';
             pts_ras = pts_ras(:, 1:3);
 
+            % STL winding: swap 2nd/3rd triangle indices so outward normals
+            % match the Brainstorm extraction (same flip as fs2zef writers).
             tris_flipped = tris(:, [1 3 2]);
 
             if i <= size(atlas_struct.Labels, 1) && size(atlas_struct.Labels, 2) >= 2

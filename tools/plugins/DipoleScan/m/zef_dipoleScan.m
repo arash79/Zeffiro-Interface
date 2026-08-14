@@ -1,51 +1,23 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z, reconstruction_information] = zef_dipoleScan(zef)
-% --- Zeffiro documentation header ---
-% zef_dipoleScan — Zef dipole Scan.
+%ZEF_DIPOLESCAN  Dipole scan (single-dipole fit) inverse plugin.
 %
-% Purpose:
-%   Zef dipole Scan.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   [z, reconstruction_information] = zef_dipoleScan(zef)
 %
-% Outputs:
-%   z
-%   reconstruction_information
+%   Called from Dipole Scan StartButton (not inverse.DipoleScanInverter).
+%   Needs zef.L and zef.measurements. Frames: zef.number_of_frames,
+%   zef_getFilteredData / zef_getTimeStep. Method/regularization from
+%   zef.dipole_app.InversionmethodDropDown / regType / inv_leadfield_lambda
+%   (SVD or pinv). SNR stored in reconstruction_information (zef.inv_snr).
+%   Returns cell z (one vector per frame) and info. onlymax is false as
+%   written (full GOF map, not a single peak).
 %
-% Zef fields (observed):
-%   zef.dipole_app (read)
-%   zef.inv_high_cut_frequency (read)
-%   zef.inv_hyperprior (read)
-%   zef.inv_low_cut_frequency (read)
-%   zef.inv_sampling_frequency (read)
-%   zef.inv_snr (read)
-%   zef.inv_time_1 (read)
-%   zef.inv_time_2 (read)
-%   zef.inv_time_3 (read)
-%   zef.number_of_frames (read)
-%   zef.source_direction_mode (read)
-%   zef.source_directions (read)
+%   See also zef_dipole_start, zef_dipole_window.
 %
-% Calls (project):
-%   zef_dipoleScan
-%   zef_getFilteredData
-%   zef_getTimeStep
-%   zef_normalizeInverseReconstruction
-%   zef_postProcessInverse
-%   zef_processLeadfields
-%   zef_waitbar
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z, reconstruction_information]] = zef_dipoleScan(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 invMethod=eval( 'zef.dipole_app.InversionmethodDropDown.Value');
 regType=eval( 'zef.dipole_app.regType.Value');
@@ -105,6 +77,7 @@ for f_ind = 1 : number_of_frames
             notNormal=setdiff(1:length(procFile.s_ind_0), procFile.s_ind_4);
             % mom=cell(size(L,2)/3);
             %for i=1:size(L,2)/3
+            % Cortical-normal sources: 1-column lead field; store GOF on all 3 slots.
             for j=1:length(normal)
                 i=normal(j);
 
@@ -147,6 +120,8 @@ for f_ind = 1 : number_of_frames
 
             end
 
+            % Free-orientation sources: 3-column lf; optional SVD rank from
+            % inv_leadfield_lambda; store GOF * unit moment on xyz.
             for j=1:length(notNormal)
                 i=notNormal(j);
 
@@ -159,6 +134,8 @@ for f_ind = 1 : number_of_frames
                 %
 
                 if strcmp('SVD', regType)
+                    % Reduce the 3-column lf to inv_leadfield_lambda right
+                    % singular vectors (regType ItemsData 'SVD', not '1').
                     [~,~,V_reg]=svd(lf, 'econ');
                     lf=lf*V_reg(:, 1:str2double(inv_leadfield_lambda)); %columns of V are the right singular vectors
 
@@ -210,6 +187,7 @@ for f_ind = 1 : number_of_frames
     onlymax=false;
     [z_max, z_ind]=max(z_vec);
     reconstruction_information.maximum=z_max;
+    % estimation_attr "max" is unused: onlymax is never set from the GUI.
     if onlymax
         z_vec=z_vec-z_vec;
         z_vec(z_ind)=z_max;

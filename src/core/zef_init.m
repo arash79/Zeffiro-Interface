@@ -1,29 +1,27 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef_delete_original_surface_meshes; — Zef delete original surface meshes;.
+%ZEF_INIT  Populate missing zef fields with default project and visualization settings.
 %
-% Purpose:
-%   Zef delete original surface meshes;.
-%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.fieldnames (read, write)
-%   zef.file (read, write)
-%   zef.file_path (read, write)
-%   zef.font_size (read)
+%   Script (not a function). Called from zef_start after GUI handles exist.
+%   Requires zef in the caller workspace. Copies existing fields into
+%   zef_data, writes defaults for imaging, mesh, inverse, and visualization
+%   options, then copies only missing fields back onto zef so a loaded
+%   project is not overwritten. Finishes with zef_apply_init_profile,
+%   zef_init_compartments, zef_init_sensors, and zef_apply_parameter_profile.
 %
-% Calls (project):
-%   zef_apply_parameter_profile
+%   Workspace
+%     zef       - session struct, read and written.
+%     zef_data  - temporary defaults struct; cleared before return.
+%     zef_i     - loop index; cleared before return.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
+%   Side effects
+%     Calls zef_delete_original_surface_meshes and zef_delete_original_field
+%     first. Mutates zef in the caller (typically zef_start).
 %
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_delete_original_surface_meshes;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_start, zef_apply_parameter_profile.
 
 
 
@@ -36,6 +34,8 @@ for zef_i = 1 : length(zef.fieldnames)
     zef_data.(zef.fieldnames{zef_i}) = zef.(zef.fieldnames{zef_i});
 end
 
+% Defaults go onto zef_data. Only names missing from the live zef are
+% copied back at the end, so a loaded project is not overwritten.
 zef_data.imaging_method_cell = {'Scalar field', 'Vector field', 'Vector field gradient'};
 zef_data.update_colorscale = 1;
 zef_data.dof_decomposition_type = 2;
@@ -188,6 +188,8 @@ zef_data.location_unit= 1;
 zef_data.elevation= 0;
 zef_data.azimuth= 0;
 zef_data.axes_visible= 0;
+% Mesh-tool / Forward defaults: 10000 sources, 3 mm lattice, electrodes
+% attached, Normal directions (2), SSOR PCG (preconditioner=2 below).
 zef_data.n_sources= 10000;
 zef_data.mesh_resolution= 3;
 zef_data.attach_electrodes= 1;
@@ -323,6 +325,8 @@ zef_data.frame_step = 1;
 zef_data.orbit_1 = 0;
 zef_data.orbit_2 = 0;
 zef_data.non_source_ind = [];
+% Numeric 2 = H(div) (core.types.ZefSourceModel.from). Later option
+% dialogs may write the enum instead.
 zef_data.source_model = 2;
 zef_data.use_depth_electrodes = 0;
 zef_data.inv_hyperprior_tail_length_db = 10;
@@ -350,6 +354,8 @@ zef_data.smoothing_steps_dist = 0.9;
 zef_data.reuna_submesh_ind = cell(0);
 zef_data.reuna_mesh_ind = [];
 
+% Copy only fields that the current zef is missing so a loaded project
+% keeps its values; defaults fill gaps after a version upgrade.
 zef.fieldnames = fieldnames(zef_data);
 
 for zef_i = 1 : length(zef.fieldnames)

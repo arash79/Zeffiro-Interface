@@ -1,48 +1,21 @@
 function zef = zef_ias_map_estimation_roi_window(zef)
-% --- Zeffiro documentation header ---
-% zef_ias_map_estimation_roi_window — Zef ias map estimation roi window.
+%ZEF_IAS_MAP_ESTIMATION_ROI_WINDOW  GUIDE figure: IAS MAP estimation ROI.
 %
-% Purpose:
-%   Zef ias map estimation roi window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_ias_map_estimation_roi_window(zef)
 %
-% Outputs:
-%   zef
+%   Layout. Title 'IAS MAP estimation ROI' (renamed by init).
+%   Start → zef_update_ias_roi; [reconstruction, iasroi_rec_source]
+%   = ias_iteration_roi([]). There is no ias_iteration_roi.m; solver on
+%   disk is zef_ias_iteration_roi (init does not override Start).
+%   Cancel closes. Plot ROI → zef_iasroi_plot_roi. Plot source →
+%   update + zef_plot_source(2). ROI-mode dropdown → zef_switch_roi_mode.
 %
-% Zef fields (observed):
-%   zef.h_iasroi_apply (read, write)
-%   zef.h_iasroi_cancel (read, write)
-%   zef.h_iasroi_high_cut_frequency (read, write)
-%   zef.h_iasroi_hyperprior (read, write)
-%   zef.h_iasroi_low_cut_frequency (read, write)
-%   zef.h_iasroi_map_estimation (read, write)
-%   zef.h_iasroi_n_map_iterations (read, write)
-%   zef.h_iasroi_normalize_data (read, write)
-%   zef.h_iasroi_number_of_frames (read, write)
-%   zef.h_iasroi_plot_roi (read, write)
-%   zef.h_iasroi_plot_source (read, write)
-%   zef.h_iasroi_rec_source_8 (read, write)
-%   zef.h_iasroi_rec_source_9 (read, write)
-%   zef.h_iasroi_roi_mode (read, write)
-%   zef.h_iasroi_roi_sphere_1 (read, write)
-%   … (26 more)
-%
-% Calls (project):
-%   zef_ias_map_estimation_roi_window
-%   zef_plot_source
-%
-% Side effects:
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_ias_map_estimation_roi_window(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_init_ias_roi.
 
 h1 = figure(...
     'PaperUnits',get(0,'defaultfigurePaperUnits'),...
@@ -78,7 +51,7 @@ h1 = figure(...
     'DeleteFcn',blanks(0),...
     'Tag','figure1',...
     'UserData',[],...
-    'WindowStyle',get(0,'defaultfigureWindowStyle'),...
+    'WindowStyle','normal',......
     'DockControls',get(0,'defaultfigureDockControls'),...
     'Resize',get(0,'defaultfigureResize'),...
     'PaperPosition',get(0,'defaultfigurePaperPosition'),...

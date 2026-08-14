@@ -1,39 +1,16 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% if  ismac — If  ismac.
+%EXP_EM_MAP_ESTIMATION  Open GUIDE window: EM MAP estimation (not on default menu).
 %
-% Purpose:
-%   If  ismac.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_exp_em_apply (read)
-%   zef.h_exp_em_beta (read)
-%   zef.h_exp_em_cancel (read)
-%   zef.h_exp_em_data_segment (read)
-%   zef.h_exp_em_high_cut_frequency (read)
-%   zef.h_exp_em_low_cut_frequency (read)
-%   zef.h_exp_em_map_estimation (read, write)
-%   zef.h_exp_em_n_L1_iterations (read)
-%   zef.h_exp_em_n_map_iterations (read)
-%   zef.h_exp_em_number_of_frames (read)
-%   zef.h_exp_em_sampling_frequency (read)
-%   zef.h_exp_em_snr (read)
-%   zef.h_exp_em_start (read)
-%   zef.h_exp_em_theta0 (read)
-%   … (4 more)
+%   Script. Opens exp_em_map_estimation.fig (title ZEFFIRO Interface:
+%   EM MAP estimation), zef_init_exp_em, enables data-segment when
+%   measurements is a cell. Start in the fig runs exp_em_iteration([]).
+%   Needs zef.L and zef.measurements. Not the default Lasso app
+%   (zef_exp_app_launch).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if  ismac` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_exp_em, exp_em_iteration.
 
 if  ismac
     zef.h_exp_em_map_estimation = open('exp_em_map_estimation.fig');
@@ -42,7 +19,7 @@ elseif ispc
 else
     zef.h_exp_em_map_estimation = open('exp_em_map_estimation.fig');
 end
-set(zef.h_exp_em_map_estimation,'Name','ZEFFIRO Interface: EM MAP estimation');
+set(zef.h_exp_em_map_estimation,'Name','ZEFFIRO Interface: EM MAP estimation')
 set(findobj(zef.h_exp_em_map_estimation.Children,'-property','FontUnits'),'FontUnits','pixels')
 set(findobj(zef.h_exp_em_map_estimation.Children,'-property','FontSize'),'FontSize',zef.font_size);
 

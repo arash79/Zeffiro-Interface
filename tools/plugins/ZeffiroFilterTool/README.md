@@ -1,41 +1,42 @@
-# tools/plugins/ZeffiroFilterTool
+# Filter tool
 
-## Purpose of this folder
+Builds an ordered pipeline of FIR/IIR, referencing, epoching, and channel stages, then runs that pipeline on imported **raw** time series. Inverse tools still read `zef.measurements` (and optionally `zef.noise_data`); this window is how you get from a `.mat`/`.dat` dump to those fields.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+Stages live in `m/filter_bank/`. The list in the window is `help()` of those files: each stage must contain `Description:`, `Input: … [Default: …]`, and `Output:` so **Add** can fill the parameter table.
 
-## Contents
+## How to open it
 
-Subfolders:
-- `m/`
-- `mlapp/`
+**Forward tools → Filter tool** (default `multicompartment_head` profile). Callback: `zef_filter_tool` (script). Window title: **ZEFFIRO Interface: Filter tool**.
 
-## How this folder fits into the overall workflow
+Need data in `zef.raw_data` (Import) or copy measurements into raw first.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+## Buttons (`ButtonPushedFcn` in `m/zef_filter_tool.m`)
 
-## GUI usage
+| Button handle | Action |
+|---------------|--------|
+| Import data | `zef_import_raw_data` → `zef.raw_data` from `.mat`/`.dat` |
+| Plot data | scroll bar + `zef_filter_raw_data` + `zef_filter_plot_data` (runs the pipeline into `zef.processed_data` and plots) |
+| Add / Delete / Move up / Move down | edit `zef.filter_pipeline` |
+| Load epoch points / Get epoch points / Reset epoch points | `zef.filter_epoch_points` (manual epoching) |
+| Substitute raw with measurements | copy `zef.measurements` → `zef.raw_data` |
+| Substitute measurements | confirm, run pipeline, write `zef.processed_data` → `zef.measurements` (or `zef.measurements{filter_data_segment}` if segment &gt; 0). Handle `h_filter_substitute_raw_data` calls `zef_filter_substitute_measurement_data` (names are swapped) |
+| Substitute raw | confirm, run pipeline, `zef.raw_data = zef.processed_data`. Handle `h_filter_substitute_measurement_data` calls `zef_filter_substitute_raw_data` |
+| Substitute noise | confirm, run pipeline, `zef.noise_data = zef.processed_data` |
+| Load / Save as / Save processed / Reset | pipeline `.mat` (v7.3 `zef_data` of `filter_*` fields + `raw_data`; **not JSON**), processed export, reset widgets. **Save as** writes `filter_file_list` from `filter_name_list` as written. **Load** stores the dialog pick on `zef_data.file` then `load([zef.file_path zef.file])` — the project `zef.file`, not the dialog pick. |
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+Sampling rate widget writes `zef.filter_sampling_rate`. Filter-bank defaults named `filter_sampling_rate` pick that field up.
 
-## Programmatic usage
+## Scripting
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
+```matlab
+zef_import_raw_data;          % or assign zef.raw_data
+zef_add_filter_item;          % after choosing a stage in the list
+zef_filter_raw_data;          % zef.processed_data
+zef.measurements = zef.processed_data;
+```
 
-## Examples
+Or call a stage directly, e.g. `zef_ellip_low_pass_filter(f, 3, 3, 80, 40, fs)`.
 
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
+## Files here
 
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Start script `m/zef_filter_tool.m`, pipeline runner `m/zef_filter_raw_data.m`, stages `m/filter_bank/*.m`. Layout: `mlapp/zeffiro_interface_filter_tool.mlapp`.

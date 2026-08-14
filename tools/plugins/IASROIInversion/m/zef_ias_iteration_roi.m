@@ -1,54 +1,22 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,rec_source] = zef_ias_iteration_roi(zef)
-% --- Zeffiro documentation header ---
-% zef_ias_iteration_roi — Zef ias iteration roi.
+%ZEF_IAS_ITERATION_ROI  IAS inverse constrained to a region-of-interest.
 %
-% Purpose:
-%   Zef ias iteration roi.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   [z, rec_source] = zef_ias_iteration_roi(zef)
 %
-% Outputs:
-%   z
-%   rec_source
+%   IAS MAP on sources inside the ROI (sphere / threshold / parcellation).
+%   Needs zef.L, measurements, source_positions, iasroi_* ROI fields.
+%   Frames: zef.iasroi_number_of_frames. SNR: zef.iasroi_snr (dB) →
+%   10^(-iasroi_snr/20). Returns [z, rec_source]. Window Start still
+%   names ias_iteration_roi, not this function — there is no
+%   ias_iteration_roi.m (unpatched). Does not fill reconstruction_information.
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.compartment_tags (read)
-%   zef.gpu_count (read)
-%   zef.iasroi_data_segment (read)
-%   zef.iasroi_high_cut_frequency (read)
-%   zef.iasroi_hyperprior (read)
-%   zef.iasroi_low_cut_frequency (read)
-%   zef.iasroi_n_map_iterations (read)
-%   zef.iasroi_normalize_data (read)
-%   zef.iasroi_number_of_frames (read)
-%   zef.iasroi_rec_source (read)
-%   zef.iasroi_roi_mode (read)
-%   zef.iasroi_roi_sphere (read)
-%   zef.iasroi_roi_threshold (read)
-%   zef.iasroi_sampling_frequency (read)
-%   … (20 more)
+%   See also ias_map_estimation_roi, zef_ias_map_estimation_roi_window.
 %
-% Calls (project):
-%   zef_find_g_hyperprior
-%   zef_find_ig_hyperprior
-%   zef_ias_iteration_roi
-%   zef_smooth_field
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z, rec_source]] = zef_ias_iteration_roi(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 h = zef_waitbar(0,1,['IAS MAP iteration.']);
 [s_ind_1] = unique(eval('zef.source_interpolation_ind{1}'));
@@ -180,6 +148,8 @@ end
 I_aux = [];
 roi_ind_vec = [];
 
+% roi_mode 1: sources inside roi_sphere (center + radius). 2: threshold on
+% an existing reconstruction. 3: selected parcellation labels.
 if roi_mode == 1
 
     for j = 1 : size(roi_sphere,1)
@@ -350,6 +320,10 @@ for f_ind = 1 : number_of_frames
         f = gpuArray(f);
     end
 
+    % Sequential IAS MAP: scale L by sqrt(theta), Tikhonov-like
+    % z = D^{1/2} L' (L L' + S)^{-1} f, then update theta from the
+    % inverse-gamma (1) or gamma (2) hyperprior. Only ROI columns of L
+    % were kept above (L(:,roi_aux_ind)).
     for i = 1 : n_ias_map_iter
         if f_ind > 1;
             zef_waitbar(i,n_ias_map_iter,h,['Step ' int2str(f_ind) ' of ' int2str(number_of_frames) '. Ready: ' date_str '.' ]);

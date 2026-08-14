@@ -1,38 +1,17 @@
-%Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef — Zef.
+%SESAME_APP_RUN  Launch the SESAME App Designer window and wire callbacks.
 %
-% Purpose:
-%   Zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.SESAME_App (read)
-%   zef.SESAME_n_sampler (read, write)
-%   zef.SESAME_snr (read, write)
-%   zef.font_size (read)
-%   zef.inv_data_segment (read, write)
-%   zef.inv_high_cut_frequency (read, write)
-%   zef.inv_low_cut_frequency (read, write)
-%   zef.inv_rec_source (read)
-%   zef.inv_sampling_frequency (read, write)
-%   zef.inv_time_1 (read, write)
-%   zef.inv_time_2 (read, write)
-%   zef.inv_time_3 (read, write)
-%   zef.normalize_data (read, write)
-%   zef.number_of_frames (read, write)
-%   zef.reconstruction (read, write)
+%   Script. Asteroid INI callback (Inverse tools → SESAME; not in
+%   multicompartment_head). Instantiates SESAME_App, zef_init_SESAME,
+%   copies zef fields onto h_<field> widgets, SESAME_core_check, and
+%   sets h_start to zef_update_SESAME; zef.reconstruction =
+%   SESAME_inversion([]). Needs zef.L, measurements, and the SESAME
+%   core. No inverse.*Inverter.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also SESAME_inversion, zef_init_SESAME.
 
 zef.SESAME_App = SESAME_App;
 zef_init_SESAME;

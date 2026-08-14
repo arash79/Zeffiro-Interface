@@ -1,38 +1,25 @@
 function zef = zef_axes_popup(zef)
-% --- Zeffiro documentation header ---
-% zef_axes_popup — Zef axes popup.
+%ZEF_AXES_POPUP  Copy Figure-tool axes1 (and colorbar) into a standalone figure.
 %
-% Purpose:
-%   Zef axes popup.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Uses gcf as the source. Creates a figure named
+%   'ZEFFIRO Interface: Figure tool axes popup' (Tag
+%   figure_tool_axes_popup) to the right of zef.h_zeffiro, copyobj of
+%   children with Tag 'axes1' or Type 'colorbar', then reparents them
+%   and sets axes OuterPosition to [0.2 0.2 0.6 0.6]. nargout==0
+%   assignin base zef.
 %
-% Outputs:
-%   zef
+%   Callers: Figure-tool context menu **Axes pop-up**; Mesh visualization
+%   tool button **Axes pop-up**.
 %
-% Zef fields (observed):
-%   zef.h_figure_aux (read, write)
-%   zef.h_object_aux_new (read, write)
-%   zef.h_zeffiro (read)
-%   zef.h_zeffiro_axes_popup (read, write)
-%   zef.use_display (read)
+%   zef = zef_axes_popup(zef)
+%   zef_axes_popup  % reads and writes base zef
 %
-% Calls (project):
-%   zef_axes_popup
-%
-% Side effects:
-%   - base/caller workspace
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_axes_popup(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_figure_tool, zef_mesh_visualization_tool.
 if nargin == 0
     zef = evalin('base','zef');
 end
@@ -58,7 +45,7 @@ zef.h_zeffiro_axes_popup = figure(...
     'HandleVisibility','on',...
     'Tag','figure_tool_axes_popup',...
     'UserData',[],...
-    'WindowStyle',get(0,'defaultfigureWindowStyle'),...
+    'WindowStyle','normal',......
     'Resize',get(0,'defaultfigureResize'),...
     'PaperPosition',get(0,'defaultfigurePaperPosition'),...
     'PaperSize',[20.99999864 29.69999902],...

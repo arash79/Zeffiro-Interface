@@ -1,26 +1,17 @@
-% --- Zeffiro documentation header ---
-% if not(isequal(zef — If not(isequal(zef.
+%ZEF_GET_SENSOR_POINTS  Load DAT xyz into zef.<current_sensors>_points.
 %
-% Purpose:
-%   If not(isequal(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field (read, write)
-%   zef.current_sensors (read)
-%   zef.file (read)
-%   zef.file_path (read)
+%   Script (not a function). Segmentation-tool sensors table context menu
+%   **Import sensors → Points (DAT file)**: uigetfile then this script
+%   (zef_menu_tool). Requires zef.file / zef.file_path already set; file==0
+%   (cancel) is a no-op. zef_get_mesh(..., 'points') then
+%   zef_init_sensors_parameter_profile (caller) and zef_update (caller).
 %
-% Calls (project):
-%   zef_get_mesh
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isequal(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_get_sensor_directions, zef_get_mesh.
 
 if not(isequal(zef.file,0));
     zef.aux_field = zef_get_mesh(zef,[zef.file_path zef.file],zef.current_sensors,'points');

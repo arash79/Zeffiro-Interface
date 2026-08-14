@@ -1,39 +1,21 @@
 classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
-% --- Zeffiro documentation header ---
-% inverse.HALpRInverter.HALpRInverter — Inverse solver class implementing HALpR reconstruction.
+%HALpRInverter  Hierarchical adaptive Lp regression (HALpR / SHALpR).
 %
-% Purpose:
-%   Inverse solver class implementing HALpR reconstruction.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   args
+%   Gamma hyperprior with L1 (q=1, L1_optimization + MM-LQA) or L2 (q=2, IRLS-style
+%   weighted normal equations) sparsity. estimation_type: IAS, EM, or Standardized
+%   (sLORETA-like scaling when q=2). Optional multiresolution averaging as in
+%   GroupLassoInverter.
 %
-% Calls (project):
-%   inverse.CommonInverseParameters
-%   zef_make_multires_dec
+%   Reference: Lahtinen et al., Clinical Neurophysiology 159 (2024),
+%   DOI 10.1016/j.clinph.2023.12.001.
 %
-% Side effects:
-%   - GPU
-%   - filesystem I/O
-%   - waitbar progress UI
+%   See also inverse.GroupLassoInverter, L1_optimization.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `inverse.HALpRInverter.HALpRInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
-
-    %
-    % HALpRInverter, Copyright © 2025- Joonas Lahtinen
-    %
-    % A class which defines the properties needed by the Hierarchical Adaptive Lp-Regression (HALpR) inversion method,
-    % and the method itself.
-    % The method is based on the one introduced in the article:
-    % "Standardized hierarchical adaptive Lp regression for noise robust focal epilepsy source reconstructions". 
-    % In: Clinical neurophysiology 159 (2024)
-    % DOI: https://doi.org/10.1016/j.clinph.2023.12.001
-    %
 
     properties
 
@@ -149,12 +131,12 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
     methods
 
         function self = HALpRInverter(args)
-
+            %HALpRInverter  Construct a hierarchical adaptive Lp inverter.
             %
-            % HALpRInverter
-            %
-            % The constructor for this class.
-            %
+            %   Name-value: q (1 or 2), estimation_type, beta, theta0,
+            %   hyperprior_mode, n_map_iterations, n_L1_iterations,
+            %   initial_prior_steering_db, noise_cov, use_multiresolution
+            %   (constructor currently forces false), plus CommonInverseParameters.
 
             arguments
 
@@ -270,8 +252,10 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
         %multiresolution decompositions as it would by pressing the make
         %decomposition button
         function self = make_multires_dec(self)
-            %Function to make multiresolution decomposition that
-            %multiresolution computation uses.
+            %make_multires_dec  Intended wrapper around zef_make_multires_dec.
+            %
+            %   Same RAMUS property names as GroupLassoInverter.make_multires_dec;
+            %   this class does not define them, so the call errors if used.
             arguments
                 self (1,1)
             end
@@ -280,13 +264,12 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
     
         % Declare the initialize and inverse method defined in the files invert and initialize in this same
         % folder.
-        self = initialize(self)
+        self = initialize(self, L, f_data)
 
-        [reconstruction, self] = invert(self)
+        [reconstruction, self] = invert(self, f_data, L, procFile, source_direction_mode, source_positions, opts)
 
         function self = terminateComputation(self)
-            % Function to reset the values that are changed during
-            %inverse computations.
+            %terminateComputation  Drop SNR_variable; clear auto-estimated noise_cov.
 
             %If the user has not given their own inversion parameters, we
             %reset the automatically computed parameters because the user 
@@ -306,6 +289,7 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
         % The function set the respective *Setted property value true when 
         % value is changed.
         function setEventsFlags(src,evnt,self) %two first inputs must be there and have these dedicated roles. The third 'self' is an extra variable.
+        %setEventsFlags  PostSet listener: mark noise_cov as user-set when not computing.
          if not(self.computing_parameters)
              if isempty(self.noise_cov)
                  self.noise_covSetted = false;
@@ -316,6 +300,7 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
         end % function
 
         function InitialStatement 
+            %InitialStatement  Print the HALpR citation banner once per construction. 
             txt = strcat('This class object is for computing inversion with the Hierarchical\n'...
                 , 'Adaptive Lp regularization method (HALpR) or the Standardized Hierarchi-\n'...
                 ,'cal Adaptive Lp regularization method (SHALpR).\n' ...

@@ -1,30 +1,18 @@
-% --- Zeffiro documentation header ---
-% if isfield(zef,'source_positions_original_field') — If isfield(zef,'source positions original field').
+%ZEF_FIELD_DOWNSAMPLING  Mesh-tool "Resample field": subsample source columns of zef.L.
 %
-% Purpose:
-%   If isfield(zef,'source positions original field').
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.L (read, write)
-%   zef.L_original_field (read, write)
-%   zef.n_sources (read)
-%   zef.rand_vec_aux (read, write)
-%   zef.source_direction_mode (read)
-%   zef.source_directions (read, write)
-%   zef.source_directions_original_field (read, write)
-%   zef.source_interpolation_ind (read, write)
-%   zef.source_interpolation_ind_original_field (read, write)
-%   zef.source_positions (read, write)
-%   zef.source_positions_original_field (read, write)
+%   Script. Bound to h_field_downsampling. Caches the full field in
+%   *_original_field on first run (or restores from that cache). If
+%   zef.n_sources is smaller than the number of source positions, draws a
+%   random subset: Cartesian/normal (direction_mode 2) keeps 3 L columns per
+%   source; basis mode (3) keeps one column per source. Then
+%   zef_source_interpolation. No-op when n_sources is not smaller.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if isfield(zef,'source_positions_original_field')` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_source_interpolation, zef_mesh_tool.
 
 if isfield(zef,'source_positions_original_field')
     if isempty(zef.source_positions_original_field)

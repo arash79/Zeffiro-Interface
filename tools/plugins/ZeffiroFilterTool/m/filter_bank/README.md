@@ -1,68 +1,27 @@
-# tools/plugins/ZeffiroFilterTool/m/filter_bank
+# Filter-bank stages (`m/filter_bank`)
 
-## Purpose of this folder
+Each `.m` file here is one row you can **Add** in **Forward tools → Filter tool**. The tool does not hard-code the list: `zef_init_filter_tool` (and Add) call `help()` on every file in this folder and parse:
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+- `Description:` — label shown in the stage list (sorted as the files are scanned)
+- `Input: … [Default: …]` — parameter table rows
+- `Output:` — unused for execution, required so the parser does not break
 
-## Contents
+Do **not** remove those tags when editing help. Inverse methods still read `zef.measurements`; this pipeline writes `zef.processed_data`, and the Substitute buttons copy that onto measurements / raw / noise.
 
-MATLAB sources:
-- `zef_constant_epoching.m` — **zef_constant_epoching**: Zef constant epoching.
-- `zef_define_time_interval.m` — **zef_define_time_interval**: Zef define time interval.
-- `zef_electrode_reference.m` — **zef_electrode_reference**: Zef electrode reference.
-- `zef_ellip_band_stop_filter.m` — **zef_ellip_band_stop_filter**: Zef ellip band stop filter.
-- `zef_ellip_high_pass_filter.m` — **zef_ellip_high_pass_filter**: Zef ellip high pass filter.
-- `zef_ellip_low_pass_filter.m` — **zef_ellip_low_pass_filter**: Zef ellip low pass filter.
-- `zef_exclude_channels.m` — **zef_exclude_channels**: Zef exclude channels.
-- `zef_manual_epoching.m` — **zef_manual_epoching**: Zef manual epoching.
-- `zef_select_channels.m` — **zef_select_channels**: Zef select channels.
-- `zef_simple_downsampling_filter.m` — **zef_simple_downsampling_filter**: Zef simple downsampling filter.
-- `zef_simple_ica_cleaning.m` — **zef_simple_ica_cleaning**: Zef simple ica cleaning.
-- `zef_threshold_epoching.m` — **zef_threshold_epoching**: Zef threshold epoching.
-- `zef_zero_reference.m` — **zef_zero_reference**: Zef zero reference.
+| File | `Description:` (list label) |
+|------|-----------------------------|
+| `zef_ellip_low_pass_filter.m` | Elliptic low-pass filter |
+| `zef_ellip_high_pass_filter.m` | Elliptic high-pass filter |
+| `zef_ellip_band_stop_filter.m` | Elliptic band-stop filter |
+| `zef_zero_reference.m` | Set the reference (average) level to zero |
+| `zef_electrode_reference.m` | Set a given electrode as a reference |
+| `zef_select_channels.m` | Select channels |
+| `zef_exclude_channels.m` | Exclude channels |
+| `zef_define_time_interval.m` | Define time interval |
+| `zef_constant_epoching.m` | Averaging over epochs with constant length |
+| `zef_manual_epoching.m` | Averaging over manually selected epochs |
+| `zef_threshold_epoching.m` | Averaging over epochs obtained via thresholding |
+| `zef_simple_downsampling_filter.m` | Simple downsampling filter |
+| `zef_simple_ica_cleaning.m` | Simple ICA for data cleaning |
 
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
-
-## Programmatic usage
-
-From the project root:
-
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
-```
-
-Representative entry points in this folder:
-- ``[processed_data] = zef_constant_epoching(f, first_epoch_point, epoch_step, number_of_epochs, …)` with project root and `src` on the path.`
-- ``[processed_data] = zef_define_time_interval(f, start_time, end_time, sampling_frequency)` with project root and `src` on the path.`
-- ``[processed_data] = zef_electrode_reference(f, electrode_index)` with project root and `src` on the path.`
-- ``[processed_data] = zef_ellip_band_stop_filter(f, filter_order, ripple, attenuation, …)` with project root and `src` on the path.`
-- ``[processed_data] = zef_ellip_high_pass_filter(f, filter_order, ripple, attenuation, …)` with project root and `src` on the path.`
-- ``[processed_data] = zef_ellip_low_pass_filter(f, filter_order, ripple, attenuation, …)` with project root and `src` on the path.`
-- ``[processed_data] = zef_exclude_channels(f, exclude_channels)` with project root and `src` on the path.`
-- ``[processed_data] = zef_manual_epoching(f, epoch_points, start_time, end_time, …)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+How to open the tool, Substitute-button name swap, and scripting: [parent README](../../README.md).

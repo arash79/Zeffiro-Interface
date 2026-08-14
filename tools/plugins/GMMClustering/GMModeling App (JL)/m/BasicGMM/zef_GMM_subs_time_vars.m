@@ -1,43 +1,17 @@
-%Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-
-%function for changing time serie parameters temporarly for GMM visualization
-%Input char 'in' means replacing inv_... parameters with the ones saved to
-%GMM structure and 'out' changes them back. parameter are temporarly placed
-%on workspace with names like zef_temp_time_1
-
 function zef_GMM_subs_time_vars(char_var)
-% --- Zeffiro documentation header ---
-% zef_GMM_subs_time_vars — Zef GMM subs time vars.
+%ZEF_GMM_SUBS_TIME_VARS  Swap GMM time_variables with zef.inv_time_* ('in'/'out').
 %
-% Purpose:
-%   Zef GMM subs time vars.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   char_var
+%   zef_GMM_subs_time_vars(char_var)
 %
-% Outputs:
-%   See function signature and code below.
+%   'in': stash inv_time_1/2/3 and inv_sampling_frequency, copy from
+%   zef.GMM.time_variables. 'out': restore the stash. Uses evalin base.
+%   Called around GMM fit/plot when the model carries its own time axis.
 %
-% Zef fields (observed):
-%   zef.GMM (read)
-%   zef.inv_sampling_frequency (read, write)
-%   zef.inv_time_1 (read, write)
-%   zef.inv_time_2 (read, write)
-%   zef.inv_time_3 (read, write)
-%
-% Calls (project):
-%   zef_GMM_subs_time_vars
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_GMM_subs_time_vars(char_var)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_GMModeling.
 
 if evalin('base','isfield(zef.GMM,''time_variables'')')
     if evalin('base','~isempty(zef.GMM.time_variables)')

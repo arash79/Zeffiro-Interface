@@ -1,25 +1,17 @@
 function strip_struct = zef_get_strip_parameters(strip_struct)
-% --- Zeffiro documentation header ---
-% zef_get_strip_parameters — Zef get strip parameters.
+%ZEF_GET_STRIP_PARAMETERS  Fill strip_radius and strip_n_contacts from strip_model.
 %
-% Purpose:
-%   Zef get strip parameters.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   strip_struct
+%   strip_struct = zef_get_strip_parameters(strip_struct)
 %
-% Outputs:
-%   strip_struct
+%   Model 1: 4 contacts, 2: 8, 3: 40. Radius always 0.635. Called from
+%   zef_create_strip / embed / add_contacts. Does not write zef.
 %
-% Calls (project):
-%   zef_get_strip_parameters
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[strip_struct] = zef_get_strip_parameters(strip_struct)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_create_strip.
 
 if isequal(strip_struct.strip_model,1)
 strip_struct.strip_radius = 0.635;

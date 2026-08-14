@@ -1,55 +1,41 @@
 function zef = zef_start(zef)
-% --- Zeffiro documentation header ---
-% zef_start — Zef start.
+%ZEF_START  Apply system settings, open the core GUI tools, and sync zef.
 %
-% Purpose:
-%   Zef start.
-%   Folder: Application lifecycle: `zef_start`, `zef_init`, `zef_update`, `zef_close_all`, logging, waitbars, window layout—not the `+core` package.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Called from zeffiro_interface after paths are set. Merges
+%   zef_apply_system_settings into the current zef (caller fields win),
+%   optionally git-pulls, counts GPUs, opens segmentation/figure/mesh/menu
+%   tools, then zef_update. Distinct from the +core package.
 %
-% Outputs:
-%   zef
+%   zef = zef_start(zef)
+%   zef_start          % reads zef from the base workspace
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.gpu_count (read, write)
-%   zef.gpu_num (read)
-%   zef.h_mesh_tool (read)
-%   zef.h_mesh_visualization_tool (read)
-%   zef.h_zeffiro (read)
-%   zef.h_zeffiro_window_main (read, write)
-%   zef.mlapp (read, write)
-%   zef.new_empty_project (read, write)
-%   zef.program_path (read)
-%   zef.start_mode (read)
-%   zef.use_display (read, write)
-%   zef.use_github (read)
-%   zef.use_gpu (read, write)
-%   zef.ver (read, write)
-%   … (1 more)
+%   Input
+%     zef  - session struct. If omitted, evalin('base','zef').
 %
-% Calls (project):
-%   zef_apply_system_settings
-%   zef_start
-%   zef_update
+%   Output
+%     zef  - updated session. If nargout is 0, assigned into the base workspace.
 %
-% Side effects:
-%   - GPU
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Side effects
+%     May run !git pull when zef.use_github is true and zeffiro_restart is 0.
+%     Selects gpuDevice(zef.gpu_num) when a GPU is requested and available.
+%     Creates the main GUI figures and forces standalone window style via
+%     zef_window_manager (MATLAB R2025a+ defaults WindowStyle to docked).
+%     Adds src/nodisplay to the path when zef.use_display is 0.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_start(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zeffiro_interface, zef_init, zef_update, zef_close_all.
 
 
 if nargin == 0
     zef = evalin('base','zef');
 end
 
+% Apply INI/system defaults, then overlay the caller's zef fields so
+% session-specific values (paths, start_mode, GPU flags) are not lost.
 zef_aux = zef;
 zef = zef_apply_system_settings(zef);
 fieldnames_aux = fieldnames(zef_aux);
@@ -71,19 +57,19 @@ if isequal(zef.zeffiro_restart,0)
 
 end
 
-zef.ver = ver;
-if not(license('test','distrib_computing_toolbox')) || not(any(strcmp(cellstr(char(zef.ver.Name)), 'Parallel Computing Toolbox')))
-    zef.gpu_count = 0;
-else
-    zef.gpu_count = gpuDeviceCount;
-end
-zef = rmfield(zef, 'ver');
+% gpuDeviceCount requires Parallel Computing Toolbox; treat a missing
+% license as "no GPU" rather than erroring at startup.
+zef.gpu_count = zef_gpu_count();
 
 if ismember(zef.start_mode,{'nodisplay'})
     zef.use_display = 0;
 else
     zef.use_display = 1;
 end
+
+% R2025a+: figure() factory WindowStyle is 'docked'. Force standalone
+% windows for the session before any Zeffiro figure is created.
+zef_window_manager('init');
 
 if not(zef.use_display)
     addpath(genpath(fullfile(zef.program_path, 'src', 'nodisplay')));
@@ -122,6 +108,13 @@ set(findobj(zef.h_mesh_tool.Children,'-property','FontUnits'),'FontUnits','pixel
 set(findobj(zef.h_mesh_tool.Children,'-property','FontSize'),'FontSize',zef.font_size);
 set(findobj(zef.h_mesh_visualization_tool.Children,'-property','FontUnits'),'FontUnits','pixels')
 set(findobj(zef.h_mesh_visualization_tool.Children,'-property','FontSize'),'FontSize',zef.font_size);
+
+zef_window_manager('standalone', zef.h_zeffiro_window_main);
+zef_window_manager('standalone', zef.h_zeffiro);
+zef_window_manager('standalone', zef.h_mesh_tool);
+zef_window_manager('standalone', zef.h_mesh_visualization_tool);
+zef_window_manager('standalone', zef.h_zeffiro_menu);
+zef_window_manager('dock_menu', zef);
 
 if nargout == 0
     assignin('base','zef',zef);

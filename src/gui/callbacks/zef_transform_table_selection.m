@@ -1,35 +1,24 @@
 function zef_transform_table_selection(hObject,eventdata,handles)
-% --- Zeffiro documentation header ---
-% zef_transform_table_selection — Zef transform table selection.
+%ZEF_TRANSFORM_TABLE_SELECTION  CellSelectionCallback for the Transform UITable.
 %
-% Purpose:
-%   Zef transform table selection.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   hObject
-%   eventdata
-%   handles
+%   Wired from zef_segmentation_tool onto h_transform_table.
+%   evalin('base',...).
 %
-% Outputs:
-%   See function signature and code below.
+%   First selected row → zef.current_transform (1-based layer index on
+%   current_tag). zef_init_transform_parameters fills the parameters
+%   table (scaling, corrections, rotations, affine). Unique selected row
+%   indices go to zef.transforms_selected for **Delete transform(s)**.
 %
-% Zef fields (observed):
-%   zef.current_transform (read, write)
-%   zef.transforms_selected (read, write)
+%   Inputs (MATLAB UITable CellSelectionCallback)
+%     hObject, handles  - unused.
+%     eventdata.Indices - N-by-2 [row, column] of the selection.
 %
-% Calls (project):
-%   zef_transform_table_selection
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `zef_transform_table_selection(hObject, eventdata, handles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_delete_transform, zef_add_transform, zef_apply_transform.
 
 transform_selected = eventdata.Indices(1);
 

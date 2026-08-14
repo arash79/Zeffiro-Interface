@@ -1,34 +1,20 @@
 function [x,fval,exitflag] = zef_gurobi_linprog(f,A,b,Aeq,beq,lb,ub,options)
-% --- Zeffiro documentation header ---
-% zef_gurobi_linprog — Zef gurobi linprog.
+%ZEF_GUROBI_LINPROG  Gurobi linprog-compatible wrapper for ES LP.
 %
-% Purpose:
-%   Zef gurobi linprog.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   f
-%   A
-%   b
-%   Aeq
-%   beq
-%   lb
-%   ub
-%   options
+%   Called from zef_ES_optimize_current search_method 1 when
+%   ES_opt_solver_list{ES_opt_solver} is 'Gurobi'. Maps Algorithm
+%   interior-point/dual-simplex/primal-simplex onto Gurobi Method 2/1/0.
+%   exitflag 1 = OPTIMAL (linprog-style).
 %
-% Outputs:
-%   x
-%   fval
-%   exitflag
+%   [x, fval, exitflag] = zef_gurobi_linprog(f, A, b, Aeq, beq, lb, ub, options)
 %
-% Calls (project):
-%   zef_gurobi_linprog
+%   See also zef_ES_optimize_current, zef_mosek_linprog.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[x, fval, exitflag]] = zef_gurobi_linprog(f, A, b, Aeq, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin < 4
     Aeq = [];

@@ -1,20 +1,12 @@
-% --- Zeffiro documentation header ---
-% figures'; — Figures';.
+%PLOT_QUANTILES  Script: 25/50/75% bands of SG 005 and LH 023 from saved rec_*.fig files.
 %
-% Purpose:
-%   Figures';.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Calls (project):
-%   zef_import_figure
+%   Imports figures from a hard-coded folder. Not a plugin button.
 %
-% Side effects:
-%   - creates/updates figures
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `figures';` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 
 folder = '/media/datadisk/paavo/zeffiro_interface/figures';
 

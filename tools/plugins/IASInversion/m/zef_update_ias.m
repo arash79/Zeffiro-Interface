@@ -1,39 +1,14 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef.ias_hyperprior = get(zef — Zef.ias hyperprior = get(zef.
+%ZEF_UPDATE_IAS  IAS widgets → zef.ias_* and zef.inv_time_*/snr/frames.
 %
-% Purpose:
-%   Zef.ias hyperprior = get(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_ias_high_cut_frequency (read)
-%   zef.h_ias_low_cut_frequency (read)
-%   zef.h_ias_n_map_iterations (read)
-%   zef.h_ias_normalize_data (read)
-%   zef.h_ias_number_of_frames (read)
-%   zef.h_ias_sampling_frequency (read)
-%   zef.h_ias_snr (read)
-%   zef.h_ias_time_1 (read)
-%   zef.h_ias_time_2 (read)
-%   zef.h_ias_time_3 (read)
-%   zef.h_ias_type (read)
-%   zef.ias_high_cut_frequency (read, write)
-%   zef.ias_low_cut_frequency (read, write)
-%   zef.ias_n_map_iterations (read, write)
-%   zef.ias_normalize_data (read, write)
-%   … (15 more)
+%   Script. Apply and Start. Copies hyperprior, type, n_map_iterations,
+%   band, time windows. Does not invert.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.ias_hyperprior = get(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_init_ias, zef_ias_iteration.
 
 zef.ias_hyperprior = get(zef.h_ias_hyperprior ,'value');
 zef.ias_snr = str2num(get(zef.h_ias_snr,'string'));

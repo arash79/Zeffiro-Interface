@@ -1,56 +1,30 @@
-# tools/plugins/ReconstructionTool
+# ReconstructionTool
 
-## Purpose of this folder
+A bank of reconstructions (`zef.reconstructionTool.bankReconstruction` + `bankInfo` table). Store the current `zef.reconstruction` / `zef.reconstruction_information`, put a bank row back, import a file, or apply `mean` / `power` (and any extra `m/apply_functions/zef_reconstructionTool_*.m`) to checked rows.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+## How to open it
 
-## Contents
+**Multi tools → ReconstructionTool** (default profile). Callback: `zef_reconstructionTool_start` (script).
 
-Subfolders:
-- `m/`
+## Buttons (`ButtonPushedFcn` in `zef_reconstructionTool_start.m`)
 
-MATLAB sources:
-- `zef_reconstructionTool_start.m` — **zef.reconstructionTool**: Zef.reconstruction Tool.
+| Button | Action |
+|--------|--------|
+| **Add** | `zef_reconstructionTool_addCurrent2bank` — wrap non-cell reconstructions as `{rec}`; copy `reconstruction_information` |
+| **Replace** | `zef_reconstructionTool_replace` — first checked row → live `zef.reconstruction` and `zef.reconstruction_information` (also copies `inv_time_*` when present) |
+| **Refresh** | `zef_reconstructionTool_refresh` — current table from live `zef` |
+| **Delete** | `zef_reconstructionTool_delete` |
+| **Apply transformation** | `zef_reconstructionTool_apply` — `str2func('zef_reconstructionTool_' + dropdown)` on each checked reconstruction; appends a new bank row (does not overwrite) |
+| **Import** | `[zef.reconstruction, zef.reconstruction_information] = zef_reconstructionTool_import` then refresh |
 
-Other files:
-- `zef_reconstructionTool_app.mlapp`
+Dropdown is filled from `m/apply_functions/*.m` (names after `Tool_`). Shipped: **mean** (average frames), **power** (mean of squares).
 
-## How this folder fits into the overall workflow
+Checkbox column 7 of `bankInfo` is the apply/replace selection.
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-- **zef.reconstructionTool**: GUI callback or dialog (`zef.reconstructionTool`).
-
-## Programmatic usage
-
-From the project root:
+## Scripting
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+zef_reconstructionTool_start;
+zef_reconstructionTool_addCurrent2bank;
+zef.reconstruction = zef.reconstructionTool.bankReconstruction{k}.reconstruction;
 ```
-
-Representative entry points in this folder:
-- `Call `zef.reconstructionTool` from MATLAB with the project root on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

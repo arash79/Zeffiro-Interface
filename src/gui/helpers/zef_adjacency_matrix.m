@@ -1,29 +1,19 @@
 function [A, I, J] = zef_adjacency_matrix(nodes, tetra)
-% --- Zeffiro documentation header ---
-% zef_adjacency_matrix — Zef adjacency matrix.
+%ZEF_ADJACENCY_MATRIX  Sparse node–node adjacency of a tetrahedral mesh.
 %
-% Purpose:
-%   Zef adjacency matrix.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetra
+%   [A, I, J] = zef_adjacency_matrix(nodes, tetra)
 %
-% Outputs:
-%   A
-%   I
-%   J
+%   A(p,q) is nonzero when nodes p and q share a tet edge (spones of the
+%   six edge pairs, symmetrized). I,J are the row/column index vectors
+%   used to build A. St. Venant interpolation uses A(:,centre) as the
+%   neighbour stencil. Waitbar with onCleanup.
 %
-% Calls (project):
-%   zef_adjacency_matrix
-%   zef_waitbar
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[A, I, J]] = zef_adjacency_matrix(nodes, tetra)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_st_venant_interpolation.
 arguments
     nodes (:,3) double {mustBeNonNan}
     tetra (:,4) double {mustBeInteger, mustBePositive}

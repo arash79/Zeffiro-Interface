@@ -1,29 +1,19 @@
 function [sigma, phi, B, C, D] = Q_quantities(P, m, G, y)
-% --- Zeffiro documentation header ---
-% Q_quantities — Q quantities.
+%Q_QUANTITIES  EM-style averages of P, m, G, y over time (sigma, phi, B, C, D).
 %
-% Purpose:
-%   Q quantities.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   P
-%   m
-%   G
-%   y
+%   [sigma, phi, B, C, D] = Q_quantities(P, m, G, y)
 %
-% Outputs:
-%   sigma
-%   phi
-%   B
-%   C
-%   D
+%   Not called from zef_KF. Helper for identifying Q from stored smoother
+%   quantities. T = size(m,2)-1. C and D loops overwrite rather than
+%   accumulate (as written). No zef fields.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[sigma, phi, B]] = Q_quantities(P, m, G, y)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also RTS_smoother.
+%
 
     T = size(m,2) - 1;
 

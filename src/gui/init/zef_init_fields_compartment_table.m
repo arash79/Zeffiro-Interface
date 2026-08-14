@@ -1,25 +1,28 @@
-% --- Zeffiro documentation header ---
-% zef.h_compartment_table.ColumnName(1:zef — Zef.h compartment table.Column Name(1:zef.
+%ZEF_INIT_FIELDS_COMPARTMENT_TABLE  Fill one Segmentation-tool compartment row (script).
 %
-% Purpose:
-%   Zef.h compartment table.Column Name(1:zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field_1 (read)
-%   zef.compartment_activity (read)
-%   zef.compartment_table_size (read)
-%   zef.compartment_tags (read)
-%   zef.h_compartment_table (read)
+%   Script. Required workspace: zef, zef_i (table row), zef_j (tag
+%   index), zef.aux_field_1 (cell that becomes Data). Sets ColumnName /
+%   Editable / Format for the first compartment_table_size columns, then
+%   writes aux_field_1{zef_i,:} from compartment_tags{zef_j}:
+%     1 Index          — zef_i
+%     2 On             — *_on (logical)
+%     3 Name           — *_name
+%     4 Visible        — *_visible
+%     5 Surface nodes  — size(*_points,1) (read-only)
+%     6 Surface triangles — size(*_triangles,1) (read-only)
+%     7 Merge          — *_merge
+%     8 Invert normal  — *_invert
+%     9 Activity       — compartment_activity{*_sources+2}
+%       (Bounding box, Inactive, Constrained field, Unconstrained field,
+%       Active surface). *_sources is stored as that list index minus 2.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.h_compartment_table.ColumnName(1:zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_update_compartment_table_data,
+%   zef_init_fields_compartment_table_profile.
 zef.h_compartment_table.ColumnName(1:zef.compartment_table_size) =     {'Index','On','Name','Visible','Surface nodes','Surface triangles','Merge','Invert normal','Activity' };
 zef.h_compartment_table.ColumnEditable(1:zef.compartment_table_size) = logical([1 1 1 1 0 0 1 1 1]);
 zef.h_compartment_table.ColumnEditable(zef.compartment_table_size:end) = true;

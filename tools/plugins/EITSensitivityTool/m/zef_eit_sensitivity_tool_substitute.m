@@ -1,35 +1,20 @@
-% --- Zeffiro documentation header ---
-% if isequal(zef.h_eit_sensitivity_tool_distribution.Value,zef.h_eit_sensitivity_tool_distribution — If isequal(zef.h eit sensitivity tool distribution.Value,zef.h eit sensitivity tool distribution.
+%ZEF_EIT_SENSITIVITY_TOOL_SUBSTITUTE  Apply dropdown metric to zef.reconstruction.
 %
-% Purpose:
-%   If isequal(zef.h eit sensitivity tool distribution.Value,zef.h eit sensitivity tool distribution.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.L (read, write)
-%   zef.aux_quantile (read, write)
-%   zef.aux_vec_L (read, write)
-%   zef.aux_vec_L_1 (read, write)
-%   zef.aux_vec_L_2 (read, write)
-%   zef.aux_vec_bg_data (read, write)
-%   zef.aux_vec_sigma_index (read, write)
-%   zef.brain_ind (read)
-%   zef.domain_labels (read)
-%   zef.eit_sensitivity_tool_L_EEG_1 (read, write)
-%   zef.eit_sensitivity_tool_L_EEG_2 (read, write)
-%   zef.eit_sensitivity_tool_L_EEG_parcellation_interp_ind (read, write)
-%   zef.eit_sensitivity_tool_L_EEG_source_ind (read, write)
-%   zef.eit_sensitivity_tool_L_EEG_source_interpolation_ind (read, write)
-%   zef.eit_sensitivity_tool_L_EEG_source_positions (read, write)
-%   … (17 more)
+%   Script. ButtonPushedFcn of h_eit_sensitivity_tool_substitute. Switch
+%   on h_eit_sensitivity_tool_distribution.Value vs Items{k} (labels
+%   set in zef_eit_sensitivity_tool_start). Sigma 1/2 also write
+%   zef.sigma(brain_ind,1) from interpolant avg on
+%   source_interpolation_ind{1}. Several EIT metrics scale by
+%   1./zef_eit_sensitivity_tool_volume'. Store/Use items copy L
+%   to/from zef.eit_sensitivity_tool_L_*. Quantile clip from the start
+%   window. Confirm dialogs are commented out.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `if isequal(zef.h_eit_sensitivity_tool_distribution.Value,zef.h_eit_sensitivity_tool_distribution` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_eit_sensitivity_tool_volume, zef_eit_sensitivity_tool_start.
 
 if isequal(zef.h_eit_sensitivity_tool_distribution.Value,zef.h_eit_sensitivity_tool_distribution.Items{1})
     %Sigma 1

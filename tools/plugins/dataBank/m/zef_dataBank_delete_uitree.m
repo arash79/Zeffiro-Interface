@@ -1,21 +1,27 @@
-% --- Zeffiro documentation header ---
-% zef = zef_dataBank_delete_uitree(zef) — Zef = zef data Bank delete uitree(zef).
+%ZEF_DATABANK_DELETE_UITREE  Delete currently selected uitreenode(s) from the widget.
 %
-% Purpose:
-%   Zef = zef data Bank delete uitree(zef).
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   UI-only companion to zef_dataBank_delete (which updates the tree
+%   struct). zef_open_dataBank's deleteMenu does not call this file; it
+%   deletes from the struct then zef_dataBank_refreshTree. This file has
+%   no `function` keyword: the first executable line is a self-call
+%   `zef = zef_dataBank_delete_uitree(zef)` and the rest uses nargin /
+%   nargout as if it were a function. Documented as-is; not wired to a
+%   ButtonPushedFcn.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Intended: zef = zef_dataBank_delete_uitree(zef)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef = zef_dataBank_delete_uitree(zef)` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   Inputs
+%     zef  - session with dataBank.app.Tree.SelectedNodes.
+%
+%   Side effects
+%     Calls .delete on the selected uitreenode(s). Does not rmfield the tree.
+%
+%   See also zef_dataBank_delete, zef_dataBank_uiTreeDeleteHash.
 
 zef = zef_dataBank_delete_uitree(zef)
 

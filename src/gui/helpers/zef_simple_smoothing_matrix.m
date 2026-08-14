@@ -1,27 +1,19 @@
 function S_mat = zef_simple_smoothing_matrix(tetra, nodes)
-% --- Zeffiro documentation header ---
-% zef_simple_smoothing_matrix — Zef simple smoothing matrix.
+%ZEF_SIMPLE_SMOOTHING_MATRIX  Row-stochastic graph smoother from tet connectivity.
 %
-% Purpose:
-%   Zef simple smoothing matrix.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tetra
-%   nodes
+%   S = zef_simple_smoothing_matrix(tetra, nodes)
 %
-% Outputs:
-%   S_mat
+%   For each tet, add 1 on every vertex pair (including i=i). Then
+%   S = D^{-1} A with D_ii = sum_j A_ij so rows sum to 1. c_ave is
+%   computed (1/4) but unused. zef_smooth_field does *not* call this;
+%   it rebuilds a similar average with accumarray.
 %
-% Calls (project):
-%   zef_simple_smoothing_matrix
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[S_mat] = zef_simple_smoothing_matrix(tetra, nodes)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_smooth_field.
 n_nodes = size(nodes,1);
 c_ave = 1/size(tetra,2);
 

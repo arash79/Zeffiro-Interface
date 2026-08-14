@@ -1,28 +1,14 @@
-% --- Zeffiro documentation header ---
-% function zef_reset_color_sliders — Function zef reset color sliders.
-%
-% Purpose:
-%   Function zef reset color sliders.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
-%
-% Zef fields (observed):
-%   zef.colorscale_max_slider (read, write)
-%   zef.colorscale_min_slider (read, write)
-%   zef.h_colorscale_max_slider (read)
-%   zef.h_colorscale_min_slider (read)
-%
-% Calls (project):
-%   zef_reset_color_sliders
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_reset_color_sliders` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function zef_reset_color_sliders
+%ZEF_RESET_COLOR_SLIDERS  Zero figure-tool colorscale min/max sliders.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Sets zef.colorscale_min_slider / colorscale_max_slider and the
+%   matching h_* widget Values to 0 in the base workspace. Does not
+%   touch brightness or contrast.
 
 
 evalin('base','zef.colorscale_min_slider = 0;');

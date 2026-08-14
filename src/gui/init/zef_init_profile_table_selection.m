@@ -1,35 +1,16 @@
 function zef_init_profile_table_selection(hObject,eventdata,handles)
-% --- Zeffiro documentation header ---
-% zef_init_profile_table_selection — Initializes GUI widgets and default `zef` fields for profile_table_selection.
+%ZEF_INIT_PROFILE_TABLE_SELECTION  CellSelectionCallback for Pre-settings profile table.
 %
-% Purpose:
-%   Initializes GUI widgets and default `zef` fields for profile_table_selection.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   hObject
-%   eventdata
-%   handles
+%   Function (GUIDE-style signature). Writes unique selected row indices
+%   to zef.init_profile_selected in base so the Add/Delete menus in
+%   zef_open_init_profile know where to insert/remove. Does not edit Data.
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.init_profile_selected (read, write)
-%
-% Calls (project):
-%   zef_init_profile_table_selection
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `zef_init_profile_table_selection(hObject, eventdata, handles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_open_init_profile.
 init_profile_selected = eventdata.Indices(:,1);
 init_profile_selected = unique(init_profile_selected);
 init_profile_selected = init_profile_selected(:)';

@@ -1,28 +1,19 @@
-% --- Zeffiro documentation header ---
-% examples.studies.decision_making.helpers.zef — Example or study script demonstrating zef.
+%ZEF_CLUSTER_RECONSTRUCTIONS_FOCAL_EPILEPSY  GMM of max-points and cluster centres.
 %
-% Purpose:
-%   Example or study script demonstrating zef.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.GMModel (read)
-%   zef.reconstruction (read)
-%   zef.source_positions (read)
+%   Script. Needs workspace z_inverse_results, zef.source_positions, and
+%   the parameters from zef_parameters_focal_epilepsy. For each method:
+%   zef_rec_maximizer, then zef_cluster_reconstruction (GMModel fields on
+%   zef). Stacks max points and centres as z_ref_points. If
+%   supervised_clustering=='on', load(credibility_data_file_name) into
+%   credibility_data; else cred_val_points ones. zef_find_clusters →
+%   I_aux, J_aux = indices of the largest cluster (used by process/final).
 %
-% Calls (project):
-%   zef_cluster_reconstruction
-%   zef_find_clusters
-%   zef_rec_maximizer
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `examples.studies.decision_making.helpers.zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_final_reconstruction_focal_epilepsy, zef_rec_maximizer.
 
 zef.reconstruction = cell(0);
 

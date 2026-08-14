@@ -1,34 +1,19 @@
 function [P_store,z_inverse] = kalman_filter_sLORETA(m,P,A,Q,L,R, timeSteps ,number_of_frames, smoothing,standardization_exponent)
-% --- Zeffiro documentation header ---
-% kalman_filter_sLORETA — Kalman filter s LORETA.
+%KALMAN_FILTER_SLORETA  Per-frame kf_predict + kf_sL_update; stores D*m.
 %
-% Purpose:
-%   Kalman filter s LORETA.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   m
-%   P
-%   A
-%   Q
-%   L
-%   R
-%   timeSteps
-%   number_of_frames
-%   smoothing
-%   standardization_exponent
+%   [P_store, z_inverse] = kalman_filter_sLORETA(m, P, A, Q, L, R, timeSteps, number_of_frames, smoothing, standardization_exponent)
 %
-% Outputs:
-%   P_store
-%   z_inverse
+%   zef_KF filter_type 3 (spatiotemporal standardization). smoothing == 2
+%   stores P for RTS. standardization_exponent from the Kalman dropdown.
+%   Inputs match kalman_filter plus the exponent. z_inverse{k} = D*m.
 %
-% Calls (project):
-%   zef_waitbar
+%   See also zef_KF, kf_sL_update, kalman_filter.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[P_store, z_inverse]] = kalman_filter_sLORETA(m, P, A, Q, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 P_store = cell(0);
 z_inverse = cell(0);

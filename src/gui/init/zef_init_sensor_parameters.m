@@ -1,29 +1,19 @@
-% --- Zeffiro documentation header ---
-% zef — Zef.
+%ZEF_INIT_SENSOR_PARAMETERS  Load h_parameters_table for the selected sensor (script).
 %
-% Purpose:
-%   Zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_data_1 (read)
-%   zef.aux_data_2 (read, write)
-%   zef.current_parameters (read, write)
-%   zef.current_sensor_name (read)
-%   zef.current_sensors (read)
-%   zef.h_parameters_table (read)
-%   zef.imaging_method_cell (read)
-%   zef.parameter_profile (read)
+%   Script. Required: zef.current_sensor_name (row index) and
+%   zef.current_sensors. Columns written: Parameter name, Value.
+%   Imaging method cell{1}: X/Y/Z-coordinate (points 1:3).
+%   cell{2}: plus X/Y/Z-direction (directions 1:3).
+%   cell{3}: plus X/Y/Z-gradient (directions 4:6).
+%   Then enabled Sensors parameter-profile rows. Sets
+%   current_parameters='sensor' so zef_update_parameters knows the map.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_update_parameters, zef_init_sensors_parameter_profile.
 zef.aux_data_1 = cell(0);
 zef_i = evalin('base','zef.current_sensor_name');
 

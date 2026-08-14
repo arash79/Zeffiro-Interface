@@ -1,36 +1,35 @@
 function zef = zef_apply_system_settings(zef)
-% --- Zeffiro documentation header ---
-% zef_apply_system_settings — Zef apply system settings.
+%ZEF_APPLY_SYSTEM_SETTINGS  Merge profile/zeffiro_interface.ini into missing zef fields.
 %
-% Purpose:
-%   Zef apply system settings.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Settings → **System settings (zeffiro_interface.ini)**. The window's
+%   Apply control (h_system_settings_apply) runs zef_save_system_settings
+%   then this function. Also called from zef_start and zef_load (existing
+%   zef fields win; only missing names are filled).
 %
-% Outputs:
-%   zef
+%   zef = zef_apply_system_settings(zef)
+%   zef_apply_system_settings          % nargout 0 → assignin base
 %
-% Zef fields (observed):
-%   zef.ini_cell (read, write)
-%   zef.ini_cell_mod (read)
-%   zef.parallel_processes (read, write)
-%   zef.program_path (read)
-%   zef.segmentation_tool_default_position (read, write)
+%   Input
+%     zef  - session. Omitted → evalin('base','zef').
 %
-% Calls (project):
-%   zef_apply_system_settings
+%   What it does
+%     1. readcell program_path/profile/zeffiro_interface.ini.
+%        Column 4 'number' → str2num if needed; 'string' → num2str.
+%        Column 3 is the zef field name; column 2 the value. Assigned
+%        only if not already isfield.
+%     2. Drops ini_cell. If ini_cell_mod exists, same loop then rmfield
+%        (string branch writes ini_cell{i,2} and stores num2str of the
+%        mod value).
+%     3. If segmentation_tool_default_position is [0 0 0 0], sets it from
+%        groot ScreenSize.
+%     4. Caps parallel_processes at maxNumCompThreads.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_apply_system_settings(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_system_settings_table_selection, zef_start, zef_save_system_settings.
 
 if nargin == 0
     zef = evalin('base','zef');

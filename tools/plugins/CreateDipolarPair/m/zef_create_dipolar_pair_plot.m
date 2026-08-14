@@ -1,31 +1,14 @@
-% --- Zeffiro documentation header ---
-% zef_create_dipolar_pair_update_struct; — Zef create dipolar pair update struct;.
+%ZEF_CREATE_DIPOLAR_PAIR_PLOT  quiver3 the current pair orientation on h_axes1.
 %
-% Purpose:
-%   Zef create dipolar pair update struct;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field (read, write)
-%   zef.create_dipolar_pair_color (read)
-%   zef.create_dipolar_pair_length (read)
-%   zef.create_dipolar_pair_ori_x (read, write)
-%   zef.create_dipolar_pair_ori_y (read, write)
-%   zef.create_dipolar_pair_ori_z (read, write)
-%   zef.create_dipolar_pair_x (read)
-%   zef.create_dipolar_pair_y (read)
-%   zef.create_dipolar_pair_z (read)
-%   zef.h_axes1 (read)
-%   zef.h_create_dipolar_pair_arrow (read, write)
+%   Script. Plot button. update_struct first; deletes previous
+%   h_create_dipolar_pair_arrow. Does not add contacts.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef_create_dipolar_pair_update_struct;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_create_dipolar_pair_add.
 
 zef_create_dipolar_pair_update_struct;
 

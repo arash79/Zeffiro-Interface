@@ -1,50 +1,21 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_open_mcmc(zef)
-% --- Zeffiro documentation header ---
-% zef_open_mcmc — Opens the mcmc options dialog.
+%ZEF_OPEN_MCMC  Build the MCMC window, default inv_* fields, wire Start.
 %
-% Purpose:
-%   Opens the mcmc options dialog.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_open_mcmc(zef)
 %
-% Outputs:
-%   zef
+%   Called via zef_tool_start from hb_sampler. zef_mcmc_window then names
+%   the figure ZEFFIRO Interface: Hierarchical Bayesian MCMC sampler.
+%   Start (h_mcmc_start): zef_update_mcmc; [reconstruction,
+%   reconstruction_information] = zef_mcmc(zef). Defaults
+%   inv_hyperprior=2, sample_size=25, n_burn_in=1. Does not sample by
+%   itself.
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_mcmc_apply (read)
-%   zef.h_mcmc_cancel (read)
-%   zef.h_mcmc_cm_estimation (read)
-%   zef.h_mcmc_high_cut_frequency (read)
-%   zef.h_mcmc_hyperprior (read)
-%   zef.h_mcmc_low_cut_frequency (read)
-%   zef.h_mcmc_n_burn_in (read)
-%   zef.h_mcmc_normalize_data (read)
-%   zef.h_mcmc_number_of_frames (read)
-%   zef.h_mcmc_sample_size (read)
-%   zef.h_mcmc_sampling_frequency (read)
-%   zef.h_mcmc_snr (read)
-%   zef.h_mcmc_start (read)
-%   zef.h_mcmc_time_1 (read)
-%   … (18 more)
-%
-% Calls (project):
-%   zef_mcmc
-%   zef_mcmc_window
-%   zef_open_mcmc
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_open_mcmc(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_mcmc_window, zef_mcmc.
 
 zef = zef_mcmc_window(zef);
 

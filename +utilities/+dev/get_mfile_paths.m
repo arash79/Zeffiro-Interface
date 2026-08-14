@@ -1,24 +1,16 @@
 function mfiles = get_mfile_paths(folder)
-% --- Zeffiro documentation header ---
-% utilities.dev.get_mfile_paths — Get mfile paths.
+%GET_MFILE_PATHS  Recursive dir of *.m under folder (full paths).
 %
-% Purpose:
-%   Get mfile paths.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   folder
+%   Developer helper for indent_mfiles / lint_mfiles. folder must exist.
+%   Returns a string array of fullfile(folder,name) for every match,
+%   including this tree's tests and plugins if you point at the repo root.
 %
-% Outputs:
-%   mfiles
-%
-% Calls (project):
-%   utilities.dev.get_mfile_paths
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[mfiles] = utilities.dev.get_mfile_paths(folder)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   mfiles = get_mfile_paths(folder)
 
     arguments
 

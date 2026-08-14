@@ -1,33 +1,28 @@
 function zef = zef_create_sensors(zef,sensor_tag,field_cell_update)
-% --- Zeffiro documentation header ---
-% zef_create_sensors — Zef create sensors.
+%ZEF_CREATE_SENSORS  Ensure default fields exist for one sensor tag.
 %
-% Purpose:
-%   Zef create sensors.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   sensor_tag
-%   field_cell_update
+%   Initializes missing zef.<tag>_* sensor fields (points, directions,
+%   imaging method name, electrode geometry defaults, get_functions, etc.)
+%   and prepends sensor_tag to zef.sensor_tags when new. Sets
+%   zef.current_sensors for legacy tags 's' and 's1'.
 %
-% Outputs:
-%   zef
+%   zef = zef_create_sensors(zef, sensor_tag)
+%   zef = zef_create_sensors(zef, sensor_tag, field_cell_update)
 %
-% Zef fields (observed):
-%   zef.current_sensors (read, write)
+%   Inputs
+%     zef               - session struct.
+%     sensor_tag        - short tag (e.g. 's1').
+%     field_cell_update - optional {{name, expr}, ...} field overrides.
 %
-% Calls (project):
-%   zef_create_sensors
+%   Output
+%     zef - session with sensor fields defined.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_create_sensors(zef, sensor_tag, field_cell_update)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_build_sensors_table, zef_fix_sensors_get_functions_array_size.
 
 if isequal(sensor_tag,'s') || isequal(sensor_tag,'s1')
     eval(['zef.current_sensors =''' sensor_tag ''';']);

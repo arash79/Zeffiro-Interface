@@ -1,67 +1,27 @@
-% run.m
-%
-% Main conversion function for importing Duneuro-generated FEM meshes and
-% associated data into Zeffiro Interface format. This function provides a
-% programmatic interface with comprehensive error handling and validation.
-%
-% Input:
-%   config - (Optional) Configuration structure. If not provided, uses defaults.
-%            See get_default_config.m for available options.
-%
-% Output:
-%   results - Structure containing:
-%       .success - Logical indicating overall success
-%       .errors - Cell array of error messages
-%       .warnings - Cell array of warning messages
-%       .processed_files - Cell array of successfully processed files
-%       .config - Configuration used (validated)
-%
-% Usage:
-%   % Use default configuration
-%   results = utilities.duneuro2zef.run();
-%
-%   % Customize configuration
-%   config = utilities.duneuro2zef.get_default_config();
-%   config.input_folder = 'my_data/duneuro_export';
-%   config.output_folder = 'my_data/zeffiro_import';
-%   results = utilities.duneuro2zef.run(config);
-%
-% See also: get_default_config.m, validate_config.m
-
 function results = run(config)
-% --- Zeffiro documentation header ---
-% utilities.duneuro2zef.run — Run.
+%RUN  Convert a Duneuro export folder to Zeffiro .mat files (no session import).
 %
-% Purpose:
-%   Run.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   config
+%   results = run(config)
 %
-% Outputs:
-%   results
+%   If config is omitted, uses get_default_config (input_folder 'data/exported',
+%   output_folder 'data/converted'). validate_config must pass. Writes
+%   tetra_mesh.mat (hex→tet via zef_hexa_to_tetra), source_space.mat, optional
+%   resection_points.mat, and EEG/MEG L / measurements / sensors according to
+%   config.process_eeg / process_meg / process_resection_points.
 %
-% Calls (project):
-%   utilities.duneuro2zef.convert_mesh
-%   utilities.duneuro2zef.get_default_config
-%   utilities.duneuro2zef.process_eeg_data
-%   utilities.duneuro2zef.process_meg_data
-%   utilities.duneuro2zef.process_resection_points
-%   utilities.duneuro2zef.process_source_space
-%   utilities.duneuro2zef.run
-%   utilities.duneuro2zef.validate_config
-%   zef_start_dataBank
+%   invert_domain_labels (default true) remaps hex labels. Paths are relative
+%   to pwd. Does not start Zeffiro; if base workspace has zef, initializes
+%   databank only. For session import see import_duneuro_project.
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
+%   results: .success, .errors, .warnings, .processed_files, .config.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[results] = utilities.duneuro2zef.run(config)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also get_default_config, import_duneuro_project, convert_mesh.
+%
 
     results = struct();
     results.success = false;

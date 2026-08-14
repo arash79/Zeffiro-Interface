@@ -1,31 +1,27 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [eit_ind,eit_count] = make_eit_dec(nodes,tetrahedra,brain_ind,source_ind)
-% --- Zeffiro documentation header ---
-% make_eit_dec — Make eit dec.
-%
-% Purpose:
-%   Make eit dec.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
-%
-% Inputs:
-%   nodes
-%   tetrahedra
-%   brain_ind
-%   source_ind
-%
-% Outputs:
-%   eit_ind
-%   eit_count
-%
-% Calls (project):
-%   zef_waitbar
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[eit_ind, eit_count]] = make_eit_dec(nodes, tetrahedra, brain_ind, source_ind)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%ZEF_MAKE_EIT_DEC  Nearest-source binning of brain tetrahedra for EIT DOFs.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Centroids of all tetrahedra vs centroids of source_ind. knnsearch maps
+%   each brain_ind tetra onto a source tetra. eit_count is occupancy per
+%   source bin. Called from EIT FEM when rebuilding the decomposition.
+%   Public name is zef_make_eit_dec (filename); the function line is
+%   historical make_eit_dec.
+%
+%   [eit_ind, eit_count] = zef_make_eit_dec(nodes, tetrahedra, brain_ind, source_ind)
+%
+%   Input: nodes [n × 3], tetrahedra [n_tet × 4], brain_ind and source_ind
+%   integer tetra indices. Output eit_ind [numel(brain_ind) × 1], eit_count
+%   [n_unique_sources × 1].
+%
+%   See also zef_lead_field_eit_fem, zef_make_gravity_dec.
 
 h = zef_waitbar(0,1,'Field decomposition');
 

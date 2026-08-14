@@ -1,42 +1,27 @@
-% --- Zeffiro documentation header ---
-% function [z,Var_loc] = MUSIC_iteration — Function [z,Var loc] = MUSIC iteration.
-%
-% Purpose:
-%   Function [z,Var loc] = MUSIC iteration.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.MUSIC_L_reg_type (read)
-%   zef.MUSIC_leadfield_lambda (read)
-%   zef.MUSIC_type (read)
-%   zef.c_color (read)
-%   zef.c_on (read)
-%   zef.c_priority (read)
-%   zef.c_sigma (read)
-%   zef.c_sources (read)
-%   zef.c_visible (read)
-%   zef.d10_color (read)
-%   zef.d10_on (read)
-%   zef.d10_priority (read)
-%   zef.d10_sigma (read)
-%   zef.d10_sources (read)
-%   … (167 more)
-%
-% Calls (project):
-%   zef_smooth_field
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function [z,Var_loc] = MUSIC_iteration` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [z,Var_loc] = MUSIC_iteration
-
+%MUSIC_ITERATION  MUSIC subspace scan per time frame.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   [z, Var_loc] = MUSIC_iteration
+%
+%   Called from MUSIC StartButton (legacy_music; no inverse.*Inverter).
+%   Reads base workspace zef.L directly (not zef_processLeadfields) and
+%   subsets columns by source_interpolation_ind; measurements via inline
+%   elliptic band-filter (not zef_getFilteredData). Frames:
+%   zef.number_of_frames, inv_time_*. SNR: zef.inv_snr (dB) →
+%   10^(-inv_snr/20); empty signal subspace errors 'Given
+%   signal-to-noise ratio is too high!'. Type zef.MUSIC_type 1 source
+%   projection (largestreal eigs of L' P L) / 2 noise out-projection
+%   (smallestreal). MUSIC_L_reg_type 1 ridge lambda / 2 pinv. Each
+%   frame is mean() of its window. Peak-normalizes in place (no
+%   zef_postProcessInverse). The button stores only z; Var_loc is a
+%   cell when number_of_frames > 1 and is never filled.
+%
+%   See also MUSIC_app_start.
 
 h = zef_waitbar(0,1,['MUSIC.']);
 [s_ind_1] = unique(evalin('base','zef.source_interpolation_ind{1}'));
@@ -479,11 +464,16 @@ for f_ind = 1 : number_of_frames
     end
 
     if size_f > 1
+        % Collapse the time window to one topography before C. After this,
+        % f is n_sensors×1 so the covariance below is rank-1.
         f = mean(f,2);
     end
 
-    %---------------CALCULATIONS STARTS HERE----------------------------------
-    %Data covariance matrix
+    % Per-frame MUSIC: sample covariance of the (already window-mean) data,
+    % then SVD. Signal subspace U keeps singular values above
+    % (10^(-SNR/20))^2 * max(f.^2). Empty U → SNR too high. Type 1: P = (UU')^2
+    % (project onto signal). Type 2: P = (I-UU')^2 or I-UU' (noise). Each
+    % source (triplet or scalar column) is an eigs of L_aux'*P*L_aux vs L_aux'*L_aux.
     C = (f-mean(f,1))*(f-mean(f,1))'/size(f,2);
 
     %determine indices of triplets (ind) and their total amount (nn)
@@ -497,6 +487,8 @@ for f_ind = 1 : number_of_frames
     nn = size(L_ind,1);
     update_waiting_bar = floor(0.1*(nn-2));
 
+    % Signal subspace: singular vectors whose S exceeds noise power
+    % (std_lhood^2 * max(f.^2)). Empty U means SNR was set too high.
     [U,S,~] = svd(C);
     S=diag(S);
     U = U(:,S>(std_lhood^2*max(f.^2,[],'all')));
@@ -505,8 +497,11 @@ for f_ind = 1 : number_of_frames
     end
 
     if evalin('base','zef.MUSIC_type')==1
+        % Type 1: projector onto the signal subspace (squared).
         P = (U*U')^2;
     elseif evalin('base','zef.MUSIC_type')==2
+        % Type 2: projector onto the noise subspace. Ridge path squares
+        % it; pinv path does not.
         if evalin('base','zef.MUSIC_L_reg_type')==1
             P = (eye(size(U,1))-U*U')^2;
         elseif evalin('base','zef.MUSIC_L_reg_type')==2
@@ -541,6 +536,12 @@ for f_ind = 1 : number_of_frames
                 [orj,amp] = eigs(pinv(L_aux)*P*L_aux,1,'smallestreal');
             end
 
+            % Type 2 can return a complex generalized eigenvalue. Clamp
+            % negative-real / |amp|>1 cases, then if the eigenvector is
+            % complex, reconstruct a real orientation in the (Re, Im) plane
+            % by solving a 2×2 quadratic for the phase that maximises the
+            % (real) MUSIC score. Documented from this branch; do not treat
+            % as a textbook complex-MUSIC formula.
             if real(amp) < 0 && imag(amp) <= 0
                 amp = 0;
             elseif abs(amp) > 1
@@ -581,6 +582,8 @@ for f_ind = 1 : number_of_frames
 
                 clear M const_a const_b v1 v2 orj_r orj_i orj_r_perp s
             else
+                % Real eigenvalue: store (1-amp)*orientation so a perfect
+                % noise-space match (amp→1) is a null; type 1 used abs(amp)*orj.
                 z_vec(L_ind(n_iter,:)) = (1-amp)*orj;
             end
         end
@@ -631,6 +634,7 @@ else
     z = z./max(aux_norm_vec);
 end;
 
-close(h);
+close(h)
+;
 
 end

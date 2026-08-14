@@ -1,20 +1,3 @@
-% --- Zeffiro documentation header ---
-% plugins.ClassGMM.function [S,NlogL,optimInfo]... — Function [S,Nlog L,optim Info].
-%
-% Purpose:
-%   Function [S,Nlog L,optim Info]....
-%   Folder: Namespaced algorithm support (e.g. ClassGMM, ClassKF) used by GUI plugins and class inverters.
-%
-% Calls (project):
-%   plugins.ClassGMM.AdvGMModeling4Rec
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `plugins.ClassGMM.function [S,NlogL,optimInfo]...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function [S,NlogL,optimInfo]...
     =AdvGMModeling4Rec(X,weight,k,start,reps, CovType,SharedCov, RegV, options,probtol)
 

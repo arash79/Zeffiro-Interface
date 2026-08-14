@@ -1,40 +1,36 @@
 function results = run(config)
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.run — Run.
+%RUN  Brainstorm protocol → Zeffiro session (compartments + FEM mesh).
 %
-% Purpose:
-%   Run.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   config
+%   results = run(config)
 %
-% Outputs:
-%   results
+%   Requires Brainstorm on the path and an initialized protocol
+%   (bst_get('ProtocolInfo').SUBJECTS). Does not write STL/ASC folders.
+%   Starts zeffiro_interface('start_mode','nodisplay'), builds compartments
+%   from Brainstorm surfaces, runs zef_create_finite_element_mesh, optionally
+%   zef_save. Does not close the session (call zef_close_all(results.zef)).
 %
-% Zef fields (observed):
-%   zef.domain_labels (read)
-%   zef.name_tags (read)
-%   zef.nodes (read)
-%   zef.tetra (read)
+%   config fields (defaults in validate_and_set_defaults):
+%     .settings_file_name  - basename in settings/ (default 'zef_bst_default')
+%     .project_file_name   - if non-empty, save [name].mat via zef_save
+%     .run_type            - 1 fresh from Brainstorm; 2 reload dumped
+%                            *_compartment_settings.dat + *_surface_meshes.mat
+%                            (3 is rejected; use zef_bst_edit_project)
+%     .input_mode          - 1 use input files; 2 ignore compartment_files
+%     .verbose             - default true
+%     .save_project        - default true iff project_file_name non-empty
+%     .subject_struct / .subject_folder / .zef_bst / .use_gpu /
+%     .parallel_processes  - optional overrides
 %
-% Calls (project):
-%   utilities.brainstorm2zef.run
-%   utilities.brainstorm2zef.zef_bst_create_project
-%   utilities.brainstorm2zef.zef_bst_get_settings
-%   utilities.brainstorm2zef.zef_bst_validate_environment
-%   zef_bst_edit_project
-%   zef_close_all
-%   zef_create_finite_element_mesh
-%   zef_save
+%   results: .success, .zef, .mesh_data (nodes in metres = zef.nodes /
+%   zef_bst.unit_conversion, tetra=[tetra domain_labels], name_tags),
+%   .errors, .warnings, .config, .processing_time.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[results] = utilities.brainstorm2zef.run(config)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_create_project, zef_bst_plugin_start, zef_bst_default.
 
 results = struct();
 results.success = false;

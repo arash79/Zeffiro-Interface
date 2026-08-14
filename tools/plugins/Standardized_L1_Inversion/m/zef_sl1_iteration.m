@@ -1,58 +1,22 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [z,reconstruction_information] = zef_sl1_iteration(zef)
-% --- Zeffiro documentation header ---
-% zef_sl1_iteration — Zef sl1 iteration.
+%ZEF_SL1_ITERATION  Core iteration loop for standardized L1 MAP (quadprog).
 %
-% Purpose:
-%   Zef sl1 iteration.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   [z, reconstruction_information] = zef_sl1_iteration(zef)
 %
-% Outputs:
-%   z
-%   reconstruction_information
+%   Called from sL1 Start (legacy_sl1; not inverse.HALpRInverter). Needs
+%   zef.L, measurements, and quadprog. Frames: zef.sl1_number_of_frames.
+%   SNR: zef.sl1_snr (dB) → 10^(-sl1_snr/20). MAP loops
+%   sl1_n_map_iterations. sl1_type 2 = sLORETA-style diag(R); 3 = column
+%   maximum. Returns post-processed z and reconstruction_information
+%   (tag sl1).
 %
-% Zef fields (observed):
-%   zef.gpu_count (read)
-%   zef.inv_amplitude_db (read)
-%   zef.inv_hyperprior_tail_length_db (read)
-%   zef.inv_hyperprior_weight (read)
-%   zef.inv_prior_over_measurement_db (read)
-%   zef.sl1_high_cut_frequency (read)
-%   zef.sl1_hyperprior (read)
-%   zef.sl1_low_cut_frequency (read)
-%   zef.sl1_n_map_iterations (read)
-%   zef.sl1_normalize_data (read)
-%   zef.sl1_number_of_frames (read)
-%   zef.sl1_sampling_frequency (read)
-%   zef.sl1_snr (read)
-%   zef.sl1_time_1 (read)
-%   zef.sl1_time_2 (read)
-%   … (6 more)
+%   See also sl1_map_estimation, zef_l2_l1_optimizer, zef_init_sl1.
 %
-% Calls (project):
-%   zef_find_ig_hyperprior
-%   zef_getFilteredData
-%   zef_getTimeStep
-%   zef_l2_l1_optimizer
-%   zef_normalizeInverseReconstruction
-%   zef_postProcessInverse
-%   zef_processLeadfields
-%   zef_sl1_iteration
-%   zef_waitbar
-%
-% Side effects:
-%   - GPU
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z, reconstruction_information]] = zef_sl1_iteration(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 inverse_gamma_ind = [1:4];
 gamma_ind = [5:10];
@@ -162,10 +126,12 @@ for f_ind = 1 : number_of_frames
         z_vec = zef_l2_l1_optimizer(L, f, std_lhood.^2./theta, options_quad);
 
       if isequal(sl1_type,2)
+          % sLORETA-style standardization of the L1 iterate
           p_vec = 0.5*abs(z_vec).*theta;
           R = (p_vec.*L')*(inv(L*(p_vec.*L') + std_lhood.^2.*eye(size(L,1)))*L);
           z_vec = sqrt(1./diag(R)).*z_vec;
       elseif isequal(sl1_type,3)
+          % Column-maximum scaling
           z_vec = z_vec./(max(abs(L))');
       end 
 

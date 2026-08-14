@@ -2,46 +2,35 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function zef = zef_source_interpolation(zef)
-% --- Zeffiro documentation header ---
-% zef_source_interpolation — Zef source interpolation.
+%ZEF_SOURCE_INTERPOLATION  Map lead-field columns to mesh/surface nodes (Mesh-tool button).
 %
-% Purpose:
-%   Zef source interpolation.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Bound to Mesh tool "Source interpolation". Also called from
+%   zef_lead_field_matrix when source_interpolation_on is true, and from
+%   the modality wrappers. Inverse zef_processLeadfields requires
+%   zef.source_interpolation_ind{1}.
 %
-% Outputs:
-%   zef
+%   Drops columns of L (and matching source_positions / source_directions)
+%   whose column-sum of abs is NaN. Then three nearest-neighbour maps in the
+%   current location_unit (cm positions are ×10; metre positions are written
+%   back ×1000 into zef.source_positions):
+%     {1} source positions → 4 nodes of each active tetrahedron
+%     {2}{compartment} sources → triangles of each active source surface
+%     {3} source positions → combined surface-triangle centroids
 %
-% Zef fields (observed):
-%   zef.L (read, write)
-%   zef.active_compartment_ind (read)
-%   zef.compartment_tags (read)
-%   zef.location_unit_current (read)
-%   zef.nodes (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.source_directions (read, write)
-%   zef.source_interpolation_ind (read, write)
-%   zef.source_positions (read, write)
-%   zef.tetra (read)
+%   zef = zef_source_interpolation(zef)
 %
-% Calls (project):
-%   zef_source_interpolation
-%   zef_waitbar
+%   Input / output
+%     zef  - needs L, source_positions, nodes, tetra, active_compartment_ind,
+%            reuna_p, reuna_t, compartment_tags. If omitted, read from base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_source_interpolation(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_lead_field_matrix, zef_processLeadfields.
+
+
 
 
 if nargin == 0
@@ -90,6 +79,9 @@ if not(isempty(active_compartment_ind)) && not(isempty(source_positions)) && not
 
     MdlKDT = KDTreeSearcher(source_positions);
     source_interpolation_ind{1} = knnsearch(MdlKDT,center_points);
+    % Unique tet-node ids were flattened; reshape back to one row per
+    % active tetrahedron (4 nearest sources, one per node). Volume
+    % plotters average those four values (/4 or size(...,2)).
     source_interpolation_ind{1} = reshape(source_interpolation_ind{1}(center_points_ind), length(active_compartment_ind), 4);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

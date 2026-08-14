@@ -1,51 +1,22 @@
-%This is the startup function for KF app. 
-%Beamformer, inverse_tools, zef_KF_start
 function zef = zef_kf_open_window(zef)
-% --- Zeffiro documentation header ---
-% zef_kf_open_window — Zef kf open window.
+%ZEF_KF_OPEN_WINDOW  Construct the Kalman App Designer window.
 %
-% Purpose:
-%   Zef kf open window.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_kf_open_window
+%   zef = zef_kf_open_window(zef)
 %
-% Outputs:
-%   zef
+%   Called from zef_kf_start (INI: Inverse tools → Kalman). Instantiates
+%   zef_kf_app, copies inv_snr / frames / filter_type onto widgets, and
+%   sets StartButton.ButtonPushedFcn to zef = zef_KF(zef). Does not invert.
+%   If zef.kf_burn_in exists, the burn-in widget is set with mun2str (as
+%   written; MATLAB has num2str).
 %
-% Zef fields (observed):
-%   zef.KF (read, write)
-%   zef.filter_type (read, write)
-%   zef.font_size (read)
-%   zef.inv_high_cut_frequency (read, write)
-%   zef.inv_low_cut_frequency (read, write)
-%   zef.inv_sampling_frequency (read, write)
-%   zef.inv_snr (read, write)
-%   zef.inv_time_1 (read, write)
-%   zef.inv_time_2 (read, write)
-%   zef.inv_time_3 (read, write)
-%   zef.kf_burn_in (read, write)
-%   zef.kf_smoothing (read, write)
-%   zef.normalize_data (read, write)
-%   zef.number_of_ensembles (read, write)
-%   zef.number_of_frames (read, write)
-%   … (1 more)
+%   See also zef_kf_start, zef_KF.
 %
-% Calls (project):
-%   zef_KF
-%   zef_kf_open_window
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_kf_open_window(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin == 0
     zef = evalin('base','zef');
@@ -70,7 +41,7 @@ zef.KF.inv_snr.Value = '30';
 end
 
 if isfield(zef,'kf_burn_in')
-    zef.KF.burn_in.Value=mun2str(zef.kf_burn_in);
+    zef.KF.burn_in.Value=mun2str(zef.kf_burn_in);  % as written (not num2str)
 else
     zef.kf_burn_in = 4;
     zef.KF.burn_in.Value='4';

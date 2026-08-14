@@ -1,36 +1,23 @@
 
 function  zef_nse_plot_histogram(zef, plot_vec, x_label, legend_text)
-% --- Zeffiro documentation header ---
-% zef_nse_plot_histogram — Zef nse plot histogram.
+%ZEF_NSE_PLOT_HISTOGRAM  Histogram of plot_vec on h_axes1 with IDR/IQR bars.
 %
-% Purpose:
-%   Zef nse plot histogram.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   plot_vec
-%   x_label
-%   legend_text
+%   Called from zef_nse_plot_graph (histogram graph_types). Overlay bars at
+%   interdecile (p=0.8) and interquartile (p=0.5) ranges. Optional
+%   legend_text. Note: plot_graph type 18 currently calls this with
+%   (zef, nse_field, plot_vec, label) — four args after zef — which does
+%   not match this signature (nse_field would be taken as plot_vec).
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_nse_plot_histogram(zef, plot_vec, x_label)
+%   zef_nse_plot_histogram(zef, plot_vec, x_label, legend_text)
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.h_axes1 (read)
+%   See also zef_nse_plot_graph.
 %
-% Calls (project):
-%   zef_nse_plot_histogram
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_nse_plot_histogram(zef, plot_vec, x_label, legend_text)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 if nargin < 4 
     legend_text = cell(0);

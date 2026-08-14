@@ -1,28 +1,33 @@
 function [info,columnNames, hashList] = zef_databank_showAll(tree, type)
-% --- Zeffiro documentation header ---
-% zef_databank_showAll — Zef databank show All.
+%ZEF_DATABANK_SHOWALL  Fill DataTable from every tree node of the selected type.
 %
-% Purpose:
-%   Zef databank show All.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   tree
-%   type
+%   showButton.ButtonPushedFcn and Entrytype.ValueChangedFcn in
+%   zef_open_dataBank. Filename is zef_databank_showAll.m (lowercase b).
+%   Collects hashes whose .type equals type, then size/tag columns:
+%     leadfield       - imaging_method, size(L)
+%     data            - size(measurements)
+%     reconstruction  - tag, type, size(reconstruction)
+%     gmm             - empty columns
+%   Other types (noisedata, custom, import) leave info empty. hashList is
+%   stored as zef.dataBank.DataTableHashList for table context menus.
 %
-% Outputs:
-%   info
-%   columnNames
-%   hashList
+%   [info, columnNames, hashList] = zef_databank_showAll(tree, type)
 %
-% Calls (project):
-%   zef_databank_showAll
-%   zef_size
+%   Inputs
+%     tree  - zef.dataBank.tree (or a dummy one-node tree from showCurrent).
+%     type  - char Entrytype.Value.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[info, columnNames, hashList]] = zef_databank_showAll(tree, type)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     info         - n-by-k cell for the table Data.
+%     columnNames  - cellstr of headers (type-dependent).
+%     hashList     - 1-by-n cell of matching hashes.
+%
+%   See also zef_dataBank_showCurrent, zef_size.
 
 info=cell(0,0);
 columnNames=cell(0,0);
@@ -30,6 +35,8 @@ columnNames=cell(0,0);
 dbFieldNames=fieldnames(tree);
 hashList=cell(0,0);
 
+%get all hashes of type nodes
+% this will add a tiny bit of runtime, but makes the funtion more readable
 for i=1:length(dbFieldNames)
     if strcmp(tree.(dbFieldNames{i}).type, type)
         hashList{end+1}=dbFieldNames{i};

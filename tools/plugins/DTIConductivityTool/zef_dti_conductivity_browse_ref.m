@@ -1,46 +1,20 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_DTI_CONDUCTIVITY_BROWSE_REF
-%
-%Browse for reference MRI file (e.g. orig.mgz from FreeSurfer recon-all).
-%The reference MRI provides the coordinate geometry needed to transform
-%between Zeffiro's mesh display space and the FA voxel space.
-%
-%Supported formats:
-%  - MGZ/MGH (FreeSurfer native)
-%  - NIfTI (.nii, .nii.gz)
-%
-%After selection, the file path is stored in zef. The actual geometry
-%extraction happens when the user clicks the 'Load' button, which calls
-%zef_dti_conductivity_load_freesurfer.
-% --- Zeffiro documentation header ---
-% function zef_dti_conductivity_browse_ref — Function zef dti conductivity browse ref.
-%
-% Purpose:
-%   Function zef dti conductivity browse ref.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Zef fields (observed):
-%   zef.dti_ref_mri_file (read, write)
-%   zef.freesurfer_fa_file (read)
-%   zef.h_dti_ref_mri_file (read)
-%   zef.save_file_path (read)
-%
-% Calls (project):
-%   zef_dti_conductivity_browse_ref
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `function zef_dti_conductivity_browse_ref` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
 function zef_dti_conductivity_browse_ref
-
+%ZEF_DTI_CONDUCTIVITY_BROWSE_REF  uigetfile reference MRI → zef.dti_ref_mri_file.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Browse button on the DTI Conductivity Tool. Filters: *.mgz/*.mgh then
+%   *.nii.gz/*.nii. Starting folder is the current reference path, else the
+%   FA file folder, else zef.save_file_path, else pwd. Writes the path to
+%   zef.dti_ref_mri_file and the path edit if it exists. Geometry is not
+%   read here — Load → zef_dti_conductivity_load_freesurfer.
+%
+%   Script-style: evalin/assignin base zef. Cancel leaves zef unchanged.
+%
+%   See also zef_dti_conductivity_browse_fa, zef_dti_conductivity_load_freesurfer.
 
 zef = evalin('base','zef');
 

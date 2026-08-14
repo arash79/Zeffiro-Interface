@@ -1,38 +1,48 @@
-%% Copyright © 2025- Joonas Lahtinen 
 function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
-% --- Zeffiro documentation header ---
-% inverse.CSMInverter.invert — Runs one inverse reconstruction step for a single measurement frame.
+%invert  One-frame dSPM, sLORETA, 3D sLORETA, or SBL reconstruction.
 %
-% Purpose:
-%   Runs one inverse reconstruction step for a single measurement frame.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   f
-%   L
-%   procFile
-%   source_direction_mode
-%   source_positions
-%   opts
+%   Called once per time frame by utilities.inverse.run_frame_loop after
+%   initialize / precompute. Inverse-tools → Classical Sparse Methods uses
+%   zef_CSM_iteration instead of this method.
 %
-% Outputs:
-%   z_vec
-%   self
+%   dSPM: z = d .* (P*f) with d_i = 1/sqrt((P S P')_ii),
+%   S = (10^(-SNR/20)^2 / theta0) I. sLORETA: extra /sqrt(theta0) and
+%   d from diag(P L). sLORETA 3D: per-source sqrtm(P_i L_i) solve; when
+%   source_direction_mode==2, constrained nodes (procFile.s_ind_4) get a
+%   scalar scale and free nodes get the 3×3 block. SBL: iterative gamma
+%   from whitened data covariance (cov(f') — one frame is rank-deficient
+%   and is ridge-stabilized).
 %
-% Calls (project):
-%   inverse.invert
-%   zef_find_gaussian_prior
-%   zef_waitbar
+%   [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, ...
+%       source_positions, opts)
 %
-% Side effects:
-%   - GPU
-%   - waitbar progress UI
+%   Inputs
+%     self  - CSMInverter. method_type is "dSPM"|"sLORETA"|"sLORETA 3D"|"SBL"
+%             (default "dSPM"). Uses theta0, signal_to_noise_ratio,
+%             precomputed_P / precomputed_d when precompute ran.
+%     f     - n_sensors×1 frame from zef_getTimeStepClassObj (filtered).
+%     L     - n_sensors×n_dof lead field after zef_processLeadfields.
+%             Cartesian layout is [x-block, y-block, z-block], each of
+%             length n_interp = numel(procFile.s_ind_0).
+%     procFile - from zef_processLeadfields: s_ind_0 (all interpolated
+%             sources), s_ind_4 (constrained / normal-locked indices).
+%             Required for sLORETA 3D; unused for dSPM/sLORETA/SBL.
+%     source_direction_mode - 1 Cartesian, 2 Normal, 3 Basis. Only the
+%             sLORETA 3D branch switches on == 2.
+%     source_positions - unused in this method (kept for the common
+%             invert signature).
+%     opts.use_gpu - from zef.use_gpu. Moves S/P to gpuArray when a device
+%             exists; result is gathered.
+%     opts.normalize_data - from zef.normalize_data; unused here.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[z_vec, self]] = inverse.CSMInverter.invert(self, f, L, procFile, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Outputs
+%     z_vec - n_dof×1 reconstruction for this frame.
+%     self  - unchanged except waitbar lifecycle.
 
     arguments
 
@@ -97,6 +107,7 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
             else
                 d = self.precomputed_d;
             end
+    % dSPM: z_i = P_i f / sqrt((P S P')_ii)  (noise-normalized MNE)
             z_vec = d.*P*f;
 
         elseif self.method_type == "sLORETA"
@@ -107,6 +118,7 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
             else
                 d = self.precomputed_d;
             end
+            % sLORETA: extra /sqrt(θ₀) so the resolution matrix is identity at each source
             z_vec = d.*P*f/sqrt(theta0);
 
         else
@@ -181,7 +193,7 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
             S_mat = gpuArray(S_mat);
         end
 
-        %__ Sparse Bayesian Learning _
+        %__ Sparse Bayesian Learning: iterative gamma from whitened data covariance __
         n_iter = self.SBL_number_of_iterations;
         C_data = cov(f');
 

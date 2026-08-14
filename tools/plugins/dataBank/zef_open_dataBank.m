@@ -1,42 +1,16 @@
 function zef = zef_open_dataBank(zef)
-% --- Zeffiro documentation header ---
-% zef_open_dataBank — Opens the databank options dialog.
+%ZEF_OPEN_DATABANK  Build the Data Bank window and wire buttons.
 %
-% Purpose:
-%   Opens the databank options dialog.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Add snapshots Entrytype from live zef; Load copies a node back.
+%   Combine: [zef.L, zef.measurements] = zef_dataBank_combineLeadFields(...).
 %
-% Outputs:
-%   zef
+%   zef = zef_open_dataBank(zef)
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.dataBank (read)
-%   zef.measurements (read)
-%
-% Calls (project):
-%   zef_dataBank_WorkingSpaceInfo
-%   zef_dataBank_combineLeadFields
-%   zef_dataBank_delete
-%   zef_dataBank_hash2tree
-%   zef_dataBank_hashToWorkingSpace
-%   zef_dataBank_init
-%   zef_dataBank_showCurrent
-%   zef_databank_showAll
-%   zef_open_dataBank
-%   zef_set_size_change_function
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_open_dataBank(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 
 zef.dataBank.app=zef_dataBank_app;
 

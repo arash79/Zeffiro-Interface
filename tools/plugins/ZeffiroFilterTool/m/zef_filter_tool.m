@@ -1,50 +1,26 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-% --- Zeffiro documentation header ---
-% zef_data= zeffiro_interface_filter_tool; — Zef data= zeffiro interface filter tool;.
+%ZEF_FILTER_TOOL  Open Forward tools → Filter tool.
 %
-% Purpose:
-%   Zef data= zeffiro interface filter tool;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field (read, write)
-%   zef.fieldnames (read, write)
-%   zef.filter_epoch_points (read, write)
-%   zef.filter_list_selected (read, write)
-%   zef.filter_pipeline (read)
-%   zef.filter_pipeline_selected (read, write)
-%   zef.filter_sampling_rate (read, write)
-%   zef.filter_tag (read, write)
-%   zef.font_size (read)
-%   zef.h_add_filter (read)
-%   zef.h_axes1 (read)
-%   zef.h_del_filter (read)
-%   zef.h_filter_get_epoch_points (read)
-%   zef.h_filter_import_data (read)
-%   zef.h_filter_list (read)
-%   … (21 more)
+%   Menu callback from profile/multicompartment_head/zeffiro_plugins.ini
+%   (label "Filter tool", parent forward_tools). Script: opens the App
+%   Designer window, wires ButtonPushedFcn, then zef_init_filter_tool.
+%   Pipeline stages are m/filter_bank; runner is zef_filter_raw_data.
+%   Writes zef.processed_data; substitute buttons copy to measurements,
+%   raw_data, or noise_data.
 %
-% Calls (project):
-%   zef_change_size_function
+%   See also zef_filter_raw_data, zef_import_raw_data.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_data= zeffiro_interface_filter_tool;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
 
 zef_data= zeffiro_interface_filter_tool;
 zef.fieldnames = fieldnames(zef_data);
 for zef_i = 1:length(zef.fieldnames)
     zef.(zef.fieldnames{zef_i}) = zef_data.(zef.fieldnames{zef_i});
 end
-set(zef.h_zef_filter_tool,'Name','ZEFFIRO Interface: Filter tool');
+set(zef.h_zef_filter_tool,'Name','ZEFFIRO Interface: Filter tool')
 set(findobj(zef.h_zef_filter_tool.Children,'-property','FontUnits'),'FontUnits','pixels')
 set(findobj(zef.h_zef_filter_tool.Children,'-property','FontSize'),'FontSize',zef.font_size);
 clear zef_i zef_data;

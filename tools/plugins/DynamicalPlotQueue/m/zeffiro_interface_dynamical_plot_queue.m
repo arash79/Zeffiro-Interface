@@ -1,30 +1,23 @@
 function zef = zef_dpq_start(zef)
-% --- Zeffiro documentation header ---
-% zef_dpq_start — Zef dpq start.
+%ZEF_DPQ_START  Open Multi tools → Dynamical plot queue.
 %
-% Purpose:
-%   Zef dpq start.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   File zeffiro_interface_dynamical_plot_queue.m (the INI callback name
+%   in profile/*/zeffiro_plugins.ini). The in-file function is
+%   zef_dpq_start. Opens the queue editor via zef_tool_start →
+%   zef_dpq_window. The window only edits zef.dynamical_plot_queue_table;
+%   playback is zef_plot_dpq('static'|'dynamical') from visualization.
 %
-% Outputs:
-%   zef
+%   zef = zeffiro_interface_dynamical_plot_queue(zef)
+%   zef = zeffiro_interface_dynamical_plot_queue
 %
-% Calls (project):
-%   zef_dpq_start
-%   zef_tool_start
+%   No-arg form reads zef from base. Zero outputs assignin back to base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dpq_start(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_plot_dpq, zef_dpq_window.
 
 if nargin == 0
     zef = evalin('base','zef');

@@ -1,55 +1,24 @@
-# +inverse/@HALpRInverter
+# inverse.HALpRInverter
 
-## Purpose of this folder
+Hierarchical adaptive Lp regression / SHALpR (Lahtinen et al. 2024). Registry id: `halpr`. No Inverse-tools wiring to this class.
 
-Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+`q = 1`: inner `L1_optimization` (MM-LQA), then `gamma = beta ./ (theta0 + |z|)`.  
+`q = 2`: IRLS weighted normal equations; `"Standardized"` uses an sLORETA-like `T_scale`. Then `gamma = beta ./ (theta0 + |z|^q)`.
 
-## Contents
+## Parameters
 
-MATLAB sources:
-- `HALpRInverter.m` — **inverse.HALpRInverter.HALpRInverter**: Inverse solver class implementing HALpR reconstruction.
-- `initialize.m` — **inverse.HALpRInverter.initialize**: Estimates priors, noise covariance, or regularization from multi-frame data.
-- `invert.m` — **inverse.HALpRInverter.invert**: Runs one inverse reconstruction step for a single measurement frame.
+Same hyperprior / iteration / `noise_cov` pattern as GroupLasso, plus:
 
-## How this folder fits into the overall workflow
+- `q` — 1 or 2 (default 1)
+- `estimation_type`: `"IAS"` \| `"EM"` \| `"Standardized"` (tag becomes `SHALpR` when Standardized)
+- `n_L1_iterations` — used only for `q == 1`
+- `multiresolution_*` fields exist, but the constructor forces `use_multiresolution = false`, and `make_multires_dec` uses RAMUS property names that this class does not define
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+`initialize` matches GroupLasso (`SNR_variable`, `noise_cov`).
 
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+## Call
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+[zef, r] = zef_inverse_run(zef, "halpr", "execution", "local", ...
+    "MethodParams", struct("q", 1, "estimation_type", "IAS"));
 ```
-
-Representative entry points in this folder:
-- ``inverse.HALpRInverter.HALpRInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.`
-- ``[self] = inverse.HALpRInverter.initialize(self, L, f_data)` with project root and `src` on the path.`
-- ``[[z_vec, self]] = inverse.HALpRInverter.invert(self, f_data, L, procFile, …)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-Programmatic: `zef_inverse_run(zef, 'eloreta')` or `inverse.ELORETAInverter().computeInversionWithZI(zef)`.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

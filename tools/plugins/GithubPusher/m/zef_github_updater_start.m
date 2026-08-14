@@ -1,31 +1,17 @@
-% --- Zeffiro documentation header ---
-% zef_data = zef_github_updater; — Zef data = zef github updater;.
+%ZEF_GITHUB_UPDATER_START  Open Settings → Github pusher.
 %
-% Purpose:
-%   Zef data = zef github updater;.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.font_size (read)
-%   zef.github_updater_current_size (read, write)
-%   zef.h_github_author (read)
-%   zef.h_github_message (read)
-%   zef.h_github_pull_button (read)
-%   zef.h_github_reset_button (read)
-%   zef.h_github_updater (read)
-%   zef.h_github_updater_button (read)
-%   zef.user_tag (read)
+%   Script. Default-profile INI callback. Constructs zef_github_updater,
+%   title ZEFFIRO Interface: GitHub pusher tool. Default message text
+%   and author from zef.user_tag. Push → confirm then
+%   zef_github_updater_script. Pull: !git pull. Reset:
+%   !git reset --hard origin; !git fetch --all; !git pull.
 %
-% Calls (project):
-%   zef_change_size_function
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_data = zef_github_updater;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_git_push, zef_github_updater_script.
 
 zef_data = zef_github_updater;
 zef_assign_data;
@@ -37,7 +23,8 @@ zef.h_github_updater_button.ButtonPushedFcn = 'if isequal(questdlg(''Push to rem
 zef.h_github_reset_button.ButtonPushedFcn = 'if isequal(questdlg(''Reset remote origin?''),''Yes''); eval(''!git reset --hard origin; !git fetch --all; !git pull;''); end;';
 zef.h_github_pull_button.ButtonPushedFcn = 'if isequal(questdlg(''Pull from remote origin?''),''Yes'');eval(''!git pull;''); end;';
 
-set(findobj(zef.h_github_updater.Children,'-property','FontSize'),'FontSize',zef.font_size);
+set(findobj(zef.h_github_updater.Children,'-property','FontSize')
+,'FontSize',zef.font_size);
 
 set(zef.h_github_updater,'AutoResizeChildren','off');
 zef.github_updater_current_size = get(zef.h_github_updater,'Position');

@@ -1,25 +1,17 @@
-% --- Zeffiro documentation header ---
-% examples.studies.decision_making.helpers.if size(zef — Example or study script demonstrating if size(zef.
+%ZEF_SHOW_RESULTS_FOCAL_EPILEPSY  Table and plot of cluster vs resection distances.
 %
-% Purpose:
-%   Example or study script demonstrating if size(zef.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.resection_points (read)
-%   zef.use_display (read)
+%   Script. Needs z_ref_points, z_final_max_point, z_inverse_info,
+%   z_max/mean_deviations, zef.resection_points. If more than one resection
+%   point, alphaShape(...,3.4) then zef_distance_to_resection; else point
+%   cloud. Two uifigures (Visible=zef.use_display): clustering table and
+%   distance plot. Does not write files.
 %
-% Calls (project):
-%   zef_distance_to_resection
-%   zef_set_size_change_function
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `examples.studies.decision_making.helpers.if size(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_final_reconstruction_focal_epilepsy, zef_distance_to_resection.
 
 if size(zef.resection_points, 1) > 1
     A=alphaShape(zef.resection_points(:,1), zef.resection_points(:,2), zef.resection_points(:,3),3.4);
@@ -52,7 +44,6 @@ h_t.Units = 'normalized';
 h_t.Data = result_cell;
 h_t.ColumnName = [{'Data'} {'Method'} {'Type'} {'Dist. reference'} {'Dist. resection'} {'Max. deviation'} {'Mean deviation'}];
 zef_set_size_change_function(h_f_1,1,0)
-
 h_f_2 = uifigure('Visible',zef.use_display);
 h_f_2.Name = 'ZEFFIRO Interface: Clustering plot';
 h_a = axes(h_f_2);

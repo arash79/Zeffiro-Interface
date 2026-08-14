@@ -1,30 +1,20 @@
-%Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
-%See: https://github.com/sampsapursiainen/GPU-Torre-3D
 
 
 function [mh_vec, d_mh_vec, d_2_mh_vec] = mh_window(t, T, carrier_cycles_per_pulse_cycle,carrier_mode)
-% --- Zeffiro documentation header ---
-% mh_window — Mh window.
+%MH_WINDOW  Modified Hanning pulse envelope and first/second derivatives.
 %
-% Purpose:
-%   Mh window.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface (GPU-ToRRe-3D wave module).
+%   Copyright © 2021- Sampsa Pursiainen & GPU-ToRRe-3D Development Team
+%   See: https://github.com/sampsapursiainen/GPU-Torre-3D
 %
-% Inputs:
-%   t
-%   T
-%   carrier_cycles_per_pulse_cycle
-%   carrier_mode
+%   Same (t, T, carrier_cycles_per_pulse_cycle, carrier_mode) contract as
+%   bh_window, with a Hanning-style kernel instead of Blackman–Harris.
 %
-% Outputs:
-%   mh_vec
-%   d_mh_vec
-%   d_2_mh_vec
+%   [mh_vec, d_mh_vec, d_2_mh_vec] = mh_window(t, T, carrier_cycles_per_pulse_cycle, carrier_mode)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[mh_vec, d_mh_vec, d_2_mh_vec]] = mh_window(t, T, carrier_cycles_per_pulse_cycle, carrier_mode)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also bh_window.
+
+
 
 
 ones_vec = ones(size(t));

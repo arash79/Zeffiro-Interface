@@ -1,43 +1,14 @@
-# profile/asteroid_gravity
+# `asteroid_gravity`
 
-## Purpose of this folder
+Gravity lead-field profile for a two-compartment asteroid (bounding box + body). Density `rho` is the active tissue parameter; electrical `sigma` and electrode CEM rows are Off.
 
-Startup profiles and `zeffiro_plugins.ini` that attach plugin menus.
+Switch: segmentation tool **Profile:** then Apply plugin/parameter INIs and Mesh tool **Update from profile**, or set **Profile name** in **Settings → System settings (zeffiro_interface.ini)** and restart. Details: [`profile/README.md`](../README.md). Sample meshes: `data/itokawa_model/`. Saved project: `data/example_projects/asteroid_gravity_project.mat`.
 
-## Contents
+## INIs
 
-Other files:
-- `zeffiro_forward_simulation.ini`
-- `zeffiro_init.ini`
-- `zeffiro_parameters.ini`
-- `zeffiro_plugins.ini`
-- `zeffiro_segmentation.ini`
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+| File | This profile |
+|------|----------------|
+| `zeffiro_segmentation.ini` | Tags `c1` (Box, `_sources == -1` PML/bounding box, ρ=0), `c2` (Asteroid, unconstrained field, ρ=2000). |
+| `zeffiro_parameters.ini` | `rho` On; `sigma` and electrode impedance/radii Off. |
+| `zeffiro_forward_simulation.ini` | Gravity scalar/vector and gravity-gradient scalar/vector (`zef_gravity_*`). No EEG/MEG. |
+| `zeffiro_plugins.ini` | SESAME, wireframe creator. Drops Kalman, NSE, SL1, DTI, EXP Lasso. Adds EXP IAS RAMUS. GMM App (JL) only. |

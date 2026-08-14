@@ -1,32 +1,27 @@
 function slider_value_new = zef_update_transparency_reconstruction(varargin)
-% --- Zeffiro documentation header ---
-% zef_update_transparency_reconstruction — Syncs GUI control values into `zef` for transparency_reconstruction.
+%ZEF_UPDATE_TRANSPARENCY_RECONSTRUCTION  Figure-tool **Transp. rec.:** slider.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for transparency_reconstruction.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Finds the slider Tag='transparency_reconstruction_slider' on the Figure
+%   tool (or on varargin{1} if a popped-out figure was passed), then sets
+%   FaceAlpha on every patch Tag='reconstruction' in axes1.
 %
-% Outputs:
-%   slider_value_new
+%   Alpha is 1.05^(-100*slider). Slider 0 → opaque; larger values fade
+%   the reconstruction so surfaces behind it show through. Non-numeric
+%   FaceAlpha (e.g. 'interp') is replaced by min(1,kappa); numeric alpha
+%   is overwritten the same way in the loop body.
 %
-% Zef fields (observed):
-%   zef.h_zeffiro (read)
+%   Sibling sliders: zef_update_transparency_surface / _sensor / _cones /
+%   _additional. Wired as Callback strings from zef_figure_tool.
 %
-% Calls (project):
-%   zef_update_transparency_reconstruction
+%   slider_value_new = zef_update_transparency_reconstruction
+%   slider_value_new = zef_update_transparency_reconstruction(h_figure)
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[slider_value_new] = zef_update_transparency_reconstruction(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_update_transparency_surface, zef_figure_tool.
 
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');

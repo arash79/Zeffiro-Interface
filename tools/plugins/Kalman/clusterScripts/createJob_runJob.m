@@ -1,14 +1,12 @@
-% --- Zeffiro documentation header ---
-% warning('plugins.Kalman.clusterScripts:Deprecated', ... — Warning('plugins.Kalman.cluster Scripts:Deprecated', .
+%CREATEJOB_RUNJOB  Deprecated stub; use utilities.cluster.examples.kalman_workflow.
 %
-% Purpose:
-%   Warning('plugins.Kalman.cluster Scripts:Deprecated', ....
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `warning('plugins.Kalman.clusterScripts:Deprecated', ...` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   Warns and returns. Not the Inverse tools → Kalman button.
+%
 
 warning('plugins.Kalman.clusterScripts:Deprecated', ...
     ['createJob_runJob is deprecated. Use ', ...

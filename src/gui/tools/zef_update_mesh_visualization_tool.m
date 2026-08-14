@@ -1,39 +1,13 @@
-% --- Zeffiro documentation header ---
-% zef.show_contour = zef.h_show_contour — Zef.show contour = zef.h show contour.
+%ZEF_UPDATE_MESH_VISUALIZATION_TOOL  Push visualization-tool widgets into zef.
 %
-% Purpose:
-%   Zef.show contour = zef.h show contour.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.attach_electrodes (read, write)
-%   zef.axes_visible (read, write)
-%   zef.azimuth (read, write)
-%   zef.brain_transparency (read, write)
-%   zef.cam_va (read, write)
-%   zef.cone_draw (read, write)
-%   zef.contour_set (read, write)
-%   zef.contour_set_text (read, write)
-%   zef.cp2_a (read, write)
-%   zef.cp2_b (read, write)
-%   zef.cp2_c (read, write)
-%   zef.cp2_d (read, write)
-%   zef.cp2_on (read, write)
-%   zef.cp3_a (read, write)
-%   zef.cp3_b (read, write)
-%   … (73 more)
-%
-% Calls (project):
-%   zef_get_profile_parameters
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.show_contour = zef.h_show_contour` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   Script. Copies contour, clipping planes, camera, frames, colormap,
+%   cone/streamline flags. layer_transparency and brain_transparency are
+%   stored as (1 - slider). Does not call zef_update.
 zef.show_contour = zef.h_show_contour.Value;
 zef.show_contour_text = zef.h_show_contour_text.Value;
 zef.contour_set_text = zef.h_contour_set_text.Value;
@@ -59,7 +33,7 @@ zef.cp3_a = str2num(zef.h_cp3_a.Value);
 zef.cp3_b = str2num(zef.h_cp3_b.Value);
 zef.cp3_c = str2num(zef.h_cp3_c.Value);
 zef.cp3_d = str2num(zef.h_cp3_d.Value);
-zef.layer_transparency = 1 - str2num(zef.h_layer_transparency.Value);
+zef.layer_transparency = 1 - str2num(zef.h_layer_transparency.Value); % slider is opacity; field is transparency
 zef.reconstruction_type = zef.h_reconstruction_type.Value;
 zef.cp_on = zef.h_checkbox_cp_on.Value;
 zef.cp_a = str2num(zef.h_edit_cp_a.Value);
@@ -69,7 +43,7 @@ zef.cp_d = str2num(zef.h_edit_cp_d.Value);
 zef.inv_scale = zef.h_inv_scale.Value;
 zef.inv_colormap = zef.h_inv_colormap.Value;
 zef.cp_mode = zef.h_cp_mode.Value;
-zef.brain_transparency = 1 - str2num(zef.h_brain_transparency.Value);
+zef.brain_transparency = 1 - str2num(zef.h_brain_transparency.Value); % slider is opacity; field is transparency
 zef.inv_dynamic_range = str2num(zef.h_inv_dynamic_range.Value);
 zef.use_inflated_surfaces = zef.h_use_inflated_surfaces.Value;
 zef.explode_everything = zef.h_explode_everything.Value;

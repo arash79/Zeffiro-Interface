@@ -1,35 +1,19 @@
 function  patch_data = zef_set_surface_resolution(zef,patch_data,surface_resolution)
-% --- Zeffiro documentation header ---
-% zef_set_surface_resolution — Zef set surface resolution.
+%ZEF_SET_SURFACE_RESOLUTION  Refine or reducepatch a surface to a target face count.
 %
-% Purpose:
-%   Zef set surface resolution.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   patch_data
-%   surface_resolution
+%   Function. If surface_resolution<=100, target faces =
+%   resolution^2 * area / mesh_resolution^2. Too few faces →
+%   zef_triangular_mesh_refinement floor(log4(ratio)) times; too many →
+%   reducepatch. If resolution>100, reducepatch to that absolute count.
+%   Does not plot; plotters call this before creating Tag='surface'
+%   patches.
 %
-% Outputs:
-%   patch_data
-%
-% Zef fields (observed):
-%   zef.mesh_resolution (read)
-%
-% Calls (project):
-%   zef_set_surface_resolution
-%   zef_triangular_mesh_refinement
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[patch_data] = zef_set_surface_resolution(zef, patch_data, surface_resolution)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_plot_meshes, zef_triangular_mesh_refinement.
 if not(isempty(patch_data.vertices))
 
     mesh_res = eval('zef.mesh_resolution');

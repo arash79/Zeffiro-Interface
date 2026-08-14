@@ -1,31 +1,30 @@
 function [x,y,z,D] = zef_3by3_solver(a,b,c,d,D)
-% --- Zeffiro documentation header ---
-% zef_3by3_solver — Zef 3by3 solver.
+%ZEF_3BY3_SOLVER  Batched Cramer rule for T independent 3×3 systems.
 %
-% Purpose:
-%   Zef 3by3 solver.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   a
-%   b
-%   c
-%   d
-%   D
+%   Each row is one matrix with columns a(t,:).', b(t,:).', c(t,:).'.
+%   Used by zef_volume_barycentric (∇ψ), zef_source_tetra (barycentric
+%   locate), and zef_inflate_surfaces (ray–triangle).
 %
-% Outputs:
-%   x
-%   y
-%   z
-%   D
+%   [x, y, z, D] = zef_3by3_solver(a, b, c)           % D only; x,y,z = []
+%   [x, y, z, D] = zef_3by3_solver(a, b, c, d)        % also solve M λ = d
+%   [x, y, z]    = zef_3by3_solver(a, b, c, d, D)     % reuse D
 %
-% Calls (project):
-%   zef_3by3_solver
+%   Inputs
+%     a, b, c - T×3, the three columns of M (or the three edges).
+%     d       - T×3 right-hand side (optional). If omitted, only D is
+%               computed (nargin < 4 after D's optional 5th slot).
+%     D       - T×1 det(M) from a prior call (optional, nargin>=5).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[x, y, z]] = zef_3by3_solver(a, b, c, d, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Outputs
+%     x, y, z - T×1, λ = M^{-1} d when d is given.
+%     D       - T×1 det([a b c]) with columns as rows of a,b,c.
+%
+%   See also zef_volume_barycentric.
 
 x = [];
 y = [];

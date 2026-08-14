@@ -1,24 +1,22 @@
 classdef ELORETAInverter < inverse.CommonInverseParameters & handle
-% --- Zeffiro documentation header ---
-% inverse.ELORETAInverter.ELORETAInverter — Inverse solver class implementing ELORETA reconstruction.
+%ELORETAInverter  Exact low-resolution electromagnetic tomography (eLORETA) inverter.
 %
-% Purpose:
-%   Inverse solver class implementing ELORETA reconstruction.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   args
+%   Implements the fixed-point eLORETA update (Pascual-Marqui, 2007): a
+%   spatially weighted minimum-norm operator W is iterated until convergence,
+%   then cached as precomputed_inverse_operator so each frame is z = T*f.
 %
-% Calls (project):
-%   inverse.CommonInverseParameters
+%   Key properties: regularization_parameter (alpha), noise_cov, n_max_iterations,
+%   convergence_tolerance, apply_average_reference.
 %
-% Side effects:
-%   - GPU
+%   Workflow: initialize(L,f_data) → precompute(L,procFile) → invert(f,...).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `inverse.ELORETAInverter.ELORETAInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
+%   See also inverse.MNEInverter, inverse.CSMInverter.
+%
 
     properties
 
@@ -95,6 +93,12 @@ classdef ELORETAInverter < inverse.CommonInverseParameters & handle
     methods
 
         function self = ELORETAInverter(args)
+            %ELORETAInverter  Construct an eLORETA inverter.
+            %
+            %   Name-value: regularization_parameter (alpha), noise_cov,
+            %   n_max_iterations, convergence_tolerance, apply_average_reference,
+            %   plus CommonInverseParameters band/frame/SNR fields. Empty alpha
+            %   and noise_cov are filled in initialize.
 
             arguments
                 args.regularization_parameter = []
@@ -151,6 +155,7 @@ classdef ELORETAInverter < inverse.CommonInverseParameters & handle
         [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
 
         function self = terminateComputation(self)
+            %terminateComputation  Clear auto-estimated alpha/noise_cov and cached T.
             if not(self.regularization_parameterSetted)
                 self.regularization_parameter = [];
             end
@@ -167,6 +172,7 @@ classdef ELORETAInverter < inverse.CommonInverseParameters & handle
 
     methods (Static)
         function setEventsFlags(src,evnt,self)
+            %setEventsFlags  PostSet listener: mark alpha/noise_cov as user-set.
             if not(self.computing_parameters)
                 switch src.Name
                     case "regularization_parameter"

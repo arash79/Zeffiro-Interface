@@ -1,40 +1,36 @@
 function [L,n_interp, procFile] = zef_processLeadfields(zef)
-% --- Zeffiro documentation header ---
-% zef_processLeadfields — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%ZEF_PROCESSLEADFIELDS  Subselect and constrain zef.L for inversion source models.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Inverse orchestration: filtered measurements, lead-field processing, `zef_inverse_run`, bundle extraction, and post-processing into `zef.reconstruction`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Extracts active source columns from raw zef.L using zef.source_interpolation_ind.
+%   Depending on zef.source_direction_mode:
+%     1 – free orientation: keep all three Cartesian blocks (s_ind_1).
+%     2 – constrained normal: compute smoothed outward normals on cortical
+%         triangles for nodes in s_ind_4, project lead field to normal direction.
+%     3 – fixed directions: use zef.source_directions at interpolated nodes.
+%   Returns procFile index maps used by inversion and post-processing.
 %
-% Outputs:
-%   L
-%   n_interp
-%   procFile
+%   [L, n_interp, procFile] = zef_processLeadfields()
+%   [L, n_interp, procFile] = zef_processLeadfields(zef)
 %
-% Zef fields (observed):
-%   zef.L (read)
-%   zef.compartment_tags (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.source_direction_mode (read)
-%   zef.source_directions (read)
-%   zef.source_interpolation_ind (read)
+%   Inputs
+%     zef - session struct; if omitted or numeric placeholder, loaded from base.
 %
-% Calls (project):
-%   zef_processLeadfields
-%   zef_smooth_field
+%   Outputs
+%     L        - lead field (n_sensors x n_columns) after mode-specific processing.
+%     n_interp - number of unique interpolated source nodes (length s_ind_0).
+%     procFile - struct with source_direction_mode, source_directions, s_ind_0:4,
+%                n_interp, sizeL2.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Requires zef.source_interpolation_ind cell array from zef_source_interpolation.
+%   Mode 2 additionally reads compartment surface meshes (reuna_p, reuna_t).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[L, n_interp, procFile]] = zef_processLeadfields(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_process_inversion, zef_inverse_extract_bundle,
+%            zef_postProcessInverse, zef_source_interpolation.
 
 source_direction_mode = [];
 if nargin == 0 || isnumeric(zef)

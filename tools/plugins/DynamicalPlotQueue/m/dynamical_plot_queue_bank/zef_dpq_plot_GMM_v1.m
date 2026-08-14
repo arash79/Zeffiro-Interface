@@ -1,25 +1,22 @@
-% --- Zeffiro documentation header ---
-% function zef_PlotGMModel — Function zef Plot GMModel.
-%
-% Purpose:
-%   Function zef Plot GMModel.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Zef fields (observed):
-%   zef.GMM (read)
-%
-% Calls (project):
-%   zef_PlotGMModel
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `function zef_PlotGMModel` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
 function zef_PlotGMModel
+%ZEF_PLOTGMMODEL  Queue renderer: older GMMClustering overlay (zef.GMM).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   File zef_dpq_plot_GMM_v1.m; first function is also named
+%   zef_PlotGMModel. Same zef.GMM.parameters / model / dipoles path as
+%   zef_dpq_plot_GMM. Prefer the non-v1 file for new queue rows. Custom-
+%   color numeric branch contains a leftover keyboard.
+%
+%   zef_dpq_plot_GMM_v1
+%
+%   Non-cell dipole y-direction uses mu(:,1) rather than mu(:,4). Time-
+%   series branch uses mu(:,4). start_t / stop_t / ellip_trans unused.
+%
+%   See also zef_dpq_plot_GMM, zef_plot_GMModel.
 
 t = evalin('caller','f_ind');
 parameters = evalin('base','zef.GMM.parameters.Values');
@@ -69,7 +66,7 @@ else
         if size(colors,2) < 3 || size(colors,2) > 3
             colors = reshape(colors',3,[])';
         end
-        keyboard
+        keyboard   % leftover debugger in the custom RGB-numeric color path
         if size(colors,1) < K
             colors = [colors; repmat(colors(end,:),K-size(colors,1),1)];
         end
@@ -195,11 +192,12 @@ if ~iscell(GMModel)
     plot3(h,GMModel.mu(dip_ind,1),GMModel.mu(dip_ind,2),GMModel.mu(dip_ind,3),m_sym,'LineWidth',m_width,'MarkerSize',m_size)
     %set direction vectors (original can be non-unit length)
     %direct = s_length*GMModel.mu(dip_ind,4:6)./sqrt(sum(GMModel.mu(dip_ind,4:6).^2,2));
+    % y uses mu(:,1) here; the cell-model branch below uses mu(:,4).
     direct = s_length*[cos(GMModel.mu(dip_ind,5)).*sin(GMModel.mu(dip_ind,4)),sin(GMModel.mu(dip_ind,5)).*sin(GMModel.mu(dip_ind,1)),cos(GMModel.mu(dip_ind,4))];
     quiver3(h,GMModel.mu(dip_ind,1),GMModel.mu(dip_ind,2),GMModel.mu(dip_ind,3),direct(:,1),direct(:,2),direct(:,3),0,'color',erase(m_sym,'o'), 'linewidth',m_width,'MarkerSize',m_size);
     hold(h,'off')%set old time parameters back to their places:
 
-    %If time serie exists:
+    %If time serie exists (one GMM per reconstruction frame):
 else
 
     if isempty(GMModel{t})

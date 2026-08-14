@@ -1,35 +1,23 @@
 function zef_update_contour(zef)
-% --- Zeffiro documentation header ---
-% zef_update_contour — Syncs GUI control values into `zef` for contour.
+%ZEF_UPDATE_CONTOUR  Redraw contour overlays on Tag='reconstruction' patches.
 %
-% Purpose:
-%   Syncs GUI control values into `zef` for contour.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Function. No-op unless zef.show_contour is true (Mesh visualization
+%   tool contour toggle, copied by zef_update_mesh_visualization_tool).
+%   Deletes existing Tag='contour' and Tag='contour_text' on gcf axes1,
+%   then calls zef_plot_contour(zef, zef.contour_set, FaceVertexCData,
+%   Faces, Vertices) for each reconstruction patch.
 %
-% Outputs:
-%   See function signature and code below.
+%   Also run from zef_update_colorscale_min / _max after CLim changes.
+%   Does not write zef fields.
 %
-% Zef fields (observed):
-%   zef.contour_set (read)
-%   zef.show_contour (read)
+%   zef_update_contour(zef)
 %
-% Calls (project):
-%   zef_plot_contour
-%   zef_update_contour
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_update_contour(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_plot_contour, zef_update_mesh_visualization_tool.
 if eval('zef.show_contour')
     h_fig = gcf;
     h_axes = findobj(h_fig.Children,'Tag','axes1');

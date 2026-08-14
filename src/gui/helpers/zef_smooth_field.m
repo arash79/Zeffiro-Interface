@@ -1,31 +1,20 @@
 %Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %See: https://github.com/sampsapursiainen/zeffiro_interface
 function [s_field_vec] = zef_smooth_field(triangulation, field_vec, n_nodes, n_iter)
-% --- Zeffiro documentation header ---
-% zef_smooth_field — Zef smooth field.
+%ZEF_SMOOTH_FIELD  n_iter Jacobi averages of a field on a triangulation.
 %
-% Purpose:
-%   Zef smooth field.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   triangulation
-%   field_vec
-%   n_nodes
-%   n_iter
+%   s = zef_smooth_field(triangulation, field_vec, n_nodes, n_iter)
 %
-% Outputs:
-%   s_field_vec
-%
-% Calls (project):
-%   zef_smooth_field
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[s_field_vec] = zef_smooth_field(triangulation, field_vec, n_nodes, n_iter)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   triangulation is F×k node indices (triangles k=3 or tets k=4).
+%   Empty or 0 n_nodes → max(triangulation). Each iteration: nodal
+%   mean of incident values (accumarray), then scatter the mean back
+%   to elements as the average of the k vertices. Does not call
+%   zef_simple_smoothing_matrix.
 if or(isempty(n_nodes),isequal(n_nodes,0))
     n_nodes = max(triangulation,[],'all');
 end

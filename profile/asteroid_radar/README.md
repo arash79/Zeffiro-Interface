@@ -1,43 +1,19 @@
-# profile/asteroid_radar
+# `asteroid_radar`
 
-## Purpose of this folder
+This folder is the asteroid **radar / wireframe** profile: a two-compartment body (bounding box + asteroid) with density `rho` On, electrical `sigma` Off, and gravity rows in the Mesh-tool forward table.
 
-Startup profiles and `zeffiro_plugins.ini` that attach plugin menus.
+In **this** tree the five INIs are the same physics as [`asteroid_gravity/`](../asteroid_gravity/README.md): gravity (scalar/vector) and gravity-gradient scripts, SESAME, and **Wireframe creator tool**. There is no separate radar lead-field script in `zeffiro_forward_simulation.ini`. The distinction is the **example project and surfaces**, not a different PDE in the INI.
 
-## Contents
+| Asset | Path |
+|-------|------|
+| Saved radar project | `data/example_projects/asteroid_radar_project.mat` |
+| Itokawa surfaces (exterior, mantle, void) | `data/itokawa_model/` |
+| Gravity sibling project | `data/example_projects/asteroid_gravity_project.mat` |
 
-Other files:
-- `zeffiro_forward_simulation.ini`
-- `zeffiro_init.ini`
-- `zeffiro_parameters.ini`
-- `zeffiro_plugins.ini`
-- `zeffiro_segmentation.ini`
+Open the radar project with **Project → Open project**, or import the Itokawa surfaces and run a gravity **Run script** row. Use **Multi-tools → Wireframe creator tool** (`zef_wireframe_creator_start`) when you need a radar-style wireframe of the body rather than a volume reconstruction.
 
-## How this folder fits into the overall workflow
+## Switching here
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Segmentation tool **Profile:** → `asteroid_radar`, then Apply plugin / parameter INIs and Mesh tool **Update from profile**, **or** set **Profile name** in **Settings → System settings (zeffiro_interface.ini)** and restart. Parent: [`profile/README.md`](../README.md).
 
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+The gravity profile’s SESAME INI row has extra spaces around commas (`SESAME, inverse_tools, SESAME_App_run`); this folder’s row does not. Both still call `SESAME_App_run`.

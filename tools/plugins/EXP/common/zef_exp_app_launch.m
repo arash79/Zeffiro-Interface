@@ -1,30 +1,19 @@
 function zef = zef_exp_app_launch(zef)
-% --- Zeffiro documentation header ---
-% zef_exp_app_launch — Zef exp app launch.
+%ZEF_EXP_APP_LAUNCH  Inverse tools → Standardized Hierarchical L1/L2 MAP (Lasso).
 %
-% Purpose:
-%   Zef exp app launch.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_exp_app_launch
+%   zef = zef_exp_app_launch(zef)
 %
-% Outputs:
-%   zef
+%   Default-profile INI callback. zef_tool_start(..., 'zef_exp_app_start',
+%   1/6, 1). StartButton runs exp_iteration(zef), not
+%   inverse.GroupLassoInverter. nargin 0 / nargout 0 use base zef.
 %
-% Calls (project):
-%   zef_exp_app_launch
-%   zef_tool_start
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_exp_app_launch(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_exp_app_start, exp_iteration.
 
 if nargin == 0
     zef = evalin('base','zef');

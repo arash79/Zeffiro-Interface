@@ -1,27 +1,20 @@
 function strip_struct = zef_create_strip(strip_struct)
-% --- Zeffiro documentation header ---
-% zef_create_strip — Zef create strip.
+%ZEF_CREATE_STRIP  Two cylinders (strip + encapsulation) aligned to orientation.
 %
-% Purpose:
-%   Zef create strip.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   strip_struct
+%   strip_struct = zef_create_strip(strip_struct)
 %
-% Outputs:
-%   strip_struct
+%   zef_get_strip_parameters then zef_simple_cylinder_generator twice
+%   (strip_radius vs radius+encapsulation_thickness). Shifts z so the
+%   strip sits on [0,length]. Fills rotation_axis/angle from
+%   orientation_axis vs [0;0;1]. Does not embed into zef compartments
+%   (zef_strip_tool_embed).
 %
-% Calls (project):
-%   zef_create_strip
-%   zef_get_strip_parameters
-%   zef_simple_cylinder_generator
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[strip_struct] = zef_create_strip(strip_struct)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_get_strip_parameters, zef_strip_tool_embed.
 
 strip_struct = zef_get_strip_parameters(strip_struct);
 [triangles{1}, points{1}] = zef_simple_cylinder_generator(strip_struct.strip_radius,strip_struct.strip_n_sectors,strip_struct.strip_length);

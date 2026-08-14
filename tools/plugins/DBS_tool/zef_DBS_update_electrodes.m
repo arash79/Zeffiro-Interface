@@ -1,25 +1,16 @@
 function zef = zef_DBS_update_electrodes(zef)
-% --- Zeffiro documentation header ---
-% zef_DBS_update_electrodes — Zef DBS update electrodes.
+%ZEF_DBS_UPDATE_ELECTRODES  Attach-electrodes button: copy contacts onto sensors.
 %
-% Purpose:
-%   Zef DBS update electrodes.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = zef_DBS_update_electrodes(zef)
 %
-% Outputs:
-%   zef
+%   Thin wrapper around zef_DBS_attach_electrodes.
 %
-% Calls (project):
-%   zef_DBS_attach_electrodes
-%   zef_DBS_update_electrodes
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_DBS_update_electrodes(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_DBS_attach_electrodes.
 
 zef=zef_DBS_attach_electrodes(zef);
 end

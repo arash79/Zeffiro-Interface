@@ -1,13 +1,15 @@
-% --- Zeffiro documentation header ---
-% zef_downsample_surfaces; zef_process_meshes; zef_source_interpolation; zef_update; — Zef downsample surfaces; zef process meshes; zef source interpolation; zef update;.
+%ZEF_SURFACE_DOWNSAMPLING  Mesh-tool "Resample surfaces": decimate surfaces, re-interpolate sources.
 %
-% Purpose:
-%   Zef downsample surfaces; zef process meshes; zef source interpolation; zef update;.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef_downsample_surfaces; zef_process_meshes; zef_source_interpolation; zef_update;` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   Script. Bound to h_surface_downsampling. Runs zef_downsample_surfaces,
+%   zef_process_meshes, zef_source_interpolation, zef_update. Distinct from
+%   the Create FEM mesh checkbox "Resample surf." which only downsamples
+%   before volume meshing.
+%
+%   See also zef_downsample_surfaces, zef_source_interpolation.
 
 zef_downsample_surfaces; zef_process_meshes; zef_source_interpolation; zef_update;

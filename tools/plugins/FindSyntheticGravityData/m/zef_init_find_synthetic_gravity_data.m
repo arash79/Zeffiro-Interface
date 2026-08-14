@@ -1,27 +1,14 @@
-% --- Zeffiro documentation header ---
-% set(zef.h_inv_roi_sphere_1 ,'string',num2str(zef — Set(zef.h inv roi sphere 1 ,'string',num2str(zef.
+%ZEF_INIT_FIND_SYNTHETIC_GRAVITY_DATA  inv_roi_sphere / perturbation / noise onto edits.
 %
-% Purpose:
-%   Set(zef.h inv roi sphere 1 ,'string',num2str(zef.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.h_inv_eit_noise (read)
-%   zef.h_inv_roi_perturbation (read)
-%   zef.h_inv_roi_sphere_2 (read)
-%   zef.h_inv_roi_sphere_3 (read)
-%   zef.h_inv_roi_sphere_4 (read)
-%   zef.inv_eit_noise (read)
-%   zef.inv_roi_perturbation (read)
-%   zef.inv_roi_sphere (read)
+%   Script. Called from the gravity window. Does not compute data
+%   (Create → zef_synthetic_gravity_data).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `set(zef.h_inv_roi_sphere_1 ,'string',num2str(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_update_find_synthetic_gravity_data.
 
 set(zef.h_inv_roi_sphere_1 ,'string',num2str(zef.inv_roi_sphere(:,1)'));
 set(zef.h_inv_roi_sphere_2 ,'string',num2str(zef.inv_roi_sphere(:,2)'));

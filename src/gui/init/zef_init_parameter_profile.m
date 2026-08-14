@@ -1,23 +1,17 @@
-% --- Zeffiro documentation header ---
-% for zef_i = 1 : size(zef — For zef i = 1 : size(zef.
+%ZEF_INIT_PARAMETER_PROFILE  Create missing zef.<tag>_<param> fields from the profile (script).
 %
-% Purpose:
-%   For zef i = 1 : size(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.parameter_profile (read)
-%   zef.sensor_tags (read)
+%   Script. For enabled Segmentation rows, if
+%   zef.<compartment_tags{j}>_<profile{i,2}> is missing, creates it from
+%   the profile default (column 4). For enabled Sensors rows, creates
+%   empty zef.<sensor_tags{j}>_<param> arrays. Does not open
+%   Settings → Parameter profile (that is zef_open_parameter_profile).
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `for zef_i = 1 : size(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_open_parameter_profile, zef_update_parameter_distributions.
 for zef_i = 1 : size(zef.parameter_profile,1)
 
     for zef_j = 1 : length(zef.compartment_tags)

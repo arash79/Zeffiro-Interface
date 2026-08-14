@@ -1,5 +1,19 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
+function Q_tract = zef_dti_tractography_covariance(zef, source_positions, varargin)
+%ZEF_DTI_TRACTOGRAPHY_COVARIANCE  Source covariance from deterministic v1 streamlines.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Q_tract = zef_dti_tractography_covariance(zef, source_positions)
+%   Q_tract = zef_dti_tractography_covariance(..., Name, Value, ...)
+%
+%   Called from zef_dti_structural_Q(..., 'tractography') on the legacy
+%   Kalman plugin path only (not inverse.KalmanInverter). Seeds at sources
+%   with FA above threshold; C(i,j) counts co-traversal.
+%
+
 %
 %ZEF_DTI_TRACTOGRAPHY_COVARIANCE
 %
@@ -51,42 +65,7 @@
 %
 %See also: zef_dti_fa_covariance, zef_dti_interpolate_to_sources,
 %          zef_dti_streamlines, zef_dti_get_mesh2voxel
-
-function Q_tract = zef_dti_tractography_covariance(zef, source_positions, varargin)
-% --- Zeffiro documentation header ---
-% zef_dti_tractography_covariance — Zef dti tractography covariance.
 %
-% Purpose:
-%   Zef dti tractography covariance.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Inputs:
-%   zef
-%   source_positions
-%   varargin
-%
-% Outputs:
-%   Q_tract
-%
-% Zef fields (observed):
-%   zef.freesurfer_fa_data (read)
-%   zef.freesurfer_v1_data (read)
-%
-% Calls (project):
-%   zef_dti_get_mesh2voxel
-%   zef_dti_tractography_covariance
-%   zef_waitbar
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[Q_tract] = zef_dti_tractography_covariance(zef, source_positions, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
 p = inputParser;
 addRequired(p, 'zef');
 addRequired(p, 'source_positions', @(x) isnumeric(x) && size(x,2)==3);

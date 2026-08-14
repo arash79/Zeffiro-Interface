@@ -1,57 +1,28 @@
-# +inverse/@DipoleScanInverter
+# inverse.DipoleScanInverter
 
-## Purpose of this folder
+Goodness-of-fit map: for each source, fit a dipole to whitened `f` and store `GoF = 1 - ‖f - L s‖²/‖f‖²` (free sources also encode direction / √3). Registry ids: `dipolescan`, `dipole_scan`. GUI: `legacy_dipolescan` → `zef_dipoleScan`.
 
-Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+## Files
 
-## Contents
+| File | Role |
+|------|------|
+| `DipoleScanInverter.m` | `method_type`, `reg_type`, `reg_parameter`, `noise_cov`, SVD caches |
+| `initialize.m` | `noise_cov = 10^(-SNR/10) * mean(f²) * I` if empty |
+| `precompute.m` | `Chalf = sqrtm(C)`, cache whitening and per-source thin SVDs |
+| `invert.m` | Batched `pagemtimes` path if caches exist; else per-source SVD/pinv loop |
 
-MATLAB sources:
-- `DipoleScanInverter.m` — **inverse.DipoleScanInverter.DipoleScanInverter**: Inverse solver class implementing DipoleScan reconstruction.
-- `initialize.m` — **inverse.DipoleScanInverter.initialize**: Estimates priors, noise covariance, or regularization from multi-frame data.
-- `invert.m` — **inverse.DipoleScanInverter.invert**: Runs one inverse reconstruction step for a single measurement frame.
-- `precompute.m` — **inverse.DipoleScanInverter.precompute**: Precomputes cached operators before the per-frame inversion loop.
+## Parameters
 
-## How this folder fits into the overall workflow
+- `method_type`: `"SVD"` (default) \| `"Pseudoinverse"`
+- `reg_type`: `"None"` \| `"Basic"` (adds `reg_parameter` to singular values)
+- `reg_parameter` (0.001)
+- `noise_cov` optional
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+Lead field columns must be a multiple of 3 (`precompute` errors otherwise).
 
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+## Call
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+[zef, r] = zef_inverse_run(zef, "dipolescan", "execution", "local", ...
+    "MethodParams", struct("method_type", "SVD", "reg_type", "None"));
 ```
-
-Representative entry points in this folder:
-- ``inverse.DipoleScanInverter.DipoleScanInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.`
-- ``[self] = inverse.DipoleScanInverter.initialize(self, L, f_data)` with project root and `src` on the path.`
-- ``[[z_vec, self]] = inverse.DipoleScanInverter.invert(self, f, L, procFile, …)` with project root and `src` on the path.`
-- ``[self] = inverse.DipoleScanInverter.precompute(self, L)` with project root and `src` on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-Programmatic: `zef_inverse_run(zef, 'eloreta')` or `inverse.ELORETAInverter().computeInversionWithZI(zef)`.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.

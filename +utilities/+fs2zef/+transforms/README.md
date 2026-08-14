@@ -1,52 +1,14 @@
-# +utilities/+fs2zef/+transforms
+# `+transforms` — CRAS translation only
 
-## Purpose of this folder
-
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
-
-## Contents
-
-MATLAB sources:
-- `apply_affine_transform.m` — **utilities.fs2zef.transforms.apply_affine_transform**: Apply affine transform.
-- `compute_affine_transform.m` — **utilities.fs2zef.transforms.compute_affine_transform**: Compute affine transform.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
+Specialized FreeSurfer volumes (thalamic nuclei, hippocampal subfields) often do not share the `orig.mgz` centre. Surfaces from `mri_mc` are still in tkr RAS millimetres; Zeffiro then applies a 4×4 `affine_transform` from the `.zef` row at `zef_process_meshes`.
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
+A = utilities.fs2zef.transforms.compute_affine_transform( ...
+    fullfile(mri_dir, "ThalamicNuclei.v13.T1.FSvoxelSpace.mgz"), ...
+    fullfile(mri_dir, "orig.mgz"));
+% A is translation-only: dx = c_r(source) - c_r(target), same for S/A.
 ```
 
-Representative entry points in this folder:
-- ``utilities.fs2zef.transforms.apply_affine_transform(mesh_file, affine_matrix, options)` with project root and `src` on the path.`
-- ``[affine_matrix] = utilities.fs2zef.transforms.compute_affine_transform(source_mgz, target_mgz, options)` with project root and `src` on the path.`
+`compute_affine_transform(source_mgz, target_mgz)` returns that matrix from `mri_info` volume centres (`c_r`, `c_s`, `c_a` via `get_volume_centers`). There is no rotation.
 
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+`apply_affine_transform(mesh_file, affine_matrix)` rewrites vertices in that file. `run` does not call apply; it embeds the matrix in the `.zef` so Zeffiro applies it at mesh time. Parent: [`../README.md`](../README.md).

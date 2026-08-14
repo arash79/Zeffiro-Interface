@@ -1,36 +1,25 @@
 function zef = zef_build_compartment_table(zef)
-% --- Zeffiro documentation header ---
-% zef_build_compartment_table — Zef build compartment table.
+%ZEF_BUILD_COMPARTMENT_TABLE  Refresh segmentation-tool compartment table data.
 %
-% Purpose:
-%   Zef build compartment table.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Walks zef.compartment_tags in reverse order, collects Segmentation
+%   profile parameters marked On, and writes rows into
+%   zef.h_compartment_table when that handle is valid. Returns immediately
+%   if the table handle is missing or invalid.
 %
-% Outputs:
-%   zef
+%   zef = zef_build_compartment_table(zef)
 %
-% Zef fields (observed):
-%   zef.aux_field_1 (read, write)
-%   zef.compartment_table_size (read)
-%   zef.compartment_tags (read, write)
-%   zef.h_compartment_table (read)
-%   zef.parameter_profile (read)
+%   Input
+%     zef - session struct with compartment_tags and parameter_profile.
 %
-% Calls (project):
-%   zef_build_compartment_table
+%   Output
+%     zef - session after table Data update (aux_field_1 removed).
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_build_compartment_table(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_init_fields_compartment_table, zef_import_segmentation.
 
 if nargin == 0
     zef = evalin('base','zef');

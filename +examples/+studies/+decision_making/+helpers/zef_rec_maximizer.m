@@ -1,25 +1,18 @@
 function max_point = zef_rec_maximizer(rec_arr, s_pos)
-% --- Zeffiro documentation header ---
-% examples.studies.decision_making.helpers.zef_rec_maximizer — Example or study script demonstrating zef_rec_maximizer.
+%ZEF_REC_MAXIMIZER  Source position of the largest 3-component |moment|.
 %
-% Purpose:
-%   Example or study script demonstrating zef_rec_maximizer.
-%   Folder: Runnable examples and study scripts that exercise meshing, forward lead fields, inverse solvers, importing, and published workflows.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   rec_arr
-%   s_pos
+%   max_point = zef_rec_maximizer(rec_arr, s_pos)
 %
-% Outputs:
-%   max_point
+%   Reshapes rec_arr to 3-by-N (column-major xyz per source), takes
+%   max of sqrt(sum(q.^2)) over sources, returns s_pos(max_ind,:).
+%   s_pos is N-by-3 (zef.source_positions).
 %
-% Calls (project):
-%   zef_rec_maximizer
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[max_point] = examples.studies.decision_making.helpers.zef_rec_maximizer(rec_arr, s_pos)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_cluster_reconstructions_focal_epilepsy.
 
     [~, max_ind] = max(sqrt(sum(reshape(rec_arr, 3, length(rec_arr(:))/3).^2)), [], 2);
     max_point = s_pos(max_ind, :);

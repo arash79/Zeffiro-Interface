@@ -1,29 +1,20 @@
 function zef = hb_sampler(zef)
-% --- Zeffiro documentation header ---
-% hb_sampler — Hb sampler.
+%HB_SAMPLER  Inverse tools → Hierarchical Bayesian Sampler.
 %
-% Purpose:
-%   Hb sampler.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   zef = hb_sampler(zef)
 %
-% Outputs:
-%   zef
+%   INI callback in every default/asteroid profile. Opens zef_mcmc_window
+%   via zef_tool_start(..., 'zef_open_mcmc', 1/4, 0) — not
+%   fig/hb_sampler.fig. Start runs zef_mcmc(zef) into reconstruction
+%   and reconstruction_information. Needs zef.L and zef.measurements.
+%   No inverse.*Inverter. nargin 0 / nargout 0 use base zef.
 %
-% Calls (project):
-%   zef_tool_start
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = hb_sampler(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_open_mcmc, zef_mcmc.
 
 if nargin == 0
     zef = evalin('base','zef');

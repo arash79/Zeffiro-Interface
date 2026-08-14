@@ -1,40 +1,51 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function [mesh_data_1,mesh_data_2,submesh_data] = zef_get_mesh(zef,file_str,field_id,file_type,varargin)
-% --- Zeffiro documentation header ---
-% zef_get_mesh — Zef get mesh.
+%ZEF_GET_MESH  Load a surface file into points / triangles / submesh_ind.
 %
-% Purpose:
-%   Zef get mesh.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   file_str
-%   field_id
-%   file_type
-%   varargin
+%   Reads file_str (already chosen by the caller; this function does not
+%   call uigetfile). file_type:
+%     'points'     load() numeric array → mesh_data_1
+%     'triangles'  load() connectivity; without output_mode 'full' the
+%                  triangles go in mesh_data_1, with 'full' in mesh_data_2
+%     'stl'        stlread then drop unused vertices (local compact)
+%     'asc'        FreeSurfer surface ASCII (n_points n_triangles on the
+%                  second line); label .asc files error with a pointer
+%                  to atlas_points_filename
 %
-% Outputs:
-%   mesh_data_1
-%   mesh_data_2
-%   submesh_data
+%   Merge/invert come from zef.<field_id>_merge and _invert. Merge
+%   concatenates onto the existing <field_id>_points/_triangles and
+%   appends the new triangle count to submesh_ind. Invert swaps
+%   triangle columns 1–2. Always clears
+%   <field_id>_*_original_surface_mesh on zef.
 %
-% Calls (project):
-%   zef_compact_mesh
-%   zef_get_mesh
-%   zef_import_asc
+%   Callers: zef_get_surface_mesh (compartment + surface_mesh_type,
+%   'full'); zef_get_sensor_points ('points'); zef_get_sensor_directions
+%   ('triangles', stored as *_directions); zef_import_segmentation;
+%   zef_plot_volume.m.m (sensor points).
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
+%   [mesh_data_1, mesh_data_2, submesh_data] = zef_get_mesh(zef, file_str, field_id, file_type)
+%   [mesh_data_1, mesh_data_2, submesh_data] = zef_get_mesh(..., output_mode)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[mesh_data_1, mesh_data_2, submesh_data]] = zef_get_mesh(zef, file_str, field_id, file_type, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   Inputs
+%     zef         - session; <field_id>_points/_triangles/_submesh_ind,
+%                   _merge, _invert.
+%     file_str    - full path passed through fullfile.
+%     field_id    - compartment or sensor tag string.
+%     file_type   - 'points' | 'triangles' | 'stl' | 'asc'.
+%     output_mode - optional; 'full' also preloads existing points,
+%                   triangles, and submesh_ind into the outputs.
+%
+%   Outputs
+%     mesh_data_1  - points, or triangles when file_type is 'triangles'
+%                    and output_mode is not 'full'.
+%     mesh_data_2  - triangles for 'stl'/'asc'/'full' triangles.
+%     submesh_data - cumulative triangle counts per merged patch.
+%
+%   See also zef_get_surface_mesh, zef_import_segmentation.
 output_mode = 1;
 if not(isempty(varargin))
     output_mode = varargin{1};

@@ -1,34 +1,26 @@
 function zef = zef_dataBank_importNodeButtonPress(zef)
-% --- Zeffiro documentation header ---
-% zef_dataBank_importNodeButtonPress — Zef data Bank import Node Button Press.
+%ZEF_DATABANK_IMPORTNODEBUTTONPRESS  Import a node file or a whole-bank .mat.
 %
-% Purpose:
-%   Zef data Bank import Node Button Press.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   importButton.ButtonPushedFcn in zef_open_dataBank. typeDropDown.Value
+%   'Node' → uigetfile MultiSelect on, then importNode. Otherwise a single
+%   dataBank file via importDataBank. Parent is the selected uitree node
+%   (or 'node' if none). Refuses multiple selected parents. Then
+%   zef_dataBank_refreshTree (no output, so base workspace).
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_importNodeButtonPress(zef)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef  - session with dataBank.app and tree. nargin==0 → base.
 %
-% Calls (project):
-%   zef_dataBank_importDataBank
-%   zef_dataBank_importNode
-%   zef_dataBank_importNodeButtonPress
+%   Output
+%     zef  - tree updated in the returned struct; refreshTree also assignin's.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_dataBank_importNodeButtonPress(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_importNode, zef_dataBank_importDataBank.
 
 if nargin == 0
     zef = evalin('base','zef')

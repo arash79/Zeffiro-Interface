@@ -1,64 +1,26 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_DTI_CONDUCTIVITY_LOAD_FREESURFER
-%
-%Loads FreeSurfer FA (and optional v1), register.dat, and reference MRI
-%geometry into zef.
-%Sets freesurfer_fa_data, freesurfer_fa_info, freesurfer_register_transform,
-%and optionally freesurfer_v1_data. freesurfer_fa_info.Transform.T is set
-%so that zef_freesurfer_transform_coordinates can use it (voxel → tkRAS).
-%Also extracts reference MRI geometry (vox2ras, vox2ras-tkr, center) if
-%a reference file path is specified.
-
 function zef = zef_dti_conductivity_load_freesurfer(zef)
-% --- Zeffiro documentation header ---
-% zef_dti_conductivity_load_freesurfer — Zef dti conductivity load freesurfer.
+%ZEF_DTI_CONDUCTIVITY_LOAD_FREESURFER  Load FA, v1, register.dat, reference MRI.
 %
-% Purpose:
-%   Zef dti conductivity load freesurfer.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   Load button on the DTI Conductivity Tool. Requires zef.freesurfer_fa_file
+%   (or the path edit). Does not write zef.sigma.
 %
-% Outputs:
-%   zef
+%   Side effects on zef
+%     freesurfer_fa_data / _info / _loaded — niftiread + niftiinfo; Transform.T
+%       is forced to a 4×4 so zef_freesurfer_transform_coordinates can voxel→tkRAS
+%     optional freesurfer_v1_data(:,:,:,1:3) if the NIfTI is 4-D with ≥3 vols
+%     freesurfer_register_transform from zef_freesurfer_read_register_dat
+%     dti_ref_vox2ras / _tkr / _center / dti_ref_geometry if the reference MRI exists
+%     dti_fa_geometry from zef_freesurfer_read_volume_geometry
+%     status/info labels on the tool
 %
-% Zef fields (observed):
-%   zef.dti_fa_geometry (read, write)
-%   zef.dti_ref_center (read, write)
-%   zef.dti_ref_geometry (read, write)
-%   zef.dti_ref_mri_file (read)
-%   zef.dti_ref_vox2ras (read, write)
-%   zef.dti_ref_vox2ras_tkr (read, write)
-%   zef.freesurfer_fa_data (read, write)
-%   zef.freesurfer_fa_file (read, write)
-%   zef.freesurfer_fa_info (read, write)
-%   zef.freesurfer_fa_loaded (read, write)
-%   zef.freesurfer_register_file (read)
-%   zef.freesurfer_register_transform (read, write)
-%   zef.freesurfer_v1_data (read, write)
-%   zef.freesurfer_v1_file (read)
-%   zef.freesurfer_v1_info (read, write)
-%   … (7 more)
+%   Missing FA path or file → warning and return. nargout==0 → assignin base.
 %
-% Calls (project):
-%   zef_dti_conductivity_load_freesurfer
-%   zef_dti_conductivity_update
-%   zef_freesurfer_read_register_dat
-%   zef_freesurfer_read_volume_geometry
-%   zef_freesurfer_transform_coordinates
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dti_conductivity_load_freesurfer(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dti_apply_to_sigma, zef_dti_conductivity_browse_fa.
 
 if nargin == 0
     zef = evalin('base','zef');

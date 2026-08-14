@@ -1,33 +1,20 @@
 function [P_store,z_inverse] = kalman_filter_sLORETA_EVO_DIAG_WEIGHT(m,P,A,Q,L,R, timeSteps ,number_of_frames, smoothing)
-% --- Zeffiro documentation header ---
-% kalman_filter_sLORETA_EVO_DIAG_WEIGHT — Kalman filter s LORETA EVO DIAG WEIGHT.
+%KALMAN_FILTER_SLORETA_EVO_DIAG_WEIGHT  sLORETA Kalman that rescales diag(Q) from the current |source| map.
 %
-% Purpose:
-%   Kalman filter s LORETA EVO DIAG WEIGHT.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   m
-%   P
-%   A
-%   Q
-%   L
-%   R
-%   timeSteps
-%   number_of_frames
-%   smoothing
+%   [P_store, z_inverse] = kalman_filter_sLORETA_EVO_DIAG_WEIGHT(m, P, A, Q, L, R, timeSteps, number_of_frames, smoothing)
 %
-% Outputs:
-%   P_store
-%   z_inverse
+%   Not wired to the Kalman StartButton (zef_KF uses kalman_filter_sLORETA
+%   for type 3). After each update, Q diagonal is weighted by a normalized
+%   amplitude map (c_val = 0.05). Optional helper. kf_sL_update is called
+%   without standardization_exponent (MATLAB default).
 %
-% Calls (project):
-%   zef_waitbar
+%   See also kalman_filter_sLORETA, kf_sL_update.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[P_store, z_inverse]] = kalman_filter_sLORETA_EVO_DIAG_WEIGHT(m, P, A, Q, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 P_store = cell(0);
 z_inverse = cell(0);

@@ -1,22 +1,18 @@
-% --- Zeffiro documentation header ---
-% zef.reconstructionTool.bankSize=zef.reconstructionTool — Zef.reconstruction Tool.bank Size=zef.reconstruction Tool.
+%ZEF_RECONSTRUCTIONTOOL_ADDCURRENT2BANK  Snapshot live reconstruction into the bank.
 %
-% Purpose:
-%   Zef.reconstruction Tool.bank Size=zef.reconstruction Tool.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.reconstruction (read)
-%   zef.reconstructionTool (read)
-%   zef.reconstruction_information (read)
+%   Script. AddButton. Increments bankSize, copies currentInfo into
+%   bankInfo columns 1:6, stores reconstruction (wrapping a non-cell as
+%   {rec}) plus reconstruction_information, and sets checkbox column 7
+%   false. Fills .tag / .lead_field_id on reconstruction_information when
+%   missing, from currentInfo{1} and {6}. Writes BankTable.Data. Does not
+%   change live zef.reconstruction.
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `zef.reconstructionTool.bankSize=zef.reconstructionTool` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_reconstructionTool_replace, zef_reconstructionTool_refresh.
 
 zef.reconstructionTool.bankSize=zef.reconstructionTool.bankSize+1;
 

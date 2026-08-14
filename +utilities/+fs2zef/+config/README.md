@@ -1,54 +1,11 @@
-# +utilities/+fs2zef/+config
+# `+config` — fs2zef lookup tables
 
-## Purpose of this folder
+These tables turn FreeSurfer label **names** into Zeffiro compartment defaults when `generate_zef_import` writes `import_segmentation.zef`. They are not read by `zef_import_segmentation` at GUI import time; they only affect converter output.
 
-Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+| Function | Used by | What it stores |
+|----------|---------|----------------|
+| `compartment_mappings` | `generate_zef_import` | Keyword → default `sigma` (S/m), `activity` (source flag), `inflate`. Examples in the file: grey 0.33 / 1, white 0.14 / 3, CSF 1.79 / 0, skull 0.0064 / 0 |
+| `default_config` | `test_unified_pipeline` only | Parcellation scheme names, `recon_all` flags, retries. **`run` does not read this** |
+| `parcellation_schemes` | `test_unified_pipeline` | Desikan-Killiany (`aparc`, id `'36'`) and Destrieux (`aparc.a2009s`, id `'76'`) metadata |
 
-## Contents
-
-MATLAB sources:
-- `compartment_mappings.m` — **utilities.fs2zef.config.compartment_mappings**: Compartment mappings.
-- `default_config.m` — **utilities.fs2zef.config.default_config**: Default config.
-- `parcellation_schemes.m` — **utilities.fs2zef.config.parcellation_schemes**: Parcellation schemes.
-
-## How this folder fits into the overall workflow
-
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
-
-## GUI usage
-
-No dedicated menu item in this folder; functionality is reached through parent tools, menus, or `zef_*` orchestration.
-
-## Programmatic usage
-
-From the project root:
-
-```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-zef = zeffiro_interface('start_mode', 'nodisplay');  % or use an existing zef
-```
-
-Representative entry points in this folder:
-- `Call `utilities.fs2zef.config.compartment_mappings` from MATLAB with the project root on the path.`
-- `Call `utilities.fs2zef.config.default_config` from MATLAB with the project root on the path.`
-- `Call `utilities.fs2zef.config.parcellation_schemes` from MATLAB with the project root on the path.`
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Package namespaces `core.*`, `inverse.*`, `utilities.*` via project-root `addpath`.
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+Edit `compartment_mappings` when a new tissue name should get a non-default conductivity. Adding a field to `default_config` will not change `utilities.fs2zef.run` until someone wires it. Parent pipeline: [`../README.md`](../README.md).

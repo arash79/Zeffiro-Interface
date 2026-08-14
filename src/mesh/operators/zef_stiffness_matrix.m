@@ -1,32 +1,46 @@
 function A = zef_stiffness_matrix(nodes, tetrahedra, volume, tensor)
-% --- Zeffiro documentation header ---
-% zef_stiffness_matrix — Zef stiffness matrix.
+%ZEF_STIFFNESS_MATRIX  Sparse N×N P1 stiffness A_ij = ∫ ∇ψ_i · (σ ∇ψ_j) dV.
 %
-% Purpose:
-%   Zef stiffness matrix.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   nodes
-%   tetrahedra
-%   volume
-%   tensor
+%   EEG/MEG/EIT/TES lead fields call this after zef_tetra_volume(..., true).
+%   zef_volume_gradient returns the signed *area vector* of the face
+%   opposite local vertex i (½ e1×e2, oriented toward that vertex), not
+%   ∇ψ_i. For linear hats, ∇ψ_i = area_i / (3V), so
 %
-% Outputs:
-%   A
+%       ∫ ∇ψ_i · (σ ∇ψ_j) dV = (area_i · σ area_j) / (9V)
 %
-% Calls (project):
-%   zef_stiffness_matrix
-%   zef_volume_gradient
-%   zef_waitbar
+%   because the two missing 3V factors give 9V² and the remaining V is the
+%   integration measure. That is why every entry is divided by (9*volume).
+%   Contrast zef_tetra_gradient_field, which *does* divide by volume and is
+%   used by TES for σ∇u, not by this matrix.
 %
-% Side effects:
-%   - waitbar progress UI
+%   A = zef_stiffness_matrix(nodes, tetrahedra, volume, tensor)
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[A] = zef_stiffness_matrix(nodes, tetrahedra, volume, tensor)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Inputs
+%     nodes       - N×3 (metres on the lead-field path).
+%     tetrahedra  - T×4 1-based indices.
+%     volume      - 1×T (or T×1) tet volumes from zef_tetra_volume. Must
+%                   match the length unit of nodes.
+%     tensor      - 6×T packed symmetric conductivity per tet:
+%                   row 1 σ_xx, 2 σ_yy, 3 σ_zz, 4 σ_xy, 5 σ_xz, 6 σ_yz.
+%                   Isotropic tissue repeats the scalar on rows 1–3 and
+%                   leaves 4–6 zero. Off-diagonal rows add both
+%                   g_i(a)g_j(b) and g_i(b)g_j(a) (the missing transpose
+%                   of σ).
+%
+%   Output
+%     A  - N×N sparse, symmetric. Assembly: for local vertices i ≤ j,
+%          sparse(tetrahedra(:,i), tetrahedra(:,j), entry_vec', N, N);
+%          off-diagonals add A_part + A_part'.
+%
+%   Side effects: waitbar, closed by onCleanup.
+%
+%   See also zef_volume_gradient, zef_tetra_volume, zef_build_electrodes,
+%            zef_lead_field_eeg_fem.
 
 wb = zef_waitbar(0,1,'Stiffness matrix.');
 
@@ -89,6 +103,7 @@ for i = 1 : n_of_tetra_faces
             % Calculate the integrand times a volume element ∇ψⱼ⋅(σ∇ψᵢ) d𝑉
 
             if k <= 3
+                % Diagonal σ_aa: area_i(a) * σ_aa * area_j(a) / (9V).
                 entry_vec =         ...
                     entry_vec       ...
                     +               ...
@@ -100,6 +115,7 @@ for i = 1 : n_of_tetra_faces
                     ./              ...
                     (9 * volume);
             else
+                % Off-diagonal σ_ab: both area_i(a)area_j(b) and area_i(b)area_j(a).
                 entry_vec =             ...
                     entry_vec           ...
                     +                   ...

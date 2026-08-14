@@ -1,26 +1,22 @@
 function atlas_surfaces = extract_SimNIBS_surfaces( ...
-% --- Zeffiro documentation header ---
-% utilities.sn2zef.atlas_surfaces — Atlas surfaces.
-%
-% Purpose:
-%   Atlas surfaces.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
-%
-% Calls (project):
-%   utilities.sn2zef.extract_SimNIBS_surfaces
-%   zef_inflate_surface
-%   zef_waitbar
-%
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `utilities.sn2zef.atlas_surfaces` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
     zef, atlas_struct, n_inflation_steps, transform_cell, compartment_type)
+%EXTRACT_SIMNIBS_SURFACES  Closed surfaces from a labelled volume (atlas_struct.Cube).
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   atlas_struct.Cube (labelled volume) and .Labels required. Optional
+%   n_inflation_steps, transform_cell (default {}), compartment_type ('').
+%   Each label becomes a closed triangulated surface (marching / inflation
+%   path in the body). Used by volume pipelines inside sn2zef; the public
+%   public run uses export_segmentation_meshes → zef_bst_get_atlas_surfaces
+%   instead. Keep this function for callers that already have an atlas_struct.
+%
+%   atlas_surfaces = extract_SimNIBS_surfaces(zef, atlas_struct, ...
+%       n_inflation_steps, transform_cell, compartment_type)
+%
 
     if nargin < 4
         transform_cell = {};

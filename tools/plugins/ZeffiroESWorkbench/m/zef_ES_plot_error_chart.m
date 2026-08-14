@@ -1,36 +1,22 @@
 function zef_ES_plot_error_chart(varargin)
-% --- Zeffiro documentation header ---
-% zef_ES_plot_error_chart — Zef ES plot error chart.
+%ZEF_ES_PLOT_ERROR_CHART  Heat maps of zef_ES_table columns on the α/ε grid.
 %
-% Purpose:
-%   Zef ES plot error chart.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   Plot-data menu item 3 and plot_type 3. Does not call
+%   zef_ES_error_criteria. Three uitabs (current pattern, volume current,
+%   algorithm) with imagesc of table columns; yellow marker at (sc,sr)
+%   from zef_ES_objective_function. Nested printing_imagesc draws one panel.
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_ES_plot_error_chart()
+%   zef_ES_plot_error_chart(zef)
+%   zef_ES_plot_error_chart(zef, table_or_interval)
 %
-% Zef fields (observed):
-%   zef.h_ES_error_chart (read, write)
-%   zef.use_display (read)
-%   zef.y_ES_interval (read)
+%   See also zef_ES_table, zef_ES_objective_function.
 %
-% Calls (project):
-%   zef_ES_objective_function
-%   zef_ES_plot_error_chart
-%   zef_ES_table
-%
-% Side effects:
-%   - base/caller workspace
-%   - creates/updates figures
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_ES_plot_error_chart(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 switch nargin
     case {0, 1}
@@ -82,7 +68,6 @@ catch
     movegui(h_fig,'center')
 end
 pbaspect([1 1 1])
-%% Tab properties & plotting
 h = uitabgroup();
 tab_titles = [{'Current pattern'}; {'Volume current'}; {'Algorithm'}];
 fieldnames_table    = {};
@@ -102,7 +87,7 @@ for i_idx = 1:3
 end
 %% Wrapping up, functions and return of variables
     function printing_imagesc(vec, fieldnames_table, sr, sc)
-        % This function prepares the image with scaled color
+        %PRINTING_IMAGESC  One imagesc panel; yellow star at (sc,sr).
 
         imagesc(vec.(fieldnames_table){:});
         %h_f.ButtonDownFcn = @(s,e) assignin('base', 'xy_click', [round(e.IntersectionPoint(1)), round(e.IntersectionPoint(2))]);

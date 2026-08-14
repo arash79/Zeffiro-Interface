@@ -1,29 +1,33 @@
 function self = initialize(self,L,f_data)
-% --- Zeffiro documentation header ---
-% inverse.BeamformerInverter.initialize — Estimates priors, noise covariance, or regularization from multi-frame data.
+%initialize  Estimate Beamformer error_cov from the measurement frames.
 %
-% Purpose:
-%   Estimates priors, noise covariance, or regularization from multi-frame data.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   L
-%   f_data
+%   Called once from utilities.inverse.run_frame_loop before the per-frame
+%   invert loop (not from invert itself). Inverse tools → Beamformer uses
+%   zef_beamformer and never reaches this method.
 %
-% Outputs:
-%   self
+%   If error_cov is already set, this is a no-op besides
+%   computing_parameters = true. Otherwise:
+%     several frames — demeaned sample covariance / n_frames
+%                      (f-mean(f,2))*(f-mean(f,2))'/T
+%     one frame      — outer product of the demeaned vector (mean along
+%                      dim 1). invert then Tikhonov-regularizes this C
+%                      and uses L_modified = C \ L.
+%   L is unused (kept for the common initialize(L, f_data) signature).
 %
-% Calls (project):
-%   inverse.initialize
+%   Inputs
+%     L      - processed lead field (ignored).
+%     f_data - n_sensors × n_frames measurements after filtering
+%              (all framed columns, or zef.inverse_initialization_measurements).
 %
-% Side effects:
-%   - GPU
+%   Output
+%     self.error_cov  n_sensors × n_sensors, unless it was already set.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[self] = inverse.BeamformerInverter.initialize(self, L, f_data)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also inverse.BeamformerInverter/invert, utilities.inverse.run_frame_loop.
 
     arguments
 

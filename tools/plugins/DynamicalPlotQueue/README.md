@@ -1,41 +1,30 @@
-# tools/plugins/DynamicalPlotQueue
+# Dynamical plot queue
 
-## Purpose of this folder
+A table of extra plot commands that run **during** mesh visualization. Each row is `{script_or_function, enabled, 'static'|'dynamical', description}`. `zef_plot_dpq(type)` walks enabled rows of that type and `evalin('caller', row{1})` so overlays (synthetic arrows, GMM, strips, resection, …) appear on the current axes.
 
-Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+The visualization pipeline is expected to call `zef_plot_dpq('static')` / `zef_plot_dpq('dynamical')`. This window only **edits** `zef.dynamical_plot_queue_table`.
 
-## Contents
+## How to open it
 
-Subfolders:
-- `m/`
-- `mlapp/`
+**Multi tools → Dynamical plot queue** (default profile). Callback: `zeffiro_interface_dynamical_plot_queue` (file; function inside is `zef_dpq_start`) → `zef_dpq_window`. Title: **ZEFFIRO Interface: Dynamical plot queue**.
 
-## How this folder fits into the overall workflow
+## Controls (`zef_dpq_window.m`)
 
-Startup begins at `zeffiro_interface.m`, which adds `src/` and the project root, builds `zef`, and opens tools that call into this folder. Forward pipelines write `zef.L` (lead field); inverse orchestration in `src/inverse` and `+inverse` consume it; GUI code paths refresh via `zef_update`.
+There are no `ButtonPushedFcn` pushbuttons; the UI is menus + list:
 
-## GUI usage
+| Control | Action |
+|---------|--------|
+| Menu **Add** | `zef_dpq_add` — append a blank/custom row |
+| Menu **List** | append the selected bank function (`m/dynamical_plot_queue_bank/*.m`) as a **static** enabled row; description from `help()` |
+| Menu **Delete** | `zef_dpq_delete` |
+| Table edit | writes `zef.dynamical_plot_queue_table` |
+| Bank list | `help()` text into the description box |
 
-Open the corresponding tool or plugin from the Zeffiro menu bar (profile-dependent). Widget callbacks in this folder update `zef` and call `zef_update`.
+Bank examples: `zef_plot_synthetic_source`, `zef_plot_3D_arrow_reconstructed_source`, `zef_dpq_plot_GMM`, `zef_plot_strip(s)`, `zef_dpq_plot_resection`, `zef_dpq_wireframe_plot`, `zef_plot_SESAME_dipoles`. **List** appends a bank file as a **static** enabled row (description from `help()`). Visualization (`zef_plot_volume` / `zef_plot_meshes` / `zef_print_meshes`) then calls `zef_plot_dpq('static')` or `'dynamical'` so those overlays appear on `h_axes1` / the print figure. A **dynamical** row re-runs every movie frame; **static** runs once per draw.
 
-## Programmatic usage
+## Scripting
 
-Add the project root to the MATLAB path (`zeffiro_interface` or `addpath(genpath(projectRoot))`), then call functions in child folders using package or `zef_*` names as listed under Contents.
-
-## Examples
-
-GUI: `zef = zeffiro_interface;` then use menus in the segmentation/mesh tools.
-
-## Dependencies and assumptions
-
-- MATLAB (release compatible with `arguments` blocks where used).
-- Project root on path; `src` on path for `zef_*` helpers.
-- Populated `zef` struct (from `zeffiro_interface` or `zef_load`).
-- Optional: Parallel Computing Toolbox, GPU arrays, Statistics/Optimization for some plugins.
-
-## Notes for developers
-
-- Document behavior from code, not legacy filenames; keep `zef` field names stable unless migrating all callers.
-- Package directories (`+core`, `+inverse`, …) must be addressed with qualified names—do not `addpath` the package folder itself.
-- GUI callbacks should continue to return or assign `zef` and call `zef_update` when UI tables change.
-- Inverse changes: prefer updating `+inverse` classes and `utilities.inverse.run_frame_loop` over duplicating frame loops in plugins.
+```matlab
+zef = zeffiro_interface_dynamical_plot_queue(zef);
+zef_plot_dpq('static', zef);
+```

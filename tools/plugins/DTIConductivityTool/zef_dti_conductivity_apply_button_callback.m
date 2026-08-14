@@ -1,43 +1,16 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_DTI_CONDUCTIVITY_APPLY_BUTTON_CALLBACK
-%
-%Callback for the "Apply to Mesh" button. Ensures the waitbar is active
-%so the user sees live progress, then runs the pipeline and updates the
-%GUI on success or shows a clear error on failure.
-
 function zef_dti_conductivity_apply_button_callback()
-% --- Zeffiro documentation header ---
-% zef_dti_conductivity_apply_button_callback — GUI callback for dti_conductivity_apply_button actions.
+%ZEF_DTI_CONDUCTIVITY_APPLY_BUTTON_CALLBACK  Apply to Mesh → zef_dti_apply_to_sigma.
 %
-% Purpose:
-%   GUI callback for dti_conductivity_apply_button actions.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Outputs:
-%   See function signature and code below.
+%   GUI callback. Turns waitbar on, runs zef_dti_apply_to_sigma (src/forward/dti),
+%   assigns zef back to base, updates the window. Does not rebuild zef.L.
 %
-% Zef fields (observed):
-%   zef.dti_conductivity_metadata (read)
-%   zef.h_dti_status_text (read)
-%   zef.use_waitbar (read, write)
+%   See also zef_dti_apply_to_sigma, zef_dti_conductivity_open.
 %
-% Calls (project):
-%   zef_dti_apply_to_sigma
-%   zef_dti_conductivity_apply_button_callback
-%   zef_dti_conductivity_update
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `zef_dti_conductivity_apply_button_callback` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-
 zef = evalin('base', 'zef');
 
 % Ensure use_waitbar is on so the pipeline shows progress from the GUI.

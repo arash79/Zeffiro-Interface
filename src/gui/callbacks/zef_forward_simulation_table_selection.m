@@ -1,37 +1,25 @@
 function zef_forward_simulation_table_selection(hObject,eventdata,handles)
-% --- Zeffiro documentation header ---
-% zef_forward_simulation_table_selection — Zef forward simulation table selection.
+%ZEF_FORWARD_SIMULATION_TABLE_SELECTION  CellSelectionCallback for the Mesh-tool script table.
 %
-% Purpose:
-%   Zef forward simulation table selection.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   hObject
-%   eventdata
-%   handles
+%   Wired from zef_mesh_tool onto h_forward_simulation_table (columns
+%   Name / Description / Script). evalin('base',...).
 %
-% Outputs:
-%   See function signature and code below.
+%   Unique selected rows → zef.forward_simulation_selected (used by the
+%   table context **Add** / **Delete** and by **Run script**, which evals
+%   the selected INI cell). First selected column →
+%   zef.forward_simulation_column_selected. Copies that cell's text into
+%   h_forward_simulation_script.Value.
 %
-% Zef fields (observed):
-%   zef.forward_simulation_column_selected (read, write)
-%   zef.forward_simulation_selected (read, write)
-%   zef.h_forward_simulation_script (read)
-%   zef.h_forward_simulation_table (read)
+%   Inputs (MATLAB UITable CellSelectionCallback)
+%     hObject, handles  - unused.
+%     eventdata.Indices - N-by-2 [row, column] of the selection.
 %
-% Calls (project):
-%   zef_forward_simulation_table_selection
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `zef_forward_simulation_table_selection(hObject, eventdata, handles)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_run_forward_simulation, zef_mesh_tool.
 
 forward_simulation_selected = eventdata.Indices(:,1);
 forward_simulation_column_selected = eventdata.Indices(1,2);

@@ -1,35 +1,21 @@
 function zef_ES_plot_data(varargin)
-% --- Zeffiro documentation header ---
-% zef_ES_plot_data — Zef ES plot data.
+%ZEF_ES_PLOT_DATA  Plot data button: dispatch on zef.ES_plot_type (pattern, bar, error, properties, distance).
 %
-% Purpose:
-%   Zef ES plot data.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   varargin
+%   ButtonPushedFcn of h_ES_plot_data. ES_plot_type Items in the window are
+%   {'Current pattern','Electrode potentials','Error Chart','Show properties',
+%   'Plot distance curves'}; case 2 still calls zef_ES_plot_barplot
+%   (electrode currents, figure title "ES electrode potentials").
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_ES_plot_data()
+%   zef_ES_plot_data(zef)
 %
-% Zef fields (observed):
-%   zef.ES_plot_type (read)
+%   See also zef_ES_plot_current_pattern, zef_ES_plot_barplot.
 %
-% Calls (project):
-%   zef_ES_optimizer_properties_show
-%   zef_ES_plot_barplot
-%   zef_ES_plot_current_pattern
-%   zef_ES_plot_data
-%   zef_ES_plot_error_chart
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_ES_plot_data(varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 if nargin == 0
     zef = evalin('base','zef');

@@ -1,27 +1,21 @@
 function M = zef_averaging_matrix(nodes,tetra,I)
-% --- Zeffiro documentation header ---
-% zef_averaging_matrix — Zef averaging matrix.
-%
-% Purpose:
-%   Zef averaging matrix.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
-%
-% Inputs:
-%   nodes
-%   tetra
-%   I
-%
-% Outputs:
-%   M
-%
-% Calls (project):
-%   zef_averaging_matrix
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[M] = zef_averaging_matrix(nodes, tetra, I)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
+
+
+%ZEF_AVERAGING_MATRIX  Sparse tetra-to-node averaging weights for NSE smoothing.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   If I is nonempty, only tetrahedra that contain a node in I are kept.
+%   Edge-length weights between the four vertices of each tet are accumulated
+%   into M [n_nodes × n_nodes], then row-normalized. Used by zef_smooth_nse_field.
+%
+%   M = zef_averaging_matrix(nodes, tetra, I)
+%
+%   See also zef_smooth_nse_field.
 
 if nargin < 3
 

@@ -1,61 +1,20 @@
-%Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%
-%ZEF_DTI_PRINT_ANISOTROPY_REPORT
-%
-%Prints a per-compartment anisotropy summary to the command window.
-%Can be called standalone or is invoked automatically after "Apply to Mesh".
-%
-%The report includes:
-%  - Number of tetrahedra per active compartment
-%  - Number and percentage with anisotropic conductivity
-%  - Sample eigenvalue decompositions from the most anisotropic compartment
-%
-%Inputs:
-%   zef  - Zeffiro struct (optional; reads from base workspace if not provided)
-%   opts - Optional struct with:
-%          .aniso_tol   - Min eigenvalue spread to count as anisotropic (default 0.05)
-%          .n_samples   - Number of sample tensors to display (default 5)
-%          .verbose     - If false, suppress sample tensor output (default true)
-%
-%Usage:
-%   zef_dti_print_anisotropy_report();          % uses base workspace
-%   zef_dti_print_anisotropy_report(zef);       % uses provided zef
-%   zef_dti_print_anisotropy_report(zef, struct('n_samples', 10));
-
 function zef_dti_print_anisotropy_report(zef, opts)
-% --- Zeffiro documentation header ---
-% zef_dti_print_anisotropy_report — Zef dti print anisotropy report.
+%ZEF_DTI_PRINT_ANISOTROPY_REPORT  Print FA/anisotropy statistics after Apply to mesh.
 %
-% Purpose:
-%   Zef dti print anisotropy report.
-%   Folder: Forward modeling: lead-field FEM assembly, DTI conductivity, NSE, wave models, and PCG solvers.
+%   Zeffiro Interface.
+%   Copyright © 2024- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   opts
+%   Requires zef.sigma_anisotropy. opts.aniso_tol (default 0.05) flags
+%   off-diagonal magnitude; opts.n_samples (1–20, default 5) prints example
+%   tetrahedra; opts.verbose (default true).
 %
-% Outputs:
-%   See function signature and code below.
+%   zef_dti_print_anisotropy_report(zef, opts)
 %
-% Zef fields (observed):
-%   zef.compartment_tags (read)
-%   zef.domain_labels (read, write)
-%   zef.dti_conductivity_metadata (read)
-%   zef.sigma_anisotropy (read)
-%
-% Calls (project):
-%   zef_dti_print_anisotropy_report
-%
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_dti_print_anisotropy_report(zef, opts)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_dti_apply_to_sigma.
+
+
 
 
 arguments

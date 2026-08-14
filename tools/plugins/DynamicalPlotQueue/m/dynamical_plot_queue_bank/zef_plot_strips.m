@@ -1,33 +1,20 @@
 function zef_plot_strips(strip_struct)
-% --- Zeffiro documentation header ---
-% zef_plot_strips — Renders or updates a plot_strips figure from current `zef` state.
+%ZEF_PLOT_STRIPS  Queue renderer: grey surfaces for every StripTool probe.
 %
-% Purpose:
-%   Renders or updates a plot_strips figure from current `zef` state.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   strip_struct
+%   trisurf of strip_struct.faces{i}/vertices{i} for i = 1:probe_num.
+%   Default strip_struct is caller zef.strip_struct. Axes are caller
+%   zef.h_axes1 (not h_axes_image). Tag: 'additional: electrode strip'.
+%   No electrode spheres (those are zef_plot_strip).
 %
-% Outputs:
-%   See function signature and code below.
-%
-% Zef fields (observed):
-%   zef.h_axes1 (read)
-%   zef.strip_struct (read)
-%
-% Calls (project):
 %   zef_plot_strips
+%   zef_plot_strips(strip_struct)
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_plot_strips(strip_struct)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_plot_strip.
 
 hold on
 if nargin == 0;

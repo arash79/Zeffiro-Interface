@@ -1,43 +1,41 @@
 function nodes = zef_inflate_surfaces(zef, nodes, tetra, domain_labels)
-% --- Zeffiro documentation header ---
-% zef_inflate_surfaces — Zef inflate surfaces.
+%ZEF_INFLATE_SURFACES  Snap interior FEM boundary nodes toward segmentation.
 %
-% Purpose:
-%   Zef inflate surfaces.
-%   Folder: FEM mesh generation, surface processing, refinement, and barycentric operators.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nodes
-%   tetra
-%   domain_labels
+%   For each non-PML compartment, takes the skin of the union of tets with
+%   domain_labels ≤ that compartment (zef_surface_mesh node_pair output)
+%   and moves those FEM nodes along the interior edge toward the nearest
+%   segmentation triangle. The intersection is a 3×3 barycentric solve
+%   (zef_3by3_solver) against 25 k-nearest triangle centroids. The step
+%   length is zef.fem_mesh_inflation_strength times the smallest |λ1|
+%   among hits with λ1 in (−1,0) and λ2,λ3 in (0,1).
 %
-% Outputs:
-%   nodes
+%   Called from zef_smoothing_step when that script inflates the volume
+%   mesh, not from zef_downsample_surfaces (that uses zef_inflate_surface).
 %
-% Zef fields (observed):
-%   zef.fem_mesh_inflation_strength (read)
-%   zef.parallel_processes (read)
-%   zef.parallel_vectors (read)
-%   zef.reuna_p (read)
-%   zef.reuna_t (read)
-%   zef.reuna_type (read)
+%   nodes = zef_inflate_surfaces(zef, nodes, tetra, domain_labels)
 %
-% Calls (project):
-%   zef_3by3_solver
-%   zef_inflate_surfaces
-%   zef_surface_mesh
-%   zef_waitbar
+%   Inputs
+%     zef            - session: fem_mesh_inflation_strength, reuna_p/t/type,
+%                      parallel_processes, parallel_vectors. Empty → base.
+%     nodes          - V×3 FEM vertices (updated in place).
+%     tetra          - T×4.
+%     domain_labels  - T×1 compartment (or subdomain) IDs aligned with tetra.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
+%   Output
+%     nodes  - V×3. Vertices with no accepted intersection are unchanged.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[nodes] = zef_inflate_surfaces(zef, nodes, tetra, domain_labels)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Notes
+%     The last reuna surface is skipped when it is a PML box (_sources==-1).
+%     The loop over nodes is serial (nodes_cell is filled then written back);
+%     parallel_processes only sizes the blocks. Waitbar is opened unless the
+%     caller already has a valid h.
+%
+%   See also zef_inflate_surface, zef_surface_mesh, zef_3by3_solver.
 
 if isempty(zef)
     zef = evalin('base','zef');
@@ -71,6 +69,7 @@ for compartment_counter = 1 : compartment_length
 
     interior_ind = find(domain_labels<=compartment_counter);
     if not(isempty(interior_ind))
+    % node_list(:,1) = boundary node, (:,2) = interior neighbour on the dual edge.
     [~,~,~,~,~,~,node_list] = zef_surface_mesh(tetra,[],interior_ind);
 
     if not(isempty(node_list))
@@ -137,6 +136,7 @@ for compartment_counter = 1 : compartment_length
                     vec_2 = nodes_tri_ref(tri_ref(nearest_neighbor_ind(block_ind(k),:),2),:) - nodes_tri_ref(tri_ref(nearest_neighbor_ind(block_ind(k),:),1),:);
                     vec_3 = nodes_tri_ref(tri_ref(nearest_neighbor_ind(block_ind(k),:),3),:) - nodes_tri_ref(tri_ref(nearest_neighbor_ind(block_ind(k),:),1),:);
 
+                    % Ray p + λ1*(p_min-p) vs triangle: λ1<0 means toward the interior neighbour.
                     [lambda_1, lambda_2, lambda_3] = zef_3by3_solver(vec_1,vec_2,vec_3,d_vec);
                     I = find(lambda_1<0 & lambda_1 > -1 & lambda_2 >0 & lambda_2<1 & lambda_3>0 & lambda_3 <1);
 

@@ -1,24 +1,20 @@
 classdef IASInverter < inverse.CommonInverseParameters & dynamicprops
-% --- Zeffiro documentation header ---
-% inverse.IASInverter.IASInverter — Inverse solver class implementing IAS reconstruction.
+%IASInverter  Iterative alternating sequential (IAS) MAP inversion.
 %
-% Purpose:
-%   Inverse solver class implementing IAS reconstruction.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   args
+%   Conditionally Gaussian model with inverse-gamma or gamma hyperpriors. Each
+%   MAP iteration forms W from d_sqrt (prior std), inverts W*W'+C, updates z = W*f,
+%   then refreshes d_sqrt from hyperprior rules. Optional dSPM/sLORETA post-hoc
+%   scaling via method_type.
 %
-% Calls (project):
-%   inverse.CommonInverseParameters
+%   Reference: Calvetti & Somersalo; DOI 10.1137/080723995.
 %
-% Side effects:
-%   - filesystem I/O
+%   See also inverse.RAMUSInverter, inverse.HALpRInverter.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `inverse.IASInverter.IASInverter(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
 
     properties
         %
@@ -87,12 +83,12 @@ classdef IASInverter < inverse.CommonInverseParameters & dynamicprops
     methods
 
         function self = IASInverter(args)
-
+            %IASInverter  Construct an IAS MAP inverter.
             %
-            % IASInverter
-            %
-            % The constructor for this class.
-            %
+            %   Name-value: method_type, hyperprior, hyperprior_mode,
+            %   n_map_iterations, hyperprior_tail_length_db, hyperprior_weight,
+            %   amplitude_db, prior_over_measurement_db, plus
+            %   CommonInverseParameters band/frame/SNR fields.
 
             arguments
 
@@ -168,11 +164,12 @@ classdef IASInverter < inverse.CommonInverseParameters & dynamicprops
         % Declare the initialize and inverse method defined in the files invert and initialize in this same
         % folder.
 
-        self = initialize(self)
+        self = initialize(self, L, f_data)
 
-        [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode)
+        [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
 
         function self = terminateComputation(self)
+            %terminateComputation  Delete dynamic theta0, beta, d_sqrt, noise_cov.
             
             theta0 = findprop(self,'theta0');
             beta = findprop(self,'beta');
@@ -187,7 +184,8 @@ classdef IASInverter < inverse.CommonInverseParameters & dynamicprops
     end % methods
 
     methods (Static)
-        function InitialStatement 
+        function InitialStatement
+            %InitialStatement  Print the IAS citation banner once per construction. 
             txt = strcat('This class object is for computing inversion with the Iterative Alter-\n'...
                 , 'nating Sequential (IAS) hyperparameter updating method for a conditio-\n' ...
                 , 'nally Gaussian model with inverse-gamma or gamma distributed hyperparam-\n' ...

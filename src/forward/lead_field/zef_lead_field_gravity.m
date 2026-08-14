@@ -1,44 +1,19 @@
-%Copyright © 2018, Sampsa Pursiainen
 function [L_gravity,  bg_data, source_locations, source_directions] = lead_field_gravity(nodes,elements,rho,sensors,varargin)
-% --- Zeffiro documentation header ---
-% lead_field_gravity — Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
+%LEAD_FIELD_GRAVITY  Scalar gravity potential lead field from mass density rho.
 %
-% Purpose:
-%   Builds or applies a sensor lead-field matrix for forward/inverse pipelines.
-%   Folder: Sensor lead-field matrices (EEG, MEG, EIT, TES, gravity) and `zef_lead_field_matrix` dispatch on `core.types.ZefSourceModel`.
+%   Zeffiro Interface.
+%   Copyright © 2018, Sampsa Pursiainen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
 %
-% Inputs:
-%   nodes
-%   elements
-%   rho
-%   sensors
-%   varargin
+%   Called as zef_lead_field_gravity from the asteroid profile scripts and
+%   from zef_lead_field_matrix_gravity (types 3–4). Uses zef.source_model
+%   from the base workspace. rho plays the role of sigma: 1-col isotropic or
+%   6-col tensor, optional prism cell.
 %
-% Outputs:
-%   L_gravity
-%   bg_data
-%   source_locations
-%   source_directions
+%   [L_gravity, bg_data, source_locations, source_directions] = ...
+%       zef_lead_field_gravity(nodes, elements, rho, sensors, varargin)
 %
-% Zef fields (observed):
-%   zef.gravity_field_type (read)
-%   zef.sensors (read)
-%   zef.source_model (read)
-%
-% Calls (project):
-%   core.types.ZefSourceModel.from
-%   zef_make_gravity_dec
-%   zef_tetra_volume
-%   zef_waitbar
-%
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[L_gravity, bg_data, source_locations]] = lead_field_gravity(nodes, elements, rho, sensors, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_gravity_lead_field_scalar, zef_lead_field_gravity_grad.
 
 L = size(sensors,1);
 

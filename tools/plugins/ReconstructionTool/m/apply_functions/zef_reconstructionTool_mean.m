@@ -1,25 +1,18 @@
 function [newRec] = zef_reconstructionTool_mean(reconstruction)
-% --- Zeffiro documentation header ---
-% zef_reconstructionTool_mean — Zef reconstruction Tool mean.
+%ZEF_RECONSTRUCTIONTOOL_MEAN  Time-average of a cell reconstruction into one frame.
 %
-% Purpose:
-%   Zef reconstruction Tool mean.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   reconstruction
+%   [newRec] = zef_reconstructionTool_mean(reconstruction)
 %
-% Outputs:
-%   newRec
+%   reconstruction is a cell of frames. Returns {mean}. Called from
+%   zef_reconstructionTool_apply via FunctionDropDown 'mean'.
+%   Does not write zef.
 %
-% Calls (project):
-%   zef_reconstructionTool_mean
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[newRec] = zef_reconstructionTool_mean(reconstruction)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_reconstructionTool_power, zef_reconstructionTool_apply.
 
 newRec=reconstruction{:,1};
 

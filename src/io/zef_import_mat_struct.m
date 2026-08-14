@@ -1,35 +1,31 @@
 function zef = zef_import_mat_struct(zef,varargin)
-% --- Zeffiro documentation header ---
-% zef_import_mat_struct — Loads external data or a saved Zeffiro project into `zef`.
+%ZEF_IMPORT_MAT_STRUCT  Merge variables from a MAT file into zef.
 %
-% Purpose:
-%   Loads external data or a saved Zeffiro project into `zef`.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   varargin
+%   Loads a MAT file (uigetfile when path not given in varargin{1}),
+%   optionally derives surface_triangles from tetra via zef_surface_mesh,
+%   optionally prefixes all field names with varargin{2}, and copies each
+%   loaded variable onto zef.
 %
-% Outputs:
-%   zef
+%   zef = zef_import_mat_struct(zef)
+%   zef = zef_import_mat_struct(zef, file_path)
+%   zef = zef_import_mat_struct(zef, file_path, extension_prefix)
 %
-% Zef fields (observed):
-%   zef.save_file_path (read)
+%   Inputs
+%     zef             - session struct.
+%     file_path       - optional full or relative path to *.fig dialog
+%                       filter (legacy) or MAT file path.
+%     extension_prefix - optional string prepended to each imported field
+%                        name (e.g. compartment tag plus underscore).
 %
-% Calls (project):
-%   zef_import_mat_struct
-%   zef_surface_mesh
+%   Output
+%     zef - session with imported fields merged in.
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: `[zef] = zef_import_mat_struct(zef, varargin)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_import_segmentation, zef_surface_mesh.
 
 mat_struct = [];
 extension = [];
@@ -56,8 +52,6 @@ if not(isequal(file_name,0))
 
 end
 
-
-
 if isfield(mat_struct,'tetra')
     [mat_struct.surface_triangles] = zef_surface_mesh(mat_struct.tetra);
     [mat_struct.tetra_aux] = mat_struct.tetra;
@@ -66,7 +60,6 @@ end
 if isfield(mat_struct,'nodes')
     [mat_struct.nodes_aux] = mat_struct.nodes;
 end
-
 
 if not(isempty(extension))
     mat_struct_aux = cell(0);
@@ -86,7 +79,5 @@ end
 if nargout == 0
     assignin('base','zef', zef);
 end
-
-
 
 end

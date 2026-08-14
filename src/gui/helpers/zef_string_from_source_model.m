@@ -1,25 +1,25 @@
 function str = zef_string_from_source_model(input)
-% --- Zeffiro documentation header ---
-% zef_string_from_source_model — Zef string from source model.
+%ZEF_STRING_FROM_SOURCE_MODEL  Map a few ZefSourceModel members to strings.
 %
-% Purpose:
-%   Zef string from source model.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   input
+%   Switch on core.types.ZefSourceModel: Error → 'Error', Whitney →
+%   'Whitney', Hdiv → 'H(div)'. Any other member (StVenant, Continuous*,
+%   …) warns and returns 'Error'. Live display names are
+%   ZefSourceModel.to_string. No first-party callers in this tree.
 %
-% Outputs:
-%   str
+%   str = zef_string_from_source_model(input)
 %
-% Calls (project):
-%   zef_string_from_source_model
+%   Input
+%     input - core.types.ZefSourceModel value.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[str] = zef_string_from_source_model(input)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   Output
+%     str - 'Whitney', 'H(div)', or 'Error'.
+%
+%   See also core.types.ZefSourceModel.
 switch input
     case core.types.ZefSourceModel.Error
         str = 'Error';

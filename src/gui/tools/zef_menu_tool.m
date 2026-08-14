@@ -1,47 +1,25 @@
-% --- Zeffiro documentation header ---
-% set(groot,'defaultFigureVisible','off') — Set(groot,'default Figure Visible','off').
+%ZEF_MENU_TOOL  Wire the menu bar (Project / Import / Export / Edit / Window / …).
 %
-% Purpose:
-%   Set(groot,'default Figure Visible','off').
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.ImportelectrodesMenu (read, write)
-%   zef.L (read, write)
-%   zef.always_show_waitbar (read)
-%   zef.brain_ind (read, write)
-%   zef.current_version (read)
-%   zef.domain_labels_aux (read, write)
-%   zef.fieldnames (read, write)
-%   zef.file (read, write)
-%   zef.file_path (read)
-%   zef.font_size (read)
-%   zef.h_compartment_table (read)
-%   zef.h_menu_about (read)
-%   zef.h_menu_add_compartment (read)
-%   zef.h_menu_add_sensor_sets (read)
-%   zef.h_menu_add_sensors (read)
-%   … (133 more)
+%   Script (not a function). Called last from zef_start. Instantiates
+%   zef_menu_tool_app_exported, copies h_* onto zef, and sets every
+%   MenuSelectedFcn. Labels are the App Designer Text= values except
+%   h_menu_new_segmentation_from_folder → "Import data to a new project"
+%   and h_menu_import_segmentation_update_from_folder → "Import data to
+%   project". Import → Import electrodes uses
+%   core.gui.menu_tool.import_electrodes_callback.
 %
-% Calls (project):
-%   core.gui.menu_tool.import_electrodes_callback
-%   zef_arrange_windows
-%   zef_eval_entry
-%   zef_import
-%   zef_import_figure
-%   zef_set_menu_size
-%   zef_set_size_change_function
-%   zef_update
-%   zef_window_visible
+%   Side effects
+%     DeleteFcn on h_zeffiro_menu is zef_close_all. zef_plugin injects
+%     Inverse/Forward/Multi-tools items. zef_window_manager('standalone')
+%     and ('dock_menu'). Dynamic properties ZefTool, ZefUseWaitbar,
+%     ZefWaitbarSize, ZefTaskId, ZefCurrentLogFile, …
 %
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `set(groot,'defaultFigureVisible','off')` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_plugin, zef_arrange_windows, zef_window_manager.
 set(groot,'defaultFigureVisible','off')
 zef_data = zef_menu_tool_app_exported;
 zef_data.h_zeffiro_menu.Visible = zef.use_display;
@@ -185,29 +163,17 @@ zef = rmfield(zef,'menu_accelerator_vec');
 
 zef_set_size_change_function(zef.h_zeffiro_menu,1);
 
-% if zef.h_segmentation_tool_toggle == 1
-% 
-zef.h_zeffiro_menu.Position = [zef.segmentation_tool_default_position(1), ...
-         zef.segmentation_tool_default_position(2) + zef.segmentation_tool_default_position(4),...
-         zef.segmentation_tool_default_position(3),...
-         0];
-% 
-% else
-% 
-%     zef.h_zeffiro_menu.Position = [zef.segmentation_tool_default_position(1), ...
-%         zef.segmentation_tool_default_position(2) + zef.segmentation_tool_default_position(4),...
-%         2.25*zef.segmentation_tool_default_position(3),...
-%         0];
-% 
-% end
-
-
-
-
+zef_window_manager('standalone', zef.h_zeffiro_menu);
+try
+    zef.h_zeffiro_menu.Scrollable = 'off';
+catch
+end
 
 zef.menu_expanded_size = 0.8*zef.segmentation_tool_default_position(4);
-zef.h_zeffiro_menu.WindowButtonUpFcn = 'zef_set_menu_size(zef,''minimized'');';
-%zef.h_zeffiro_menu.WindowButtonMotionFcn = 'zef_set_menu_size(zef,''expanded'');';
+% Do not use WindowButtonUpFcn to collapse the menu: on R2025a+ WebGL
+% uifigures, menu clicks also fire it and immediately undo expand.
+zef.h_zeffiro_menu.WindowButtonUpFcn = '';
+zef_window_manager('dock_menu', zef);
 zef.h_temp = findobj(zef.h_zeffiro_menu,'Type','uimenu');
 
 for i = 1 : length(zef.h_temp)

@@ -1,70 +1,14 @@
-%% DTI Structural Covariance Matrix — Test & Visualization
+%TEST_DTI_STRUCTURAL_COVARIANCE  Script: load FA/v1, build FA and tractography Q, side-by-side spy plots.
 %
-% This script demonstrates two approaches for building a structural
-% covariance matrix from DTI imaging data for Kalman-filter-based EEG
-% source localization:
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   1. FA-based:           Fractional anisotropy weighted spatial covariance
-%   2. Tractography-based: Streamline-derived structural connectivity
+%   Requires FreeSurfer dt_recon paths in Section 1. Optional zef in the
+%   workspace for source_positions. Sets zef.kf_structural_Q_type. Not the
+%   Kalman StartButton.
 %
-% The script loads FreeSurfer dt_recon outputs, interpolates DTI data to
-% source positions, builds both covariance matrices, and presents a clean
-% side-by-side visualization.
-%
-% REQUIREMENTS:
-%   - FreeSurfer dt_recon outputs:
-%       fa.nii.gz      — Fractional anisotropy map
-%       v1.nii.gz      — Principal eigenvector field
-%       register.dat   — DWI-to-anatomy registration
-%   - FreeSurfer reference MRI:
-%       orig.mgz       — Anatomical reference (for coordinate transforms)
-%   - FREESURFER_HOME environment variable set
-%   - Either: existing Zeffiro project with mesh loaded (zef in workspace)
-%        Or:  source positions will be generated from the FA volume
-%
-% HOW TO RUN:
-%   1. Set your file paths in Section 1 below
-%   2. Run the entire script (Ctrl+Enter or F5)
-%   3. Examine the figure with both covariance matrices
-%
-% Copyright © 2024- Sampsa Pursiainen & ZI Development Team
-% --- Zeffiro documentation header ---
-% fa.nii — Fa.nii.
-%
-% Purpose:
-%   Fa.nii.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
-%
-% Zef fields (observed):
-%   zef.kf_structural_Q_type (read, write)
-%
-% Calls (project):
-%   zef_KF
-%   zef_dti_fa_covariance
-%   zef_dti_get_mesh2voxel
-%   zef_dti_interpolate_to_sources
-%   zef_dti_tractography_covariance
-%   zef_freesurfer_load_fa
-%   zef_freesurfer_load_v1
-%   zef_freesurfer_read_register_dat
-%   zef_freesurfer_read_volume_geometry
-%
-% Side effects:
-%   - base/caller workspace
-%   - creates/updates figures
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Invoked from a menu, button, or table callback in the Zeffiro tools.
-%   Programmatic: Call `fa.nii` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
-
-%% ========================================================================
-%  SECTION 1: CONFIGURATION — Set your file paths here
-%  ========================================================================
-
-% --- FreeSurfer dt_recon output files ---
 
 
 

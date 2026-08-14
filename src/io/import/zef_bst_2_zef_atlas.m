@@ -1,34 +1,34 @@
 function [p_c_table, p_points] = zef_bst_2_zef_atlas(subject,surface_ind_aux,surface_struct,atlas_compartment,atlas_type,varargin)
-% --- Zeffiro documentation header ---
-% zef_bst_2_zef_atlas — Zef bst 2 zef atlas.
+%ZEF_BST_2_ZEF_ATLAS  Convert Brainstorm surface atlas scouts to Zeffiro parcellation tables.
 %
-% Purpose:
-%   Zef bst 2 zef atlas.
-%   Folder: Project load/save, segmentation import, figure import, FEM export.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   subject
-%   surface_ind_aux
-%   surface_struct
-%   atlas_compartment
-%   atlas_type
-%   varargin
+%   Finds an atlas on a Brainstorm surface by name, builds p_c_table label
+%   and RGB rows from Scouts, and p_points with vertex coordinates scaled
+%   by unit_scale (default 1000). Compartment references use
+%   zef_find_compartment when atlas_compartment > 0.
 %
-% Outputs:
-%   p_c_table
-%   p_points
+%   [p_c_table, p_points] = zef_bst_2_zef_atlas(subject, surface_ind_aux, ...
+%       surface_struct, atlas_compartment, atlas_type)
+%   [p_c_table, p_points] = zef_bst_2_zef_atlas(..., atlas_tag, unit_scale)
 %
-% Calls (project):
-%   zef_bst_2_zef_atlas
-%   zef_find_compartment
+%   Inputs
+%     subject            - Brainstorm subject index.
+%     surface_ind_aux    - surface index on the subject.
+%     surface_struct     - preloaded struct with Atlas and Vertices, or [].
+%     atlas_compartment  - compartment selector (>0 enables export).
+%     atlas_type         - atlas Name to match (case insensitive).
+%     atlas_tag          - optional table tag (defaults to atlas_type).
+%     unit_scale         - coordinate scale factor (default 1000).
 %
-% Side effects:
-%   - filesystem I/O
+%   Outputs
+%     p_c_table - Zeffiro parcellation colortable cell for one atlas.
+%     p_points  - N-by-4 point table with scout indices in column 4.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[p_c_table, p_points]] = zef_bst_2_zef_atlas(subject, surface_ind_aux, surface_struct, atlas_compartment, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_2_zef_surface, zef_import_parcellation_colortable.
 
 atlas_tag = '';
 unit_scale = 1;

@@ -1,26 +1,27 @@
 function zef_bst = zef_bst_get_settings(settings_file_name, zef_bst)
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst_get_settings — Zef bst get settings.
+%ZEF_BST_GET_SETTINGS  Merge defaults, a settings/*.m script, and overrides.
 %
-% Purpose:
-%   Zef bst get settings.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   settings_file_name
-%   zef_bst
+%   zef_bst = zef_bst_get_settings(settings_file_name)
+%   zef_bst = zef_bst_get_settings(settings_file_name, zef_bst)
 %
-% Outputs:
-%   zef_bst
+%   1. Runs zef_bst_init (script) so zef_bst exists in this workspace.
+%   2. If settings_file_name is non-empty, runs
+%      <this package>/settings/<basename>.m (path stripped; extension
+%      ignored). Missing or failing scripts warn and keep defaults.
+%   3. Copies every field of the input zef_bst (second argument, default
+%      struct) over the result.
+%   4. Caps zef_bst.parallel_processes at maxNumCompThreads.
+%   5. Warns if zef_bst_validate_settings fails (does not error).
 %
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_get_settings
-%   utilities.brainstorm2zef.zef_bst_validate_settings
+%   settings_file_name  - basename or path; '' skips the file step.
+%   zef_bst             - optional override struct (nargin < 2 → struct).
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef_bst] = utilities.brainstorm2zef.zef_bst_get_settings(settings_file_name, zef_bst)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_init, zef_bst_default, zef_bst_validate_settings.
 
 if nargin < 2
     zef_bst = struct;

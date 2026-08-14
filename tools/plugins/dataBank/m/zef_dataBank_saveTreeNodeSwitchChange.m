@@ -1,35 +1,26 @@
 function zef = zef_dataBank_saveTreeNodeSwitchChange(zef)
-% --- Zeffiro documentation header ---
-% zef_dataBank_saveTreeNodeSwitchChange — Zef data Bank save Tree Node Switch Change.
+%ZEF_DATABANK_SAVETREENODESWITCHCHANGE  savetodiskSwitch: dump nodes to disk or load them back.
 %
-% Purpose:
-%   Zef data Bank save Tree Node Switch Change.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
+%   savetodiskSwitch.ValueChangedFcn in zef_open_dataBank. Copies the
+%   switch Value to zef.dataBank.save2disk. 'On' → saveTreeNodes into
+%   zef.dataBank.folder (payloads become matfile handles). 'Off' →
+%   loadTreeNodes (loads structs and deletes node_* files). Shows
+%   zef_waitbar during the copy.
 %
-% Outputs:
-%   zef
+%   zef = zef_dataBank_saveTreeNodeSwitchChange(zef)
 %
-% Zef fields (observed):
-%   zef.dataBank (read)
+%   Inputs
+%     zef  - session with savetodiskSwitch, tree, and folder. nargin==0 → base.
 %
-% Calls (project):
-%   zef_dataBank_loadTreeNodes
-%   zef_dataBank_saveTreeNodeSwitchChange
-%   zef_dataBank_saveTreeNodes
-%   zef_waitbar
+%   Output
+%     zef  - tree payloads swapped. nargout==0 → assignin base.
 %
-% Side effects:
-%   - base/caller workspace
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[zef] = zef_dataBank_saveTreeNodeSwitchChange(zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
+%   See also zef_dataBank_saveTreeNodes, zef_dataBank_loadTreeNodes.
 
 if nargin == 0
     zef = evalin('base','zef')

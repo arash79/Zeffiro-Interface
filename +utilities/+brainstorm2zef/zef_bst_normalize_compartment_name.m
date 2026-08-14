@@ -1,24 +1,17 @@
 function normalized_name = zef_bst_normalize_compartment_name(name)
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst_normalize_compartment_name — Zef bst normalize compartment name.
+%ZEF_BST_NORMALIZE_COMPARTMENT_NAME  lower(name) with spaces, '_', '-' removed.
 %
-% Purpose:
-%   Zef bst normalize compartment name.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   name
+%   normalized_name = zef_bst_normalize_compartment_name(name)
 %
-% Outputs:
-%   normalized_name
+%   Non-char/string name returns ''. Output is char. Used when matching
+%   Brainstorm Comment strings to zef_bst.compartment_list entries.
 %
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_normalize_compartment_name
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[normalized_name] = utilities.brainstorm2zef.zef_bst_normalize_compartment_name(name)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_find_compartment, zef_bst_get_compartment_property.
 
 if ~ischar(name) && ~isstring(name)
     normalized_name = '';

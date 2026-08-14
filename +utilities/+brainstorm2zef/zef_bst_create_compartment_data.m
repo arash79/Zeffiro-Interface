@@ -1,36 +1,29 @@
 function [compartment_settings, surface_meshes, zef] = zef_bst_create_compartment_data(settings_file_name, zef_bst, zef)
-% --- Zeffiro documentation header ---
-% utilities.brainstorm2zef.zef_bst_create_compartment_data — Zef bst create compartment data.
+%ZEF_BST_CREATE_COMPARTMENT_DATA  Load Brainstorm .mat surfaces/atlases into structs.
 %
-% Purpose:
-%   Zef bst create compartment data.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   settings_file_name
-%   zef_bst
-%   zef
+%   [compartment_settings, surface_meshes, zef] =
+%       zef_bst_create_compartment_data(settings_file_name, zef_bst, zef)
 %
-% Outputs:
-%   compartment_settings
-%   surface_meshes
-%   zef
+%   Requires bst_get and a protocol (zef_bst_validate_environment). Subject
+%   is zef_bst.subject_struct or bst_get('Subject'); folder is
+%   zef_bst.subject_folder or ProtocolInfo.SUBJECTS.
 %
-% Calls (project):
-%   utilities.brainstorm2zef.zef_bst_compartment_settings
-%   utilities.brainstorm2zef.zef_bst_create_compartment_data
-%   utilities.brainstorm2zef.zef_bst_find_compartment
-%   utilities.brainstorm2zef.zef_bst_get_atlas_surfaces
-%   utilities.brainstorm2zef.zef_bst_validate_environment
+%   If zef_bst.compartment_files is empty, zef_bst_find_compartment walks
+%   zef_bst.compartment_list. Else each path must exist (or resolve under
+%   subject_folder). Files are reordered to match compartment_list.
 %
-% Side effects:
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
+%   Each .mat: Vertices+Faces → Points = unit_conversion*Vertices (mm),
+%   Triangles=Faces. Cube field → zef_bst_get_atlas_surfaces. Then
+%   zef_bst_compartment_settings; rows with <4 vertices are dropped.
+%   settings_file_name is unused. zef is passed through for inflation.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[compartment_settings, surface_meshes, zef]] = utilities.brainstorm2zef.zef_bst_create_compartment_data(settings_file_name, zef_bst, zef)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   See also zef_bst_find_compartment, zef_bst_get_atlas_surfaces,
+%   zef_bst_create_project.
 
 [is_valid, error_msg] = utilities.brainstorm2zef.zef_bst_validate_environment();
 if ~is_valid

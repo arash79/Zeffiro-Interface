@@ -1,28 +1,4 @@
 function m = meshLoadGmsh4( fileName )
-% --- Zeffiro documentation header ---
-% utilities.sn2zef.meshLoadGmsh4 — Mesh Load Gmsh4.
-%
-% Purpose:
-%   Mesh Load Gmsh4.
-%   Folder: Reusable utilities: cluster dispatch, Brainstorm/FreeSurfer/Duneuro/SN converters, plotting helpers, inverse frame loop, sensitivity Monte Carlo.
-%
-% Inputs:
-%   fileName
-%
-% Outputs:
-%   m
-%
-% Calls (project):
-%   utilities.sn2zef.meshLoadGmsh4
-%
-% Side effects:
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[m] = utilities.sn2zef.meshLoadGmsh4(fileName)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
 %
 % m = meshLoadGmsh4(fileName)
 %

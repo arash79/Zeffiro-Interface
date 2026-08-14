@@ -1,26 +1,16 @@
-% --- Zeffiro documentation header ---
-% if not(isequal(zef — If not(isequal(zef.
+%ZEF_GET_SENSOR_DIRECTIONS  Load DAT directions into zef.<current_sensors>_directions.
 %
-% Purpose:
-%   If not(isequal(zef.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Zef fields (observed):
-%   zef.aux_field (read, write)
-%   zef.current_sensors (read)
-%   zef.file (read)
-%   zef.file_path (read)
+%   Script. **Import sensors → Directions (DAT file)** on the sensors table.
+%   Uses zef_get_mesh(..., 'triangles') — that file_type means "load a
+%   numeric array as connectivity/directions", not triangle meshing.
+%   Cancel (zef.file==0) is a no-op. MEG needs directions; EEG typically not.
 %
-% Calls (project):
-%   zef_get_mesh
-%
-% Side effects:
-%   - reads/updates `zef` struct fields
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: Call `if not(isequal(zef` from MATLAB with the project root on the path.
-% --- End Zeffiro documentation header
+%   See also zef_get_sensor_points, zef_get_mesh.
 
 if not(isequal(zef.file,0));
     zef.aux_field = zef_get_mesh(zef,[zef.file_path zef.file],zef.current_sensors,'triangles');

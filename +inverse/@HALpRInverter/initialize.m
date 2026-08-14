@@ -1,30 +1,25 @@
-%% Copyright © 2025- Joonas Lahtinen
 function self = initialize(self,L,f_data)
-% --- Zeffiro documentation header ---
-% inverse.HALpRInverter.initialize — Estimates priors, noise covariance, or regularization from multi-frame data.
+%initialize  HALpR noise_cov (if empty) and SNR_variable for hyperpriors.
 %
-% Purpose:
-%   Estimates priors, noise covariance, or regularization from multi-frame data.
-%   Folder: Object-oriented inverse solvers (`inverse.*Inverter`) sharing `inverse.CommonInverseParameters`; orchestrated from `src/inverse` and `+utilities/+cluster`.
+%   Zeffiro Interface.
+%   Copyright © 2025- Joonas Lahtinen
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   self
-%   L
-%   f_data
+%   Adds dynamic property SNR_variable if missing. noise_cov: cov(f') when
+%   several frames, else (10^(-SNR/10))*mean(f.^2)*I. SNR_variable =
+%   (1-noise_p2)*10^(initial_prior_steering_db/10)*data_power with
+%   data_power = mean channel variance (multi-frame) or mean(f.^2).
+%   Same formulae as GroupLassoInverter.initialize. Called from
+%   utilities.inverse.run_frame_loop before invert (not from invert).
+%   Inverse tools → Standardized Hierarchical L1 MAP uses zef_sl1_iteration.
 %
-% Outputs:
-%   self
+%   Inputs
+%     L      - processed lead field (size(L,1) for the one-frame noise I).
+%     f_data - n_sensors × n_frames filtered measurements.
 %
-% Calls (project):
-%   inverse.initialize
-%
-% Side effects:
-%   - GPU
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[self] = inverse.HALpRInverter.initialize(self, L, f_data)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
+%   Output
+%     self.noise_cov, self.SNR_variable as in GroupLassoInverter.initialize.
 
         arguments
     

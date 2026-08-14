@@ -1,45 +1,39 @@
 
 function [nodes,flag_val] = zef_fix_negatives(zef, nodes, tetra)
-% --- Zeffiro documentation header ---
-% zef_fix_negatives — Zef fix negatives.
+%ZEF_FIX_NEGATIVES  Move vertices of inverted tets until condition_number ≥ 0.
 %
-% Purpose:
-%   Zef fix negatives.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   zef
-%   nodes
-%   tetra
+%   Inverted tets are those with zef_condition_number < 0 (positive
+%   volume vs the stored negative-volume convention). Up to
+%   zef.mesh_optimization_repetitions outer loops: expand to tets that
+%   share vertices with the inverted set, and for each inverted tet try
+%   moving each of its four vertices. A candidate is a mean of random
+%   unique surface nodes; if zef_point_in_cluster says it is outside,
+%   the point is walked along zef_find_intersecting_triangle rays by
+%   the hard-coded fraction fix_param = 0.5. Accept the move if the tet
+%   plus its face-neighbours then have no negative condition numbers;
+%   otherwise restore the vertex.
 %
-% Outputs:
-%   nodes
-%   flag_val
+%   Callers: zef_postprocess_fem_mesh; zef_smoothing_step (after each
+%   Taubin repetition, before zef_tetra_turn).
 %
-% Zef fields (observed):
-%   zef.mesh_optimization_repetitions (read)
-%   zef.meshing_threshold (read)
+%   [nodes, flag_val] = zef_fix_negatives(zef, nodes, tetra)
 %
-% Calls (project):
-%   zef_condition_number
-%   zef_find_intersecting_triangle
-%   zef_fix_negatives
-%   zef_point_in_cluster
-%   zef_surface_mesh
-%   zef_waitbar
+%   Inputs
+%     zef    - session; empty → evalin('base','zef'). Uses
+%              meshing_threshold and mesh_optimization_repetitions.
+%     nodes  - V-by-3, modified in place.
+%     tetra  - T-by-4 connectivity (unchanged).
 %
-% Side effects:
-%   - base/caller workspace
-%   - filesystem I/O
-%   - reads/updates `zef` struct fields
-%   - waitbar progress UI
+%   Outputs
+%     nodes    - V-by-3 after attempted repairs.
+%     flag_val - 1 if no inverted tets remain, -1 otherwise.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[nodes, flag_val]] = zef_fix_negatives(zef, nodes, tetra)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-
+%   See also zef_condition_number, zef_tetra_turn, zef_point_in_cluster.
 if isempty(zef)
     zef = evalin('base','zef');
 end

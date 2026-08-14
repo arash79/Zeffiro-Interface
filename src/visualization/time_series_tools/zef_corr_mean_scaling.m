@@ -1,32 +1,13 @@
 function [y_vals, plot_mode] = zef_corr_mean_scaling(time_series)
-% --- Zeffiro documentation header ---
-% zef_corr_mean_scaling — Zef corr mean scaling.
+%ZEF_CORR_MEAN_SCALING  Pairwise corr after dividing by the series mean.
 %
-% Purpose:
-%   Zef corr mean scaling.
-%   Folder: Main procedural runtime (`zef_*`): GUI tools, mesh, forward lead fields, inverse orchestration, I/O, and visualization. Added via `genpath` from `zeffiro_interface`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   time_series
-%
-% Outputs:
-%   y_vals
-%   plot_mode
-%
-% Calls (project):
-%   zef_corr_mean_scaling
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[y_vals, plot_mode]] = zef_corr_mean_scaling(time_series)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
-
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
-%This function processes the N-by-M data array f for N channels and M time
-%steps. The other arguments can be controlled via the ZI user interface.
-%The desctiption and argument definitions shown in ZI are listed below.
-%Description: Correlation, mean scaling
+%   Description: Correlation, mean scaling
+%   Function. time_series./mean then corr(time_series'); NaN -> 1. plot_mode=2.
 
 time_series = time_series./mean(time_series);
 y_vals = corr(time_series');

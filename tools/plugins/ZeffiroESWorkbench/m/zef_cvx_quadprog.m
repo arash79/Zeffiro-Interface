@@ -1,34 +1,20 @@
 function [x, function_val, flag_val] = zef_cvx_linprog(Q,z,A,b,Aeq,beq,lb,ub,varargin)
-% --- Zeffiro documentation header ---
-% zef_cvx_linprog — Zef cvx linprog.
+%ZEF_CVX_QUADPROG  CVX quadratic program for ES search_method 5 (L2L2 / QP).
 %
-% Purpose:
-%   Zef cvx linprog.
-%   Folder: Individual Zeffiro plugins (inverse GUIs, data bank, Kalman, SESAME, etc.) registered via profile INI files.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Q
-%   z
-%   A
-%   b
-%   Aeq
-%   beq
-%   lb
-%   ub
-%   varargin
+%   Called as zef_cvx_quadprog from zef_ES_optimize_current (MATLAB uses
+%   the filename). The in-file function name is still zef_cvx_linprog —
+%   left unchanged. Display-off branch minimizes ||Q x - z||; Display-on
+%   minimizes 0.5 x' Q x + z' x. SDPT3/SeDuMi via opts.Solver.
 %
-% Outputs:
-%   x
-%   function_val
-%   flag_val
+%   [x, fval, flag] = zef_cvx_quadprog(Q, z, A, b, Aeq, beq, lb, ub, opts)
 %
-% Calls (project):
-%   zef_cvx_linprog
+%   See also zef_ES_optimize_current, zef_cvx_linprog.
 %
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `[[x, function_val, flag_val]] = zef_cvx_linprog(Q, z, A, b, …)` with project root and `src` on the path.
-% --- End Zeffiro documentation header
 
 opts = [];
 solver_package = 'sdpt3';

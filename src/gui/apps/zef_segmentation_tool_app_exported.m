@@ -1,41 +1,14 @@
-%ZEF_SEGMENTATION_TOOL_APP_EXPORTED ZEFFIRO Interface segmentation tool (exported).
-%
-%   This class implements the Segmentation Tool window for the ZEFFIRO
-%   Interface. It provides tables and controls for managing compartments
-%   (with visibility, merge, invert normal, conductivity), sensor sets
-%   (modality, visibility, points/directions), coordinate transforms,
-%   project information and notes, and sensor names. Context menus support
-%   adding/deleting compartments and sensor sets, importing surface meshes
-%   (STL, DAT points/triangles) and sensors (DAT points/directions). The UI
-%   is built with MATLAB App Designer and exported to this standalone class.
-%
-%   The app follows a singleton pattern: only one instance runs at a time.
-%
-%   Source: Exported from zef_segmentation_tool_app.mlapp (MATLAB App Designer).
-%
-%   See also matlab.apps.AppBase, zef_segmentation_tool_app.
-
 classdef zef_segmentation_tool_app_exported < matlab.apps.AppBase
-% --- Zeffiro documentation header ---
-% zef_segmentation_tool_app_exported — Zef segmentation tool app exported.
+%ZEF_SEGMENTATION_TOOL_APP_EXPORTED  App Designer export: segmentation tool UIFigure.
 %
-% Purpose:
-%   Zef segmentation tool app exported.
-%   Folder: Interactive UI: App Designer exports, menu tools, callbacks, plot refresh, and `zef_update_*` sync from widgets to `zef`.
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-% Inputs:
-%   Constructor and method arguments are declared in classdef methods below.
-%
-% Side effects:
-%   - creates/updates figures
-%   - filesystem I/O
-%
-% Workflow:
-%   GUI: Used indirectly through tools, menus, or `zef_update` refresh chains.
-%   Programmatic: `zef_segmentation_tool_app_exported(...)` after `addpath(projectRoot)`; methods: initialize / precompute / invert where defined.
-% --- End Zeffiro documentation header
-
-    properties (Access = public)
+%   Generated from the matching .mlapp; layout only—wire callbacks in src/gui/tools.
+%   Tool scripts copy h_* properties into zef and attach MenuSelectedFcn/ButtonPushedFcn.
+properties (Access = public)
         h_zeffiro_window_main           matlab.ui.Figure
         h_set_position                  matlab.ui.control.Button
         h_segmentation_tool_toggle      matlab.ui.control.Button
