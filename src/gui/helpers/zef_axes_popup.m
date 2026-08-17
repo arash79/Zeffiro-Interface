@@ -25,13 +25,21 @@ if nargin == 0
 end
 
 zef.h_figure_aux = gcf;
+src_pos = [100 100 640 480];
+try
+    zef.h_zeffiro.Units = 'pixels';
+    src_pos = zef.h_zeffiro.Position;
+catch
+end
+pop_w = 640;
+pop_h = 480;
 zef.h_zeffiro_axes_popup = figure(...
     'PaperUnits',get(0,'defaultfigurePaperUnits'),...
-    'Units','normalized',...
-    'Position',[zef.h_zeffiro.Position(1)+zef.h_zeffiro.Position(3) zef.h_zeffiro.Position(2)  zef.h_zeffiro.Position(3)  zef.h_zeffiro.Position(4)],...
+    'Units','pixels',...
+    'Position',[src_pos(1)+src_pos(3)+12, src_pos(2), pop_w, pop_h],...
     'Renderer',get(0,'defaultfigureRenderer'),...
     'Visible',zef.use_display,...
-    'Color',get(0,'defaultfigureColor'),...
+    'Color',zef_ui_theme().color.bg,...
     'CloseRequestFcn','closereq;',...
     'CurrentAxesMode','manual',...
     'IntegerHandle','off',...
@@ -53,12 +61,16 @@ zef.h_zeffiro_axes_popup = figure(...
     'InvertHardcopy',true,...
     'ScreenPixelsPerInchMode','manual' );
 
-zef.h_object_aux_new = copyobj(findobj(zef.h_figure_aux.Children,'Tag','axes1','-or','Type','colorbar'),zef.h_figure_aux);
+zef.h_object_aux_new = copyobj(zef_ui_axes(zef.h_figure_aux), zef.h_figure_aux);
+h_cb = findall(zef.h_figure_aux, 'Type', 'colorbar');
+if ~isempty(h_cb)
+    zef.h_object_aux_new = [zef.h_object_aux_new; copyobj(h_cb, zef.h_figure_aux)];
+end
 for zef_i = 1 : length(zef.h_object_aux_new)
     if isequal(zef.h_object_aux_new(zef_i).Tag,'axes1')
         zef.h_object_aux_new(zef_i).Parent = zef.h_zeffiro_axes_popup;
         zef.h_object_aux_new(zef_i).Units = 'normalized';
-        zef.h_object_aux_new(zef_i).OuterPosition  = [0.2 0.2 0.6 0.6];
+        zef.h_object_aux_new(zef_i).OuterPosition  = [0.06 0.06 0.88 0.88];
     end
 end
 for zef_i = 1 : length(zef.h_object_aux_new)
@@ -74,5 +86,8 @@ clear zef_i
 if nargout == 0
     assignin('base','zef',zef);
 end
+
+zef_ui_apply_theme(zef.h_zeffiro_axes_popup);
+zef_ui_apply_size(zef.h_zeffiro_axes_popup, 640, 480, 400, 320);
 
 end

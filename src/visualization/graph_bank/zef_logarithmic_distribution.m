@@ -14,6 +14,7 @@ axes(evalin('base','zef.h_axes1')
 
 h_axes = evalin('base','zef.h_axes1');
 cla(h_axes,'reset');
+h_axes.Tag = 'axes1';
 
 parameter_vec = max(1E-30,parameter_vec);
 h_hist = histogram(log10(parameter_vec),200);

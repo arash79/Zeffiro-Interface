@@ -1,82 +1,62 @@
-# `utilities.brainstorm2zef` — Brainstorm protocol → Zeffiro project
+# +utilities/+brainstorm2zef
 
-Builds a Zeffiro session from an **open Brainstorm protocol**: surfaces become compartments, then `zef_create_finite_element_mesh` runs. Unlike fs2zef/sn2zef, this converter does **not** write a folder of STL/ASC + `import_segmentation.zef` as its main product. It starts `zeffiro_interface('start_mode','nodisplay')` itself and optionally `zef_save`s a `.mat`.
+## Folder purpose
 
-GUI entry: `zef_bst_plugin_start` (figure named `ZEFFIRO-Brainstorm plugin`). Programmatic entry: `utilities.brainstorm2zef.run(config)`.
+Convert a **Brainstorm** protocol into a Zeffiro project (compartments + FEM mesh), typically under `nodisplay`. Unlike `fs2zef` (FreeSurfer surfaces → ASC/STL/`.zef` dump), this path drives a live Zeffiro session and optional project save.
 
-## What must exist
+## Main contents
 
-- Brainstorm on the MATLAB path (`exist('bst_get','file')`).
-- An initialized protocol: `bst_get('ProtocolInfo')` must return a struct with `SUBJECTS`. `zef_bst_validate_environment` fails otherwise.
-- Subject anatomy in that protocol matching `zef_bst.compartment_list` (default: Scalp, OuterSkull, InnerSkull, Cortex, Other, white, subcortical).
-- Settings script under `settings/` (default `zef_bst_default.m`), loaded by `zef_bst_get_settings`.
+| Item | Role |
+|------|------|
+| `run.m` | `utilities.brainstorm2zef.run(config)` — main programmatic entry |
+| `zef_bst_plugin_start.m` | GUI “ZEFFIRO-Brainstorm plugin” |
+| `zef_bst_create_project.m` | Surfaces → compartments (no mesh yet) |
+| `zef_bst_default_fem_mesh_create.m` | Discovered mesh-create script (`zef_bst_*_fem_mesh_create.m`) |
+| `zef_bst_init` / `zef_bst_get_settings` / validators | Defaults and checks |
+| `zef_bst_edit_project.m` | Edit / reload flows (run_type nuances) |
+| `settings/` | Preset scripts (e.g. `zef_bst_default.m`) |
+| `projects/` | Optional dump target for saved `.mat` / compartment dumps |
+| Adapters in `src/io/import/zef_bst_2_zef_*` | Low-level BST → Zeffiro field mapping |
 
-No FreeSurfer/`SUBJECTS_DIR` requirement for `run` itself; Brainstorm already holds the surfaces.
+## Code functionality
 
-## Public entry
+`run` pipeline (typical):
 
-```matlab
-config = struct();
-config.settings_file_name = 'zef_bst_default';  % basename in settings/
-config.project_file_name = fullfile(pwd, 'data', 'bst_project');  % optional save
-config.run_type = 1;      % 1 = fresh from Brainstorm; 2 = reload saved compartment dumps
-config.input_mode = 1;    % 1 = use input files; 2 = ignore compartment_files
-config.verbose = true;
-% optional: subject_struct, subject_folder, use_gpu, parallel_processes, zef_bst overrides
+1. Validate Brainstorm environment / settings.
+2. `zeffiro_interface('start_mode','nodisplay')`.
+3. `zef_bst_create_project` — build compartments from BST surfaces.
+4. `zef_create_finite_element_mesh` — FEM.
+5. Extract `mesh_data` (nodes often converted to metres via `/unit_conversion`).
+6. Optional `zef_save` — does **not** auto-close the session.
 
-results = utilities.brainstorm2zef.run(config);
-% results.success, .zef, .mesh_data, .errors, .warnings, .processing_time
-% Caller should zef_close_all(results.zef) when done — run does not close.
+Config highlights: `settings_file_name`, `project_file_name`, `run_type` (1 fresh / 2 reload dumps; prefer `zef_bst_edit_project` for some edit paths), `input_mode`, `verbose`, GPU/parallel overrides. Defaults include a Scalp…subcortical `compartment_list` and `unit_conversion=1000`.
+
+## Workflow context
+
+```
+Brainstorm protocol
+  → utilities.brainstorm2zef.run / plugin
+  → src/mesh + lead_field (afterward, user-driven)
 ```
 
-### `config` fields (`run` / `validate_and_set_defaults`)
+Siblings: `fs2zef`, `sn2zef`, `duneuro2zef`.
 
-| Field | Default | Meaning |
-|-------|---------|---------|
-| `settings_file_name` | `'zef_bst_default'` | Script in `settings/` (no `.m` needed) |
-| `project_file_name` | `''` | If non-empty, `zef_save` to `[file_name].mat` |
-| `run_type` | `1` | `1` fresh; `2` import previously written `*_compartment_settings.dat` + `*_surface_meshes.mat`. **3 is rejected** here — use `zef_bst_edit_project` or `zeffiro_interface('open_project',...)` |
-| `input_mode` | `1` | `2` clears `zef_bst.compartment_files` |
-| `verbose` | `true` | Also copied onto `zef_bst.verbose_mode` |
-| `save_project` | true iff `project_file_name` non-empty | |
-| `subject_struct` / `subject_folder` | empty | Overrides inside `zef_bst` |
-| `use_gpu` / `parallel_processes` | `[]` | Passed into `zeffiro_interface` when set |
-| `zef_bst` | `struct()` | Merged over the settings script |
-
-## Pipeline (`run`)
-
-1. `zef_bst_validate_environment`
-2. `zef_bst_get_settings` (runs `zef_bst_init` then the settings `.m`)
-3. `zeffiro_interface('start_mode','nodisplay', ...)`
-4. `zef_bst_create_project` — `zef_add_bounding_box`, pull surfaces, `zef_add_compartment` per row
-5. `zef_create_finite_element_mesh(zef)`
-6. Copy mesh to `results.mesh_data`: **nodes divided by `zef_bst.unit_conversion`** (Zeffiro millimetres → metres for Brainstorm-side consumers). Tetra is `[zef.tetra zef.domain_labels]`. `name_tags` drops the last tag (bounding box).
-7. Optional `zef_save`
-
-## Coordinate frame
-
-Compartment points/triangles come from Brainstorm surface files (`zef_bst_find_compartment` / `zef_bst_get_atlas_surfaces`). Triangle winding is flipped `(:,[1 3 2])` when stored on `zef`. Zeffiro mesh coordinates stay in the session length unit (typically mm). Only `results.mesh_data.nodes` is converted to metres.
-
-## How the result is used
-
-Keep `results.zef` and continue (lead field, inverse) in the same MATLAB session, or load the saved `.mat` later:
+## Usage instructions
 
 ```matlab
-zef = zeffiro_interface('start_mode', 'nodisplay', 'open_project', [file_name '.mat']);
+cfg = struct();  % see settings presets / help utilities.brainstorm2zef.run
+utilities.brainstorm2zef.run(cfg);
+% or open the GUI plugin: zef_bst_plugin_start
 ```
 
-There is no `import_to_new_project` `.zef` from this path unless you add one yourself.
+## Important notes
 
-## Plugin GUI
+- Prefer not nesting inside an already-open GUI session — use nodisplay/`run` or a clean start.
+- `projects/` may be empty in a fresh clone; set explicit output paths.
+- Conductivities / DOF defaults come from `zef_bst_init` and settings overlays.
 
-`zef_bst_plugin_start(folder_name, zef_bst, open_dialog)` builds figure `zeffiro_bst_plugin`, lists `zef_bst_*_fem_mesh_create.m` in this package (currently `zef_bst_default_fem_mesh_create`), and settings/project subfolders. `zef_bst_settings_file` is a dialog script for picking the settings `.m`.
+## Developer guidance
 
-## Settings / projects folders
-
-- `settings/zef_bst_default.m` — factory `zef_bst` (mesh_resolution 3, compartment_list, GPU, inflation, …). It is a **script** that assigns `zef_bst.*`.
-- `projects/` — intended dump location for plugin-created projects (`README.txt` only in-tree).
-
-## Gaps
-
-- `run_type` 3 is documented in some comments as “existing project” but `run` and `zef_bst_create_project` error if it is passed.
-- Intermediate `*_compartment_settings.dat` / `*_surface_meshes.mat` are written next to the **settings file path**, not necessarily under `projects/`.
+- Keep BST I/O adapters in `src/io/import`; keep orchestration here.
+- Document any new `zef_bst_*_fem_mesh_create` discovery name in this README.
+- Pitfall: mixing fs2zef ASC imports with Brainstorm run without clearing compartments.

@@ -1,19 +1,38 @@
-# EXP IAS solver files
+# tools/plugins/EXP/exp_ias/m
 
-GUIDE **IAS MAP estimation for EP** internals. IAS (iterative alternating sequential MAP on the same L1/L2 hierarchical prior) is estimation type 1 in the unified Exponential Prior tool. This folder is the older standalone window for IAS without RAMUS coarsening.
+## Folder purpose
 
-**Not** on the default Inverse-tools menu. Asteroid / `_legacy` profiles open the **IAS RAMUS** window (`exp_ias_multires/`), not this one. Open from MATLAB:
+MATLAB sources for legacy GUIDE **EXP IAS MAP** (single-resolution). Start opens `../fig/exp_ias_map_estimation.fig`. Not on the default `multicompartment_head` Inverse menu (unified App Designer EXP/Lasso path). Asteroid / legacy profiles more often use **IAS multires** (`exp_ias_multires`).
 
-```matlab
-exp_ias_map_estimation;   % script; opens the GUIDE fig
-```
-
-Start in the fig still calls `exp_ias_iteration([])`. Same `zef.L` / SNR / frame needs as `exp_iteration`. Writes `zef.reconstruction` / `reconstruction_information`.
+## Main contents
 
 | File | Role |
 |------|------|
-| `exp_ias_map_estimation.m` | **script** that `open`s the fig and runs `zef_init_exp_ias` |
-| `exp_ias_iteration.m` | Solver (`[]` from the fig Start callback) |
-| `zef_init_exp_ias.m` / `zef_update_exp_ias.m` | Widget ↔ `zef` |
+| `exp_ias_map_estimation.m` | Start: open fig + `zef_init_exp_ias` |
+| `zef_init_exp_ias.m` | Defaults / widget bind |
+| `zef_update_exp_ias.m` | Widgets → `zef` |
+| `exp_ias_iteration.m` | Solver (Start → `exp_ias_iteration([])`); tag `'EXP IAS'` |
 
-Folder overview: [../README.md](../README.md). Unified app: [../../README.md](../../README.md). RAMUS IAS GUIDE: [../../exp_ias_multires/m/README.md](../../exp_ias_multires/m/README.md).
+## Code functionality
+
+IAS-style exponential-prior MAP on `zef.L` + measurements after `zef_processLeadfields` / post-process helpers. Uses `evalin('base','zef…')` (GUIDE-era).
+
+## Workflow context
+
+Siblings: `exp_em` (EM), `exp_ias_multires` / `exp_em_multires`, App Designer `zef_exp_app_launch`. Class cousins: `inverse.IASInverter`.
+
+## Usage instructions
+
+```matlab
+exp_ias_map_estimation;  % then Start in the GUIDE UI
+```
+
+## Important notes
+
+- Needs `zef.L` and measurements before Start.
+- Distinct field namespace from EM / multires plugins.
+
+## Developer guidance
+
+- Prefer porting fixes to App Designer / `+inverse` rather than growing GUIDE callbacks.
+- Pitfall: comparing to multires IAS without matching lattices and priors.

@@ -119,8 +119,8 @@ set(zef.h_mesh_tool,'DeleteFcn','zef_closereq;');
 zef.h_mesh_tool.Units = 'normalized';
 %zef.h_mesh_tool.Position(1:2) = [0.2 0.2];
 zef.h_mesh_tool.Units = 'pixels';
-set(zef.h_mesh_tool,'AutoResizeChildren','off');
-zef_set_size_change_function(zef.h_mesh_tool,2)
+zef = zef_ui_tag_handles(zef);
+zef.h_mesh_tool.AutoResizeChildren = 'on';
 
 %if zef.h_segmentation_tool_toggle == 1
 
@@ -138,15 +138,11 @@ zef_set_size_change_function(zef.h_mesh_tool,2)
 
 %end
 
-relative_size = 0.8;
-width_aux = relative_size*zef.segmentation_tool_default_position(3);
-        height_aux = 0.5*zef.segmentation_tool_default_position(3);
-        vertical_aux = zef.segmentation_tool_default_position(2)+zef.segmentation_tool_default_position(4)-height_aux;
-        horizontal_aux = zef.segmentation_tool_default_position(1)+zef.segmentation_tool_default_position(3)-width_aux;
-        zef.h_mesh_tool.Position = [horizontal_aux vertical_aux width_aux height_aux]; 
-zef_window_manager('standalone', zef.h_mesh_tool); 
-
-set(findobj(zef.h_mesh_tool.Children,'-property','FontSize'),'FontSize',zef.font_size);
+ref = zef.segmentation_tool_default_position;
+zef.h_mesh_tool.Position = [ref(1) + ref(3) - 780, ref(2) + ref(4) - 500, 780, 500];
+zef_window_manager('standalone', zef.h_mesh_tool);
+zef_ui_apply_size(zef.h_mesh_tool, 780, 500, 680, 460);
+zef_ui_ready(zef.h_mesh_tool);
 
 if not(ismember('ZefTool',properties(zef.h_mesh_tool)))
     addprop(zef.h_mesh_tool,'ZefTool');

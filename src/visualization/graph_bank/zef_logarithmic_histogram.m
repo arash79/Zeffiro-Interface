@@ -15,6 +15,7 @@ axes(evalin('base','zef.h_axes1')
 
 h_axes = evalin('base','zef.h_axes1');
 cla(h_axes,'reset');
+h_axes.Tag = 'axes1';
 
 h_hist = histogram(log10(parameter_vec),200);
 h_hist.FaceColor = [0.5 0.5 0.5];

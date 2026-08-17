@@ -21,6 +21,10 @@ b = 1/sigma*y;
 reg = sqrt(0.5*pi/m)*norm(A,'fro');
 
 for iter = 1 : maxiter
+    % D = diag(|x|/gamma) is the FOCUSS weight. The sensor-side Gram
+    % A D A' is ridge-regularized with reg·trace(D) I,
+    % reg = sqrt(π/(2m)) ‖A‖_F. Type 3 also left-multiplies by
+    % T_scale = 1/sqrt(diag(R)) from the current weighted resolution.
     if estimation_type == 3
         P_sqrt = abs(x)./gamma;   %Fixed-point/FOCUSS
         L_aux = A.*P_sqrt';

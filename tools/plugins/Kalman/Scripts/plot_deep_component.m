@@ -46,7 +46,7 @@ for frame = [21 31 51 61 101]
     %612   510
     f2.Position(3) = 620;
     f2.Position(4) = 600;
-    copyobj(findobj(f1.Children, 'tag','axes1'), f2);
+    copyobj(zef_ui_axes(f1), f2);
 
     f2.Children.Position(2) = 60;
     grid off

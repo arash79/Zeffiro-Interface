@@ -30,12 +30,8 @@ else
     h_figure = eval('zef.h_zeffiro');
 end
 
-h = findobj(get(h_figure,'Children'),'Tag','axes1');
-h_object = findobj(get(h_figure,'Children'),'Tag','update_ambience_slider');
-if isempty(h_object)
-    h_figure = eval('zef.h_zeffiro');
-    h_object = findobj(get(h_figure,'Children'),'Tag','update_ambience_slider');
-end
+h = zef_ui_axes(h_figure);
+h_object = zef_ui_control(h_figure, 'update_ambience_slider');
 
 ambience_val = h_object.Value;
 h = h.Children;

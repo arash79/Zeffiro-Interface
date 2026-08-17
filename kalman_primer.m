@@ -10,7 +10,7 @@
 %   pulses, noise_dB=25. Nearest brain sources via zef_processLeadfields
 %   (temporarily sets source_direction_mode 2 then 1). Writes
 %   zef.measurements. The zef_KF / visualize block at the bottom is
-%   commented out. Does not save. Pair with run.m (custom Q on disk).
+%   commented out. Does not save. Pair with kalman_custom_q_driver.m.
 %
 
 noise_dB = 25;  % Measurement noise level (dB, higher = less noise)

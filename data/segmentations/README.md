@@ -1,22 +1,57 @@
-# `data/segmentations`
+# data/segmentations
 
-These folders are **import assets**: closed tissue surfaces plus an `import_segmentation.zef` manifest. Zeffiro does not load them at startup. You import them (GUI or CLI), then mesh and compute a lead field as usual.
+## Folder purpose
 
-The only bundled tree is `multicompartment_head_project/`: FreeSurfer-style `.asc` surfaces (scalp, skull, CSF, brain, …), sample `electrodes.dat`, parcellation colortables, and the `.zef` that names those files. That subfolder’s README lists each surface and the offline regenerators (`create_colortable.m`, `fs2zef.sh`).
+Shipped **surface anatomy** for the multicompartment head demo: FreeSurfer-style `.asc` boundaries, cortex/WM, subcortical structures, 36-parcel labels, sensors, and an `import_segmentation.zef` manifest. Used by **Import → Import data to a new project** and CLI `import_to_new_project` — not loaded automatically at every startup.
 
-## How to import
+## Main contents
 
-**GUI:** **Import → Import data to a new project** (label assigned in `zef_menu_tool.m`), pick `import_segmentation.zef`. That resets the session (`zef_start_new_project` with `new_empty_project=1`), runs `zef_import_segmentation`, then `zef_build_compartment_table`.
+Under `multicompartment_head_project/`:
 
-**MATLAB:**
+| Kind | Examples |
+|------|----------|
+| Boundaries | `outer_skin`, `outer_skull`, `inner_skull` |
+| Cortex / WM | `lh.pial`, `rh.pial`, `lh.wm`, `rh.wm`, cerebellum cortex/WM |
+| Subcortical / CSF / vessels / CC / brainstem | Many `lh.` / `rh.` prefixed ASC files |
+| Parcellation | `lh_labels_36`, `rh_labels_36`, `color_table_{lh,rh}_36.mat` |
+| Sensors | `electrodes.dat`, `meg_points.dat`, `meg_directions.dat` |
+| Manifest | `import_segmentation.zef` |
+| Offline regenerators | `fs2zef.sh`, `create_colortable.m`, `create_points.m`, `creat_points.m` (legacy typo name), `read_annotation.m` |
 
-```matlab
-zef = zeffiro_interface('import_to_new_project', ...
-    fullfile(projectRoot,'data','segmentations','multicompartment_head_project','import_segmentation.zef'));
+See `multicompartment_head_project/README.md` for file-level detail.
+
+## Code functionality
+
+Data + offline regeneration scripts. Import parsers live under `src/io`. Production FreeSurfer conversion for new subjects: `utilities.fs2zef`.
+
+## Workflow context
+
+```
+import_segmentation.zef
+  → compartments on zef
+  → Mesh tool Create FEM mesh
+  → lead_field → inverse
 ```
 
-Coordinates are millimetres. The importer (`src/io/zef_import_segmentation`) resolves `filename` / `foldername` relative to the folder that contains the `.zef`. After import, Mesh tool **Create FEM mesh**.
+Related: `data/example_projects/*.mat` (prebuilt sessions), `+examples/+importing`.
 
-To *produce* a new `.zef` from FreeSurfer, use `utilities.fs2zef.run` (writes `ascii/import_segmentation.zef` and/or `mesh/`). Do not confuse that with the tetrahedral importer `zef_import` under **Import → Import volume data**.
+## Usage instructions
 
-Parent data root: [`data/README.md`](../README.md). Manifest `type=` rows: [`src/io/README.md`](../../src/io/README.md).
+```matlab
+zef = zeffiro_interface('start_mode','nodisplay', ...
+    'import_to_new_project', fullfile(pwd,'data','segmentations', ...
+    'multicompartment_head_project','import_segmentation.zef'));
+```
+
+Or GUI Import to a new project and browse to this folder’s manifest.
+
+## Important notes
+
+- Coordinates are typically **mm**.
+- ASC inventory is large (~60+ surfaces); do not delete label/color_table pairs.
+- Regenerators assume FreeSurfer/`SUBJECTS_DIR` and are not required for normal demos.
+
+## Developer guidance
+
+- Prefer regenerating via `fs2zef` rather than hand-editing dozens of ASC files.
+- Pitfall: importing without turning compartments **On** before meshing.

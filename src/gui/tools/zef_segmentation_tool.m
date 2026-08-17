@@ -72,8 +72,8 @@ zef.h_profile_name.ValueChangedFcn = 'zef.profile_name = zef.h_profile_name.Valu
 
 zef.h_project_tag.Value = zef.project_tag;
 
-set(zef.h_zeffiro_window_main,'AutoResizeChildren','off');
-zef_set_size_change_function(zef.h_zeffiro_window_main,2);
+zef = zef_ui_tag_handles(zef);
+zef.h_zeffiro_window_main.AutoResizeChildren = 'on';
 zef.h_windows_open = findall(groot, 'Type','figure','-regexp','Name','ZEFFIRO Interface:*','-not','Name','ZEFFIRO Interface: Segmentation tool');
 
 %set(zef.h_zeffiro_window_main,'DeleteFcn','zef_closereq;');
@@ -88,13 +88,6 @@ if isempty(zef.h_segmentation_tool_toggle.UserData)
 
 end
 
-set(findobj(zef.h_zeffiro_window_main.Children,'-property','FontSize'),'FontSize',zef.font_size);
-
-if not(ismember('ZefTool',properties(zef.h_zeffiro_window_main)))
-    addprop(zef.h_zeffiro_window_main,'ZefTool');
-end
-zef.h_zeffiro_window_main.ZefTool = mfilename;
-
 zef = zef_build_compartment_table(zef);
 
 % CRITICAL FIX: Skip zef_update here during initial load - it can hang on large projects.
@@ -105,10 +98,13 @@ zef = zef_build_compartment_table(zef);
 zef.h_zeffiro_window_main.CloseRequestFcn = 'zef.h_zeffiro_window_main.Visible=''off'';';
 zef.h_zeffiro_window_main.DeleteFcn = 'zef.h_zeffiro_window_main.Visible=''off'';';
 
-    relative_size = 1;
-width_aux = relative_size*zef.segmentation_tool_default_position(3);
-        height_aux = 1.15*zef.segmentation_tool_default_position(3);
-        vertical_aux = zef.segmentation_tool_default_position(2)+zef.segmentation_tool_default_position(4)-height_aux;
-        horizontal_aux = zef.segmentation_tool_default_position(1)+zef.segmentation_tool_default_position(3)-width_aux;
-        zef.h_zeffiro_window_main.Position = [horizontal_aux vertical_aux width_aux height_aux];
+if not(ismember('ZefTool',properties(zef.h_zeffiro_window_main)))
+    addprop(zef.h_zeffiro_window_main,'ZefTool');
+end
+zef.h_zeffiro_window_main.ZefTool = mfilename;
+
+ref = zef.segmentation_tool_default_position;
+zef.h_zeffiro_window_main.Position = [ref(1), ref(2), 1280, 620];
 zef_window_manager('standalone', zef.h_zeffiro_window_main);
+zef_ui_apply_size(zef.h_zeffiro_window_main, 1280, 620, 1020, 500);
+zef_ui_ready(zef.h_zeffiro_window_main);

@@ -1,56 +1,50 @@
-# IASROIInversion
+## Folder purpose
 
-IAS MAP restricted to a region of interest (sphere, threshold, or parcellation). Use it when you already know an approximate focus and want the hierarchical Bayes update only there.
+IAS MAP restricted to a region of interest (sphere, threshold, or parcellation). Use when an approximate focus is known and the hierarchical Bayes update should run only there. There is no `inverse.*Inverter` for this ROI variant.
 
-There is **no** `inverse.*Inverter` for this ROI variant.
+## Main contents
 
-## Menu
+| Path | Role |
+|------|------|
+| `m/ias_map_estimation_roi.m` | INI callback (filename); opens the ROI window |
+| `m/zef_init_ias_roi.m` | Defaults and widget seed |
+| `m/zef_ias_map_estimation_roi_window.m` | GUIDE dump; live Start callback string |
+| `m/zef_ias_iteration_roi.m` | Solver on disk |
+| `m/zef_iasroi_plot_roi.m` | Plot Sphere(s) / source helpers |
+| `m/zef_update_ias_roi.m`, `m/zef_switch_roi_mode.m` | Widget sync / mode enable |
 
-| Profile | Path |
-|---------|------|
-| `multicompartment_head` | Inverse tools → **IAS ROI Inversion** |
-| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
+## Code functionality
 
-INI callback: `ias_map_estimation_roi` (file `m/ias_map_estimation_roi.m`).
+ROI modes (`zef.iasroi_roi_mode`):
 
-Window title: `ZEFFIRO Interface: IAS ROI MAP estimation`.
+| Value | Label | Sources kept |
+|-------|-------|----------------|
+| 1 | Sphere(s) | Inside any `iasroi_roi_sphere` ball `[x y z radius]` |
+| 2 | Threshold | Existing `zef.reconstruction` amplitude ≥ `iasroi_roi_threshold` (peak-normalized) |
+| 3 | Parcellation | Selected parcellation labels |
 
-## Run the solver
+IAS MAP then runs only on the corresponding lead-field columns (`L(:, roi_aux_ind)`). SNR: `zef.iasroi_snr` → `10^(-iasroi_snr/20)`. Intended writes: `zef.reconstruction` and `zef.iasroi_rec_source`. Does not fill `zef.reconstruction_information`.
 
-**Start** (`zef.h_iasroi_start`) Callback in `zef_ias_map_estimation_roi_window` (init does **not** override it):
+## Workflow context
+
+Menu: Inverse tools → **IAS ROI Inversion** (`multicompartment_head` and legacy / NSE / asteroid profiles). INI callback: `ias_map_estimation_roi`. Window title: `ZEFFIRO Interface: IAS ROI MAP estimation`. Needs `zef.L`, interpolation, `zef.source_positions`, and `zef.measurements` before Start.
+
+## Usage instructions
+
+Open from the menu, set ROI mode and parameters, then **Start**. Live Start string (from the window):
 
 ```matlab
 zef_update_ias_roi; [zef.reconstruction, zef.iasroi_rec_source] = ias_iteration_roi([]);
 ```
 
-The function on disk is `zef_ias_iteration_roi`. There is no `ias_iteration_roi.m` in this tree — the live Start string does not match the solver filename.
+**Plot Sphere(s)** / **Plot source(s)** visualize the ROI on Figure-tool axes; they do not invert.
 
-Also on the window: **Plot Sphere(s)** / **Plot source(s)** for ROI visualization; they do not run the inverse.
+## Important notes
 
-## Needs
+- The solver file is `zef_ias_iteration_roi.m`; there is no `ias_iteration_roi.m`. The live Start string does not match the solver filename; init does not override it.
+- File `ias_map_estimation_roi.m` declares `function zef = ias_map_estimation(zef)` (same name as the non-ROI start). INI calls the filename.
+- Full-volume IAS MAP is a separate plugin / `inverse.IASInverter`.
 
-- `zef.L`, interpolation, `zef.source_positions`
-- `zef.measurements`
-- SNR: `zef.iasroi_snr` (from `inv_snr` at init) → `10^(-iasroi_snr/20)`
-- Frames: `zef.iasroi_number_of_frames`, `iasroi_time_*`, band edges
-- ROI: `zef.iasroi_roi_mode`, `iasroi_roi_sphere`, `iasroi_roi_threshold`, `iasroi_rec_source`
+## Developer guidance
 
-ROI mode dropdown (`zef_ias_map_estimation_roi_window` `String`):
-
-| Value | Label | Sources kept |
-|-------|-------|----------------|
-| 1 | Sphere(s) | Inside any `iasroi_roi_sphere` ball `[x y z radius]` (same units as `source_positions`) |
-| 2 | Threshold | Existing `zef.reconstruction` amplitude ≥ `iasroi_roi_threshold` (peak-normalized) |
-| 3 | Parcellation | Selected parcellation labels (`default` in `zef_init_ias_roi`) |
-
-IAS MAP then runs only on the corresponding lead-field columns (`L(:, roi_aux_ind)`). **Plot Sphere(s)** / **Plot source(s)** draw on Figure-tool axes; they do not invert.
-
-## Writes
-
-- Intended: `zef.reconstruction` and `zef.iasroi_rec_source` from `zef_ias_iteration_roi` (`[z, rec_source]`)
-- Does **not** fill `zef.reconstruction_information`
-
-## Files
-
-- Start: `m/ias_map_estimation_roi.m` → `zef_init_ias_roi`
-- Solver: `m/zef_ias_iteration_roi.m`
+Keep ROI selection logic and the MAP loop in `m/`. Prefer fixing Start to call `zef_ias_iteration_roi` explicitly. Class path for non-ROI IAS: `+inverse/@IASInverter`. Menu wiring: profile `zeffiro_plugins.ini`.

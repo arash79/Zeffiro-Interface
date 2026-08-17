@@ -76,12 +76,19 @@ zef.aux_field = dir(zef.time_series_tools_dir);
 for zef_i = 1 : length(zef.aux_field)
     [~, zef.time_series_tools_file_list{zef_i}] = fileparts(zef.aux_field(zef_i).name);
 end
-zef.time_series_tools_file_list = setdiff(zef.time_series_tools_file_list,[{'.'} {''}]);
+zef.time_series_tools_file_list = setdiff(zef.time_series_tools_file_list,[{'.'} {''} {'README'} {'contents'}]);
 for zef_i = 1 : length(zef.time_series_tools_file_list)
     zef.aux_field = help(zef.time_series_tools_file_list{zef_i});
-    % Label is the rest of the help after "Description:" (see file H1 blocks).
-    zef.aux_field = zef.aux_field(strfind(zef.aux_field,'Description:'):end);
-    zef.time_series_tools_name_list{zef_i} = strtrim(zef.aux_field(13:end-1));
+    zef_desc = strfind(zef.aux_field, 'Description:');
+    if isempty(zef_desc) || numel(zef.aux_field) < zef_desc(1) + 13
+        zef.time_series_tools_name_list{zef_i} = strrep(zef.time_series_tools_file_list{zef_i}, '_', ' ');
+    else
+        zef.aux_field = zef.aux_field(zef_desc(1):end);
+        zef.time_series_tools_name_list{zef_i} = strtrim(zef.aux_field(13:min(end-1, numel(zef.aux_field))));
+        if isempty(zef.time_series_tools_name_list{zef_i})
+            zef.time_series_tools_name_list{zef_i} = strrep(zef.time_series_tools_file_list{zef_i}, '_', ' ');
+        end
+    end
 end
 [zef.time_series_tools_name_list, zef.aux_field] = sort(zef.time_series_tools_name_list);
 zef.time_series_tools_file_list = zef.time_series_tools_file_list(zef.aux_field);

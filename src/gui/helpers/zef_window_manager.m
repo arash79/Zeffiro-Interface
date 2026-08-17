@@ -253,6 +253,11 @@ if isfield(zef, 'menu_expanded_size') && ~isempty(zef.menu_expanded_size)
     expanded_size = zef.menu_expanded_size;
 end
 main_pos = h_main.Position;
+if is_expanded
+    menu_w = min(main_pos(3), 800);
+else
+    menu_w = min(main_pos(3), local_menu_bar_width(h_menu));
+end
 
 sc = [];
 try
@@ -262,15 +267,39 @@ catch
 end
 
 if is_expanded
-    h_menu.Position = [main_pos(1), main_pos(2) + main_pos(4) - expanded_size, main_pos(3), expanded_size];
+    h_menu.Position = [main_pos(1), main_pos(2) + main_pos(4) - expanded_size, menu_w, expanded_size];
 else
-    h_menu.Position = [main_pos(1), main_pos(2) + main_pos(4), main_pos(3), min_h];
+    h_menu.Position = [main_pos(1), main_pos(2) + main_pos(4), menu_w, min_h];
 end
 
 try
     h_menu.SizeChangedFcn = sc;
 catch
 end
+
+end
+
+function w = local_menu_bar_width(h_menu)
+
+w = 36;
+try
+    kids = allchild(h_menu);
+    for i = 1:numel(kids)
+        try
+            if ~strcmpi(char(kids(i).Type), 'uimenu')
+                continue
+            end
+            txt = strtrim(char(string(kids(i).Text)));
+            if isempty(txt)
+                continue
+            end
+            w = w + 6.6 * numel(txt) + 16;
+        catch
+        end
+    end
+catch
+end
+w = min(max(round(w), 620), 680);
 
 end
 

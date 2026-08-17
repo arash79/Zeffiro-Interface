@@ -178,12 +178,15 @@ for f_ind = 1 : number_of_frames
 
         z_vec = L*f;
 
+        % Hyperprior update needs a host array; gather before θ.
         if eval('zef.use_gpu') == 1 & eval('zef.gpu_count') > 0
             z_vec = gather(z_vec);
         end
         if eval('zef.inv_hyperprior') == 1
+            % Inverse-gamma: θ ← (θ0 + ½ z²) / (β + 3/2)
             theta = (theta0+0.5*z_vec.^2)./(beta + 1.5);
         elseif eval('zef.inv_hyperprior') == 2
+            % Gamma: closed-form MAP for the same hierarchical model
             theta = theta0.*(beta-1.5 + sqrt((1./(2.*theta0)).*z_vec.^2 + (beta+1.5).^2));
         end
     end;

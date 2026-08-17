@@ -15,9 +15,11 @@ function zef_toggle_edges
 %
 %   See also zef_toggle_figure_controls, zef_figure_tool.
 
-h = get(gcf,'Children');
-h = findobj(h,'Tag','axes1');
-h = get(h,'Children');
+h = zef_ui_axes(gcf);
+if isempty(h)
+    return
+end
+h = get(h(1), 'Children');
 for i = 1 : length(h);
     if find(ismember(properties(h(i)),'EdgeColor'));
         if isequal(h(i).EdgeColor,[1 1 1])

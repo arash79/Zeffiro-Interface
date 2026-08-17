@@ -1,6 +1,22 @@
-# `+plugins/+ClassGMM` — GMM clustering on reconstructions
+# `plugins.ClassGMM` — GMM on reconstructions
 
-Fits a Gaussian mixture to an inverse reconstruction (spatial, optionally orientation). Used after a class inverter has produced `reconstruction`; it is **not** a registry inverse method. Statistics Toolbox (`fitgmdist` / EM internals) is required.
+## Folder purpose
+
+**Gaussian-mixture clustering** of an existing inverse reconstruction (spatial, optionally orientation). Used after a class inverter has produced sources; **not** a registry inverse method. Requires Statistics Toolbox (`fitgmdist` / EM).
+
+## Main contents
+
+| File | Role |
+|------|------|
+| `ClassGMModeling.m` | Public entry: fit GMM, model selection, store on `MethodClassObj.GMM` |
+| `FitAdvGMM.m` | Weighted EM driver |
+| `AdvGMModeling4Rec.m` | Core reconstruction-weighted EM loop |
+| `estep.m` / `EstepWeight.m` | E-step variants |
+| `WeightedCondDensity.m` | Component densities |
+
+GUI parallel copies exist under `tools/plugins/GMMClustering/.../AdvancedGMM` and may drift.
+
+## Code functionality
 
 Typical call from a class object that already ran invert:
 
@@ -9,39 +25,37 @@ MethodClassObj = plugins.ClassGMM.ClassGMModeling(MethodClassObj, reconstruction
     "number_of_clusters", 3, ...
     "sought_estimate", "Location & orientation", ...
     "model_selection_criterion", "Bayesian information criterion");
-% results stored on MethodClassObj.GMM
 ```
 
-## `ClassGMModeling` name-values
+**Name-values (defaults):** `number_of_clusters=3`, `sought_estimate="Location & orientation"`, `covariance_type="full"`, `MaxIter=1000`, `reconstruction_threshold=0.25`, `regularization_parameter=1e-2`, BIC or fixed-K selection, optional parcellation restriction, frame sub-range.
 
-| Name | Default | Meaning |
-|------|---------|---------|
-| `number_of_clusters` | 3 | `K` or candidate counts |
-| `sought_estimate` | `"Location & orientation"` | or `"Location"` |
-| `covariance_type` | `"full"` | or `"diagonal"` |
-| `MaxIter` | 1000 | EM cap |
-| `reconstruction_threshold` | 0.25 | Amplitude cutoff |
-| `regularization_parameter` | 1e-2 | Covariance ridge |
-| `SharedCovariance` | false | |
-| `use_selected_parcellations` | false | Restrict to selected parcels |
-| `amplitude_estimation_type` | `"Point density"` | or ML / MAP |
-| `model_selection_criterion` | `"Bayesian information criterion"` | or given K / L2 density error |
-| `initial_cluster_finding_approach` | `"Maximum component-wise fit"` | or k-means++ / max probability |
-| `number_of_replicates` | 1 | |
-| `log_posterior_threshold_dB` | 6 | |
-| `reconstruction_smoothing_std` | 0 | |
-| `mixture_component_probability` | 0.95 | |
-| `start_frame` / `stop_frame` | empty | Sub-range of a cell reconstruction |
+Needs `zef.source_positions` (and parcellation fields if enabled). Opens a waitbar.
 
-Needs `zef.source_positions` (and parcellation fields if that flag is on). Opens a waitbar.
+## Workflow context
 
-## Numerical kernels
+```
+inverse.*Inverter → reconstruction → CommonInverseParameters.computeGMM → ClassGMModeling
+```
 
-| File | Role |
-|------|------|
-| `FitAdvGMM` | Weighted EM wrapper (`positions`, `weight`, `k`, FITGMDIST-style name-values) |
-| `AdvGMModeling4Rec` | Advanced GMM fit used for reconstructions |
-| `estep` / `EstepWeight` | E-step posteriors / weighted update |
-| `WeightedCondDensity` | Component log-likelihoods |
+`computeGMM` exists on the base class but may have few live GUI callers today. Studies often use legacy `zef_cluster_reconstruction` (GMModel SP) instead.
 
-These are not user-facing inverse ids. Focal-epilepsy study scripts use **legacy** GMM GUI paths, not necessarily this package.
+## Usage instructions
+
+```matlab
+inv = inverse.ELORETAInverter();
+[zef, inv] = inv.computeInversionWithZI(zef);
+inv = inv.computeGMM(zef);   % if wired on your branch
+% or call ClassGMModeling directly as above
+```
+
+## Important notes
+
+- Not listed in `inverse_method_registry` as an inverse id.
+- JL GUI advanced path duplicates these helpers under the plugin tree.
+- Thresholding and smoothing parameters strongly affect cluster count stability.
+
+## Developer guidance
+
+- Consolidate plugin AdvancedGMM with this package before feature work.
+- Add a unit test with synthetic multi-blob reconstructions when changing EM.
+- Keep `MethodClassObj.GMM` schema documented for export tools.

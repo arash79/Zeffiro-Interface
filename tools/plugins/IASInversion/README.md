@@ -1,21 +1,13 @@
-# IASInversion
+## Folder purpose
 
 Iterative alternating sequential (IAS) MAP: alternate a Gaussian source update with a gamma / inverse-gamma hyperprior on per-source variance. Use it for sparse-ish hierarchical Bayes without RAMUS multiresolution.
 
-This plugin does **not** construct `inverse.IASInverter`. Class id `ias` (and `legacy_ias`) is a separate `zef_inverse_run` track.
+## Main contents
 
-## Menu
+- Start: `m/ias_map_estimation.m` → `zef_init_ias` → `zef_ias_map_estimation_window`
+- Solver: `m/zef_ias_iteration.m`
 
-| Profile | Path |
-|---------|------|
-| `multicompartment_head` | Inverse tools → **IAS Inversion** |
-| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
-
-INI callback: `ias_map_estimation`.
-
-Window title: `ZEFFIRO Interface: IAS MAP estimation`.
-
-## Run the solver
+## Code functionality
 
 **Start** (`zef.h_ias_start`) Callback, set in `zef_init_ias` (overrides the window constructor):
 
@@ -35,21 +27,32 @@ Hyperprior popup: spatially balanced vs constant (`zef.ias_hyperprior`). Standar
 
 IAS then updates `θ` (inverse-gamma or gamma from `zef.inv_hyperprior`) and repeats `ias_n_map_iterations` times.
 
-## Needs
+Needs: `zef.L`, `zef.source_interpolation_ind`, `zef.source_direction_mode`, `zef.measurements`; SNR `zef.ias_snr` (copied from `zef.inv_snr` at init) → `std_lhood = 10^(-ias_snr/20)`; frames `zef.ias_number_of_frames`, `ias_time_1/2/3`, `ias_sampling_frequency`, `ias_low_cut_frequency`, `ias_high_cut_frequency`; MAP iterations `zef.ias_n_map_iterations` (default 25); hyperprior family `zef.inv_hyperprior` (1 inverse-gamma, 2 gamma) plus `inv_prior_over_measurement_db`.
 
-- `zef.L`, `zef.source_interpolation_ind`, `zef.source_direction_mode`
-- `zef.measurements`
-- SNR: `zef.ias_snr` (copied from `zef.inv_snr` at init) → `std_lhood = 10^(-ias_snr/20)`
-- Frames: `zef.ias_number_of_frames`, `ias_time_1/2/3`, `ias_sampling_frequency`, `ias_low_cut_frequency`, `ias_high_cut_frequency`
-- MAP iterations: `zef.ias_n_map_iterations` (default 25)
-- Hyperprior family still uses `zef.inv_hyperprior` (1 inverse-gamma, 2 gamma) plus `inv_prior_over_measurement_db`
+Writes: `zef.reconstruction` after `zef_postProcessInverse` / peak-norm; `zef.reconstruction_information` with tag `IAS`.
 
-## Writes
+## Workflow context
 
-- `zef.reconstruction` after `zef_postProcessInverse` / peak-norm
-- `zef.reconstruction_information` with tag `IAS`
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **IAS Inversion** |
+| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
 
-## Files
+INI callback: `ias_map_estimation`. Window title: `ZEFFIRO Interface: IAS MAP estimation`.
 
-- Start: `m/ias_map_estimation.m` → `zef_init_ias` → `zef_ias_map_estimation_window`
-- Solver: `m/zef_ias_iteration.m`
+This plugin does **not** construct `inverse.IASInverter`. Class id `ias` (and `legacy_ias`) is a separate `zef_inverse_run` track.
+
+## Usage instructions
+
+1. Open Inverse tools → IAS Inversion.
+2. Set hyperprior, standardization type, and MAP iteration count.
+3. Press Start.
+
+## Important notes
+
+- Standardization value 3 (sLORETA last step) is never reached as written — both sLORETA branches test `isequal(ias_type,2)`.
+- Hyperprior family still uses global `zef.inv_hyperprior`, not only the IAS-specific popup.
+
+## Developer guidance
+
+Preserve callback `ias_map_estimation`, Start override in `zef_init_ias`, and tag `IAS`. Do not conflate with `ias` / `legacy_ias` class ids.

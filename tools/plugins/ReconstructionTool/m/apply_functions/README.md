@@ -1,14 +1,44 @@
-# ReconstructionTool **Apply** transforms
+# tools/plugins/ReconstructionTool/m/apply_functions
 
-Each file `zef_reconstructionTool_<name>.m` is `str2func`'d by **Apply transformation** in the ReconstructionTool window. The dropdown label is the `<name>` part after `zef_reconstructionTool_`. Adding a file here adds an item; no INI edit.
+## Folder purpose
 
-The transform runs on each **checked** bank row (checkbox column 7 of `bankInfo`) and **appends** a new row. It does not overwrite the source reconstruction. Live `zef.reconstruction` is unchanged until you **Replace**.
+Small **post-process kernels** applied to reconstructions from the Reconstruction Tool (mean / power and similar). Parent `m/` owns bank/UI wiring; this folder is the apply-function library discovered or called by name.
 
-## Shipped transforms
+## Main contents
 
-| File | Input | Output |
-|------|-------|--------|
-| `zef_reconstructionTool_mean.m` | Cell of frames, or a vector | Frame-wise mean of a cell; a vector is returned unchanged |
-| `zef_reconstructionTool_power.m` | Cell of frames, or a vector | Mean of squares across frames (`mean(x.^2)`); a vector is returned unchanged |
+| File | Role |
+|------|------|
+| `zef_reconstructionTool_mean.m` | Reduce / average reconstruction frames or components |
+| `zef_reconstructionTool_power.m` | Power / energy-style transform of reconstruction |
 
-A new transform should accept the reconstruction stored in the bank (cell or numeric) and return a reconstruction of the same kind the plotters expect (typically a cell of 3-component source vectors, or one vector). Parent: [../../README.md](../../README.md).
+Additional apply functions may appear beside these — follow the `zef_reconstructionTool_*` naming pattern.
+
+## Code functionality
+
+Each function takes reconstruction data (and possibly `zef` context) and returns a transformed reconstruction suitable for plotting or further bank storage. Exact signatures are in the file headers.
+
+## Workflow context
+
+```
+Inverse → zef.reconstruction
+  → Reconstruction Tool → apply_functions
+  → updated reconstruction / display
+```
+
+## Usage instructions
+
+Prefer the Reconstruction Tool UI Apply dropdown. Programmatic:
+
+```matlab
+% See help zef_reconstructionTool_mean / _power for arguments
+```
+
+## Important notes
+
+- Does not run inverse solvers.
+- Input size must match the tool’s expected frame layout.
+
+## Developer guidance
+
+- Add new applies as `zef_reconstructionTool_<name>.m` and register them in the parent tool’s list builder.
+- Pitfall: mutating `zef.reconstruction` in place without copying when the bank still references the old array.

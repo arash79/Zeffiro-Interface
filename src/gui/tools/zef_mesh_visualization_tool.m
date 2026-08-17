@@ -59,9 +59,27 @@ set(zef.h_mesh_visualization_parameter_list,'value',zef.mesh_visualization_param
 
 zef.mesh_visualization_graph_list = cell(0);
 zef.dir_aux = dir(fileparts(which('zef_histogram')));
-for zef_i = 3 : length(zef.dir_aux)
-    zef.mesh_visualization_graph_list{1}{zef_i-2} = help([zef.dir_aux(zef_i).folder filesep zef.dir_aux(zef_i).name]);
-    [~, zef.mesh_visualization_graph_list{2}{zef_i-2}] = fileparts(zef.dir_aux(zef_i).name);
+zef_i_graph = 0;
+for zef_i = 1 : length(zef.dir_aux)
+    zef_name_aux = zef.dir_aux(zef_i).name;
+    [~, zef_fn_aux, zef_ext_aux] = fileparts(zef_name_aux);
+    if ~strcmpi(zef_ext_aux, '.m') || startsWith(zef_fn_aux, '.') || strcmpi(zef_fn_aux, 'contents')
+        continue
+    end
+    zef_i_graph = zef_i_graph + 1;
+    zef_label_aux = strrep(zef_fn_aux, '_', ' ');
+    if strncmpi(zef_label_aux, 'zef ', 4)
+        zef_label_aux = strtrim(zef_label_aux(5:end));
+    end
+    if ~isempty(zef_label_aux)
+        zef_label_aux(1) = upper(zef_label_aux(1));
+    end
+    zef.mesh_visualization_graph_list{1}{zef_i_graph} = zef_label_aux;
+    zef.mesh_visualization_graph_list{2}{zef_i_graph} = zef_fn_aux;
+end
+if zef_i_graph < 1
+    zef.mesh_visualization_graph_list{1} = {'(none)'};
+    zef.mesh_visualization_graph_list{2} = {''};
 end
 
 set(zef.h_mesh_visualization_graph_list,'Items',zef.mesh_visualization_graph_list{1});
@@ -133,13 +151,7 @@ zef.h_mesh_visualization_tool.Units = 'normalized';
 zef.h_mesh_visualization_tool.Position = [0.3 0.3 zef.h_mesh_visualization_tool.Position(3:4)];
 zef.h_mesh_visualization_tool.Units = 'pixels';
 
-set(findobj(zef.h_mesh_visualization_tool.Children,'-property','FontSize'),'FontSize',zef.font_size);
-
-set(zef.h_mesh_visualization_tool,'AutoResizeChildren','off');
-zef.mesh_visualization_tool_current_size = get(zef.h_mesh_visualization_tool,'Position');
-set(zef.h_mesh_visualization_tool,'SizeChangedFcn','zef.mesh_visualization_tool_current_size = zef_change_size_function(zef.h_mesh_visualization_tool,zef.mesh_visualization_tool_current_size);');
-
-zef_set_size_change_function(zef.h_mesh_visualization_tool,2);
+zef = zef_ui_tag_handles(zef);
 
 clear zef_data;
 
@@ -159,15 +171,15 @@ clear zef_data;
 % 
 % end
 
-relative_size = 0.55;
-width_aux = relative_size*zef.segmentation_tool_default_position(3);
-        height_aux = 1.15*zef.segmentation_tool_default_position(3);
-        vertical_aux = zef.segmentation_tool_default_position(2)+zef.segmentation_tool_default_position(4)-height_aux;
-        horizontal_aux = zef.segmentation_tool_default_position(1)+zef.segmentation_tool_default_position(3)-width_aux;
-        zef.h_mesh_visualization_tool.Position = [horizontal_aux vertical_aux width_aux height_aux]; 
-zef_window_manager('standalone', zef.h_mesh_visualization_tool); 
-
-set(findobj(zef.h_mesh_visualization_tool.Children,'-property','FontSize'),'FontSize',zef.font_size);
+ref = zef.segmentation_tool_default_position;
+zef.h_mesh_visualization_tool.Position = [ref(1) + ref(3) - 680, ref(2) + ref(4) - 600, 680, 600];
+zef_window_manager('standalone', zef.h_mesh_visualization_tool);
+zef_ui_apply_size(zef.h_mesh_visualization_tool, 700, 620, 640, 580);
+try
+    zef.h_mesh_visualization_tool.Scrollable = 'off';
+catch
+end
+zef_ui_ready(zef.h_mesh_visualization_tool);
 
 set(zef.h_mesh_visualization_tool,'DeleteFcn','zef_closereq;');
 

@@ -1,14 +1,58 @@
-# `core.io` — parsers that do not need a `zef` session
+# +core/+io
 
-Package functions that turn files into MATLAB arrays. They take a path (and optional name-value arguments) and return numeric data. They do **not** read or write the session struct `zef`.
+## Folder purpose
 
-Today the only child is **`+electrodes/`**: `from_csv` and `from_dat`. Those are the parsers behind **Import → Import electrodes**. The GUI callback that *does* write `zef.sensors` is `core.gui.menu_tool.import_electrodes_callback`.
+Session-free I/O helpers under the `core.io` package. These functions take file paths and return arrays; they do **not** read or write the live `zef` session. Project `.mat`, STL, and `.zef` persistence remain in `src/io`.
 
-```matlab
-[pos, names] = core.io.electrodes.from_csv("electrodes.csv");
-[pos, names] = core.io.electrodes.from_dat("electrodes.dat");
+## Main contents
+
+| Path | Role |
+|------|------|
+| `+electrodes/` | Electrode layout parsers (`from_dat`, `from_csv`) |
+| `+electrodes/README.md` | Format details and column rules |
+
+No other `core.io` subpackages exist yet (no generic CSV/MAT helpers here).
+
+## Code functionality
+
+Electrodes package (see child README for full rules):
+
+- `core.io.electrodes.from_dat(path)` — whitespace-separated lines with 3/4/6/7 fields.
+- `core.io.electrodes.from_csv(path)` — headered CSV; required `x,y,z`; optional `label` and CEM radii/impedance.
+
+**Outputs:** `[electrode_data, electrode_labels]` where data is `N×3` or `N×6`.  
+**Callers:** `core.gui.menu_tool.import_electrodes_callback`; any script may call parsers directly.
+
+## Workflow context
+
+```
+data/electrodes/*.dat
+        ↓
+core.io.electrodes.from_*
+        ↓
+core.gui.menu_tool.import_electrodes_callback  →  zef.sensors / *_points
+        ↓
+mesh attach / forward (src/mesh, src/forward)  →  zef.L
 ```
 
-Formats, CEM columns (inner/outer radius, impedance), and DAT vs CSV differences: [+electrodes/README.md](+electrodes/README.md).
+Contrast with `src/io` (projects, logs, nodisplay save) and converter packages under `+utilities` (FreeSurfer, Brainstorm, DUNEuro).
 
-This package is not a general I/O layer. Project `.mat` save/load, STL import, and `.zef` scripts live under `src/io`. FreeSurfer / SimNIBS converters live under `+utilities`.
+## Usage instructions
+
+```matlab
+[data, labels] = core.io.electrodes.from_dat( ...
+    fullfile(zef.program_path, 'data', 'electrodes', 'biosemi-64.dat'));
+[data, labels] = core.io.electrodes.from_csv('/path/to/cap.csv');
+```
+
+## Important notes
+
+- CSV vs DAT impedance validation differs (CSV may allow `0`; DAT requires `> 0` for CEM lines).
+- No unit conversion inside parsers.
+- CEM column order in files is `[inner, outer, impedance]`; later attachment code may reorder.
+
+## Developer guidance
+
+- Add new sensor formats as sibling functions under `+electrodes`, not ad-hoc GUI parsers.
+- Keep this package free of `uigetfile` / `zef` mutation — orchestration belongs in `core.gui`.
+- Add tests under `+tests` when changing column semantics.

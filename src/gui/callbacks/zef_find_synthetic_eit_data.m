@@ -33,8 +33,7 @@ end
 
 % Set window title and scale fonts to match application settings.
 set(zef.h_find_synthetic_source,'Name','ZEFFIRO Interface: Find synthetic EIT data');
-set(findobj(zef.h_find_synthetic_source.Children,'-property','FontUnits'),'FontUnits','pixels');
-set(findobj(zef.h_find_synthetic_source.Children,'-property','FontSize'),'FontSize',zef.font_size);
+zef_ui_ready(zef.h_find_synthetic_source);
 
 % Initialize tool-specific state and callbacks.
 zef_init_find_synthetic_eit_data;

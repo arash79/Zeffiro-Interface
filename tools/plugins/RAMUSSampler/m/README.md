@@ -1,16 +1,47 @@
-# RAMUSSampler / m
+# tools/plugins/RAMUSSampler/m
 
-MATLAB for the Metropolized RAMUS sampler. There is **no** INI row and no `inverse.*Inverter`. Open with `ramus_sampler` from MATLAB. User-facing Start / Create-decomposition buttons and required `zef` fields: [parent README](../README.md).
+## Folder purpose
 
-Likelihood uses `zef.inv_likelihood_std` (a standard deviation), **not** `inv_snr`. Each draw picks a random RAMUS decomposition and level, runs an inner IAS MAP, then Metropolis–Hastings (`Δ log-posterior ≥ log U(0,1)`). Samples after `inv_n_burn_in` are averaged into `zef.reconstruction`.
+Legacy GUIDE **Metropolized RAMUS Sampler**: posterior sampling on a multiresolution RAMUS hierarchy. **Not** listed in default `zeffiro_plugins.ini` — launch `ramus_sampler` manually. Not an `inverse.*Inverter`.
+
+## Main contents
 
 | File | Role |
 |------|------|
-| `ramus_sampler.m` | Opens `fig/ramus_sampler.fig` |
-| `zef_init_ramus_sampler.m` / `zef_update_ramus_sampler.m` | Defaults / widgets |
-| `ramus_sampling_process.m` | Sampler (`void` unused; reads base `zef`) |
+| `ramus_sampler.m` | Start script: open `ramus_sampler.fig`, title “Metropolized RAMUS Sampler” |
+| `zef_init_ramus_sampler.m` | Defaults for `inv_multires_*` / sampler fields onto widgets |
+| `zef_update_ramus_sampler.m` | Widgets → `zef` (Start callback also runs this) |
+| `ramus_sampling_process.m` | Metropolized sampler → returns `z` (assigned to `zef.reconstruction`) |
 
-## Unpatched (documented as written)
+Fig: `../fig/ramus_sampler.fig`.
 
-- Fig Start calls `ramus_sampling_process([])`. Create decomposition in the fig calls `make_multires_dec` (not `zef_make_multires_dec`).
-- `zef_init_ramus_sampler`: if `inv_n_sampler` / `inv_n_burn_in` are missing, it writes `inv_multires_n_sampler` instead.
+## Code functionality
+
+1. Open fig → init (default `n_decompositions=20`, empty decompositions until built).
+2. Start: `zef_update_ramus_sampler` then `zef.reconstruction = ramus_sampling_process([])`.
+3. Sampler reads base `zef`: `L`, measurements, frames, **`inv_likelihood_std`** (not `inv_snr`), `inv_n_sampler`, `inv_n_burn_in`, `inv_multires_*`.
+4. Returns samples/`z` only — **no** `reconstruction_information` struct from the process function.
+
+Known quirk: missing `inv_n_sampler` / `inv_n_burn_in` in init may write `inv_multires_n_sampler` instead — verify fields before long runs.
+
+## Workflow context
+
+Related: `RAMUSInversion` plugin, `inverse.RAMUSInverter`, `zef_make_multires_dec`. Manual / research use when INI does not register the tool.
+
+## Usage instructions
+
+```matlab
+% Session with zef.L + measurements + likelihood std:
+ramus_sampler;   % Start in UI after setting multires / sampler counts
+```
+
+## Important notes
+
+- Not on default Inverse-tools menus.
+- GUIDE + `evalin('base')`.
+- Build multires decompositions before expecting hierarchical sampling to work.
+
+## Developer guidance
+
+- Align with `inverse.RAMUSInverter` if promoting to a supported path; add INI entry + tests.
+- Pitfall: assuming `inv_snr` drives the likelihood — this tool uses `inv_likelihood_std`.

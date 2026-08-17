@@ -38,6 +38,10 @@ source_directions = evalin('base','zef.source_directions');
 
 if source_direction_mode == 2
 
+    % Normal-constraint path copies zef_processLeadfields, but the
+    % compartment loop is hardcoded d1…d22, w, g, c, sk, sc (k=1:27).
+    % It does not walk zef.compartment_tags, so extra tagged tissues
+    % never enter s_ind_4 here.
     [s_ind_3] = evalin('base','zef.source_interpolation_ind{3}');
 
     i = 0;

@@ -90,6 +90,8 @@ for f_ind = 1 : zef.number_of_frames
     if f_ind == 1
         zef_waitbar([0 0 0], [1 1 1],h,['IAS MAP iteration. Time step ' int2str(f_ind) ' of ' int2str(zef.number_of_frames) '.']);
     end
+    % Unused: the GUI "IAS MAP iterations" box writes ramus_multires_n_iter
+    % (n_iter below). ramus_n_map_iterations is only initialized (default 25).
     n_ias_map_iter = eval('zef.ramus_n_map_iterations');
 
     if eval('zef.use_gpu') == 1 & eval('zef.gpu_count') > 0
@@ -183,6 +185,8 @@ for f_ind = 1 : zef.number_of_frames
                     else
                         zef_waitbar([ i j n_rep f_ind], [n_iter(j) n_multires n_decompositions zef.number_of_frames],h,['IAS MAP iteration. Dec. ' int2str(n_rep) ' of ' int2str(n_decompositions) ', Time step ' int2str(f_ind) ' of ' int2str(zef.number_of_frames) '.' ]);
                     end;
+                    % Same IAS step as zef_ias_iteration type 1 (no sLORETA/dSPM):
+                    % z = √θ · L' (L θ L' + σ² I)⁻¹ f, then update θ.
                     d_sqrt = sqrt(theta);
                     if eval('zef.use_gpu') == 1 & eval('zef.gpu_count') > 0
                         d_sqrt = gpuArray(d_sqrt);
@@ -208,9 +212,13 @@ for f_ind = 1 : zef.number_of_frames
                 if length(beta) > 1
                     beta = beta(mr_ind);
                 end
+                % Scatter the coarse z/θ onto the fine grid (mr_ind is the
+                % nearest-coarse index for every fine source).
                 theta = theta(mr_ind);
                 z_vec = z_vec(mr_ind);
             else
+                % n_iter(j)==0: this level adds zeros and drops its sparsity
+                % weight from the later average.
                 z_vec = zeros(length(mr_ind),1);
                 weight_vec_aux(j) = 0;
             end
@@ -220,6 +228,9 @@ for f_ind = 1 : zef.number_of_frames
         end
     end
 
+    % Average over decompositions and levels. Denominator uses the original
+    % n_multires even when some levels were zeroed; weight_vec_aux is
+    % sparsity.^[0:n_multires-1] with zeros at skipped levels.
     z_vec = z_vec_aux/(n_multires*n_decompositions*sum(weight_vec_aux));
     z_inverse{f_ind} = z_vec;
 

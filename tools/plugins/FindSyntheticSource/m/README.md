@@ -1,20 +1,10 @@
-# Find synthetic source — MATLAB files (`m/`)
+# FindSyntheticSource / m
 
-These files implement the **built-in** Forward-tools item **Find synthetic source** (hardcoded in `zef_menu_tool.m`, not an INI plugin). They place dipoles on `zef.source_positions`, form `zef.measurements = L × sources + noise`, and optionally a Blackman–Harris time course.
+## Folder purpose
 
-Amplitude is **nAm**, scaled by `1e-3` in `zef_find_source`. Noise is **dB** (`10^(dB/20)`). The INI sibling **Find synthetic source legacy** is a different folder (`FindSyntheticSourceLegacy/`: linear-fraction noise). User-facing buttons and table columns: [parent README](../README.md).
+MATLAB implementation of the built-in Forward-tools item **Find synthetic source**: place dipoles on `zef.source_positions`, form `zef.measurements = L × sources + noise`, and optionally build a Blackman–Harris time course.
 
-## Typical scripted sequence
-
-```matlab
-zef = find_synthetic_source(zef);   % or find_synthetic_source; from the menu
-zef = zef_update_fss(zef);          % table → inv_synth_source + pulse cells
-[zef.time_sequence, zef.time_variable] = zef_generate_time_sequence(zef);
-zef.measurements = zef_find_source(zef);
-zef.h_synth_source = zef_plot_source(1);   % 1 = synthetic arrows; 2 = reconstructed
-```
-
-Needs `zef.L` and `zef.source_positions`. Each xyz is snapped to the nearest source point.
+## Main contents
 
 | File | Role |
 |------|------|
@@ -25,3 +15,34 @@ Needs `zef.L` and `zef.source_positions`. Each xyz is snapped to the nearest sou
 | `zef_generate_time_sequence` | Blackman–Harris × cosine pulses |
 | `zef_plot_source` | 3-D arrows (type 1 synth / type 2 reconstructed) |
 | `zef_plot_source_intensity` | Curves vs `time_variable`, or a bar when `fss_time_val` is set |
+
+## Code functionality
+
+- Amplitude is **nAm**, scaled by `1e-3` in `zef_find_source`. Noise is **dB** (`10^(dB/20)`).
+- Each xyz is snapped to the nearest source point.
+- Update → generate time sequence → find source is the usual scripted chain.
+
+## Workflow context
+
+Hardcoded in `zef_menu_tool.m` (not an INI plugin). INI sibling **Find synthetic source legacy** is `FindSyntheticSourceLegacy/` (linear-fraction noise). User-facing buttons: parent [`../README.md`](../README.md).
+
+## Usage instructions
+
+```matlab
+zef = find_synthetic_source(zef);   % or find_synthetic_source; from the menu
+zef = zef_update_fss(zef);
+[zef.time_sequence, zef.time_variable] = zef_generate_time_sequence(zef);
+zef.measurements = zef_find_source(zef);
+zef.h_synth_source = zef_plot_source(1);   % 1 = synthetic; 2 = reconstructed
+```
+
+Needs `zef.L` and `zef.source_positions`.
+
+## Important notes
+
+- Do not confuse with legacy linear-fraction noise or the extended source patch tool.
+- Plot type argument on `zef_plot_source` selects synthetic vs reconstructed arrows.
+
+## Developer guidance
+
+Keep pulse-cell packing in `zef_update_fss` aligned with `zef_generate_time_sequence` and `zef_find_source`. When changing noise units, update the parent README and legacy comparison notes.

@@ -40,9 +40,23 @@ if not(isempty(varargin))
 end
 
 movie_fps = zef.movie_fps;
-h_fig = gcf;
-h_axes = findobj(h_fig.Children,'Tag','axes1');
-h_time_text = findobj(h_fig.Children,'Tag','time_text');
+h_fig = [];
+try
+    h_src = gcbo;
+    if ~isempty(h_src)
+        h_fig = ancestor(h_src, 'figure');
+    end
+catch
+end
+if isempty(h_fig) || ~isgraphics(h_fig)
+    if isstruct(zef) && isfield(zef, 'h_zeffiro')
+        h_fig = zef.h_zeffiro;
+    else
+        h_fig = gcf;
+    end
+end
+h_axes = zef_ui_axes(h_fig);
+h_time_text = zef_ui_control(h_fig, 'time_text');
 h_c = h_axes.Children;
 
 for j = 1 : loop_count
@@ -62,6 +76,11 @@ for j = 1 : loop_count
 
             if find(ismember(properties(h_c(i)),'CData'))
 
+                ud = h_c(i).UserData;
+                if isempty(ud) || ~isstruct(ud) || ~isfield(ud, 'number_of_frames')
+                    continue
+                end
+
                 number_of_frames = h_c(i).UserData(f_ind).number_of_frames;
                 if not(isequal(show_frame_number,0))
                     f_ind = min(max(1,round(show_frame_number*number_of_frames)),number_of_frames);
@@ -75,7 +94,9 @@ for j = 1 : loop_count
                 end
                 h_c(i).CData = CData_aux;
                 if not(details_set)
-                    set(h_time_text,'String',h_c(i).UserData(f_ind).time_string);
+                    if ~isempty(h_time_text) && isvalid(h_time_text)
+                        set(h_time_text,'String',h_c(i).UserData(f_ind).time_string);
+                    end
                     if isequal(show_frame_number,0)
                         eval(['zef.h_slider.Value=' num2str(min(max(0,f_ind/number_of_frames),1)) ';']);
                     end

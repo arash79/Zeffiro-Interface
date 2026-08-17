@@ -1,34 +1,53 @@
-# ES Workbench MATLAB (`m/`)
+# tools/plugins/ZeffiroESWorkbench/m
 
-This folder is the **runtime** for Inverse tools → **ES Workbench** (`zef_ES_optimization` in `profile/multicompartment_head/zeffiro_plugins.ini`). It is tES **electrode-current** optimization against `zef.L` and `zef.inv_synth_source`, not MEG/EEG inverse.
+## Folder purpose
 
-| Location | Role |
-|----------|------|
-| `m/` (this folder) | Start, window wiring, α/ε grid, LP/QP/SDP wrappers, plots |
-| `../mlapp/` | App Designer layout only (`zef_ES_optimization_app`). Buttons are bound here in `zef_ES_optimization_window` |
-| `../README.md` | User manual |
+**tES electrode-current optimization**: choose currents `y` so the FEM map `zef.L` matches a target current density at `zef.inv_synth_source`. Results live in `zef.y_ES_interval`. This is **not** MEG/EEG inverse and is **not** registered in `inverse_method_registry` / `zef_inverse_run`. **Update reconstruction** only copies volumetric density into `zef.reconstruction` for mesh plotting.
 
-## GUI vs scripting
+## Main contents
 
-`zef_ES_optimization` → `zef_tool_start(..., 'zef_ES_optimization_window', ...)`. That constructor instantiates the `.mlapp`, then sets:
+| Group | Files |
+|-------|--------|
+| Start / UI | `zef_ES_optimization`, `_window`, `_init`, `_update`, `_init_parameter_table`, `_update_parameter_values` |
+| Solve / HPO | `_find_currents`, `_find_currents_recursive`, `_optimize_current`, `_find_parameters`, `_recursive_search`, `_centralize_recursive_search`, `_centralize_recursive_search_window`, `_objective_function`, `_table`, `_fix_active_electrodes`, `_rwnnz` |
+| Solver backends | `zef_cvx_linprog`, `_quadprog`, `_semidefprog`, `zef_gurobi_linprog`, `zef_mosek_linprog` (+ MATLAB `linprog`/`quadprog` handles) |
+| Plot / display | `_update_reconstruction`, `_plot_data`, `_plot_current_pattern`, `_plot_barplot`, `_plot_error_chart`, `_plot_distance_curves`, `_optimizer_properties`, `_optimizer_properties_show` |
+| Unwired leftovers | `_4x1_*`, `_plot_4x1*`, `_find_valid_separation_angle`, `_score_sys`, `_clear_plot_data`, `_error_criteria`, `_update_plot_data` |
 
-| Handle | Callback |
-|--------|----------|
-| **Find currents** | confirm dialog; HPO method 1 → `zef_ES_find_currents`, 2 → `zef_ES_find_currents_recursive` |
-| **Update reconstruction** | `zef_ES_update_reconstruction` then `zef_plot_meshes` |
-| **Plot data** | `zef_ES_plot_data` (dispatch on `ES_plot_type`) |
-| Right-click menu | current pattern, bar plot, error chart, optimizer properties, distance curves |
-| Parameter table / dropdowns | `zef_ES_optimization_update` |
+Layouts: `mlapp/zef_ES_optimization_app.mlapp`, `zef_ES_optimizer_properties_app.mlapp`.
 
-Scripting the optimizer (no window required after `ES_*` fields exist):
+## Code functionality
+
+1. Requires `zef.L`, `zef.source_positions`, ≥1 row `zef.inv_synth_source` (position, orientation, density).
+2. HPO 1: α/ε grid → `zef_ES_optimize_current` (LP L1L1 / SDP L1L2 / LS / backprop / QP L2L2).
+3. Enforces zero-sum currents; caps `ES_total_max_current`, `ES_max_current_channel`.
+4. Writes `y_ES_interval` (`y_ES`, volumetric density, residuals, nnz, field metrics, α/ε).
+5. HPO 2: recursive search, then fix active electrodes and search again.
+
+## Workflow context
+
+- Menu: **Inverse tools → ES Workbench** (`ES Workbench,inverse_tools,zef_ES_optimization`).
+- Sibling study package: `+examples/+studies/+tES_hyperparameter_optimization` (different `zef_ES_recursive_search` signature — **name clash** when both are on the path).
+- Display sink: `zef_plot_meshes` after Update reconstruction.
+
+## Usage instructions
 
 ```matlab
-zef = zef_ES_find_currents(zef);
-zef = zef_ES_update_reconstruction(zef);
+% Mesh + lead field + synthetic target sources first
+zef_ES_optimization;   % opens workbench
+% Tune solver / α–ε / current limits → Find currents → Update reconstruction → Plot data
 ```
 
-## Not wired from the workbench
+## Important notes
 
-These files exist for scripting or leftover 4×1 montage helpers. They are **not** `ButtonPushedFcn` / `MenuSelectedFcn` in `zef_ES_optimization_window`: `zef_ES_4x1_fun`, `zef_ES_plot_4x1`, `zef_ES_plot_4x1_fun`, `zef_ES_find_valid_separation_angle`, `zef_ES_score_sys`, `zef_ES_clear_plot_data`, `zef_ES_error_criteria`, `zef_ES_update_plot_data`, `zef_ES_centralize_recursive_search_window`.
+- Density in `zef.reconstruction` is a **stimulation field**, not a neural inverse estimate.
+- Plugin vs examples `zef_ES_recursive_search` — unqualified calls resolve by path order.
+- Some `zef_cvx_*` files still declare `zef_cvx_linprog` internally (filename dispatch).
+- Optional Gurobi / CVX / MOSEK; optimize may `addpath(genpath('external'))`.
+- `zef_ES_update_reconstruction(zef)` with one argument hits an `otherwise` error; GUI uses nargin 0.
 
-`zef_cvx_quadprog.m` and `zef_cvx_semidefprog.m` are called by **filename**; the in-file `function` name is still `zef_cvx_linprog`.
+## Developer guidance
+
+- Keep solver math in `_optimize_current` / objective; keep UI tables in init/update.
+- When changing recursive search, update the examples package or rename one side to end the clash.
+- Pitfall: treating ES Workbench results as EEG/MEG reconstructions in downstream inverse metrics.

@@ -1,6 +1,14 @@
-# Github pusher
+## Folder purpose
 
 A small Git UI over the Zeffiro working copy: **push**, **pull**, and **reset**. It is **destructive** and it is **not** a general Git client.
+
+## Main contents
+
+- Start: `m/zef_github_updater_start.m`
+- Push helper: `zef_git_push` / `zef_github_updater_script`
+- Layout under `mlapp/`
+
+## Code functionality
 
 `zef_git_push` rewrites `origin` to
 
@@ -14,11 +22,7 @@ The default message widget *says* `./data/` and `./profile/` are ignored. `zef_g
 
 Reset is `git reset --hard origin` then fetch/pull. There is no dry-run. Review `git status` yourself before using this window.
 
-## How to open it
-
-**Settings → Github pusher** (default profile; asteroid profiles: **GitHub pusher**). Callback: `zef_github_updater_start` (script). Title: **ZEFFIRO Interface: GitHub pusher tool**.
-
-## Buttons (`ButtonPushedFcn` in `m/zef_github_updater_start.m`)
+Buttons (`ButtonPushedFcn` in `m/zef_github_updater_start.m`):
 
 | Handle | Action |
 |--------|--------|
@@ -28,8 +32,26 @@ Reset is `git reset --hard origin` then fetch/pull. There is no dry-run. Review 
 
 Author field defaults to `zef.user_tag`. PAT is `zef.h_github_pat`.
 
-## Scripting
+## Workflow context
+
+**Settings → Github pusher** (default profile; asteroid profiles: **GitHub pusher**). Callback: `zef_github_updater_start` (script). Title: **ZEFFIRO Interface: GitHub pusher tool**.
+
+## Usage instructions
 
 ```matlab
 zef_git_push(token, 'message', 'user: message text');
 ```
+
+1. Open Settings → Github pusher / GitHub pusher.
+2. Enter PAT and message; confirm before Push / Pull / Reset.
+3. Prefer reviewing `git status` outside this tool before destructive actions.
+
+## Important notes
+
+- Push rewrites `origin` to upstream with PAT embedded; not your fork.
+- Widget text about ignoring `./data/` and `./profile/` is not an exclude list — `git add -A` still runs.
+- Reset is hard reset to origin; no dry-run.
+
+## Developer guidance
+
+Preserve callback `zef_github_updater_start`. Document destructive remote rewrite and `git add -A` behavior clearly; do not present this as a safe general Git client.

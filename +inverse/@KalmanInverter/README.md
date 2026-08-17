@@ -1,10 +1,8 @@
-# inverse.KalmanInverter
+## Folder purpose
 
-Sequential filter for `L x_t ≈ y_t` with state `x_t = A x_{t-1} + w`, `w ~ N(0, Q)`. Registry ids: `kalman`, `kf`. Default `method_type` is `"Basic Kalman filter"`. GUI Kalman still calls `zef_KF` (`legacy_kalman`). `+examples/+inverse/zef_KalmanDemo.m` also still calls `zef_KF`.
+Sequential Kalman filter for `L x_t ≈ y_t` with state `x_t = A x_{t-1} + w`, `w ~ N(0, Q)`. Registry ids: `kalman`, `kf`. Default `method_type` is `"Basic Kalman filter"`.
 
-Not a handle class (unlike the other inverters). Predict/update kernels: `plugins.ClassKF`. Optional RTS smoother after the frame loop when `use_smoothing` is true (`dispatch_inverse` / `zef_process_inversion` call `smoother(z_inverse, L)`).
-
-## Files
+## Main contents
 
 | File | Role |
 |------|------|
@@ -13,15 +11,13 @@ Not a handle class (unlike the other inverters). Predict/update kernels: `plugin
 | `invert.m` | One predict-update; EnKF is inline (not ClassKF) |
 | `smoother.m` | RTS / Sample RTS over stored `posterior_covs` |
 
-## `method_type`
+## Code functionality
 
-`"Basic Kalman filter"` \| `"Standardized Kalman filter"` \| `"Approximated Standardized Kalman filter"` \| `"Ensembled Kalman filter"`
+Not a handle class (unlike other inverters). Predict/update kernels: `plugins.ClassKF`. Optional RTS smoother after the frame loop when `use_smoothing` is true (`dispatch_inverse` / `zef_process_inversion` call `smoother(z_inverse, L)`).
 
-Standardized types return `z = D x` with sLORETA-style `D` from `kf_sL_update` / `_approx`. EnKF uses `number_of_ensembles` (default 100).
+`method_type`: `"Basic Kalman filter"` \| `"Standardized Kalman filter"` \| `"Approximated Standardized Kalman filter"` \| `"Ensembled Kalman filter"`. Standardized types return `z = D x` with sLORETA-style `D` from `kf_sL_update` / `_approx`. EnKF uses `number_of_ensembles` (default 100).
 
-## Process noise Q (not DTI inside this class)
-
-`evolution_prior_model`:
+Process noise Q via `evolution_prior_model`:
 
 | Value | What `initialize` stores |
 |-------|--------------------------|
@@ -32,11 +28,13 @@ Standardized types return `z = D x` with sLORETA-style `D` from `kf_sL_update` /
 | `"Reworked original"` | Identity times `time_step * (σ_max(L)² / ‖L‖_F²) * 10^(db/20)` |
 | `"User supplied Q"` | Requires `evolution_cov` of size `n_state × n_state` |
 
-DTI / tractography Q (`zef_dti_structural_Q`, `zef.kf_structural_Q_type`) is **legacy `zef_KF` only**. On this class, precompute Q yourself and pass `"User supplied Q"`.
+Other parameters: `state_transition_model_A` (default `I`), `initial_prior_steering_db`, `number_of_noise_steps` (4), `smoother_type` `"None"` \| `"RTS"` \| `"Sample RTS"`.
 
-Other parameters: `state_transition_model_A` (default `I`), `initial_prior_steering_db`, `number_of_noise_steps` (4), `smoother_type` `"None"` \| `"RTS"` \| `"Sample RTS"`. The `smoother_type` setter currently only toggles `use_smoothing` and does not store `val` (see gaps).
+## Workflow context
 
-## Call
+GUI Kalman still calls `zef_KF` (`legacy_kalman`). `+examples/+inverse/zef_KalmanDemo.m` also still calls `zef_KF`. Cluster example: `+utilities/+cluster/+examples/kalman_workflow.m`.
+
+## Usage instructions
 
 ```matlab
 [zef, r] = zef_inverse_run(zef, "kalman", "execution", "local");
@@ -46,4 +44,10 @@ Other parameters: `state_transition_model_A` (default `I`), `initial_prior_steer
     "evolution_prior_db", -34));
 ```
 
-Cluster example: `+utilities/+cluster/+examples/kalman_workflow.m`.
+## Important notes
+
+DTI / tractography Q (`zef_dti_structural_Q`, `zef.kf_structural_Q_type`) is **legacy `zef_KF` only**. On this class, precompute Q yourself and pass `"User supplied Q"`. The `smoother_type` setter currently only toggles `use_smoothing` and does not store `val`.
+
+## Developer guidance
+
+Keep ClassKF kernel contracts stable. Document Q models here when adding new `evolution_prior_model` values; do not silently depend on plugin DTI helpers.

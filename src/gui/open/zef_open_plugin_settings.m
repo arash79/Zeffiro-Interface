@@ -32,12 +32,6 @@ set(zef.h_plugin_settings_update_from_profile,'ButtonPushedFcn','zef.h_plugin_se
 set(zef.h_menu_plugin_settings_table_add,'MenuSelectedFcn','zef.h_plugin_settings_table.Data{end+1,1} = char(0); zef.h_plugin_settings_table.Data = [zef.h_plugin_settings_table.Data(1:zef.plugin_settings_selected(1),:) ; zef.h_plugin_settings_table.Data(end,:) ; zef.h_plugin_settings_table.Data(zef.plugin_settings_selected(1)+1:end-1,:)];');
 set(zef.h_menu_plugin_settings_table_delete,'MenuSelectedFcn','zef.h_plugin_settings_table.Data = zef.h_plugin_settings_table.Data(find(not(ismember([1:size(zef.h_plugin_settings_table.Data,1)],zef.plugin_settings_selected))),:);');
 
-set(findobj(zef.h_plugin_settings.Children,'-property','FontSize'),'FontSize',zef.font_size);
-set(zef.h_plugin_settings,'AutoResizeChildren','off');
-zef.plugin_settings_current_size = get(zef.h_plugin_settings,'Position');
-zef.plugin_settings_relative_size = zef_get_relative_size(zef.h_plugin_settings);
-set(zef.h_plugin_settings,'SizeChangedFcn','zef.plugin_settings_current_size = zef_change_size_function(zef.h_plugin_settings,zef.plugin_settings_current_size,zef.plugin_settings_relative_size);');
-
 zef.h_plugin_settings.Name = 'ZEFFIRO Interface: Plugin settings';
-
 set(zef.h_plugin_settings,'DeleteFcn','zef_closereq;');
+zef_ui_ready(zef.h_plugin_settings);

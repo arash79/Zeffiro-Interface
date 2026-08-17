@@ -46,6 +46,10 @@ mne_exponent = 0.6;                            %EXPONENT PARAMETER HERE!, JL
 std_lhood = 10^(-snr_val/20);
 
 zef.inv_sampling_frequency = zef.mne_sampling_frequency;
+% Copied onto inv_high_pass / inv_low_pass, but zef_getFilteredData
+% reads inv_low_cut_frequency / inv_high_cut_frequency. Changing the
+% MNE filter widgets therefore does not change the elliptic band-pass
+% unless those inv_*_cut_frequency fields were already set elsewhere.
 zef.inv_high_pass = zef.mne_low_cut_frequency;
 zef.inv_low_pass = zef.mne_high_cut_frequency;
 zef.number_of_frames = zef.mne_number_of_frames;
@@ -153,6 +157,8 @@ for f_ind = 1 : zef.number_of_frames
 
     % wMNE as the weighting is done in regularization (source prior)
     if isequal(mne_type,4)
+        % Per-node ∑_xyz ‖L_i‖², repeated onto the three Cartesian slots,
+        % then √θ ← √θ / (that sum)^{0.3} (mne_exponent is hardcoded 0.6).
         aux_vec = repelem(sum(reshape(sum(L.^2,1),n_interp,[]),2),3);
         d_sqrt = d_sqrt./(aux_vec.^(0.5*mne_exponent));
     end

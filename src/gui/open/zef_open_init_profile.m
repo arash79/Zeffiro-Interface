@@ -35,13 +35,6 @@ set(zef.h_menu_init_profile_add,'MenuSelectedFcn','zef.h_init_profile_table.Data
 
 set(zef.h_menu_init_profile_delete,'MenuSelectedFcn','zef.h_init_profile_table.Data = zef.h_init_profile_table.Data(find(not(ismember([1:size(zef.h_init_profile_table.Data,1)],zef.init_profile_selected))),:);');
 
-set(findobj(zef.h_init_profile.Children,'-property','FontSize'),'FontSize',zef.font_size);
-
-set(zef.h_init_profile,'AutoResizeChildren','off');
-zef.init_profile_current_size = get(zef.h_init_profile,'Position');
-zef.init_profile_relative_size = zef_get_relative_size(zef.h_init_profile);
-set(zef.h_init_profile,'SizeChangedFcn','zef.init_profile_current_size = zef_change_size_function(zef.h_init_profile,zef.init_profile_current_size,zef.init_profile_relative_size);');
-
 zef.h_init_profile.Name = 'ZEFFIRO Interface: Initialization profile';
-
 set(zef.h_init_profile,'DeleteFcn','zef_closereq;');
+zef_ui_ready(zef.h_init_profile);

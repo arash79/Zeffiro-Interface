@@ -1,55 +1,64 @@
-# Barycentric P1 operators (`src/mesh/barycentric`)
+# src/mesh/barycentric
 
-Sparse volume and surface matrices of products of linear hats on tetrahedra. **NSE** (`src/forward/nse`) is the live consumer. EEG/MEG/EIT stiffness does **not** use this folder — that path is `operators/zef_stiffness_matrix` (area vectors / 9V). Pipeline context: [`src/mesh/README.md`](../README.md).
+## Folder purpose
 
-## Letter table
+Sparse **P1 finite-element assemblers** built from linear hat functions on tetrahedra and boundary faces. The live physics consumer is the **NSE / microcirculation** stack (`src/forward/nse` and `tools/plugins/NSE_tool`). EEG/MEG/EIT stiffness assembly uses `src/mesh/operators/zef_stiffness_matrix.m`, **not** this folder. Visualization does not call these assemblers.
 
-Assemblers name integrals by concatenating symbols. `φ` is a per-tet scalar (`scalar_field`).
+## Main contents
 
-| Letter | Meaning |
-|--------|---------|
-| **F** | P1 hat ψ at a tet (or face) vertex |
-| **G** | One Cartesian component of ∇ψ (from `zef_volume_barycentric` columns 1:3) |
-| **D** | Same as G in the generic `*_D` / `*_DD` kernels (explicit gradient index `g_i_ind`) |
-| **n** | Unit outward face normal (surface files with `n` / `Fn` / `FFn` / `FGn` / `Dn`) |
-| **C** | Constant per tet (no hat; `CC` is φ × volume) |
-| **u** | Extra vector field in matrix-free kernels (`uFG`, `GFu`) |
+| Role | Files |
+|------|--------|
+| Core geometry | `zef_volume_barycentric`, `zef_barycentric_weighting`, `zef_3by3_solver` |
+| Volume mass / Laplacian / coupling | `zef_volume_scalar_matrix`, `_FF`, `_GG`, `_FG`, `_DD`, `_D`, `_FFG`, `_GFu` |
+| Volume vectors / constants | `zef_volume_scalar_vector`, `_F`, `_CC`, `_GCC`, `_Kx` |
+| Diagonal / matrix-free | `zef_volume_scalar_diagonal_matrix`, `_FF`, `zef_volume_scalar_matrix_uFG` |
+| Surface integrals | `zef_surface_scalar_matrix*` (`_FF`, `_FG`, `_D`, `_DD`, `_n`, `_Dn`, `_FFn`, `_FGn`, …) and surface vectors `_F`, `_Fn` |
 
-Weights from `zef_barycentric_weighting` (reference tet volume 1 or triangle area 1; assemblers multiply by |V| or area):
+Letter codes in names: **F** = hat, **G/D** = gradient component, **n** = face normal, **C** = constant field, **u** = auxiliary nodal field.
 
-| Type | Weights | Integral |
-|------|---------|----------|
-| `FF` | `[1/10 1/20]` | ∫ ψ_i ψ_j dV (diag / off) |
-| `GG` | `1` | ∫ (∇ψ)_α (∇ψ)_β dV (grads already 1/V) |
-| `FG` | `1/4` | ∫ ψ ∇ψ dV (mean of ψ is 1/4) |
-| `uFG` | `[1/10 1/20]` | same pair as FF for the u·F·G kernel |
-| `surface_FF` | `[1/6 1/12]` | ∫_Δ ψ_i ψ_j dS |
-| `surface_FG` | `1/3` | ∫_Δ ψ ∇ψ dS |
+## Code functionality
 
-Hats and ∇ψ: `zef_volume_barycentric` (batched Cramer kernel `zef_3by3_solver`). Volume V = |det|/6.
+1. `zef_volume_barycentric(nodes, tetra, p_ind, det)` returns barycentric gradient data `b_coord` and signed `det` (related to 6V), using `zef_3by3_solver` for the local 3×3 systems.
+2. `zef_barycentric_weighting` supplies reference-tet weights (e.g. volume FF `[1/10 1/20]`, GG `1`, FG `1/4`, surface FF `[1/6 1/12]`).
+3. Named wrappers set those weights and call the generic `zef_volume_scalar_matrix*` / `zef_surface_scalar_matrix*` assemblers, returning sparse matrices/vectors on the nodal index set.
 
-## Volume wrappers (NSE)
+**Inputs:** `nodes`, `tetra` (and face connectivity for surface routines), optional subdomain masks.  
+**Outputs:** sparse FE matrices / vectors for NSE mass, stiffness-like GG blocks, FG couplings, and boundary terms.
 
-| Function | Integral | NSE use |
-|----------|----------|---------|
-| `zef_volume_scalar_matrix_FF` | φ F F | mass C, I_μ, M_2 |
-| `zef_volume_scalar_matrix_GG` | φ G_α G_β | Laplacian K, L (`GG(1,1)+GG(2,2)+GG(3,3)`) |
-| `zef_volume_scalar_matrix_FG` | φ F G_α | divergence blocks Q_1…Q_3 |
-| `zef_volume_scalar_vector_F` | φ F | load / mean vectors |
-| `zef_volume_scalar_matrix` / `_D` / `_DD` / `_CC` / `_GCC` / `_FFG` / `_Kx` / `_GFu` / `_uFG` | generic or specialised | wrappers or unused extras |
+## Workflow context
 
-`zef_volume_scalar_diagonal_matrix` / `_FF` lump the mass onto the diagonal.
+```
+nodes/tetra
+    → barycentric assemblers
+    → zef_nse_matrices / zef_nse_poisson(_dynamic)
+    → NSE_tool Solve / perfusion plots
+```
 
-## Surface wrappers
+`zef_3by3_solver` is also reused outside NSE for geometry predicates: `zef_source_tetra`, `zef_inflate_surfaces`, `zef_find_intersecting_triangle`.
 
-Skin faces from `zef_surface_mesh`. Area uses (abs(det)/2)×‖∇ψ_f‖ for the hat opposite the face.
+**Not** on the EEG lead-field FEM path. Sensor burial barycentric λ values live elsewhere (`zef_attach_sensors_volume`).
 
-| Function | Role |
-|----------|------|
-| `zef_surface_scalar_matrix_FF` | Robin / surface mass M_1 |
-| `zef_surface_scalar_vector_F` / `_Fn` | surface loads (with/without n) |
-| `*_FG`, `*_FGn`, `*_FFn`, `*_D`, `*_DD`, `*_Dn`, `*_n` | gradient / normal variants |
+## Usage instructions
 
-## Do not confuse with stiffness
+Prefer calling through NSE helpers rather than assembling ad hoc:
 
-`operators/zef_stiffness_matrix` builds A_ij = ∫ ∇ψ_i · (σ ∇ψ_j) dV via `zef_volume_gradient` (signed face-area vectors) divided by **9V**. That is the EEG lead-field matrix. GG here is a P1 product with barycentric ∇ψ, used by NSE, not a drop-in replacement for A.
+```matlab
+% Typical production path (inside NSE):
+%   zef_nse_matrices → volume FF/GG/FG + surface _n/_Dn
+% Direct experiment (advanced):
+[b_coord, det] = zef_volume_barycentric(nodes, tetra, p_ind, []);
+W = zef_barycentric_weighting();
+M = zef_volume_scalar_matrix_FF(nodes, tetra, ...);  % see file headers for args
+```
+
+## Important notes
+
+- Gradients from `zef_volume_barycentric` already include the 1/V factor; GG weighting is therefore `1`.
+- Several wrappers (`*_uFG`, `*_Kx`, `*_CC`, some surface variants) have **no first-party callers** today — treat as library extras.
+- Do not redirect EEG stiffness through this folder without an explicit design change and tests.
+
+## Developer guidance
+
+- New integral: add a named `zef_volume_scalar_matrix_*` (or surface twin), document the letter code here, and wire it through `zef_nse_matrices` / Poisson.
+- Keep `zef_3by3_solver` numerically stable — meshing and intersection tests depend on it.
+- Pitfall: assuming these matrices are what `zef_stiffness_matrix` uses for EEG.

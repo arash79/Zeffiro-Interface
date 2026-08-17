@@ -298,11 +298,11 @@ properties (Access = public)
             % Create h_menu_inverse_tools
             app.h_menu_inverse_tools = uimenu(app.h_zeffiro_menu);
             app.h_menu_inverse_tools.Checked = 'on';
-            app.h_menu_inverse_tools.Text = 'Inverse tools';
+            app.h_menu_inverse_tools.Text = 'Inverse Tools';
 
             % Create h_menu_forward_tools
             app.h_menu_forward_tools = uimenu(app.h_zeffiro_menu);
-            app.h_menu_forward_tools.Text = 'Forward tools';
+            app.h_menu_forward_tools.Text = 'Forward Tools';
 
             % Create h_menu_butterfly_plot
             app.h_menu_butterfly_plot = uimenu(app.h_menu_forward_tools);
@@ -318,7 +318,7 @@ properties (Access = public)
 
             % Create h_menu_multi_tools
             app.h_menu_multi_tools = uimenu(app.h_zeffiro_menu);
-            app.h_menu_multi_tools.Text = 'Multi-tools';
+            app.h_menu_multi_tools.Text = 'Multi-Tools';
 
             % Create h_menu_segmentation_tool
             app.h_menu_segmentation_tool = uimenu(app.h_menu_multi_tools);

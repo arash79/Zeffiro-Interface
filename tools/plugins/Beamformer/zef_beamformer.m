@@ -204,8 +204,12 @@ for f_ind = 1 : number_of_frames
                 invLTinvCL = pinv(L_aux'*L_aux);
             end
 
-            %dipole momentum estimate:
-
+            % Whitened data: f ← C^{-1/2} f, L ← C^{-1/2} L. Per source,
+            % z = (L'L + λI)^{-1} L' f (ridge) or pinv(L'L) L' f.
+            % Constrained-field nodes (s_ind_4) use the single normal
+            % column; others use the 3-column triplet after optional
+            % lead-field column/Frobenius/row normalization.
+            % Var_vec stores trace(z z') as a scalar location strength.
             z_vec(L_ind(n_iter,:)) = real(invLTinvCL*L_aux'*f);
             %location estimation:
             Var_vec(L_ind(n_iter,:)) = trace(z_vec(L_ind(n_iter,:))*z_vec(L_ind(n_iter,:))');
@@ -356,7 +360,9 @@ for f_ind = 1 : number_of_frames
                     end
                 end
             end
-            %Borgiotti-Kaplan steering:
+            % Unit-noise-gain (Borgiotti–Kaplan): column-normalize the
+            % LCMV-style weights so ‖w‖=1, then z = w' f. Constrained-field
+            % nodes (s_ind_4) skip lead-field column normalization.
             weights = weights./sqrt(sum(weights.^2,1));
 
             %dipole moment estimation:
@@ -444,7 +450,9 @@ for f_ind = 1 : number_of_frames
                 end
             end
 
-            %Find optiomal orienation via Rayleigh-Ritz formula
+            % Unit-gain: Rayleigh–Ritz smallest eigenvector of L'L (after
+            % C^{-1/2} whitening) as the orientation, then the same 1-column
+            % LCMV solve as type 1, multiplied back by that orientation.
             [opt_orientation ,~] = eigs(L_aux'*L_aux,1,'smallestabs');
             opt_orientation = opt_orientation/norm(opt_orientation);
             L_aux = L_aux*opt_orientation;
@@ -472,6 +480,11 @@ for f_ind = 1 : number_of_frames
         end
 
     elseif method_type==4
+
+        % Scalar unit-noise-gain: no C^{-1/2} prewhitening of f. L_aux is
+        % C\L, L_aux2 = L' C^{-1} L, orientation from the generalized
+        % eigenproblem eigs(L'L, L_aux2), then z = (L'L)^{-1/2} L' f
+        % times that orientation. Constrained-field nodes use one column.
 
         %determine indices of triplets (ind) and their total amount (nn)
         if source_direction_mode == 1  || source_direction_mode == 2
@@ -541,10 +554,10 @@ for f_ind = 1 : number_of_frames
                 end
             end
 
-            L_aux2=L_aux'*(C\L_aux); %is needed for the orientation
+            L_aux2=L_aux'*(C\L_aux); % Gram in the C^{-1} inner product
             L_aux=C\L_aux;
 
-            %Find optiomal orienation via Rayleigh-Ritz formula
+            % Generalized Rayleigh–Ritz: smallest eigenvector of L'L vs L'C^{-1}L.
             [opt_orientation ,~] = eigs(L_aux'*L_aux,L_aux2, 1,'smallestabs');
             opt_orientation = opt_orientation/norm(opt_orientation);
             L_aux = L_aux*opt_orientation;

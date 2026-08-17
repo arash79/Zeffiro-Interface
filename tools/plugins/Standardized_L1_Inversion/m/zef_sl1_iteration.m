@@ -121,6 +121,8 @@ for f_ind = 1 : number_of_frames
             zef_waitbar(i,n_sl1_map_iter,h,['Standardized L1 MAP iteration. Time step ' int2str(f_ind) ' of ' int2str(number_of_frames) '.' ]);
         end
 
+        % Hierarchical L1 weight: theta = (theta0 + |z|)/beta, then
+        % quadprog on the weighted L2–L1 problem (zef_l2_l1_optimizer).
         theta = (theta0+abs(z_vec))./beta;
 
         z_vec = zef_l2_l1_optimizer(L, f, std_lhood.^2./theta, options_quad);

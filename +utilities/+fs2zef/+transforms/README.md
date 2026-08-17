@@ -1,14 +1,41 @@
-# `+transforms` — CRAS translation only
+# +utilities/+fs2zef/+transforms
 
-Specialized FreeSurfer volumes (thalamic nuclei, hippocampal subfields) often do not share the `orig.mgz` centre. Surfaces from `mri_mc` are still in tkr RAS millimetres; Zeffiro then applies a 4×4 `affine_transform` from the `.zef` row at `zef_process_meshes`.
+## Folder purpose
+
+CRAS / FreeSurfer volume-center **translation** helpers so specialized `.mgz` surfaces can be aligned to `orig.mgz` before Zeffiro import. Used by `utilities.fs2zef.run` when embedding or applying an affine at mesh time.
+
+## Main contents
+
+| File | Role |
+|------|------|
+| `compute_affine_transform.m` | Build translation-only 4×4 from volume centres (`mri_info`) |
+| `apply_affine_transform.m` | Rewrite mesh vertex coordinates |
+
+## Code functionality
+
+1. `compute_affine_transform` — translation between specialized volume and `orig` centres (no rotation).
+2. `apply_affine_transform` — apply that matrix to vertex arrays.
+3. `run` may embed the matrix in the generated `.zef`; mesh creation applies it when needed.
+
+## Workflow context
+
+Part of `fs2zef` after FreeSurfer shell extraction (`+scripts`) and before/during MATLAB project generation (`+generators` / `+readers`).
+
+## Usage instructions
+
+Prefer `utilities.fs2zef.run(...)`. Direct use:
 
 ```matlab
-A = utilities.fs2zef.transforms.compute_affine_transform( ...
-    fullfile(mri_dir, "ThalamicNuclei.v13.T1.FSvoxelSpace.mgz"), ...
-    fullfile(mri_dir, "orig.mgz"));
-% A is translation-only: dx = c_r(source) - c_r(target), same for S/A.
+T = utilities.fs2zef.transforms.compute_affine_transform(...);
+V2 = utilities.fs2zef.transforms.apply_affine_transform(V, T);
 ```
 
-`compute_affine_transform(source_mgz, target_mgz)` returns that matrix from `mri_info` volume centres (`c_r`, `c_s`, `c_a` via `get_volume_centers`). There is no rotation.
+## Important notes
 
-`apply_affine_transform(mesh_file, affine_matrix)` rewrites vertices in that file. `run` does not call apply; it embeds the matrix in the `.zef` so Zeffiro applies it at mesh time. Parent: [`../README.md`](../README.md).
+- Translation only — not a full FreeSurfer `talairach` / `Torig` stack.
+- Requires FreeSurfer `mri_info` available when computing from MGZ headers.
+
+## Developer guidance
+
+- If adding rotation/scale, rename or version the API and update `run` callers.
+- Pitfall: applying the transform twice (embedded in `.zef` and again manually).

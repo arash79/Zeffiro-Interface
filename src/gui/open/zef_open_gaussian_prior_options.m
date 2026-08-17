@@ -40,13 +40,8 @@ zef.h_inv_amplitude_db.Value = num2str(-zef.inv_amplitude_db);
 zef.h_inv_evolution_prior.Value = num2str(zef.inv_evolution_prior);
 
 zef.h_zef_gaussian_prior_options.Name = 'ZEFFIRO Interface: Hierarchical prior options';
-set(findobj(zef.h_zef_gaussian_prior_options.Children,'-property','FontUnits'),'FontUnits','pixels');
-set(findobj(zef.h_zef_gaussian_prior_options.Children,'-property','FontSize'), 'FontSize', zef.font_size);
-
-set(zef.h_zef_gaussian_prior_options,'AutoResizeChildren','off');
-zef.gaussian_prior_options_current_size = get(zef.h_zef_gaussian_prior_options,'Position');
-set(zef.h_zef_gaussian_prior_options,'SizeChangedFcn','zef.gaussian_prior_options_current_size = zef_change_size_function(zef.h_zef_gaussian_prior_options,zef.gaussian_prior_options_current_size);');
-
+zef = zef_ui_tag_handles(zef);
+zef_ui_ready(zef.h_zef_gaussian_prior_options);
 set(zef.h_zef_gaussian_prior_options,'DeleteFcn','zef_closereq;');
 
 

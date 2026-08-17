@@ -1,23 +1,46 @@
-# Apply `zef` to graphics (`src/gui/set`)
+# Apply `zef` → graphics (`src/gui/set`)
 
-The inverse of `update/`: push session fields onto figures (colors, lights, sizes). Not the place that *reads* sliders.
+## Folder purpose
 
-**Set position** and **Toggle controls** on the Segmentation tool are wired in `zef_segmentation_tool.m` (`h_set_position`, `h_segmentation_tool_toggle`). Figure-tool **Reset** lives in `tools/zef_set_figure_tool_sliders.m` (`set_mode==0` writes factory slider values).
+Helpers that **push `zef` state onto graphics objects** (figure tool axes, colorbars, lights, window geometry). Opposite direction from `src/gui/update` (widgets → `zef`).
 
-The Figure-tool **Compartments:** / **Sensors:** lists are `zef_colored_list` widgets (`Trigger=buttondown`). A click runs `zef_set_compartment_color` / `zef_set_sensor_color`, then the caller runs `zef_update`. Details has no swatches (`ShowSwatches=false`). See `src/gui/helpers/README.md`.
+## Main contents
 
-| File | Kind | Trigger | What it applies |
-|------|------|---------|-----------------|
-| `zef_set_compartment_color` | function | Figure **Compartments:** `ButtonDownFcn` | `uisetcolor` → `zef.<tag>_color` (on+visible tags, reverse order). Caller runs `zef_update` |
-| `zef_set_sensor_color` | function | **Sensors:** `ButtonDownFcn` | row of `*_color_table` |
-| `zef_set_color` | function | legacy compartment list `h_compartment_color` | same write, different list |
-| `zef_set_lights` | function | after plot / print | recreate Light objects from `zef.update_lights` codes on `h_axes1` (or passed axes) |
-| `zef_set_sliders_plot` | function | end of `zef_plot_volume` / `zef_plot_meshes` | re-apply colormap, ColorScale, transparency κ, zoom, lights so new patches match sliders. Mode 2 = rec transparency only |
-| `zef_set_sliders_print` | function | `zef_print_meshes` | same chain on the print figure |
-| `zef_set_linear_colorbar_ticks` | function | log reconstruction colorbar | labels = `max_val * 10^((tick-Limits(2))/20)` (undo 20*log10) |
-| `zef_set_timepointline` | function | butterfly / volume time click | vertical Tag=`timepointline` |
-| `zef_set_position` | function | Segmentation **Set position** | write `segmentation_tool_default_position` to `zeffiro_interface.ini` |
-| `zef_set_menu_size` | function | after each `MenuSelectedFcn` | `'expanded'` / `'minimized'` vs measured min height (not `Position(4)==0`) |
-| `zef_set_size_change_function` | function | tools at creation | SizeChangedFcn → `zef_window_manager('on_size_changed', src)` |
-| `zef_set_figure_current_size` | **script** | Figure-tool resize | store normalized size in `zef.zeffiro_current_size` |
-| `zef_set_surface_resolution` | function | before surface patches | refine or `reducepatch` to target face count |
+| File | Role |
+|------|------|
+| `zef_set_size_change_function` | Hook `SizeChangedFcn` → `zef_change_size_function` |
+| `zef_set_sliders_plot` / `zef_set_sliders_print` | Init time/colorscale sliders for plot vs print |
+| `zef_set_color` / `zef_set_compartment_color` / `zef_set_sensor_color` | Patch/line colors from table selections |
+| `zef_set_lights` | Scene lighting from slider vector |
+| `zef_set_linear_colorbar_ticks` | Colorbar tick formatting |
+| `zef_set_surface_resolution` / `zef_set_timepointline` | Mesh/time UI helpers |
+| `zef_set_position` | Segmentation tool window placement |
+| `zef_set_menu_size` / `zef_set_figure_current_size` | Window geometry bookkeeping |
+
+## Code functionality
+
+Called after plot creation or when the user changes a color/light control that should immediately affect existing patch objects. Uses `zef.h_axes1`, `zef.h_zeffiro`, and findobj on tagged graphics.
+
+## Workflow context
+
+Used heavily from `zef_figure_tool`, `zef_menu_tool`, and post-resize hooks. Plotters in `src/gui/plot` create geometry; `set/` adjusts appearance without rebuilding meshes.
+
+## Usage instructions
+
+```matlab
+zef_set_lights(zef);           % typical pattern after slider change
+zef_set_compartment_color(zef);
+```
+
+Usually invoked from callbacks, not typed by end users.
+
+## Important notes
+
+- Requires valid figure handles (`h_zeffiro`, `h_axes1`) — call after figure tool exists.
+- Print vs plot slider init differ (`zef_set_sliders_print` for publication snapshots).
+
+## Developer guidance
+
+- Keep color application consistent with compartment table columns (RGB in `zef`).
+- New figure-tool chrome: add a `zef_set_*` rather than embedding graphics code in update scripts.
+- Coordinate with `zef_change_size_function` in helpers for responsive layouts.

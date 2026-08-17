@@ -71,6 +71,7 @@ if isfield(zef,'h_compartment_table') && isvalid(zef.h_compartment_table)
     zef.h_compartment_table.CellEditCallback = '';
     zef.h_compartment_table.Data = zef.aux_field_1;
     zef.h_compartment_table.CellEditCallback = original_callback;
+    zef_ui_fit_table(zef.h_compartment_table);
 end
 zef = rmfield(zef,'aux_field_1');
 % CRITICAL FIX: Skip zef_update here - it can hang during project load on large projects.

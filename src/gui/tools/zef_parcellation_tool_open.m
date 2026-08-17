@@ -15,8 +15,8 @@ zef_init_parcellation;
 
 zef = zef_parcellation_tool_window(zef);
 set(zef.h_parcellation_tool,'Name','ZEFFIRO Interface: Parcellation tool');
-set(findobj(zef.h_parcellation_tool.Children,'-property','FontUnits'),'FontUnits','pixels')
-set(findobj(zef.h_parcellation_tool.Children,'-property','FontSize'),'FontSize',zef.font_size);
+zef = zef_ui_tag_handles(zef);
+zef_ui_ready(zef.h_parcellation_tool);
 
 
 if not(isempty(zef.time_series_tools_name_list))

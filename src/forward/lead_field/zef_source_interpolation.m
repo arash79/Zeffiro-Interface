@@ -133,6 +133,10 @@ if not(isempty(active_compartment_ind)) && not(isempty(source_positions)) && not
 
         center_points = eval(['zef.reuna_p{' int2str(aux_active_compartment_ind(ab_ind)) '}']);
 
+        % Interpolation 2: for each active source compartment, nearest
+        % source at every surface vertex, then index those sources by
+        % the compartment triangles → n_tri × 3 map used when
+        % print_meshes averages surface CData with /3.
         MdlKDT = KDTreeSearcher(source_positions);
         source_interpolation_aux = knnsearch(MdlKDT,center_points);
 
@@ -157,6 +161,9 @@ if not(isempty(active_compartment_ind)) && not(isempty(source_positions)) && not
 
     end
 
+    % Interpolation 3: stacked active-compartment surfaces; nearest
+    % triangle centroid for each source position. Mode-2 (normal)
+    % inversion uses this as s_ind_3 in zef_processLeadfields.
     center_points = (1/3)*(aux_p(aux_t(:,1),:) + aux_p(aux_t(:,2),:) + aux_p(aux_t(:,3),:));
 
     MdlKDT = KDTreeSearcher(center_points);

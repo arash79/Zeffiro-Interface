@@ -1,38 +1,67 @@
-# Data Bank internals (`tools/plugins/dataBank/m`)
+# tools/plugins/dataBank/m
 
-Functions the Data Bank window calls after `zef_start_dataBank` opens the App. They implement the tree: hash keys, load/save node `.mat` files, import/export, reconstruction get/set, and the uitree refresh.
+## Folder purpose
 
-This is not a second public API. Use **Multi tools → Data Bank** (or `zef_start_dataBank`) as documented in [../README.md](../README.md). Call these `zef_dataBank_*` helpers only when extending the plugin or when a script already has `zef.dataBank` (duneuro `EEG_to_databank` / `MEG_to_databank`, decision-making examples, analysis scripts).
+Implementation of the **Data Bank** Multi-tools plugin: a named snapshot tree for lead fields, measurements, noise, reconstructions, GMM models, and custom/import shells. Lets one session keep several `L`/data sets, **Load** them back onto live `zef`, or **Combine** selected lead fields/measurements. Distinct from LFBankTool and LeadFieldProcessingTool.
 
-`zef_dataBank_app` / `zef_dataBank_nameChange_app` are App Designer figures loaded from the MATLAB path (not `.m` in this folder). Callbacks in `zef_open_dataBank` point here.
+## Main contents
 
-## What lives here vs the start function
+App Designer layouts live in the plugin root (`zef_dataBank_app.mlapp`, rename app) — not under `m/`.
 
-| Location | Role |
-|----------|------|
-| `../zef_start_dataBank.m` | Menu callback: `zef_tool_start(..., 'zef_open_dataBank', ...)` |
-| `../zef_open_dataBank.m` | Constructs the App, wires `ButtonPushedFcn` / menus, first `hash2tree` |
-| `m/` (this folder) | Tree algebra, disk I/O, table fill, Combine, reconstruction get/set |
+| Group | Files |
+|-------|--------|
+| Start / open | `zef_start_dataBank` (plugin root), `zef_open_dataBank` |
+| CRUD / payload | `zef_dataBank_add`, `_addButtonPress`, `_add_data_item`, `_getData`, `_setData`, `_delete`, `_delete_uitree`, `_uiTreeDeleteHash` |
+| Hash / uitree | `zef_dataBank_number2hash`, `_hash2tree`, `_sortTree`, `_rebuildTree`, `_rebuildTreeSaveFile`, `_refreshTree`, `_reorderTree` (legacy), `_getHashForMenu`, `_getHashForTableMenu`, `_treeSearch` |
+| Working / combine | `_hashToWorkingSpace`, `_WorkingSpaceInfo`, `_combineLeadFields` (in-file name `combineLeadFieLds`) |
+| Disk I/O | `_saveFolderButtonPush`, `_saveTreeNodeSwitchChange`, `_saveTreeNodes`, `_loadTreeNodes`, `_importNodeButtonPress`, `_importNode`, `_importDataBank`, `_exportButtonPress` |
+| UI / session | `_init`, `_update`, `_showAll` / `zef_databank_showAll`, `_showCurrent`, `_FunctionsDropDown`, `_startNameChange`, `zef_size` |
+| Scripting | `_get_reconstructions`, `_set_reconstructions` |
+| Orphan | `_text2struct` (no first-party callers) |
 
-## Hash keys
+## Code functionality
 
-`zef.dataBank.tree` is a struct whose fields are hashes `node`, `node_1`, `node_1_2`, … (`zef_dataBank_number2hash`). Each node has `.type`, `.name`, `.hash`, and `.data` (payload struct, or a `matfile` handle when `zef.dataBank.save2disk` is `'On'`). Uitree `NodeData` stores that hash. `zef_dataBank_add` appends the next free sibling `parentHash_i`.
+Storage: `zef.dataBank.tree` keyed by hashes (`node`, `node_1`, …). Each node has `.type`, `.name`, `.hash`, `.data` (struct or `matfile` when save-to-disk is on).
 
-## GUI vs programmatic
+| Entry type | Payload via `getData` |
+|------------|------------------------|
+| `data` | measurements |
+| `noisedata` | `zef.noise_data` |
+| `leadfield` | `L`, sensors, imaging method, interpolants, compartment source flags, … |
+| `reconstruction` | reconstruction + `reconstruction_information` |
+| `gmm` | GMM model / dipoles / amplitudes / parameters |
+| `custom` / `import` | shell nodes (parents / imports) |
 
-Most GUI callbacks are string `ButtonPushedFcn`s that call these functions with **no arguments**; they `evalin('base','zef')` and `assignin` when `nargout==0`. Scripts that keep a local `zef` should pass it in and capture the output.
+Combine modes (workingHashes, not tree highlight alone): `frobenius` / `fuchs` / `whitening` → updates `zef.L` / `zef.measurements`.
 
-Programmatic add used by duneuro: `zef_dataBank_add_data_item` (needs the App already open). Reconstruction harvest: `zef_dataBank_get_reconstructions` / `zef_dataBank_set_reconstructions`.
+## Workflow context
 
-## Combine and filename mismatches
+```
+Multi tools → Data Bank → zef_start_dataBank → zef_open_dataBank
+External: duneuro2zef EEG/MEG_to_databank, decision-making examples, analysis scripts
+```
 
-**Combine** reads `zef.dataBank.workingHashes` (filled by tree **Modify**), not the current uitree highlight. Approaches: `'frobenius'`, `'fuchs'`, `'whitening'` (`combineMenu.Value`). See parent README.
+INI: `Data Bank,multi_tools,zef_start_dataBank`.
 
-MATLAB dispatches by filename:
+## Usage instructions
 
-| Filename | `function` line inside |
-|----------|------------------------|
-| `zef_dataBank_getHashForMenu.m` | `zef_dataBank_getHasForMenu` |
-| `zef_dataBank_combineLeadFields.m` | `zef_dataBank_combineLeadFieLds` |
+```matlab
+zef_start_dataBank;           % or Multi tools menu
+% Add entry by type → Load / Load with parents
+% Modify → workingHashes → Combine
+[zef, recs] = zef_dataBank_get_reconstructions(zef);  % scripting harvest
+```
 
-Callers use the filenames. Do not rename the in-file symbols without updating every string callback.
+## Important notes
+
+- Combine uses **workingHashes**, not selection alone.
+- Preserve filename / in-file name typos (`combineLeadFieLds`, `getHashForMenu`) — callers depend on them.
+- `get_reconstructions` can clear `zef.reconstruction` as a side effect.
+- `custom`/`import` have no full `getData` cases.
+- Many GUI callbacks `evalin` base `zef`.
+
+## Developer guidance
+
+- Extend entry types in `getData`/`setData` together; update the Add dropdown.
+- Prefer `add_data_item` for programmatic inserts when the App is open.
+- Pitfall: confusing Data Bank with LFBankTool (lead-field bank) or LeadFieldProcessingTool.

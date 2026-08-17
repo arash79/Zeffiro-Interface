@@ -198,7 +198,15 @@ for f_ind = 1 : number_of_frames
             gamma = zeros(length(z_vec),1)+beta./theta0;
             %-----------------------------------------------------------------------------------
 
-            %__ Initialization __
+            % Each MAP step updates z then the per-source penalty gamma.
+            % q==1: L1_optimization (IAS/EM inner solver) then
+            %   gamma = beta / (theta0 + |z|).
+            % q≠1: diagonal-weighted Tikhonov
+            %   z = (T_scale .* w) .* L' (L diag(w) L' + I)^{-1} f
+            % with w = 1/(gamma * σ² * max(f)²). estimation_type 3
+            % (sLORETA) sets T_scale = 1/sqrt(diag(R)) from the current
+            % weighted resolution; IAS/EM leave T_scale = 1. Then
+            %   gamma = beta / (theta0 + |z|^q).
             n = size(L_aux,2);
             %L_aux = 1/std_lhood*L_aux_2;
 

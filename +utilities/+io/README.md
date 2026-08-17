@@ -1,16 +1,40 @@
-# `utilities.io` — path, git, and EDF helpers
+# +utilities/+io
 
-Small functions used at setup and in study scripts. Not electrode parsers (`core.io.electrodes`) and not project load/save (`src/io`).
+## Folder purpose
 
-| Function | Behaviour |
-|----------|-----------|
-| `abspath(files)` | Column of **existing** files → absolute paths via `dir`. Each path must pass `mustBeFile`. |
-| `float_is_int(x)` | True iff every element is finite and `x == floor(x)` (NaN/Inf → false). |
-| `is_eof(token)` | True iff the string is `"-1"` (ASCII sentinel used by some readers). |
-| `read_gitmodules(file)` | Parse `.gitmodules` `[submodule "…"]` blocks. Adds `abspath` (relative to the file’s folder) and `name`. Default required keys: `path`, `url`, `branch`, `startupscript` (used by `zeffiro_setup`). |
-| `reconstruction_from_edf_fn(path)` | `edfread` (Signal Processing Toolbox). Rows = timetable columns (channels), columns = concatenated cells. Also returns `sample_rate`, `time_step`, `column_title_vec`. |
+Small path / file / numeric I/O helpers used by converters, cluster code, and import utilities. Not the project `.mat` save/load API (`src/io`).
+
+## Main contents
+
+| File | Role |
+|------|------|
+| `abspath.m` | Resolve absolute paths |
+| `float_is_int.m` | Test whether a float is an integer value |
+| `is_eof.m` | EOF helper for file IDs |
+| `read_gitmodules.m` | Parse `.gitmodules` for submodule metadata |
+| `reconstruction_from_edf_fn.m` | Build / locate reconstruction naming from EDF-related filenames |
+
+## Code functionality
+
+Pure helpers: string/path and lightweight parsing. Call as `utilities.io.<name>(...)`.
+
+## Workflow context
+
+Used by package converters and tooling that must not depend on GUI `uigetfile`. Session persistence remains `src/io`.
+
+## Usage instructions
 
 ```matlab
-subs = utilities.io.read_gitmodules(fullfile(projectRoot, ".gitmodules"));
-[rec, fs, dt, names] = utilities.io.reconstruction_from_edf_fn("recording.edf");
+p = utilities.io.abspath('data/example_projects');
+tf = utilities.io.float_is_int(3.0);
 ```
+
+## Important notes
+
+- Does not read electrode `.dat` (see `core.io.electrodes`).
+- `read_gitmodules` expects the repo-root `.gitmodules` format.
+
+## Developer guidance
+
+- Keep this package free of `zef` mutation.
+- Pitfall: using `abspath` with assumptions about `pwd` vs `zef.program_path`.

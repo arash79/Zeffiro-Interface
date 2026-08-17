@@ -67,6 +67,9 @@ source_positions = evalin('base','zef.source_positions');
 %check parcellation
 tag_ind = evalin('base','find(strcmp(zef.GMM.parameters.Tags,''domain''))');
 
+% Domain parameter: '1' = every interpolated source; '2' = union of the
+% currently selected parcellation interpolation indices (same I_aux
+% construction as zef_GMMcluster when GMMcluster_domain ~= 1).
 if strcmp(parameters{tag_ind},'2')
     source_ind_aux = evalin('base','zef.source_interpolation_ind{1}');
     p_ind_aux_1 = [];
@@ -143,7 +146,11 @@ for t=t_start:T
     end
     J = sqrt(z);      %current density
     z = z./max(z);
-    %Gaussian moothing step
+    % Spatial Gaussian smooth of the normalized amplitude (std in the
+    % same length unit as source_positions), then a discrete sampling
+    % step: values below threshold are zeroed, the rest are rounded to
+    % integer counts so high-amplitude locations are replicated when
+    % passed to fitgmdist (more samples near peaks).
     if smooth_std > 0
         ind = find(z>=threshold);
         for i = 1:length(ind)
@@ -167,6 +174,7 @@ for t=t_start:T
     activity_dir = [atan2(sqrt(sum((direct(ind,[1,2]).^2),2)),direct(ind,3)),atan2(direct(ind,2),direct(ind,1))];
 
     if estim_param == 1
+        % Fit in (x,y,z, polar, azimuth) so orientations enter the GMM.
         activity_space = [activity_pos(cumsum(ind2),:),activity_dir(cumsum(ind2),:)];
     elseif estim_param == 2
         activity_space = activity_pos(cumsum(ind2),:);

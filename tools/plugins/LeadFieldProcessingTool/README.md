@@ -1,16 +1,18 @@
-# LeadFieldProcessingTool
+## Folder purpose
 
 A second lead-field **bank** (`zef.LeadFieldProcessingTool.bank`) with App Designer tables: add the current `L`, replace `zef` from a checked row, mag→grad via a loaded `tra` matrix, and noise-weighted vertical combine.
 
 Default-profile menu label is **LeadFieldProcessingTool** (same callback as asteroid profiles’ “Lead field processing tool”).
 
-## How to open it
+## Main contents
 
-**Multi tools → LeadFieldProcessingTool** (default profile). Callback: `LeadFieldProcessingTool_start` (script).
+Start script and bank helpers under this plugin (`LeadFieldProcessingTool_start` and `zef_LeadFieldProcessingTool_*` / `zef_LeadfieldProcessingTool_*` functions).
+
+## Code functionality
 
 Need a current `zef.L` (and usually sensors / source positions) before **Add**.
 
-## Buttons (`ButtonPushedFcn` in `LeadFieldProcessingTool_start.m`)
+Buttons (`ButtonPushedFcn` in `LeadFieldProcessingTool_start.m`):
 
 | Button | Action |
 |--------|--------|
@@ -24,10 +26,28 @@ Need a current `zef.L` (and usually sensors / source positions) before **Add**.
 
 Bank table checkbox column (index 6) selects rows. Combine uses **Noisestart** / **Noiseend** spinners.
 
-## Scripting
+## Workflow context
+
+**Multi tools → LeadFieldProcessingTool** (default profile). Callback: `LeadFieldProcessingTool_start` (script).
+
+## Usage instructions
 
 ```matlab
 LeadFieldProcessingTool_start;
 zef_LeadFieldProcessingTool_addCurrentData2bank;
 zef_LeadfieldProcessingTool_aux2current;   % after checking a row
 ```
+
+1. Add the current lead field to the bank.
+2. Optionally loadTra + Mag2Grad, or Combine with noise window.
+3. Replace to push a checked row onto live `zef`.
+
+## Important notes
+
+- Distinct from default-profile **Multi lead field tool** (`LFBankTool/`).
+- Function naming mixes `LeadField` and `Leadfield` in identifiers — callers use the existing spellings.
+- Mag2Grad sets `imaging_method = 3` and creates a new bank entry.
+
+## Developer guidance
+
+Preserve callback `LeadFieldProcessingTool_start` and bank field `zef.LeadFieldProcessingTool.bank`. Do not “fix” `LeadField`/`Leadfield` spelling inconsistencies without updating all callers.

@@ -1,16 +1,19 @@
-# Filter tool
+## Folder purpose
 
 Builds an ordered pipeline of FIR/IIR, referencing, epoching, and channel stages, then runs that pipeline on imported **raw** time series. Inverse tools still read `zef.measurements` (and optionally `zef.noise_data`); this window is how you get from a `.mat`/`.dat` dump to those fields.
 
+## Main contents
+
+- Start script: `m/zef_filter_tool.m`
+- Pipeline runner: `m/zef_filter_raw_data.m`
+- Stages: `m/filter_bank/*.m`
+- Layout: `mlapp/zeffiro_interface_filter_tool.mlapp`
+
 Stages live in `m/filter_bank/`. The list in the window is `help()` of those files: each stage must contain `Description:`, `Input: … [Default: …]`, and `Output:` so **Add** can fill the parameter table.
 
-## How to open it
+## Code functionality
 
-**Forward tools → Filter tool** (default `multicompartment_head` profile). Callback: `zef_filter_tool` (script). Window title: **ZEFFIRO Interface: Filter tool**.
-
-Need data in `zef.raw_data` (Import) or copy measurements into raw first.
-
-## Buttons (`ButtonPushedFcn` in `m/zef_filter_tool.m`)
+Buttons (`ButtonPushedFcn` in `m/zef_filter_tool.m`):
 
 | Button handle | Action |
 |---------------|--------|
@@ -26,7 +29,13 @@ Need data in `zef.raw_data` (Import) or copy measurements into raw first.
 
 Sampling rate widget writes `zef.filter_sampling_rate`. Filter-bank defaults named `filter_sampling_rate` pick that field up.
 
-## Scripting
+## Workflow context
+
+**Forward tools → Filter tool** (default `multicompartment_head` profile). Callback: `zef_filter_tool` (script). Window title: **ZEFFIRO Interface: Filter tool**.
+
+Need data in `zef.raw_data` (Import) or copy measurements into raw first.
+
+## Usage instructions
 
 ```matlab
 zef_import_raw_data;          % or assign zef.raw_data
@@ -37,6 +46,16 @@ zef.measurements = zef.processed_data;
 
 Or call a stage directly, e.g. `zef_ellip_low_pass_filter(f, 3, 3, 80, 40, fs)`.
 
-## Files here
+1. Import raw data (or substitute measurements into raw).
+2. Build the pipeline (Add / reorder stages).
+3. Plot / substitute into measurements or noise_data.
 
-Start script `m/zef_filter_tool.m`, pipeline runner `m/zef_filter_raw_data.m`, stages `m/filter_bank/*.m`. Layout: `mlapp/zeffiro_interface_filter_tool.mlapp`.
+## Important notes
+
+- Substitute-measurements and substitute-raw handle names are swapped relative to the functions they call.
+- Pipeline save/load is `.mat` v7.3, not JSON.
+- Load uses project `zef.file` / `zef.file_path`, not the dialog pick stored on `zef_data.file`.
+
+## Developer guidance
+
+Every new stage in `m/filter_bank/` must expose `Description:`, `Input: … [Default: …]`, and `Output:` in `help()` so Add can fill the parameter table. Keep callback `zef_filter_tool` stable.

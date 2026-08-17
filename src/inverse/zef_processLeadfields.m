@@ -23,8 +23,15 @@ function [L,n_interp, procFile] = zef_processLeadfields(zef)
 %   Outputs
 %     L        - lead field (n_sensors x n_columns) after mode-specific processing.
 %     n_interp - number of unique interpolated source nodes (length s_ind_0).
-%     procFile - struct with source_direction_mode, source_directions, s_ind_0:4,
-%                n_interp, sizeL2.
+%     procFile - struct with:
+%                  source_direction_mode, source_directions,
+%                  s_ind_0  unique interpolation node indices,
+%                  s_ind_1  L-column indices actually kept,
+%                  s_ind_2  Cartesian triplet map (mode 3 only),
+%                  s_ind_3  surface-interpolation indices (mode 2),
+%                  s_ind_4  subset of those nodes with Activity =
+%                           Constrained field (normal-projected),
+%                  n_interp, sizeL2.
 %
 %   Requires zef.source_interpolation_ind cell array from zef_source_interpolation.
 %   Mode 2 additionally reads compartment surface meshes (reuna_p, reuna_t).
@@ -65,6 +72,11 @@ end
 [s_ind_1] = unique(eval('zef.source_interpolation_ind{1}'));
 n_interp = length(s_ind_1);
 
+% Mesh-tool Directions = Normal (source_direction_mode 2): build a smoothed
+% outward normal on every active-compartment surface triangle, then later
+% replace the three Cartesian L columns at Constrained-field nodes with
+% that normal projection (copied into all three slots so triplet layout
+% is preserved).
 if source_direction_mode == 2
 
     [s_ind_3] = eval('zef.source_interpolation_ind{3}');
@@ -99,6 +111,9 @@ if source_direction_mode == 2
             visible_vec(i,1) = i*visible_val;
             submesh_cell{i} = submesh_ind;
             if eval(['zef.' compartment_tags{k} '_sources']);
+                % Activity column: Constrained field (_sources==1) gets
+                % aux_dir_mode 0 and is later normal-constrained; Unconstrained
+                % field (2) and Active surface (3) are left Cartesian.
                 aux_brain_ind = [aux_brain_ind i];
                 aux_dir_mode = [aux_dir_mode eval(['zef.' compartment_tags{k} '_sources'])-1];
             end
@@ -117,6 +132,9 @@ if source_direction_mode == 2
 
     end
 
+    % Per-triangle unit normals from the stacked surface, then 7 Laplacian
+    % smoothing passes and a sign flip so the field points inward (toward
+    % the source space). a_d_i_vec is 0 on Constrained-field triangles.
     a_d_i_vec = a_d_i_vec(aux_t(:,1));
     n_vec_aux = cross(aux_p(aux_t(:,2),:)' - aux_p(aux_t(:,1),:)', aux_p(aux_t(:,3),:)' - aux_p(aux_t(:,1),:)')';
     n_vec_aux = n_vec_aux./repmat(sqrt(sum(n_vec_aux.^2,2)),1,3);
@@ -138,6 +156,8 @@ end
 s_ind_0=s_ind_1;
 
 if source_direction_mode == 1  || source_direction_mode == 2
+    % Expand unique node indices to the three Cartesian L-column blocks
+    % (x then y then z), matching how zef_lead_field_matrix stores L.
     s_ind_1 = [3*s_ind_1-2 ; 3*s_ind_1-1 ; 3*s_ind_1]; %not triplet anymore
 end
 if  source_direction_mode == 3
@@ -158,6 +178,9 @@ if source_direction_mode == 2
     s_2 = source_directions(:,2)';
     s_3 = source_directions(:,3)';
     ones_vec = ones(size(L,1),1);
+    % L_0 = n_x L_x + n_y L_y + n_z L_z at Constrained-field nodes.
+    % The same scalar column is written into all three Cartesian slots so
+    % later code that still indexes triplets does not drop those sources.
     L_0 = L_1(:,s_ind_4).*s_1(ones_vec,s_ind_4) + L_2(:,s_ind_4).*s_2(ones_vec,s_ind_4) + L_3(:,s_ind_4).*s_3(ones_vec,s_ind_4); %normal matrix
     L(:,s_ind_4) = L_0;
     L(:,n_interp+s_ind_4) = L_0;

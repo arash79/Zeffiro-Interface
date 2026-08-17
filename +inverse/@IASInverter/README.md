@@ -1,25 +1,50 @@
 # inverse.IASInverter
 
-Iterative alternating sequential MAP for a conditionally Gaussian model with inverse-gamma or gamma hyperpriors (Calvetti–Somersalo). Registry id: `ias`. GUI: `legacy_ias` → `zef_ias_iteration`.
+## Folder purpose
 
-Each MAP step: `W = diag(d) L' (L diag(d²) L' + C)^{-1}`, `z = W f`, then update `d` from the hyperposterior. Optional post-hoc dSPM/sLORETA row scaling via `method_type`.
+Class package for **Iterative Alternating Sequential (IAS) MAP** reconstruction under inverse-gamma or gamma hyperpriors, with optional dSPM/sLORETA post-hoc scaling. Registry id: `ias`.
 
-## Parameters
+## Main contents
 
-- `hyperprior`: `"Inverse gamma"` (default) \| `"Gamma"`
-- `hyperprior_mode`: `"Constant"` \| `"Balanced"` (spatial balance in `zef_find_ig_hyperprior` / `zef_find_g_hyperprior`)
-- `n_map_iterations` (25)
-- `hyperprior_tail_length_db` (10), `hyperprior_weight` (0)
-- `amplitude_db` (20), `prior_over_measurement_db` (20) — enter `modified_SNR = SNR - prior_over_measurement_db + amplitude_db`
-- `method_type`: `"None"` \| `"sLORETA last step"` \| `"dSPM each step"` \| `"dSPM last step"`
+| File | Role |
+|------|------|
+| `IASInverter.m` | Hyperprior mode/type, `n_map_iterations`, amplitude / prior-over-measurement dB knobs |
+| `initialize.m` | Dynamic `theta0` / `beta` / `d_sqrt` / `noise_cov` via `zef_find_ig_hyperprior` / `zef_find_g_hyperprior` |
+| `invert.m` | `n_map_iterations` of W-filter update + hyperposterior `d_sqrt` refresh |
 
-`initialize` adds dynamic props `theta0`, `beta`, `d_sqrt`, `noise_cov` (`C = 10^(-SNR/10) I`). `terminateComputation` deletes them.
+No `precompute`. `terminateComputation` deletes dynamic properties.
 
-Last-step dSPM/sLORETA branches compare `i == self.n_n_map_iterations` (property is actually `n_map_iterations`) — those branches never run as written.
+## Code functionality
 
-## Call
+**Model:** Conditionally Gaussian sources with hierarchical hyperpriors. Each MAP step builds a weighted filter from current `d_sqrt`, applies to `f`, then updates hyperparameters.
+
+**Key defaults (typical):** `hyperprior="Inverse gamma"`, `n_map_iterations=25`, `hyperprior_mode="Constant"`, SNR-related dB fields (`amplitude_db`, `prior_over_measurement_db`, tail length).
+
+**Deps:** `zef_find_ig_hyperprior`, `zef_find_g_hyperprior` (GUI/callback helpers on path via `src`).
+
+## Workflow context
+
+```
+zef_inverse_run(zef,'ias') → run_frame_loop → IASInverter
+```
+
+GUI: **IAS MAP estimation** → `zef_ias_iteration` (`legacy_ias`). ROI variant lives in `tools/plugins/IASROIInversion` (legacy only).
+
+## Usage instructions
 
 ```matlab
-[zef, r] = zef_inverse_run(zef, "ias", "execution", "local", ...
-    "MethodParams", struct("n_map_iterations", 25, "hyperprior", "Inverse gamma"));
+[zef, r] = zef_inverse_run(zef, 'ias', 'execution', 'local', ...
+    'MethodParams', struct('n_map_iterations', 25, 'hyperprior', 'Inverse gamma'));
 ```
+
+## Important notes
+
+- Code contains a known typo risk: last-step branches referencing `n_n_map_iterations` may never run — verify before relying on “last iteration only” post-weighting.
+- Dynamicprops created in `initialize` must be cleaned in `terminateComputation` to avoid stale state across runs.
+- Method_type `"None"` vs dSPM/sLORETA strings control post-hoc scaling.
+
+## Developer guidance
+
+- Fix the `n_n_map_iterations` typo carefully with a unit test that asserts post-weighting actually executes.
+- Keep hyperprior helper APIs stable; IAS/RAMUS share them.
+- Prefer registry + class path over duplicating IAS loops in new plugins.

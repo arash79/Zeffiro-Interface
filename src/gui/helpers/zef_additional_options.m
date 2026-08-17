@@ -80,11 +80,7 @@ zef.h_smoothing_steps_ele.Value =  num2str(zef.smoothing_steps_ele);
 zef.h_cone_alpha.Value = num2str(1 - zef.cone_alpha);
 
 zef.h_additional_options.Name = 'ZEFFIRO Interface: Options';
-set(findobj(zef.h_additional_options.Children,'-property','FontUnits'),'FontUnits','pixels');
-set(findobj(zef.h_additional_options.Children,'-property','FontSize'), 'FontSize', zef.font_size);
-
-set(zef.h_additional_options,'AutoResizeChildren','off');
-zef.additional_options_current_size = get(zef.h_additional_options,'Position');
-set(zef.h_additional_options,'SizeChangedFcn','zef.additional_options_current_size = zef_change_size_function(zef.h_additional_options,zef.additional_options_current_size);');
+zef = zef_ui_tag_handles(zef);
+zef_ui_ready(zef.h_additional_options);
 
 clear zef_data;

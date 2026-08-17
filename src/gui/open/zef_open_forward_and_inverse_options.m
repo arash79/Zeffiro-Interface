@@ -171,13 +171,8 @@ zef.h_priority_mode.Value = zef.priority_mode;
 zef.h_normalize_lead_field.Value =  num2str(zef.normalize_lead_field);
 
 zef.h_zef_forward_and_inverse_processing_options.Name = 'ZEFFIRO Interface: Forward and inverse processing options';
-set(findobj(zef.h_zef_forward_and_inverse_processing_options.Children,'-property','FontUnits'),'FontUnits','pixels');
-set(findobj(zef.h_zef_forward_and_inverse_processing_options.Children,'-property','FontSize'), 'FontSize', zef.font_size);
-
-set(zef.h_zef_forward_and_inverse_processing_options,'AutoResizeChildren','off');
-zef.forward_and_inverse_options_current_size = get(zef.h_zef_forward_and_inverse_processing_options,'Position');
-set(zef.h_zef_forward_and_inverse_processing_options,'SizeChangedFcn','zef.forward_and_inverse_options_current_size = zef_change_size_function(zef.h_zef_forward_and_inverse_processing_options,zef.forward_and_inverse_options_current_size);');
-
+zef = zef_ui_tag_handles(zef);
+zef_ui_ready(zef.h_zef_forward_and_inverse_processing_options);
 set(zef.h_zef_forward_and_inverse_processing_options,'DeleteFcn','zef_closereq;');
 
 clear zef_data;

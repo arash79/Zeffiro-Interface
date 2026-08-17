@@ -35,7 +35,6 @@ zef_menu_tool;
 
 zef = zef_update(zef);
 
-set(findobj(zef.h_zeffiro_menu.Children,'-property','FontUnits'),'FontUnits','pixels')
-set(findobj(zef.h_zeffiro_menu.Children,'-property','FontSize'),'FontSize',zef.font_size);
+zef_ui_ready(zef.h_zeffiro_menu);
 
 zef.clear_axes1 = 0;

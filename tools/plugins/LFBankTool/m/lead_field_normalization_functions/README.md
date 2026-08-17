@@ -1,33 +1,47 @@
-# Lead-field normalization maps (merge time)
+## Folder purpose
 
-Each file is `(L, measurements) = f(lf_bank_index)`. **Merge selected** (`zef_combine_lead_fields`) does `str2func` of the selected file and runs it on each selected bank index. The functions `evalin('base', ...)` the item `zef.lf_bank_storage{index}` and return scaled copies. They do **not** assemble a new lead field and they do **not** `assignin`.
+Lead-field normalization maps applied at **Merge selected** time in the Multi lead field tool. Each file scales one bank item’s `L` and measurements; none assemble a new lead field or `assignin`.
 
-## Dropdown labels
+## Main contents
 
-`zef_init_lf_bank_tool` `dir`s this folder, then for each file takes MATLAB `help`, finds `Description:`, and uses `strtrim` of the remainder as the list label. **Keep a `Description:` line** or the dropdown entry is empty. Labels are then **sorted alphabetically**, so `zef.lf_normalization` is an index into that sorted list, not a stable enum.
+| File | `Description:` label |
+|------|----------------------|
+| `zef_lead_field_no_normalization.m` | No normalization |
+| `zef_lead_field_normalize_frobenius.m` | Normalize Frobenius |
+| `zef_lead_field_normalize_maximum_data.m` | Normalize maximum data |
+| `zef_lead_field_normalize_mean_data.m` | Normalize mean data |
+| `zef_lead_field_scaling.m` | Scaling |
+| `zef_lead_field_whitening.m` | Whitening |
+| `zef_lead_field_whitening_diagonal_identity.m` | Whitening diagonal identity |
 
-With the current Description strings the sorted order is:
+## Code functionality
 
-1. No normalization
-2. Normalize Frobenius
-3. Normalize maximum data
-4. Normalize mean data
-5. Scaling
-6. Whitening
-7. Whitening diagonal identity
+Signature: `(L, measurements) = f(lf_bank_index)`. `zef_combine_lead_fields` does `str2func` of the selected file and runs it on each selected bank index. Functions `evalin('base', ...)` the item `zef.lf_bank_storage{index}` and return scaled copies.
 
-After stacking, `zef_combine_lead_fields` additionally rescales the concatenated `L` and measurements by `sqrt(sum_i ||L_i||_F^2) / ||L||_F` when `zef.lf_normalization == 2` (that is, when the sorted selection is **Normalize Frobenius**).
+| File | Body |
+|------|------|
+| no_normalization | Unchanged |
+| normalize_frobenius | `sqrt(n_sensors)*L / \|\|L\|\|_F` (same on measurements) |
+| normalize_maximum_data | Scale by `max(L,'fro')` |
+| normalize_mean_data | `sqrt(n_sensors) / mean(column 2-norms)` |
+| scaling | Multiply by item `scaling_factor` |
+| whitening | Left-multiply by `inv(sqrtm(cov(noise_data')))` |
+| whitening_diagonal_identity | Same after scaling noise covariance to unit diagonal |
 
-## What each file computes
+## Workflow context
 
-| File | `Description:` | Body |
-|------|----------------|------|
-| `zef_lead_field_no_normalization` | No normalization | Return `L` and measurements unchanged. |
-| `zef_lead_field_normalize_frobenius` | Normalize Frobenius | `sqrt(n_sensors)*L / ||L||_F` (same factor on measurements). |
-| `zef_lead_field_normalize_maximum_data` | Normalize maximum data | Scale by `max(L,'fro')`. |
-| `zef_lead_field_normalize_mean_data` | Normalize mean data | `sqrt(n_sensors) / mean(column 2-norms)`. |
-| `zef_lead_field_scaling` | Scaling | Multiply by the item’s `scaling_factor` (set when adding to the bank). |
-| `zef_lead_field_whitening` | Whitening | Left-multiply by `inv(sqrtm(cov(noise_data')))`. Needs `noise_data`. |
-| `zef_lead_field_whitening_diagonal_identity` | Whitening diagonal identity | Same after scaling the noise covariance to unit diagonal. |
+Called only from LFBankTool merge. Parent tool README and `../README.md` cover Add / Compute / Merge. After stacking, `zef_combine_lead_fields` may apply an extra Frobenius rescale when `zef.lf_normalization == 2` (Normalize Frobenius in the sorted list).
 
-Parent merge semantics (first selected item wins sensors / imaging method): [../../README.md](../../README.md).
+## Usage instructions
+
+Choose a normalization in the Multi lead field tool dropdown, then Merge. Labels come from MATLAB `help` `Description:` lines; `zef_init_lf_bank_tool` `dir`s this folder and sorts labels alphabetically.
+
+## Important notes
+
+- Keep a `Description:` line or the dropdown entry is empty.
+- `zef.lf_normalization` indexes the sorted list, not a stable enum — order can change if Descriptions are renamed.
+- Whitening maps need `noise_data` on the bank item.
+
+## Developer guidance
+
+Add a new `.m` with `Description:` / help tags; no INI edit. Do not `assignin` from map functions. Document any post-stack rescale assumptions in the combine function if changing Frobenius behavior.

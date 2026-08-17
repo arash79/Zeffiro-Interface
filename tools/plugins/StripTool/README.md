@@ -1,32 +1,55 @@
-# Strip tool
+# tools/plugins/StripTool
 
-Defines depth-electrode **strips** as extra compartments (optional encapsulation) and can add their contacts to the current sensors. Each strip is a struct in `zef.<current_sensors>_strip_cell`.
+## Folder purpose
 
-**Not in the default profile INI.** Call `zef_strip_tool_start` from MATLAB. DBS_tool is the probe-sensor cousin.
+Generic **implanted strip / cylinder** geometry as FEM compartments (optional encapsulation) plus contact points. Broader than `DBS_tool` (which is sensor-contact oriented). **Not** on default profile INIs — start with `zef_strip_tool_start`.
 
-## How to open it
+## Main contents
 
-```matlab
-zef = zef_strip_tool_start(zef);   % zef_tool_start → zef_strip_tool_open
+| File | Role |
+|------|------|
+| `zef_strip_tool_start` / `_open` / `_window` | GUIDE UI |
+| `zef_strip_tool_init` / `_update` / `_add` / `_delete` | `*_strip_cell` lifecycle |
+| `zef_create_strip` | Strip geometry |
+| `zef_simple_cylinder_generator` | Cylinder mesh helper |
+| `zef_get_strip_parameters` | Parameter pack |
+| `zef_strip_coordinate_transform` | Local ↔ world |
+| `zef_strip_tool_embed` | `zef_add_compartment` for strip (+ encapsulation) |
+| `zef_strip_tool_add_contacts` / `zef_get_strip_contacts` | Sensor contacts |
+| `zef_strip_tool_plot` | Preview |
+
+## Code functionality
+
+1. Add strip entry → tip, orientation, length, impedance, encapsulation options.
+2. **Plot** preview in local/world coordinates.
+3. **Embed** creates compartment(s) via `zef_add_compartment`.
+4. **Add contacts** writes sensor points for stimulation/recording setups.
+5. Geometry edits lock when status is Embedded.
+
+## Workflow context
+
+```
+StripTool → compartments + contacts on zef
+  → remesh / attach electrodes / forward (EIT/tES/EEG as applicable)
 ```
 
-Need a current sensor prefix and a FEM/segmentation context for embedding.
+Contrast: `DBS_tool` (vendor probe contacts without compartment embed).
 
-## Buttons (`Callback` in `zef_strip_tool_window.m`)
-
-| Label | Action |
-|-------|--------|
-| **Add** | `zef_strip_tool_add` — new strip in the list |
-| **Embed** | confirm → `zef_strip_tool_embed` — `zef_create_strip` + coordinate transform; `zef_add_compartment` for strip (and encapsulation if on); copies triangles/points/σ onto the new compartment; status `'Embedded'`. After Embed, geometry widgets (tip, orientation, length, conductivity, encapsulation, Embed itself) are **disabled** until you Delete the strip. |
-| **Add contacts** | confirm → `zef_strip_tool_add_contacts` |
-| **Delete** | confirm → `zef_strip_tool_delete` |
-| **Plot** | `zef_strip_tool_plot` |
-
-Most numeric widgets only run `zef_strip_tool_update` (copy into the current strip struct). List box sets `zef.strip_tool.current_strip` and re-inits.
-
-## Scripting
+## Usage instructions
 
 ```matlab
-zef = zef_strip_tool_add(zef);
-zef = zef_strip_tool_embed(zef);
+zef_strip_tool_start;
+% Add strip → set tip/orientation/length → Plot → Embed → Add contacts
 ```
+
+## Important notes
+
+- Delete clears strip_cell / helper state; it does **not** remove already-embedded compartments automatically.
+- Embedded strips should be remeshed before trusting FEM results.
+- Not registered in default `zeffiro_plugins.ini`.
+
+## Developer guidance
+
+- Keep coordinate transforms centralized in `zef_strip_coordinate_transform`.
+- If adding vendor presets, consider sharing builders with `DBS_tool` instead of duplicating.
+- Pitfall: editing geometry after Embed without clearing status locks.

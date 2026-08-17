@@ -35,7 +35,7 @@ end
 triangles = double(triangles);
 
 h_fig = gcf;
-h_axes = findobj(h_fig.Children,'Tag','axes1');
+h_axes = zef_ui_axes(h_fig);
 hold_status = ishold(h_axes);
 
 colormap_size = length(rel_val);

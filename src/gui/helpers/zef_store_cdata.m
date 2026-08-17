@@ -31,8 +31,8 @@ if not(isempty(varargin))
 end
 
 h_fig = evalin('base','zef.h_zeffiro');
-h_axes = findobj(h_fig.Children,'Tag','axes1');
-h_time_text = findobj(h_fig.Children,'Tag','time_text');
+h_axes = zef_ui_axes(h_fig);
+h_time_text = zef_ui_control(h_fig, 'time_text');
 h_c = h_axes.Children;
 
 for i = 1 : length(h_c)

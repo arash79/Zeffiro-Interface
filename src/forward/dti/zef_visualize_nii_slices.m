@@ -34,7 +34,7 @@ addParameter(p, 'zef',                struct(),  @isstruct);
 addParameter(p, 'slice_world',        [],        @(x) isnumeric(x) && numel(x)==3);
 addParameter(p, 'alpha',              0.6,       @(x) isnumeric(x) && isscalar(x));
 addParameter(p, 'colormap_name',      'gray',    @ischar);
-addParameter(p, 'axes_handle',        [],        @(x) isempty(x) || isgraphics(x,'axes'));
+addParameter(p, 'axes_handle',        [],        @(x) isempty(x) || isgraphics(x));
 addParameter(p, 'freesurfer_coords',  true,      @(x) islogical(x) || x==0 || x==1);
 parse(p, varargin{:});
 
@@ -58,12 +58,12 @@ end
 % Locate target axes
 % -------------------------------------------------------------------------
 if isempty(hax)
-    if isfield(zef_s, 'h_axes1') && isgraphics(zef_s.h_axes1, 'axes')
+    if isfield(zef_s, 'h_axes1') && isvalid(zef_s.h_axes1)
         hax = zef_s.h_axes1;
     else
         h_fig = findobj(0, 'Tag', 'figure_tool');
         if ~isempty(h_fig)
-            hax = findobj(h_fig(1).Children, 'Tag', 'axes1');
+            hax = zef_ui_axes(h_fig(1));
         end
         if isempty(hax)
             hax = gca;

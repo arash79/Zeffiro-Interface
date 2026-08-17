@@ -1,21 +1,14 @@
-# MUSIC
+## Folder purpose
 
 MUSIC subspace scan: SVD of the data covariance, then score each lead-field column against the signal (or noise) subspace. Use it for a few focal sources when you want a subspace correlation map rather than a distributed inverse.
 
-There is **no** `inverse.*Inverter` for MUSIC. Registry id `legacy_music` dispatches `MUSIC_iteration`.
+## Main contents
 
-## Menu
+- Start: `MUSIC_app_start.m` constructs `MUSIC_app`
+- Solver: `MUSIC_iteration.m`
+- Layout: `MUSIC_app.mlapp`
 
-| Profile | Path |
-|---------|------|
-| `multicompartment_head` | Inverse tools → **MUSIC** |
-| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
-
-INI callback: `MUSIC_app_start` (script).
-
-Window title in the `.mlapp`: `ZEFFIRO Interface: MUSIC`.
-
-## Run the solver
+## Code functionality
 
 **StartButton** `ButtonPushedFcn`:
 
@@ -31,20 +24,36 @@ Each frame first **means the time window to a single topography** (`mean(f,2)`),
 
 Type 2 can return a complex generalized eigenvalue. The solver clamps `amp`, then if the eigenvector is complex it reconstructs a real orientation in the (Re, Im) plane with a 2×2 quadratic. That is not textbook complex-MUSIC. The real type-2 path stores `(1-amp)*orientation` (a perfect noise-space match is a null).
 
-## Needs
+MUSIC does **not** call `zef_processLeadfields`. For Mesh-tool **Directions = Normal** it rebuilds `s_ind_4` itself by looping hardcoded compartments `d1`…`d22`, `w`, `g`, `c`, `sk`, `sc` (`k = 1:27`). Extra `zef.compartment_tags` never enter that normal constraint. Band-pass is an inline elliptic filter, not `zef_getFilteredData`.
 
-- `zef.L`, interpolation, `zef.source_direction_mode`
-- `zef.measurements`
-- SNR: `zef.inv_snr` → `10^(-inv_snr/20)`; if the signal subspace is empty the solver errors `Given signal-to-noise ratio is too high!`
-- Frames: `zef.number_of_frames`, `inv_time_*`, band edges
-- Reads `zef` from the base workspace (`evalin`)
+Needs: `zef.L`, interpolation, `zef.source_direction_mode`, `zef.measurements`; SNR `zef.inv_snr` → `10^(-inv_snr/20)`; if the signal subspace is empty the solver errors `Given signal-to-noise ratio is too high!`; frames `zef.number_of_frames`, `inv_time_*`, band edges. Reads `zef` from the base workspace (`evalin`).
 
-## Writes
+Writes: `zef.reconstruction` only (peak-normalized in the solver).
 
-- `zef.reconstruction` only (peak-normalized in the solver)
+## Workflow context
 
-## Files
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **MUSIC** |
+| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
 
-- Start: `MUSIC_app_start.m` constructs `MUSIC_app`
-- Solver: `MUSIC_iteration.m`
-- Layout: `MUSIC_app.mlapp`
+INI callback: `MUSIC_app_start` (script). Window title in the `.mlapp`: `ZEFFIRO Interface: MUSIC`.
+
+There is **no** `inverse.*Inverter` for MUSIC. Registry id `legacy_music` dispatches `MUSIC_iteration`.
+
+## Usage instructions
+
+1. Open Inverse tools → MUSIC.
+2. Choose Source projection or Noise out-projection and lead-field regularization.
+3. Press Start.
+
+## Important notes
+
+- Per-frame mean makes covariance rank-1; not multi-snapshot MUSIC.
+- Does not assign `reconstruction_information`; discards `Var_loc`.
+- Normal-constraint rebuild uses hardcoded compartment tags `d1`…`d22`, `w`, `g`, `c`, `sk`, `sc` only.
+- Band-pass is inline elliptic, not `zef_getFilteredData`.
+
+## Developer guidance
+
+Preserve callback `MUSIC_app_start` and registry id `legacy_music` → `MUSIC_iteration`. Document type-2 complex handling as implementation-specific, not textbook complex-MUSIC.

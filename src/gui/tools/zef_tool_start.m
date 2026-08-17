@@ -16,13 +16,11 @@ function [zef] = zef_tool_start(zef,tool_script,relative_size,scale_positions)
 %
 %   See also zef_parcellation_tool, zef_window_manager.
 if nargin < 3
-    relative_size = 1/2;
-else
-    relative_size = 2*relative_size;
+    relative_size = 1/3;
 end
 
 if isempty(relative_size)
-    relative_size = 1/2;
+    relative_size = 1/3;
 end
 
 if nargin < 4
@@ -103,6 +101,9 @@ else
 
         width_aux = relative_size*zef.h_zeffiro_menu.Position(3);
         height_aux = relative_size*h_groot_children(i).Position(4)*zef.h_zeffiro_menu.Position(3)/h_groot_children(i).Position(3);
+        scr = screen_size_aux;
+        width_aux = min(max(400, width_aux), 0.55 * scr(3));
+        height_aux = min(max(320, height_aux), 0.70 * scr(4));
         vertical_aux = zef.h_zeffiro_menu.Position(2)+zef.h_zeffiro_menu.Position(4)-height_aux;
         if vertical_aux < 0 
         relative_size = relative_size*(vertical_aux + height_aux)/height_aux;
@@ -118,6 +119,9 @@ else
 
         width_aux = relative_size*zef.h_zeffiro_menu.Position(3);
         height_aux = relative_size*h_groot_children(i).Position(4)*zef.h_zeffiro_menu.Position(3)/h_groot_children(i).Position(3);
+        scr = screen_size_aux;
+        width_aux = min(max(400, width_aux), 0.55 * scr(3));
+        height_aux = min(max(320, height_aux), 0.70 * scr(4));
         vertical_aux = zef.h_zeffiro_menu.Position(2)+zef.h_zeffiro_menu.Position(4)-height_aux;
         horizontal_aux = zef.h_zeffiro_menu.Position(1)+zef.h_zeffiro_menu.Position(3)-width_aux;
 
@@ -138,9 +142,8 @@ else
      
         position_aux = h_groot_children(i).Position;
         zef_window_manager('standalone', h_groot_children(i), [horizontal_aux vertical_aux width_aux height_aux]);
-
-        set(findobj(h_groot_children(i).Children,'-property','FontUnits'),'FontUnits','pixels');
-        set(findobj(h_groot_children(i).Children,'-property','FontSize'),'FontSize',zef.font_size);
+        zef_ui_ready(h_groot_children(i));
+        zef_ui_bind_min_size(h_groot_children(i), 400, 320);
 
     end
 

@@ -1,30 +1,50 @@
 # inverse.BeamformerInverter
 
-Per-source spatial filters for `L x ≈ f`. Registry id: `beamformer`. GUI beamformer is `legacy_beamformer` → `zef_beamformer`, not this class.
+## Folder purpose
 
-Scans `procFile.s_ind_4` (fixed orientation, one column) then free-orientation triplets. If `error_cov` is set, uses Mahalanobis whitening `L_mod = C \ L` with Tikhonov `λ_cov * tr(C)/m` on `C`.
+Class package for **spatial beamforming** (LCMV, UNG, unit-gain) on whitened lead fields. Used by `zef_inverse_run` with id `beamformer`. The GUI Beamformer plugin still calls legacy `zef_beamformer`.
 
-## `method_type`
+## Main contents
 
-- `"Linearly constrained minimum variance (LCMV) beamformer"` — weights = 1
-- `"Unit noise gain (UNG) beamformer"` — `sqrtm(L_mod' L_mod) \ (L' L_mod)`
-- `"Unit-gain constrained beamformer"` — optimal orientation from `eigs(L'*L,1)`, then scalar UNG-style weights
+| File | Role |
+|------|------|
+| `BeamformerInverter.m` | Classdef: `method_type`, covariance / lead-field regularization, `error_cov` |
+| `initialize.m` | Estimate demeaned sample covariance if `error_cov` empty |
+| `invert.m` | Per-source beamformer weights applied to `f` (fixed then free-orientation loops) |
 
-## Other parameters
+No `precompute` or `smoother`.
 
-- `cov_reg_parameter` (0.05) — regularizes `error_cov`
-- `leadfield_reg_parameter` (0.001), `leadfield_reg_type` `"Basic"` \| `"Pseudoinverse"`
-- `leadfield_normalization` `"None"` \| `"Matrix norm"` \| `"Column norm"` \| `"Row norm"`
-- `error_cov` — optional; `initialize` fills demeaned sample covariance if empty
+## Code functionality
 
-Constructor name-value `reg_type` maps to property `leadfield_reg_type`.
+**Inputs to `invert`:** measurement column `f`, lead field `L`, `procFile` (indices from `zef_processLeadfields`), direction mode, source positions, optional GPU / normalize flags.
 
-## Call
+**Steps:** Tikhonov-regularize noise cov `C`; form whitened `L_mod = C \ L` (or identity path); for each source (and free orientations via `eigs`) build beamformer weights from regularized `(LF'*LF_mod)`; apply to `f`.
 
-```matlab
-[zef, r] = zef_inverse_run(zef, "beamformer", "execution", "local", ...
-    "MethodParams", struct("method_type", ...
-    "Linearly constrained minimum variance (LCMV) beamformer"));
+**Key properties:** `method_type` (LCMV / UNG / unit-gain), `cov_reg_parameter` (default ~0.05), `leadfield_reg_parameter`, `leadfield_reg_type`, `leadfield_normalization`, `error_cov`.
+
+## Workflow context
+
+```
+zef_inverse_run(zef,'beamformer') → run_frame_loop → BeamformerInverter
 ```
 
-No `precompute`. `invert` loops sources every frame.
+GUI: **Inverse tools → Beamformer** → `zef_beamformer_start` → `zef_beamformer` (`legacy_beamformer`).
+
+## Usage instructions
+
+```matlab
+[zef, r] = zef_inverse_run(zef, 'beamformer', 'execution', 'local', ...
+    'MethodParams', struct('method_type', 'LCMV'));
+```
+
+## Important notes
+
+- `initialize` must run (or `error_cov` must be user-set) before meaningful `invert`.
+- Free-orientation sources are more expensive (eigenproblems per location).
+- Registry: `beamformer` (class), `legacy_beamformer` (plugin).
+
+## Developer guidance
+
+- Keep `method_type` strings aligned with the GUI plugin’s `zef.bf_type` vocabulary when migrating menus to the class path.
+- Beamformer loops are O(n_sources); profile before changing batching.
+- Extend registry + tests when adding a new beamformer variant.

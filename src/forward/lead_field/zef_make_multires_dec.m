@@ -1,7 +1,4 @@
 function [multires_dec, multires_ind, multires_count] = zef_make_multires_dec(varargin)
-
-
-
 %ZEF_MAKE_MULTIRES_DEC  Nested source-space index maps for multiresolution inverse.
 %
 %   Zeffiro Interface.
@@ -41,6 +38,8 @@ for n_rep = 1 : n_decompositions
 
     source_points = evalin('base','zef.source_positions');
 
+    % Work in the interpolated source positions (unique tet-node sources).
+    % Coordinates stay in the project length unit (typically millimetres).
     source_points = source_points(s_ind,:);
     source_points = source_points';
     source_points_aux = source_points;
@@ -51,6 +50,7 @@ for n_rep = 1 : n_decompositions
         h = zef_waitbar([0 0], [1 1],['Dec: ' int2str(1) '/' int2str(n_decompositions) ', Level ' int2str(1) '/' int2str(n_levels) '.']);
     end
 
+    % Finest level is the identity: every source is its own coarse node.
     multires_dec{n_rep}{n_levels} = [1:size_center_points]';
     multires_ind{n_rep}{n_levels} = [1:size_center_points]';
     multires_count{n_rep}{n_levels} = ones(size_center_points,1);
@@ -63,6 +63,8 @@ for n_rep = 1 : n_decompositions
 
     for k = 1 : n_levels-1
 
+        % k=1 is coarsest: about n / sparsity^(n_levels-1) random sources.
+        % Each later k is denser; the last stored level (n_levels) is identity.
         size_source_points = floor(size_center_points/multires_sparsity^(n_levels - k));
         source_interpolation_aux = zeros(size_source_points,1);
 
@@ -73,6 +75,8 @@ for n_rep = 1 : n_decompositions
 
         multires_dec{n_rep}{k} = aux_ind(1:size_source_points)';
 
+        % Nearest coarse source for every fine source; occupancy is how
+        % many fine nodes land on each coarse index (used when averaging).
         MdlKDT = KDTreeSearcher(source_points');
         source_interpolation_aux = knnsearch(MdlKDT,center_points');
 

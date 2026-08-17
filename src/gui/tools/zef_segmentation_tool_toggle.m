@@ -37,9 +37,7 @@ else
 end
 
 warning off
-zef.h_zeffiro_window_main.SizeChangedFcn = '';
 zef.h_zeffiro_window_main.Position = position_vec;
-zef_set_size_change_function(zef.h_zeffiro_window_main);
 warning on
 
 end

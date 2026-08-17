@@ -16,6 +16,9 @@ function [newRec] = zef_reconstructionTool_mean(reconstruction)
 
 newRec=reconstruction{:,1};
 
+% Averages along size(...,2). Bank copies zef.reconstruction as-is, which
+% solvers store as N×1, so this loop does not run extra frames and {:,1}
+% is the first column (first frame for N×1). A 1×N cell would average.
 for frame=2:size(reconstruction,2)
     nextRec=reconstruction{:,frame};
     newRec=newRec+nextRec;

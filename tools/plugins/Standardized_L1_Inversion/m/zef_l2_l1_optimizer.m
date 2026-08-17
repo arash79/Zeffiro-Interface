@@ -22,6 +22,10 @@ function x = zef_l2_l1_optimizer(L, y, reg_param, options)
 %
 %   See also zef_sl1_iteration.
 
+% Lifted Lasso: x = [z; t] with t ≥ |z| componentwise.
+% Quadratic term is only on z (H = blkdiag(L'L, 0)); linear term is
+% -L'y on z and the L1 weights on t. Constraints:
+%   z - t ≤ 0,  -z + t ≤ 0  (i.e. t ≥ |z|),  -t ≤ 0.
 H = [ L'*L zeros(size(L,2), size(L,2)) ; zeros(size(L,2), 2*size(L,2)) ];
 f = [ - L'*y ; reg_param ];
 

@@ -1,21 +1,14 @@
-# Beamformer
+## Folder purpose
 
-Spatial filters (LCMV, unit-noise-gain, unit-gain, scalar UNG) that scan the source grid. Use it when you want a covariance-based localization rather than a distributed Tikhonov map.
+Spatial-filter beamformer plugin (LCMV, unit-noise-gain, unit-gain, scalar UNG) that scans the source grid. Use it for covariance-based localization rather than a distributed Tikhonov map.
 
-This plugin does **not** construct `inverse.BeamformerInverter`. Class id `beamformer` (and `legacy_beamformer`) is a separate `zef_inverse_run` track.
+## Main contents
 
-## Menu
+- Start: `zef_beamformer_start.m` → `zef_beamformer_window`
+- Solver: `zef_beamformer.m`
+- Layout: `zef_beamformer_app.mlapp`
 
-| Profile | Path |
-|---------|------|
-| `multicompartment_head` | Inverse tools → **Beamformer** |
-| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
-
-INI callback: `zef_beamformer_start`.
-
-Window title: `ZEFFIRO Interface: Beamformer`.
-
-## Run the solver
+## Code functionality
 
 **StartButton** `ButtonPushedFcn` (depends on `estimation_attr`):
 
@@ -46,21 +39,44 @@ Covariance dropdown (`zef.cov_type`):
 
 Lead-field regularization: Basic / Pseudoinverse (`zef.L_reg_type` 1/2). Normalization of `L` columns: Matrix / Column / Row / None.
 
-## Needs
+What each **type** does after that covariance `C` (implementation in `zef_beamformer.m`):
 
-- `zef.L`, interpolation, `zef.source_direction_mode`
-- `zef.measurements`
-- SNR: `zef.inv_snr` → `10^(-inv_snr/20)`
-- Covariance: `zef.cov_type`, `zef.inv_cov_lambda`; lead-field ridge `zef.inv_leadfield_lambda` / `zef.L_reg_type`
-- Frames: `zef.number_of_frames`, `inv_time_*`, band edges
+| `bf_type` | Label | Filter |
+|-----------|-------|--------|
+| 1 | LCMV | Whiten with \(C^{-1/2}\), then \(z = (L^\top L + \lambda I)^{-1} L^\top f\) (or `pinv`) per source triplet |
+| 2 | Unit noise gain | Same LCMV-style weights, then column-normalize \(\|w\|=1\) (Borgiotti–Kaplan) and \(z = w^\top f\). On free-orientation sources with `L_reg_type==2` and Matrix/Column normalization, the `else` branch multiplies a `weights` that this iteration has not assigned |
+| 3 | Unit-gain constraint | After \(C^{-1/2}\) whitening, orientation = smallest eigenvector of \(L^\top L\), then type-1 LCMV on that 1-column \(L\), times the orientation |
+| 4 | Unit noise gain scalar | **No** \(C^{-1/2}\) on \(f\). \(L \leftarrow C\setminus L\), orientation from `eigs(L'L, L'C^{-1}L)`, then \(z = (L^\top L)^{-1/2} L^\top f\) times that orientation |
 
-## Writes
+Constrained-field nodes (`procFile.s_ind_4`, Mesh-tool Directions = Normal) use a single lead-field column in every type. `Var_loc` stores `trace(z z')` per source as a scalar “location strength”.
 
-- `zef.reconstruction` and `zef.reconstruction_information` (tags `Beamformer/LCMV`, `/UNG`, `/UG`, `/UNGsc`)
-- Optionally `zef.bf_var_loc`
+Needs: `zef.L`, interpolation, `zef.source_direction_mode`, `zef.measurements`; SNR `zef.inv_snr` → `10^(-inv_snr/20)`; covariance `zef.cov_type`, `zef.inv_cov_lambda`; lead-field ridge `zef.inv_leadfield_lambda` / `zef.L_reg_type`; frames `zef.number_of_frames`, `inv_time_*`, band edges.
 
-## Files
+Writes: `zef.reconstruction` and `zef.reconstruction_information` (tags `Beamformer/LCMV`, `/UNG`, `/UG`, `/UNGsc`); optionally `zef.bf_var_loc`.
 
-- Start: `zef_beamformer_start.m` → `zef_beamformer_window`
-- Solver: `zef_beamformer.m`
-- Layout: `zef_beamformer_app.mlapp`
+## Workflow context
+
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **Beamformer** |
+| `_legacy`, `_nse`, asteroid_radar, asteroid_gravity | same |
+
+INI callback: `zef_beamformer_start`. Window title: `ZEFFIRO Interface: Beamformer`.
+
+This plugin does **not** construct `inverse.BeamformerInverter`. Class id `beamformer` (and `legacy_beamformer`) is a separate `zef_inverse_run` track.
+
+## Usage instructions
+
+1. Open Inverse tools → Beamformer.
+2. Choose beamformer type, covariance type, lead-field regularization, and normalization.
+3. Press Start; inspect `zef.reconstruction` (and optionally `zef.bf_var_loc`).
+
+## Important notes
+
+- Covariance type 0 disables the λ box but is not a listed dropdown item.
+- Unit noise gain (`bf_type` 2) has a known unassigned-`weights` path for free-orientation + `L_reg_type==2` + Matrix/Column normalization.
+- Scalar UNG does not whiten `f` with \(C^{-1/2}\).
+
+## Developer guidance
+
+Keep menu callback `zef_beamformer_start` and reconstruction tags (`Beamformer/LCMV`, `/UNG`, `/UG`, `/UNGsc`) stable. Do not conflate this plugin with the `beamformer` / `legacy_beamformer` `zef_inverse_run` class path.

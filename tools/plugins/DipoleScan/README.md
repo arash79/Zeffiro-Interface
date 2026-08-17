@@ -1,22 +1,14 @@
-# DipoleScan
+## Folder purpose
 
 Scan every source location for the single dipole (or local orientation) that best fits the current time frame. Use it for a one-source localization map, not a distributed image.
 
-This plugin does **not** construct `inverse.DipoleScanInverter`. Class ids `dipolescan` / `dipole_scan` (and `legacy_dipolescan`) are a separate `zef_inverse_run` track.
+## Main contents
 
-## Menu
+- Start: `m/zef_dipole_start.m` → `zef_dipole_window`
+- Solver: `m/zef_dipoleScan.m`
+- Layout: `mlapp/dipole_app.mlapp`
 
-| Profile | Path |
-|---------|------|
-| `multicompartment_head` | Inverse tools → **Dipole Scan** |
-| `_legacy`, `_nse` | Inverse tools → **Dipole Scan** |
-| asteroid_radar / asteroid_gravity | Inverse tools → **Dipole scan** |
-
-INI callback: `zef_dipole_start`.
-
-Window title at runtime (`zef_dipole_window`): `ZEFFIRO Interface: Dipole scan tool`. The App Designer resource itself is named `ZEFFIRO Interface: Dipole Scan`.
-
-## Run the solver
+## Code functionality
 
 **StartButton** `ButtonPushedFcn`:
 
@@ -28,20 +20,34 @@ Inversion method (`InversionmethodDropDown` `Items` / `ItemsData`): **SVD** / **
 
 The map stored in `zef.reconstruction` is goodness-of-fit `1 − ‖f−Lf q‖²/‖f‖²`. Constrained-normal locations copy that scalar onto all three xyz slots; free-orientation locations store `gof × unit moment`. `onlymax` is hardcoded `false`, so the **Relative residual variance (max)** dropdown (`estimation_attr`) does **not** collapse the map to a single peak. `dipole_type` is **Fixed** only.
 
-## Needs
+Needs: `zef.L`, interpolation, `zef.source_direction_mode`, `zef.measurements`; SNR `zef.inv_snr` stored in `reconstruction_information` (scan itself is residual-based); frames `zef.number_of_frames`, `inv_time_1/2/3`, sampling frequency, band edges.
 
-- `zef.L`, interpolation, `zef.source_direction_mode`
-- `zef.measurements`
-- SNR: `zef.inv_snr` stored in `reconstruction_information` (scan itself is residual-based)
-- Frames: `zef.number_of_frames`, `inv_time_1/2/3`, sampling frequency, band edges
+Writes: `zef.reconstruction` (cell, one frame each); `zef.reconstruction_information` with tag `Dipole` + method name.
 
-## Writes
+## Workflow context
 
-- `zef.reconstruction` (cell, one frame each)
-- `zef.reconstruction_information` with tag `Dipole` + method name
+| Profile | Path |
+|---------|------|
+| `multicompartment_head` | Inverse tools → **Dipole Scan** |
+| `_legacy`, `_nse` | Inverse tools → **Dipole Scan** |
+| asteroid_radar / asteroid_gravity | Inverse tools → **Dipole scan** |
 
-## Files
+INI callback: `zef_dipole_start`. Window title at runtime (`zef_dipole_window`): `ZEFFIRO Interface: Dipole scan tool`. The App Designer resource itself is named `ZEFFIRO Interface: Dipole Scan`.
 
-- Start: `m/zef_dipole_start.m` → `zef_dipole_window`
-- Solver: `m/zef_dipoleScan.m`
-- Layout: `mlapp/dipole_app.mlapp`
+This plugin does **not** construct `inverse.DipoleScanInverter`. Class ids `dipolescan` / `dipole_scan` (and `legacy_dipolescan`) are a separate `zef_inverse_run` track.
+
+## Usage instructions
+
+1. Open Inverse tools → Dipole Scan / Dipole scan.
+2. Choose inversion method (SVD / pinv) and lead-field regularization.
+3. Press Start.
+
+## Important notes
+
+- `inv_leadfield_lambda` is SVD rank (singular vectors kept), not a ridge λ, on the free-orientation path.
+- `onlymax` is hardcoded `false`; the Relative residual variance (max) dropdown does not collapse to a peak.
+- `dipole_type` is Fixed only.
+
+## Developer guidance
+
+Preserve callback `zef_dipole_start` and tag `Dipole` + method name. Do not conflate with `dipolescan` / `dipole_scan` / `legacy_dipolescan` class ids.

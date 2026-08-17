@@ -1,6 +1,10 @@
-# dynamical_plot_queue_bank
+# DynamicalPlotQueue / dynamical_plot_queue_bank
 
-Overlay functions listed in the queue window. Each file’s `help()` (newlines stripped) is the List-row description. Invoked via `zef_plot_dpq` → `evalin('caller', filename)`. Most draw on caller `h_axes_image`; a few use `zef.h_axes1`. User manual: [parent README](../../README.md).
+## Folder purpose
+
+Overlay functions listed in the Dynamical plot queue window. Each file’s `help()` (newlines stripped) is the List-row description. Invoked via `zef_plot_dpq` → `evalin('caller', filename)`.
+
+## Main contents
 
 | File | Overlay |
 |------|---------|
@@ -15,3 +19,28 @@ Overlay functions listed in the queue window. Each file’s `help()` (newlines s
 | `zef_dpq_plot_resection` | free-boundary mesh of `zef.resection_points` |
 | `zef_dpq_wireframe_plot` | `zef.wireframe_triangles` / `wireframe_nodes` |
 | `zef_add_dof_space` | scatter3 of `zef.source_positions` |
+
+## Code functionality
+
+- Most draw on caller `h_axes_image`; a few use `zef.h_axes1`.
+- Bank entries are discovered by listing `.m` files; help text is the UI label.
+- Overlays assume the relevant `zef.*` fields were produced by synthetic-source, GMM, SESAME, StripTool, or wireframe workflows.
+
+## Workflow context
+
+Used after Dynamical plot queue is open and a reconstruction / synthetic source / GMM / strip / wireframe exists. Parent tool docs: [`../../README.md`](../../README.md).
+
+## Usage instructions
+
+1. Open **Dynamical plot queue** from Multi-tools.
+2. Add bank entries from the list (labels come from each file’s help).
+3. Play / step the queue so `zef_plot_dpq` `eval`s selected filenames in the caller.
+
+## Important notes
+
+- `evalin('caller', filename)` requires the file to be on the path and callable as a script/function name matching the filename.
+- SP `zef.GMModel` vs JL `zef.GMM` use different plot helpers — pick the matching bank entry.
+
+## Developer guidance
+
+New overlays: add `zef_dpq_my_overlay.m` with clear `help` (becomes the list row). Prefer `hold on` overlays on the shared axes; document required `zef` fields in the help header. User manual: parent README.

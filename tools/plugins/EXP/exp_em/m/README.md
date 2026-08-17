@@ -1,19 +1,38 @@
-# EXP EM solver files
+# tools/plugins/EXP/exp_em/m
 
-GUIDE **EM MAP estimation** internals. EM (expectation–maximization) is one of the three estimation types in the unified Exponential Prior tool (`common/exp_iteration`: IAS / EM / sLORETA). This folder is the older standalone window for EM only.
+## Folder purpose
 
-**Not** on the default Inverse-tools menu (that uses `zef_exp_app_launch` → `exp_iteration`). Open from MATLAB:
+MATLAB sources for legacy GUIDE **EXP EM MAP** (single-resolution exponential-prior EM). Companion fig: `../fig/exp_em_map_estimation.fig`. Not on the default head Inverse-tools menu.
 
-```matlab
-exp_em_map_estimation;   % script; opens the GUIDE fig
-```
-
-Start in the fig still calls `exp_em_iteration([])`. Needs `zef.L`, interpolation, `zef.measurements`, and the same SNR/frame fields as other EXP solvers (`inv_snr`, `number_of_frames`, `inv_time_*`). Writes `zef.reconstruction` / `reconstruction_information`.
+## Main contents
 
 | File | Role |
 |------|------|
-| `exp_em_map_estimation.m` | **script** that `open`s the fig and runs `zef_init_exp_em` |
-| `exp_em_iteration.m` | Solver (`[]` from the fig Start callback) |
-| `zef_init_exp_em.m` / `zef_update_exp_em.m` | Widget ↔ `zef` |
+| `exp_em_map_estimation.m` | Start: open fig + `zef_init_exp_em` |
+| `zef_init_exp_em.m` | Defaults / bind |
+| `zef_update_exp_em.m` | Widgets → `zef` |
+| `exp_em_iteration.m` | Solver (Start → `exp_em_iteration([])`); tag `'EXP EM'` |
 
-Folder overview: [../README.md](../README.md). Unified app (default INI): [../../README.md](../../README.md).
+## Code functionality
+
+`zef_processLeadfields` → EM / L1 updates (`L1_optimization` or closed form when `q==2`) → `zef_postProcessInverse` / normalize. GUIDE + base-workspace `zef`.
+
+## Workflow context
+
+See parent `exp_em/README.md`. Multires sibling: `exp_em_multires`. Unified GUI: `zef_exp_app_launch`.
+
+## Usage instructions
+
+```matlab
+exp_em_map_estimation;
+```
+
+## Important notes
+
+- Requires lead field + measurements.
+- Do not mix `exp_em_*` fields with `exp_ias_*` casually.
+
+## Developer guidance
+
+- Keep solver changes aligned with any class/HALpR cousins when sharing L1 code.
+- Pitfall: running Start with empty `zef.L`.

@@ -63,7 +63,7 @@ if eval('isfield(zef,''h_axes1'');')
             eval('zef.h_colorscale_max_slider.Value = 0;');
             eval('zef.update_lights = 1; zef.h_update_lights.Value = 1;');
             
-            h_axes = findobj(zef.h_update_colormap.Parent.Children,'Tag','axes1');
+            h_axes = zef_ui_axes(ancestor(zef.h_update_colormap, 'figure'));
             axis(h_axes,'auto');
             axis(h_axes,'tight');
             axis(h_axes,'equal');

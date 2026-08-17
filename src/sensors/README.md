@@ -1,64 +1,57 @@
-# Sensors (`src/sensors`)
+## Folder purpose
 
-A **sensor set** is one EEG cap, MEG helmet, EIT electrode array, or similar: positions, optional orientations, names, and how they attach to the volume mesh.
+A **sensor set** is one EEG cap, MEG helmet, EIT electrode array, or similar: positions, optional orientations, names, and how they attach to the volume mesh. This folder allocates tagged fields, fills Segmentation-tool tables, and snaps contacts onto the FEM surface before a lead field is built.
 
-This folder allocates those tagged fields, fills the Segmentation-tool tables, and snaps contacts onto the FEM surface before a lead field is built.
-
-## What you do in the GUI
-
-In **ZEFFIRO Interface: Segmentation tool**:
-
-| Table / menu | Role |
-|--------------|------|
-| **Sensor sets:** | One row per set (`zef.sensor_tags`). Imaging method, on/off, visibility. Cell edit → `zef_update`. |
-| **Sensors:** | Names and per-contact flags for the **current** set (`zef.current_sensors`). |
-| **Add sensor set** / **Delete sensor set(s)** | `zef_add_sensors` / `zef_delete_sensor_sets` |
-| **Add sensor** / **Delete sensor(s)** | `zef_add_sensor_name` / `zef_delete_sensors` |
-| **Import sensors → Points (DAT file)** | `zef_get_sensor_points` then `zef_init_sensors_parameter_profile` |
-| **Import sensors → Directions (DAT file)** | `zef_get_sensor_directions` |
-| **Import sensor names (DAT file)** | `zef_import_sensor_names` |
-| **Toggle visible** | flip visibility on selected name-table rows |
-| **Lock on** (sensor sets / names) | `zef.lock_sensor_sets_on` / `zef.lock_sensor_names_on` |
-
-**Import → Import electrodes** (menu bar, not this table) writes `zef.sensors` and the active prefix via `+core/+io/+electrodes`. That is the CSV/DAT electrode path with optional CEM columns.
-
-Mesh visualization **Attach electrodes** (`zef.attach_electrodes`) is a *plot* flag; the geometry snap used by the lead field is `zef_attach_sensors_volume`.
-
-## Attachment (required before `zef.L`)
-
-Every lead-field `*_make_all` path calls `zef_attach_sensors_volume` so contacts sit on the outer surface (or volume, depending on imaging method). Wrong attachment yields a wrong `zef.L`.
-
-`zef_sensor_get_function_eval` runs a per-contact **get function** string (`feval`) when you supply a custom placement expression. Those strings are trusted MATLAB.
-
-`zef_fix_sensors_get_functions_array_size` pads or trims the `_get_functions` cell to the electrode count.
-
-`zef_triangles_2_sensor_boundary` offsets triangle indices onto the stacked sensor-boundary mesh.
-
-## Fields
-
-Prefix like compartments: `s_points`, `s_directions`, `s_name_list`, `s_imaging_method_name`, … `zef.current_sensors` is the active tag. CEM data (inner/outer radius, impedance) extends `_points` to 6 columns when the import file has them. `zef.imaging_method` must match the lead-field type (EEG vs MEG vs EIT).
-
-`zef_build_sensors_table` is a **script**: it writes `h_sensors_table` from `sensor_tags` and expects `zef` in the caller.
-
-## Scripting
-
-```matlab
-zef = zef_create_sensors(zef, 's');
-zef = zef_attach_sensors_volume(zef, zef.sensors);
-```
-
-## Files
+## Main contents
 
 | File | Kind | Role |
 |------|------|------|
 | `zef_create_sensors.m` | function | Default `<tag>_*` |
-| `zef_build_sensors_table.m` | **script** | Fill sensors table |
-| `zef_attach_sensors_volume.m` | function | Snap to volume/surface |
+| `zef_build_sensors_table.m` | **script** | Fill sensors table (expects `zef` in caller) |
+| `zef_attach_sensors_volume.m` | function | Snap to volume/surface; returns attachment table |
 | `zef_triangles_2_sensor_boundary.m` | function | Triangle index offset |
-| `zef_fix_sensors_get_functions_array_size.m` | function | Cell length vs N sensors |
+| `zef_fix_sensors_get_functions_array_size.m` | function | Pad/trim `_get_functions` cell |
 | `zef_sensor_get_function_eval.m` | function | `feval` placement string |
 
-## Developer notes
+## Code functionality
 
-- New modality: defaults in `zef_create_sensors` + attachment rules in `zef_attach_sensors_volume` + imaging-method list in `zef_init`.
-- Keep CSV column layout consistent with `+core/+io/+electrodes` (3 vs 6 columns).
+Prefix fields like compartments: `s_points`, `s_directions`, `s_name_list`, `s_imaging_method_name`, …. `zef.current_sensors` is the active tag. `zef.imaging_method` must match lead-field type.
+
+**Attachment** (required before `zef.L` for EEG/EIT/TES; MEG does **not** attach):
+
+```matlab
+zef.sensors_attached_volume = zef_attach_sensors_volume(zef, zef.sensors);
+```
+
+`attach_type`: `'mesh'` (FEM / Visualize volume), `'geometry'` (surfaces), `'points'` (CEM name labels).
+
+| Input | Model | Attachment |
+|-------|--------|------------|
+| N×3 | PEM | Nearest scalp node (or volume node if depth electrodes on) |
+| N×6, col4=col5=0 | Buried CEM | Barycentric coords in enclosing tet (4 rows/contact) |
+| N×6, col4=0, col5=1 | Point-like CEM | One nearest surface vertex |
+| N×6 otherwise | Annular CEM | Triangles with inner (col5) ≤ d < outer (col4) |
+
+`[outer, inner, impedance]` in columns 4–6 is what `zef_cem_electrode` writes. `zef_process_meshes` may overwrite 6-column radii from Segmentation-tool widgets. **Import → Import electrodes** stores `[inner, outer, impedance]` and does **not** fill widgets — lead-field runs then use widget radii unless you copy file values.
+
+## Workflow context
+
+In Segmentation tool: **Sensor sets:** / **Sensors:** tables; Add/Delete set or sensor; Import points/directions/names DAT; Toggle visible; Lock on. **Import → Import electrodes** (menu bar) writes via `+core/+io/+electrodes`. Mesh-vis **Attach electrodes** is a *plot* flag; geometry snap for lead field is `zef_attach_sensors_volume`.
+
+## Usage instructions
+
+```matlab
+zef = zef_create_sensors(zef, 's');
+zef.sensors_attached_volume = zef_attach_sensors_volume(zef, zef.sensors);
+```
+
+Per-contact **get function** strings are trusted MATLAB (`zef_sensor_get_function_eval`).
+
+## Important notes
+
+- Wrong attachment yields a wrong `zef.L`.
+- Attachment returns a table — assign it; it does not mutate `zef` in place.
+
+## Developer guidance
+
+New modality: defaults in `zef_create_sensors` + attachment rules in `zef_attach_sensors_volume` + imaging-method list in `zef_init`. Keep CSV column layout consistent with `+core/+io/+electrodes` (3 vs 6 columns).

@@ -26,8 +26,7 @@ if isfield(zef, 'h_zeffiro_menu') && isvalid(zef.h_zeffiro_menu)
 end
 window_handle.Visible = 'on';
 zef_window_manager('raise', window_handle);
-set(findobj(window_handle.Children,'-property','FontUnits'),'FontUnits','pixels')
-set(findobj(window_handle.Children,'-property','FontSize'),'FontSize',zef.font_size);
+zef_ui_apply_theme(window_handle);
 
 if isfield(zef, 'h_zeffiro_window_main') && isequal(window_handle, zef.h_zeffiro_window_main)
     zef_window_manager('dock_menu', zef);

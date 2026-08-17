@@ -1,11 +1,41 @@
-# `+config` — fs2zef lookup tables
+# +utilities/+fs2zef/+config
 
-These tables turn FreeSurfer label **names** into Zeffiro compartment defaults when `generate_zef_import` writes `import_segmentation.zef`. They are not read by `zef_import_segmentation` at GUI import time; they only affect converter output.
+## Folder purpose
 
-| Function | Used by | What it stores |
-|----------|---------|----------------|
-| `compartment_mappings` | `generate_zef_import` | Keyword → default `sigma` (S/m), `activity` (source flag), `inflate`. Examples in the file: grey 0.33 / 1, white 0.14 / 3, CSF 1.79 / 0, skull 0.0064 / 0 |
-| `default_config` | `test_unified_pipeline` only | Parcellation scheme names, `recon_all` flags, retries. **`run` does not read this** |
-| `parcellation_schemes` | `test_unified_pipeline` | Desikan-Killiany (`aparc`, id `'36'`) and Destrieux (`aparc.a2009s`, id `'76'`) metadata |
+Lookup tables for FreeSurfer→Zeffiro **generators** (compartment names → conductivity/activity/inflate; parcellation scheme IDs). Not the GUI import dialog.
 
-Edit `compartment_mappings` when a new tissue name should get a non-default conductivity. Adding a field to `default_config` will not change `utilities.fs2zef.run` until someone wires it. Parent pipeline: [`../README.md`](../README.md).
+## Main contents
+
+| File | Role |
+|------|------|
+| `compartment_mappings.m` | Name → σ / activity / inflate defaults |
+| `parcellation_schemes.m` | DK `36` / Destrieux `76` scheme metadata |
+| `default_config.m` | Used by **`test_unified_pipeline` only** — **`run` does not read it** |
+
+## Code functionality
+
+Generators and tests query these maps when building compartment tables / label schemes. Changing a mapping changes generated project defaults for those pipelines.
+
+## Workflow context
+
+```
+fs2zef generators / tests → +config
+fs2zef.run → scripts + readers + transforms (does not load default_config)
+```
+
+## Usage instructions
+
+```matlab
+m = utilities.fs2zef.config.compartment_mappings();
+s = utilities.fs2zef.config.parcellation_schemes();
+```
+
+## Important notes
+
+- `default_config` is easy to mistake for runtime settings — it is test-oriented.
+- Conductivities here are defaults, not patient-specific.
+
+## Developer guidance
+
+- When adding tissues, update mappings and any generator that iterates them.
+- Pitfall: editing `default_config` expecting `run` to pick it up.

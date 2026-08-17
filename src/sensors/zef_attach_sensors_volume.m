@@ -6,25 +6,75 @@ function  [sensors_attached_volume] = zef_attach_sensors_volume(zef,sensors,vara
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   For imaging_method in [1, 4, 5], projects sensors onto nodes or scalp
-%   triangles, evaluates optional per-sensor get_functions, and builds
-%   sensors_attached_volume rows describing tetra barycentric weights,
-%   nearest nodes, or annular triangle patches for concentric sphere models.
-%   attach_type selects 'mesh' vs 'geometry' attachment; varargin can override
-%   nodes, tetra, surface_triangles, get_functions, and bypass_functions.
+%   For imaging_method in {1, 4, 5} (EEG / EIT / TES), snaps contacts onto
+%   the FEM mesh or the compartment surface so the lead-field builders can
+%   couple them. MEG (2, 3) returns [] — coils stay at zef.sensors xyz.
+%
+%   Callers: every EEG/EIT/TES *_make_all / *_lead_field path, plotters
+%   (Visualize volume/surfaces and Frame/Movie), zef_smooth_electrodes,
+%   LF-bank recompute. The Mesh-vis checkbox Attach electrodes is only a
+%   *plot* flag; the forward path always attaches.
+%
+%   Column layout of the input sensors matrix (this is what the body
+%   actually tests, not the CSV header names):
+%     N×3  → electrode_model 1 (PEM). Snap xyz to nearest surface node
+%            (or nearest volume node when zef.use_depth_electrodes is 1).
+%     N×6  → electrode_model 2 (CEM). Columns 4 and 5 are radii in the
+%            same length unit as xyz:
+%              col4 == 0 and col5 == 0 → buried contact: barycentric
+%                coordinates in the enclosing tetra (mesh) or a dummy
+%                geometry row.
+%              col4 == 0 and col5 == 1 → nearest surface node (one row).
+%              otherwise annular patch: triangles whose centroid distance
+%                d from the (snapped) centre satisfies col5 ≤ d < col4,
+%                i.e. col4 is the outer radius and col5 the inner radius.
+%            That [outer, inner] order matches zef_cem_electrode (called
+%            from zef_process_meshes as create_patch_sensor for EEG). CSV
+%            import stores [inner, outer] in columns 4–5; process_meshes
+%            overwrites those columns from the Segmentation-tool radius
+%            widgets before a typical lead-field run.
+%
+%   attach_type (varargin{1}, default 'mesh')
+%     'mesh'     – FEM nodes / tetra / surface_triangles{end-k+1}.
+%     'geometry' – compartment surface reuna_p / reuna_t (plotters use
+%                  this for Visualize surfaces).
+%     'points'   – PEM-style xyz snap even when sensors are 6-column;
+%                  used to place CEM name labels.
+%
+%   Which surface: zef.<current_sensors>_electrode_surface_index (default
+%   1). If the outermost reuna_type is Bounding box (_sources == -1),
+%   the index is counted from the last non-box surface.
+%
+%   Output table (consumed by zef_pem2cem / zef_build_electrodes and by
+%   the CEM trisurf plot path):
+%     PEM / 'points': N×(same width as input), xyz replaced by the snap.
+%     CEM tetra: 4 rows per contact [id, tet_node, barycentric λ, 0].
+%     CEM nearest node: 1 row [id, node_or_triangle_index, 1, 0].
+%     CEM annulus: one row per triangle [id, n1, n2, n3].
+%   Empty when imaging_method is not 1, 4, or 5.
 %
 %   sensors_attached_volume = zef_attach_sensors_volume(zef, sensors)
 %   sensors_attached_volume = zef_attach_sensors_volume(zef, sensors, attach_type, ...)
 %
 %   Inputs
-%     zef     - session struct (read from base when empty).
-%     sensors - N-by-3 or N-by-6 sensor coordinate table.
+%     zef     - session struct (read from base when empty). Must contain
+%               nodes, tetra, surface_triangles or reuna_p/t, imaging_method,
+%               current_sensors, use_depth_electrodes.
+%     sensors - N-by-3 (PEM) or N-by-6 (CEM) as above.
+%     varargin:
+%       {1} attach_type       - 'mesh' | 'geometry' | 'points'
+%       {2} get_functions     - cell of per-contact MATLAB strings
+%       {3} nodes             - override zef.nodes
+%       {4} tetra             - override zef.tetra
+%       {5} surface_triangles - override zef.surface_triangles
+%       {6} bypass_functions  - 1 skips get_function eval
 %
 %   Output
-%     sensors_attached_volume - attachment table consumed by forward solvers;
-%                               empty when imaging_method is not supported.
+%     sensors_attached_volume - attachment table; assign to
+%       zef.sensors_attached_volume. Does not return a modified zef.
 %
-%   See also zef_sensor_get_function_eval, zef_fix_sensors_get_functions_array_size.
+%   See also zef_sensor_get_function_eval, zef_fix_sensors_get_functions_array_size,
+%            zef_cem_electrode, zef_build_electrodes.
 
 if isempty(zef)
     zef = evalin('base','zef');
@@ -112,6 +162,8 @@ if ismember(zef.imaging_method,[1,4,5])
     %    sensors = gpuArray(sensors);
     %end
 
+    % 6 columns → complete electrode model (radii + impedance). 3 columns
+    % (or attach_type 'points') → point electrodes: only xyz is snapped.
     if size(sensors,2) == 6
         electrode_model = 2;
     else
@@ -120,6 +172,9 @@ if ismember(zef.imaging_method,[1,4,5])
 
     if electrode_model == 1 || isequal(attach_type,'points')
 
+        % PEM / label-points: snap each contact to a single vertex.
+        % Depth electrodes (use_depth_electrodes) search the volume nodes;
+        % otherwise search the scalp/geometry surface.
         if electrode_model == 1 && use_depth_electrodes == 1
             surface_ind = [];
             deep_ind = [1:size(sensors,1)]';
@@ -172,6 +227,9 @@ i_ind = 0;
                 i_ind = i_ind + 1; 
                 sensors_aux = [sensors_aux; sensors_attached_get_functions{i_ind}];
             else
+            % Buried CEM contact: both radii zero. Mesh path finds the
+            % enclosing tetra via barycentric λ_i ∈ [0,1] and stores four
+            % (electrode, node, λ, 0) rows for zef_pem2cem.
             if sensors(i,4) == 0 && sensors(i,5) == 0
 
                 if isequal(attach_type,'mesh')
@@ -198,6 +256,8 @@ i_ind = 0;
 
                 end
 
+            % Point-like CEM: outer radius 0, inner flag 1 → nearest
+            % surface vertex (one row [id, node_index, 1, 0]).
             elseif sensors(i,4) == 0 && sensors(i,5) == 1
 
                 if isequal(attach_type,'mesh')
@@ -217,6 +277,10 @@ i_ind = 0;
 
             else
 
+                % Annular CEM patch: snap the centre to the nearest surface
+                % vertex, then keep triangles whose centroid distance d
+                % satisfies inner (col5) ≤ d < outer (col4). Each kept
+                % triangle becomes one [id n1 n2 n3] row.
                 if isequal(attach_type,'mesh')
 
                     [min_val, min_ind] = min(sqrt(sum((ele_nodes - repmat(sensors(i,1:3),size(ele_nodes,1),1)).^2,2)));

@@ -543,11 +543,20 @@ end
 
 function theme = local_theme()
 theme = struct();
-theme.bg = [0.97 0.975 0.978];
-theme.text = [0.14 0.18 0.22];
-theme.muted = [0.42 0.47 0.51];
-theme.track = [0.82 0.87 0.88];
-theme.fill = [0.12 0.52 0.55];
+try
+    t = zef_ui_theme();
+    theme.bg = t.color.bg;
+    theme.text = t.color.text;
+    theme.muted = t.color.textMuted;
+    theme.track = t.color.accentSoft;
+    theme.fill = t.color.accent;
+catch
+    theme.bg = [0.97 0.975 0.978];
+    theme.text = [0.14 0.18 0.22];
+    theme.muted = [0.42 0.47 0.51];
+    theme.track = [0.82 0.87 0.88];
+    theme.fill = [0.12 0.52 0.55];
+end
 end
 
 function [html_bar, track, fill_bar, empty_bar] = local_make_bar(parent, theme)

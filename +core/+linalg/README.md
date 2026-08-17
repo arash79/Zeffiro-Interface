@@ -1,16 +1,39 @@
-# `core.linalg` — shared preconditioner matrices
+# +core/+linalg
 
-Dense left-preconditioner matrices for iterative linear solvers:
+## Folder purpose
+
+Namespace parent for shared linear-algebra helpers under `core.linalg.*`. Today it only hosts **preconditioners**; there is no menu entry and no other sibling packages yet.
+
+## Main contents
+
+| Path | Role |
+|------|------|
+| `+preconditioners/` | `jacobi`, `ssor` — see child README |
+| `README.md` | This file |
+
+## Code functionality
 
 ```matlab
-M = core.linalg.preconditioners.jacobi(A);             % M = D^{-1}, D = diag(A)
-M = core.linalg.preconditioners.ssor(A, "coeff", 1);    % ω ∈ [0, 2], default 1
+M = core.linalg.preconditioners.jacobi(A);
+M = core.linalg.preconditioners.ssor(A, "coeff", 1.2);
 ```
 
-Both require a square `A` (sparse or dense) and return a **dense** matrix the same size. They are not opened from any Zeffiro menu.
+Implementations build explicit matrices (including via `eye(size(A))`) — fine for small tests, **not** for large sparse FEM as written.
 
-## Where this sits in Zeffiro
+## Workflow context
 
-EEG/MEG/EIT/TES lead fields assemble a sparse stiffness matrix and PCG-solve the transfer with `zef_transfer_matrix` (`src/gui/helpers`). That path still builds its own SSOR / incomplete-Cholesky factors from `zef.preconditioner` (`1` Cholinc, `2` SSOR). **`core.linalg.preconditioners` is not that call site yet.** Use this package when writing new solvers that want a dense `M` you can left-multiply or factor yourself.
+Production EEG lead-field PCG uses `zef_transfer_matrix` (`src/gui/helpers`) with Cholinc/SSOR options on `zef.preconditioner` — it does **not** call `core.linalg.preconditioners` yet. This package is a pending shared home for that logic.
 
-Formulas and arguments: [+preconditioners/README.md](+preconditioners/README.md). Parent overview: [../README.md](../README.md).
+## Usage instructions
+
+Use the child package APIs directly (see `+preconditioners/README.md`). Do not `addpath` into `+linalg`.
+
+## Important notes
+
+- Empty of code except the child package.
+- Dense `eye`-based builders will OOM on realistic head meshes.
+
+## Developer guidance
+
+- Migrate production preconditioners here only with sparse factors / `decomposition` and regression tests against `zef_transfer_matrix`.
+- Pitfall: assuming these are already on the lead-field path.

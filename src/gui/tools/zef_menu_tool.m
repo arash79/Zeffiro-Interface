@@ -191,8 +191,6 @@ end
 
 zef = rmfield(zef,'h_temp');
 
-set(findobj(zef.h_zeffiro_menu.Children,'-property','FontSize'),'FontSize',zef.font_size);
-
 if not(isprop(zef.h_zeffiro_menu,'ZefTool'))
     addprop(zef.h_zeffiro_menu,'ZefTool');
 end
@@ -242,9 +240,14 @@ zef.h_zeffiro_menu.ZefProgramPath = zef.program_path;
 if not(isprop(zef.h_zeffiro_menu,'ZefFontSize'))
     addprop(zef.h_zeffiro_menu,'ZefFontSize');
 end
-zef.h_zeffiro_menu.ZefFontSize = zef.font_size;
+theme_aux = zef_ui_theme(zef);
+zef.h_zeffiro_menu.ZefFontSize = theme_aux.font.size;
+clear theme_aux;
 
 if not(isprop(zef.h_zeffiro_menu,'ZefWaitbarHandle'))
     addprop(zef.h_zeffiro_menu,'ZefWaitbarHandle');
 end
 zef.h_zeffiro_menu.ZefWaitbarHandle = findall(groot,'-property','ZefWaitStartTime');
+
+zef = zef_ui_tag_handles(zef);
+zef_ui_ready(zef.h_zeffiro_menu);

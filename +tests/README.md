@@ -1,49 +1,58 @@
-# `+tests` — how to run these tests
+# +tests
 
-MATLAB `matlab.unittest` classes for inverse dispatch, eLORETA numerics, cluster I/O, and (separately) figure window-style. They do **not** start the full GUI workflow. Most inverse tests build a tiny `zef` in `createSyntheticInverseZef` (random `L` 4×6, 3 frames, `inv_data_mode='raw'`).
+## Folder purpose
+
+MATLAB unit / integration tests for inverse dispatch, UI helpers, and related APIs. Package name `tests.*` — **do not** `addpath('+tests')`; call `runtests` from the project root after `zeffiro_interface` path setup (or add only the project root).
+
+## Main contents
+
+| Class / file | Covers |
+|--------------|--------|
+| `ClassVsLegacyTest` | `dspm` vs `legacy_csm` both nonempty recon — **not** numerical equality |
+| `InverseDispatchTest` | `mne` / `legacy_mne` via `dispatch_inverse` |
+| `ELORETADispatchTest` | registry → `ELORETAInverter`; local `zef_inverse_run("eloreta")` |
+| `ELORETAInverterTest` | shape, fixed-point T, point-source, manual α, rescale |
+| `EndToEndSyntheticTest` | `zef_inverse_run(...,"dspm","local")` fills `zef.reconstruction` |
+| `InverseBundleExtractionTest` | bundle `L`, `F`, `procFile`, frames |
+| `InverseFailureModesTest` | `UnknownInverseMethod`; `MissingLegacyZef` |
+| `ClusterRunnerTest` | `run_inverse_job` → result.mat (`dspm`); no CSC required |
+| `ClusterProfileTest` | `configure_cluster_profile` CSC fields; skips without `ComputingProject` |
+| `ParameterSweepGenerationTest` | sweep → submissions; CSC skip when unavailable |
+| `LeadFieldTest` | **empty TODO** — asserts nothing today (fake coverage) |
+| `WindowManagementTest` | `zef_window_manager` / `WindowStyle` |
+| `WaitbarTest` | `zef_waitbar` lifecycle |
+| `ColoredListTest` | HTML/`uihtml` listboxes |
+| `UiThemeTest` | `zef_ui_theme` / layout tokens |
+| `ZefSourceModelLoadTest` | `core.types.ZefSourceModel.from` + legacy enum MAT load |
+| `createSyntheticInverseZef.m` | Shared synthetic `zef` fixture for inverse tests |
+
+## Code functionality
+
+Tests construct synthetic `L` / measurements via helpers, call `utilities.cluster.dispatch_inverse` or `zef_inverse_run`, and assert shapes / nonempty reconstructions / error ids. Cluster profile tests skip cleanly when Parallel Computing Toolbox / CSC `parcluster` is absent.
+
+## Workflow context
+
+Protects the class inverse track (`src/inverse` + `+inverse` + `+utilities/+cluster`) and selected GUI helpers (`src/gui/helpers`). Does not replace manual GUI QA under `data/log`.
+
+## Usage instructions
 
 ```matlab
-projectRoot = fileparts(which('zeffiro_interface'));
-addpath(projectRoot);
-addpath(genpath(fullfile(projectRoot, 'src')));
-
-results = runtests('+tests');
-% one class:
-results = runtests('tests.ELORETAInverterTest');
-results = runtests('tests.WindowManagementTest');
-results = runtests('tests.WaitbarTest');
-results = runtests('tests.ColoredListTest');
+cd /path/to/MainZeffiroProject
+zef = zeffiro_interface('start_mode','nodisplay');  % optional path warmup
+runtests('+tests')
+% or:
+runtests('tests.ELORETAInverterTest')
 ```
 
-Package name is `tests.*` because the folder is `+tests` on the project root path. Do not `addpath('+tests')`.
+## Important notes
 
-## Inverse / cluster classes
+- Synthetic `L` only — not a substitute for real head-project validation.
+- `ClassVsLegacyTest` checks both paths run, not bit-exact parity.
+- `LeadFieldTest` is a placeholder — do not treat a green run as LF coverage.
+- Cluster* tests need PCT / site-specific `parcluster` for full exercise.
 
-| Class | What it actually calls |
-|-------|------------------------|
-| `ELORETAInverterTest` | `inverse.ELORETAInverter` methods on synthetic `L` |
-| `ELORETADispatchTest` | Registry `eloreta` → class; `zef_inverse_run` fills `reconstruction` |
-| `InverseDispatchTest` | `mne` class and `legacy_mne` |
-| `InverseBundleExtractionTest` | `zef_inverse_extract_bundle` fields |
-| `InverseFailureModesTest` | Unknown id; missing `legacy_zef` |
-| `ClassVsLegacyTest` | `dspm` vs `legacy_csm` |
-| `EndToEndSyntheticTest` | `zef_inverse_run(zef,'dspm','execution','local')` |
-| `ClusterRunnerTest` | `run_inverse_job` writes `result.mat` |
-| `ClusterProfileTest` | `configure_cluster_profile` — needs CSC `parcluster` |
-| `ParameterSweepGenerationTest` | Sweep → 4 bundles — needs cluster |
+## Developer guidance
 
-`LeadFieldTest` is an empty `Test` block (`% TODO`) — it does not assert anything.
-
-## Window management
-
-`WindowManagementTest` exercises `zef_window_manager` / figure `WindowStyle` (docked vs normal, R2025a+ factory docked). It creates real figures and restores `groot` defaults in teardown. Not related to inverse dispatch.
-
-`WaitbarTest` exercises `zef_waitbar` lifecycle: all calling conventions, close vs delete, recreation after a stale handle, create/update/close cycles, menu-tool interaction, and repeated real callers (`zef_hexa_to_tetra`, `zef_adjacency_matrix`, `zef_stiffness_matrix`) together with window management. It also checks that the window is a filled progress bar (not a linear `uigauge`) and that the percentage label matches the current value immediately.
-
-`ColoredListTest` covers color-swatch lists on both backends: HTML listboxes (pre-R2025a) and compact `uihtml` lists from R2025a (no table grid). It checks Value get/set, empty/multiselect, parcellation V/X markers, Details without swatches, and `zef_update_fig_details`.
-
-## Helper
-
-`createSyntheticInverseZef` — not a test. Returns a minimal struct for bundle/dispatch tests. Extend it when `zef_processLeadfields` grows new required fields.
-
-Cluster tests skip or fail without Parallel Computing Toolbox / a configured profile. Legacy ids must stay aligned with `inverse_method_registry.m`.
+- New registry method → add a dispatch/smoke test here.
+- Prefer `createSyntheticInverseZef` over ad-hoc fixtures.
+- Pitfall: `addpath('+tests')` breaks package resolution — add the **project root** only.

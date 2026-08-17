@@ -1,16 +1,20 @@
-# DTI Conductivity Tool
+## Folder purpose
 
 White-matter conductivity in a FEM head model is usually a single scalar per tissue. DTI measures a preferred diffusion direction; this plugin lets you load FreeSurfer `dt_recon` volumes and **Apply to Mesh** so each tetrahedron in selected compartments gets a 6-component σ tensor. Anisotropic EEG/MEG lead fields (types 6–10) then use `zef.sigma(:,3:8)`.
 
 The interpolation and conversion math is in `src/forward/dti/` (`zef_dti_apply_to_sigma`). This folder is only the window and its callbacks.
 
-## How to open it
+## Main contents
 
-**Forward tools → DTI Conductivity Tool** (default `multicompartment_head` profile). Callback: `zef_dti_conductivity_open`. Window title: **ZEFFIRO Interface: DTI Conductivity Tool**.
+- Start: `zef_dti_conductivity_open.m`
+- Window: `zef_dti_conductivity_window.m`
+- Browse / load / clear / update / apply callbacks
+- `zef_dti_empty_geometry_struct.m`
+- Algorithm: `src/forward/dti/README.md`
 
-You need a FEM mesh first (Mesh tool **Create FEM mesh**).
+## Code functionality
 
-## What to load
+Need a FEM mesh first (Mesh tool **Create FEM mesh**).
 
 Panel **FreeSurfer Input Files** (browse buttons + Load):
 
@@ -23,7 +27,7 @@ Panel **FreeSurfer Input Files** (browse buttons + Load):
 
 Coordinate matrices are read from those files; you do not type a 4×4 by hand. **Load** runs `zef_dti_conductivity_load_freesurfer`. **Clear** drops the loaded volumes.
 
-## Apply
+Apply steps:
 
 1. Choose conversion model. The dropdown `Items` / `ItemsData` in `zef_dti_conductivity_window` are:
 
@@ -40,7 +44,11 @@ Coordinate matrices are read from those files; you do not type a 4×4 by hand. *
 
 Streamlines: Mesh visualization tool **Visualize DTI streamlines**, not this Apply button.
 
-## Scripting without the window
+## Workflow context
+
+**Forward tools → DTI Conductivity Tool** (default `multicompartment_head` profile). Callback: `zef_dti_conductivity_open`. Window title: **ZEFFIRO Interface: DTI Conductivity Tool**.
+
+## Usage instructions
 
 ```matlab
 zef.freesurfer_fa_data = zef_freesurfer_load_fa('fa.nii.gz');
@@ -48,6 +56,18 @@ zef.freesurfer_register_transform = zef_freesurfer_read_register_dat('register.d
 zef = zef_dti_apply_to_sigma(zef);
 ```
 
-## Files here
+1. Create FEM mesh; open Forward tools → DTI Conductivity Tool.
+2. Load FA, register.dat, reference MRI (optional v1).
+3. Choose conversion model and compartments; Apply to Mesh; recompute anisotropic lead field.
 
-Start `zef_dti_conductivity_open.m`, window `zef_dti_conductivity_window.m`, browse/load/clear/update/apply callbacks, `zef_dti_empty_geometry_struct.m`. Algorithm: `src/forward/dti/README.md`.
+## Important notes
+
+- Apply does not rebuild `zef.L`; use lead_field_type 6–10 afterward.
+- `register.dat` is required for Apply.
+- Streamline visualization is in Mesh visualization tool, not this window.
+
+## Developer guidance
+
+Preserve callback `zef_dti_conductivity_open` and conversion ItemsData 1–3. Keep algorithm documentation in `src/forward/dti/`; this plugin is UI-only.
+
+FA/v1 volumes loaded here can also feed **Kalman plugin structural Q** (`zef_dti_structural_Q`) — that path does not call Apply-to-sigma. Do not merge the two pipelines without separate tests.

@@ -1,12 +1,12 @@
 # `+core/+types` — `ZefSourceModel`
 
-Canonical enumeration for how a current dipole is discretized inside each tetrahedron when `zef_lead_field_matrix` assembles `zef.L`. The Mesh tool / Forward & inverse options dropdown stores an integer 1–6 on `zef.source_model`; this class is the typed form of that integer.
+## Folder purpose
 
-There are no other types in this folder. `core.ZefSourceModel` at `+core/` (not here) is the original enumeration name stored in older `.mat` files. It must remain an enumeration so MATLAB can load those projects; `from()` then maps members onto this class.
+Canonical enumeration for how a current dipole is discretized inside each tetrahedron when `zef_lead_field_matrix` assembles `zef.L`. The Mesh tool / Forward & inverse options dropdown stores an integer 1–6 on `zef.source_model`; this class is the typed form of that integer. There are no other types in this folder.
 
-## Members and legacy codes
+## Main contents
 
-`from()` maps integers (and the strings `"1"`–`"6"`) to members. Invalid input returns `Error`.
+`ZefSourceModel` enumeration and helpers: `from()`, `to_string()`, `variants()`, `loadobj`. Compatibility shim `core.ZefSourceModel` lives at `+core/` (not here) so older `.mat` files still load; `from()` maps those members onto this class.
 
 | Code | Member | `to_string` |
 |------|--------|-------------|
@@ -17,11 +17,17 @@ There are no other types in this folder. `core.ZefSourceModel` at `+core/` (not 
 | 5 | `ContinuousHdiv` | Continuous H(div) |
 | 6 | `ContinuousStVenant` | Continuous St.Venant |
 
-Whitney / H(div) / St.Venant are the three FEM source models implemented under `src/forward/lead_field`. The **Continuous** variants use the same element type with a continuous (nodal) interpolation of the moment. `Error` is a sentinel, not a solver.
+Whitney / H(div) / St.Venant are the three FEM source models under `src/forward/lead_field`. **Continuous** variants use the same element type with continuous (nodal) interpolation of the moment. `Error` is a sentinel, not a solver.
 
-`variants()` lists every member including `Error`. `loadobj` maps a saved value through `from()`; if that yields `Error` it becomes **`Hdiv`** (not `Error`), so a corrupt `.mat` still loads a valid source model.
+## Code functionality
 
-`from()` also accepts member names (`"Hdiv"`), display names (`"H(div)"`), cells, structs with `ValueNames`, and the shim class `core.ZefSourceModel`.
+`from()` maps integers and strings `"1"`–`"6"` to members; invalid input returns `Error`. Also accepts member names (`"Hdiv"`), display names (`"H(div)"`), cells, structs with `ValueNames`, and `core.ZefSourceModel`. `variants()` lists every member including `Error`. `loadobj` maps a saved value through `from()`; if that yields `Error` it becomes **`Hdiv`**, so a corrupt `.mat` still loads a valid source model.
+
+## Workflow context
+
+Consumed by `src/forward/lead_field` and the Forward & inverse options dropdown. Parent overview: `+core/README.md`.
+
+## Usage instructions
 
 ```matlab
 m = core.types.ZefSourceModel.from(zef.source_model);  % enum, 1–6, or "1"–"6"
@@ -29,4 +35,10 @@ zef.source_model = core.types.ZefSourceModel.Whitney;
 core.types.ZefSourceModel.to_string(m);   % e.g. "H(div)"
 ```
 
-Consumed by `src/forward/lead_field` and the Forward & inverse options dropdown. Parent: [`../README.md`](../README.md).
+## Important notes
+
+Keep the root-level `core.ZefSourceModel` enumeration so MATLAB can load older projects; do not remove or rename members without a migration path.
+
+## Developer guidance
+
+Do not add unrelated types to this folder. When adding a source model, update both the enumeration and the lead-field branch that consumes it; keep legacy numeric codes documented in this README.

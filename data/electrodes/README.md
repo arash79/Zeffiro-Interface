@@ -1,17 +1,50 @@
-# `data/electrodes`
+# data/electrodes
 
-Sample EEG / NIRS cap layouts as whitespace-separated `.dat` files (no header). Typical line: `x y z label` in millimetres. Parsed by `core.io.electrodes.from_dat` (3, 4, 6, or 7 columns). These files are **not** attached to a mesh until you import them and run a lead field.
+## Folder purpose
 
-**Import → Import electrodes** (`core.gui.menu_tool.import_electrodes_callback`) opens a file picker; point it here or copy a layout next to a project.
+Canonical **electrode / optode layout tables** shipped with Zeffiro. Files are plain-text `.dat` layouts (mm coordinates + optional labels / CEM parameters) consumed by `core.io.electrodes.from_dat` and the Import electrodes menu.
 
-| Prefix | Caps |
-|--------|------|
-| `standard-1020`, `standard-1005` | 10–20 / 10–05 |
-| `biosemi-*` | BioSemi 16–256 |
-| `GSN-HydroCel-*`, `EGI-256` | EGI GSN HydroCel |
-| `easycap-M-*` | EasyCap M-1 / M-10 |
-| `brainproducts-RNP-BA-128` | BrainProducts |
-| `mgh-60`, `mgh-70` | MGH |
-| `artinis-brite-23`, `artinis-octamon` | Artinis NIRS |
+## Main contents
 
-Coordinates are **not** converted. They must already match the project length unit. Format details: [`+core/+io/+electrodes/README.md`](../../+core/+io/+electrodes/README.md).
+Representative sets (not exhaustive):
+
+| Pattern | Systems |
+|---------|---------|
+| `standard-1020.dat`, `standard-1005.dat` | 10–20 / 10–05 style |
+| `biosemi-16.dat` … `biosemi-256.dat` | BioSemi caps |
+| `GSN-HydroCel-*.dat`, `EGI-256.dat` | EGI / HydroCel |
+| `easycap-M-1.dat`, `easycap-M-10.dat` | EasyCap |
+| `brainproducts-RNP-BA-128.dat` | Brain Products |
+| `mgh-60.dat`, `mgh-70.dat` | MGH layouts |
+| `artinis-brite-23.dat`, `artinis-octamon.dat` | fNIRS / Artinis |
+
+See `+core/+io/+electrodes/README.md` for field-count rules (3/4/6/7 columns).
+
+## Code functionality
+
+No code — data only. Parsers live in `core.io.electrodes`; GUI entry in `core.gui.menu_tool.import_electrodes_callback`.
+
+## Workflow context
+
+Import → `zef.sensors` / sensor point tables → mesh electrode attachment → lead-field types 1 (EEG) / related modalities. Does not by itself create `zef.L`.
+
+## Usage instructions
+
+GUI: **Import → electrodes**, then choose a file from this folder.
+
+```matlab
+p = fullfile(zef.program_path, 'data', 'electrodes', 'biosemi-64.dat');
+[xyz, labels] = core.io.electrodes.from_dat(p);
+```
+
+## Important notes
+
+- Coordinates are typically **millimeters** in the same frame as the head model.
+- Some filenames include trailing hyphens (`GSN-HydroCel-64-.dat`) — use the exact name.
+- CEM / impedance columns are optional; presence changes column count semantics.
+
+## Developer guidance
+
+- Add new caps as `.dat` following an existing neighbor file’s column style; include a one-line comment header only if the parser allows it (prefer no headers for `.dat`).
+- Prefer CSV + `from_csv` for labeled research caps with CEM metadata.
+- Pitfall: mixing a 10–20 layout with a non-MNI / non-project-scaled mesh and assuming automatic registration.

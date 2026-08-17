@@ -19,22 +19,13 @@
 
 ## Code functionality
 
-**Startup load** (if file exists):
-```matlab
-zef = zef_load(zef, 'default_project.mat', zef.data_path);
-```
-
-**Import segmentation:** GUI or CLI passes path to `import_segmentation.zef`; manifest lists relative paths into `segmentations/multicompartment_head_project/*.asc`.
-
-**Logs:** `zef_start_log` creates `data/log/` and prunes old files per `max_n_log_files` in system INI.
-
-**Examples** write outputs here: e.g. `+examples/+forward/lead_field_example.mat` → `data/lead_field_example.mat`.
+**Startup load** (if file exists): `zef_load(zef, 'default_project.mat', zef.data_path)`. Import segmentation: GUI or CLI passes path to `import_segmentation.zef`; manifest lists relative paths into `segmentations/multicompartment_head_project/*.asc`. Logs: `zef_start_log` creates `data/log/` and prunes old files per `max_n_log_files` in system INI. Examples write outputs here (e.g. `data/lead_field_example.mat`).
 
 ## Workflow context
 
 | Consumer | Path used |
 |----------|-----------|
-| `zeffiro_interface` CLI args | Relative paths with no directory → `data/` (not `data/example_projects/` or `data/segmentations/`) |
+| `zeffiro_interface` CLI args | Relative paths with no directory → `data/` (not `example_projects/` or `segmentations/` alone) |
 | `+examples/+importing` | Hard-coded `scripts/scripts_for_importing/...`; if missing, pass `data/segmentations/.../import_segmentation.zef` |
 | `+core` electrode import | User-selected files; sample caps in `electrodes/` |
 | `profile/zeffiro_interface.ini` | `save_file_path = ./data/` |
@@ -44,11 +35,9 @@ Not on MATLAB path as code — data only.
 ## Usage instructions
 
 ```matlab
-% Import bundled head segmentation (full path; relative would look under data/)
 zef = zeffiro_interface('import_to_new_project', ...
     fullfile(projectRoot,'data','segmentations','multicompartment_head_project','import_segmentation.zef'));
 
-% Open example project (open_project is a single path; no directory → data/)
 zef = zeffiro_interface('open_project', ...
     fullfile(projectRoot,'data','example_projects','multicompartment_head_project.mat'));
 ```
@@ -57,7 +46,7 @@ zef = zeffiro_interface('open_project', ...
 
 - Large `.mat` files may be gitignored or LFS — check repo before assuming presence.
 - Segmentation `.asc` files are **import inputs**, not loaded at startup.
-- `fs2zef.sh` in segmentation folder is a FreeSurfer conversion helper script.
+- `fs2zef.sh` in the segmentation folder is a FreeSurfer conversion helper script.
 - Do not commit sensitive patient data to `data/` in shared repos.
 
 ## Developer guidance

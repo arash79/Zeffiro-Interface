@@ -324,6 +324,8 @@ for f_ind = 1 : number_of_frames
             z_vec_aux = z_vec_aux + z_vec_current;
         end
 
+        % Running mean of θ over every draw (accepted or not) becomes the
+        % next proposal. z above averages only post-burn-in accepted z.
         theta_vec_aux = theta_vec_aux + theta;
         theta = theta_vec_aux/iter_ind;
 

@@ -1,16 +1,42 @@
-# Inverse example — legacy Kalman demo
+# +examples/+inverse
 
-`zef_KalmanDemo.m` is a **script** (cells), not a package function. It calls **legacy** `zef_KF` in `tools/plugins/Kalman`, not `inverse.KalmanInverter` / `zef_inverse_run`.
+## Folder purpose
 
-```matlab
-addpath(fileparts(which('zeffiro_interface')));
-run('+examples/+inverse/zef_KalmanDemo.m');
+Worked inverse demos for learners. Currently a single Kalman demonstration that drives the **legacy plugin** path (`zef_KF`), not `inverse.KalmanInverter`.
+
+## Main contents
+
+| File | Role |
+|------|------|
+| `zef_KalmanDemo.m` | Cell script: synth EEG via forward example + two dipoles → `zef_KF` (`filter_type=1`) |
+
+## Code functionality
+
+Builds or reuses a lead field (often via `examples.forward.lead_field_example`), synthesizes measurements, runs legacy Kalman, optionally plots/saves (some cells may be commented / under maintenance).
+
+## Workflow context
+
+```
+examples.forward → L + measurements
+  → tools/plugins/Kalman (zef_KF)
+Class alternative: zef_inverse_run / inverse.KalmanInverter
 ```
 
-Sequence in the file:
+## Usage instructions
 
-1. `zef_KalmanDemo_create_measurement` — `examples.forward.lead_field_example` with `n_sources=2000`, `lead_field_type=1`, then two synthetic dipoles (cortical `[-33,-37,80]`, thalamic `[-12,-32,50]`, 10 nAm, Blackman–Harris, 25 dB noise). Temporarily uses `source_direction_mode=2` for `zef_processLeadfields`.
-2. `zef_KalmanDemo_runKalman` — sets `inv_snr=25`, `number_of_frames=26`, `filter_type=1` (Kalman), `kf_smoothing=1` (none), then `[zef] = zef_KF(zef)`.
-3. Save / visualization cells are commented (`zef_KalmanDemo_save`, `zef_Kalman_visualization` marked under maintenance).
+```matlab
+edit examples.inverse.zef_KalmanDemo   % or open the .m and run cells
+```
 
-For the class Kalman path use `zef_inverse_run(zef,"kalman")` or `+utilities/+cluster/+examples/kalman_workflow.m`.
+Ensure Zeffiro is on the path (`zeffiro_interface` once from repo root).
+
+## Important notes
+
+- Script, not a package function with `arguments`.
+- Does not demonstrate structural Q or ClassKF.
+- Visualization/save cells may need local path edits.
+
+## Developer guidance
+
+- Prefer adding a second demo that calls `zef_inverse_run(...,'kalman',...)` for the class path.
+- Pitfall: treating this as the supported API for production KF studies.

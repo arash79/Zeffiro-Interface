@@ -28,13 +28,6 @@ set(zef.h_menu_segmentation_profile_table_add_column,'MenuSelectedFcn','zef.h_se
 set(zef.h_menu_segmentation_profile_table_delete_rows,'MenuSelectedFcn','zef.h_segmentation_profile_table.Data = zef.h_segmentation_profile_table.Data(find(not(ismember([1:size(zef.h_segmentation_profile_table.Data,2)],zef.segmentation_profile_row_selected))),:);');
 set(zef.h_menu_segmentation_profile_table_delete_columns,'MenuSelectedFcn','zef.h_segmentation_profile_table.Data = zef.h_segmentation_profile_table.Data(:,find(not(ismember([1:size(zef.h_segmentation_profile_table.Data,2)],zef.segmentation_profile_column_selected))));');
 
-set(findobj(zef.h_segmentation_profile.Children,'-property','FontSize'),'FontSize',zef.font_size);
-
-set(zef.h_segmentation_profile,'AutoResizeChildren','off');
-zef.segmentation_profile_current_size = get(zef.h_segmentation_profile,'Position');
-zef.segmentation_profile_relative_size = zef_get_relative_size(zef.h_segmentation_profile);
-set(zef.h_segmentation_profile,'SizeChangedFcn','zef.segmentation_profile_current_size = zef_change_size_function(zef.h_segmentation_profile,zef.segmentation_profile_current_size,zef.segmentation_profile_relative_size);');
-
 zef.h_segmentation_profile.Name = 'ZEFFIRO Interface: Segmentation profile';
-
 set(zef.h_segmentation_profile,'DeleteFcn','zef_closereq;');
+zef_ui_ready(zef.h_segmentation_profile);

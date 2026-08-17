@@ -14,8 +14,7 @@ file_name = 'butterfly_plot_auditory';
 
 f1 = gcf;
 f2 = figure();
-copyobj(findobj(f1.Children, 'tag','axes1')
-, f2);
+copyobj(zef_ui_axes(f1), f2);
 
 f2.Children.Position(2) = 40; 
 f2.Children.Box = 0;

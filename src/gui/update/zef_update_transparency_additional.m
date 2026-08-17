@@ -35,12 +35,8 @@ else
     h_figure = eval('zef.h_zeffiro');
 end
 
-h = findobj(get(h_figure,'Children'),'Tag','axes1');
-h_object = findobj(get(h_figure,'Children'),'Tag','transparency_additional_slider');
-if isempty(h_object)
-    h_figure = eval('zef.h_zeffiro');
-    h_object = findobj(get(h_figure,'Children'),'Tag','transparency_additional_slider');
-end
+h = zef_ui_axes(h_figure);
+h_object = zef_ui_control(h_figure, 'transparency_additional_slider');
 
 slider_value_new = h_object.Value;
 

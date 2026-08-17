@@ -1,3 +1,9 @@
 data/Sub01FG*
 .DS_Store
 **/.DS_Store
+check.m
+compartment_wise.m
+compute_Q.m
+kalman_custom_q_driver.m
+kalman_primer.m
+run_eloreta_shalpr_snr_sweep.m

@@ -47,13 +47,8 @@ zef.h_contour_n_smoothing.Value = num2str(zef.contour_n_smoothing);
 zef.h_contour_line_width.Value = num2str(zef.contour_line_width);
 
 zef.h_zef_graphics_processing_options.Name = 'ZEFFIRO Interface: Graphics processing options';
-set(findobj(zef.h_zef_graphics_processing_options.Children,'-property','FontUnits'),'FontUnits','pixels');
-set(findobj(zef.h_zef_graphics_processing_options.Children,'-property','FontSize'), 'FontSize', zef.font_size);
-
-set(zef.h_zef_graphics_processing_options,'AutoResizeChildren','off');
-zef.graphics_options_current_size = get(zef.h_zef_graphics_processing_options,'Position');
-set(zef.h_zef_graphics_processing_options,'SizeChangedFcn','zef.graphics_options_current_size = zef_change_size_function(zef.h_zef_graphics_processing_options,zef.graphics_options_current_size);');
-
+zef = zef_ui_tag_handles(zef);
+zef_ui_ready(zef.h_zef_graphics_processing_options);
 set(zef.h_zef_graphics_processing_options,'DeleteFcn','zef_closereq;');
 
 

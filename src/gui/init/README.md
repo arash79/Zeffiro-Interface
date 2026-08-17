@@ -1,39 +1,68 @@
 # Table and dialog init (`src/gui/init`)
 
-**Scripts** (mostly) that write defaults onto `zef` and/or UITable column metadata when a tool or options window opens. They do not open figures (`src/gui/open` does that). `zef_init` in `src/core` is the session-wide dump; this folder is per-widget.
+## Folder purpose
 
-Scripts mutate caller `zef`. Converting one to a function requires updating every `zef_open_*` and `zef_update` call site.
+**Per-widget and per-dialog defaults** for the GUI: seed missing `zef` fields and UITable column metadata when a tool or options window opens. Distinct from session-wide `src/core/zef_init.m`. Most entries are **scripts** that mutate caller/workspace `zef`.
 
-## Segmentation tool
+## Main contents
 
-Called from `zef_update` / `zef_build_compartment_table` / sensor builders.
+### Segmentation / sensors / transforms
 
-| File | Kind | Required workspace | What it fills |
-|------|------|--------------------|---------------|
-| `zef_init_fields_compartment_table` | script | `zef_i` (row), `zef_j` (tag index), `zef.aux_field_1` | Columns **Index, On, Name, Visible, Surface nodes, Surface triangles, Merge, Invert normal, Activity**. Activity is `compartment_activity{*_sources+2}`: Bounding box, Inactive, Constrained field, Unconstrained field, Active surface (`*_sources` = that index minus 2) |
-| `zef_init_fields_compartment_table_profile` | script | same | Extra columns from enabled Segmentation `parameter_profile` rows |
-| `zef_init_compartments` | script | `zef` | Empty table, then compartments from `zeffiro_segmentation.ini` unless `new_empty_project` |
-| `zef_init_sensors` | script | `zef` | Reset tags; create default set `'s'` |
-| `zef_init_sensors_table` | script | `current_tag` | Filename is historical: writes **Index, Name** on `h_transform_table`, not the sensors table |
-| `zef_init_sensors_name_table` | **function** | — | **Index, Name, Visible** on `h_sensors_name_table` |
-| `zef_init_sensors_parameter_profile` | script | `current_sensors` | Pad per-sensor profile arrays to point count (`evalin` base) |
-| `zef_init_sensor_parameters` | script | `current_sensor_name` | Parameters table: X/Y/Z (and directions / gradients by imaging method) plus Sensors profile rows. Sets `current_parameters='sensor'` |
-| `zef_init_transform` | script | `current_tag` | Transform table **Index, Name** |
-| `zef_init_transform_parameters` | script | `current_transform` | Scaling, X/Y/Z-shift, Xy/Yz/Zx-rotation, Affine transform. Sets `current_parameters='transform'` |
+| File | Role |
+|------|------|
+| `zef_init_compartments` | Empty table; load compartments from `zeffiro_segmentation.ini` unless `new_empty_project` |
+| `zef_init_fields_compartment_table` | Fill compartment table columns (On, Name, Visible, Activity, …) |
+| `zef_init_fields_compartment_table_profile` | Extra columns from parameter profile |
+| `zef_init_sensors` / `zef_init_sensors_name_table` | Sensor set defaults and name table |
+| `zef_init_sensors_table` | Historical name: writes transform table Index/Name |
+| `zef_init_sensor_parameters` / `zef_init_sensors_parameter_profile` | Parameters table for current sensor |
+| `zef_init_transform` / `zef_init_transform_parameters` | Transform stack defaults |
 
-## Option dialogs (before `zef_open_*` copies handles)
+### Option dialogs (before `zef_open_*`)
 
-isfield-guarded defaults only — they do not copy widgets.
+| File | Settings menu |
+|------|----------------|
+| `zef_init_forward_and_inverse_options` | Forward and inverse processing options |
+| `zef_init_graphics_options` | Graphics processing options |
+| `zef_init_gaussian_prior_options` | Hierarchical prior options |
+| `zef_init_options` | Shared / historical catch-all |
+| `zef_init_parameter_profile` / `zef_init_init_profile` | Profile field creation / apply |
+| `zef_init_parcellation` | Parcellation defaults + scan time-series tools |
+| `zef_init_butterfly_plot` | Butterfly plot defaults |
+| `zef_init_find_synthetic_eit_data` | Synthetic EIT ROI widget strings |
 
-| File | Settings menu item |
-|------|-------------------|
-| `zef_init_forward_and_inverse_options` | **Forward and inverse processing options** |
-| `zef_init_graphics_options` | **Graphics processing options** (the `cone_lattice_resolution` guard writes `cone_field_lattice_resolution`) |
-| `zef_init_gaussian_prior_options` | **Hierarchical prior options** |
-| `zef_init_options` | shared / historical catch-all. If `reconstruction_type` is missing it writes **1**; a normal session already has **7** from `zef_init`. |
-| `zef_init_parameter_profile` | creates missing `zef.<tag>_<param>` from the profile (does not open the editor) |
-| `zef_init_init_profile` | applies `init_profile` rows (`string` / `number` / `evaluate`) |
-| `zef_init_profile_table_selection` | **function**; Pre-settings table click → `init_profile_selected` |
-| `zef_init_parcellation` | Parcellation defaults + scan `time_series_tools` for `Description:` |
-| `zef_init_butterfly_plot` | Butterfly `bf_*` from inverse defaults, then widget String |
-| `zef_init_find_synthetic_eit_data` | ROI widget strings from `inv_roi_sphere` |
+## Code functionality
+
+Scripts typically: `if ~isfield(zef, …)` set defaults; build table `ColumnName` / `Data`; sometimes `eval` dynamic `<tag>_*` fields. They **do not** open figures — `src/gui/open` does that after init.
+
+**Activity codes** on compartments: Bounding box, Inactive, Constrained/Unconstrained field, Active surface (via `*_sources` index into `compartment_activity`).
+
+## Workflow context
+
+```
+zef_open_* → zef_init_* → instantiate app → zef_update_* on edits
+zef_update / zef_build_compartment_table → zef_init_fields_compartment_table*
+```
+
+Profile INIs under `profile/<name>/` supply segmentation and parameter templates.
+
+## Usage instructions
+
+Called automatically when opening tools/dialogs. Programmatic:
+
+```matlab
+zef_init_compartments;          % script — zef in workspace
+zef = zef_init_sensors_name_table(zef);  % function form where available
+```
+
+## Important notes
+
+- Most are **scripts**: converting to functions requires updating every `zef_open_*` call site.
+- `zef_init_sensors_table` does **not** initialize the sensors table (historical filename).
+- `zef_init_options` may write `reconstruction_type=1` if missing; a normal `zef_init` session often already has `7`.
+
+## Developer guidance
+
+- New dialog field: add default in the matching `zef_init_*`, widget in App Designer, sync in `zef_update_*`.
+- Keep INI column order aligned with table builders.
+- Prefer `isfield` guards so re-opening a dialog does not wipe user values.

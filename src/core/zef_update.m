@@ -279,7 +279,7 @@ end
                     zef.aux_field_1 = sum(contains(get(zef.h_windows_open(1:zef_i),'Name'),get(zef.h_windows_open(zef_i),'Name')));
                     if isfield(zef,'h_menu_window') && isvalid(zef.h_menu_window)
                         if contains(zef.h_windows_open(zef_i).Name,'ZEFFIRO Interface: Figure tool')
-                            uimenu(zef.h_menu_window,'label',[zef.h_windows_open(zef_i).Name],'callback',['figure(evalin(''base'', ''zef.h_windows_open(' num2str(zef_i) ')'')); zef.h_zeffiro = gcf; zef.h_axes1 = findobj(get(zef.h_zeffiro,''Children''),''Tag'',''axes1'');']);
+                            uimenu(zef.h_menu_window,'label',[zef.h_windows_open(zef_i).Name],'callback',['figure(evalin(''base'', ''zef.h_windows_open(' num2str(zef_i) ')'')); zef.h_zeffiro = gcf; zef.h_axes1 = zef_ui_axes(zef.h_zeffiro);']);
                         else
                             uimenu(zef.h_menu_window,'label',[zef.h_windows_open(zef_i).Name ' ' num2str(zef.aux_field_1)],'callback',['figure(evalin(''base'', ''zef.h_windows_open(' num2str(zef_i) ')''))']);
                         end

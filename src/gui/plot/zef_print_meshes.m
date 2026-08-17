@@ -234,6 +234,8 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
         if electrode_model == 1 & eval('zef.attach_electrodes') & ismember(eval('zef.imaging_method'),[1 4 5])
             sensors = zef_attach_sensors_volume(zef,sensors,'mesh',sensors_get_functions);
         elseif electrode_model==2 & eval('zef.attach_electrodes') & ismember(eval('zef.imaging_method'),[1 4 5])
+            % CEM: attach, split tetra/point rows (col4==0) from annular
+            % triangle patches, draw patches as trisurf and points as spheres.
             sensors = zef_attach_sensors_volume(zef,sensors,'mesh',sensors_get_functions);
             sensors_point_like_index = find(sensors(:,4)==0);
             unique_sensors_point_like = unique(sensors(sensors_point_like_index,1));
@@ -311,6 +313,10 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
             end
         end
         if ismember(eval('zef.imaging_method'),[2,3])
+            % MEG cones on the Frame/Movie volume path. Facecolor looks up
+            % zef.<tag>color (no underscore), unlike zef_plot_volume which
+            % uses zef.<tag>_color. Nine-column sensors: 7:9 are normalized
+            % then the cone is still drawn from 4:6 (cyan duplicate).
             sensors(:,4:6) = sensors(:,4:6)./repmat(sqrt(sum(sensors(:,4:6).^2,2)),1,3);
             h=coneplot(sensors(:,1) + aux_scale_val*sensors(:,4),sensors(:,2) + aux_scale_val*sensors(:,5),sensors(:,3) + aux_scale_val*sensors(:,6),2*aux_scale_val*sensors(:,4),2*aux_scale_val*sensors(:,5),2*aux_scale_val*sensors(:,6),0,'nointerp');
             set(h,'facecolor',eval(['zef.' sensor_tag 'color']));
@@ -581,6 +587,9 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
         if ismember(eval('zef.visualization_type'),[2])
 
             %******************************************************
+            % Colour-limit pass: amplitude only (‖xyz‖, /4 tet-node average),
+            % then a 50-bin histogram. CData below is remapped with the
+            % Mesh-vis Component dropdown (types 1–7).
             if iscell(volumetric_distribution)
                 reconstruction = eval(['zef.reconstruction{' int2str(frame_start) '}']);
             else
@@ -1809,6 +1818,9 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
         end
 
         if ismember(eval('zef.imaging_method'),[2 3])
+            % Surface-print MEG cones. Second coil (9 columns): 7:9 are
+            % normalized then the cone is still drawn from 4:6, unlike
+            % zef_plot_meshes which uses 7:9.
             sensors(:,4:6) = sensors(:,4:6)./repmat(sqrt(sum(sensors(:,4:6).^2,2)),1,3);
             h=coneplot(sensors(:,1) + aux_scale_val*sensors(:,4),sensors(:,2) + aux_scale_val*sensors(:,5),sensors(:,3) + aux_scale_val*sensors(:,6),2*aux_scale_val*sensors(:,4),2*aux_scale_val*sensors(:,5),2*aux_scale_val*sensors(:,6),0,'nointerp');
 

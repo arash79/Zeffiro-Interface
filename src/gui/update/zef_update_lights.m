@@ -28,10 +28,9 @@ else
     h_figure = evalin('base','zef.h_zeffiro');
 end
 
-h_1 = evalin('base','findobj(get(gcf,''Children''),''Tag'',''axes1'');');
-
-h_2 = evalin('base','findobj(get(gcf,''Children''),''Tag'',''lightsselection'');');
-h_3 = findobj(h_1.Children,'Type','Light');
+h_1 = zef_ui_axes(h_figure);
+h_2 = zef_ui_control(h_figure, 'lightsselection');
+h_3 = findobj(h_1.Children, 'Type', 'Light');
 h_axes1 = evalin('base','zef.h_axes1');
 lights_vec = evalin('base','zef.update_lights');
 

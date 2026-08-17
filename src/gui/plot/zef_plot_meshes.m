@@ -62,11 +62,7 @@ end
 void = [];
 sensors_point_like = [];
 
-if isequal(eval('zef.h_toggle_controls.UserData'),1) || isempty(eval('zef.h_toggle_controls.UserData'))
-    colorbar_position = [0.60 0.647 0.01 0.29];
-else
-    colorbar_position = [0.8769 0.647 0.01 0.29];
-end
+colorbar_position = local_colorbar_position(eval('zef.h_axes1'));
 
 loop_movie = 1;
 length_reconstruction_cell = 1;
@@ -621,6 +617,8 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
         end
 
         if ismember(eval('zef.imaging_method'),[2 3])
+            % MEG: first coil along columns 4:6; imaging_method 3 second
+            % coil along 7:9 (this is the plotter that actually uses 7:9).
             sensors(:,4:6) = sensors(:,4:6)./repmat(sqrt(sum(sensors(:,4:6).^2,2)),1,3);
             h=coneplot(sensors(:,1) + aux_scale_val*sensors(:,4),sensors(:,2) + aux_scale_val*sensors(:,5),sensors(:,3) + aux_scale_val*sensors(:,6),2*aux_scale_val*sensors(:,4),2*aux_scale_val*sensors(:,5),2*aux_scale_val*sensors(:,6),0,'nointerp');
             set(h,'facecolor',eval(['zef.' sensor_tag '_color']));
@@ -836,7 +834,7 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                                 set(h_colorbar,'Tag','rightColorbar');
                                 h_axes_text = axes('position',[0.0325 0.95 0.5 0.05],'visible','off');
                                 set(h_axes_text,'tag','image_details');
-                                h_text = findobj(get(gcf,'Children'),'Tag','time_text');
+                                h_text = findall(gcf,'Tag','time_text');
                                 set(h_text,'String',['Time: ' num2str(eval('zef.inv_time_1') + eval('zef.inv_time_2')/2 + frame_step*(f_ind - 1)*eval('zef.inv_time_3'),'%0.6f') ' s, Frame: ' num2str(f_ind) ' / ' num2str(length_reconstruction_cell) '.']);
                                 set(h_text,'visible','on','Tag','time_text');
                                 set(h_axes_text,'layer','bottom');
@@ -915,7 +913,7 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                             set(h_colorbar,'Tag','rightColorbar');
                             h_axes_text = axes('position',[0.0325 0.95 0.5 0.05],'visible','off');
                             set(h_axes_text,'tag','image_details');
-                            h_text = findobj(get(gcf,'Children'),'Tag','time_text');
+                            h_text = findall(gcf,'Tag','time_text');
                             set(h_text,'String',['Time: ' num2str(eval('zef.inv_time_1') + eval('zef.inv_time_2')/2 + frame_step*(f_ind - 1)*eval('zef.inv_time_3'),'%0.6f') ' s, Frame: ' num2str(f_ind) ' / ' num2str(length_reconstruction_cell) '.']);
                             set(h_text,'visible','on','Tag','time_text');
                             set(h_axes_text,'layer','bottom');
@@ -1300,4 +1298,19 @@ end
 rotate3d on;
 camva(zef.h_axes1,eval('zef.cam_va'));
 
+end
+
+function pos = local_colorbar_position(ax)
+pos = [0.60 0.647 0.01 0.29];
+if isempty(ax) || ~isgraphics(ax) || ~isvalid(ax)
+    return
+end
+try
+    orig = ax.Units;
+    ax.Units = 'normalized';
+    p = ax.Position;
+    ax.Units = orig;
+    pos = [p(1) + p(3) - 0.018, p(2) + 0.12 * p(4), 0.012, 0.55 * p(4)];
+catch
+end
 end

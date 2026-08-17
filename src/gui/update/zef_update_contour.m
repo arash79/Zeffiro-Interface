@@ -20,7 +20,7 @@ function zef_update_contour(zef)
 %   See also zef_plot_contour, zef_update_mesh_visualization_tool.
 if eval('zef.show_contour')
     h_fig = gcf;
-    h_axes = findobj(h_fig.Children,'Tag','axes1');
+    h_axes = zef_ui_axes(h_fig);
     h_contour_old = findobj(h_axes.Children,'Tag','contour');
     delete(h_contour_old);
     h_contour_text_old = findobj(h_axes.Children,'Tag','contour_text');

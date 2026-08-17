@@ -34,16 +34,10 @@ else
     h_figure = eval('zef.h_zeffiro');
 end
 
-h = findobj(get(h_figure,'Children'),'Tag','axes1');
-h_object_1 = findobj(get(h_figure,'Children'),'Tag','update_contrast_slider');
-h_object_2 = findobj(get(h_figure,'Children'),'Tag','update_brightness_slider');
-h_object_3 = findobj(get(h_figure,'Children'),'Tag','colormapselection');
-if isempty(h_object_1)
-    h_figure = eval('zef.h_zeffiro');
-    h_object_1 = findobj(get(h_figure,'Children'),'Tag','update_contrast_slider');
-    h_object_2 = findobj(get(h_figure,'Children'),'Tag','update_brightness_slider');
-    h_object_3 = findobj(get(h_figure,'Children'),'Tag','colormapselection');
-end
+h = zef_ui_axes(h_figure);
+h_object_1 = zef_ui_control(h_figure, 'update_contrast_slider');
+h_object_2 = zef_ui_control(h_figure, 'update_brightness_slider');
+h_object_3 = zef_ui_control(h_figure, 'colormapselection');
 
 slider_value_new = h_object_1.Value;
 

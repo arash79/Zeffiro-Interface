@@ -69,8 +69,9 @@ if isfield(zef,'h_compartment_table') && isvalid(zef.h_compartment_table)
 
     if size(zef.h_compartment_table.Data,2) > length(zef.h_compartment_table.ColumnWidth)
         missing_entries = (size(zef.h_compartment_table.Data,2) - length(zef.h_compartment_table.ColumnWidth));
-        zef.h_compartment_table.ColumnWidth = [zef.h_compartment_table.ColumnWidth repmat({'fit'},1,missing_entries)];
+        zef.h_compartment_table.ColumnWidth = [zef.h_compartment_table.ColumnWidth repmat({'1x'},1,missing_entries)];
     end
+    zef_ui_fit_table(zef.h_compartment_table);
 end
 
 zef.compartment_tags = fliplr(zef.compartment_tags);

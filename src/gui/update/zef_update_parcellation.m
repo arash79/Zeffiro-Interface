@@ -22,12 +22,31 @@ end
 
 set(zef.h_parcellation_name,'string',zef.parcellation_name);
 set(zef.h_parcellation_tolerance,'string',num2str(zef.parcellation_tolerance));
-zef.h_parcellation_roi_name.String = zef.parcellation_roi_name{zef.parcellation_roi_selected};
-zef.h_parcellation_roi_center.String = num2str(zef.parcellation_roi_center(zef.parcellation_roi_selected,:));
-zef.h_parcellation_roi_radius.String = num2str(zef.parcellation_roi_radius(zef.parcellation_roi_selected));
-zef.h_parcellation_roi_color.String = num2str(zef.parcellation_roi_color(zef.parcellation_roi_selected,:));
-zef.h_parcellation_roi_color.BackgroundColor = zef.parcellation_roi_color(zef.parcellation_roi_selected,:);
-zef.h_parcellation_roi_list.Value = zef.parcellation_roi_selected;
+zef_sel = zef.parcellation_roi_selected;
+if isempty(zef_sel) || ~isscalar(zef_sel) || zef_sel < 1
+    zef_sel = 1;
+    zef.parcellation_roi_selected = 1;
+end
+n_roi = 0;
+try
+    n_roi = numel(zef.parcellation_roi_name);
+catch
+end
+if n_roi < 1
+    zef.parcellation_roi_name = {'ROI 1'};
+    zef.parcellation_roi_center = [0 0 0];
+    zef.parcellation_roi_radius = 0;
+    zef.parcellation_roi_color = [0.2 0.5 0.6];
+    n_roi = 1;
+end
+zef_sel = min(zef_sel, n_roi);
+zef.parcellation_roi_selected = zef_sel;
+zef.h_parcellation_roi_name.String = zef.parcellation_roi_name{zef_sel};
+zef.h_parcellation_roi_center.String = num2str(zef.parcellation_roi_center(zef_sel,:));
+zef.h_parcellation_roi_radius.String = num2str(zef.parcellation_roi_radius(zef_sel));
+zef.h_parcellation_roi_color.String = num2str(zef.parcellation_roi_color(zef_sel,:));
+zef.h_parcellation_roi_color.BackgroundColor = zef.parcellation_roi_color(zef_sel,:);
+zef.h_parcellation_roi_list.Value = zef_sel;
 zef.h_parcellation_roi_list.String = zef.parcellation_roi_name;
 zef.h_parcellation_time_series_mode.Value = zef.parcellation_time_series_mode;
 
