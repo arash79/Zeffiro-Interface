@@ -24,7 +24,7 @@
 
 ## Workflow context
 
-**Forward tools → Synthetic extended source patch** on the default profile. Sibling of point-dipole `FindSyntheticSource` and legacy point tool `FindSyntheticSourceLegacy/`.
+**Forward tools → Synthetic extended source patch** on the default profile. Sibling of point-dipole `FindSyntheticSource`, legacy point tool `FindSyntheticSourceLegacy/`, and curved-disk / SVD ROI tool `FindSyntheticSourceROI/`.
 
 ## Usage instructions
 

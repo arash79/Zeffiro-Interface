@@ -61,7 +61,7 @@ See each `@*Inverter/README.md` for constructor properties.
 
 - `"sloreta"` / `"sbl"` may still construct CSM with default `method_type="dSPM"` unless `MethodParams.method_type` is set.
 - Bundle path forces `inv_data_mode='raw'`; `computeInversionWithZI` does not.
-- IAS/RAMUS: watch for `n_n_map_iterations` vs `n_map_iterations` typos in property wiring.
+- IAS/RAMUS last-step dSPM/sLORETA use `n_map_iterations` (per-level index for RAMUS).
 - GroupLasso/HALpR need EXP optimizers on the path; RAMUS needs `multiresolution_dec`.
 
 ## Developer guidance

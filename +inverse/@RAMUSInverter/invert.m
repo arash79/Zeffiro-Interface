@@ -135,7 +135,7 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
                 dspm_vec = sqrt(dspm_vec);
                 W = W./dspm_vec;
             elseif strcmp(method_type, "dSPM last step")
-                if i == self.n_n_map_iterations
+                if i == self.n_map_iterations(mr_ind)
                     dspm_vec = sum(W.^2, 2);
                     dspm_vec = sqrt(dspm_vec);
                     W = W./dspm_vec;
@@ -144,7 +144,7 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
                 sloreta_vec = sqrt(sum(W.*L_sub', 2));
                 W = W./sloreta_vec(:,ones(size(W,2),1));
             elseif strcmp(method_type, "sLORETA last step")
-                if i == self.n_n_map_iterations
+                if i == self.n_map_iterations(mr_ind)
                     sloreta_vec = sqrt(sum(W.*L_sub', 2));
                     W = W./sloreta_vec(:,ones(size(W,2),1));
                 end

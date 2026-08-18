@@ -12,8 +12,7 @@ function zef = zef_kf_open_window(zef)
 %   Called from zef_kf_start (INI: Inverse tools → Kalman). Instantiates
 %   zef_kf_app, copies inv_snr / frames / filter_type onto widgets, and
 %   sets StartButton.ButtonPushedFcn to zef = zef_KF(zef). Does not invert.
-%   If zef.kf_burn_in exists, the burn-in widget is set with mun2str (as
-%   written; MATLAB has num2str).
+%   If zef.kf_burn_in exists, the burn-in widget is set with num2str.
 %
 %   See also zef_kf_start, zef_KF.
 %
@@ -41,7 +40,7 @@ zef.KF.inv_snr.Value = '30';
 end
 
 if isfield(zef,'kf_burn_in')
-    zef.KF.burn_in.Value=mun2str(zef.kf_burn_in);  % as written (not num2str)
+    zef.KF.burn_in.Value=num2str(zef.kf_burn_in);
 else
     zef.kf_burn_in = 4;
     zef.KF.burn_in.Value='4';

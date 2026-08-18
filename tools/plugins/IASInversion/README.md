@@ -21,7 +21,7 @@ Hyperprior popup: spatially balanced vs constant (`zef.ias_hyperprior`). Standar
 |-------|-------|-------------------------------|
 | 1 | None | Weighted MNE step only: `z = √θ · L' (LθL' + σ²I)⁻¹ f` |
 | 2 | sLORETA each step | Divide that operator by `sqrt(sum(L.*L_aux',2))` **every** MAP iteration |
-| 3 | sLORETA last step | **Not reached.** Both sLORETA branches are `isequal(ias_type,2)` as written, so value 3 never standardizes |
+| 3 | sLORETA last step | Same sLORETA scale as type 2, applied only on the last MAP iteration |
 | 4 | dSPM each step | Divide by `sqrt(sum(L.^2,2))` every iteration |
 | 5 | dSPM last step | Same dSPM scale only on the last MAP iteration |
 
@@ -50,7 +50,6 @@ This plugin does **not** construct `inverse.IASInverter`. Class id `ias` (and `l
 
 ## Important notes
 
-- Standardization value 3 (sLORETA last step) is never reached as written — both sLORETA branches test `isequal(ias_type,2)`.
 - Hyperprior family still uses global `zef.inv_hyperprior`, not only the IAS-specific popup.
 
 ## Developer guidance

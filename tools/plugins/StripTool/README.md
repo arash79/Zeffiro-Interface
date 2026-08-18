@@ -2,7 +2,7 @@
 
 ## Folder purpose
 
-Generic **implanted strip / cylinder** geometry as FEM compartments (optional encapsulation) plus contact points. Broader than `DBS_tool` (which is sensor-contact oriented). **Not** on default profile INIs — start with `zef_strip_tool_start`.
+Generic **implanted strip / cylinder** geometry as FEM compartments (optional encapsulation) plus contact points. Broader than `DBS_tool` (which is sensor-contact oriented). Default head-profile menu: **Forward tools → Strip tool** (`zef_strip_tool_start`).
 
 ## Main contents
 
@@ -46,7 +46,7 @@ zef_strip_tool_start;
 
 - Delete clears strip_cell / helper state; it does **not** remove already-embedded compartments automatically.
 - Embedded strips should be remeshed before trusting FEM results.
-- Not registered in default `zeffiro_plugins.ini`.
+- Registered on `profile/multicompartment_head/zeffiro_plugins.ini` as **Strip tool**. Other profiles still start it with `zef_strip_tool_start`.
 
 ## Developer guidance
 

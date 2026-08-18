@@ -24,7 +24,7 @@ Places one or more dipoles, optionally with a Gaussian-envelope / Blackman–Har
 
 ## Workflow context
 
-Built-in **Forward tools → Find synthetic source** (hardcoded in `zef_menu_tool.m`, every profile). The INI row **Find synthetic source legacy** opens `FindSyntheticSourceLegacy/` instead. Extended patch sources: `FindSyntheticSourceLegacy_Patch/`.
+Built-in **Forward tools → Find synthetic source** (hardcoded in `zef_menu_tool.m`, every profile). The INI row **Find synthetic source legacy** opens `FindSyntheticSourceLegacy/` instead. Ball/ellipsoid patches: `FindSyntheticSourceLegacy_Patch/`. Curved-disk / SVD-orientation ROIs: `FindSyntheticSourceROI/`.
 
 ## Usage instructions
 

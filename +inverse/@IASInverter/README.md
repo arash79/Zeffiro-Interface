@@ -39,12 +39,11 @@ GUI: **IAS MAP estimation** → `zef_ias_iteration` (`legacy_ias`). ROI variant 
 
 ## Important notes
 
-- Code contains a known typo risk: last-step branches referencing `n_n_map_iterations` may never run — verify before relying on “last iteration only” post-weighting.
+- Last-step dSPM/sLORETA branches compare against `n_map_iterations`.
 - Dynamicprops created in `initialize` must be cleaned in `terminateComputation` to avoid stale state across runs.
 - Method_type `"None"` vs dSPM/sLORETA strings control post-hoc scaling.
 
 ## Developer guidance
 
-- Fix the `n_n_map_iterations` typo carefully with a unit test that asserts post-weighting actually executes.
 - Keep hyperprior helper APIs stable; IAS/RAMUS share them.
 - Prefer registry + class path over duplicating IAS loops in new plugins.

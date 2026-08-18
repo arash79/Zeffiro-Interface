@@ -13,8 +13,8 @@ function [z,reconstruction_information] = zef_ias_iteration(zef)
 %   SNR: zef.ias_snr (dB) → std_lhood = 10^(-ias_snr/20). MAP loops
 %   zef.ias_n_map_iterations. Optional GPU on L. Writes reconstruction
 %   via zef_postProcessInverse / peak-norm; tag IAS.
-%   As written, both ias_type 2 branches are isequal(ias_type,2)
-%   (sLORETA each step, then a second identical test).
+%   Standardization popup: 1 none, 2 sLORETA each MAP step, 3 sLORETA on
+%   the last MAP step only, 4 dSPM each step, 5 dSPM last step.
 %
 %   See also ias_map_estimation, zef_init_ias.
 %
@@ -150,8 +150,8 @@ for f_ind = 1 : number_of_frames
             sloreta_vec = sqrt(sum(L.*L_aux', 2));
             L = L./sloreta_vec(:,ones(size(L,2),1));
 
-        elseif isequal(ias_type,2)
-            % Second isequal(ias_type,2) as written (same test; intended last-step sLORETA).
+        elseif isequal(ias_type,3)
+            % sLORETA last MAP step only
 
             if i == n_ias_map_iter
                 sloreta_vec = sqrt(sum(L.*L_aux', 2));

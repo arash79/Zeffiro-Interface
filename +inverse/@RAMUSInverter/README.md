@@ -39,7 +39,7 @@ GUI: **RAMUS inversion tool** → `zef_ramus_iteration` (`legacy_ramus`). Sample
 
 ## Important notes
 
-- Same IAS-family typo risk (`n_n_map_iterations`) may affect last-step post-weighting.
+- Last-step dSPM/sLORETA branches compare against `n_map_iterations(mr_ind)` (per resolution level).
 - Cost scales with `number_of_decompositions × levels × n_map_iterations` — keep defaults modest for interactive use.
 - Sensitivity package may set `ramus_decomposition` capability flags before runs.
 

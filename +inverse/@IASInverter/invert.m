@@ -89,15 +89,13 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
             dspm_vec = sqrt(dspm_vec);
             W = W./dspm_vec;
         elseif strcmp(method_type, "dSPM last step")
-            % Property is n_map_iterations; n_n_map_iterations is as written
-            % (those last-step branches never run). Documented, not patched.
-            if i == self.n_n_map_iterations
+            if i == self.n_map_iterations
                 dspm_vec = sum(W.^2, 2);
                 dspm_vec = sqrt(dspm_vec);
                 W = W./dspm_vec;
             end
         elseif strcmp(method_type, "sLORETA last step")
-            if i == self.n_n_map_iterations
+            if i == self.n_map_iterations
                 sloreta_vec = sqrt(sum(W.*L', 2));
                 W = W./sloreta_vec(:,ones(size(W,2),1));
             end

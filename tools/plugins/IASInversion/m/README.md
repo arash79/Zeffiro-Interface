@@ -34,7 +34,7 @@ Requires `zef.L` and `zef.measurements`. Typical after forward lead-field build;
 ## Important notes
 
 - Window dump Start may omit `reconstruction_information`; init overrides Start to return both.
-- As documented in `zef_ias_iteration`, both `ias_type == 2` branches are identical (sLORETA-style each step)—treat type carefully when changing behavior.
+- `ias_type` 3 is sLORETA on the last MAP iteration only (`isequal(ias_type,3)`).
 - Scripts `zef_update_ias` / init assume figure handles `h_ias_*` exist.
 
 ## Developer guidance

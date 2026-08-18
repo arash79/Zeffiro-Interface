@@ -8,9 +8,9 @@ Optional windows that attach to the Zeffiro menu bar. Ordinary MATLAB functions 
 
 Typical plugin folder: start callback (`*_start.m`), `m/` (iteration / math), `mlapp/` or `fig/` (window layout), optional README. Default Inverse-tools entries (menu → start → solver in `m/`): Minimum norm (`zef_minimum_norm_estimation` / `zef_find_mne_reconstruction`), Classical Sparse Methods, IAS / IAS ROI, RAMUS, Dipole Scan, Beamformer, Kalman, MUSIC, Hierarchical Bayesian Sampler, Preconditioned relaxation, SL1 MAP, EXP Lasso, GMM (SP/JL), ES Workbench (tES optimization). SESAME appears in some asteroid profiles, not `multicompartment_head`.
 
-Forward / Multi / Settings (INI): Filter tool, Topography, synthetic source (legacy/patch), DTI Conductivity, Multi lead field, LeadFieldProcessingTool, ReconstructionTool, Data Bank, Dynamical plot queue, NSE, Github pusher. Hardcoded in `zef_menu_tool.m` (not INI): Find synthetic source, Generate synthetic EIT data, Butterfly plot.
+Forward / Multi / Settings (INI, default head profile): Filter tool, Topography, synthetic source (legacy / patch / ROI), Strip tool, Source tree tool, DTI Conductivity, Multi lead field, LeadFieldProcessingTool, ReconstructionTool, Data Bank, Dynamical plot queue, NSE, Github pusher. Hardcoded in `zef_menu_tool.m` (not INI): Find synthetic source, Generate synthetic EIT data, Butterfly plot.
 
-Folders not in the default INI (call from MATLAB): CreateDipolarPair, DBS_tool, StripTool, RAP-MUSIC, PlotMeshesProto, RAMUSSampler, FindSyntheticGravityData, EITSensitivityTool. `FindSyntheticSource/` is absent from the INI but appears via `zef_menu_tool.m`.
+Folders not in the default INI (call from MATLAB): CreateDipolarPair, DBS_tool, RAP-MUSIC, PlotMeshesProto, RAMUSSampler, FindSyntheticGravityData, EITSensitivityTool. `FindSyntheticSource/` is absent from the INI but appears via `zef_menu_tool.m`.
 
 ## Code functionality
 

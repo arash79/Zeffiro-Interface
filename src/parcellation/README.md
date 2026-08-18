@@ -10,7 +10,7 @@ Paints atlas regions (or user spheres) onto the source space so reconstructions 
 | `zef_parcellation_default.m` | function | Colortable from compartments |
 | `zef_parcellation_roi_embed.m` | function | Spheres → colortable/points |
 | `zef_parcellation_time_series.m` | function | Reconstruction → ROI courses |
-| `zef_parcellation_colormap.m` | function | Colormap from base `zef` |
+| `zef_parcellation_colormap.m` | function | Colormap from base `zef` (returns `[]` if the field is missing) |
 | `zef_parcellation_roi_add.m` / `_delete.m` | function | ROI list |
 | `zef_parcellation_roi_pick_center.m` / `_pick_color.m` | function | GUI pickers |
 | `zef_parcellation_roi_plot.m` | function | Draw spheres |

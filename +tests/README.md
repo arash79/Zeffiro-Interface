@@ -14,6 +14,11 @@ MATLAB unit / integration tests for inverse dispatch, UI helpers, and related AP
 | `ELORETAInverterTest` | shape, fixed-point T, point-source, manual α, rescale |
 | `UKFNMMInverterTest` | SKF–NMM–UKF class: construct, initialize, invert, `run_frame_loop`, NMM once, RTS, edge cases |
 | `UKFNMMDispatchTest` | registry `ukfnmm` / `ukf_nmm`; local dispatch; cluster job serialization |
+| `IASFamilyLastStepTest` | IAS/RAMUS last-step sLORETA/dSPM; plugin `ias_type==3` |
+| `ParcellationColormapTest` | missing `zef.parcellation_colormap` returns `[]` |
+| `FindSyntheticSourceROITest` | ROI membership, ROI measurements, polar ellipsoid plot |
+| `SourceTreeJRTest` | headless Jansen–Rit tree ODE |
+| `UpstreamPortRegressionTest` | Kalman `num2str`, INI registrations, patch plugin kept |
 | `EndToEndSyntheticTest` | `zef_inverse_run(...,"dspm","local")` fills `zef.reconstruction` |
 | `InverseBundleExtractionTest` | bundle `L`, `F`, `procFile`, frames |
 | `InverseFailureModesTest` | `UnknownInverseMethod`; `MissingLegacyZef` |
@@ -26,7 +31,7 @@ MATLAB unit / integration tests for inverse dispatch, UI helpers, and related AP
 | `ColoredListTest` | HTML/`uihtml` listboxes |
 | `UiThemeTest` | `zef_ui_theme` / layout tokens |
 | `ZefSourceModelLoadTest` | `core.types.ZefSourceModel.from` + legacy enum MAT load |
-| `createSyntheticInverseZef.m` | Shared synthetic `zef` fixture for inverse tests |
+| `createSyntheticInverseZef.m` | Shared synthetic `zef` fixture for inverse tests (`source_interpolation_ind{1}` is a column) |
 | `createSyntheticUKFNMMZef.m` | Larger xyz/bump `zef` fixture for UKFNMM clustering + NMM |
 
 ## Code functionality

@@ -54,7 +54,7 @@ zef.kf_structural_Q_type = 1;  % FA; load DTI volumes first
 
 - Structural Q can make `P` dense after the first update — prefer EnKF for large source counts.
 - `kron(Q, I_3)` when using Cartesian directions.
-- Widget burn-in may use a `mun2str` typo — verify Value conversion if editing UI.
+- Burn-in widget uses `num2str(zef.kf_burn_in)`.
 - Extra Scripts/ under the plugin are plotting/batch helpers, not the Start button.
 
 ## Developer guidance

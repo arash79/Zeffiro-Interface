@@ -9,8 +9,8 @@ function zef = createSyntheticInverseZef()
 %   zef = createSyntheticInverseZef()
 %
 %   Not a test. 4 sensors, 2 sources, L randn(4,6), 3 measurement frames,
-%   inv_data_mode 'raw', use_gpu false, plus CSM/MNE/Kalman scalar fields
-%   used by legacy dispatch. No mesh. Called by tests.* inverse classes.
+%   zef.source_interpolation_ind{1} is a column so
+%   zef_postProcessInverseClassObj can expand xyz indices.
 %
 n_sensors = 4;
 n_interp = 2;
@@ -18,7 +18,7 @@ n_frames = 3;
 
 zef = struct;
 zef.source_direction_mode = 1;
-zef.source_interpolation_ind = {1:n_interp, [], []};
+zef.source_interpolation_ind = {(1:n_interp)', [], []};
 zef.source_positions = [0 0 0; 1 0 0];
 zef.source_directions = [1 0 0; 0 1 0];
 

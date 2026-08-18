@@ -9,10 +9,17 @@ function [colormap_vec] = zef_parcellation_colormap(varargin)
 %   colormap_vec = zef_parcellation_colormap()
 %
 %   Output
-%     colormap_vec - value of zef.parcellation_colormap in the base workspace.
+%     colormap_vec - value of zef.parcellation_colormap in the base
+%                    workspace, or [] if zef or the field is missing.
 %
 %   See also zef_parcellation_time_series.
 
-colormap_vec = evalin('base','zef.parcellation_colormap');
+colormap_vec = [];
+if evalin('base', 'exist(''zef'', ''var'')') == 1
+    zef_base = evalin('base', 'zef');
+    if isstruct(zef_base) && isfield(zef_base, 'parcellation_colormap')
+        colormap_vec = zef_base.parcellation_colormap;
+    end
+end
 
 end
