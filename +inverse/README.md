@@ -13,6 +13,7 @@ Object-oriented **EEG/MEG (and related) inverse solvers**. Each `@*Inverter` imp
 | `@MNEInverter` | Weighted MNE | `mne`, `wmne` |
 | `@ELORETAInverter` | eLORETA fixed-point | `eloreta` |
 | `@KalmanInverter` | KF / sLORETA-KF / EnKF + RTS | `kalman`, `kf` |
+| `@UKFNMMInverter` | Spatial KF + Jansen–Rit NMM + UKF | `ukfnmm`, `ukf_nmm` |
 | `@BeamformerInverter` | LCMV / UNG / unit-gain | `beamformer` |
 | `@DipoleScanInverter` | Dipole-scan GoF | `dipolescan`, `dipole_scan` |
 | `@IASInverter` | IAS MAP | `ias` |
@@ -30,11 +31,13 @@ Discovery is **not** a folder scan: `utilities.cluster.inverse_method_registry` 
 2. Optional `initialize(L, f_data)`  
 3. Optional `precompute(L[, procFile])`  
 4. Per frame: `invert(f, L, procFile, …)`  
-5. Optional Kalman `smoother`, `terminateComputation`, post-process → `zef.reconstruction`
+5. Optional `smoother` (Kalman RTS; UKFNMM RTS + NMM/UKF), `terminateComputation`, post-process → `zef.reconstruction`
 
 **Base class:** `REQUIRED_METHODS = "invert"`; `computeInversionWithZI` → `zef_process_inversion`; `computeGMM` → `plugins.ClassGMM`.
 
 **Kalman note:** class Kalman does **not** implement DTI structural Q; that exists only on the legacy `tools/plugins/Kalman` path (`zef_dti_structural_Q`). Pass a user `Q` via `MethodParams` if needed.
+
+**UKFNMM note:** `inverse.UKFNMMInverter` is a separate class, not a Kalman filter type. There is no Inverse-tools GUI. Spatial KF uses `plugins.ClassKF.kf_update` on a per-source SVD-modified lead field; NMM/UKF runs once from `smoother`. See `@UKFNMMInverter/README.md`.
 
 ## Workflow context
 

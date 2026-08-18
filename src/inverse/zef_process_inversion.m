@@ -99,11 +99,11 @@ function [zef,MethodClassObj] = zef_process_inversion(zef,MethodClassObj)
         waitbar_title ...
     );
 
-    % The only inverter that defines a smoother today is KalmanInverter,
-    % whose smoother.m requires (self, z_inverse, L). Guard on
-    % use_smoothing so we don't enter the smoother branch (and its buggy
-    % interior) when smoothing wasn't requested, and pass L so the
-    % signature matches when it is.
+    % Inverters that define smoother.m today: KalmanInverter (optional RTS)
+    % and UKFNMMInverter (optional RTS, then required NMM/UKF). Guard on
+    % use_smoothing so Kalman does not enter its smoother when unused.
+    % UKFNMM forces use_smoothing true so this hook runs exactly once.
+    % Pass L so the signature matches.
     should_smooth = ismethod(MethodClassObj, 'smoother') ...
         && isprop(MethodClassObj, 'use_smoothing') ...
         && MethodClassObj.use_smoothing;

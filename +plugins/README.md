@@ -9,7 +9,7 @@ MATLAB package at the repository root for Kalman predict/update and optional GMM
 | Package | Why it exists | Who calls it |
 |---------|---------------|--------------|
 | `+ClassGMM/` | Fit a Gaussian mixture to a reconstruction (clusters, optional orientation) | `inverse.CommonInverseParameters.computeGMM` after invert (Statistics Toolbox) |
-| `+ClassKF/` | Discrete Kalman predict / update / standardized update | `inverse.KalmanInverter.invert` (registry ids `kalman` / `kf`) |
+| `+ClassKF/` | Discrete Kalman predict / update / standardized update | `inverse.KalmanInverter.invert` (`kalman` / `kf`); spatial stage of `inverse.UKFNMMInverter` (`ukfnmm` / `ukf_nmm`) |
 
 ## Code functionality
 

@@ -13,9 +13,11 @@ function [m, P] = class_kf_predict(KFclassObj)
 %   identity, skips the multiplies: m unchanged, P = P + Q.
 %
 %   Called from inverse.KalmanInverter.invert for Basic / standardized /
-%   approximated standardized filters. EnKF predicts inline instead.
+%   approximated standardized filters, and from inverse.UKFNMMInverter.invert
+%   for the spatial stage. EnKF predicts inline instead.
 %
-%   See also plugins.ClassKF.kf_update, inverse.KalmanInverter.
+%   See also plugins.ClassKF.kf_update, inverse.KalmanInverter,
+%            inverse.UKFNMMInverter.
 
 if (isdiag(KFclassObj.state_transition_model_A) && all(diag(KFclassObj.state_transition_model_A) - 1) < eps)
     % Identity transition: m unchanged, P = P + Q

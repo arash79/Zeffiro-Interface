@@ -12,6 +12,8 @@ MATLAB unit / integration tests for inverse dispatch, UI helpers, and related AP
 | `InverseDispatchTest` | `mne` / `legacy_mne` via `dispatch_inverse` |
 | `ELORETADispatchTest` | registry → `ELORETAInverter`; local `zef_inverse_run("eloreta")` |
 | `ELORETAInverterTest` | shape, fixed-point T, point-source, manual α, rescale |
+| `UKFNMMInverterTest` | SKF–NMM–UKF class: construct, initialize, invert, `run_frame_loop`, NMM once, RTS, edge cases |
+| `UKFNMMDispatchTest` | registry `ukfnmm` / `ukf_nmm`; local dispatch; cluster job serialization |
 | `EndToEndSyntheticTest` | `zef_inverse_run(...,"dspm","local")` fills `zef.reconstruction` |
 | `InverseBundleExtractionTest` | bundle `L`, `F`, `procFile`, frames |
 | `InverseFailureModesTest` | `UnknownInverseMethod`; `MissingLegacyZef` |
@@ -25,6 +27,7 @@ MATLAB unit / integration tests for inverse dispatch, UI helpers, and related AP
 | `UiThemeTest` | `zef_ui_theme` / layout tokens |
 | `ZefSourceModelLoadTest` | `core.types.ZefSourceModel.from` + legacy enum MAT load |
 | `createSyntheticInverseZef.m` | Shared synthetic `zef` fixture for inverse tests |
+| `createSyntheticUKFNMMZef.m` | Larger xyz/bump `zef` fixture for UKFNMM clustering + NMM |
 
 ## Code functionality
 

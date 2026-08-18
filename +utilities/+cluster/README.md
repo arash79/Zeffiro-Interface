@@ -16,7 +16,7 @@ Bundle field list: `SCHEMA.md`.
 
 `dispatch_inverse` requires `bundle.method_info` from the registry. Class path: construct `inverse.*Inverter`, `utilities.inverse.run_frame_loop`, optional smoother/terminate, `zef_postProcessInverseClassObj`. Legacy path: `with_zef_in_base` + `feval(legacy_function)`. Errors: `utilities.cluster:UnknownInverseMethod`, `MissingLegacyZef`, `UnsupportedExecutionKind`.
 
-Registry (case-insensitive). Class: `csm`/`dspm`/`sloreta`/`sloreta3d`/`sbl`, `mne`/`wmne`, `eloreta`, `kalman`/`kf`, `beamformer`, `dipolescan`/`dipole_scan`, `ias`, `ramus`, `grouplasso`/`group_lasso`, `halpr`. Legacy: `legacy_csm`, `legacy_mne`, `legacy_kalman`, `legacy_ias`, `legacy_ramus`, `legacy_dipolescan`, `legacy_beamformer`, `legacy_sl1`, `legacy_relax`, `legacy_sesame`, `legacy_hb`/`legacy_mcmc`, `legacy_music`, `legacy_rap_music`, `legacy_exp`.
+Registry (case-insensitive). Class: `csm`/`dspm`/`sloreta`/`sloreta3d`/`sbl`, `mne`/`wmne`, `eloreta`, `kalman`/`kf`, `ukfnmm`/`ukf_nmm`, `beamformer`, `dipolescan`/`dipole_scan`, `ias`, `ramus`, `grouplasso`/`group_lasso`, `halpr`. Legacy: `legacy_csm`, `legacy_mne`, `legacy_kalman`, `legacy_ias`, `legacy_ramus`, `legacy_dipolescan`, `legacy_beamformer`, `legacy_sl1`, `legacy_relax`, `legacy_sesame`, `legacy_hb`/`legacy_mcmc`, `legacy_music`, `legacy_rap_music`, `legacy_exp`.
 
 `run_inverse_job(bundle_path, result_path)` loads `bundle`, calls `dispatch_inverse`, saves `result` (`-v7.3`); on failure still writes `result` then rethrows. `opts.EnableProfiler` stores `profilerInfo`.
 

@@ -82,6 +82,10 @@ post-hoc dSPM/sLORETA scaling. \\
 Kalman & Filter types on \ccode{method\_type}. DTI-informed process noise
 \(Q\) exists on the \emph{legacy plugin} \ccode{zef\_KF} only, not on
 \ccode{KalmanInverter}. \\
+UKFNMM & Spatial Kalman on a per-source SVD-modified lead field, then
+Jansen--Rit NMM with UKF parameter estimation
+(\ccode{inverse.UKFNMMInverter}; ids \ccode{ukfnmm}/\ccode{ukf\_nmm}).
+No Inverse-tools GUI. See \ccode{+inverse/@UKFNMMInverter/README.md}. \\
 Beamformer & Per-source LCMV (and related) weights. \\
 Dipole scan & SVD or related one-dipole fits per location. \\
 RAMUS & Needs a multiresolution decomposition

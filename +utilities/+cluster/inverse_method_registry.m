@@ -12,8 +12,9 @@ function method_info = inverse_method_registry(method_id)
 %   execution_kind ("class" or "legacy"), class_name (e.g. "inverse.CSMInverter"),
 %   and legacy_function (e.g. "zef_CSM_iteration"). Aliases include csm/dspm/
 %   sloreta/sbl → CSMInverter; mne/wmne → MNEInverter; kalman/kf → KalmanInverter;
-%   dipolescan/dipole_scan → DipoleScanInverter; grouplasso/group_lasso →
-%   GroupLassoInverter; legacy_* ids map to historical zef_* entry points.
+%   ukfnmm/ukf_nmm → UKFNMMInverter; dipolescan/dipole_scan → DipoleScanInverter;
+%   grouplasso/group_lasso → GroupLassoInverter; legacy_* ids map to historical
+%   zef_* entry points.
 %
 %   Errors if method_id is unknown.
 
@@ -41,6 +42,9 @@ elseif id == "eloreta"
 elseif any(id == ["kalman", "kf"])
     method_info.execution_kind = "class";
     method_info.class_name = "inverse.KalmanInverter";
+elseif any(id == ["ukfnmm", "ukf_nmm"])
+    method_info.execution_kind = "class";
+    method_info.class_name = "inverse.UKFNMMInverter";
 elseif id == "beamformer"
     method_info.execution_kind = "class";
     method_info.class_name = "inverse.BeamformerInverter";

@@ -78,5 +78,6 @@ zef_kf_start;
 ## Developer guidance
 
 - New class method: add `@*Inverter` + registry entry + preferably a `+tests` case; do not rely on folder discovery.
+- `ukfnmm` / `ukf_nmm` → `inverse.UKFNMMInverter` (no Inverse-tools GUI; NMM/UKF runs from `smoother` after the frame loop).
 - Keep legacy and ClassObj filter/time/post-process pairs in sync when changing `procFile`.
 - Pitfall: comparing GUI KF to `zef_inverse_run('kalman')` without matching `R`, `Q`, smoother, and data-mode settings.

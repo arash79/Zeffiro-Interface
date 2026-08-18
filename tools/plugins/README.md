@@ -33,6 +33,7 @@ Open tools from the menu after lead field and measurements exist, or call start 
 ## Important notes
 
 - GUI Kalman is `zef_KF`; class Kalman is `inverse.KalmanInverter` (registry `kalman` / `kf`)—buttons do not construct the class path.
+- Class UKFNMM (`inverse.UKFNMMInverter`, registry `ukfnmm` / `ukf_nmm`) has no Inverse-tools plugin; do not copy the Kalman GUI for it.
 - GMM GUI apps do not import `+plugins` ClassGMM.
 - `Generate synthetic EIT data` has no first-party file of that exact name; related code is under `src/gui/callbacks/`.
 

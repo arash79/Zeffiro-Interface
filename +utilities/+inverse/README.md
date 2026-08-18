@@ -16,7 +16,7 @@ Single function: `run_frame_loop`. `dispatch_inverse` (and therefore `zef_invers
 4. If `precompute` exists: tries `precompute(L, procFile)`, falls back to `precompute(L)` only on “too many inputs”.
 5. Each frame: `zef_getTimeStepClassObj` → optional `gpuArray` when `zef.use_gpu && zef.gpu_count > 0` → `invert(..., "use_gpu", ..., "normalize_data", zef.normalize_data)`.
 
-Returns the cell of source vectors and the (possibly updated) inverter object. Does not write `zef.reconstruction`; `dispatch_inverse` / `zef_postProcessInverseClassObj` do that.
+Returns the cell of source vectors and the (possibly updated) inverter object. Does not write `zef.reconstruction`; `dispatch_inverse` / `zef_postProcessInverseClassObj` do that. Optional `smoother` (Kalman RTS; UKFNMM RTS + NMM/UKF) runs **after** this loop in the driver, not inside it.
 
 ## Workflow context
 

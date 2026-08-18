@@ -6,7 +6,7 @@ Required fields:
 
 - `version` (double): schema version, currently `1`.
 - `method_id` (string): inverse method identifier (e.g. `dspm`, `mne`,
-  `eloreta`, `legacy_mne`).
+  `eloreta`, `ukfnmm`, `legacy_mne`).
 - `method_info` (struct): output of `utilities.cluster.inverse_method_registry`.
 - `method_params` (struct): method-specific parameters.
 - `L` (double): processed lead field matrix.

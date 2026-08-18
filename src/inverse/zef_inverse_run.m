@@ -17,7 +17,7 @@ function [zef, run_result] = zef_inverse_run(zef, method_id, opts)
 %
 %   Inputs
 %     zef        - session struct with lead field and measurements.
-%     method_id  - nonempty string registry id (e.g. "eloreta", "mne", "kalman").
+%     method_id  - nonempty string registry id (e.g. "eloreta", "mne", "kalman", "ukfnmm").
 %     execution  - "local" (default) or "cluster".
 %     MethodParams
 %                - struct of inverter name-value fields, default struct().
