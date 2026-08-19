@@ -81,7 +81,6 @@ I = find(nodes(:,1) <= max_x & nodes(:,1) >= min_x & nodes(:,2) <= max_y & nodes
 length_I = length(I);
 
 tic;
-ones_vec = ones(length(aux_vec_1),1);
 ind_vec_aux = zeros(length_I,1);
 nodes_aux = nodes(I,:)';
 
@@ -92,7 +91,6 @@ if use_gpu == 1 & evalin('base','zef.gpu_count') > 0
     nodes_aux = gpuArray(nodes_aux);
     aux_vec_1 = gpuArray(aux_vec_1);
     aux_vec_4 = gpuArray(aux_vec_4);
-    ones_vec = gpuArray(ones_vec);
     ind_vec_aux = gpuArray(ind_vec_aux);
 end
 
@@ -105,8 +103,8 @@ for i = 1 : par_num : length_I
     block_ind = [i: min(i+par_num-1,length_I)];
     aux_vec = nodes_aux(:,block_ind);
     aux_vec = reshape(aux_vec,3,1,length(block_ind));
-    aux_vec_5 = aux_vec_1(:,:,ones(1,length(block_ind))) - aux_vec(:,ones_vec,:);
-    aux_vec_2 = sum(aux_vec_5.*aux_vec_4(:,:,ones(1,length(block_ind))));
+    aux_vec_5 = aux_vec_1 - aux_vec;
+    aux_vec_2 = sum(aux_vec_5.*aux_vec_4);
     aux_vec_3 = sqrt(sum(aux_vec_5.*aux_vec_5));
     aux_vec_3 = (aux_vec_3.*aux_vec_3).*aux_vec_3;
     aux_vec_6 = sum(aux_vec_2./aux_vec_3)/(4*pi);

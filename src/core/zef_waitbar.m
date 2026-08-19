@@ -190,7 +190,22 @@ end
 %% Menu / options
 
 function menu = local_find_menu()
+% Cache the menu figure. Callers such as mesh labeling update the waitbar
+% tens of times per compartment; findall(groot) walks the whole graphics
+% tree (CanvasContainerModel.doCollectChildren) and dominated create_fem_mesh
+% in profiles. isvalid() misses a replaced menu, so refetch then.
+persistent cached_menu
 menu = [];
+if ~isempty(cached_menu)
+    try
+        if isvalid(cached_menu)
+            menu = cached_menu;
+            return
+        end
+    catch
+        cached_menu = [];
+    end
+end
 try
     found = findall(groot, 'ZefTool', 'zef_menu_tool');
     if ~isempty(found)
@@ -202,6 +217,7 @@ try
 catch
     menu = [];
 end
+cached_menu = menu;
 end
 
 function opts = local_menu_options(menu)

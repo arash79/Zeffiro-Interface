@@ -101,6 +101,25 @@ h = zef_waitbar(0,1,'Initial mesh.');
 
 %************************************************************
 
+% Vectorized cube→tet fill. Loop order is i_x (slowest), i_y, i_z (fastest),
+% matching the historical nested loops so tetra row order is unchanged.
+% Corner numbering is 1–4 bottom, 5–8 top. ndgrid(1:n_z,1:n_y,1:n_x)
+% produces that same linear cube order.
+
+nodes = [X(:) Y(:) Z(:)];
+n_x = size_xyz(2) - 1;
+n_y = size_xyz(1) - 1;
+n_z = size_xyz(3) - 1;
+[i_z, i_y, i_x] = ndgrid(1:n_z, 1:n_y, 1:n_x);
+ix = i_x(:);
+iy = i_y(:);
+iz = i_z(:);
+cx = [0 1 1 0 0 1 1 0];
+cy = [0 0 1 1 0 0 1 1];
+cz = [0 0 0 0 1 1 1 1];
+ind_mat_2 = sub2ind(size_xyz, iy + cy, ix + cx, iz + cz);
+mesh_labeling_approach = eval('zef.mesh_labeling_approach');
+
 if isequal(eval('zef.initial_mesh_mode'),1)
 
     % Five tets per cube. Stencil depends on (i_x,i_y,i_z) parity so
@@ -114,36 +133,26 @@ if isequal(eval('zef.initial_mesh_mode'),1)
     ind_mat_1{1}{1}{1} = [7 8 3 6; 8 1 3 6; 2 3 1 6;  1 5 6 8 ; 1 3 4 8   ];
     ind_mat_1{2}{1}{1} = [ 7 8 4 5; 5 4 7 2;  2 4 1 5; 2 5 6 7   ;  2 3 4 7 ];
 
-    tetra = zeros(5*n_cubes,4);
-    if isequal(eval('zef.mesh_labeling_approach'),1)
-        label_ind = zeros(5*n_cubes,8);
-    elseif isequal(eval('zef.mesh_labeling_approach'),2)
-        label_ind = zeros(5*n_cubes,4);
-    end
-    nodes = [X(:) Y(:) Z(:)];
-    i = 1;
-
-    for i_x = 1 : size(X,2) - 1
-        zef_waitbar(i_x,(size(X,2)-1),h,'Initial mesh.');
-        for i_y = 1 : size(X,1) - 1
-            for i_z = 1 : size(X,3) - 1
-
-                % Cube corners in the usual 1–4 bottom, 5–8 top order.
-                x_ind = [i_x   i_x+1  i_x+1  i_x    i_x    i_x+1  i_x+1  i_x]';
-                y_ind = [i_y   i_y    i_y+1  i_y+1  i_y    i_y    i_y+1  i_y+1]';
-                z_ind = [i_z   i_z    i_z    i_z    i_z+1  i_z+1  i_z+1  i_z+1]';
-                ind_mat_2 = sub2ind(size_xyz,y_ind,x_ind,z_ind);
-
-                tetra(i:i+4,:) = ind_mat_2(ind_mat_1{2-mod(i_x,2)}{2-mod(i_y,2)}{2-mod(i_z,2)});
-                if isequal(eval('zef.mesh_labeling_approach'),1)
-                    label_ind(i:i+4,:) = ind_mat_2(:,ones(5,1))';
-                elseif isequal(eval('zef.mesh_labeling_approach'),2)
-                    label_ind(i:i+4,:) = ind_mat_2(ind_mat_1{2-mod(i_x,2)}{2-mod(i_y,2)}{2-mod(i_z,2)});
-                end
-                i = i + 5;
-
+    S = zeros(5, 4, 2, 2, 2);
+    for px = 1:2
+        for py = 1:2
+            for pz = 1:2
+                S(:,:,px,py,pz) = ind_mat_1{px}{py}{pz};
             end
         end
+    end
+    px = 2 - mod(ix, 2);
+    py = 2 - mod(iy, 2);
+    pz = 2 - mod(iz, 2);
+    lin_s = sub2ind([2 2 2], px, py, pz);
+    Sflat = reshape(S, 5, 4, 8);
+    col_idx = reshape(permute(Sflat(:,:,lin_s), [2 1 3]), 20, n_cubes)';
+    gathered = ind_mat_2((1:n_cubes)' + (col_idx - 1) * n_cubes);
+    tetra = reshape(gathered', 4, [])';
+    if isequal(mesh_labeling_approach, 1)
+        label_ind = repelem(ind_mat_2, 5, 1);
+    elseif isequal(mesh_labeling_approach, 2)
+        label_ind = tetra;
     end
 
     %************************************************************
@@ -158,38 +167,18 @@ elseif isequal(eval('zef.initial_mesh_mode'),2)
         7     4     1     8 ;
         7     8     1     5  ];
 
-    tetra = zeros(6*n_cubes,4);
-    if isequal(eval('zef.mesh_labeling_approach'),1)
-        label_ind = zeros(6*n_cubes,8);
-    elseif isequal(eval('zef.mesh_labeling_approach'),2)
-        label_ind = zeros(6*n_cubes,4);
-    end
-    nodes = [X(:) Y(:) Z(:)];
-    i = 1;
-
-    for i_x = 1 : size(X,2) - 1
-        zef_waitbar(i_x,(size(X,2)-1),h,'Initial mesh.');
-        for i_y = 1 : size(X,1) - 1
-            for i_z = 1 : size(X,3) - 1
-
-                x_ind = [i_x   i_x+1  i_x+1  i_x    i_x    i_x+1  i_x+1  i_x]';
-                y_ind = [i_y   i_y    i_y+1  i_y+1  i_y    i_y    i_y+1  i_y+1]';
-                z_ind = [i_z   i_z    i_z    i_z    i_z+1  i_z+1  i_z+1  i_z+1]';
-                ind_mat_2 = sub2ind(size_xyz,y_ind,x_ind,z_ind);
-
-                tetra(i:i+5,:) = ind_mat_2(ind_mat_1);
-                if isequal(eval('zef.mesh_labeling_approach'),1)
-                    label_ind(i:i+5,:) = ind_mat_2(:,ones(6,1))';
-                elseif isequal(eval('zef.mesh_labeling_approach'),2)
-                    label_ind(i:i+5,:) = ind_mat_2(ind_mat_1);
-                end;
-                i = i + 6;
-
-            end
-        end
+    col_idx = repmat(reshape(ind_mat_1', 1, 24), n_cubes, 1);
+    gathered = ind_mat_2((1:n_cubes)' + (col_idx - 1) * n_cubes);
+    tetra = reshape(gathered', 4, [])';
+    if isequal(mesh_labeling_approach, 1)
+        label_ind = repelem(ind_mat_2, 6, 1);
+    elseif isequal(mesh_labeling_approach, 2)
+        label_ind = tetra;
     end
 
 end
+
+zef_waitbar(1,1,h,'Initial mesh.');
 
 %************************************************************
 

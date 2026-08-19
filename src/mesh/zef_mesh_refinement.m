@@ -151,23 +151,13 @@ if not(isempty(compartment_ind))
         edge_ind(:,1:2) = sort(edge_ind(:,1:2),2);
         edge_ind = sortrows(edge_ind,[1 2 5]);
         clear edge_ind_2 nodes_new distance_vec_new;
-        new_node_ind = 0;
-        current_edge = [0 0];
 
-        for i = 1 : size(edge_ind,1)
-            if edge_ind(i,5) == 1
-                if edge_ind(i,1:2) == current_edge
-                    edge_ind(i,4) = new_node_ind;
-                else
-                    new_node_ind = new_node_ind + 1;
-                    current_edge = edge_ind(i,1:2);
-                    edge_ind(i,4) = new_node_ind;
-                end
-            else
-                if edge_ind(i,1:2) == current_edge
-                    edge_ind(i,4) = new_node_ind;
-                end
-            end
+        is_full = edge_ind(:,5) == 1;
+        edge_ind(:,4) = 0;
+        if any(is_full)
+            [unique_full, ~] = unique(edge_ind(is_full, 1:2), 'rows', 'stable');
+            [tf, loc] = ismember(edge_ind(:,1:2), unique_full, 'rows');
+            edge_ind(tf,4) = loc(tf);
         end
 
         [edge_val_aux edge_ind_2] = unique(edge_ind(:,4));
