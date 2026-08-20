@@ -1,3 +1,4 @@
+# inverse.KalmanInverter
 ## Folder purpose
 
 Sequential Kalman filter for `L x_t ≈ y_t` with state `x_t = A x_{t-1} + w`, `w ~ N(0, Q)`. Registry ids: `kalman`, `kf`. Default `method_type` is `"Basic Kalman filter"`.
