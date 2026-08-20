@@ -28,7 +28,7 @@ examples.importing.zef_import_example();
 
 ## Important notes
 
-- Nodisplay session; no automatic Create FEM mesh.
+- No display session; no automatic Create FEM mesh.
 - Paths inside the script may need adjustment if `scripts/scripts_for_importing` is absent.
 
 ## Developer guidance
