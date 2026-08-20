@@ -1,3 +1,4 @@
+#inverse.ELORETAInverter
 ## Folder purpose
 
 Exact low-resolution electromagnetic tomography (Pascual-Marqui 2007). Class inverter with registry id `eloreta`. No default-profile Inverse-tools plugin for this class.
