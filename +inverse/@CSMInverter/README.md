@@ -1,3 +1,4 @@
+# inverse.CSMInverter
 ## Folder purpose
 
 Class inverter for cortical source mapping: dSPM, sLORETA, 3D sLORETA, and sparse Bayesian learning. Solves `L x ≈ f` with a minimum-norm backbone plus per-source standardization (or iterative gamma for SBL).
