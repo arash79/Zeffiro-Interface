@@ -1,3 +1,4 @@
+# src/sensors
 ## Folder purpose
 
 A **sensor set** is one EEG cap, MEG helmet, EIT electrode array, or similar: positions, optional orientations, names, and how they attach to the volume mesh. This folder allocates tagged fields, fills Segmentation-tool tables, and snaps contacts onto the FEM surface before a lead field is built.
