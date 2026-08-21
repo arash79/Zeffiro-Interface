@@ -1,3 +1,5 @@
+# tools/plugins/preconditioned_relaxation_tool
+
 ## Folder purpose
 
 Solve the inverse normal equations with a stored multigrid / diagonal preconditioner (iterative relaxation). Use it after **Find preconditioner** has filled `zef.relax_preconditioner`. This is a linear iterative solver, not hierarchical Bayes.
