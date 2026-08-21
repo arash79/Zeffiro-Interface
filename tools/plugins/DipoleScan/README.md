@@ -1,3 +1,5 @@
+# tools/plugins/DipoleScan
+
 ## Folder purpose
 
 Scan every source location for the single dipole (or local orientation) that best fits the current time frame. Use it for a one-source localization map, not a distributed image.
