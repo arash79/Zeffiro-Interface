@@ -1,4 +1,4 @@
-+utilities/+sn2zef/+transforms
+# +utilities/+sn2zef/+transforms
 ## Folder purpose
 
 Build the SimNIBS RAS → FreeSurfer RAS header affine (4×4) from volume headers only. Does not run `mri_coreg` and does not rewrite STL files.
