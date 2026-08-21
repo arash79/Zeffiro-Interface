@@ -1,3 +1,4 @@
+# +utilities/+fs2zef/+generators
 ## Folder purpose
 
 Write the CSV manifest `import_segmentation.zef` after FreeSurfer surface export. Does not call FreeSurfer and does not mesh. Last stage of `utilities.fs2zef.run`.
