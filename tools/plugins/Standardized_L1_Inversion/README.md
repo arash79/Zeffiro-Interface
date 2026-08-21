@@ -1,3 +1,5 @@
+# tools/plugins/Standardized_L1_Inversion
+
 ## Folder purpose
 
 Hierarchical L1 MAP with `quadprog` (interior-point). Use it for sparse reconstructions when you want an L1 source prior and MATLAB Optimization Toolbox, as opposed to the EXP Lasso app.
