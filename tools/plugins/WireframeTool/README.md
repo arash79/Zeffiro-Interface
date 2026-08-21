@@ -1,3 +1,5 @@
+# tools/plugins/WireframeTool
+
 ## Folder purpose
 
 Builds a **printable wireframe surface** from the FEM tetrahedral mesh and a filling vector derived from permittivity `zef.epsilon(:,1)`. GPU-ToRRe-3D microwave geometry, not an EEG tool. Writes `zef.wireframe_triangles`, `zef.wireframe_nodes`, interpolated filling / shape / permittivity vectors.
