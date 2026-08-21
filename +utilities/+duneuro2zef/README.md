@@ -49,6 +49,16 @@ results = utilities.duneuro2zef.import_duneuro_project(config, true);
 - Session import requires `zef` already in base for auto-detect paths.
 - `Duneuro2Zeffiro_convert` skips work if key outputs already exist.
 - Measurement structs default to FieldTrip-like `'avg'` field.
+- `find_files` returns an empty path and filename when the folder does not
+  exist or no files match the requested pattern.
+- When multiple files match, `find_files` uses the requested `priority`:
+  `first` selects the first `dir()` match (typically alphabetical order),
+  `smallest` selects the smallest file by size, and `largest` selects the
+  largest file by size. An unrecognized priority falls back to `first`.
+- For Duneuro files whose scientific meaning is encoded in the filename
+  (for example, resolution in `sp_vol_rgv_N*.mat`), callers should not
+  assume that file size corresponds to resolution; selection should be
+  validated when necessary.
 
 ## Developer guidance
 
