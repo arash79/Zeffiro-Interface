@@ -1,4 +1,4 @@
-#tools/plugins/DynamicalPlotQueue
+# tools/plugins/DynamicalPlotQueue
 
 ## Folder purpose
 
