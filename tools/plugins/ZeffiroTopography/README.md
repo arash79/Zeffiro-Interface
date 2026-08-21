@@ -1,3 +1,5 @@
+# tools/plugins/ZeffiroTopography
+
 ## Folder purpose
 
 Maps filtered sensor time series onto the **outer** surface mesh (`zef.reuna_p{end-1}`, `zef.reuna_t{end-1}`) with a regularized inverse-distance sum. It does **not** invert a lead field. Output is `zef.top_reconstruction` (vector, or a cell of frames). Mesh visualization type 5 plots that field.
