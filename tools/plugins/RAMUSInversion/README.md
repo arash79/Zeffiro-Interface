@@ -1,3 +1,5 @@
+# tools/plugins/RAMUSInversion
+
 ## Folder purpose
 
 RAMUS (randomized multiresolution source space) hierarchical Bayes: IAS-style updates on several sparse coarsenings of the source grid, then combine. Use it for focal sources when single-resolution IAS is too smooth.
