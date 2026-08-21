@@ -1,3 +1,4 @@
+# src
 ## Folder purpose
 
 Procedural MATLAB that runs when you start Zeffiro: GUI windows, the `zef` session, mesh and lead-field pipelines, file I/O, and inverse orchestration. Algorithm classes for newer inverse solvers live in `+inverse` at the project root; `src/inverse` bridges them to `zef`. `zeffiro_interface` does `addpath(genpath(src))`, so these files are called as `zef_create_fem_mesh`, not package-qualified names.
