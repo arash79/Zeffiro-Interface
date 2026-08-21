@@ -1,3 +1,4 @@
+# src/parcellation
 ## Folder purpose
 
 Paints atlas regions (or user spheres) onto the source space so reconstructions can be summarized per ROI. GUI: **ZEFFIRO Interface: Parcellation tool**, opened from **Multi-tools → Parcellation tool** (not at startup). Time-series *statistics* live under `src/visualization/time_series_tools`; this folder builds ROI geometry and extracts raw parcel time courses.
