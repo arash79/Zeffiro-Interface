@@ -1,3 +1,5 @@
+# tools/plugins/MUSIC
+
 ## Folder purpose
 
 MUSIC subspace scan: SVD of the data covariance, then score each lead-field column against the signal (or noise) subspace. Use it for a few focal sources when you want a subspace correlation map rather than a distributed inverse.
