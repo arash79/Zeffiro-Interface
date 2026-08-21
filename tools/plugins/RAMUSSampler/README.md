@@ -1,3 +1,5 @@
+# tools/plugins/RAMUSSampler
+
 ## Folder purpose
 
 Metropolized RAMUS: MCMC on the same multiresolution source space as RAMUS inversion. Use for posterior samples of a RAMUS-style model rather than the RAMUS MAP iteration. No `inverse.*Inverter` and no registry id.
