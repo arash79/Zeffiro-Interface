@@ -1,3 +1,4 @@
+# tools/plugins/GMModel
 ## Folder purpose
 
 Gaussian-mixture clustering of an **existing** reconstruction (SP tool). This is not an inverse solver: it needs `zef.reconstruction` already filled. Use it to turn a distributed map into a few equivalent dipoles / cluster centres.
