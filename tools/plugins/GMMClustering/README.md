@@ -1,3 +1,4 @@
+# tools/plugins/GMMClustering
 ## Folder purpose
 
 Gaussian-mixture clustering of an **existing** reconstruction (JL app). Same job as GMModel (SP): fit components, optional plot/export. Not an inverse solver.
