@@ -28,8 +28,10 @@ ok = utilities.fs2zef.environment.validate_environment();
 
 ## Important notes
 
-- Needs a real FreeSurfer install; WSL/macOS path differences matter.
-- Does not install FreeSurfer — only configures the current MATLAB process.
+- Needs a real FreeSurfer installation; WSL/macOS path differences matter.
+- `setup_freesurfer_env` modifies the environment of the current MATLAB process only; it does not install FreeSurfer or modify system-wide shell configuration.
+- `validate_environment` is read-only and checks the configured FreeSurfer installation, required directories, and binaries.
+- Does not install FreeSurfer — it only configures and validates the current MATLAB process.
 
 ## Developer guidance
 
