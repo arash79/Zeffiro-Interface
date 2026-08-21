@@ -1,3 +1,5 @@
+# tools/plugins/ZeffiroESWorkbench
+
 ## Folder purpose
 
 Optimizes **tES electrode currents** so the FEM lead field `zef.L` produces a target current density at synthetic source locations (`zef.inv_synth_source`). This is **not** MEG/EEG inverse. Results go to `zef.y_ES_interval` (currents `y_ES`, volumetric density, residuals). **Update reconstruction** copies a density volume into `zef.reconstruction` for mesh plotting.
