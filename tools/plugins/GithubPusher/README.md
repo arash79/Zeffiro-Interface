@@ -1,3 +1,5 @@
+# tools/plugins/GithubPusher
+
 ## Folder purpose
 
 A small Git UI over the Zeffiro working copy: **push**, **pull**, and **reset**. It is **destructive** and it is **not** a general Git client.
