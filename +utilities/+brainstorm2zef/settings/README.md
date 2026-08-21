@@ -1,3 +1,5 @@
+# brainstorm2zef — settings
+
 ## Folder purpose
 
 Brainstorm converter default settings scripts. Loaded by name so `zef_bst_get_settings` / the GUI plugin can assign `zef_bst.*` fields before mesh conversion.
