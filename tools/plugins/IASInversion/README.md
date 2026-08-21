@@ -1,3 +1,5 @@
+# tools/plugins/IASInversion
+
 ## Folder purpose
 
 Iterative alternating sequential (IAS) MAP: alternate a Gaussian source update with a gamma / inverse-gamma hyperprior on per-source variance. Use it for sparse-ish hierarchical Bayes without RAMUS multiresolution.
