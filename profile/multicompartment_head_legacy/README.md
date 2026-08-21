@@ -2,7 +2,7 @@
 
 ## Folder purpose
 
-Head **startup profile** whose segmentation INI is **pre-seeded** with a 25-compartment table (skin, skull, CSF, grey/white matter, plus Detail 1–22). Use when you want default tissue names and σ values without importing a segmentation first.
+Head **startup profile** whose segmentation INI is **pre-seeded** with a 27-compartment table (skin, skull, CSF, Cerebrospinal fluid, grey/white matter, plus Detail 1–22). Use when you want default tissue names and σ values without importing a segmentation first.
 
 ## Main contents
 
