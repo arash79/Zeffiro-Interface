@@ -1,3 +1,5 @@
+# data/segmentations/multicompartment_head_project
+
 ## Folder purpose
 
 Sample **multicompartment head** anatomy used by Zeffiro demos and by `zeffiro_interface(..., 'import_to_new_project', ...)`. Surfaces are FreeSurfer-style `.asc` meshes; `import_segmentation.zef` lists compartment files, conductivities, and import options for `zef_import_segmentation`.
