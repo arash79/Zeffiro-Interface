@@ -1,3 +1,5 @@
+# tools/plugins/DTIConductivityTool
+
 ## Folder purpose
 
 White-matter conductivity in a FEM head model is usually a single scalar per tissue. DTI measures a preferred diffusion direction; this plugin lets you load FreeSurfer `dt_recon` volumes and **Apply to Mesh** so each tetrahedron in selected compartments gets a 6-component σ tensor. Anisotropic EEG/MEG lead fields (types 6–10) then use `zef.sigma(:,3:8)`.
