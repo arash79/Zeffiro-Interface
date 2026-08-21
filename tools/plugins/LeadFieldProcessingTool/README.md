@@ -1,3 +1,5 @@
+# tools/plugins/LeadFieldProcessingTool
+
 ## Folder purpose
 
 A second lead-field **bank** (`zef.LeadFieldProcessingTool.bank`) with App Designer tables: add the current `L`, replace `zef` from a checked row, mag→grad via a loaded `tra` matrix, and noise-weighted vertical combine.
