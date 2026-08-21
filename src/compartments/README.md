@@ -1,3 +1,4 @@
+# src/compartments
 ## Folder purpose
 
 Tissue compartments (scalp, skull, CSF, brain, …): each is a closed surface plus flags (on/off, conductivity, sources, merge/invert, color). This folder creates tagged fields on `zef`, fills the Segmentation-tool table, and answers “is this point inside this tissue?” during volume-mesh labeling.
