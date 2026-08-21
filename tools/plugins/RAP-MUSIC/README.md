@@ -1,3 +1,4 @@
+# tools/plugins/RAP-MUSIC
 ## Folder purpose
 
 Recursively applied MUSIC: peel successive dipoles from the signal subspace (`zef.RAPMUSIC_n_dipoles`, default 8). Use for a few discrete sources when plain MUSIC’s single scan is not enough. No `inverse.*Inverter`. Registry id `legacy_rap_music` dispatches `RAP_MUSIC_iteration`.
