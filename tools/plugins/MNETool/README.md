@@ -1,3 +1,5 @@
+# tools/plugins/MNETool
+
 ## Folder purpose
 
 Tikhonov minimum-norm source imaging (MNE) plus dSPM, sLORETA, and weighted MNE. Use it for a fast linear inverse of the whole source grid rather than a sparse or sequential method.
