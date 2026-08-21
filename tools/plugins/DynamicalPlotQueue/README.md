@@ -1,3 +1,5 @@
+#tools/plugins/DynamicalPlotQueue
+
 ## Folder purpose
 
 A table of extra plot commands that run **during** mesh visualization. Each row is `{script_or_function, enabled, 'static'|'dynamical', description}`. `zef_plot_dpq(type)` walks enabled rows of that type and `evalin('caller', row{1})` so overlays (synthetic arrows, GMM, strips, resection, …) appear on the current axes.
