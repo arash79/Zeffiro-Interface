@@ -1,3 +1,4 @@
+# tools/plugins/EXP
 ## Folder purpose
 
 Exponential / L1–L2 hierarchical MAP (IAS or EM, optional RAMUS coarsening). The default-profile tool is one App Designer window (`zef_exp_app_launch`) that calls shared `exp_iteration`. Asteroid profiles instead open the older GUIDE **EXP IAS RAMUS** window.
