@@ -1,3 +1,4 @@
+# Kalman / Scripts
 ## Folder purpose
 
 Offline plotting and DTI process-noise (`Q`) experiment scripts for Kalman reconstructions. These files are not Inverse tools → Kalman → **Start**. The production solver is `../m/zef_KF.m`.
