@@ -1,3 +1,4 @@
+# src/core
 ## Folder purpose
 
 Shell around a Zeffiro session: start, default fields, the GUI↔`zef` synchronizer, waitbars, logging, window tiling, plugin menus, and shutdown. It is **not** the `+core` package at the project root. `zeffiro_interface` adds this directory (and `src/gui/helpers`) to the path first so `zef_close_all` can run even during a restart.
