@@ -43,6 +43,7 @@ Prefer the package generators over calling these alone unless debugging I/O.
 - `readFSLUT` and `get_volume_centers` require a working FreeSurfer install and environment.
 - `get_volume_centers` shells out; sandbox/CI without FS will fail.
 - Label ASCII is not a mesh; do not pass it to the segmentation surface reader.
+- These readers only parse/import metadata and geometry; they do not create Zeffiro meshes or modify a live `zef` session.
 
 ## Developer guidance
 
