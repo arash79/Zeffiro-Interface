@@ -1,3 +1,5 @@
+# tools/plugins/FindSyntheticSourceLegacy
+
 ## Folder purpose
 
 The **default-profile** synthetic-source window: a short list of dipoles (position, orientation, amplitude, noise) projected through `zef.L` onto the nearest source points. Writes a **single time sample** to `zef.measurements` (no pulse train). Noise is a linear fraction of `max(abs(meas))`, not dB.
