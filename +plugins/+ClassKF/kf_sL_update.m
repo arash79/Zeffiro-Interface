@@ -1,4 +1,5 @@
-function [m, P, K, D] = kf_sL_update(m, P, y, H, R)
+% function [m, P, K, D] = kf_sL_update(m, P, y, H, R)
+function [m, P, K, D] = kf_sL_update(m, P, y, H, R, method)
 %KF_SL_UPDATE  Kalman update plus sLORETA standardization matrix D.
 %
 %   Zeffiro Interface.
@@ -15,7 +16,7 @@ function [m, P, K, D] = kf_sL_update(m, P, y, H, R)
 %
 %   See also plugins.ClassKF.kf_sL_update_approx, plugins.ClassKF.kf_update.
 
-method = '1';  % 1: sqrtm; 2: SVD-based (for singular/near-singular P)
+% method = '1';  % 1: sqrtm; 2: SVD-based (for singular/near-singular P)
 if method == '1'
     P_sqrtm = sqrtm(P);
     B = H * P_sqrtm;
