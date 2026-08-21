@@ -1,3 +1,5 @@
+# tools/plugins/NSE_tool
+
 ## Folder purpose
 
 Opens a window for hemodynamic Poisson / Navier–Stokes-style solves on vessel compartments of the current FEM mesh. It does **not** compute an EEG lead field. Results are stored on `zef.nse_field`. The PDE lives in `src/forward/nse/`; this plugin is the UI.
