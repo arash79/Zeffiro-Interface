@@ -1,3 +1,5 @@
+# tools/plugins/IASROIInversion
+
 ## Folder purpose
 
 IAS MAP restricted to a region of interest (sphere, threshold, or parcellation). Use when an approximate focus is known and the hierarchical Bayes update should run only there. There is no `inverse.*Inverter` for this ROI variant.
