@@ -1,3 +1,5 @@
+# tools/plugins/dataBank
+
 ## Folder purpose
 
 A tree of named snapshots (lead field, measurements, noise, reconstruction, GMM, custom, import). Use it to keep several `L` / data sets in one project and load one back onto `zef`, or combine selected lead fields into the current `zef.L` / `zef.measurements`.
