@@ -1,3 +1,4 @@
+# src/visualization
 ## Folder purpose
 
 Small plotting helpers used by the **Mesh visualization tool** (histogram-style graphs on `h_axes1`) and by the **Parcellation tool** (**Plot** button). Not the main 3-D renderer — volume/surface drawing is `src/gui/plot` (`zef_plot_volume`, `zef_visualize_volume`, …).
