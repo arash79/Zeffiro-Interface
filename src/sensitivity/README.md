@@ -1,3 +1,4 @@
+# src/sensivity
 ## Folder purpose
 
 Monte-Carlo probe of an inverse method on an existing `zef` (lead field + sources + measurements), without replacing `zef.reconstruction` on the main path. **Not** the EIT Sensitivity plugin (`tools/plugins/EITSensitivityTool`). Study scripts under `+examples/+studies/+santtus_peeling_article` use older `zef_sensitivity_map_*` helpers instead of this file.
