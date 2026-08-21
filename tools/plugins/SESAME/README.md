@@ -1,3 +1,5 @@
+# tools/plugins/SESAME
+
 ## Folder purpose
 
 Stochastic sampling of discrete dipole configurations (SESAME). Use it when you want a small number of equivalent dipoles with posterior samples rather than a dense grid map.
