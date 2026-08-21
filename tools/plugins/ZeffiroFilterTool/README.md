@@ -1,3 +1,5 @@
+# tools/plugins/ZeffiroFilterTool
+
 ## Folder purpose
 
 Builds an ordered pipeline of FIR/IIR, referencing, epoching, and channel stages, then runs that pipeline on imported **raw** time series. Inverse tools still read `zef.measurements` (and optionally `zef.noise_data`); this window is how you get from a `.mat`/`.dat` dump to those fields.
