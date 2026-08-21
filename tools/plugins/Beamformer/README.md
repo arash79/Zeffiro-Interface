@@ -1,3 +1,4 @@
+# tools/plugins/Beamformer
 ## Folder purpose
 
 Spatial-filter beamformer plugin (LCMV, unit-noise-gain, unit-gain, scalar UNG) that scans the source grid. Use it for covariance-based localization rather than a distributed Tikhonov map.
