@@ -1,3 +1,4 @@
+# cluster — examples
 ## Folder purpose
 
 Cluster inverse examples: submit class inverse jobs after you already have a `zef` with `L` and measurements. Functions, not GUI demos. Need `parallel.Cluster` (Parallel Computing Toolbox).
