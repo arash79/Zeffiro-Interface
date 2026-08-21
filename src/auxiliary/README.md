@@ -1,3 +1,4 @@
+# src/auxiliary
 ## Folder purpose
 
 One-off analysis, sphere-model lead fields, MRI affine helpers, and mesh-distance utilities that are **not** on the main Zeffiro menus. Nothing here is opened by `zef_start`. Use from the MATLAB prompt or from study scripts under `+examples`.
