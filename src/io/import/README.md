@@ -1,3 +1,4 @@
+# src/io/import
 ## Folder purpose
 
 Three functions that turn a **live Brainstorm MATLAB session** (subject surfaces, channel file, scouts) into millimetre arrays Zeffiro already understands. They are **not** on the Zeffiro menu bar and do **not** open a `.zef` project by themselves. The full converter users run is `utilities.brainstorm2zef.run` (`+utilities/+brainstorm2zef`), which calls these adapters after Brainstorm has a subject loaded.
