@@ -1,3 +1,5 @@
+# tools/plugins/HBSampler
+
 ## Folder purpose
 
 Hierarchical Bayes MCMC / Gibbs sampler on source variances (same gamma / inverse-gamma family as IAS, but posterior samples instead of a MAP point). Use it when you want a Monte Carlo reconstruction rather than IAS iterations.
