@@ -1,3 +1,5 @@
+# tools/plugins/LFBankTool
+
 ## Folder purpose
 
 Stores several complete lead-field packages (`zef.lf_bank_storage{i}`: `L`, sensors, interpolation, measurements, noise, tag) and can **recompute** or **merge** them into the live `zef.L` / `zef.measurements`. Merge stacks rows (sensors) and applies a normalization from `m/lead_field_normalization_functions/`.
