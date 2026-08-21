@@ -1,5 +1,4 @@
 # tools/plugins/Kalman
-
 ## Folder purpose
 
 Discrete-time Kalman filter / RTS smoother on the source vector (`A = I`). Use it for time-resolved imaging when consecutive frames should share a process-noise prior. Optional DTI structural `Q` (`zef.kf_structural_Q_type` 1 FA, 2 tractography) is **this plugin only**, not `inverse.KalmanInverter`.
