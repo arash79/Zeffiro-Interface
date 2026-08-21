@@ -1,3 +1,4 @@
+# tools/plugins/ClassicalSparseMethods
 ## Folder purpose
 
 Classical sparse / standardized inverse methods: dSPM, sLORETA, 3D sLORETA, and Sparse Bayesian Learning on the processed lead field. Use dSPM/sLORETA for noise-normalized maps; use SBL for an iterative sparse posterior (`zef.csm_n_iter`, default 10).
