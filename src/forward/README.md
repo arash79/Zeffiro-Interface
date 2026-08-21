@@ -1,3 +1,4 @@
+# src/forward
 ## Folder purpose
 
 After segmented anatomy and a tetrahedral FEM mesh exist, this folder solves the **forward problem**: given a candidate source, what would the sensors measure? The answer is the lead-field matrix `zef.L`. Inverse methods read that matrix; they do not assemble it. Sensor-level FEM detail lives in [`lead_field/README.md`](lead_field/README.md).
