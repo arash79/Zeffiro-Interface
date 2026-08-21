@@ -1,3 +1,4 @@
+# `plugins.ClassKF` — KF for inversion
 ## Folder purpose
 
 Kalman numerical kernels (predict/update) used by `inverse.KalmanInverter.invert`. Not a user-facing inverse method: there is no registry id for this package.
