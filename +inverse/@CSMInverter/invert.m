@@ -12,7 +12,7 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
 %
 %   dSPM: z = d .* (P*f) with d_i = 1/sqrt((P S P')_ii),
 %   S = (10^(-SNR/20)^2 / theta0) I. sLORETA: extra /sqrt(theta0) and
-%   d from diag(P L). sLORETA 3D: per-source sqrtm(P_i L_i) solve; when
+%   d from diag(P L). sLORETA 3D: per-source 3×3 G^{-1/2} (G = P_i L_i); when
 %   source_direction_mode==2, constrained nodes (procFile.s_ind_4) get a
 %   scalar scale and free nodes get the 3×3 block. SBL: iterative gamma
 %   from whitened data covariance (cov(f') — one frame is rank-deficient
@@ -24,7 +24,7 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
 %   Inputs
 %     self  - CSMInverter. method_type is "dSPM"|"sLORETA"|"sLORETA 3D"|"SBL"
 %             (default "dSPM"). Uses theta0, signal_to_noise_ratio,
-%             precomputed_P / precomputed_d when precompute ran.
+%             precomputed_P / precomputed_d / precomputed_Minv when precompute ran.
 %     f     - n_sensors×1 frame from zef_getTimeStepClassObj (filtered).
 %     L     - n_sensors×n_dof lead field after zef_processLeadfields.
 %             Cartesian layout is [x-block, y-block, z-block], each of
@@ -64,11 +64,11 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
 
     end
 
-    % Initialize waitbar with a cleanup object that automatically closes the
-    % waitbar, if there is an interruption with Ctrl + C or when this function
-    % exits.
-
-    if self.number_of_frames <= 1
+    % Nested waitbar: dSPM / SBL keep the historical 1-frame figure.
+    % sLORETA and sLORETA 3D skip it — creating the uifigure dominates the
+    % solve, and utilities.inverse.run_frame_loop already reports frame progress.
+    h = [];
+    if self.number_of_frames <= 1 && ~ismember(self.method_type, ["sLORETA", "sLORETA 3D"])
         h = zef_waitbar(0,'CSM Reconstruction.');
         cleanup_fn = @(wb) close(wb);
         cleanup_obj = onCleanup(@() cleanup_fn(h));
@@ -76,14 +76,25 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
 
     % Get needed parameters from self and others.
 
-    number_of_frames = self.number_of_frames;
     std_lhood = 10^(-self.signal_to_noise_ratio/20);
     n_interp = length(procFile.s_ind_0);
 
     % Then start inverting.
 
     theta0 = self.theta0;
-    %[theta0] = zef_find_gaussian_prior(snr_val-pm_val,L,size(L,2),self.data_normalization_method,0);
+
+    % The caches are only valid for the lead field and the method_type /
+    % theta0 / SNR they were built with. Dropping them here keeps a settings
+    % change after precompute from silently mixing an old P with a new
+    % /sqrt(theta0) scaling, or from reusing the dSPM standardization vector
+    % 1/sqrt((P S P')_ii) where sLORETA needs 1/sqrt((P L)_ii).
+    if ~isempty(self.precomputed_P) ...
+            && ~isequaln(self.precomputed_cache_key, self.cacheKey(L))
+        self.precomputed_P = [];
+        self.precomputed_d = [];
+        self.precomputed_Minv = [];
+        self.precomputed_cache_key = struct([]);
+    end
 
     if ismember(self.method_type, ["dSPM" ; "sLORETA" ; "sLORETA 3D"])
 
@@ -119,14 +130,9 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
                 d = self.precomputed_d;
             end
             % sLORETA: extra /sqrt(θ₀) so the resolution matrix is identity at each source
-            z_vec = d.*P*f/sqrt(theta0);
+            z_vec = d.*(P*f)/sqrt(theta0);
 
         else
-
-            if number_of_frames <=1
-                tic;
-                time_val = toc;
-            end
 
             z_vec = P * f;
 
@@ -139,49 +145,19 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
             if source_direction_mode == 2
 
                 r_ind = setdiff(1:n_interp,procFile.s_ind_4);
-                surf_ind = procFile.s_ind_4+[0,n_interp,2*n_interp];
-                surf_ind=surf_ind(:);
+                [sx, sy, sz] = zef_interleaved_source_columns(procFile.s_ind_4);
+                surf_ind = [sx; sy; sz];
                 M = 1./sqrt(sum(P(surf_ind,:).'.*L(:,surf_ind),1))';
                 z_vec(surf_ind) = M.*z_vec(surf_ind);
-
-                for i = 1:length(r_ind)
-
-                    if number_of_frames <= 1 && i > 1
-                        date_str = datestr(datevec(now+(n_interp/(i-1) - 1)*time_val/86400)); %what does that do?
-                    end
-
-                    ind = r_ind(i)+[0,n_interp,2*n_interp];
-                    M = sqrtm(P(ind,:)*L(:,ind));
-                    z_vec(ind) = (M\z_vec(ind));
-
-                    if number_of_frames <= 1 && i > 1
-                        zef_waitbar(i/n_interp,h,['Step ' int2str(i) ' of ' int2str(n_interp) '. Ready: ' date_str '.' ]);
-                    end
-
-                end % for
-
-                z_vec = z_vec/sqrt(theta0);
+                z_vec = i_sloreta3d_apply(z_vec, P, L, n_interp, r_ind, self.precomputed_Minv);
 
             else
 
-                for i = 1:n_interp
-
-                    if number_of_frames <= 1 && i > 1
-                        date_str = datestr(datevec(now+(n_interp/(i-1) - 1)*time_val/86400)); %what does that do?
-                    end
-
-                    ind = [i,i+n_interp,i+2*n_interp];
-                    M = sqrtm(P(ind,:)*L(:,ind));
-                    z_vec(ind) = M\z_vec(ind);
-
-                    if number_of_frames <= 1 && i > 1
-                        zef_waitbar(i/n_interp,h,['Step ' int2str(i) ' of ' int2str(n_interp) '. Ready: ' date_str '.' ]);
-                    end
-                end
-
-                z_vec = z_vec/sqrt(theta0);
+                z_vec = i_sloreta3d_apply(z_vec, P, L, n_interp, 1:n_interp, self.precomputed_Minv);
 
             end % if
+
+            z_vec = z_vec/sqrt(theta0);
 
         end % if
 
@@ -237,3 +213,25 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
     end
 
 end % function
+
+function z_vec = i_sloreta3d_apply(z_vec, P, L, n, src_inds, Minv_all)
+src_inds = src_inds(:);
+if isempty(src_inds)
+    return
+end
+if ~isempty(Minv_all) && size(Minv_all, 1) == 3 && size(Minv_all, 3) == n
+    Minv = Minv_all(:, :, src_inds);
+else
+    Minv = zef_sloreta3d_build_minv(P, L, src_inds);
+end
+[ix, iy, iz] = zef_interleaved_source_columns(src_inds);
+ns = numel(src_inds);
+z3 = zeros(3, 1, ns);
+z3(1, 1, :) = z_vec(ix);
+z3(2, 1, :) = z_vec(iy);
+z3(3, 1, :) = z_vec(iz);
+z3 = pagemtimes(Minv, z3);
+z_vec(ix) = z3(1, 1, :);
+z_vec(iy) = z3(2, 1, :);
+z_vec(iz) = z3(3, 1, :);
+end

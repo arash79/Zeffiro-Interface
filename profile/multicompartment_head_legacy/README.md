@@ -8,7 +8,7 @@ Head **startup profile** whose segmentation INI is **pre-seeded** with a 25-comp
 
 | File | Difference vs `multicompartment_head` |
 |------|----------------------------------------|
-| `zeffiro_segmentation.ini` | Populated tags `sc,sk,c,g,w,d1…d22` with colours, activity (`g` unconstrained field, `w` active surface), and σ (skin 0.43, skull 0.0064, CSF 1.79, grey 0.33, white 0.14) |
+| `zeffiro_segmentation.ini` | Populated tags `sc,sk,c,g,w,d1…d22` with colours, activity (`g` `_sources=1` Constrained field, `w` `_sources=3` Active surface), and σ (skin 0.43, skull 0.0064, CSF 1.79, grey 0.33, white 0.14) |
 | `zeffiro_plugins.ini` | Adds **EXP IAS RAMUS** (`exp_ias_map_estimation_multires`); drops SL1, EXP Lasso, DTI, synthetic source patch; keeps dual GMM, Kalman, NSE |
 | `zeffiro_parameters.ini` | Same σ-on / ρ-off layout as the default head profile |
 | `zeffiro_forward_simulation.ini` | Same EEG/MEG/EIT/tES isotropic+anisotropic table as the default head |
@@ -39,4 +39,4 @@ Parent: [`../README.md`](../README.md).
 
 ## Developer guidance
 
-When editing the 25-row table, keep tag/order conventions compatible with `zef_init_compartments`. Coordinate EXP IAS RAMUS callback names with `tools/plugins/EXP/`. Parent: [`../README.md`](../README.md).
+When editing the 25-row table, keep tag/order conventions compatible with `zef_init_compartments`. Coordinate EXP IAS RAMUS callback names with `plugins/EXP/`. Parent: [`../README.md`](../README.md).

@@ -43,11 +43,21 @@ interp.}), \ccode{zef\_source\_interpolation} fills
 Gravity lead fields (asteroid profiles) bypass this integer dispatcher.
 
 EEG/EIT/TES assemble a sparse stiffness \(A\), couple electrodes
-(\ccode{zef\_build\_electrodes}: PEM if the electrode array has 3 columns,
-CEM if 4), PCG-solve the transfer with \ccode{zef\_transfer\_matrix}, then
+(\ccode{zef\_build\_electrodes}), PCG-solve the transfer with
+\ccode{zef\_transfer\_matrix} (EEG/TES) or an inlined copy (EIT), then
 form \(L\) from interpolation \(G\) or, for TES, from
 \ccode{zef\_tetra\_gradient\_field}. Nodes must already be in metres inside
 those FEM cores; the wrappers convert using \ccode{location\_unit}.
+
+The FEM \ccode{electrodes} argument is not the same array as
+\ccode{zef.sensors}. Session sensors are \(N\times 3\) (PEM, \(xyz\)) or
+\(N\times 6\) (CEM: \(xyz\), radii, impedance). After
+\ccode{zef\_attach\_sensors\_volume}, PEM becomes snapped \(xyz\) which the
+dispatcher divides by 1000 (mm\(\to\)m). CEM becomes a four-column
+\textbf{index} table \([e, n_1, n_2, n_3]\) and is \emph{not} divided by
+1000. The FEM then treats three columns as PEM and four columns as CEM.
+Impedance for CEM is copied from \ccode{zef.sensors(:,6)} into
+\ccode{lf\_param.impedances}.
 
 DTI conductivity (\textbf{Forward tools \(\to\) DTI Conductivity Tool})
 writes the six-column tensor used by types \(6\)--\(10\). It does not write
@@ -68,10 +78,11 @@ the packed tensor \(xx,yy,zz,xy,xz,yz\). DTI Apply to Mesh fills those
 columns.}
 
 \zeffield{sensors}{:,3 or 6}{double}{}{Sensor geometry in the mesh frame.
-PEM: \(N\times 3\) positions. CEM import (\ccode{core.io.electrodes}) may
-be \(N\times 6\) (\(xyz\), inner radius, outer radius, impedance in ohms).
-After attachment, EEG FEM sees PEM as \(N\times 3\) or CEM as an index
-table with 4 columns.}
+PEM: \(N\times 3\) positions. CEM import (\ccode{core.io.electrodes}) is
+\(N\times 6\) (\(xyz\), inner radius, outer radius, impedance in ohms).
+This is \emph{not} what the FEM cores receive. After attachment, EEG/EIT/TES
+see PEM as snapped \(xyz\) in metres, or CEM as an index table with 4
+columns \([e, n_1, n_2, n_3]\).}
 
 \zeffield{lead\_field\_type}{1,1}{double}{}{Integer \(1\)--\(10\) as in the
 table above. Gravity scripts set a separate \ccode{gravity\_field\_type}.}
@@ -104,20 +115,26 @@ count is \ccode{size(source\_positions,1)}.}
 depth (millimetres in the interpolation helpers) so sources are not placed
 on the outermost layer of active tissue.}
 
-\zeffield{location\_unit}{1,1}{double}{}{\(1\) metres, \(2\) centimetres,
-\(3\) millimetres. Source interpolation converts positions toward
-millimetres internally.}
+\zeffield{location\_unit}{1,1}{double}{}{\(1\) millimetres, \(2\) centimetres,
+\(3\) metres (Mesh tool dropdown \ccode{mm}/\ccode{cm}/\ccode{m} in
+\ccode{zef\_mesh\_tool}). After FEM (metres), \ccode{zef\_lead\_field\_matrix}
+scales \ccode{source\_positions} by \(1000\), \(100\), or \(1\). Interpolation
+searches against \ccode{nodes} in millimetres.}
 
 \zeffield{location\_unit\_current}{1,1}{double}{}{Unit currently stored on
 \ccode{source\_positions} during interpolation.}
 
-\zeffield{preconditioner}{1,1}{double}{}{PCG preconditioner in the FEM
-transfer: \(1\) incomplete Cholesky, \(2\) SSOR. Default in
-\ccode{zef\_init} is \(2\). The package
-\ccode{core.linalg.preconditioners} is not yet this call site.}
+\zeffield{preconditioner}{1,1}{double}{}{CPU PCG preconditioner for the
+electrode-transfer solve: \(1\) incomplete Cholesky
+(\ccode{ichol} with type \ccode{nofill}), \(2\) SSOR. Default in
+\ccode{zef\_init} is \(2\). EEG and TES call
+\ccode{zef\_transfer\_matrix}; MEG and EIT inline the same loops.
+On GPU the field is ignored and the iteration uses Jacobi
+(\(1./\mathrm{diag}(A)\)).}
 
-\zeffield{preconditioner\_tolerance}{1,1}{double}{}{Drop tolerance for
-incomplete Cholesky when that preconditioner is selected.}
+\zeffield{preconditioner\_tolerance}{1,1}{double}{}{Copied to
+\ccode{lf\_param.cholinc\_tol}. The live PCG does not read it:
+incomplete Cholesky is no-fill, with no drop-tolerance argument.}
 
 \zeffield{solver\_tolerance}{1,1}{double}{}{Relative residual for
 \ccode{zef\_transfer\_matrix} PCG (default \(10^{-6}\)). A column that

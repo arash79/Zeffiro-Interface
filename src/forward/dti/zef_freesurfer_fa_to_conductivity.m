@@ -12,11 +12,11 @@ function conductivity_tensor = zef_freesurfer_fa_to_conductivity(fa_data, model_
 %   anisotropy_threshold become isotropic.
 %
 %   model_type
-%     1  volume fraction: σ_iso = vf*σ_i + (1-vf)*σ_e, σ_par = σ_iso(1+2 FA),
-%        σ_perp = σ_iso(1-FA)
+%     1  volume fraction: σ_iso = vf*σ_i + (1-vf)*σ_e, σ_par = σ_iso(1+2 α),
+%        σ_perp = σ_iso(1−α) with α = Westin C_L from FA
 %     2  Tuch effective medium: σ = 0.844*(d - 0.124) S/m with
-%        d_par = MD(1+2 FA), d_perp = MD(1-FA); MD default 0.7 μm²/ms
-%     3  direct scaling: σ_par = scale*(1+2 FA), σ_perp = scale*(1-FA)
+%        d_par = MD(1+2 α), d_perp = MD(1−α); MD default 0.7 μm²/ms
+%     3  direct scaling: σ_par = scale*(1+2 α), σ_perp = scale*(1−α)
 %
 %   conductivity_tensor = zef_freesurfer_fa_to_conductivity(fa_data, model_type, varargin)
 %
@@ -64,14 +64,16 @@ end
 
 fa_flat = fa_data(:);
 fa_flat = min(1, max(0, fa_flat));
+% FA is not Westin C_L. Uniaxial FA = √3 α / √(1+2α²) with α = C_L.
+alpha = zef_fa_to_westin_cl(fa_flat);
 low_fa = fa_flat < fa_min;
 
 % Model 1: Volume fraction (Tuch-style). Isotropic base from mixture;
 % anisotropy from FA with same eigenvectors; trace = 3*sigma_iso preserved.
 if model_type == 1
     sigma_iso = vf * sig_i + (1 - vf) * sig_e;
-    sigma_par = sigma_iso .* (1 + 2 * fa_flat);
-    sigma_perp = sigma_iso .* (1 - fa_flat);
+    sigma_par = sigma_iso .* (1 + 2 * alpha);
+    sigma_perp = sigma_iso .* (1 - alpha);
     sigma_par(low_fa) = sigma_iso;
     sigma_perp(low_fa) = sigma_iso;
 end
@@ -82,8 +84,8 @@ end
 k_tuch = 0.844;   % S·s/mm³ → with d in μm²/ms gives sigma in S/m: 0.844 (d_um2_ms)
 d_eps = 0.124;    % μm²/ms
 if model_type == 2
-    d_par = md .* (1 + 2 * fa_flat);
-    d_perp = md .* (1 - fa_flat);
+    d_par = md .* (1 + 2 * alpha);
+    d_perp = md .* (1 - alpha);
     sigma_par = k_tuch .* (d_par - d_eps);
     sigma_perp = k_tuch .* (d_perp - d_eps);
     sigma_par(low_fa) = k_tuch * (md - d_eps);
@@ -96,8 +98,8 @@ end
 
 % Model 3: Direct scaling
 if model_type == 3
-    sigma_par = scale .* (1 + 2 * fa_flat);
-    sigma_perp = scale .* (1 - fa_flat);
+    sigma_par = scale .* (1 + 2 * alpha);
+    sigma_perp = scale .* (1 - alpha);
     sigma_par(low_fa) = scale;
     sigma_perp(low_fa) = scale;
 end

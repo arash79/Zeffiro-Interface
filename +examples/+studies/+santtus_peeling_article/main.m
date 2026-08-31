@@ -24,6 +24,20 @@ function [ sensitivities_with_statistics, L ] = main ( ...
 %   zef_eeg_lead_field), n_of_sources, source_model, build_reconstructions.
 %   In-memory zef is assignin('base','zef',...) for legacy tools.
 %
+%   Name-value args (defaults):
+%     use_gpu (false), build_mesh (false), mesh_resolution (3),
+%     build_lead_field (true; calls zef_eeg_lead_field, EEG isotropic only),
+%     n_of_sources (10000), acceptable_source_depth (0),
+%     optimization_system_type ("pbo"), source_model (Hdiv),
+%     build_reconstructions (true), lead_field_filter_quantile (1),
+%     zef (struct()) — non-empty struct skips open_project.
+%
+%   Side effects: may mesh, rebuild L, open the MNE tool window, assignin
+%   base zef when using the in-memory path.
+%
+%   See also examples.studies.santtus_peeling_article.helpers.zef_rec_diff.
+
+    arguments
 
         project_path (:,:) char = char.empty(0,0)
 
@@ -71,13 +85,12 @@ function [ sensitivities_with_statistics, L ] = main ( ...
 
     if not(use_in_memory_zef)
         if isempty(strtrim(string(project_path)))
-            error("examples.studies.santtus_peeling_article:MissingProject", ...
+            error("examples:studies:santtus_peeling_article:MissingProject", ...
                 "Provide project_path to a .mat file, or pass name-value zef=... with a non-empty project struct.");
         end
         % Load an initial project struct from the given path.
         project_struct = zeffiro_interface( ...
             'start_mode','nodisplay', ...
-            'use_github', false, ...
             'use_gpu', args.use_gpu, ...
             'open_project', project_path ...
         );

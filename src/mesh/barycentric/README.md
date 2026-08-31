@@ -2,19 +2,18 @@
 
 ## Folder purpose
 
-Sparse **P1 finite-element assemblers** built from linear hat functions on tetrahedra and boundary faces. The live physics consumer is the **NSE / microcirculation** stack (`src/forward/nse` and `tools/plugins/NSE_tool`). EEG/MEG/EIT stiffness assembly uses `src/mesh/operators/zef_stiffness_matrix.m`, **not** this folder. Visualization does not call these assemblers.
+Sparse **P1 finite-element assemblers** built from linear hat functions on tetrahedra and boundary faces. The live physics consumer is the **NSE / microcirculation** stack (`src/forward/nse` and `plugins/NSE_tool`). EEG/MEG/EIT stiffness assembly uses `src/mesh/operators/zef_stiffness_matrix.m`, **not** this folder. Visualization does not call these assemblers.
 
 ## Main contents
 
 | Role | Files |
 |------|--------|
-| Core geometry | `zef_volume_barycentric`, `zef_barycentric_weighting`, `zef_3by3_solver` |
-| Volume mass / Laplacian / coupling | `zef_volume_scalar_matrix`, `_FF`, `_GG`, `_FG`, `_DD`, `_D`, `_FFG`, `_GFu` |
-| Volume vectors / constants | `zef_volume_scalar_vector`, `_F`, `_CC`, `_GCC`, `_Kx` |
-| Diagonal / matrix-free | `zef_volume_scalar_diagonal_matrix`, `_FF`, `zef_volume_scalar_matrix_uFG` |
-| Surface integrals | `zef_surface_scalar_matrix*` (`_FF`, `_FG`, `_D`, `_DD`, `_n`, `_Dn`, `_FFn`, `_FGn`, …) and surface vectors `_F`, `_Fn` |
+| Core geometry | `zef_volume_barycentric`, `zef_barycentric_weighting`, `zef_3by3_solver`, `zef_determinant` |
+| Volume mass / Laplacian / coupling | `zef_volume_scalar_matrix`, `_FF`, `_GG`, `_FG`, `_DD`, `_D` |
+| Volume load | `zef_volume_scalar_vector_F` |
+| Surface integrals | `zef_surface_scalar_matrix`, `_FF`, `_n`, `_Dn`; vectors `_F`, `_Fn` |
 
-Letter codes in names: **F** = hat, **G/D** = gradient component, **n** = face normal, **C** = constant field, **u** = auxiliary nodal field.
+Letter codes in names: **F** = hat, **G/D** = gradient component, **n** = face normal.
 
 ## Code functionality
 
@@ -34,7 +33,7 @@ nodes/tetra
     → NSE_tool Solve / perfusion plots
 ```
 
-`zef_3by3_solver` is also reused outside NSE for geometry predicates: `zef_source_tetra`, `zef_inflate_surfaces`, `zef_find_intersecting_triangle`.
+`zef_3by3_solver` is also reused outside NSE for geometry predicates: `zef_source_tetra`, `zef_inflate_surfaces`, `zef_find_intersecting_triangle`. `zef_determinant` is the vectorized 3×3 determinant used by `zef_attach_sensors_volume` for barycentric λ of a point sensor inside a tet.
 
 **Not** on the EEG lead-field FEM path. Sensor burial barycentric λ values live elsewhere (`zef_attach_sensors_volume`).
 
@@ -45,7 +44,6 @@ Prefer calling through NSE helpers rather than assembling ad hoc:
 ```matlab
 % Typical production path (inside NSE):
 %   zef_nse_matrices → volume FF/GG/FG + surface _n/_Dn
-% Direct experiment (advanced):
 [b_coord, det] = zef_volume_barycentric(nodes, tetra, p_ind, []);
 W = zef_barycentric_weighting();
 M = zef_volume_scalar_matrix_FF(nodes, tetra, ...);  % see file headers for args
@@ -54,7 +52,6 @@ M = zef_volume_scalar_matrix_FF(nodes, tetra, ...);  % see file headers for args
 ## Important notes
 
 - Gradients from `zef_volume_barycentric` already include the 1/V factor; GG weighting is therefore `1`.
-- Several wrappers (`*_uFG`, `*_Kx`, `*_CC`, some surface variants) have **no first-party callers** today — treat as library extras.
 - Do not redirect EEG stiffness through this folder without an explicit design change and tests.
 
 ## Developer guidance

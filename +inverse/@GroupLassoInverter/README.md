@@ -1,24 +1,22 @@
 # inverse.GroupLassoInverter
 
-## Folder purpose
+Group LASSO penalizes the ℓ₂ norm of each 3-component source together, so a location is either on (all three components) or off, rather than shrinking axes independently. The MAP loop calls `LG_optimization` in `plugins/EXP/common`.
 
-Class package for **group-LASSO MAP** (ℓ₂ over 3-DOF source blocks) via `LG_optimization` from the EXP plugin common library. Registry ids: `grouplasso`, `group_lasso`. Not wired to a dedicated Inverse-tools menu button as a class; related GUI path is EXP / Lasso plugins.
+Registry ids: `grouplasso`, `group_lasso`. Inverse tools → Group Lasso opens a class-inverter dialog. Related legacy GUI remains EXP / Lasso.
 
 ## Main contents
 
 | File | Role |
 |------|------|
-| `GroupLassoInverter.m` | `estimation_type` (IAS/EM/Standardized), hyperpriors, L1 iteration counts, multires flags |
+| `GroupLassoInverter.m` | `estimation_type` (IAS/EM/Standardized), hyperpriors, L1 iteration counts |
 | `initialize.m` | `noise_cov` + dynamic `SNR_variable` |
 | `invert.m` | MAP loop calling `LG_optimization`; updates `gamma = β/(θ₀ + ‖z‖₂)` |
 
-Constructor currently forces `use_multiresolution = false`. A `make_multires_dec` helper may reference RAMUS property names incorrectly if enabled.
-
 ## Code functionality
 
-**Dependencies:** `tools/plugins/EXP/common/LG_optimization.m` must be on the MATLAB path (plugins path is added by `zeffiro_interface`).
+**Dependencies:** `plugins/EXP/common/LG_optimization.m` must be on the MATLAB path (plugins path is added by `zeffiro_interface`).
 
-**Inputs:** Unlike single-column inverters, this path often passes **matrix** `f_data` (all frames) into optimization helpers — match the signature expected by `invert.m`.
+**Inputs:** `run_frame_loop` calls `invert` once per frame with a single measurement column. `procFile`, `source_direction_mode`, and `source_positions` are unused here (kept for the shared inverter signature). `size(L,2)` must be a multiple of 3. Partial NaNs in a MAP iterate are replaced by the mean of finite `|z|` (one warning); an all-NaN iterate errors.
 
 **Key defaults:** `estimation_type="IAS"`, `hyperprior_mode="Sensitivity weighted"`, `beta=3`, `theta0=1e-10`, `n_map_iterations=25`, `n_L1_iterations=5`.
 
@@ -38,12 +36,9 @@ GUI-related: EXP App / Standardized L1–L2 Lasso menus call legacy `exp_iterati
 
 ## Important notes
 
-- Multiresolution support is **disabled / incomplete** in the constructor — do not rely on `use_multiresolution=true` without fixing `make_multires_dec`.
 - Heavy dependency on EXP common optimizers — keep plugins on path even for “class-only” scripts.
-- No dedicated `ClassVsLegacyTest` entry may exist yet for this id.
 
 ## Developer guidance
 
-- Fix or remove broken multires hooks before advertising them in docs or menus.
 - When migrating EXP GUI to class API, map estimation_type strings carefully.
 - Prefer extending `LG_optimization` over copying IRLS loops into `invert.m`.

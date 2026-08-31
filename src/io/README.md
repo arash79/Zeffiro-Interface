@@ -2,7 +2,7 @@
 
 ## Folder purpose
 
-Project **save/load** and Import/Export menu helpers for anatomy, sensors, figures, and related artifacts. Electrode CSV/DAT parsers are **`core.io.electrodes`** (not here). Dialog wrappers `zef_import` / `zef_inv_import` live in **`src/gui/helpers`**. Session text logs are under **`data/log/`** (not this folder).
+Project **save/load** and Import/Export menu helpers for anatomy, sensors, figures, and related artifacts. Electrode CSV/DAT parsers are **`core.io.electrodes`** (not here). Measurement/reconstruction import dialogs live in **`zef_inv_import`** in this folder. Session text logs are under **`data/log/`** (not this folder).
 
 ## Main contents
 
@@ -11,17 +11,17 @@ Project **save/load** and Import/Export menu helpers for anatomy, sensors, figur
 | File | Role |
 |------|------|
 | `zef_save.m` | `save_switch` 1–10: full project, L, sources, sensors, segmentation, volume, overwrite save, reconstruction, figures, print |
-| `zef_save_nodisplay.m` | **Script** headless save |
 | `zef_save_system_settings.m` | **Script** → system INI |
 | `zef_save_plugin_settings.m` | **Script** → plugin INI |
 
-Project saves strip GUI handles (`zef_remove_object_handles`), close tools/figs, write `-v7.3`, may reopen mesh tools.
+Project saves strip GUI handles (`zef_remove_object_handles`), close tools/figs, write `-v7.3`, may reopen mesh tools. `zef_load` expands a legacy one-struct MAT in memory and does **not** rewrite that file (upstream `load`+`save('-struct','zef_data')` could replace the project with an empty session).
 
 ### Load
 
 | File | Role |
 |------|------|
 | `zef_load.m` | Open project MAT; `zef_start_new_project`; batched load; rebuild sensors/compartments/GUI; converts legacy single-var MAT |
+| `zef_merge_project_data.m` | Copy scientific fields from loaded MAT onto live `zef` while **preserving** live unified-shell figures / uicontrols / App objects (strips stale handles from the file) |
 
 ### Import
 
@@ -29,14 +29,16 @@ Project saves strip GUI handles (`zef_remove_object_handles`), close tools/figs,
 |------|------|
 | `zef_import_segmentation.m` | Modern `.zef`/`.mat` manifest (`box`/`segmentation`/`sensors`/`struct`/`script`) |
 | `zef_import_segmentation_legacy.m` | Old 12-column `.zef` |
-| `zef_import_project.m` | ASCII project index |
 | `zef_import_mat_struct.m` | Merge arbitrary MAT fields |
+| `zef_inv_import.m` | **Script.** Import → measurement data / reconstruction / current pattern / noise (`inv_import_type` 1–4). `uigetfile` `.mat`/`.dat`. |
 | `zef_import_sensor_names.m` | **Script** DAT names → sensor table |
 | `zef_import_resection_points.m` | **Script** resection coords |
 | `zef_import_figure.m` | `.fig` → Figure tool |
 | `zef_import_asc.m` | One-line ASC numeric parse |
-| `zef_import_surface_mesh_type.m` | STL/DAT type picker dialog |
 | `zef_import_parcellation_colortable.m` / `_points.m` | Parcellation tool |
+| `zef_get_mesh.m` | Load a surface file into points / triangles / `submesh_ind` (`points` / `triangles` / `stl` / `asc`). Used by compartment import and sensor-point loaders. |
+| `zef_get_surface_mesh.m` | **Script.** Compartment-table **Import surface mesh** (STL/DAT) via `zef_get_mesh(..., 'full')`. |
+| `zef_replace_project_fields.m` | **Script.** Rename legacy project fields after load (`current_version` ≤ 2.2 priorities; `< 4` `brain_ind` → `active_compartment_ind`). |
 
 ### Export
 

@@ -49,13 +49,11 @@ switch id
 
     case "halpr"
         capability.strategy = "iterative_static";
-        capability.prep_hooks = "halpr_decomposition";
-        capability.notes = "Hierarchical adaptive Lp regression; sensitivity preflight auto-builds the multiresolution decomposition when use_multiresolution is true.";
+        capability.notes = "Hierarchical adaptive Lp regression; bounded batches are correct.";
 
     case {"grouplasso", "group_lasso"}
         capability.strategy = "iterative_static";
-        capability.prep_hooks = "grouplasso_decomposition";
-        capability.notes = "Group Lasso IAS iterations; sensitivity preflight auto-builds the multiresolution decomposition when use_multiresolution is true.";
+        capability.notes = "Group Lasso IAS iterations; bounded batches are correct.";
 
     case {"kalman", "kf"}
         capability.strategy = "stateful_dynamic";

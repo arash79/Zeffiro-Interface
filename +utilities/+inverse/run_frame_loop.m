@@ -46,12 +46,12 @@ end
 z_inverse = cell(1, MethodClassObj.number_of_frames);
 f_data = zef_getFilteredDataClassObj(zef, MethodClassObj);
 if isempty(f_data)
-    error("utilities.inverse:run_frame_loop:EmptyData", ...
+    error("utilities:inverse:run_frame_loop:EmptyData", ...
         "No measurement data were returned for inv_data_mode '%s'.", ...
         string(zef.inv_data_mode));
 end
 if MethodClassObj.number_of_frames > size(f_data, 2)
-    error("utilities.inverse:run_frame_loop:FrameCountExceedsData", ...
+    error("utilities:inverse:run_frame_loop:FrameCountExceedsData", ...
         "number_of_frames=%d exceeds the available measurement frames (%d).", ...
         MethodClassObj.number_of_frames, size(f_data, 2));
 end
@@ -67,7 +67,7 @@ if ismethod(MethodClassObj,'initialize')
             'UniformOutput', false ...
         ));
     end
-    MethodClassObj = MethodClassObj.initialize(L, f_data_framed);
+    MethodClassObj = i_initialize(MethodClassObj, L, f_data_framed, source_direction_mode);
 end
 
 if ismethod(MethodClassObj,'precompute')
@@ -114,6 +114,24 @@ for f_ind = 1:MethodClassObj.number_of_frames
     z_inverse{f_ind} = z_vec;
 end
 
+end
+
+function MethodClassObj = i_initialize(MethodClassObj, L, f_data, source_direction_mode)
+%I_INITIALIZE Call initialize with source_direction_mode when supported.
+%
+% Kalman / MNE depth weights group interleaved Cartesian triples for
+% modes 1–2 and per-column energy for mode 3. Older initialize methods
+% only accept (L, f_data).
+
+try
+    MethodClassObj = MethodClassObj.initialize(L, f_data, source_direction_mode);
+catch ME
+    if i_is_too_many_inputs(ME)
+        MethodClassObj = MethodClassObj.initialize(L, f_data);
+    else
+        rethrow(ME);
+    end
+end
 end
 
 function MethodClassObj = i_precompute(MethodClassObj, L, procFile)

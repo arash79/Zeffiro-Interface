@@ -1,42 +1,47 @@
-# external/SDPT3
+# `external/SDPT3`
 
-## Purpose of this folder
+## Folder purpose
 
-This folder is responsible for placeholder folders for optional external solver/toolbox submodules within the Zeffiro Interface project.
+Optional **SDPT3** semidefinite / second-order cone solver (git submodule). Used as a **CVX backend**, not as a Zeffiro-native inverse method. Empty until `zeffiro_setup` clones it. No first-party MATLAB in this folder.
 
-## Contents
+## Main contents
 
-This folder currently contains no tracked source or asset files. It is kept as a placeholder for runtime or optional dependency content.
+| Item | Role |
+|------|------|
+| Vendor tree (after clone) | SDPT3 MATLAB sources |
+| This README | How Zeffiro expects the submodule to exist |
 
-## How this folder fits into the overall workflow
+`.gitmodules`: `https://github.com/sqlp/sdpt3.git`, branch `master`. **No** `startupscript` (unlike CVX / FieldTrip).
 
-Zeffiro Interface starts in `zeffiro_interface.m`, adds the project runtime paths, and then calls into folders like this one as the GUI, examples, plugins, or numerical routines require placeholder folders for optional external solver/toolbox submodules.
+## Code functionality
 
-## GUI usage
+`zeffiro_setup` only `addpath('external/SDPT3')` when clone succeeds. ES Workbench `zef_cvx_linprog` / related wrappers call `cvx_solver('sdpt3')` when `ES_opt_solver` is the SDPT3 list entry. Direct `sqlp` calls from Zeffiro plugins are not the supported path.
 
-There is no direct GUI entry point here; these folders are dependency locations populated by setup when optional submodules are installed.
+## Workflow context
 
-## Programmatic usage
+```
+zeffiro_setup → addpath external/SDPT3
+  → CVX (external/CVX) selects sdpt3
+  → plugins/ZeffiroESWorkbench tES LP/SDP
+```
 
-From MATLAB, start from the project root and initialize paths with either `zeffiro_interface` or `addpath(genpath(projectRoot))` when you only need utility functions.
+Install CVX as well; SDPT3 alone does not provide `cvx_begin`.
 
-This folder has no directly callable MATLAB source files. Use the files here through the surrounding GUI, data import, profile, or documentation workflow.
+## Usage instructions
 
-## Examples
+```matlab
+zeffiro_setup("submodules", "SDPT3");
+% typical with CVX:
+zeffiro_setup("submodules", ["CVX"; "SDPT3"; "SeDuMi"]);
+```
 
-GUI example: use the surrounding Zeffiro workflow that references this folder's assets or configuration files.
+## Important notes
 
-MATLAB example: load or inspect these files with standard MATLAB I/O functions such as `load`, `readmatrix`, or `fileread` when appropriate.
+- Placeholder directory in a fresh clone is expected.
+- Keep vendor license with the cloned tree.
+- No Zeffiro `startupscript` — nothing is `run()` from `zef_start_config` for this folder.
 
-## Dependencies and assumptions
+## Developer guidance
 
-- The Zeffiro project root should be available on the MATLAB path before calling source files directly.
-- Many routines assume a populated `zef` struct created by `zeffiro_interface` and updated by GUI callbacks.
-- Optional dependency folders may be empty until `zeffiro_setup` initializes the configured submodules.
-
-## Notes for developers
-
-- Keep documentation synchronized with behavior when adding or moving files; this repository now expects every folder to have a current `README.md`.
-- Preserve numerical algorithms, GUI callback contracts, and `zef` field names unless a coordinated migration updates all callers.
-- Prefer package-qualified functions in `+...` folders and avoid adding package directories themselves directly to the MATLAB path.
-- Treat `.fig`, `.mlapp`, `.mat`, and sample data files as part of the public workflow: document required fields and formats when they change.
+- Do not vendor-patch SDPT3 inside this repo; bump the submodule commit if a fix is required.
+- Pitfall: selecting SDPT3 in ES Workbench without having cloned both CVX and SDPT3.

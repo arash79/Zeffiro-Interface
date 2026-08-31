@@ -8,12 +8,12 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
 %
 %   Called once per frame by utilities.inverse.run_frame_loop. Observation
 %   model is self.modified_L (per-source SVD U), not the original L, and
-%   the update is plugins.ClassKF.kf_update (ordinary KF), matching commit
+%   the update is inverse.kf.kf_update (ordinary KF), matching commit
 %   0b33ef8c. The NMM/UKF stage is not invoked here; the inversion driver
 %   calls smoother exactly once after the frame loop.
 %
 %   State carried on self: prev_step_reconstruction, prev_step_posterior_cov
-%   (required by plugins.ClassKF.class_kf_predict; the introducing class
+%   (required by inverse.kf.class_kf_predict; the introducing class
 %   stored only reconstruction / posterior_covs and therefore could not
 %   call class_kf_predict). Optional evolution_var consumes one column per
 %   frame into evolution_cov. If smoother_type is RTS or Sample RTS,
@@ -85,8 +85,10 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
     end
 
     if isprop(self, 'evolution_var') && ~isempty(self.evolution_var)
-        self.evolution_cov = diag(self.evolution_var(:, 1));
+        qv = self.evolution_var(:, 1);
         self.evolution_var(:, 1) = [];
+        nq = numel(qv);
+        self.evolution_cov = spdiags(qv(:), 0, nq, nq);
     end
     if isempty(self.evolution_cov)
         error("UKFNMMInverter:MissingEvolutionCov", ...
@@ -102,6 +104,9 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
         end
     end
     if use_gpu
+        if issparse(self.evolution_cov)
+            self.evolution_cov = full(self.evolution_cov);
+        end
         self.evolution_cov = gpuArray(self.evolution_cov);
         self.noise_cov = gpuArray(self.noise_cov);
         self.prev_step_posterior_cov = gpuArray(self.prev_step_posterior_cov);
@@ -110,8 +115,8 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
         f = gpuArray(f);
     end
 
-    [x, P] = plugins.ClassKF.class_kf_predict(self);
-    [x, P] = plugins.ClassKF.kf_update(x, P, f, self.modified_L, self.noise_cov);
+    [x, P] = inverse.kf.class_kf_predict(self);
+    [x, P] = inverse.kf.kf_update(x, P, f, self.modified_L, self.noise_cov);
 
     if i_wants_rts(self)
         self.posterior_covs = [self.posterior_covs, gather(P)];

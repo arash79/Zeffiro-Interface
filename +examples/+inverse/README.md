@@ -2,41 +2,67 @@
 
 ## Folder purpose
 
-Worked inverse demos for learners. Currently a single Kalman demonstration that drives the **legacy plugin** path (`zef_KF`), not `inverse.KalmanInverter`.
+Worked inverse demo for learners. The shipped script drives the **legacy Kalman plugin** (`zef_KF` in `plugins/Kalman/m`), not `inverse.KalmanInverter`. Use it to see synthetic EEG → reconstruction in one MATLAB file. Production / cluster Kalman should use `zef_inverse_run`.
 
 ## Main contents
 
 | File | Role |
 |------|------|
-| `zef_KalmanDemo.m` | Cell script: synth EEG via forward example + two dipoles → `zef_KF` (`filter_type=1`) |
+| `zef_KalmanDemo.m` | Script (not a package function with `arguments`). Local functions: `zef_KalmanDemo_create_measurement`, `zef_KalmanDemo_runKalman` |
 
 ## Code functionality
 
-Builds or reuses a lead field (often via `examples.forward.lead_field_example`), synthesizes measurements, runs legacy Kalman, optionally plots/saves (some cells may be commented / under maintenance).
+1. **`zef_KalmanDemo_create_measurement`**  
+   - Calls `examples.forward.lead_field_example` with `n_sources=2000`, EEG (`lead_field_type=1`), Cartesian directions, mesh resolution 4.5, smoothing/refinement on.  
+   - Places two 10 nAm dipoles (nearest interpolated brain nodes): cortical `[-33,-37,80]` mm, orientation `[0.2,1,0]`; thalamic `[-12,-32,50]` mm (N20 ~2 ms earlier).  
+   - Blackman–Harris pulse, 2500 Hz, 25 dB Gaussian noise. Temporarily sets `source_direction_mode=2` for `zef_processLeadfields`, then restores 1. Scales `L` by `1e-6` (µV/nAm) before `y = L*ori*amp*time + noise`.
+
+2. **`zef_KalmanDemo_runKalman`**  
+   - `inv_snr=25`, 26 frames, `inv_time_3=0.0004` s, `normalize_data=1`, `inv_evolution_prior=-34`.  
+   - `filter_type=1` (plain KF), `kf_smoothing=1` (no RTS).  
+   - `[project_struct] = zef_KF(project_struct)` — **not** `zef_inverse_run`.
+
+Needs plugins on the path (`zeffiro_interface` / `genpath(plugins)`). Meshing + lead field can take several minutes and uses GPU if `use_gpu` is left at the forward-example default.
 
 ## Workflow context
 
 ```
-examples.forward → L + measurements
-  → tools/plugins/Kalman (zef_KF)
-Class alternative: zef_inverse_run / inverse.KalmanInverter
+examples.forward.lead_field_example → L + synthetic measurements
+  → plugins/Kalman/m/zef_KF → zef.reconstruction
+Class track (not this demo):
+  zef_inverse_run(zef, "kalman", "execution", "local")
 ```
+
+Structural DTI `Q` is not exercised here (plugin-only feature; class Kalman has no DTI Q).
 
 ## Usage instructions
 
+Project root on the path. The file is a **script**; `examples.inverse.zef_KalmanDemo` is not a callable package function.
+
 ```matlab
-edit examples.inverse.zef_KalmanDemo   % or open the .m and run cells
+cd /path/to/zeffiro_interface
+zef = zeffiro_interface('start_mode','nodisplay');  % path warmup
+run('+examples/+inverse/zef_KalmanDemo.m');
 ```
 
-Ensure Zeffiro is on the path (`zeffiro_interface` once from repo root).
+Or open the `.m` in the Editor and run cells (`zef_KalmanDemo_create_measurement` then `zef_KalmanDemo_runKalman`).
+
+Class-track equivalent after you already have `zef.L` and measurements:
+
+```matlab
+[zef, r] = zef_inverse_run(zef, "kalman", "execution", "local", ...
+    "MethodParams", struct("method_type", "Basic Kalman filter"));
+```
+
+(`method_type` strings must match `inverse.KalmanInverter`.)
 
 ## Important notes
 
-- Script, not a package function with `arguments`.
-- Does not demonstrate structural Q or ClassKF.
-- Visualization/save cells may need local path edits.
+- Script, not `function` with name-value args.
+- Does not demonstrate EnKF, RTS, or structural Q.
+- Forward example may enable GPU; set `"use_gpu", false` inside `lead_field_example` if you have no CUDA.
 
 ## Developer guidance
 
-- Prefer adding a second demo that calls `zef_inverse_run(...,'kalman',...)` for the class path.
-- Pitfall: treating this as the supported API for production KF studies.
+- Adding a class-path demo should be a **second** file (e.g. `zef_KalmanClassDemo.m`) so this script remains a legacy-plugin walkthrough.
+- Pitfall: treating `zef_KF` numerics as identical to `inverse.KalmanInverter` (different Q / DTI / smoother coverage).

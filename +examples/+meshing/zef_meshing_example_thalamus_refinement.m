@@ -8,16 +8,16 @@ function project_struct = zef_meshing_example_thalamus_refinement
 %
 %   project_struct = zef_meshing_example_thalamus_refinement()
 %
-%   Imports scripts/scripts_for_importing/multicompartment_head_project/
-%   import_segmentation.zef (not the data/segmentations copy). Surface
-%   refinement on compartments 18 and 17; volume refinement on 7 (two
-%   levels); mesh_resolution 3. Saves data/example_project.mat. No kwargs.
+%   Imports data/segmentations/multicompartment_head_project/
+%   import_segmentation.zef. Surface refinement on compartments 18 and 17;
+%   volume refinement on 7 (two levels); mesh_resolution 3. Saves
+%   data/example_project.mat. No kwargs.
 %
 
 project_struct = zeffiro_interface( ...
         'start_mode', 'nodisplay', ...
         'import_to_existing_project', ...
-        'scripts/scripts_for_importing/multicompartment_head_project/import_segmentation.zef' ...
+        fullfile("data", "segmentations", "multicompartment_head_project", "import_segmentation.zef") ...
     );
 
     % Meshing parameters: enable smoothing and refinement.

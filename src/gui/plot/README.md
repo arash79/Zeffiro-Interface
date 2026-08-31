@@ -12,7 +12,7 @@
 | `zef_plot_meshes` / `zef_visualize_surfaces` | Surface mesh mode with compartment patches |
 | `zef_visualize_dti_streamlines` | DTI streamlines |
 | `zef_plot_contour` / `zef_plot_cone_field` / `zef_plot_source` / `zef_plot_3D_arrow` | Overlays |
-| `zef_plot_graph` / `zef_plot_condition` | Graph / condition diagnostics |
+| `zef_plot_graph` | Parameter-vector graph (graph_bank) |
 | `zef_plot_hyperprior` / `zef_plot_roi` | Inverse diagnostic figures |
 | `zef_plot_parcellation_time_series` | Parcel time series (uses time_series_tools) |
 | `zef_butterfly_plot` / `zef_butterfly_plot_start` / `zef_butterfly_plot_app` | Butterfly window |
@@ -47,11 +47,10 @@ Or press the corresponding Mesh visualization / menu buttons.
 ## Important notes
 
 - Safe only if `assignin('base','zef',…)` ran (startup and `zef_figure_tool` do this).
-- `zef_plot_volume.m.m` may exist as a legacy duplicate — prefer `zef_plot_volume.m`.
-- Clipping uses `src/core/zef_clipping_plane`.
+- Clipping uses `src/app/zef_clipping_plane`.
 
 ## Developer guidance
 
 - New overlay: add `zef_plot_*`, wire a button in mesh visualization tool, read parameters from `zef` fields synced by update scripts.
 - Avoid embedding heavy FEM logic here — call `src/mesh` / `src/forward` helpers.
-- Keep colormap application via `src/gui/helpers/zef_colormap` and friends.
+- Keep colormap application via `src/visualization/colormaps/zef_colormap` and friends.

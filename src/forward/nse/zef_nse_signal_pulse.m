@@ -1,7 +1,4 @@
 function y = zef_nse_signal_pulse(t,nse_field)
-
-
-
 %ZEF_NSE_SIGNAL_PULSE  Blackman–Harris P/T/D pulse waveform at times t (Pa).
 %
 %   Zeffiro Interface.
@@ -11,12 +8,11 @@ function y = zef_nse_signal_pulse(t,nse_field)
 %
 %   Sums three windowed harmonics (p_wave_*, t_wave_*, d_wave_* weight/length/start
 %   on nse_field, plus cycle_length). Normalizes to max-abs 1, then scales by
-%   pulse_amplitude * 101325/760 (mmHg → Pa). Some callers pass a third
-%   argument (legacy 256); this function only accepts (t, nse_field).
+%   pulse_amplitude * 101325/760 (mmHg → Pa).
 %
 %   y = zef_nse_signal_pulse(t, nse_field)
 %
-%   See also zef_nse_plot_pulse, zef_nse_poisson.
+%   See also zef_nse_poisson.
 
 hgmm_conversion = 101325/760;
 

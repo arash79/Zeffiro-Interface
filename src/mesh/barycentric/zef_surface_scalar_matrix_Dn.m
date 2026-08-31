@@ -6,12 +6,12 @@ function M = zef_surface_scalar_matrix_Dn(nodes, tetra, g_i_ind, n_ind, scalar_f
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Combines surface_D with the unit normal of matrix_n. Wrapper FGn is
-%   only mentioned in commented NSE lines. No live first-party caller.
+%   Combines surface gradient with the unit normal of matrix_n. NSE
+%   traction block B2 in zef_nse_matrices uses this assembler.
 %
 %   M = zef_surface_scalar_matrix_Dn(nodes, tetra, g_i_ind, n_ind, scalar_field, weighting)
 %
-%   See also zef_surface_scalar_matrix_FGn, zef_surface_scalar_matrix_D.
+%   See also zef_nse_matrices, zef_surface_mesh.
 
 N = size(nodes,1);
 K = size(tetra,1);

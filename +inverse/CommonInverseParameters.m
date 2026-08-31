@@ -11,12 +11,19 @@ classdef (HandleCompatible) CommonInverseParameters < dynamicprops
 %   SNR, and optional GMM post-processing. Each concrete inverter must implement
 %   at least the methods listed in REQUIRED_METHODS (typically invert).
 %
-%   Properties (defaults in parentheses):
+%   Properties (defaults in parentheses) apply when you construct the class
+%   directly. zef_inverse_run overwrites them from zef via withPropertiesFromZef.
+%   Those classdef defaults are not the same as zef_init (e.g. sampling_frequency
+%   1025 vs zef.inv_sampling_frequency 20000; time_step 1 vs zef.inv_time_3 0.001).
+%   Some subclass constructors pass a different sampling_frequency (MNEInverter
+%   currently uses 1024).
 %     low_cut_frequency, high_cut_frequency — elliptic band-pass edges (Hz)
 %     data_normalization_method — "Maximum entry" | "Maximum column norm" | ...
 %     number_of_frames, sampling_frequency, time_start, time_window, time_step
 %     signal_to_noise_ratio — SNR in dB for automatic prior/noise scaling
-%     normalize_reconstruction — scale output magnitudes to unity
+%     normalize_reconstruction — scale output magnitudes to unity when you
+%       set it on the object yourself. withPropertiesFromZef always writes
+%       false and does not copy a zef field.
 %     GMM — Gaussian mixture model struct (filled by computeGMM)
 %
 %   Constant:
@@ -24,12 +31,11 @@ classdef (HandleCompatible) CommonInverseParameters < dynamicprops
 %
 %   Object methods:
 %     withPropertiesFromZef(zef) — copy inv_* fields from a ZI project struct
-%     computeGMM(...) — delegate GMM fitting to plugins.ClassGMM.ClassGMModeling
+%     computeGMM(...) — delegate GMM fitting to inverse.gmm.ClassGMModeling
 %     computeInversionWithZI(zef) — run zef_process_inversion end-to-end
 %
 %   Static methods:
 %     isAnInverter(candidate) — validate subclass type and required methods
-%     substituteCommonInverseParameters(self, ParameterClassObj) — copy shared props
 %
 %   See also inverse.ELORETAInverter, inverse.MNEInverter, zef_process_inversion,
 %   utilities.inverse.run_frame_loop.
@@ -233,6 +239,8 @@ classdef (HandleCompatible) CommonInverseParameters < dynamicprops
             %   (inv_low_cut_frequency, inv_high_cut_frequency, normalize_data,
             %   number_of_frames, inv_sampling_frequency, inv_time_*, inv_snr) onto
             %   the corresponding CommonInverseParameters properties.
+            %   normalize_reconstruction is always set to false here (not read
+            %   from zef).
 
              arguments
                  self (1,1) inverse.CommonInverseParameters
@@ -250,6 +258,8 @@ classdef (HandleCompatible) CommonInverseParameters < dynamicprops
             self.time_window = zef.inv_time_2;
             self.time_step = zef.inv_time_3;
             self.signal_to_noise_ratio = zef.inv_snr;
+            % Always off on the zef_inverse_run path. Set the property on the
+            % inverter yourself if you need peak-normalized reconstructions.
             self.normalize_reconstruction = false;
 
         end  % withPropertiesFromZef function
@@ -257,7 +267,7 @@ classdef (HandleCompatible) CommonInverseParameters < dynamicprops
         function self = computeGMM(self,args)
             %computeGMM  Fit a Gaussian mixture model to a reconstruction.
             %
-            %   Wraps plugins.ClassGMM.ClassGMModeling with name-value control over
+            %   Wraps inverse.gmm.ClassGMModeling with name-value control over
             %   clusters, covariance type, parcellations, and model selection.
             arguments
                  self (1,1) inverse.CommonInverseParameters
@@ -286,7 +296,7 @@ classdef (HandleCompatible) CommonInverseParameters < dynamicprops
             args = rmfield(args,'zef');
             args = rmfield(args,'reconstruction');
             argcell = namedargs2cell(args);
-            self = plugins.ClassGMM.ClassGMModeling(self,reconstruction,zef,argcell{:});
+            self = inverse.gmm.ClassGMModeling(self,reconstruction,zef,argcell{:});
         end %computeGMM function
 
         function [self, zef] = computeInversionWithZI(self, zef)
@@ -381,27 +391,6 @@ classdef (HandleCompatible) CommonInverseParameters < dynamicprops
             end % for
 
         end % isAnInverter function
-
-        function self = substituteCommonInverseParameters(self,ParameterClassObj)
-            %substituteCommonInverseParameters  Copy shared properties onto self.
-            %
-            %   self = substituteCommonInverseParameters(self, ParameterClassObj)
-            %   copies intersecting property names (except REQUIRED_METHODS) from
-            %   ParameterClassObj onto self. Extra properties on either object
-            %   are left unchanged.
-            arguments
-                self (1,1)
-                ParameterClassObj (1,1) inverse.CommonInverseParameters
-            end
-            commonProps = convertCharsToStrings(properties(ParameterClassObj));
-            commonProps(strcmp(commonProps,"REQUIRED_METHODS"))=[];
-            Props = convertCharsToStrings(properties(self));
-            commonProps = intersect(commonProps,Props);
-            for ii = 1 : numel (commonProps)
-                prop = commonProps(ii);
-                self.(prop) = ParameterClassObj.(prop);
-            end
-        end %substituteCommonInverseParameters function
 
     end % methods (Static)
 

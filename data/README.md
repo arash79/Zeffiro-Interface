@@ -12,10 +12,8 @@
 | `example_projects/` | Saved `.mat` projects (multicompartment head, asteroid gravity/radar, ary sphere) |
 | `electrodes/` | Standard EEG cap `.dat` layouts (Biosemi, EGI, 10–20, …) |
 | `itokawa_model/` | Asteroid demo `.stl` meshes |
-| `log/` | Rotating `zeffiro_interface_*.log` files from `zef_start_log` |
-| `media/` | Screenshots and demo `.png` / `.avi` for documentation |
-| `Sub01FG.mat`, `Sub01FG_Mesh_Anisotropic.mat` | Large sample subject meshes (optional downloads) |
-| `default_project.mat` | **Expected** warm-start project — often absent in git clone |
+| `log/` | Runtime `zeffiro_interface_*.log` files from `zef_start_log` (gitignored) |
+| `default_project.mat` | Optional warm-start project — **not** shipped in a fresh clone |
 
 ## Code functionality
 
@@ -26,7 +24,7 @@
 | Consumer | Path used |
 |----------|-----------|
 | `zeffiro_interface` CLI args | Relative paths with no directory → `data/` (not `example_projects/` or `segmentations/` alone) |
-| `+examples/+importing` | Hard-coded `scripts/scripts_for_importing/...`; if missing, pass `data/segmentations/.../import_segmentation.zef` |
+| `+examples/+importing` | `data/segmentations/.../import_segmentation.zef` |
 | `+core` electrode import | User-selected files; sample caps in `electrodes/` |
 | `profile/zeffiro_interface.ini` | `save_file_path = ./data/` |
 
@@ -44,13 +42,12 @@ zef = zeffiro_interface('open_project', ...
 
 ## Important notes
 
-- Large `.mat` files may be gitignored or LFS — check repo before assuming presence.
+- Large `.mat` example projects under `example_projects/` are shipped in git (tens of MB each).
 - Segmentation `.asc` files are **import inputs**, not loaded at startup.
-- `fs2zef.sh` in the segmentation folder is a FreeSurfer conversion helper script.
 - Do not commit sensitive patient data to `data/` in shared repos.
 
 ## Developer guidance
 
 - Ship new examples with small assets under `data/` and document paths in `+examples` READMEs.
 - Keep `import_segmentation.zef` paths consistent with folder layout (relative to project root or `data/`).
-- Add `.gitignore` entries for generated logs and huge meshes in `data/log/` and root `data/*.mat` if needed.
+- Generated session logs live in `data/log/` (gitignored; created by `zef_start_log`).

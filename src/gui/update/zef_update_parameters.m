@@ -16,7 +16,7 @@
 %   Does not replot. Inverse of zef_init_sensor_parameters /
 %   zef_init_transform_parameters.
 %
-%   See also zef_update_transform_parameters.
+%   See also zef_init_transform_parameters, zef_init_sensor_parameters.
 zef.aux_field_1 = zef.h_parameters_table.Data;
 
 if isequal(zef.current_parameters,'transform')

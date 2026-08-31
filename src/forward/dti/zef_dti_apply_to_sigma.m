@@ -9,8 +9,8 @@ function zef = zef_dti_apply_to_sigma(zef, varargin)
 %   GUI: DTI Conductivity Tool → Apply (zef_dti_conductivity_apply_button_callback).
 %   Requires zef.freesurfer_fa_data, zef.freesurfer_register_transform, and a
 %   FEM mesh. Writes zef.sigma_anisotropy [n_tet × 6] as
-%   [σ11 σ22 σ33 σ12 σ13 σ23]; zef_sigma concatenates that into
-%   zef.sigma(:,3:8) for lead_field_type 6–10.
+%   [σ11 σ22 σ33 σ12 σ13 σ23] and copies that into zef.sigma(:,3:8)
+%   for lead_field_type 6–10.
 %
 %   Name-value / zef fields
 %     dti_conductivity_model     - 1 volume-fraction (default), 2 Tuch effective
@@ -200,13 +200,18 @@ tetra_centroids = (nodes(tetra(:,1),:) + nodes(tetra(:,2),:) + ...
 % ========================================================================
 % STEP 5: INTERPOLATE CONDUCTIVITY TO MESH
 % ========================================================================
-% Transforms mesh centroids to FA voxel space via the inverse of
-% (T_register * T_nifti), then uses griddedInterpolant for O(M) lookup.
-% The waitbar handle is passed through for live progress updates.
+% Transforms mesh centroids to FA voxel space. When FreeSurfer
+% vox2ras-tkr + orig.mgz + register.dat are available, uses the same
+% zef_dti_get_mesh2voxel chain as Kalman structural Q (0-based +1).
+% If register.dat is present but the chain cannot be built, this errors
+% rather than mixing tkRAS with scanner-space NIfTI. Without register.dat,
+% interpolation may use T_nifti alone.
 
 if ~isempty(h_waitbar) && isvalid(h_waitbar)
     try zef_waitbar(0.20, 1, h_waitbar, 'Interpolating conductivity to FEM mesh...'); drawnow; catch, end
 end
+
+T_mesh2voxel = zef_dti_resolve_mesh2voxel(zef);
 
 try
     sigma_mesh = zef_dti_tensor_interpolate_mesh_space(...
@@ -217,7 +222,8 @@ try
         scale_value, ...
         roi_radius, ...
         interp_mode, ...
-        h_waitbar);
+        h_waitbar, ...
+        T_mesh2voxel);
 catch ME
     if ~isempty(h_waitbar) && isvalid(h_waitbar)
         try set(h_waitbar, 'DeleteFcn', ''); delete(h_waitbar); catch, end
@@ -245,22 +251,8 @@ if ~isempty(apply_to_compartments) && isfield(zef,'domain_labels') && ~isempty(z
     update_indices = [];
     
     if isfield(zef,'compartment_tags') && ~isempty(zef.compartment_tags)
-        % Build mapping from compartment tag index to domain label index
-        % This follows the same logic as zef_find_active_compartment_ind
-        aux_compartment_ind = zeros(length(zef.compartment_tags), 1);
-        i = 0;
-        for k = 1:length(zef.compartment_tags)
-            % Check if compartment is active (on)
-            tag_name = zef.compartment_tags{k};
-            if isfield(zef, [tag_name '_on'])
-                on_val = zef.([tag_name '_on']);
-                if on_val
-                    i = i + 1;
-                    aux_compartment_ind(k) = i;  % Maps tag index k to domain label index i
-                end
-            end
-        end
-        
+        aux_compartment_ind = zef_dti_active_compartment_map(zef);
+
         % Now find tetrahedra for each selected compartment tag
         for tag_cell = apply_to_compartments
             tag = tag_cell{1};
@@ -300,12 +292,11 @@ else
 end
 
 % ========================================================================
-% STEP 7: UPDATE ZEF.SIGMA_ANISOTROPY
+% STEP 7: UPDATE ZEF.SIGMA_ANISOTROPY AND ZEF.SIGMA(:,3:8)
 % ========================================================================
-% WHY: Store anisotropic conductivity tensor in zef.sigma_anisotropy
-% zef_sigma() will concatenate this with isotropic values to create
-% the proper [M×8] format: [johtavuus(:) johtavuus_aux(:) sigma_anisotropy]
-% Lead field functions then use columns 3-8 for anisotropic computation
+% Lead-field types 6–10 read zef.sigma(:,3:8) as
+% [σ11 σ22 σ33 σ12 σ13 σ23]. Keep sigma_anisotropy as the 6-column
+% working copy used by the anisotropy report.
 
 % Initialize sigma_anisotropy if it doesn't exist
 if ~isfield(zef,'sigma_anisotropy') || isempty(zef.sigma_anisotropy)
@@ -329,19 +320,21 @@ end
 % Format: [σ11, σ22, σ33, σ12, σ13, σ23]
 zef.sigma_anisotropy(update_indices, :) = sigma_mesh(update_indices, :);
 
-% For isotropic points (zeros), set first 3 elements to compartment conductivity
-% so sigma_anisotropy = [σ, σ, σ, 0, 0, 0] per tetrahedron
-iso_mask = all(zef.sigma_anisotropy == 0, 2);
+% Isotropic fallback only on tetrahedra this Apply actually wrote.
+% domain_labels stores ACTIVE-compartment indices, not tag positions.
+iso_mask = false(M, 1);
+iso_mask(update_indices) = all(zef.sigma_anisotropy(update_indices, :) == 0, 2);
 if any(iso_mask)
     sigma_per_tetra = scale_value * ones(M, 1);
     if isfield(zef, 'domain_labels') && numel(zef.domain_labels) >= M && ...
        isfield(zef, 'compartment_tags') && ~isempty(zef.compartment_tags)
         dl = zef.domain_labels(1:M);
+        aux_map = zef_dti_active_compartment_map(zef);
         for k = 1:length(zef.compartment_tags)
             tag_name = zef.compartment_tags{k};
             sigma_var = [tag_name '_sigma'];
-            if isfield(zef, sigma_var)
-                I = (dl == k);
+            if isfield(zef, sigma_var) && aux_map(k) > 0
+                I = (dl == aux_map(k));
                 sigma_per_tetra(I) = zef.(sigma_var);
             end
         end
@@ -351,20 +344,20 @@ if any(iso_mask)
     zef.sigma_anisotropy(iso_mask, 3) = sigma_per_tetra(iso_mask);
 end
 
+if isfield(zef, 'sigma') && ~isempty(zef.sigma) && size(zef.sigma, 1) == M
+    if size(zef.sigma, 2) < 8
+        zef.sigma = [zef.sigma, zeros(M, 8 - size(zef.sigma, 2))];
+    end
+    write_rows = unique([update_indices(:); find(iso_mask)]);
+    zef.sigma(write_rows, 3:8) = zef.sigma_anisotropy(write_rows, :);
+end
+
 % ========================================================================
 % STEP 8: CLEANUP AND FLAGS
 % ========================================================================
-% WHY: Ensure system knows to recompute lead fields with new conductivity
 
-% Mark as applied
 zef.dti_applied = true;
-zef.dti_applied_time = now;  % Timestamp
-
-% Clear sigma_bypass to force recomputation
-% This ensures zef_sigma() will process and use zef.sigma_anisotropy
-% zef_sigma() will create [M×8] format: [iso(:) aux(:) anisotropy(:)]
-% Lead field functions use columns 3-8 for anisotropic computation
-zef.sigma_bypass = false;
+zef.dti_applied_time = now;
 
 % Store metadata for reference
 if ~isfield(zef,'dti_conductivity_metadata')

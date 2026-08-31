@@ -8,7 +8,7 @@ Helper for the **tES recursive hyperparameter search** study: shrink the alpha/e
 |------|------|
 | `zef_ES_centralize_recursive_search.m` | Compute new `alpha_psi`, `epsilon_psi` lattices via `zef_ES_find_parameters` |
 
-Parent study script: `../zef_ES_recursive_search.m`. ES algorithms: `tools/plugins/ZeffiroESWorkbench/m/`.
+Parent study script: `../zef_ES_recursive_search.m`. ES algorithms: `plugins/ZeffiroESWorkbench/m/`.
 
 ## Code functionality
 
@@ -33,15 +33,16 @@ Requires ES Workbench functions on path (`zef_ES_find_parameters`, current finde
 % Prefer running the parent study entry:
 zef = examples.studies.tES_hyperparameter_optimization.zef_ES_recursive_search(zef, num_lattice);
 
-% Direct helper:
-[a2, e2] = zef_ES_centralize_recursive_search(alpha, epsilon, sr, sc, ...
-    original_window, s_alpha, s_epsilon, 1);
+% Direct helper — use the packaged name so MATLAB does not pick the
+% plugins/ZeffiroESWorkbench copy of the same filename:
+[a2, e2] = examples.studies.tES_hyperparameter_optimization.helpers.zef_ES_centralize_recursive_search( ...
+    alpha, epsilon, sr, sc, original_window, s_alpha, s_epsilon, 1);
 ```
 
 ## Important notes
 
-- Duplicate copies of this helper may exist at the study root — prefer the package `+helpers` path.
 - Clamping (`non_floating=1`) prevents the window from leaving the original bounds.
+- The ES Workbench plugin has its own `zef_ES_centralize_recursive_search` on the MATLAB path; this study always calls the packaged `helpers.` function.
 
 ## Developer guidance
 

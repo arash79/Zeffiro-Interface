@@ -8,7 +8,7 @@
 %   builds a Cartesian lattice at lattice_oversampling_rate * signal_highest_frequency,
 %   saves interp_mat_*.mat with Interp_mat and xyz lattice vectors.
 %
-%   See also array_min, create_system.
+%   See also create_system.
 
 parameters;
 

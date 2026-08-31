@@ -54,21 +54,9 @@ function [A, B, C] = zef_build_electrodes(nodes, electrode_model, impedance_vec,
 %   Side effects: waitbar (closed by onCleanup).
 %
 %   See also zef_stiffness_matrix, zef_pem2cem, zef_lead_field_eeg_fem.
-
-% zef_build_elecrodes: constructs the matrices B and C [*] from given nodes,
-% impedances, a stiffness matrix A and electrode indices. Notice that the
-% stiffness matrix A is also returned from the function, to avoid the
-% copy-on-write behaviour of Matlab functions due to assignment in place [†].
-% In other words, the function needs to be called with
 %
-%     [A, B, C] = zef_build_elecrodes(A, ele_ind, n_of_nodes, n_of_electrodes);
-%
-% to possibly prevent the copying of the stiffness matrix A.
-%
-% [*]: https://iopscience.iop.org/article/10.1088/0031-9155/57/4/999/meta#pmb407475app1
-%
-% [†]: MathWorks, Avoid unnecessary copies of data,
-% URL: https://se.mathworks.com/help/matlab/matlab_prog/avoid-unnecessary-copies-of-data.html
+%   A must be returned as an output so MATLAB can update the sparse matrix
+%   in place (copy-on-write). Call as [A, B, C] = zef_build_electrodes(...).
 
 % Wait bar and its progress index
 
@@ -150,11 +138,6 @@ if isequal(electrode_model, 'CEM')
                     impedance_vec(ele_loop_ind);
 
                 for j = 1 : length(I)
-
-                    % TODO: Check if this indexing into A induces the
-                    % copy-on-write behaviour of Matlab. If this was just
-                    % A = something, there would not be an issue, as A is
-                    % returned from the function.
 
                     A(ele_ind(I(i),2),ele_ind(I(j),2)) ...
                         =                                  ...

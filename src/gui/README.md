@@ -1,6 +1,6 @@
-## Folder purpose
+# GUI (`src/gui`)
 
-Everything you click: tool windows, menus, option dialogs, table callbacks, widget→`zef` copy, and the 3-D plot. Mathematics (mesh, lead field, inverse classes) lives elsewhere; this tree opens windows and calls those functions. `zef_start` opens core tools in order: segmentation → figure → mesh → mesh visualization → menu → `zef_update`.
+Everything you click: tool windows, menus, option dialogs, table callbacks, widget→`zef` copy, and the 3-D plot. Mathematics (mesh, lead field, inverse classes) lives elsewhere; this tree opens windows and calls those functions. `zef_start` opens core tools in order: segmentation → figure → mesh → mesh visualization → menu → `zef_update`. The Figure tool is the unified application window; the Menu tool figure stays hidden and hosts the live `uimenu` tree that the left nav flyouts invoke.
 
 ## Main contents
 
@@ -12,9 +12,9 @@ Everything you click: tool windows, menus, option dialogs, table callbacks, widg
 | `update/` | `zef_update_*`: one widget family → `zef` (often replot) |
 | `plot/` | Draw into `zef.h_axes1` |
 | `init/` | Seed tables and option-dialog defaults from `zef` / profile INIs |
-| `open/` | **Settings** menu dialogs |
+| `open/` | **Settings** dialogs, plus `zef_open_class_inverse` for Inverse-tools **(class solver)** menus |
 | `set/` | Apply `zef` to graphics (lights, colors, slider reset) |
-| `helpers/` | Window manager, colormaps, interpolation, import helpers |
+| `chrome/` | Theme, layout, window manager, themed controls |
 
 ## Code functionality
 
@@ -48,8 +48,8 @@ zef = zef_update(zef);
 ## Important notes
 
 - Mixing a local `zef` never assigned back to base makes the next click see stale state.
-- `zef_plot_volume.m.m` is a leftover duplicate; use `zef_plot_volume.m`.
+- Chrome / docking: [`chrome/README.md`](chrome/README.md). Units and `zef` fields: [docs/conventions.md](../../docs/conventions.md), [docs/zef-state.md](../../docs/zef-state.md).
 
 ## Developer guidance
 
-New tool: export in `apps/`, wrapper in `tools/`, events in `callbacks/`, sync in `update/`, menu entry in `zef_menu_tool.m` or `zeffiro_plugins.ini`. Always end table mutations with `zef_update` (or matching `zef_update_*`). R2025a+ docking: `helpers/zef_window_manager.m`.
+New tool: export in `apps/`, wrapper in `tools/`, events in `callbacks/`, sync in `update/`, menu entry in `zef_menu_tool.m` or `zeffiro_plugins.ini`. Always end table mutations with `zef_update` (or matching `zef_update_*`). R2025a+ docking: `chrome/zef_window_manager.m`.

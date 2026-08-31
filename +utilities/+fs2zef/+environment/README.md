@@ -8,7 +8,7 @@ MATLAB-side FreeSurfer environment setup and validation before `fs2zef` shells o
 
 | File | Role |
 |------|------|
-| `setup_freesurfer_env.m` | `setenv` / `PATH` using `FREESURFER_HOME` |
+| `setup_freesurfer_env.m` | `setenv` / `PATH` using `FREESURFER_HOME`. Names it may set (besides `FREESURFER_HOME` itself) are listed by parent `utilities.fs2zef.FREESURFER_ENV_VARS`. |
 | `validate_environment.m` | Check required binaries and directories |
 
 ## Code functionality

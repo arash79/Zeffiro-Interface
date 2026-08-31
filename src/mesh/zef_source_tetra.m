@@ -11,8 +11,8 @@ function [t_ind, coeff, f_ind] = zef_source_tetra(source_positions, tetra, nodes
 %   with λ in [0,1]^3 is kept (f_ind=1). If none hit, the nearest centroid's
 %   tet is stored but coeff may be empty because aux_val is empty.
 %
-%   No first-party caller in this tree; source interpolation uses other
-%   helpers (zef_source_interpolation, zef_decompose_dof_space).
+%   WaitbarTest uses this as a real waitbar-producing caller. Source
+%   interpolation uses zef_source_interpolation / zef_decompose_dof_space.
 %
 %   [t_ind, coeff, f_ind] = zef_source_tetra(source_positions, tetra, nodes)
 %   [t_ind, coeff, f_ind] = zef_source_tetra(source_positions, tetra, nodes, K)

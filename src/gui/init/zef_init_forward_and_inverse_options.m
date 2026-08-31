@@ -102,8 +102,10 @@ end;
 if not(isfield(zef,'source_model'));
     zef.source_model = core.types.ZefSourceModel.Whitney;
 end;
-% Lead-field PCG preconditioner: 1 incomplete Cholesky, 2 SSOR
-% (zef_transfer_matrix, not core.linalg.preconditioners).
+% Lead-field PCG: 1 incomplete Cholesky (CPU ichol nofill), 2 SSOR.
+% GPU ignores this and uses Jacobi. Only applied if the field is missing;
+% zef_init already sets 2. preconditioner_tolerance is also filled here
+% but is not read by the live PCG.
 if not(isfield(zef,'preconditioner'));
     zef.preconditioner = 1;
 end;

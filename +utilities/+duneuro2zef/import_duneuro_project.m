@@ -112,7 +112,7 @@ function results = import_duneuro_project(config, import_to_zeffiro)
     end
     
     if config.verbose
-        fprintf('\n✓ Conversion completed successfully\n');
+        fprintf('\nConversion completed successfully\n');
     end
     
     %% Step 2: Import into Zeffiro Interface (if requested and available)
@@ -172,7 +172,7 @@ function results = import_duneuro_project(config, import_to_zeffiro)
             results.import_success = true;
             
             if config.verbose
-                fprintf('✓ Import completed successfully\n');
+                fprintf('Import completed successfully\n');
                 fprintf('  Note: Configuration step (Duneuro2Zeffiro_settings) was executed by .zef file\n');
             end
             
@@ -183,7 +183,7 @@ function results = import_duneuro_project(config, import_to_zeffiro)
             results.warnings{end+1} = 'Data was converted but not imported into Zeffiro Interface';
             
             if config.verbose
-                fprintf('✗ Import failed: %s\n', ME.message);
+                fprintf('Import failed: %s\n', ME.message);
                 fprintf('  Note: Files were converted successfully and are available in: %s\n', ...
                     config.output_folder);
             end
@@ -208,9 +208,9 @@ function results = import_duneuro_project(config, import_to_zeffiro)
         fprintf('\n========================================\n');
         fprintf('Import Pipeline Summary\n');
         fprintf('========================================\n');
-        fprintf('Conversion: %s\n', iif(conversion_results.success, '✓ Success', '✗ Failed'));
-        fprintf('Import:     %s\n', iif(results.import_success, '✓ Success', '✗ Failed/Skipped'));
-        fprintf('Overall:    %s\n', iif(results.success, '✓ Success', '⚠ Partial/Failed'));
+        fprintf('Conversion: %s\n', iif(conversion_results.success, 'Success', 'Failed'));
+        fprintf('Import:     %s\n', iif(results.import_success, 'Success', 'Failed/Skipped'));
+        fprintf('Overall:    %s\n', iif(results.success, 'Success', 'Partial/Failed'));
         
         if ~isempty(results.errors)
             fprintf('\nErrors:\n');

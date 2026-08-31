@@ -6,43 +6,29 @@ function test_unified_pipeline()
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-
-
-%
-% test_unified_pipeline - Test the unified fs2zef pipeline components
-%
-% This script tests the completed foundation modules of the unified pipeline:
-%   1. Environment validation
-%   2. Configuration system
-%   3. File readers
-%   4. Transform computation
-%   5. Dynamic ZEF import generation (KEY INNOVATION)
-%
-% Usage:
 %   utilities.fs2zef.test_unified_pipeline()
 %
-% Requirements:
-%   - FREESURFER_HOME environment variable set
-%   - FreeSurfer installation available
-%   - (Optional) FreeSurfer subject data for full testing
-%
+%   Environment validation does not require a FreeSurfer subject. Import
+%   generation uses mock ASCII meshes. Full reader tests need
+%   FREESURFER_HOME.
+
 
     fprintf('\n');
-    fprintf('═══════════════════════════════════════════════════════════════\n');
-    fprintf('  UNIFIED fs2zef PIPELINE - FOUNDATION TEST SUITE\n');
-    fprintf('═══════════════════════════════════════════════════════════════\n\n');
+    fprintf('===============================================================\n');
+    fprintf('  fs2zef pipeline smoke tests\n');
+    fprintf('===============================================================\n\n');
     
     % Test 1: Environment Validation
     fprintf('TEST 1: Environment Validation\n');
-    fprintf('───────────────────────────────────────────────────────────────\n');
+    fprintf('---------------------------------------------------------------\n');
     try
         report = utilities.fs2zef.environment.validate_environment('verbose', false);
         if report.valid
-            fprintf('✅ PASS: Environment is valid\n');
+            fprintf('PASS: Environment is valid\n');
             fprintf('   - FREESURFER_HOME: %s\n', report.environment_vars.FREESURFER_HOME);
             fprintf('   - Required binaries found: %d\n', sum(structfun(@(x) x, report.binaries_found)));
         else
-            fprintf('⚠️  WARNING: Environment has issues\n');
+            fprintf('WARNING: Environment has issues\n');
             fprintf('   - Errors: %d\n', numel(report.errors));
             fprintf('   - Warnings: %d\n', numel(report.warnings));
             if ~isempty(report.errors)
@@ -53,41 +39,41 @@ function test_unified_pipeline()
             end
         end
     catch ME
-        fprintf('❌ FAIL: %s\n', ME.message);
+        fprintf('FAIL: %s\n', ME.message);
     end
     fprintf('\n');
     
     % Test 2: Configuration System
     fprintf('TEST 2: Configuration System\n');
-    fprintf('───────────────────────────────────────────────────────────────\n');
+    fprintf('---------------------------------------------------------------\n');
     try
         config = utilities.fs2zef.config.default_config();
-        fprintf('✅ PASS: Default configuration loaded\n');
+        fprintf('PASS: Default configuration loaded\n');
         fprintf('   - Output format: %s\n', config.output_format);
         fprintf('   - Parcellation schemes: %s\n', strjoin(config.parcellation_schemes, ', '));
         
         mappings = utilities.fs2zef.config.compartment_mappings();
-        fprintf('✅ PASS: Compartment mappings loaded\n');
+        fprintf('PASS: Compartment mappings loaded\n');
         fprintf('   - Grey matter sigma: %.2f\n', mappings.grey_matter.sigma);
         fprintf('   - White matter sigma: %.2f\n', mappings.white_matter.sigma);
         fprintf('   - CSF sigma: %.2f\n', mappings.csf.sigma);
         
         schemes = utilities.fs2zef.config.parcellation_schemes();
-        fprintf('✅ PASS: Parcellation schemes loaded\n');
+        fprintf('PASS: Parcellation schemes loaded\n');
         fprintf('   - Desikan-Killiany: %d labels\n', schemes.desikan_killiany.labels);
         fprintf('   - Destrieux: %d labels\n', schemes.destrieux.labels);
     catch ME
-        fprintf('❌ FAIL: %s\n', ME.message);
+        fprintf('FAIL: %s\n', ME.message);
     end
     fprintf('\n');
     
     % Test 3: File Readers
     fprintf('TEST 3: File Readers\n');
-    fprintf('───────────────────────────────────────────────────────────────\n');
+    fprintf('---------------------------------------------------------------\n');
     try
         % Test FreeSurfer LUT reader
         lut = utilities.fs2zef.readers.readFSLUT();
-        fprintf('✅ PASS: FreeSurfer LUT loaded\n');
+        fprintf('PASS: FreeSurfer LUT loaded\n');
         fprintf('   - Total labels: %d\n', numel(lut.No));
         
         % Find some common structures
@@ -98,13 +84,13 @@ function test_unified_pipeline()
                 lut.G(thalamus_idx), lut.B(thalamus_idx));
         end
     catch ME
-        fprintf('❌ FAIL: LUT reader - %s\n', ME.message);
+        fprintf('FAIL: LUT reader - %s\n', ME.message);
     end
     fprintf('\n');
     
     % Test 4: Transform Computation (if test data available)
     fprintf('TEST 4: Transform Computation\n');
-    fprintf('───────────────────────────────────────────────────────────────\n');
+    fprintf('---------------------------------------------------------------\n');
     
     % Check if we have access to a FreeSurfer subject
     subjects_dir = getenv('SUBJECTS_DIR');
@@ -125,16 +111,16 @@ function test_unified_pipeline()
                     try
                         % Test volume center extraction
                         [c_r, c_s, c_a] = utilities.fs2zef.readers.get_volume_centers(orig_mgz);
-                        fprintf('✅ PASS: Volume centers extracted\n');
+                        fprintf('PASS: Volume centers extracted\n');
                         fprintf('   - Center (R,S,A): (%.2f, %.2f, %.2f)\n', c_r, c_s, c_a);
                         
                         % Test affine transform computation (with same file as both source and target)
                         affine = utilities.fs2zef.transforms.compute_affine_transform(orig_mgz, orig_mgz);
-                        fprintf('✅ PASS: Affine transform computed\n');
+                        fprintf('PASS: Affine transform computed\n');
                         fprintf('   - Transform is identity (same volume): %s\n', ...
                             mat2str(affine));
                     catch ME
-                        fprintf('❌ FAIL: %s\n', ME.message);
+                        fprintf('FAIL: %s\n', ME.message);
                     end
                     
                     break;
@@ -143,17 +129,16 @@ function test_unified_pipeline()
         end
         
         if ~subject_found
-            fprintf('⚠️  SKIP: No FreeSurfer subject data found for testing\n');
+            fprintf('SKIP: No FreeSurfer subject data found for testing\n');
         end
     else
-        fprintf('⚠️  SKIP: SUBJECTS_DIR not set or not accessible\n');
+        fprintf('SKIP: SUBJECTS_DIR not set or not accessible\n');
     end
     fprintf('\n');
     
     % Test 5: Dynamic ZEF Import Generator (KEY FEATURE)
-    fprintf('TEST 5: Dynamic ZEF Import Generator ⭐\n');
-    fprintf('───────────────────────────────────────────────────────────────\n');
-    fprintf('This is the KEY INNOVATION of the unified pipeline!\n\n');
+    fprintf('TEST 5: Dynamic ZEF Import Generator\n');
+    fprintf('---------------------------------------------------------------\n');
     
     % Create a test directory with mock mesh files
     test_dir = fullfile(tempdir, 'fs2zef_test');
@@ -179,7 +164,7 @@ function test_unified_pipeline()
             'compute_transforms', false, ...
             'verbose', false);
         
-        fprintf('✅ PASS: Dynamic ZEF import file generated!\n');
+        fprintf('PASS: Dynamic ZEF import file generated!\n');
         fprintf('   - Output file: %s\n', zef_file);
         
         % Read and display the generated file
@@ -190,7 +175,7 @@ function test_unified_pipeline()
             end
             lines = splitlines(content);
             fprintf('\n   Generated import file contains %d lines:\n', numel(lines));
-            fprintf('   ───────────────────────────────────────────────────\n');
+            fprintf('   ---------------------------------------------------\n');
             for i = 1:min(10, numel(lines))
                 if strlength(lines{i}) > 0
                     fprintf('   %s\n', lines{i});
@@ -199,9 +184,9 @@ function test_unified_pipeline()
             if numel(lines) > 10
                 fprintf('   ... (%d more lines)\n', numel(lines) - 10);
             end
-            fprintf('   ───────────────────────────────────────────────────\n\n');
+            fprintf('   ---------------------------------------------------\n\n');
             
-            fprintf('✅ KEY FEATURES DEMONSTRATED:\n');
+            fprintf('Checks:\n');
             fprintf('   • Auto-discovered all 5 mesh files\n');
             fprintf('   • Skipped atlas label .asc files as non-mesh inputs\n');
             fprintf('   • Parsed compartment names automatically\n');
@@ -211,7 +196,7 @@ function test_unified_pipeline()
             fprintf('   • Ready to import into Zeffiro!\n');
         end
     catch ME
-        fprintf('❌ FAIL: %s\n', ME.message);
+        fprintf('FAIL: %s\n', ME.message);
         fprintf('   Stack trace:\n');
         for i = 1:numel(ME.stack)
             fprintf('   - %s (line %d)\n', ME.stack(i).name, ME.stack(i).line);
@@ -224,25 +209,9 @@ function test_unified_pipeline()
     end
     
     fprintf('\n');
-    fprintf('═══════════════════════════════════════════════════════════════\n');
+    fprintf('===============================================================\n');
     fprintf('  TEST SUITE COMPLETE\n');
-    fprintf('═══════════════════════════════════════════════════════════════\n\n');
-    
-    fprintf('📊 SUMMARY:\n');
-    fprintf('   Foundation modules: ✅ Tested and working\n');
-    fprintf('   Key innovation: ✅ Dynamic ZEF import generation operational\n');
-    fprintf('   Ready for: 🚧 Workflow implementation (Phase 2)\n\n');
-    
-    fprintf('📖 NEXT STEPS:\n');
-    fprintf('   1. Implement core workflow modules (+core/)\n');
-    fprintf('   2. Implement processor modules (+processors/)\n');
-    fprintf('   3. Update main run.m entry point\n');
-    fprintf('   4. Create comprehensive test suite\n\n');
-    
-    fprintf('📚 DOCUMENTATION:\n');
-    fprintf('   - START_HERE.md - Quick navigation\n');
-    fprintf('   - MERGE_SUMMARY.md - Complete overview\n');
-    fprintf('   - IMPLEMENTATION_GUIDE.md - Implementation instructions\n\n');
+    fprintf('===============================================================\n\n');
 
 end % function
 

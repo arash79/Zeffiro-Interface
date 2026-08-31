@@ -7,16 +7,12 @@ Write the CSV manifest `import_segmentation.zef` after FreeSurfer surface export
 | File | Role |
 |------|------|
 | `generate_zef_import.m` | Scan surfaces, apply mappings, write `.zef` |
-| `save_dats.m` | Write atlas point `*.dat` extras |
-| `save_color_tables.m` | Write parcellation colortables |
 
 ## Code functionality
 
 `generate_zef_import(output_dir, ...)` scans `*.asc` / `*.stl` (skips FreeSurfer **label** `.asc` files), looks up color/sigma/activity from `+config/compartment_mappings` and the LUT, optional CRAS `affine_transform` from `+transforms`, and writes `import_segmentation.zef` (or `options.output_file`).
 
 Name-values used by `run`: `include_electrodes`, `include_box`, `compute_transforms`, `reference_volume`, `segmentation_volume`, `path_prefix`, `merge_left_right`.
-
-`save_dats` / `save_color_tables` write atlas extras when a study needs parcellation points — not invoked by `run`.
 
 ## Workflow context
 

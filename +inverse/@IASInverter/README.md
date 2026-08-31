@@ -1,8 +1,8 @@
 # inverse.IASInverter
 
-## Folder purpose
+Ordinary minimum-norm uses one prior variance for every source. IAS (iterative alternating sequential MAP) lets each source have its own variance, with a gamma or inverse-gamma hyperprior, and alternates between updating the sources and updating those variances. That tends to suppress small coefficients and keep a few stronger ones — a hierarchical sparse-ish map rather than a single linear filter.
 
-Class package for **Iterative Alternating Sequential (IAS) MAP** reconstruction under inverse-gamma or gamma hyperpriors, with optional dSPM/sLORETA post-hoc scaling. Registry id: `ias`.
+Registry id: `ias`. Optional post-hoc dSPM/sLORETA scaling. GUI **IAS MAP estimation** still calls `zef_ias_iteration`.
 
 ## Main contents
 
@@ -28,7 +28,7 @@ No `precompute`. `terminateComputation` deletes dynamic properties.
 zef_inverse_run(zef,'ias') → run_frame_loop → IASInverter
 ```
 
-GUI: **IAS MAP estimation** → `zef_ias_iteration` (`legacy_ias`). ROI variant lives in `tools/plugins/IASROIInversion` (legacy only).
+GUI: **IAS MAP estimation** → `zef_ias_iteration` (`legacy_ias`). ROI variant lives in `plugins/IASROIInversion` (legacy only).
 
 ## Usage instructions
 
@@ -40,6 +40,9 @@ GUI: **IAS MAP estimation** → `zef_ias_iteration` (`legacy_ias`). ROI variant 
 ## Important notes
 
 - Last-step dSPM/sLORETA branches compare against `n_map_iterations`.
+- `d_sqrt` is the prior **standard deviation** \(\sqrt{\theta_0/(\beta-1)}\) (IG)
+  or \(\sqrt{\theta_0\beta}\) (Gamma), matching `zef_ias_iteration`. Do not
+  store the variance in `d_sqrt`.
 - Dynamicprops created in `initialize` must be cleaned in `terminateComputation` to avoid stale state across runs.
 - Method_type `"None"` vs dSPM/sLORETA strings control post-hoc scaling.
 

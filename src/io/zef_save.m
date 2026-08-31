@@ -67,7 +67,9 @@ if zef.save_switch == 1
         zef.save_file = zef.file;
         zef.save_file_path = zef.file_path;
         zef_close_tools;
-        zef_close_figs;
+        if ~local_unified_shell(zef)
+            zef_close_figs;
+        end
 
         if isfield(zef,'zeffiro_variable_data')
             if not(isempty(zef.zeffiro_variable_data))
@@ -79,12 +81,19 @@ if zef.save_switch == 1
 
         zef_data = zef;
         zef_data = zef_remove_object_handles(zef_data);
+        zef_data = zef_remove_system_fields(zef, zef_data);
         save([zef.save_file_path filesep zef.save_file],'-struct','zef_data','-v7.3');
         clear zef_data;
-        zef_segmentation_tool;
-        zef_mesh_tool;
-        zef_mesh_visualization_tool;
-        zef = zef_update(zef);
+        if ~local_unified_shell(zef)
+            zef_segmentation_tool;
+            zef_mesh_tool;
+            zef_mesh_visualization_tool;
+            zef = zef_update(zef);
+        end
+        try
+            zef_ui_shell('hide_companions', zef);
+        catch
+        end
     end
 end
 if zef.save_switch == 2
@@ -161,7 +170,6 @@ if zef.save_switch == 6
     if not(isequal(zef.file,0));
         zef = zef_process_meshes(zef);
         zef.tetrahedra = zef.tetra;
-        %[zef.sigma,zef.brain_ind] = zef_postprocess_fem_mesh([]);
         if zef.imaging_method== 1
             [zef.sensors_attached_volume] = zef_attach_sensors_volume([]);
             save([zef.file_path filesep zef.file],'-struct','zef','sensors','nodes','tetrahedra','prisms','surface_triangles','sigma','sigma_prisms','sensors_attached_volume','brain_ind','-v7.3');
@@ -175,14 +183,23 @@ end
 if zef.save_switch == 7
     if not(isempty(zef.save_file)) & not(isempty(zef.save_file_path)) & not(zef.save_file_path==0) & not(isequal(zef.save_file,'default_project.mat'))
         zef_close_tools;
-        zef_close_figs;
+        if ~local_unified_shell(zef)
+            zef_close_figs;
+        end
         zef_data = zef;
         zef_data = zef_remove_object_handles(zef_data);
+        zef_data = zef_remove_system_fields(zef, zef_data);
         save([zef.save_file_path filesep zef.save_file],'-struct','zef_data','-v7.3');
         clear zef_data;
-        zef_mesh_tool;
-        zef_mesh_visualization_tool
-        zef_update;
+        if ~local_unified_shell(zef)
+            zef_mesh_tool;
+            zef_mesh_visualization_tool
+            zef_update;
+        end
+        try
+            zef_ui_shell('hide_companions', zef);
+        catch
+        end
     else
         if zef.use_display
             if not(isempty(zef.save_file_path)) & not(zef.save_file_path==0)
@@ -195,9 +212,12 @@ if zef.save_switch == 7
             zef.save_file = zef.file;
             zef.save_file_path = zef.file_path;
             zef_close_tools;
-            zef_close_figs;
+            if ~local_unified_shell(zef)
+                zef_close_figs;
+            end
             zef_data = zef;
             zef_data = zef_remove_object_handles(zef_data);
+            zef_data = zef_remove_system_fields(zef, zef_data);
             save([zef.save_file_path filesep zef.save_file],'-struct','zef_data','-v7.3');
             clear zef_data;
         end
@@ -248,6 +268,17 @@ end;
 
 if nargout == 0
     assignin('base','zef',zef);
+end
+
+end
+
+function tf = local_unified_shell(zef)
+
+tf = false;
+try
+    tf = isstruct(zef) && isfield(zef, 'h_zeffiro') && isvalid(zef.h_zeffiro) ...
+        && zef_ui_is_unified(zef.h_zeffiro);
+catch
 end
 
 end

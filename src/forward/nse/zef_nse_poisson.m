@@ -1,6 +1,4 @@
 function nse_field = zef_nse_poisson(nse_field,nodes,tetra,domain_labels,mvd_length)
-
-
 %ZEF_NSE_POISSON  Steady Poisson hemodynamic pressure solver on vessel submeshes.
 %
 %   Zeffiro Interface.
@@ -49,8 +47,6 @@ arteriole_scale = 1./( arteriole_fraction*nse_field.arteriole_diameter.^2./(arte
 capillary_scale = 1./( arteriole_fraction*nse_field.capillary_diameter.^2./(capillary_fraction*nse_field.arteriole_diameter.^2) + capillary_fraction*nse_field.capillary_diameter.^2./(capillary_fraction*nse_field.capillary_diameter.^2) + venule_fraction.*nse_field.capillary_diameter.^2./(capillary_fraction.*nse_field.venule_diameter.^2));
 venule_scale = 1./( arteriole_fraction*nse_field.venule_diameter.^2./(venule_fraction*nse_field.arteriole_diameter.^2) + capillary_fraction*nse_field.venule_diameter.^2./(venule_fraction*nse_field.capillary_diameter.^2) + venule_fraction.*nse_field.venule_diameter.^2./(venule_fraction.*nse_field.venule_diameter.^2));
 pulse_amplitude = nse_field.pulse_amplitude.*hgmm_conversion;
-%time_vec = [0:nse_field.time_step_length:nse_field.time_length];
-%p_aux = zef_nse_signal_pulse(time_vec,nse_field);
 
 mvd_length = 1E6.*mvd_length(:,1);
 
@@ -113,24 +109,11 @@ arteriole_length = nse_field.pressure_decay_in_arterioles*pi*(nse_field.arteriol
  source_vec = zeros(size(v_1_nodes,1),1);
  source_vec(b_node_ind(source_node_ind)) = 1;
 
- %p_aux = p_aux/max(p_aux); 
- %p_aux = pulse_amplitude*p_aux;
- 
 K_1 = zef_volume_scalar_matrix_GG(v_1_nodes, v_1_tetra, 1, 1, ones(size(v_1_tetra,1),1)) + ...
     zef_volume_scalar_matrix_GG(v_1_nodes, v_1_tetra, 2, 2, ones(size(v_1_tetra,1),1)) + ...
     zef_volume_scalar_matrix_GG(v_1_nodes, v_1_tetra, 3, 3, ones(size(v_1_tetra,1),1));
 M_1 = zef_surface_scalar_matrix_FF(v_1_nodes, v_1_tetra, beta.*param_aux);
 A = K_1 + M_1;
-% b =  M_1 * (p_hydrostatic);
-% if nse_field.use_gpu
-%     DM = 1./diag(A);
-%     p_hydrostatic = pcg_iteration_gpu(A,b,nse_field.pcg_tol,nse_field.pcg_maxit,DM);
-% else
-%     DM = spdiags(diag(A),0,size(A,1),size(A,1));
-%     p_hydrostatic = pcg_iteration(A,b,nse_field.pcg_tol,nse_field.pcg_maxit,DM);
-% end
-
-%p = zeros(size(source_vec));
 p = source_vec;
 p_old = zeros(size(p));
 iter_ind = 0;
@@ -138,9 +121,6 @@ conv_val = Inf;
 nse_field.conv_vec = [];
 while conv_val > nse_field.poisson_tolerance
 iter_ind = iter_ind + 1;
-%p_integral = zeros(size(source_vec));
-%for i = 1 : length(time_vec)
-%b = M_1*(p_aux(i)*source_vec + p);
 b = M_1*p;
 if nse_field.use_gpu
     DM = 1./diag(A);
@@ -149,18 +129,11 @@ else
     DM = spdiags(diag(A),0,size(A,1),size(A,1));
     p = pcg_iteration(A,b,nse_field.pcg_tol,nse_field.pcg_maxit,DM);
 end
-%if and(time_vec(i) >= nse_field.start_time, time_vec(i)<=nse_field.time_length)
-%p_integral = p_integral + nse_field.time_step_length*p;
-%p_integral = max(p_integral,p);
-%end
-%zef_waitbar(i/length(time_vec),h_waitbar,'NSE solver: pressure');
 conv_val = norm(p - p_old)./norm(p_old);
 p_old = p;
 nse_field.conv_vec = [nse_field.conv_vec conv_val];
 end
 
-%p = p_integral/(nse_field.time_length - nse_field.start_time);
-%p = p_integral;
 p = abs(p); 
 p = p/max(p); 
 p = pulse_amplitude*p;
@@ -174,7 +147,6 @@ mu_vec = nse_field.mu*ones(size(v_1_tetra,1),1);
 nse_field.bv_vessels_1{1} = zeros(size(nse_field.bp_vessels{1}));
 nse_field.bv_vessels_2{1} = zeros(size(nse_field.bp_vessels{1}));
 nse_field.bv_vessels_3{1} = zeros(size(nse_field.bp_vessels{1}));
-%nse_field.bv_vessels_b = zeros(size(nse_field.bp_vessels{1}));
 
 Q_1 = zef_volume_scalar_matrix_FG(v_1_nodes,v_1_tetra, 1, mu_vec.^(-1));
 Q_2 = zef_volume_scalar_matrix_FG(v_1_nodes,v_1_tetra, 2, mu_vec.^(-1));

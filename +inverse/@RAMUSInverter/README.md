@@ -1,8 +1,8 @@
 # inverse.RAMUSInverter
 
-## Folder purpose
+RAMUS (randomized multiresolution scanning) runs IAS-style MAP on many random sparse subsets of the source space, at several resolution levels, and averages the maps. The idea is to reduce the depth bias of a single fine-grid IAS run. You must build a multiresolution decomposition first (`zef_make_multires_dec` or sensitivity).
 
-Class package for **RAMUS** (randomized multiresolution scanning): averages IAS-style MAP updates over random sparse sub-grids of the source space. Registry id: `ramus`. Requires a precomputed multiresolution decomposition.
+Registry id: `ramus`. Paper: Rezaei, Koulouri & Pursiainen, *Brain Topography* 33 (2020).
 
 ## Main contents
 
@@ -28,7 +28,7 @@ Helper used externally: `zef_make_multires_dec` (often via a `make_multires_dec`
 zef_make_multires_dec / sensitivity preflight → zef_inverse_run(zef,'ramus')
 ```
 
-GUI: **RAMUS inversion tool** → `zef_ramus_iteration` (`legacy_ramus`). Sampler companion: `tools/plugins/RAMUSSampler` (MCMC, not this class).
+GUI: **RAMUS inversion tool** → `zef_ramus_iteration` (`legacy_ramus`).
 
 ## Usage instructions
 

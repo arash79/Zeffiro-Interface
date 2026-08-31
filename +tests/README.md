@@ -1,20 +1,41 @@
-# +tests
+# Tests (`+tests`)
 
-## Folder purpose
+MATLAB tests for inverse dispatch, UI chrome, and related APIs. Nested packages `tests.unit`, `tests.integration`, `tests.smoke`, plus fixtures in `tests.support`.
 
-MATLAB unit / integration tests for inverse dispatch, UI helpers, and related APIs. Package name `tests.*` — **do not** `addpath('+tests')`; call `runtests` from the project root after `zeffiro_interface` path setup (or add only the project root).
+Do **not** `addpath('+tests')`. After `zeffiro_interface` path setup (or adding only the project root):
+
+| Package | Role |
+|---------|------|
+| `tests.unit` | Solver kernels, types, theme/waitbar widgets |
+| `tests.integration` | Dispatch, cluster, class vs legacy |
+| `tests.smoke` | End-to-end synthetic, windows, architecture layout |
+| `tests.support` | Synthetic `zef` fixtures (`createSyntheticInverseZef`) |
+
+Child READMEs: [`+unit`](+unit/README.md), [`+integration`](+integration/README.md), [`+smoke`](+smoke/README.md), [`+support`](+support/README.md).
 
 ## Main contents
 
+Classes are listed by short name; fully qualified names are `tests.unit.ELORETAInverterTest`, `tests.integration.ELORETADispatchTest`, `tests.smoke.ArchitectureLayoutTest`, etc.
+
 | Class / file | Covers |
 |--------------|--------|
+| `ClassGMMOptTest` | `inverse.gmm` Mahalanobis/E-step opts vs original formulas; package isolation; `computeGMM` wrapper |
+| `ClassInverseDialogTest` | eLORETA / UKF-NMM class-solver dialogs expose method widgets; four `zef_*_start` names resolve |
 | `ClassVsLegacyTest` | `dspm` vs `legacy_csm` both nonempty recon — **not** numerical equality |
+| `CSMInverterSLoretaTest` | sLORETA / sLORETA 3D vs reference formulas; local `zef_inverse_run` dispatch |
+| `DipoleScanMNEOptTest` | Dipole Scan `pagesvd` vs SVD loop; MNE `W*f`; legacy MNE/dipole kernels; dispatch smoke |
+| `BeamformerInverterOptTest` | Beamformer cached `B*f` vs per-source loop; mixed orientation; dispatch smoke; plugin factorization / smoke |
+| `HALpRInverterTest` | `L1_optimization` vs sparse-D reference; HALpR q=1/q=2 invert; local `halpr` dispatch |
+| `GroupLassoInverterTest` | `LG_optimization` vs sparse-D reference; GroupLasso invert vs frozen MAP loop; local `grouplasso` dispatch |
 | `InverseDispatchTest` | `mne` / `legacy_mne` via `dispatch_inverse` |
 | `ELORETADispatchTest` | registry → `ELORETAInverter`; local `zef_inverse_run("eloreta")` |
 | `ELORETAInverterTest` | shape, fixed-point T, point-source, manual α, rescale |
 | `UKFNMMInverterTest` | SKF–NMM–UKF class: construct, initialize, invert, `run_frame_loop`, NMM once, RTS, edge cases |
 | `UKFNMMDispatchTest` | registry `ukfnmm` / `ukf_nmm`; local dispatch; cluster job serialization |
 | `IASFamilyLastStepTest` | IAS/RAMUS last-step sLORETA/dSPM; plugin `ias_type==3` |
+| `IASInverterOptTest` | IAS invert vs legacy `W = d.*(W'*inv(A))` kernel |
+| `ELORETAInverterOptTest` | Block-page eLORETA precompute vs dense `W^{-1}` loop |
+| `RAMUSInverterOptTest` | RAMUS invert vs legacy `repmat`+`inv` kernel; skip-W; dispatch smoke |
 | `ParcellationColormapTest` | missing `zef.parcellation_colormap` returns `[]` |
 | `FindSyntheticSourceROITest` | ROI membership, ROI measurements, polar ellipsoid plot |
 | `SourceTreeJRTest` | headless Jansen–Rit tree ODE |
@@ -25,14 +46,13 @@ MATLAB unit / integration tests for inverse dispatch, UI helpers, and related AP
 | `ClusterRunnerTest` | `run_inverse_job` → result.mat (`dspm`); no CSC required |
 | `ClusterProfileTest` | `configure_cluster_profile` CSC fields; skips without `ComputingProject` |
 | `ParameterSweepGenerationTest` | sweep → submissions; CSC skip when unavailable |
-| `LeadFieldTest` | **empty TODO** — asserts nothing today (fake coverage) |
 | `WindowManagementTest` | `zef_window_manager` / `WindowStyle` |
 | `WaitbarTest` | `zef_waitbar` lifecycle |
 | `ColoredListTest` | HTML/`uihtml` listboxes |
 | `UiThemeTest` | `zef_ui_theme` / layout tokens |
 | `ZefSourceModelLoadTest` | `core.types.ZefSourceModel.from` + legacy enum MAT load |
-| `createSyntheticInverseZef.m` | Shared synthetic `zef` fixture for inverse tests (`source_interpolation_ind{1}` is a column) |
-| `createSyntheticUKFNMMZef.m` | Larger xyz/bump `zef` fixture for UKFNMM clustering + NMM |
+| `tests.support.createSyntheticInverseZef` | Shared synthetic `zef` fixture for inverse tests (`source_interpolation_ind{1}` is a column) |
+| `tests.support.createSyntheticUKFNMMZef` | Larger xyz/bump `zef` fixture for UKFNMM clustering + NMM |
 
 ## Code functionality
 
@@ -40,27 +60,32 @@ Tests construct synthetic `L` / measurements via helpers, call `utilities.cluste
 
 ## Workflow context
 
-Protects the class inverse track (`src/inverse` + `+inverse` + `+utilities/+cluster`) and selected GUI helpers (`src/gui/helpers`). Does not replace manual GUI QA under `data/log`.
+Protects the class inverse track (`src/inverse` + `+inverse` + `+utilities/+cluster`) and selected GUI chrome (`src/gui/chrome`).
 
 ## Usage instructions
 
 ```matlab
-cd /path/to/MainZeffiroProject
-zef = zeffiro_interface('start_mode','nodisplay');  % optional path warmup
-runtests('+tests')
-% or:
-runtests('tests.ELORETAInverterTest')
+cd /path/to/zeffiro_interface
+zef = zeffiro_interface('start_mode','nodisplay');  % path warmup
+import matlab.unittest.TestSuite
+suite = TestSuite.fromPackage('tests', 'IncludingSubpackages', true);
+run(suite)
+% or a nested package / class:
+runtests('tests.unit')
+runtests('tests.unit.ELORETAInverterTest')
+runtests('tests.smoke.ArchitectureLayoutTest')
 ```
+
+`runtests('+tests')` does **not** pick up nested `+unit` / `+integration` / `+smoke` classes.
 
 ## Important notes
 
 - Synthetic `L` only — not a substitute for real head-project validation.
 - `ClassVsLegacyTest` checks both paths run, not bit-exact parity.
-- `LeadFieldTest` is a placeholder — do not treat a green run as LF coverage.
-- Cluster* tests need PCT / site-specific `parcluster` for full exercise.
+- ClusterProfileTest / ParameterSweepGenerationTest skip when `parcluster` is missing, then again without CSC `ComputingProject`.
 
 ## Developer guidance
 
 - New registry method → add a dispatch/smoke test here.
-- Prefer `createSyntheticInverseZef` over ad-hoc fixtures.
+- Prefer `tests.support.createSyntheticInverseZef` over ad-hoc fixtures.
 - Pitfall: `addpath('+tests')` breaks package resolution — add the **project root** only.

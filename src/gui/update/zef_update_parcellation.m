@@ -109,15 +109,12 @@ clear zef_i zef_j zef_k;
 set(zef.h_use_parcellation,'value',zef.use_parcellation);
 set(zef.h_parcellation_plot_type,'value',zef.parcellation_plot_type);
 set(zef.h_parcellation_segment,'string',zef.parcellation_segment);
-%set(zef.h_parcellation_merge,'value',zef.parcellation_merge);
 
 if zef.use_parcellation == 0
     set(zef.h_use_parcellation,'foregroundcolor',[0 0 0]);
-    %set(zef.h_parcellation_list,'enable','on');
     set(zef.h_use_parcellation,'string','Activate');
 else
     set(zef.h_use_parcellation,'foregroundcolor',[1 0 0]);
-    %set(zef.h_parcellation_list,'enable','off');
     set(zef.h_use_parcellation,'string','Active');
 end
 

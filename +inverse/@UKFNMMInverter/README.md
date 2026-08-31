@@ -4,7 +4,7 @@
 
 Class-based inverse method whose **spatial** estimate is a Kalman filter on a per-source SVD-modified lead field, and whose **temporal** model is the Jansen–Rit neural mass model with parameters estimated by an unscented Kalman filter.
 
-This is **not** `inverse.KalmanInverter` and **not** the legacy Inverse-tools Kalman plugin (`tools/plugins/Kalman`, `zef_KF`). Registry ids: `ukfnmm`, `ukf_nmm`.
+This is **not** `inverse.KalmanInverter` and **not** the legacy Inverse-tools Kalman plugin (`plugins/Kalman`, `zef_KF`). Registry ids: `ukfnmm`, `ukf_nmm`.
 
 Author: **Joonas Lahtinen** (introducing commits `462bab2c` / `0b33ef8c`). There is **no dedicated SKF–NMM–UKF publication or DOI** in this repository. The spatial Kalman component was branched from Standardized Kalman filtering (Lahtinen et al., *Clinical Neurophysiology* 168, 2024, DOI [10.1016/j.clinph.2024.09.021](https://doi.org/10.1016/j.clinph.2024.09.021)).
 
@@ -37,7 +37,7 @@ The README written in `462bab2c` says:
 
 > spatial estimation comes from SKF and time evolution from the Jansen-Rit neural mass model. JR parameters are estimated through UKF.
 
-The code committed immediately afterwards (`0b33ef8c`) does **not** call `plugins.ClassKF.kf_sL_update`. It calls ordinary `plugins.ClassKF.kf_update` with `H = modified_L`.
+The code committed immediately afterwards (`0b33ef8c`) does **not** call `inverse.kf.kf_sL_update`. It calls ordinary `inverse.kf.kf_update` with `H = modified_L`.
 
 `modified_L` is built by taking each source’s three lead-field columns `L(:, 3n-2:3n)`, computing the thin SVD, and replacing those columns with the left vectors `U` (`n_sensors × 3` when `n_sensors ≥ 3`). That is a **per-source orthonormalisation of the observable dipole subspace**, not sLORETA standardization `z = D x`.
 
@@ -49,7 +49,7 @@ Evidence for keeping ordinary KF + `modified_L`:
 
 This port therefore **preserves `kf_update` + `modified_L`**. Calling it “SKF” in the user-facing name follows the author’s README; the spatial kernel is ordinary KF on the SVD-modified observation model. That mismatch is documented, not silently “fixed” to `kf_sL_update`.
 
-`modified_L` is used **only** as the spatial Kalman observation model. NMM back-projection uses the original `L` passed into `smoother`, matching the introducing `zef_process_inversion` call (`smoother(z_inverse, L)`). Mixing `modified_L` (filter) with `L` (NMM) is scientifically ambiguous and is preserved.
+`modified_L` is used **only** as the spatial Kalman observation model (`y = U x_U`). After the optional RTS pass, `smoother` maps `x_U` to physical dipoles `p = V S^{+} x_U` (`u_to_dipole`) before NMM. NMM back-projection then uses the original `L` with physical `p`. The introducing commit mixed `U`-space state with `L p` without that map.
 
 Requires a 3-component xyz layout (`size(L,2)` divisible by 3) and at least 3 sensors (otherwise thin SVD `U` is not `n_sensors × 3`). `source_direction_mode` 3 is rejected.
 
@@ -80,7 +80,7 @@ Needs Statistics Toolbox `kmeans`.
 
 Also valid: `computeInversionWithZI` on an `inverse.UKFNMMInverter` instance. Cluster dispatch uses the same registry ids.
 
-There is **no Inverse-tools GUI** for this class. The current codebase exposes class methods through `utilities.cluster.inverse_method_registry` and `zef_inverse_run`, not through `tools/plugins`. Do not copy the legacy Kalman app.
+Head profiles (`multicompartment_head`, `_legacy`, `_nse`) register Inverse tools → **UKF-NMM (class solver)** (`plugins/UKFNMM`, `zef_ukfnmm_start`). That window is `zef_open_class_inverse`; Start calls `zef_inverse_run`. Asteroid profiles do not list it. Do not copy the legacy Kalman app onto this class.
 
 ## Usage instructions
 
@@ -90,7 +90,7 @@ Constructor name-values include:
 |----------|---------|------|
 | `number_of_corrclusters` | 3 | Clusters kept after discarding one extra k-means cluster |
 | `score_threshold` | 0.2 | Relative peak gate after max-normalisation |
-| `alpha`, `kappa`, `beta` | 5, 0, 0 | UKF weights (`alpha=5` is the committed heuristic) |
+| `alpha`, `kappa`, `beta` | 1, 0, 2 | UKF weights (van der Merwe; `α=1` is in `[10^{-3},1]`, `β=2` for Gaussians). `α=5`, `β=0` was the introducing heuristic |
 | `evolution_prior_model` | `"Sensitivity scaling"` | Spatial Q; `"User supplied Q"` needs `evolution_cov` |
 | `smoother_type` | `"None"` | `"RTS"` / `"Sample RTS"` before NMM |
 | `number_of_noise_steps` | 4 | Frames used for `theta0` (capped to available T) |
@@ -103,18 +103,19 @@ Definite introducing-commit defects fixed in this port (see also the class comme
 
 - Spatial filter state is `prev_step_reconstruction` / `prev_step_posterior_cov` so `class_kf_predict` can run (the original class did not define those properties).
 - `invert` no longer calls `smoother`; NMM runs once from the driver.
+- U-space KF state is mapped to physical dipoles before NMM (`u_to_dipole`).
+- UKF defaults are van der Merwe `α=1`, `β=2` (not `α=5`, `β=0`).
 - Posterior covariances stored for RTS are one **filter posterior per frame**, not a leading prior cell (off-by-one).
 - Unqualified `number_of_frames` in the RTS loop is `self.number_of_frames`.
-- `smoother_type` setter actually stores the value (the Kalman sibling setter does not).
+- `smoother_type` setter stores the value (same as `inverse.KalmanInverter`).
 - Warning suppression uses `onCleanup` restoration rather than `warning('on')`.
 - Triplet SVD, k-means feasibility, zero reconstruction, empty clusters, short recordings, and non-finite UKF/ODE/interp failures raise `UKFNMMInverter:*` errors instead of MATLAB indexing crashes.
 
 Preserved scientific / heuristic behaviour (not “corrected”):
 
 - Ordinary `kf_update` on `modified_L` despite the SKF README wording.
-- NMM observations from original `L`, not `modified_L`.
+- NMM observations from original `L` applied to **physical dipoles** after `u_to_dipole`.
 - `Corr_matrix = z*z'` as a Gram matrix.
-- UKF `alpha=5`, `beta=0`.
 - Extra k-means cluster discarded by score.
 - Duplicate cluster-order reassignment in `estimate_peaks`.
 - `s_ind3D = 3*s - [0;1;2]` (z,y,x packing, internally consistent).
@@ -123,4 +124,4 @@ Preserved scientific / heuristic behaviour (not “corrected”):
 
 ## Developer guidance
 
-Keep this class separate from `KalmanInverter`. New spatial-filter kernels belong in `plugins.ClassKF` only if they are shared; do not fold NMM into Kalman. Tests: `tests.UKFNMMInverterTest`, `tests.UKFNMMDispatchTest`.
+Keep this class separate from `KalmanInverter`. New spatial-filter kernels belong in `inverse.kf` only if they are shared; do not fold NMM into Kalman. Tests: `tests.unit.UKFNMMInverterTest`, `tests.integration.UKFNMMDispatchTest`.

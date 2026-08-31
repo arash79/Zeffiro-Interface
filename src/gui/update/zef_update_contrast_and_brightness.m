@@ -1,15 +1,10 @@
-function [contrast_val, brightness_val] = zef_update_contrast(varargin)
+function [contrast_val, brightness_val] = zef_update_contrast_and_brightness(varargin)
 %ZEF_UPDATE_CONTRAST_AND_BRIGHTNESS  Figure-tool **Contrast:** / **Brightness:** sliders.
 %
 %   Zeffiro Interface.
 %   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
-%
-%   Filename is zef_update_contrast_and_brightness.m; the primary function
-%   name inside the file is zef_update_contrast (MATLAB still dispatches
-%   on the filename). Both sliders' Callbacks call this file, not the
-%   split helpers zef_update_contrast.m / zef_update_brightness.m.
 %
 %   Finds Tag='update_contrast_slider' (range -1..1), Tag=
 %   'update_brightness_slider' (range 0..5), and Tag='colormapselection'
@@ -21,7 +16,7 @@ function [contrast_val, brightness_val] = zef_update_contrast(varargin)
 %   [contrast_val, brightness_val] = zef_update_contrast_and_brightness
 %   [contrast_val, brightness_val] = zef_update_contrast_and_brightness(h_figure)
 %
-%   See also zef_update_contrast, zef_update_brightness, zef_brightness_and_contrast.
+%   See also zef_brightness_and_contrast.
 if isequal(evalin('caller','exist(''zef'')'),1)
     zef = evalin('caller','zef');
 else

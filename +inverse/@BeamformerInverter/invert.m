@@ -9,12 +9,10 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
 %   Called from utilities.inverse.run_frame_loop. Inverse tools → Beamformer
 %   uses zef_beamformer, not this method.
 %
-%   If error_cov is set, columns are Mahalanobis-whitened (C \ L) with
-%   Tikhonov on C from cov_reg_parameter. initialize fills error_cov from
-%   the measurement frames when it was empty; invert does not. Calling
-%   invert without error_cov leaves L_modified undefined. Then each source:
-%   fixed orientation (procFile.s_ind_4) then free (the rest of s_ind_0).
-%   Weights depend on method_type:
+%   If precompute stored the linear operator, z = B*f. Otherwise this file
+%   regularizes error_cov, forms L_modified = C\L, and scans procFile.s_ind_4
+%   (fixed) then free sources. Calling invert without error_cov leaves
+%   L_modified undefined. Weights depend on method_type:
 %     "Linearly constrained minimum variance (LCMV) beamformer"
 %     "Unit noise gain (UNG) beamformer"
 %     "Unit-gain constrained beamformer"
@@ -54,9 +52,33 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
 
     end
     self.computing_parameters = false;
+
+    % B is only valid for the lead field, orientation split and settings it
+    % was built from. Drop it on any mismatch: B*f ignores the L passed in, so
+    % a stale operator would otherwise be applied to a different model without
+    % any warning.
+    if ~isempty(self.precomputed_inverse_operator) ...
+            && ~isequaln(self.precomputed_cache_key, self.cacheKey(L, procFile))
+        self.precomputed_inverse_operator = [];
+        self.precomputed_cache_key = struct([]);
+    end
+
+    % Fast path: if precompute stored B, each frame is one matrix–vector
+    % product. Skip the nested waitbar — run_frame_loop already reports
+    % frame progress, and B*f is milliseconds.
+    has_cache = ~isempty(self.precomputed_inverse_operator);
+    if has_cache
+        f_use = f;
+        if isa(f_use, "gpuArray")
+            f_use = gather(f_use);
+        end
+        z_vec = self.precomputed_inverse_operator * f_use;
+        return;
+    end
+
     % Initialize waitbar with a cleanup object that automatically closes the
     % waitbar, if there is an interruption with Ctrl + C or when this function
-    % exits.
+    % exits. Only used by the legacy per-source path below.
     if self.number_of_frames <= 1
         h = zef_waitbar(0,'Beamforming reconstruction.');
         cleanup_fn = @(wb) close(wb);
@@ -70,13 +92,14 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
     LF_normalization = 1;
 
     % invert assumes initialize already filled error_cov (run_frame_loop).
-    % Without C, L_modified is never assigned and the loops below error.
     % C ← C + λ_cov tr(C)/m I; L_modified = C\L  (Mahalanobis / whitened L).
-    if not(isempty(self.error_cov))
-        C = self.error_cov;
-        C = C + lambda_cov*trace(C)*eye(size(C))/size(f,1);
-        L_modified = C\L;
+    if isempty(self.error_cov)
+        error("BeamformerInverter:MissingErrorCov", ...
+            "invert requires error_cov. Call initialize(L, f_data) first or set error_cov.");
     end
+    C = self.error_cov;
+    C = C + lambda_cov*trace(C)*eye(size(C))/size(f,1);
+    L_modified = C\L;
 
     fixed_orientation_source_inds = procFile.s_ind_4;
     free_orientation_source_inds=setdiff(1:length(procFile.s_ind_0), procFile.s_ind_4);

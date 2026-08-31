@@ -1,30 +1,42 @@
 function [y_1, y_2, y_3, b_coord, volume] = zef_volume_scalar_matrix_uFG(nodes, tetra, h, x_1, x_2, x_3, u_field, scalar_field, i_node_ind, b_coord, volume)
-%ZEF_VOLUME_SCALAR_MATRIX_UFG  Matrix-free y = ∫ u ψ_k (∇ψ_j)_h x_j φ dV.
+%ZEF_VOLUME_SCALAR_MATRIX_UFG  Matrix-free ∫ σ u ψ_k ψ_j (∇ψ)_h · x dV.
 %
 %   Zeffiro Interface.
 %   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Does not build a sparse matrix. Triple loop over local vertices (i,j,k)
-%   accumulates three N×1 vectors with accumarray(tetra(:,i), ...).
-%   Weights [1/10 1/20] (uFG). Optional i_node_ind scatters/gathers a
-%   subset of DOFs; GPU arrays are preserved. b_coord and volume can be
-%   reused across calls (nargin>=10).
+%   Applies the Navier-Stokes convection operator to the three components of
+%   a nodal vector field without assembling it, which is why it takes x_1,
+%   x_2, x_3 and returns y_1, y_2, y_3 rather than a matrix. h selects the
+%   Cartesian component of the gradient, so the caller invokes it once per
+%   direction.
 %
-%   No first-party caller in this tree.
+%   The pairing weights come from zef_barycentric_weighting('uFG') and are
+%   [1/10 1/20], i.e. the P1 tetrahedral mass-matrix entries V/10 on the
+%   diagonal and V/20 off it. Only the products of two hat functions are
+%   integrated exactly this way; the gradient factor is constant per element
+%   and already carries the 1/V scaling from zef_volume_barycentric.
+%
+%   i_node_ind restricts the operator to a submesh: the inputs are scattered
+%   into full-length node vectors, the assembly runs over all tetrahedra, and
+%   the result is gathered back onto i_node_ind. Pass b_coord and volume back
+%   in on later calls to skip recomputing the barycentric data.
 %
 %   [y_1, y_2, y_3, b_coord, volume] = zef_volume_scalar_matrix_uFG( ...
-%       nodes, tetra, h, x_1, x_2, x_3, u_field, scalar_field, i_node_ind, b_coord, volume)
+%       nodes, tetra, h, x_1, x_2, x_3, u_field, scalar_field, i_node_ind)
+%   [...] = zef_volume_scalar_matrix_uFG(..., i_node_ind, b_coord, volume)
 %
-%   Inputs
-%     h           - 1..3, which gradient component of the j-hat.
-%     x_1,x_2,x_3 - N×1 nodal vector field (the "x" in uFG).
-%     u_field     - N×1 nodal scalar u.
-%     scalar_field- T×1 per-tet φ.
-%     i_node_ind  - optional subset of node indices; empty = all.
+%   Restored from upstream m/barycentric/. It was dropped during the
+%   reorganization even though zef_barycentric_weighting kept its 'uFG' case,
+%   which left its only caller, zef_nse_iteration, referring to a kernel that
+%   did not exist. Note that caller has never been reachable in either tree
+%   (see the note in zef_nse_iteration), so this routine's behaviour inside a
+%   full NSE run is untested; tests.unit.VolumeScalarMatrixUFGTest checks the
+%   assembly itself against a direct reference.
 %
-%   See also zef_volume_barycentric, zef_barycentric_weighting.
+%   See also zef_barycentric_weighting, zef_volume_barycentric,
+%   zef_volume_scalar_matrix_FG, zef_nse_iteration.
 
 if nargin < 10
     b_coord = zeros(size(tetra,1),size(tetra,2),4);
@@ -99,6 +111,5 @@ if nargin >= 9
     end
 
 end
-
 
 end

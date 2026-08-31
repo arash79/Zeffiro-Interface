@@ -60,6 +60,11 @@ classdef DipoleScanInverter < inverse.CommonInverseParameters & handle
 
         precomputed_V_pages (:,:,:) {mustBeA(precomputed_V_pages,["double","gpuArray"])} = []
 
+        % Fingerprint of the lead field and settings the caches above were
+        % built from. invert discards them on any mismatch. See
+        % inverse.precompute_cache_key.
+        precomputed_cache_key struct = struct([])
+
     end % properties
 
     methods
@@ -132,6 +137,18 @@ classdef DipoleScanInverter < inverse.CommonInverseParameters & handle
         self = precompute(self, L)
 
         [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
+
+        function key = cacheKey(self, L)
+            %cacheKey  Fingerprint of L plus every setting the caches depend on.
+            %
+            %   The whitening comes from noise_cov and the cached singular
+            %   values carry the Tikhonov shift selected by reg_type /
+            %   reg_parameter.
+            key = inverse.precompute_cache_key(L, { ...
+                gather(double(self.noise_cov)), ...
+                self.reg_type, ...
+                double(self.reg_parameter)});
+        end
 
     end % methods
 

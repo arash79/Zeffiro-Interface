@@ -1,15 +1,17 @@
-## Folder purpose
+# inverse.CSMInverter
 
-Class inverter for cortical source mapping: dSPM, sLORETA, 3D sLORETA, and sparse Bayesian learning. Solves `L x ≈ f` with a minimum-norm backbone plus per-source standardization (or iterative gamma for SBL).
+Cortical source mapping on a minimum-norm backbone. Raw MNE amplitudes mix source strength with the lead-field column norm, so a deep source looks weak. dSPM and sLORETA divide by a noise or resolution factor so maps are more comparable across locations. SBL is a different, iterative sparse model on the same class.
+
+Solves `L x ≈ f`. Registry ids `csm`, `dspm`, `sloreta`, `sloreta3d`, `sbl` all construct this class. Default `method_type` is `"dSPM"`, so `zef_inverse_run(zef, "sloreta")` still runs dSPM unless you pass `MethodParams.method_type`.
 
 ## Main contents
 
 | File | Role |
 |------|------|
-| `CSMInverter.m` | `method_type`, `theta0`, `SBL_number_of_iterations`, cached `P` / `d` |
+| `CSMInverter.m` | `method_type`, `theta0`, `SBL_number_of_iterations`, cached `P` / `d` / 3D `Minv` |
 | `initialize.m` | `theta0 = (1-noise_p2) * ‖f‖² / ‖L‖²`, `noise_p2 = 10^(-SNR/10)` |
-| `precompute.m` | For dSPM/sLORETA only: `P = L'/(L L' + S)`, `S = (std²/θ₀) I`, `std = 10^(-SNR/20)` |
-| `invert.m` | `z = d .* (P f)` (dSPM); extra `/sqrt(θ₀)` for sLORETA; 3×3 `sqrtm` per source for `"sLORETA 3D"`; SBL gamma loop |
+| `precompute.m` | dSPM / sLORETA / sLORETA 3D: `P = L'/(L L' + S)`, `S = (std²/θ₀) I`, `std = 10^(-SNR/20)` |
+| `invert.m` | `z = d .* (P*f)` (dSPM); extra `/sqrt(θ₀)` for sLORETA; cached 3×3 `G^{-1/2}` for `"sLORETA 3D"`; SBL gamma loop |
 
 ## Code functionality
 
@@ -24,7 +26,7 @@ Parameters:
 
 ## Workflow context
 
-Used via `zef_inverse_run` / dispatch after lead field and measurements exist. Legacy GUI: `legacy_csm` → `zef_CSM_iteration` (`tools/plugins/ClassicalSparseMethods`), not this class.
+Used via `zef_inverse_run` / dispatch after lead field and measurements exist. Legacy GUI: `legacy_csm` → `zef_CSM_iteration` (`plugins/ClassicalSparseMethods`), not this class.
 
 ## Usage instructions
 
@@ -36,7 +38,7 @@ Used via `zef_inverse_run` / dispatch after lead field and measurements exist. L
 
 ## Important notes
 
-Registry id `"sloreta"` alone does not set `method_type` to sLORETA — pass `MethodParams`. Parity with the plugin: `+tests/ClassVsLegacyTest.m`.
+Registry id `"sloreta"` alone does not set `method_type` to sLORETA — pass `MethodParams`. Both-paths-run (not numerical equality): `tests.integration.ClassVsLegacyTest`. sLORETA kernel: `tests.unit.CSMInverterSLoretaTest`.
 
 ## Developer guidance
 

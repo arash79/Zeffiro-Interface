@@ -1,42 +1,44 @@
-# external/spm12
+# `external/spm12`
 
-## Purpose of this folder
+## Folder purpose
 
-This folder is responsible for placeholder folders for optional external solver/toolbox submodules within the Zeffiro Interface project.
+Optional **SPM12** neuroimaging toolbox (git submodule). Zeffiro does not use SPM as the FEM or inverse engine. The clone exists so scripts that `which` SPM file I/O or volume helpers can resolve after `zeffiro_setup`. Empty until cloned. Not first-party code.
 
-## Contents
+## Main contents
 
-This folder currently contains no tracked source or asset files. It is kept as a placeholder for runtime or optional dependency content.
+| Item | Role |
+|------|------|
+| Vendor tree (after clone) | SPM12 sources |
+| This README | Integration only |
 
-## How this folder fits into the overall workflow
+`.gitmodules`: `https://github.com/spm/spm12.git`, branch `master`. No `startupscript`.
 
-Zeffiro Interface starts in `zeffiro_interface.m`, adds the project runtime paths, and then calls into folders like this one as the GUI, examples, plugins, or numerical routines require placeholder folders for optional external solver/toolbox submodules.
+## Code functionality
 
-## GUI usage
+`zeffiro_setup` `addpath('external/spm12')` after clone. No `run(spm …)` from `zef_start_config`. Core mesh / lead field / inverse paths (`src/mesh`, `src/forward`, `+inverse`) do not call `spm_*`.
 
-There is no direct GUI entry point here; these folders are dependency locations populated by setup when optional submodules are installed.
+## Workflow context
 
-## Programmatic usage
+```
+Optional clone → path for user or converter scripts
+  → Zeffiro anatomy still typically comes from .zef / fs2zef / brainstorm2zef
+```
 
-From MATLAB, start from the project root and initialize paths with either `zeffiro_interface` or `addpath(genpath(projectRoot))` when you only need utility functions.
+FreeSurfer conversion: `utilities.fs2zef`. Brainstorm: `utilities.brainstorm2zef`.
 
-This folder has no directly callable MATLAB source files. Use the files here through the surrounding GUI, data import, profile, or documentation workflow.
+## Usage instructions
 
-## Examples
+```matlab
+zeffiro_setup("submodules", "spm12");
+```
 
-GUI example: use the surrounding Zeffiro workflow that references this folder's assets or configuration files.
+## Important notes
 
-MATLAB example: load or inspect these files with standard MATLAB I/O functions such as `load`, `readmatrix`, or `fileread` when appropriate.
+- Placeholder directory is expected in a fresh clone.
+- SPM license and batch GUI remain SPM’s.
+- Putting SPM on the path can affect `which` for generic names (`spm.m`).
 
-## Dependencies and assumptions
+## Developer guidance
 
-- The Zeffiro project root should be available on the MATLAB path before calling source files directly.
-- Many routines assume a populated `zef` struct created by `zeffiro_interface` and updated by GUI callbacks.
-- Optional dependency folders may be empty until `zeffiro_setup` initializes the configured submodules.
-
-## Notes for developers
-
-- Keep documentation synchronized with behavior when adding or moving files; this repository now expects every folder to have a current `README.md`.
-- Preserve numerical algorithms, GUI callback contracts, and `zef` field names unless a coordinated migration updates all callers.
-- Prefer package-qualified functions in `+...` folders and avoid adding package directories themselves directly to the MATLAB path.
-- Treat `.fig`, `.mlapp`, `.mat`, and sample data files as part of the public workflow: document required fields and formats when they change.
+- Do not move Zeffiro volume I/O into this submodule.
+- Pitfall: documenting SPM as required for the default multicompartment head demo — it is not.

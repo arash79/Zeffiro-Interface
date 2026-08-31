@@ -1,7 +1,6 @@
 function tensor_array = zef_dti_tensor_interpolate_mesh_space( ...
         mesh_centroids, dti_tensor, fa_nifti_info, register_transform, ...
-        scale_value, roi_radius, mode, h_waitbar)
-
+        scale_value, roi_radius, mode, h_waitbar, T_mesh2voxel)
 %ZEF_DTI_TENSOR_INTERPOLATE_MESH_SPACE  Interpolate DTI conductivity to mesh centroids.
 %
 %   Zeffiro Interface.
@@ -9,64 +8,65 @@ function tensor_array = zef_dti_tensor_interpolate_mesh_space( ...
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Maps mesh tetra centroids (mm) into FA voxel space via inv(T_register *
-%   T_nifti), then samples dti_tensor [nx×ny×nz×6] on the regular grid.
-%   Modes: 'nearest' (voxel rounding) or 'radius_average'/'kdtree' (trilinear
-%   via griddedInterpolant). Enforces positive-definite symmetric tensors with
-%   Sylvester check; out-of-range voxels get scale_value isotropic fallback.
+%   Two mesh→voxel paths:
+%     1. T_mesh2voxel (9th argument): FreeSurfer 0-based voxels, +1 for
+%        MATLAB indexing. Polar rotation uses inv(T(1:3,1:3)).
+%     2. Legacy: T_combined = T_register * T_nifti (MATLAB 1-based NIfTI
+%        voxel indices). Polar rotation uses T_combined(1:3,1:3).
+%
+%   After sampling, packed tensors are rotated by the polar factor of the
+%   voxel→mesh linear map (R σ R', eigenvalues unchanged). Modes:
+%   'nearest' or 'radius_average'/'kdtree' (trilinear). SPD enforced
+%   (Sylvester); out-of-range voxels get scale_value isotropic fallback.
 %
 %   tensor_array = zef_dti_tensor_interpolate_mesh_space( ...
 %       mesh_centroids, dti_tensor, fa_nifti_info, register_transform, ...
-%       scale_value, roi_radius, mode, h_waitbar)
+%       scale_value, roi_radius, mode, h_waitbar, T_mesh2voxel)
 %
-%   Input
-%     mesh_centroids     - [M × 3] tetra centroids, millimetres (mesh / tkRAS)
-%     dti_tensor         - [nx ny nz 6] single/double, voxel FA space
-%     fa_nifti_info      - niftiinfo struct (Transform.T, row-vector affine)
-%     register_transform - 4×4 FreeSurfer register.dat (FA voxel → mesh)
-%     scale_value        - isotropic fallback σ for out-of-FOV tetra
-%     roi_radius         - unused in nearest/trilinear paths (kept for API)
-%     mode               - 'nearest' or 'radius_average'/'kdtree' (trilinear)
-%     h_waitbar          - optional waitbar handle
-%
-%   Output tensor_array is [M × 6], SPD-enforced (Sylvester), millimetres
-%   of conductivity per tetra centroid.
-%
-%   See also zef_dti_apply_to_sigma, zef_freesurfer_fa_to_conductivity.
+%   See also zef_dti_apply_to_sigma, zef_dti_get_mesh2voxel,
+%            zef_freesurfer_fa_to_conductivity.
 
 
 if nargin < 8, h_waitbar = []; end
+if nargin < 9, T_mesh2voxel = []; end
 
 % ---- Dimensions ----------------------------------------------------------
 [nx, ny, nz, ~] = size(dti_tensor);
 M = size(mesh_centroids, 1);
+pts_mesh = [mesh_centroids, ones(M, 1)];
 
-% ---- Extract NIfTI voxel→tkRAS transformation ---------------------------
-T_nifti = [];
-if isfield(fa_nifti_info, 'Transform')
-    if isfield(fa_nifti_info.Transform, 'T')
-        T_nifti = fa_nifti_info.Transform.T;
-    elseif isfield(fa_nifti_info.Transform, 'Matrix')
-        T_nifti = fa_nifti_info.Transform.Matrix;
-    elseif isa(fa_nifti_info.Transform, 'affine3d')
-        T_nifti = fa_nifti_info.Transform.T;
+use_fs_tkr = ~isempty(T_mesh2voxel);
+if use_fs_tkr
+    T_mesh2voxel = zef_dti_as_column_affine(T_mesh2voxel);
+    pts_vox = (T_mesh2voxel * pts_mesh')';
+    vx = pts_vox(:, 1) + 1;
+    vy = pts_vox(:, 2) + 1;
+    vz = pts_vox(:, 3) + 1;
+    R_lin = T_mesh2voxel(1:3, 1:3) \ eye(3);
+else
+    T_nifti = [];
+    if isfield(fa_nifti_info, 'Transform')
+        if isfield(fa_nifti_info.Transform, 'T')
+            T_nifti = fa_nifti_info.Transform.T;
+        elseif isfield(fa_nifti_info.Transform, 'Matrix')
+            T_nifti = fa_nifti_info.Transform.Matrix;
+        elseif isa(fa_nifti_info.Transform, 'affine3d')
+            T_nifti = fa_nifti_info.Transform.T;
+        end
     end
+    if isempty(T_nifti)
+        error('NIfTI transformation matrix not available.');
+    end
+    T_nifti = zef_dti_as_column_affine(T_nifti);
+    register_transform = zef_dti_as_column_affine(register_transform);
+    T_combined = register_transform * T_nifti;
+    T_inv = inv(T_combined); %#ok<MINV>
+    pts_vox = (T_inv * pts_mesh')';
+    vx = pts_vox(:, 1);
+    vy = pts_vox(:, 2);
+    vz = pts_vox(:, 3);
+    R_lin = T_combined(1:3, 1:3);
 end
-if isempty(T_nifti)
-    error('NIfTI transformation matrix not available.');
-end
-
-% ---- Compute inverse transform: mesh_tkRAS → FA voxel -------------------
-T_combined = register_transform * T_nifti;      % FA_voxel → mesh
-T_inv      = inv(T_combined);                    % mesh → FA_voxel  %#ok<MINV>
-
-% ---- Transform all mesh centroids to FA voxel coordinates (vectorized) ---
-%  [M×4] = [M×4] * [4×4]'  (row-vector convention: p_vox = p_mesh * T_inv')
-pts_mesh = [mesh_centroids, ones(M, 1)];         % [M×4]
-pts_vox  = pts_mesh * T_inv';                     % [M×4]
-vx = pts_vox(:, 1);
-vy = pts_vox(:, 2);
-vz = pts_vox(:, 3);
 
 % ---- Flatten tensor to [N×6] for fast linear-index lookup ----------------
 tensor_flat = reshape(dti_tensor, [], 6);         % [N×6], single
@@ -125,6 +125,10 @@ if any(zero_mask)
     tensor_array(zero_mask, 2) = scale_value;
     tensor_array(zero_mask, 3) = scale_value;
 end
+
+% Voxel-index σ → mesh-frame σ. Polar factor drops voxel-size scaling.
+R_mesh = zef_dti_polar_rotation(R_lin);
+tensor_array = zef_dti_rotate_packed_sigma(tensor_array, R_mesh);
 
 % ---- Vectorized positive-definiteness enforcement (Sylvester criterion) --
 %  A 3×3 symmetric matrix [a b c; b d e; c e f] is positive definite iff:

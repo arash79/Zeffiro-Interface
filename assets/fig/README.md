@@ -2,57 +2,46 @@
 
 ## Folder purpose
 
-Branding images and legacy GUIDE figure layouts used by the core GUI. `zeffiro_interface` adds this directory to the MATLAB path so `which` / `imread` / App Designer `ImageSource` can resolve logos by filename. Plugin-specific `.fig` / `.mlapp` files stay under `tools/plugins/*/fig` and `*/mlapp`.
+Branding images, unified-shell icons, and the remaining EIT GUIDE figure. `zeffiro_interface` adds this directory (via `genpath`) to the MATLAB path so `which` / `imread` / App Designer `ImageSource` can resolve files by name.
 
 ## Main contents
 
 | Asset | Typical use |
 |-------|-------------|
-| `zeffiro_logo.png` | Primary logo |
 | `zeffiro_small_logo.png` | Compact logo in tool headers / waitbar |
-| `zeffiro_logo_compass.png` | Compass-branded logo |
-| `zeffiro_interface_compass.png` | Interface splash / about imagery |
-| `zeffiro_mesh_symbol.png` / `zeffiro_symbol_mesh.png` | Mesh-themed marks |
-| `zeffiro_symbol_compass.png` | Compact compass symbol |
-| `tools/` | Legacy GUIDE `.fig` for core tools when `zef.mlapp == 0`, plus tool-local PNG copies |
-
-See `tools/README.md` for the GUIDE layout inventory.
+| `zeffiro_logo_compass.png` | Compass-branded logo (menu / segmentation) |
+| `zeffiro_interface_compass.png` | Figure-tool header / about imagery |
+| `ui/*.png` | Themed line icons (`zef_ui_icons`) |
+| `ui/Zeffiro_Modern_Icons/svg_masters/` | Vector sources for the line icons |
+| `tools/zef_find_synthetic_eit_data.fig` | Find synthetic EIT data GUIDE UI |
 
 ## Code functionality
 
-No executable code here — binary PNG/FIG assets only. Consumers include:
-
-- `src/core/zef_waitbar.m` (logo)
-- Menu / segmentation / mesh App Designer exports (`ImageSource`)
-- Layout helpers under `src/gui/helpers`
+No executable code. Consumers include `zef_waitbar`, App Designer `ImageSource`, `zef_ui_icons`, `zef_ui_shell`, and `zef_find_synthetic_eit_data`.
 
 ## Workflow context
 
 ```
-zeffiro_interface → addpath(assets/fig)
-src/gui/tools + src/gui/apps → load logos / optional legacy .fig
-tools/plugins/*/fig → plugin UIs (separate tree)
+assets/fig → path
+src/gui/chrome (theme/icons/shell) + src/gui/apps + plugins → load by filename
 ```
 
-## Usage instructions
+Plugin-specific figs/mlapps stay under `plugins/*/fig` and `*/mlapp`.
 
-From MATLAB (after startup):
+## Usage instructions
 
 ```matlab
 which zeffiro_small_logo.png
 imshow(imread(which('zeffiro_logo_compass.png')));
+folder = zef_ui_icons('folder');   % …/assets/fig/ui
 ```
-
-When authoring App Designer UIs, point image widgets at these filenames (path must include `assets/fig`).
 
 ## Important notes
 
-- **Filenames are part of the public contract** — renaming breaks `which`/`imread` call sites.
-- `.DS_Store` may appear locally; do not treat it as a project asset.
-- High-resolution PNGs are large; avoid duplicating them into every plugin folder (prefer path lookup).
+- Filenames are an API — renaming breaks `which`/`imread` call sites.
 
 ## Developer guidance
 
-- Add new brand marks here with stable, descriptive names; update waitbar/menu consumers in the same change.
-- Prefer App Designer (`.mlapp`) for new tools; keep `tools/*.fig` only for `zef.mlapp == 0` compatibility.
-- Pitfall: embedding absolute filesystem paths in `.mlapp` instead of path-relative filenames.
+- Add new brand marks with stable descriptive names; update waitbar/menu consumers in the same change.
+- Prefer App Designer / programmatic layouts; keep GUIDE figs only where still required (EIT synthetic today).
+- Pitfall: embedding absolute paths in `.mlapp` instead of path-relative filenames.

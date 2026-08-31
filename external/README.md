@@ -1,52 +1,54 @@
 # external
 
-## Purpose of this folder
+## Folder purpose
 
-This folder is responsible for placeholder folders for optional external solver/toolbox submodules within the Zeffiro Interface project.
+Git submodule placeholders for optional third-party toolboxes. They are **not** on the default Zeffiro path. `zeffiro_setup` clones the names listed in `.gitmodules` into these folders and writes `src/app/zef_start_config.m` so a later `zeffiro_interface` session can `addpath` them.
 
-## Contents
+## Main contents
 
-Subfolders:
-- `CVX/` - placeholder folders for optional external solver/toolbox submodules.
-- `fieldtrip/` - placeholder folders for optional external solver/toolbox submodules.
-- `OSQP/` - placeholder folders for optional external solver/toolbox submodules.
-- `SDPT3/` - placeholder folders for optional external solver/toolbox submodules.
-- `SeDuMi/` - placeholder folders for optional external solver/toolbox submodules.
-- `SESAME/` - placeholder folders for optional external solver/toolbox submodules.
-- `spm12/` - placeholder folders for optional external solver/toolbox submodules.
+| Folder | Typical use |
+|--------|-------------|
+| `CVX/` | Convex modeling; `cvx_startup.m`; ES Workbench `zef_cvx_*` |
+| `SDPT3/`, `SeDuMi/` | CVX numeric backends (`cvx_solver('sdpt3')` / `'sedumi'`) |
+| `OSQP/` | Optional OSQP MATLAB path; **no** first-party `osqp` wrapper today |
+| `SESAME/` | Optional SESAME_core (`hyperprior`); GUI still uses `plugins/SESAME` |
+| `fieldtrip/` | Optional MEG/EEG I/O; `ft_defaults.m` |
+| `spm12/` | Optional SPM path; not used by mesh/lead-field/inverse cores |
 
-Files and assets:
-- `.DS_Store` - project file or asset.
+Each child folder has a Zeffiro-integration `README.md`. Vendor manuals stay inside the cloned trees. Empty placeholders are expected until `zeffiro_setup` (or `git submodule update`) populates them. Submodule URLs and optional `startupscript` entries live in the repository-root `.gitmodules`.
 
-## How this folder fits into the overall workflow
+## Code functionality
 
-Zeffiro Interface starts in `zeffiro_interface.m`, adds the project runtime paths, and then calls into folders like this one as the GUI, examples, plugins, or numerical routines require placeholder folders for optional external solver/toolbox submodules.
+`zeffiro_setup` reads `.gitmodules`, clones missing submodules into these folders, and writes `src/app/zef_start_config.m` with `addpath` (and optional startup-script) lines. `zeffiro_interface` then runs that generated config so solvers that `which` CVX/OSQP/FieldTrip succeed. Empty placeholder directories are expected in a fresh clone; they are not vendor source until populated. Do not treat files that appear here after clone as first-party Zeffiro code.
 
-## GUI usage
+## Workflow context
 
-There is no direct GUI entry point here; these folders are dependency locations populated by setup when optional submodules are installed.
+```
+.gitmodule names
+  → zeffiro_setup (clone + zef_start_config.m)
+  → zeffiro_interface addpath
+  → plugins/ZeffiroESWorkbench (CVX + SDPT3/SeDuMi)
+  → plugins/SESAME (GUI; this tree optional)
+  → optional FieldTrip / SPM user scripts
+```
 
-## Programmatic usage
+`zef_start_config` `addpath`s each cloned folder (not `genpath(external)`). Startup scripts run only when `.gitmodules` defines `startupscript` and the file exists (CVX, FieldTrip today).
 
-From MATLAB, start from the project root and initialize paths with either `zeffiro_interface` or `addpath(genpath(projectRoot))` when you only need utility functions.
+## Usage instructions
 
-This folder has no directly callable MATLAB source files. Use the files here through the surrounding GUI, data import, profile, or documentation workflow.
+```matlab
+zeffiro_setup("submodules", "all");           % clone every named submodule
+zeffiro_setup("submodules", "CVX");           % one package
+zeffiro_setup("skip_submodules", true);       % rewrite config without git
+```
 
-## Examples
+## Important notes
 
-GUI example: use the surrounding Zeffiro workflow that references this folder's assets or configuration files.
+- Do not `addpath(genpath('external'))` yourself; let `zef_start_config` do it.
+- Vendor copies keep their original licenses.
+- SESAME GUI remains `plugins/SESAME` (ships `inverse_SESAME.m`; submodule branch is `hyperprior`).
+- Only CVX and FieldTrip define `startupscript` in `.gitmodules` today.
 
-MATLAB example: load or inspect these files with standard MATLAB I/O functions such as `load`, `readmatrix`, or `fileread` when appropriate.
+## Developer guidance
 
-## Dependencies and assumptions
-
-- The Zeffiro project root should be available on the MATLAB path before calling source files directly.
-- Many routines assume a populated `zef` struct created by `zeffiro_interface` and updated by GUI callbacks.
-- Optional dependency folders may be empty until `zeffiro_setup` initializes the configured submodules.
-
-## Notes for developers
-
-- Keep documentation synchronized with behavior when adding or moving files; this repository now expects every folder to have a current `README.md`.
-- Preserve numerical algorithms, GUI callback contracts, and `zef` field names unless a coordinated migration updates all callers.
-- Prefer package-qualified functions in `+...` folders and avoid adding package directories themselves directly to the MATLAB path.
-- Treat `.fig`, `.mlapp`, `.mat`, and sample data files as part of the public workflow: document required fields and formats when they change.
+Add a new optional dependency by adding a submodule under `external/` and a matching `[submodule]` block in `.gitmodules`. Keep this README’s table in sync with those names.

@@ -13,8 +13,11 @@ function sensitivity_map = zef_sensitivity_map_mne( ...
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Repeatedly perturbs dipole locations, runs MNE reconstructions, and
-%   records localization error metrics (distance, angle, magnitude, dispersion).
+%   Opens the MNE tool, sets mne_type from weighting_type ('MNE' / 'dSPM' /
+%   'sLORETA', default 'sLORETA') and mne_prior = 2, then repeats
+%   zef_rec_diff(..., @zef_find_mne_reconstruction, ...) n_reconstructions
+%   times. Each trial probes every source × xyz axis; it does not jitter
+%   source positions. Independent noise draws occur when noise_level < 0.
 %
 
     arguments

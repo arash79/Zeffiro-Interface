@@ -9,8 +9,7 @@ function zef_logarithmic_distribution(parameter_vec)
 %   Function. Mesh visualization → Plot graph. Clips parameter_vec at 1e-30.
 %   Draws on zef.h_axes1 (base).
 
-axes(evalin('base','zef.h_axes1')
-);
+axes(evalin('base','zef.h_axes1'));
 
 h_axes = evalin('base','zef.h_axes1');
 cla(h_axes,'reset');

@@ -28,11 +28,13 @@ Pattern: instantiate `*_app_exported` → `zef_assign_data` → set string callb
 
 **Mesh tool:** Create/Postprocess FEM mesh, Source interpolation, Resample field/surfaces, Run script, Apply transform, Save/Update forward INI. Checkboxes and numeric fields call `zef_update_mesh_tool`. Forward-table Script cells are trusted `eval` code.
 
-**Figure tool:** Script builds `h_zeffiro` with `uiaxes` (`h_axes1`), applies `zef_ui_theme`, and lays out via `zef_figure_tool_layout` (also on `SizeChangedFcn` / Toggle controls). Controls: edges, time slider, color/transparency/lighting via `zef_update_*`; Play/Stop/Logo; compartment/sensor color lists (`zef_colored_list`). `DeleteFcn` = `zef_reopen_figure`. **Window → Figure tool** rebuilds via `zef_figure_tool`. Layout helpers live in `src/gui/helpers`.
+**Figure tool:** Script builds `h_zeffiro` with `uiaxes` (`h_axes1`), applies `zef_ui_theme`, and lays out via `zef_figure_tool_layout` (also on `SizeChangedFcn` / Toggle controls). Controls: edges, time slider, color/transparency/lighting via `zef_update_*`; Play/Stop/Logo; compartment/sensor color lists (`zef_colored_list`). `DeleteFcn` = `zef_reopen_figure`. **Window → Figure tool** rebuilds via `zef_figure_tool`. Layout helpers live in `src/gui/chrome`.
 
 **Mesh visualization:** Visualize volume/surfaces, Frame/Movie, Axes pop-up, Plot graph, DTI streamlines, clipping, cones/streamlines/contours, visualization type and distribution mode. Graph list from `graph_bank` help text.
 
 **Parcellation:** not at startup; **Multi-tools → Parcellation tool** → `zef_tool_start` → open/init/window. Button map in `src/parcellation/README.md`.
+
+Class-solver Inverse-tools windows (`zef_eloreta_start`, …) also go through `zef_tool_start`, then `zef_open_class_inverse` in `src/gui/open/`. They are not created here.
 
 ## Workflow context
 
@@ -54,4 +56,4 @@ zef.h_mesh_tool = zef_window_visible(zef, zef.h_mesh_tool);
 
 ## Developer guidance
 
-See `src/gui/README.md` for the layer map, `src/core/zef_start.m` for open order, `src/mesh/README.md` for Create FEM mesh computation. Keep App Designer labels as the source of truth for button text.
+See `src/gui/README.md` for the layer map, `src/app/zef_start.m` for open order, `src/mesh/README.md` for Create FEM mesh computation. Keep App Designer labels as the source of truth for button text.

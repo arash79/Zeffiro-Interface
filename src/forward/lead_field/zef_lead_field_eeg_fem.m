@@ -8,7 +8,6 @@ function [L_eeg, dipole_locations, dipole_directions] = lead_field_eeg_fem( ...
     optimization_system_type, ...
     varargin ...
     )
-
 %LEAD_FIELD_EEG_FEM  FEM EEG lead field via stiffness, PCG transfer, G, and Schur.
 %
 %   Zeffiro Interface.
@@ -20,11 +19,17 @@ function [L_eeg, dipole_locations, dipole_directions] = lead_field_eeg_fem( ...
 %   The first function name in this file is the historical lead_field_eeg_fem.
 %
 %   Pipeline: tetra volumes → zef_stiffness_matrix → zef_build_electrodes
-%   (PEM if electrodes have 3 columns, CEM if 4) → zef_transfer_matrix PCG
-%   per electrode → zef_lead_field_interpolation G → L = Schur \ (T'*G)
-%   with mean-zero rows. Nodes must already be metres. sigma is a cell
-%   {tetra_sigma, prism_sigma} or a matrix: 1 column isotropic (expanded to
-%   diagonal tensor) or 6 columns anisotropic [σ11 σ22 σ33 σ12 σ13 σ23].
+%   (PEM if electrodes have 3 columns of xyz in metres; CEM if 4 columns
+%   of attachment indices from zef_attach_sensors_volume, not metres) →
+%   zef_transfer_matrix PCG per electrode → zef_lead_field_interpolation G
+%   → L = Schur \ (T'*G) with mean-zero rows. Nodes must already be metres.
+%   sigma is a cell {tetra_sigma, prism_sigma} or a matrix: 1 column
+%   isotropic (expanded to a diagonal tensor) or 6 columns anisotropic
+%   [σ11 σ22 σ33 σ12 σ13 σ23].
+%
+%   Schur handle passed to zef_transfer_matrix (opposite of TES):
+%     finite impedance → @(T,i) B'*T - C(:,i)
+%     infinite Z       → @(T,i) -C(:,i)
 %
 %   [L_eeg, dipole_locations, dipole_directions] = zef_lead_field_eeg_fem( ...
 %       zef, nodes, elements, sigma, electrodes, p_nearest_neighbour_inds, ...
@@ -35,14 +40,21 @@ function [L_eeg, dipole_locations, dipole_directions] = lead_field_eeg_fem( ...
 %     nodes                     - [n_nodes × 3] metres
 %     elements                  - tetra [n_tet × 4] or {tetra, prisms}
 %     sigma                     - conductivity, see above
-%     electrodes                - PEM [n_el × 3] or CEM [n_el × 4] metres
+%     electrodes                - PEM: [n_el × 3] snapped xyz in metres.
+%                                 CEM: [n_rows × 4] attachment table
+%                                 [electrode_id, n1, n2, n3] from
+%                                 zef.sensors_attached_volume — integer
+%                                 indices, not metres. Session CEM geometry
+%                                 is N×6 on zef.sensors; impedances arrive
+%                                 via lf_param.impedances.
 %     p_nearest_neighbour_inds  - continuous-source neighbours, or []
 %     optimization_system_type  - 'pbo' (default), 'mpo', or 'none'
 %     varargin                  - brain_ind, source_ind, then lf_param struct:
 %                                 pcg_tol (default 1e-6 here if missing),
-%                                 maxit, precond ('cholinc'|'ssor'),
+%                                 maxit, precond ('cholinc'|'ssor'; GPU ignores),
 %                                 direction_mode, dipole_mode, impedances,
-%                                 cholinc_tol, permutation ('symamd')
+%                                 permutation ('symamd'). cholinc_tol is parsed
+%                                 from lf_param and then unused (ichol is nofill).
 %
 %   Output
 %     L_eeg              - [n_electrodes × n_source_columns]
@@ -272,9 +284,6 @@ if isequal(lower(direction_mode),'cartesian') || isequal(lower(direction_mode),'
     dipole_locations = [];
     dipole_directions = [];
 
-    % Set regularization parameter based on literature.
-    % TODO: allow passing this in as a parameter.
-
     regparam = 1e-6;
 
     [G, dipole_locations] = zef_lead_field_interpolation( ...
@@ -298,6 +307,12 @@ if isequal(lower(direction_mode),'cartesian') || isequal(lower(direction_mode),'
     % <https://iopscience.iop.org/article/10.1088/0031-9155/57/4/999/pdf>.
 
     L_eeg = L_eeg - mean(L_eeg, 1);
+
+else
+    error('zef_lead_field_eeg_fem:UnsupportedDirectionMode', ...
+        ['EEG lead-field interpolation requires cartesian or normal direction_mode; ' ...
+         'got ''%s''. source_direction_mode 3 / face_based is not implemented for EEG.'], ...
+        direction_mode);
 
 end % if
 end % function

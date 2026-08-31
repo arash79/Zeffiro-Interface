@@ -325,7 +325,6 @@ if not(isequal(file_name,0))
                     end
                 end
 
-                %eval(['zef.compartments_selected = ' num2str(compartment_ind) ';']);
                 eval(['zef.current_compartment = ''' compartment_tag ''';']);
                 eval(['zef.' compartment_tag '_merge = ' merge ';']);
                 eval(['zef.' compartment_tag '_invert = ' invert ';']);
@@ -388,7 +387,6 @@ if not(isequal(file_name,0))
                         eval(['zef.' compartment_tag '_points = aux_points;']);
                         eval(['zef.' compartment_tag '_triangles = aux_triangles;']);
                         eval(['zef.' compartment_tag '_submesh_ind = aux_submesh_ind;']);
-                      % zef = zef_merge_surface_mesh(zef,compartment_tag,aux_triangles,aux_points,merge);
                     elseif isequal(filetype,'mat')
                         zef = zef_import_mat_struct(zef, filePath,[compartment_tag '_']);
                     end
@@ -438,11 +436,6 @@ if not(isequal(file_name,0))
                     end
                 end
 
-                %assignin('base','zef_data',zef_data);
-                %eval('zef_assign_data;');
-                %clear zef_data;
-
-                %    eval('zef_init_parameter_profile;');
                 zef = zef_apply_parameter_profile(zef);
                 zef = zef_build_compartment_table(zef);
 
@@ -554,7 +547,6 @@ if not(isequal(file_name,0))
                     sensor_taglist_cell = [];
                 end
 
-                %eval(['zef_data.sensora_selected = ' num2str(sensors_ind) ';']);
                 eval(['zef.current_sensors = ''' sensor_tag  ''';']);
                 eval(['zef.' sensor_tag '_name = ''' name ''';']);
                 eval(['zef.' sensor_tag '_on = ' on  ';']);
@@ -567,9 +559,6 @@ if not(isequal(file_name,0))
                 if not(isempty(foldername))
                 zef.file_path = foldername;
                 end
-                %         assignin('base','zef',zef_data);
-                %         eval('zef_assign_data;');
-                %         clear zef_data;
 
                 if not(isempty(filename))
                     if not(isempty(foldername))
@@ -606,7 +595,6 @@ if not(isequal(file_name,0))
 
                 end
 
-                % eval('zef_init_sensors_parameter_profile;');
                 eval('zef = zef_apply_parameter_profile(zef);');
                 eval('zef_build_sensors_table;');
 
@@ -643,16 +631,12 @@ if not(isequal(file_name,0))
                     if not(isempty(foldername))
                         filename = [foldername filesep filename];
                     end
-                    eval(['evalc(''' filename  ''');']);
+                    zef_run_confined_script(filename, folder_name);
                 end
 
             end
 
         end
-
-        %zef_data
-        %assignin('base','zef_data',zef_data);
-        %       eval('zef_assign_data;');
 
         delete(h);
 

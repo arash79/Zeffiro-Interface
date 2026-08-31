@@ -25,7 +25,6 @@ end
 
 set(groot,'defaultFigureVisible','off')
 zef_data = zef_segmentation_tool_app_exported;
-%zef_data.h_zeffiro_window_main.Visible = zef.use_display;
 
 set(groot,'defaultFigureVisible','on')
 zef.fieldnames = fieldnames(zef_data);
@@ -33,7 +32,6 @@ for zef_i = 1:length(zef.fieldnames)
     zef.(zef.fieldnames{zef_i}) = zef_data.(zef.fieldnames{zef_i});
 end
 
-set(zef.h_transform_table,'columnformat',{'numeric','char'});
 set(zef.h_transform_table,'columnformat',{'numeric','char'});
 set(zef.h_sensors_name_table,'columnformat',{'numeric','char','logical'});
 set(zef.h_sensors_table,'columnformat',{'numeric','char',zef.imaging_method_cell,'logical','logical','logical','logical','logical'});
@@ -51,8 +49,6 @@ set(zef.h_sensors_table,'CellSelectionCallback',@zef_sensors_table_selection);
 set(zef.h_sensors_name_table,'CellSelectionCallback',@zef_sensors_name_table_selection);
 
 zef.h_project_notes.ValueChangedFcn = 'zef = zef_update(zef);';
-
-zef.mlapp = 1;
 
 clear zef_data;
 
@@ -76,24 +72,19 @@ zef = zef_ui_tag_handles(zef);
 zef.h_zeffiro_window_main.AutoResizeChildren = 'on';
 zef.h_windows_open = findall(groot, 'Type','figure','-regexp','Name','ZEFFIRO Interface:*','-not','Name','ZEFFIRO Interface: Segmentation tool');
 
-%set(zef.h_zeffiro_window_main,'DeleteFcn','zef_closereq;');
-
 if isempty(zef.h_segmentation_tool_toggle.UserData)
     zef.h_segmentation_tool_toggle.ButtonPushedFcn = 'zef_segmentation_tool_toggle(zef,zef.h_segmentation_tool_toggle);';
     zef.h_set_position.ButtonPushedFcn = 'zef_set_position(zef);';
 
     zef.h_segmentation_tool_toggle.UserData = 1;
-    %eval(zef.h_segmentation_tool_toggle.ButtonPushedFcn);
-    %zef.h_zeffiro_window_main.Position = zef.segmentation_tool_default_position;
 
 end
 
 zef = zef_build_compartment_table(zef);
 
-% CRITICAL FIX: Skip zef_update here during initial load - it can hang on large projects.
-% The table data is already set in zef_build_compartment_table, and zef_update will be
-% called when user interacts with the UI. During load, this call can cause infinite loops.
-% zef = zef_update(zef);  % Commented out to prevent hangs during project load
+% Do not call zef_update here: on large projects it can hang or loop during
+% initial load. Tables are already filled by zef_build_compartment_table;
+% zef_update runs when the user edits the UI.
 
 zef.h_zeffiro_window_main.CloseRequestFcn = 'zef.h_zeffiro_window_main.Visible=''off'';';
 zef.h_zeffiro_window_main.DeleteFcn = 'zef.h_zeffiro_window_main.Visible=''off'';';

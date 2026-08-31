@@ -9,22 +9,18 @@ Low-level **FreeSurfer file parsers** used by the `fs2zef` import pipeline when 
 | Function | Input | Output |
 |----------|-------|--------|
 | `read_ascii_segmentation_file` | FreeSurfer ASCII surface | `nodes`, `faces` |
-| `read_ascii_label_file` | ASCII label `.asc` | `labels`, `colors` |
 | `readFSLUT` | `$FREESURFER_HOME/FreeSurferColorLUT.txt` | struct `No/Name/R/G/B/A` |
-| `readAsegStatsFile` | `aseg.stats` (recon-all) | MATLAB table |
 | `get_volume_centers` | `.mgz` via `mri_info` | `c_r`, `c_s`, `c_a` |
 
 ## Code functionality
 
 - ASCII surface: validates `#!ascii version of…` header, reads node/face counts, parses geometry (`mustBeFile`).
-- ASCII label: `#!ascii label` header; integer labels + RGB columns.
 - `readFSLUT`: `textscan` of LUT, skips `#` comments; errors if `FREESURFER_HOME` unset or file missing.
-- `readAsegStatsFile`: `readtable` + parses `# ColHeaders` / `# NRows` / `# NTableCols` metadata; optional name-value kwargs.
 - `get_volume_centers`: `bash -lc` with `SetUpFreeSurfer.sh` then `mri_info`; regex for `c_r`/`c_s`/`c_a`.
 
 ## Workflow context
 
-Called as `utilities.fs2zef.readers.*` from `+generators/generate_zef_import` (LUT + surfaces), `+transforms/apply_affine_transform` / `compute_affine_transform` (centers), and pipeline tests. Upstream of writing `import_segmentation.zef`.
+Called as `utilities.fs2zef.readers.*` from `+generators/generate_zef_import` (LUT) and `+transforms/compute_affine_transform` (centers), and from the in-package pipeline test. Upstream of writing `import_segmentation.zef`.
 
 ## Usage instructions
 
@@ -33,7 +29,6 @@ setenv('FREESURFER_HOME','/path/to/freesurfer');
 lut = utilities.fs2zef.readers.readFSLUT();
 [nodes,faces] = utilities.fs2zef.readers.read_ascii_segmentation_file("lh.pial.asc");
 [c_r,c_s,c_a] = utilities.fs2zef.readers.get_volume_centers(mgzPath);
-T = utilities.fs2zef.readers.readAsegStatsFile(asegStatsPath);
 ```
 
 Prefer the package generators over calling these alone unless debugging I/O.
@@ -42,7 +37,6 @@ Prefer the package generators over calling these alone unless debugging I/O.
 
 - `readFSLUT` and `get_volume_centers` require a working FreeSurfer install and environment.
 - `get_volume_centers` shells out; sandbox/CI without FS will fail.
-- Label ASCII is not a mesh; do not pass it to the segmentation surface reader.
 
 ## Developer guidance
 

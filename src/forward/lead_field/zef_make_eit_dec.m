@@ -1,7 +1,4 @@
 function [eit_ind,eit_count] = make_eit_dec(nodes,tetrahedra,brain_ind,source_ind)
-
-
-
 %ZEF_MAKE_EIT_DEC  Nearest-source binning of brain tetrahedra for EIT DOFs.
 %
 %   Zeffiro Interface.

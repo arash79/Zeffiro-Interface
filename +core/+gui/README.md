@@ -35,7 +35,7 @@ No other GUI packages exist under `+core/+gui` today.
 
 ## Usage instructions
 
-From the GUI: **Import → electrodes** (exact label follows the menu tool).
+From the GUI: **Import → Import electrodes** (`ImportelectrodesMenu.Text` in `zef_menu_tool_app_exported.m`).
 
 Programmatically (display required):
 

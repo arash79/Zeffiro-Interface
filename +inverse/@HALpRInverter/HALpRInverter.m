@@ -8,8 +8,7 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
 %
 %   Gamma hyperprior with L1 (q=1, L1_optimization + MM-LQA) or L2 (q=2, IRLS-style
 %   weighted normal equations) sparsity. estimation_type: IAS, EM, or Standardized
-%   (sLORETA-like scaling when q=2). Optional multiresolution averaging as in
-%   GroupLassoInverter.
+%   (sLORETA-like scaling when q=2).
 %
 %   Reference: Lahtinen et al., Clinical Neurophysiology 159 (2024),
 %   DOI 10.1016/j.clinph.2023.12.001.
@@ -20,17 +19,11 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
     properties
 
         %
-        % Estimation type that is either "IAS" (Iterative Altenating
+        % Estimation type that is either "IAS" (Iterative Alternating
         % Sequential), "EM" (Expectation Maximization) or "Standardized"
         % that uses the standardization technique known from sLORETA method.
         %
         estimation_type (1,1) string { mustBeMember(estimation_type, ["IAS", "EM", "Standardized"]) } = "IAS"
-
-        %
-        % Logical parameter to determine if multiresolution technique is
-        % used or not.
-        %
-        use_multiresolution (1,1) logical = false;
 
         %
         % Method for hyperparameter selection. Options are:
@@ -54,8 +47,8 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
         theta0 (1,1)  double {mustBePositive} = 1e-10;
 
         %
-        % The p-parameter for Lp-regularization: gamma*|x|^p
-        % The current optioms are 1 and 2.
+        % The p-parameter for Lp-regularization: gamma*|x|^p.
+        % The current options are 1 and 2.
         %
         q (1,1) int8 {mustBeInRange(q,1,2)} = 1;
 
@@ -68,23 +61,6 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
         % Number of MM-LQA iteration steps to estimate L1-optimum (q=1).
         %
         n_L1_iterations (1,1) int16 {mustBePositive,mustBeInteger} = 5;
-
-        %
-        % Number of multiresolution levels
-        %
-        multiresolution_levels_number (1,1) int16 {mustBePositive,mustBeInteger} = 10;
-
-        %
-        % Sparsity factos that indicates how many times smaller the coarser
-        % level is compared to the one-step-finer, i.e., if finer level has
-        % 10,000 sources and the sparsity factor is 10, the next level has
-        % 1,000 sources and so on.
-        multiresolution_sparsity_factor (1,1)  double {mustBeNonnegative} = 10;
-
-        %
-        % Number of decompositions, i.e., Monte Carlo iterations for source
-        % spaces.
-        multiresolution_decomposition_number (1,1) int16 {mustBePositive,mustBeInteger} = 10;
 
         %
         % Parameter for prior variance selection
@@ -135,8 +111,7 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
             %
             %   Name-value: q (1 or 2), estimation_type, beta, theta0,
             %   hyperprior_mode, n_map_iterations, n_L1_iterations,
-            %   initial_prior_steering_db, noise_cov, use_multiresolution
-            %   (constructor currently forces false), plus CommonInverseParameters.
+            %   initial_prior_steering_db, noise_cov, plus CommonInverseParameters.
 
             arguments
 
@@ -153,14 +128,6 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
                 args.n_L1_iterations = 5
 
                 args.estimation_type = "IAS"
-
-                args.use_multiresolution = false
-
-                args.multiresolution_levels_number = 10;
-
-                args.multiresolution_sparsity_factor = 0.001;
-
-                args.multiresolution_decomposition_number = 10;
 
                 args.data_normalization_method = "Maximum entry"
 
@@ -210,8 +177,6 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
 
             self.estimation_type = args.estimation_type;
 
-            self.use_multiresolution = false;
-
             self.beta = args.beta;
 
             self.theta0 = args.theta0;
@@ -223,12 +188,6 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
             self.n_map_iterations = args.n_map_iterations;
 
             self.n_L1_iterations = args.n_L1_iterations;
-
-            self.multiresolution_levels_number = args.multiresolution_levels_number;
-
-            self.multiresolution_sparsity_factor = args.multiresolution_sparsity_factor;
-
-            self.multiresolution_decomposition_number = args.multiresolution_decomposition_number;
 
             self.initial_prior_steering_db = args.initial_prior_steering_db;
             
@@ -248,20 +207,6 @@ classdef HALpRInverter < inverse.CommonInverseParameters & dynamicprops
 
         end
 
-        %This function calculates the
-        %multiresolution decompositions as it would by pressing the make
-        %decomposition button
-        function self = make_multires_dec(self)
-            %make_multires_dec  Intended wrapper around zef_make_multires_dec.
-            %
-            %   Same RAMUS property names as GroupLassoInverter.make_multires_dec;
-            %   this class does not define them, so the call errors if used.
-            arguments
-                self (1,1)
-            end
-            [self.multiresolution_dec, self.multiresolution_ind, self.multiresolution_count] = zef_make_multires_dec(self.number_of_decompositions, self.number_of_multiresolution_levels, self.sparsity_factor);
-        end %function
-    
         % Declare the initialize and inverse method defined in the files invert and initialize in this same
         % folder.
         self = initialize(self, L, f_data)

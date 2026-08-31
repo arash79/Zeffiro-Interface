@@ -39,6 +39,7 @@ p = fullfile(zef.program_path, 'data', 'electrodes', 'biosemi-64.dat');
 
 ## Important notes
 
+- These are coordinate tables named after public 10–20 / vendor montages, not vendor SDKs. Cite the cap manufacturer when a publication depends on a specific layout. See [THIRD_PARTY.md](../../THIRD_PARTY.md).
 - Coordinates are typically **millimeters** in the same frame as the head model.
 - Some filenames include trailing hyphens (`GSN-HydroCel-64-.dat`) — use the exact name.
 - CEM / impedance columns are optional; presence changes column count semantics.

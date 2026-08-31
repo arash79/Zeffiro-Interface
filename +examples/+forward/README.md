@@ -12,7 +12,7 @@ Scripted forward / lead-field demo: build a mesh (via the meshing example) then 
 
 Calls `examples.meshing.zef_meshing_example`, then `copy_fields` of `lead_field_kwargs` onto `zef`, `zef_attach_sensors_volume`, `zef_lead_field_matrix`, and `zef_save`. Returns the project struct with `zef.L` populated when the forward run succeeds.
 
-Typical knobs (name-value groups): `use_gpu`, `mesh_resolution`, `n_sources`, `lead_field_type` (1 EEG … 5 tES; 6–10 anisotropic via `zef_lead_field_matrix`), `source_model` (`core.types.ZefSourceModel`), `source_direction_mode`.
+Typical knobs (name-value groups): `use_gpu` (default **true**), `mesh_resolution` (4.5), `n_sources` (1e4), `lead_field_type` (**1–5 only** in this example: EEG / MEG mag / MEG grad / EIT / TES isotropic). Anisotropic types 6–10 are valid in `zef_lead_field_matrix` but `mustBeMember` on this function rejects them. `source_model` (`core.types.ZefSourceModel`, default Hdiv), `source_direction_mode` (default **1** Cartesian; `zef_init` uses **2** Normal). Other example defaults that differ from `zef_init`: `preconditioner` 1 (`ichol` nofill) vs 2 (SSOR), `solver_tolerance` `1e-8` vs `1e-6`.
 
 ## Workflow context
 
@@ -36,7 +36,7 @@ zef = examples.forward.lead_field_example( ...
 
 ## Important notes
 
-Needs the multicompartment segmentation (or an explicit `input_project_path`). Lead-field type codes follow `zef_lead_field_matrix`, not a separate wrapper.
+Needs the multicompartment segmentation (or an explicit `input_project_path`). This example’s `lead_field_type` argument is **1–5**. For anisotropic 6–10, mesh first then call `zef_lead_field_matrix` yourself. Default `use_gpu` is true — pass `"use_gpu", false` without CUDA.
 
 ## Developer guidance
 

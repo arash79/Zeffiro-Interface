@@ -82,8 +82,6 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
     set(h_fig_aux,'paperunits','inches');
     set(h_fig_aux,'papersize',snapshot_resolution);
     set(h_fig_aux,'paperposition',[0 0 fliplr(snapshot_resolution)]);
-    %light('Position',[0 0 1],'Style','infinite');
-    %light('Position',[0 0 -1],'Style','infinite');
     if not(eval('zef.axes_visible'))
         h_axes_image = axes('visible','off');
         set(h_axes_image,'Tag','axes1');
@@ -139,7 +137,6 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
         open(h_aviobj);
     end
 
-    %April 2021
     sensors = eval('zef.sensors');
     %January 2023
     sensor_explosion_parameter_1 = zef.sensor_explosion_parameter_1;
@@ -159,7 +156,6 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
         sensors_color_table = sensors_color_table(sensors_visible,:);
         sensors_get_functions = sensors_get_functions(sensors_visible);
     end
-    %April 2021
 
     [X_s, Y_s, Z_s] = sphere(20);
     sphere_scale = aux_scale_val;
@@ -224,12 +220,10 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
         end
         aux_ind = [];
 
-        %April 2021
         if not(eval('zef.attach_electrodes'))
             sensors_name_points = sensors(:,1:3);
         end
         sensors_aux = sensors;
-        %April 2021
 
         if electrode_model == 1 & eval('zef.attach_electrodes') & ismember(eval('zef.imaging_method'),[1 4 5])
             sensors = zef_attach_sensors_volume(zef,sensors,'mesh',sensors_get_functions);
@@ -240,10 +234,8 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
             sensors_point_like_index = find(sensors(:,4)==0);
             unique_sensors_point_like = unique(sensors(sensors_point_like_index,1));
             sensors_point_like = zeros(length(unique_sensors_point_like),3);
-            %April 2021
             sensors_name_points = zef_attach_sensors_volume(zef,sensors_aux,'points',sensors_get_functions);
             sensors_point_like_id = find(sensors(:,4)==0);
-            %April 2021
             for spl_ind = 1 : length(unique_sensors_point_like)
                 spl_aux_ind = find(sensors(sensors_point_like_index,1)==unique_sensors_point_like(spl_ind));
                 sensors_point_like(spl_ind,:) = mean(nodes(sensors(sensors_point_like_index(spl_aux_ind),2),:),1);
@@ -259,21 +251,15 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
                 h = surf(sensors(i,1) + X_s, sensors(i,2) + Y_s, sensors(i,3) + Z_s);
                 h.Tag = 'sensor';
                 h.EdgeColor = 'none';
-                %April 2021
                 if eval(['zef.' eval('zef.current_sensors') '_names_visible'])
                     h_text = text(sensors(i,1),sensors(i,2),sensors(i,3),sensors_name{i});
                     set(h_text,'FontSize',1500);
                 end
                 set(h,'facecolor',sensors_color_table(i,:));
-                %April 2021
                 set(h,'edgecolor','none');
-                %set(h,'specularstrength',0.3);
-                %set(h,'diffusestrength',0.7);
-                %set(h,'ambientstrength',0.7);
                 set(h,'facealpha',eval('zef.layer_transparency'));
             end
         else
-            %April 2021
             if eval(['zef.' eval('zef.current_sensors') '_names_visible'])
                 for i = 1 : size(sensors_name_points,1)
                     h_text = text(sensors_name_points(i,1),sensors_name_points(i,2),sensors_name_points(i,3),sensors_name{i});
@@ -291,9 +277,6 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
                     set(h(i),'facecolor',sensors_color_table(unique_sensors_aux_1(i),:));
                 end
                 set(h,'edgecolor','none');
-                % set(h,'specularstrength',0.3);
-                % set(h,'diffusestrength',0.7);
-                % set(h,'ambientstrength',0.7);
                 set(h,'facealpha',eval('zef.layer_transparency'));
                 set(h,'edgealpha',eval('zef.layer_transparency'));
             end
@@ -304,11 +287,7 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
                     set(h(i),'facecolor',sensors_color_table(sensors_point_like_id(i),:));
                     set(h(i),'Tag','sensor');
                 end
-                %April 2021
                 set(h,'edgecolor','none');
-                % set(h,'specularstrength',0.3);
-                % set(h,'diffusestrength',0.7);
-                % set(h,'ambientstrength',0.7);
                 set(h,'facealpha',eval('zef.layer_transparency'));
             end
         end
@@ -321,18 +300,12 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
             h=coneplot(sensors(:,1) + aux_scale_val*sensors(:,4),sensors(:,2) + aux_scale_val*sensors(:,5),sensors(:,3) + aux_scale_val*sensors(:,6),2*aux_scale_val*sensors(:,4),2*aux_scale_val*sensors(:,5),2*aux_scale_val*sensors(:,6),0,'nointerp');
             set(h,'facecolor',eval(['zef.' sensor_tag 'color']));
             set(h,'edgecolor','none');
-            % set(h,'specularstrength',0.3);
-            % set(h,'diffusestrength',0.7);
-            % set(h,'ambientstrength',0.7);
             set(h,'facealpha',eval('zef.layer_transparency'));
             if size(sensors,2) == 9
                 sensors(:,7:9) = sensors(:,7:9)./repmat(sqrt(sum(sensors(:,7:9).^2,2)),1,3);
                 h=coneplot(sensors(:,1) + aux_scale_val*sensors(:,4),sensors(:,2) + aux_scale_val*sensors(:,5),sensors(:,3) + aux_scale_val*sensors(:,6),2*aux_scale_val*sensors(:,4),2*aux_scale_val*sensors(:,5),2*aux_scale_val*sensors(:,6),0,'nointerp');
                 set(h,'facecolor',0.9*[0 1 1]);
                 set(h,'edgecolor','none');
-                % set(h,'specularstrength',0.3);
-                % set(h,'diffusestrength',0.7);
-                % set(h,'ambientstrength',0.7);
                 set(h,'facealpha',eval('zef.layer_transparency'));
             end
         end
@@ -443,6 +416,7 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
     % Reconstruction CData uses source_interpolation_ind{1} (volume
     % barycentric map). Parameter modes 2/4 colour every tetra instead.
     if ismember(eval('zef.visualization_type'), [2,4])
+        if ismember(eval('zef.volumetric_distribution_mode'), [1,3])
             if not(isempty(eval('zef.source_interpolation_ind')))
                 s_i_ind = eval('zef.source_interpolation_ind{1}');
             end
@@ -500,7 +474,6 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
             end
         end
     elseif  eval('zef.visualization_type') == 2
-        %s_i_ind = eval('zef.source_interpolation_ind{1}');
         reconstruction = volumetric_distribution;
         reconstruction = reconstruction(:);
         reconstruction = reshape(reconstruction,3,length(reconstruction)/3);
@@ -541,11 +514,6 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
             zef_waitbar(f_ind_aux,number_of_frames,h_waitbar,['Frame ' int2str(f_ind_aux) ' of ' int2str(number_of_frames) '.']);
             set(h_waitbar,'handlevisibility','off');
         end
-        %axes(eval('zef.h_axes1'));
-        %if not(isempty(h_colorbar))
-        %colorbar(h_colorbar,'delete');
-        %h_colorbar = [];
-        %end
         hold on;
         %**************************************************************************
         if ismember(eval('zef.visualization_type'),[2,4])
@@ -709,14 +677,12 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
                 aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                 I_aux_rec = find(aux_rec > 0);
                 reconstruction(I_aux_rec) = 0;
-                %reconstruction = reconstruction./max(abs(reconstruction(:)));
             end
 
             if eval('zef.reconstruction_type') == 5
                 aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                 I_aux_rec = find(aux_rec <= 0);
                 reconstruction(I_aux_rec) = 0;
-                %reconstruction = reconstruction./max(abs(reconstruction(:)));
             end
 
             if ismember(eval('zef.reconstruction_type'), [2 3 4 5 6 7])
@@ -786,11 +752,6 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
                 min_rec = min_rec - 1e-15;
             end
             set(h_axes_image,'CLim',[min_rec max_rec]);
-            %set(h_surf_2,'specularstrength',0.2);
-            %set(h_surf_2,'specularexponent',0.8);
-            %set(h_surf_2,'SpecularColorReflectance',0.8);
-            %set(h_surf_2,'diffusestrength',1);
-            %set(h_surf_2,'ambientstrength',1);
             if eval('zef.brain_transparency') < 1 || eval('zef.use_parcellation')
                 f_alpha_aux = zeros(size(nodes,1),1);
                 I_tr = I_3;
@@ -827,7 +788,6 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
             lighting phong;
 
             if eval('zef.visualization_type') == 2
-                %h_colorbar = colorbar('EastOutside','Position',[0.94 0.675 0.01 0.29],'fontsize',1500);
                 h_axes_hist = axes('position',[0.03 0.035 0.2 0.1],'visible','off');
                 h_bar = bar(h_axes_hist,b_hist+(max_rec-min_rec)/(2*50),a_hist,'hist');
                 set(h_bar,'facecolor',[0.5 0.5 0.5]);
@@ -852,9 +812,6 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
                     [min_n_aux, min_t_aux] = zef_minimal_mesh(nodes,surface_triangles(I_3,:));
                     h_surf = trimesh(min_t_aux,min_n_aux(:,1),min_n_aux(:,2),min_n_aux(:,3),'edgecolor','none','facecolor',color_str,'facelighting','flat');
                     set(h_surf,'Tag','surface');
-                    %set(h_surf,'specularstrength',0.1);
-                    %set(h_surf,'diffusestrength',0.5);
-                    %set(h_surf,'ambientstrength',0.85);
                     if not(ismember(eval('zef.visualization_type'),[2,4])) || not(ismember(i,aux_active_compartment_ind))
                         set(h_surf,'facealpha',eval('zef.layer_transparency'));
                     end
@@ -926,12 +883,9 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
                 elseif file_index ==3;
                     print(h_fig_aux,'-dpng','-r1',[file_path  file_name(1:end-4) '_' int2str(f_ind) file_name(end-3:end)]);
                 elseif file_index ==4;
-                    %bmp_file_temp = [file_path  file_name(1:end-4) '_temp.bmp'];
                     [movie_frame] = print(h_fig_aux,'-r1','-RGBImage');
-                    % = imread(bmp_file_temp,'bmp');
                     h_frame = im2frame(movie_frame);
                     writeVideo(h_aviobj,h_frame);
-                    %delete(bmp_file_temp);
                 end;
             else
                 if file_index == 1;
@@ -1046,14 +1000,12 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
             aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
             I_aux_rec = find(aux_rec > 0);
             reconstruction(I_aux_rec) = 0;
-            %reconstruction = reconstruction./max(abs(reconstruction(:)));
         end
 
         if eval('zef.reconstruction_type') == 5
             aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
             I_aux_rec = find(aux_rec <= 0);
             reconstruction(I_aux_rec) = 0;
-            %reconstruction = reconstruction./max(abs(reconstruction(:)));
         end
 
         if ismember(eval('zef.reconstruction_type'), [2 3 4 5 6 7])
@@ -1110,13 +1062,7 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
             min_rec = min_rec - 1e-15;
         end
         set(gca,'CLim',[min_rec max_rec]);
-        %set(h_surf_2,'specularstrength',0.2);
-        %set(h_surf_2,'specularexponent',0.8);
-        %set(h_surf_2,'SpecularColorReflectance',0.8);
-        %set(h_surf_2,'diffusestrength',1);
-        %set(h_surf_2,'ambientstrength',1);
         if eval('zef.brain_transparency') < 1 || eval('zef.use_parcellation')
-            %f_alpha_aux = zeros(size(nodes,1),1);
             if eval('zef.inv_scale') == 1
                 r_alpha_aux = (reconstruction-min(reconstruction))/(max(reconstruction)-min(reconstruction));
             else
@@ -1179,10 +1125,8 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
             print(h_fig_aux,'-dpng','-r1',[file_path  file_name(1:end-4) '_' int2str(f_ind) file_name(end-3:end)]);
         elseif file_index == 4;
             [movie_frame] = print(h_fig_aux,'-r1','-RGBImage');
-            %[movie_frame] = imread(bmp_file_temp,'bmp');
             h_frame = im2frame(movie_frame);
             writeVideo(h_aviobj,h_frame);
-            %delete(bmp_file_temp);
         end;
 
     end
@@ -1489,7 +1433,6 @@ else
     h_axes_image = get(h_fig_aux,'currentaxes');
     set(h_axes_image,'Tag','axes1');
     hold on;
-    %April 2021
     sensors = eval('zef.sensors');
     %January 2023
     sensor_explosion_parameter_1 = zef.sensor_explosion_parameter_1;
@@ -1509,7 +1452,6 @@ else
         sensors_color_table = sensors_color_table(sensors_visible,:);
         sensors_get_functions = sensors_get_functions(sensors_visible);
     end
-    %April 2021
 
     [X_s, Y_s, Z_s] = sphere(20);
     sphere_scale = aux_scale_val;
@@ -1546,9 +1488,6 @@ else
         cp_d = eval('zef.cp_d');
 
         clipping_plane = {cp_a,cp_b,cp_c,cp_d};
-        % if cp_a ~= 0 | cp_b ~=0
-        % light('Position',[-cp_a -cp_b -cp_b],'Style','infinite');
-        % end
         if clipped
             aux_ind_1 = zef_clipping_plane(sensors(:,1:3),clipping_plane,aux_ind_1);
         else
@@ -1571,9 +1510,6 @@ else
         cp2_d = eval('zef.cp2_d');
 
         clipping_plane = {cp2_a,cp2_b,cp2_c,cp2_d};
-        % if cp2_a ~= 0 | cp2_b ~=0
-        % light('Position',[-cp2_a -cp2_b -cp2_b],'Style','infinite');
-        % end
         if clipped
             aux_ind_1 = zef_clipping_plane(sensors(:,1:3),clipping_plane,aux_ind_1);
         else
@@ -1596,9 +1532,6 @@ else
         cp3_d = eval('zef.cp3_d');
 
         clipping_plane = {cp3_a,cp3_b,cp3_c,cp3_d};
-        % if cp3_a ~= 0 | cp3_b ~=0
-        % light('Position',[-cp3_a -cp3_b -cp3_b],'Style','infinite');
-        % end
         if clipped
             aux_ind_1 = zef_clipping_plane(sensors(:,1:3),clipping_plane,aux_ind_1);
         else
@@ -1716,11 +1649,9 @@ else
         electrode_model = 0;
     end
 
-    %April 2021
     if not(eval('zef.attach_electrodes'))
         sensors_name_points = sensors(:,1:3);
     end
-    %April 2021
 
     if eval('zef.attach_electrodes') & electrode_model == 1
         sensors = zef_attach_sensors_volume(zef,sensors,'geometry',sensors_get_functions);
@@ -1729,10 +1660,8 @@ else
         sensors_point_like_index = find(sensors_aux(:,4)==0);
         sensors_point_like = zeros(length(sensors_point_like_index),3);
 
-        %April 2021
         sensors_name_points = zef_attach_sensors_volume(zef,sensors,'points',sensors_get_functions);
         sensors_point_like_id = find(sensors(:,4)==0);
-        %April 2021
 
         for spl_ind = 1 : length(sensors_point_like_index)
             if sensors_aux(sensors_point_like_index(spl_ind),2) == 0
@@ -1753,17 +1682,12 @@ else
             for i = 1 : size(sensors,1)
                 h = surf(sensors(i,1) + X_s, sensors(i,2) + Y_s, sensors(i,3) + Z_s);
                 h.Tag = 'sensor';
-                %April 2021
                 if eval(['zef.' eval('zef.current_sensors') '_names_visible'])
                     h_text = text(sensors(i,1),sensors(i,2),sensors(i,3),sensors_name{i});
                     set(h_text,'FontSize',1500);
                 end
                 set(h,'facecolor',sensors_color_table(i,:));
-                %April 2021
                 set(h,'edgecolor','none');
-                %set(h,'specularstrength',0.3);
-                %set(h,'diffusestrength',0.7);
-                %set(h,'ambientstrength',0.7);
                 set(h,'facealpha',eval('zef.layer_transparency'));
             end
         elseif electrode_model == 2
@@ -1772,7 +1696,6 @@ else
  else
  electrode_surface_index = 1;
  end
-            %April 2021
             if eval(['zef.' eval('zef.current_sensors') '_names_visible'])
                 for i = 1 : size(sensors_name_points,1)
                     h_text = text(sensors_name_points(i,1),sensors_name_points(i,2),sensors_name_points(i,3),sensors_name{i});
@@ -1795,9 +1718,6 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                     set(h(i),'facecolor',sensors_color_table(unique_sensors_aux_1(i),:));
                 end
                 set(h,'edgecolor','none');
-                %set(h,'specularstrength',0.3);
-                %set(h,'diffusestrength',0.7);
-                %set(h,'ambientstrength',0.7);
                 set(h,'facealpha',eval('zef.layer_transparency'));
                 set(h,'edgealpha',eval('zef.layer_transparency'));
             end
@@ -1808,11 +1728,7 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                     set(h(i),'facecolor',sensors_color_table(sensors_point_like_id(i),:));
                     set(h(i),'Tag','sensor');
                 end
-                %April 2021;
                 set(h,'edgecolor','none');
-                %set(h,'specularstrength',0.3);
-                %set(h,'diffusestrength',0.7);
-                %set(h,'ambientstrength',0.7);
                 set(h,'facealpha',eval('zef.layer_transparency'));
             end
         end
@@ -1826,18 +1742,12 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
 
             set(h,'facecolor',eval(['zef.' sensor_tag '_color']));
             set(h,'edgecolor','none');
-            %set(h,'specularstrength',0.3);
-            %set(h,'diffusestrength',0.7);
-            %set(h,'ambientstrength',0.7);
             set(h,'facealpha',eval('zef.layer_transparency'));
             if size(sensors,2) == 9
                 sensors(:,7:9) = sensors(:,7:9)./repmat(sqrt(sum(sensors(:,7:9).^2,2)),1,3);
                 h=coneplot(sensors(:,1) + aux_scale_val*sensors(:,4),sensors(:,2) + aux_scale_val*sensors(:,5),sensors(:,3) + aux_scale_val*sensors(:,6),2*aux_scale_val*sensors(:,4),2*aux_scale_val*sensors(:,5),2*aux_scale_val*sensors(:,6),0,'nointerp');
                 set(h,'facecolor', 0.9*[1 1 1]);
                 set(h,'edgecolor','none');
-                %set(h,'specularstrength',0.3);
-                %set(h,'diffusestrength',0.7);
-                %set(h,'ambientstrength',0.7);
                 set(h,'facealpha',eval('zef.layer_transparency'));
             end
         end
@@ -1964,14 +1874,12 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                                 aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                                 I_aux_rec = find(aux_rec > 0);
                                 reconstruction(I_aux_rec) = 0;
-                                %reconstruction = reconstruction./max(abs(reconstruction(:)));
                             end
 
                             if eval('zef.reconstruction_type') == 5
                                 aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                                 I_aux_rec = find(aux_rec <= 0);
                                 reconstruction(I_aux_rec) = 0;
-                                %reconstruction = reconstruction./max(abs(reconstruction(:)));
                             end
 
                             if ismember(eval('zef.reconstruction_type'), [2 3 4 5 6 7])
@@ -2030,11 +1938,6 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                             min_rec = min_rec - 1e-15;
                         end
                         set(gca,'CLim',[min_rec max_rec]);
-                        %set(h_surf_2{ab_ind},'specularstrength',0.2);
-                        %set(h_surf_2{ab_ind},'specularexponent',0.8);
-                        %set(h_surf_2{ab_ind},'SpecularColorReflectance',0.8);
-                        %set(h_surf_2{ab_ind},'diffusestrength',1);
-                        %set(h_surf_2{ab_ind},'ambientstrength',1);
                         if eval('zef.brain_transparency') < 1 || eval('zef.use_parcellation')
                             f_alpha_aux = zeros(size(reuna_p{i},1),1);
                             if eval('zef.inv_scale') == 1
@@ -2083,18 +1986,12 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                             set(h_text,'visible','on','fontsize',1500);
                             axes(h_axes_image); set(h_fig_aux,'visible','on');
                         end
-                        %set(h_colorbar,'layer','bottom');
                         lighting phong;
 
                     else
 
                         if ismember(eval('zef.visualization_type'),[5]) && i == length(reuna_p)
                             %%%%%Topography reconstruction.
-
-                            if  iscell(eval('zef.top_reconstruction'))
-                                h_waitbar = zef_waitbar(1,number_of_frames,['Frame ' int2str(1) ' of ' int2str(number_of_frames) '.']);
-                                set(h_waitbar,'handlevisibility','off');
-                            end
 
                             if  iscell(eval('zef.top_reconstruction'))
                                 h_waitbar = zef_waitbar(1,number_of_frames,['Frame ' int2str(1) ' of ' int2str(number_of_frames) '.']);
@@ -2131,11 +2028,6 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                                 min_rec = min_rec - 1e-15;
                             end
                             set(gca,'CLim',gather([min_rec max_rec]));
-                            %set(h_surf_2{i},'specularstrength',0.2);
-                            %set(h_surf_2{i},'specularexponent',0.8);
-                            %set(h_surf_2{i},'SpecularColorReflectance',0.8);
-                            %set(h_surf_2{i},'diffusestrength',1);
-                            %set(h_surf_2{i},'ambientstrength',1);
                             if eval('zef.brain_transparency') < 1 || eval('zef.use_parcellation')
                                 f_alpha_aux = zeros(size(reuna_p{i},1),1);
                                 if eval('zef.inv_scale') == 1
@@ -2179,13 +2071,8 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                             [min_n_aux, min_t_aux] = zef_minimal_mesh(reuna_p{i},reuna_t{i});
                             h_surf = trimesh(min_t_aux,min_n_aux(:,1),min_n_aux(:,2),min_n_aux(:,3),'edgecolor','none','facecolor',color_str);
                             set(h_surf,'Tag','surface');
-                            %set(h_surf,'specularstrength',0.1);
-                            %set(h_surf,'diffusestrength',0.5);
-                            %set(h_surf,'ambientstrength',0.85);
                             set(h_surf,'facealpha',eval('zef.layer_transparency'));
-                            %if not(eval('zef.visualization_type')==3);
                             lighting phong;
-                            %end
                         end
 
                     end
@@ -2257,12 +2144,9 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                 elseif file_index ==3;
                     print(h_fig_aux,'-dpng','-r1',[file_path  file_name(1:end-4) '_' int2str(frame_start) file_name(end-3:end)]);
                 elseif file_index ==4;
-                    %bmp_file_temp = [file_path  file_name(1:end-4) '_temp.bmp'];
                     [movie_frame] = print(h_fig_aux,'-r1','-RGBImage');
-                    %[movie_frame] = imread(bmp_file_temp,'bmp');
                     h_frame = im2frame(movie_frame);
                     writeVideo(h_aviobj,h_frame);
-                    %delete(bmp_file_temp);
                 end;
             else
                 if file_index == 1;
@@ -2284,12 +2168,9 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                 elseif file_index ==3;
                     print(h_fig_aux,'-dpng','-r1',[file_path  file_name(1:end-4) '_' int2str(frame_start) file_name(end-3:end)]);
                 elseif file_index ==4;
-                    %bmp_file_temp = [file_path  file_name(1:end-4) '_temp.bmp'];
                     [movie_frame] = print(h_fig_aux,'-r1','-RGBImage');
-                    %[movie_frame] = imread(bmp_file_temp,'bmp');
                     h_frame = im2frame(movie_frame);
                     writeVideo(h_aviobj,h_frame);
-                    %delete(bmp_file_temp);
                 end;
             else
                 if file_index == 1;
@@ -2396,14 +2277,12 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                             aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                             I_aux_rec = find(aux_rec > 0);
                             reconstruction(I_aux_rec) = 0;
-                            %reconstruction = reconstruction./max(abs(reconstruction(:)));
                         end
 
                         if eval('zef.reconstruction_type') == 5
                             aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                             I_aux_rec = find(aux_rec <= 0);
                             reconstruction(I_aux_rec) = 0;
-                            %reconstruction = reconstruction./max(abs(reconstruction(:)));
                         end
 
                         if ismember(eval('zef.reconstruction_type'), [2 3 4 5 6 7])
@@ -2462,11 +2341,6 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                             min_rec = min_rec - 1e-15;
                         end
                         set(gca,'CLim',[min_rec max_rec]);
-                        %set(h_surf_2{ab_ind},'specularstrength',0.2);
-                        %set(h_surf_2{ab_ind},'specularexponent',0.8);
-                        %set(h_surf_2{ab_ind},'SpecularColorReflectance',0.8);
-                        %set(h_surf_2{ab_ind},'diffusestrength',1);
-                        %set(h_surf_2{ab_ind},'ambientstrength',1);
                         if eval('zef.brain_transparency') < 1 || eval('zef.use_parcellation')
                             f_alpha_aux = zeros(size(reuna_p{i},1),1);
                             if eval('zef.inv_scale') == 1
@@ -2502,17 +2376,14 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                     reconstruction = reconstruction(:);
 
                     axes(h_axes_image);
-                    %h_surf_2{ab_ind} = trisurf(reuna_t{i},reuna_p{i}(:,1),reuna_p{i}(:,2),reuna_p{i}(:,3),reconstruction,'edgecolor','none');
                     delete(h_surf_2{i});
 
                     if ismember(i,aux_active_compartment_ind) && eval('zef.use_inflated_surfaces') && not(isempty(reuna_p_inf))
                         h_surf_2{i} = trisurf(reuna_t{i},reuna_p_inf{i}(:,1),reuna_p_inf{i}(:,2),reuna_p_inf{i}(:,3),reconstruction,'edgecolor','none');
                         set(h_surf_2{i},'Tag','reconstruction');
-                        %[h_contour{i},h_contour_text{i}] = zef_plot_contour(zef,eval('zef.contour_set'),reconstruction,reuna_t{i},reuna_p_inf{i});
                     else
                         h_surf_2{i} = trisurf(reuna_t{i},reuna_p{i}(:,1),reuna_p{i}(:,2),reuna_p{i}(:,3),reconstruction,'edgecolor','none');
                         set(h_surf_2{i},'Tag','reconstruction');
-                        %[h_contour{i},h_contour_text{i}] = zef_plot_contour(zef,eval('zef.contour_set'),reconstruction,reuna_t{i},reuna_p{i});
 
                     end
                     if ismember(eval('zef.volumetric_distribution_mode'),[1, 3])
@@ -2524,11 +2395,6 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                         min_rec = min_rec - 1e-15;
                     end
                     set(gca,'CLim',[min_rec max_rec]);
-                    %set(h_surf_2{i},'specularstrength',0.2);
-                    %set(h_surf_2{i},'specularexponent',0.8);
-                    %set(h_surf_2{i},'SpecularColorReflectance',0.8);
-                    %set(h_surf_2{i},'diffusestrength',1);
-                    %set(h_surf_2{i},'ambientstrength',1);
                     if eval('zef.brain_transparency') < 1 || eval('zef.use_parcellation')
                         f_alpha_aux = zeros(size(reuna_p{i},1),1);
                         if eval('zef.inv_scale') == 1
@@ -2603,10 +2469,8 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                     print(h_fig_aux,'-dpng','-r1',[file_path  file_name(1:end-4) '_' int2str(f_ind) file_name(end-3:end)]);
                 elseif file_index == 4;
                     [movie_frame] = print(h_fig_aux,'-r1','-RGBImage');
-                    %[movie_frame] = imread(bmp_file_temp,'bmp');
                     h_frame = im2frame(movie_frame);
                     writeVideo(h_aviobj,h_frame);
-                    %delete(bmp_file_temp);
                 end;
 
             end
@@ -2628,9 +2492,6 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                     if not(isempty(min_n_aux))
                         h_surf = trimesh(min_t_aux,min_n_aux(:,1),min_n_aux(:,2),min_n_aux(:,3),'edgecolor','none','facecolor',color_str);
                         set(h_surf,'Tag','surface');
-                        %set(h_surf,'specularstrength',0.1);
-                        %set(h_surf,'diffusestrength',0.5);
-                        %set(h_surf,'ambientstrength',0.85);
                         set(h_surf,'facealpha',eval('zef.layer_transparency'));
                         lighting phong;
                     end

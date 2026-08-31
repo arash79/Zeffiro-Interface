@@ -6,7 +6,7 @@
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Script. Default INI row "EIT lead field with isotropic electrical
-%   conductivity". Same body as zef_eit_lead_field. Uses zef.sigma(:,1).
+%   conductivity". zef_eit_lead_field is a script alias of this file.
 %
 %   See also zef_lead_field_matrix, zef_run_forward_simulation.
 

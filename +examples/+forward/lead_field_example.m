@@ -11,7 +11,11 @@ function project_struct = lead_field_example ( kwargs, mesh_kwargs, lead_field_k
 %   Needs the same import_segmentation.zef as the meshing example. After
 %   meshing: copy_fields of lead_field_kwargs, zef_attach_sensors_volume,
 %   zef_lead_field_matrix, zef_save to data/lead_field_example.mat.
-%   Default lead_field_type 1 (EEG), n_sources 1e4, Hdiv, direction mode 1.
+%   Default lead_field_type 1 (EEG isotropic). This example accepts types
+%   1–5 only (mustBeMember); anisotropic 6–10 need zef_lead_field_matrix
+%   after meshing. Other defaults that differ from zef_init: use_gpu true,
+%   source_direction_mode 1 (Cartesian), preconditioner 1 (CPU ichol
+%   nofill), solver_tolerance 1e-8. n_sources 1e4, Hdiv.
 %
 
     arguments

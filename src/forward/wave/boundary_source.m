@@ -54,21 +54,17 @@ end
 
 boundary_vec_1 = zeros(n_nodes, n_source_points);
 boundary_vec_2 = zeros(n_nodes, n_source_points);
-%boundary_vec_3 = zeros(n_nodes, n_source_points);
 
 aux_ind_2 = [1 : n_source_points];
 aux_ind_2 = aux_ind_2(ones(n_triangles,1),:);
 aux_vec_1 = -(1/3).*scaling_vec.*scaling_vec_2.*ala_vec(:,ones(n_source_points,1))./(s_vec.^2);
 aux_vec_2 = -(1/3).*scaling_vec.*scaling_vec_2.*ala_vec(:,ones(n_source_points,1))./(s_vec);
-%aux_vec_3 = -scaling_vec.*ala_vec(:,ones(n_source_points,1))./(s_vec);
-%aux_vec_3 = ala_vec(:,ones(n_source_points,1));
 
 for i = 1 : 3
     aux_ind_1 = orbit_triangles(:,i);
     aux_ind_1 = aux_ind_1(:,ones(n_source_points,1));
     boundary_vec_1  = boundary_vec_1 + accumarray([aux_ind_1(:) aux_ind_2(:)], aux_vec_1(:), [n_nodes, n_source_points]);
     boundary_vec_2  = boundary_vec_2 + accumarray([aux_ind_1(:) aux_ind_2(:)], aux_vec_2(:), [n_nodes, n_source_points]);
-    %boundary_vec_3  = boundary_vec_3 + accumarray([aux_ind_1(:) aux_ind_2(:)], aux_vec_3(:), [n_nodes, n_source_points]);
 end
 
 s_orbit = s_vec_2;

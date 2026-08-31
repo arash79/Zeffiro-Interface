@@ -1,6 +1,4 @@
 function sigma_out = zef_nse_sigma(nse_field, nodes, tetra, domain_labels, sigma_in, s_interp_ind, singular_threshold)
-
-
 %ZEF_NSE_SIGMA  Map NSE capillary/vessel state onto tetrahedral conductivity.
 %
 %   Zeffiro Interface.
@@ -161,8 +159,6 @@ function sigma_out = conductivity_fn( ...
 %
 % Updates a given conductivity array based on the chosen conductivity mode.
 %
-% TODO: check if passing in a single column of sigma_out would be better.
-%
 
     arguments
 
@@ -220,8 +216,6 @@ function sigma_std = standard_deviation_fn( ...
 %
 % Updates a given conductivity array based on the chosen conductivity mode.
 %
-% TODO: check if passing in a single column of sigma_out would be better.
-%
 
     arguments
 
@@ -245,15 +239,7 @@ function sigma_std = standard_deviation_fn( ...
 
         squared_diffs = ( sigma_out - sigma_out_builder_vec ) .^ 2 ;
 
-        % mean ( sigma_out )
-
-        % mean ( sigma_out_builder_vec )
-
-        % mean ( squared_diffs )
-
         sigma_std = sigma_std + squared_diffs ./ double ( n_of_time_frames ) ;
-
-        % mean ( sigma_std )
 
     elseif ismember( cm, [1, 2, 4, 5] )
 

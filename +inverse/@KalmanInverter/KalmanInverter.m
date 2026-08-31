@@ -14,7 +14,7 @@ classdef KalmanInverter < inverse.CommonInverseParameters
 %   Reference: Lahtinen et al., Clinical Neurophysiology 168 (2024),
 %   DOI 10.1016/j.clinph.2024.09.021.
 %
-%   See also plugins.ClassKF, inverse.HALpRInverter.
+%   See also inverse.kf, inverse.HALpRInverter.
 %
 
     properties
@@ -64,6 +64,25 @@ classdef KalmanInverter < inverse.CommonInverseParameters
         smoother_type (1,1) string { mustBeMember(smoother_type, ["None", "RTS", "Sample RTS"]) } = "None"
 
         %
+        %Power applied to the sLORETA standardization weights,
+        %w_i = 1/(diag(G' B))^standardization_exponent, used by the
+        %"Standardized Kalman filter" and "Approximated Standardized Kalman
+        %filter" methods. 1/2 is textbook sLORETA (normalize by the standard
+        %deviation of the resolution kernel); larger values weight deep
+        %sources more aggressively.
+        %
+        %The default 1/2 is what this class path has always used. Note the
+        %legacy GUI plugin (zef_KF / zef_kf_open_window) defaults its
+        %equivalent zef.standardization_exponent to 1 and offers
+        %1/2, 1, 5/4, 3/2, 7/4 and 2, so reproducing a legacy sLORETA run
+        %through this class requires setting this property to match. Before
+        %this property existed the exponent was hard-coded here, which made
+        %that discrepancy silent and the legacy dropdown unreachable from the
+        %class API.
+        %
+        standardization_exponent (1,1) double { mustBePositive, mustBeFinite } = 0.5
+
+        %
         %state transition model of Kalman Filter (usually denoted A)
         %
         state_transition_model_A = [];
@@ -99,7 +118,7 @@ classdef KalmanInverter < inverse.CommonInverseParameters
         evolution_cov = [] 
 
         %
-        %Prevoius step reconstruction
+        % Previous step reconstruction
         %
         prev_step_reconstruction = []
     
@@ -109,9 +128,16 @@ classdef KalmanInverter < inverse.CommonInverseParameters
         prev_step_posterior_cov = []
 
         %
-        %Stored posterior covariances
+        % Stored posterior covariances
         %
         posterior_covs = cell(0)
+
+        %
+        % Per-frame sLORETA operators D_t from the filter's prior P (before
+        % the measurement update). RTS applies D_t to the smoothed mean so
+        % standardization matches the filter, including standardization_exponent.
+        %
+        filter_standardization_D = cell(0)
 
     end % properties
 
@@ -124,8 +150,6 @@ classdef KalmanInverter < inverse.CommonInverseParameters
     end
 
     methods
-        %set the use_smoothing to a logical value. Set simultaneously the
-        %smoother type to "None" when use_smoothing set to false
         function obj = set.use_smoothing(obj,val)
             %set.use_smoothing  Coerce numeric to logical; does not change smoother_type.
             if islogical(val)
@@ -133,23 +157,18 @@ classdef KalmanInverter < inverse.CommonInverseParameters
             elseif isnumeric(val)
                     obj.use_smoothing = logical(val);
             else
-                error("Field 'use_RTS_smoothing' should be logical.")
+                error("KalmanInverter:InvalidUseSmoothing", ...
+                    "use_smoothing must be logical or numeric.");
             end
 
         end
 
-        %setter to set the use_smoothing to true, when smoothing is used
-        %and visa versa
         function obj = set.smoother_type(obj,val)
-            %set.smoother_type  Set use_smoothing from val; does not assign smoother_type.
+            %set.smoother_type  Store RTS choice and keep use_smoothing in sync.
             %
-            %   "None" → use_smoothing false, otherwise true. The property
-            %   smoother_type itself is not written here.
-            if strcmp(val,"None")
-                obj.use_smoothing = false;
-            else
-                obj.use_smoothing = true;
-            end
+            %   "None" → use_smoothing false, otherwise true.
+            obj.smoother_type = val;
+            obj.use_smoothing = ~strcmp(val, "None");
         end
 
 
@@ -194,6 +213,8 @@ classdef KalmanInverter < inverse.CommonInverseParameters
                 args.prev_step_posterior_cov = [];
                 
                 args.posterior_covs = cell(0);
+
+                args.standardization_exponent = 0.5;
 
                 args.data_normalization_method = "Maximum entry"
 
@@ -264,6 +285,10 @@ classdef KalmanInverter < inverse.CommonInverseParameters
             self.prev_step_posterior_cov = args.prev_step_posterior_cov;
 
             self.prev_step_reconstruction = args.prev_step_reconstruction;
+
+            self.posterior_covs = args.posterior_covs;
+
+            self.standardization_exponent = args.standardization_exponent;
 
             %Print the statement:
             self.InitialStatement

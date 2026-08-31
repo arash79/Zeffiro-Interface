@@ -42,8 +42,8 @@ function zef = zeffiro_interface(args)
 %                           hole: only pass trusted content.
 %     exit_zeffiro        - logical, default false. Calls zef_close_all on return.
 %     quit_matlab         - logical, default false. Calls quit force on return.
-%     use_github          - logical, default false. Forwarded into zef; zef_start
-%                           may run !git pull when this is true.
+%     use_github          - logical, default false. Accepted and ignored
+%                           (startup no longer runs git pull).
 %     use_gpu             - logical. Select gpuDevice(zef.gpu_num) when a GPU
 %                           is present. Missing fields are copied from args
 %                           by utilities.structs.copy_fields.
@@ -67,7 +67,7 @@ function zef = zeffiro_interface(args)
 %            base workspace and cleared locally so ans is not duplicated.
 %
 %   Side effects
-%     Adds project paths, may write src/core/zef_start_config.m via
+%     Adds project paths, may write src/app/zef_start_config.m via
 %     zeffiro_setup, creates GUI figures, may load default_project.mat,
 %     and may mutate GPU device, files, and the base workspace.
 %
@@ -77,7 +77,7 @@ function zef = zeffiro_interface(args)
 %     (typically because zeffiro_setup was never executed). Warns and
 %     continues if gpu_num does not match a device.
 %
-%   See also zeffiro_setup, zef_start, zef_close_all, zef_load, zef_save.
+%   See also zeffiro_setup, zeffiro_downloader, zef_start, zef_close_all, zef_load, zef_save.
 
 arguments
 
@@ -149,10 +149,10 @@ if not(args.zeffiro_restart) && evalin("base","exist('zef', 'var');")
 end
 
 root_path = fileparts(mfilename('fullpath'));
-addpath(fullfile(root_path, 'src', 'core'));
+addpath(fullfile(root_path, 'src', 'app'));
 % zef_close_all restores R2025a+ WindowStyle via zef_window_manager, which
-% lives next to the other GUI helpers, not in src/core.
-addpath(fullfile(root_path, 'src', 'gui', 'helpers'));
+% lives in src/gui/chrome, not in src/app.
+addpath(fullfile(root_path, 'src', 'gui', 'chrome'));
 
 zef_close_all();
 
@@ -174,10 +174,6 @@ program_path = string(program_path);
 
 code_path = fullfile(program_path, "src");
 
-% TODO: should this be run here?
-%
-% run(code_path + filesep + "zef_close_all.m");
-
 zef.program_path = char(program_path);
 
 zef.code_path = code_path;
@@ -190,27 +186,13 @@ zef.zeffiro_task_id = 0;
 
 zef.zeffiro_restart_time = cputime;
 
-% Cluster utilities path (for backward compatibility)
-% Note: Cluster utilities are available via the +utilities/+cluster package.
-% MATLAB namespace (package) directories must NOT be added to the path;
-% they are accessible automatically when the parent directory is on the path
-% (e.g., call functions as utilities.cluster.functionName).
-zef.cluster_path = fullfile(zef.program_path, "+utilities", "+cluster");
-
 addpath(zef.program_path);
 addpath(zef.code_path);
 addpath(genpath(zef.code_path));
 
 addpath(genpath(fullfile(zef.program_path, "assets", "fig")));
-addpath(genpath(fullfile(zef.program_path, "tools", "plugins")));
+addpath(genpath(fullfile(zef.program_path, "plugins")));
 addpath(genpath(fullfile(zef.program_path, "profile")));
-
-% legacy/ holds deprecated shims (compute_measurements, run_inverse_script)
-% that delegate to the new zef_-prefixed functions. Add it to the path so
-% existing batch / cluster jobs that source those names keep working.
-if isfolder(fullfile(zef.program_path, "legacy"))
-    addpath(genpath(fullfile(zef.program_path, "legacy")));
-end
 
 addpath(zef.external_path);
 
@@ -243,10 +225,22 @@ if isfield(zef, "h_zeffiro_window_main") ...
         && zef.start_mode == "display"
 
     zef.h_zeffiro.Visible = 1;
-    zef.h_zeffiro_window_main.Visible = 1;
-    zef.h_mesh_tool.Visible = 1;
-    zef.h_mesh_visualization_tool.Visible = 1;
-    zef.h_zeffiro_menu.Visible = 1;
+    try
+        if zef_ui_is_unified(zef.h_zeffiro)
+            zef_ui_shell('hide_companions', zef);
+            zef_ui_shell('hide_menu', zef);
+        else
+            zef.h_zeffiro_window_main.Visible = 1;
+            zef.h_mesh_tool.Visible = 1;
+            zef.h_mesh_visualization_tool.Visible = 1;
+            zef.h_zeffiro_menu.Visible = 0;
+        end
+    catch
+        zef.h_zeffiro_window_main.Visible = 1;
+        zef.h_mesh_tool.Visible = 1;
+        zef.h_mesh_visualization_tool.Visible = 1;
+        zef.h_zeffiro_menu.Visible = 0;
+    end
     zef.use_display = 1;
 
 end

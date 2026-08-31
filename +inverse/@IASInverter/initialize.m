@@ -10,8 +10,10 @@ function self = initialize(self,L,f_data)
 %   Inverse tools → IAS uses zef_ias_iteration, not this method.
 %
 %   modified_SNR = signal_to_noise_ratio - prior_over_measurement_db + amplitude_db
-%   hyperprior "Inverse gamma" → zef_find_ig_hyperprior, d_sqrt = theta0/(beta-1)
-%   hyperprior "Gamma"         → zef_find_g_hyperprior,  d_sqrt = theta0*beta
+%   hyperprior "Inverse gamma" → zef_find_ig_hyperprior, d_sqrt = sqrt(theta0/(beta-1))
+%   hyperprior "Gamma"         → zef_find_g_hyperprior,  d_sqrt = sqrt(theta0*beta)
+%   theta0/(beta-1) (IG) and theta0*beta (Gamma) are prior *variances*; the
+%   MAP filter uses standard deviations, matching zef_ias_iteration.
 %   hyperprior_mode "Balanced" sets the spatial-balance flag on those helpers.
 %   data_normalization_method is passed through as 'maximum entry' or
 %   'something else' (the helpers only special-case the first string).
@@ -65,11 +67,11 @@ function self = initialize(self,L,f_data)
     if strcmp(self.hyperprior,"Inverse gamma")
         [self.beta, self.theta0] = zef_find_ig_hyperprior(modified_SNR,...
             self.hyperprior_tail_length_db,L,size(L,2),normalize_data,balance_spatially,self.hyperprior_weight);
-        self.d_sqrt = self.theta0./(self.beta-1);
+        self.d_sqrt = sqrt(self.theta0./(self.beta-1));
     elseif strcmp(self.hyperprior,"Gamma")
         [self.beta, self.theta0] = zef_find_g_hyperprior(modified_SNR,...
             self.hyperprior_tail_length_db,L,size(L,2),normalize_data,balance_spatially,self.hyperprior_weight);
-        self.d_sqrt = self.theta0.*self.beta;
+        self.d_sqrt = sqrt(self.theta0.*self.beta);
     end
 
 

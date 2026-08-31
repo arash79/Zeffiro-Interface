@@ -1,7 +1,4 @@
 function [nodes,simplexes,J] = zef_get_submesh(nodes,simplexes,I)
-
-
-
 %ZEF_GET_SUBMESH  Extract the nodal submesh of tetrahedra I (or all tetra).
 %
 %   Zeffiro Interface.

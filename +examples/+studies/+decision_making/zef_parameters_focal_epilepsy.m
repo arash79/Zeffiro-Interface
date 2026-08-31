@@ -9,10 +9,9 @@
 %   fileparts(mfilename('fullpath'))/data/:
 %     training_data_file_name      starts '' → that folder with a trailing
 %                                  filesep (save() would treat it as a dir)
-%     credibility_data_file_name   'credibility_dataset_p0857_10dB' (no .mat)
-%     project_file_name            set to a ~/Dropbox/... string THEN
-%                                  concatenated under data/ — that default
-%                                  does not resolve; edit after folder_name
+%     credibility_data_file_name   basename without .mat
+%     project_file_name            basename of a Zeffiro project .mat you
+%                                  place in data/ (not shipped)
 %   Also: snr_vec=[10], training_data_size=50, frame_number=1,
 %   supervised_clustering='on', cred_val_rec/points, max_n_clusters=100,
 %   n_dynamic_levels, tol_val_*, reg_param_*, max_iter.
@@ -21,8 +20,8 @@
 %   See also zef_create_training_data_focal_epilepsy.
 
 training_data_file_name = '';
-credibility_data_file_name = 'credibility_dataset_p0857_10dB';
-project_file_name = '~/Dropbox/ResearchData/PerEpi_material/Patients/p0803.mat';
+credibility_data_file_name = 'credibility_dataset';
+project_file_name = 'project.mat';
 
 supervised_clustering = 'on';
 frame_number = 1;

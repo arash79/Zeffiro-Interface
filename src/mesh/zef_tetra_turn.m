@@ -15,8 +15,6 @@ function [tetra, flag_val, nodes_ind] = zef_tetra_turn(zef, nodes, tetra, thresh
 %   volumes (the stored orientation convention). Loops up to
 %   zef.mesh_optimization_repetitions times.
 %
-%   zef_optimize_mesh is a thin unused wrapper around this function.
-%
 %   [tetra, flag_val, nodes_ind] = zef_tetra_turn(zef, nodes, tetra, thresh_val)
 %
 %   Inputs
@@ -138,7 +136,6 @@ while not(isempty(tetra_ind)) & iter_ind_aux_0 < eval('zef.mesh_optimization_rep
                 tetra(tetra_ind(i),:) = tetra_1;
                 tetra(tetra_aux_ind(k_min_2),:) = tetra_2;
                 condition_number([tetra_ind(i); tetra_aux_ind(k_min_2)]) = zef_condition_number(nodes,[tetra_1 ; tetra_2]);
-                %tetra = zef_fix_inverted_pair([tetra_ind(i); tetra_aux_ind(k_min_2)],tetra,nodes);
 
             end
 

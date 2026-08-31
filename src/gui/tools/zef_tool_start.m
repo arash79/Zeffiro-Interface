@@ -97,42 +97,55 @@ else
     zef.zeffiro_variable_data = [zef.zeffiro_variable_data; variable_cell];
     set(0,'DefaultFigureVisible',visible_val);
 
-    for i = 1 : length(h_groot_children)
-
-        width_aux = relative_size*zef.h_zeffiro_menu.Position(3);
-        height_aux = relative_size*h_groot_children(i).Position(4)*zef.h_zeffiro_menu.Position(3)/h_groot_children(i).Position(3);
-        scr = screen_size_aux;
-        width_aux = min(max(400, width_aux), 0.55 * scr(3));
-        height_aux = min(max(320, height_aux), 0.70 * scr(4));
-        vertical_aux = zef.h_zeffiro_menu.Position(2)+zef.h_zeffiro_menu.Position(4)-height_aux;
-        if vertical_aux < 0 
-        relative_size = relative_size*(vertical_aux + height_aux)/height_aux;
-        end
-
+    h_anchor = zef_ui_anchor(zef);
+    if isempty(h_anchor) || ~isvalid(h_anchor)
+        h_anchor = zef.h_zeffiro_menu;
     end
 
     for i = 1 : length(h_groot_children)
 
         set(h_groot_children(i),'DeleteFcn',['zef_closereq(''' tool_script ''');'])
 
-        h_groot_children(i).Units = zef.h_zeffiro_menu.Units;
-
-        width_aux = relative_size*zef.h_zeffiro_menu.Position(3);
-        height_aux = relative_size*h_groot_children(i).Position(4)*zef.h_zeffiro_menu.Position(3)/h_groot_children(i).Position(3);
+        h_groot_children(i).Units = h_anchor.Units;
+        position_aux = h_groot_children(i).Position;
+        width_aux = position_aux(3);
+        height_aux = position_aux(4);
         scr = screen_size_aux;
-        width_aux = min(max(400, width_aux), 0.55 * scr(3));
-        height_aux = min(max(320, height_aux), 0.70 * scr(4));
-        vertical_aux = zef.h_zeffiro_menu.Position(2)+zef.h_zeffiro_menu.Position(4)-height_aux;
-        horizontal_aux = zef.h_zeffiro_menu.Position(1)+zef.h_zeffiro_menu.Position(3)-width_aux;
+        try
+            if isappdata(h_groot_children(i), 'ZefMinSize')
+                mins = getappdata(h_groot_children(i), 'ZefMinSize');
+                width_aux = max(width_aux, mins(1));
+                height_aux = max(height_aux, mins(2));
+            end
+        catch
+        end
+        if width_aux < 280
+            width_aux = 420;
+        end
+        if height_aux < 160
+            height_aux = 280;
+        end
+        width_aux = min(width_aux, min(0.99 * scr(3), scr(3) - 8));
+        height_aux = min(height_aux, min(0.99 * scr(4), scr(4) - 8));
+        try
+            au = h_anchor.Units;
+            h_anchor.Units = 'pixels';
+            ap = double(h_anchor.Position);
+            h_anchor.Units = au;
+        catch
+            ap = [80 80 800 600];
+        end
+        tool_pos = zef_ui_clamp_position( ...
+            zef_ui_center_position([0 0 width_aux height_aux], ap), ...
+            zef_ui_screen_workarea(ap));
 
         if not(isempty(findobj(h_groot_children(i),'-property','Resize')))
         h_groot_children(i).Resize = 'on';
         end
 
-        if isempty(findall(h_groot_children(i),'Type','uitable','-or','Type','uipanel'))
-            zef_set_size_change_function(h_groot_children(i),1,scale_positions);
-        else
-            zef_set_size_change_function(h_groot_children(i),2,scale_positions);
+        try
+            h_groot_children(i).AutoResizeChildren = 'off';
+        catch
         end
 
         if not(ismember('ZefTool',properties(h_groot_children(i))))
@@ -140,10 +153,35 @@ else
         end
         h_groot_children(i).ZefTool = tool_script;
      
-        position_aux = h_groot_children(i).Position;
-        zef_window_manager('standalone', h_groot_children(i), [horizontal_aux vertical_aux width_aux height_aux]);
+        zef_window_manager('standalone', h_groot_children(i), tool_pos);
         zef_ui_ready(h_groot_children(i));
-        zef_ui_bind_min_size(h_groot_children(i), 400, 320);
+        try
+            has_grid = ~isempty(findall(h_groot_children(i), 'Tag', 'zef_ui_root'));
+            has_form = isappdata(h_groot_children(i), 'ZefGuideForm');
+            scf = [];
+            try
+                scf = h_groot_children(i).SizeChangedFcn;
+            catch
+            end
+            if ~has_grid && ~has_form && ~isa(scf, 'function_handle')
+                if isempty(findall(h_groot_children(i),'Type','uitable','-or','Type','uipanel'))
+                    zef_set_size_change_function(h_groot_children(i),1,scale_positions);
+                else
+                    zef_set_size_change_function(h_groot_children(i),2,scale_positions);
+                end
+            end
+        catch
+        end
+        try
+            vis = 'off';
+            if isprop(h_groot_children(i), 'Visible')
+                vis = char(h_groot_children(i).Visible);
+            end
+            if strcmpi(vis, 'on')
+                zef_window_manager('raise', h_groot_children(i));
+            end
+        catch
+        end
 
     end
 

@@ -7,8 +7,7 @@ classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Hierarchical gamma hyperprior with group sparsity (L2 over 3-DOF blocks).
-%   estimation_type selects IAS, EM, or Standardized inner solvers. Optional
-%   multiresolution path (use_multiresolution) averages over random sub-grids.
+%   estimation_type selects IAS, EM, or Standardized inner solvers.
 %   hyperprior_mode "Sensitivity weighted" auto-tunes beta and theta0 from L.
 %
 %   See also inverse.HALpRInverter, LG_optimization.
@@ -17,8 +16,6 @@ classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
     properties
 
         estimation_type (1,1) string { mustBeMember(estimation_type, ["IAS", "EM", "Standardized"]) } = "IAS"
-
-        use_multiresolution (1,1) logical = false;
 
         hyperprior_mode (1,1) string { mustBeMember( ...
             hyperprior_mode, ...
@@ -32,12 +29,6 @@ classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
         n_map_iterations (1,1) int16 {mustBePositive,mustBeInteger} = 25;
 
         n_L1_iterations (1,1) int16 {mustBePositive,mustBeInteger} = 5;
-
-        multiresolution_levels_number (1,1) int16 {mustBePositive,mustBeInteger} = 10;
-
-        multiresolution_sparsity_factor (1,1)  double {mustBeNonnegative} = 0.001;
-
-        multiresolution_decomposition_number (1,1) int16 {mustBePositive,mustBeInteger} = 10;
 
         %
         % Parameter for prior variance selection
@@ -84,8 +75,7 @@ classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
             %
             %   Name-value: estimation_type, beta, theta0, hyperprior_mode,
             %   n_map_iterations, n_L1_iterations, initial_prior_steering_db,
-            %   noise_cov, use_multiresolution (currently ignored: constructor
-            %   sets false), plus CommonInverseParameters.
+            %   noise_cov, plus CommonInverseParameters.
 
             arguments
 
@@ -100,14 +90,6 @@ classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
                 args.n_L1_iterations = 5
 
                 args.estimation_type = "IAS"
-
-                args.use_multiresolution = false
-
-                args.multiresolution_levels_number = 10;
-
-                args.multiresolution_sparsity_factor = 0.001;
-
-                args.multiresolution_decomposition_number = 10;
 
                 args.data_normalization_method = "Maximum entry"
 
@@ -157,8 +139,6 @@ classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
 
             self.estimation_type = args.estimation_type;
 
-            self.use_multiresolution = false;
-
             self.beta = args.beta;
 
             self.theta0 = args.theta0;
@@ -168,12 +148,6 @@ classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
             self.n_map_iterations = args.n_map_iterations;
 
             self.n_L1_iterations = args.n_L1_iterations;
-
-            self.multiresolution_levels_number = args.multiresolution_levels_number;
-
-            self.multiresolution_sparsity_factor = args.multiresolution_sparsity_factor;
-
-            self.multiresolution_decomposition_number = args.multiresolution_decomposition_number;
 
             self.initial_prior_steering_db = args.initial_prior_steering_db;
             
@@ -190,22 +164,6 @@ classdef GroupLassoInverter < inverse.CommonInverseParameters & dynamicprops
 
         end
 
-        %This function calculates the
-        %multiresolution decompositions as it would by pressing the make
-        %decomposition button
-        function self = make_multires_dec(self)
-            %make_multires_dec  Intended wrapper around zef_make_multires_dec.
-            %
-            %   Calls zef_make_multires_dec with number_of_decompositions,
-            %   number_of_multiresolution_levels, sparsity_factor — property
-            %   names this class does not define (RAMUS names). Will error if
-            %   invoked until those properties exist or the call is updated.
-            arguments
-                self (1,1)
-            end
-            [self.multiresolution_dec, self.multiresolution_ind, self.multiresolution_count] = zef_make_multires_dec(self.number_of_decompositions, self.number_of_multiresolution_levels, self.sparsity_factor);
-        end %function
-    
         % Declare the initialize and inverse method defined in the files invert and initialize in this same
         % folder.
         self = initialize(self, L, f_data)

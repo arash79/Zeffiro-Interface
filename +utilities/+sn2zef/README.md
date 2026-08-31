@@ -10,11 +10,9 @@ Extract **closed compartment surfaces** from SimNIBS `final_tissues.nii.gz` (vox
 |-------|------|
 | `run.m` | Primary volume → STL / `.zef` pipeline |
 | `export_segmentation_meshes.m` | NIfTI + FreeSurfer coreg path |
-| `exportSegmentationSTLs.m` | STL writer helper |
-| `extract_SimNIBS_surfaces.m` | Surface extraction from tissue volume |
 | `export_from_gmsh_mesh.m` / `meshLoadGmsh4.m` | Gmsh 4 reader path (third-party reader) |
 | `readSNLUT.m` | Tissue LUT parser (`final_tissues_LUT.txt`) |
-| `save_atlas_points.m` / `save_volume_atlas_points.m` | Atlas point exports |
+| `save_volume_atlas_points.m` | Atlas point export from labelled volumes |
 | `run_and_print_command.m` | Shell/command logging helper |
 | `+transforms/` | SimNIBS ↔ FreeSurfer translation helpers |
 

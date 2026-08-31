@@ -2,7 +2,7 @@
 
 ## Folder purpose
 
-Surface meshes for the **Itokawa asteroid** demo used with asteroid gravity / radar profiles and example projects. Provides exterior and interior compartment STLs for segmentation / meshing workflows.
+Surface meshes for the **Itokawa asteroid** demo used with asteroid gravity / radar profiles and example projects. The shipped STLs are the three-layer model (Itokawa exterior, mantle, ellipsoidal void) used by `asteroid_radar_project.mat` and `asteroid_gravity_project.mat`.
 
 ## Main contents
 
@@ -12,7 +12,6 @@ Surface meshes for the **Itokawa asteroid** demo used with asteroid gravity / ra
 | `itokawa_exterior_highres.stl` | High-resolution exterior (~9.8 MB) |
 | `mantle.stl` | Mantle compartment surface |
 | `void.stl` | Interior void surface |
-| `README.txt` | Short legacy asset note |
 | `README.md` | This documentation |
 
 ## Code functionality
@@ -51,7 +50,6 @@ python3 scripts/validate_stl_manifold.py data/itokawa_model/itokawa_exterior.stl
 
 - Units and scale must match asteroid profile mesh settings (do not mix with head-mm assumptions blindly).
 - Highres exterior is large — prefer the standard exterior for routine tests.
-- `README.txt` may be terse; trust this README + profile docs for workflow.
 
 ## Developer guidance
 

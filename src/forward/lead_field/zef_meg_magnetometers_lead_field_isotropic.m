@@ -6,7 +6,7 @@
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Script. Default INI row "MEG lead field with isotropic electrical
-%   conductivity, magnetometers". Same body as zef_meg_magnetometers_lead_field.
+%   conductivity, magnetometers".
 %   Sensors: positions(:,1:3) mm, orientations(:,4:6).
 %
 %   See also zef_lead_field_matrix, zef_run_forward_simulation.

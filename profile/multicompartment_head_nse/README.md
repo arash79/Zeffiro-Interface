@@ -20,12 +20,12 @@ No `.m` files in this folder—INI data only.
 
 - Startup / profile switch reads these INIs into `zef` (plugins list, parameter definitions, forward method strings).
 - `zeffiro_parameters.ini` enables `sigma`, and adds `mvd_length` (microvessel density, default 200 Count/mm³) and `nse_sigma` (NSE conductivity, default 0 S/m, On but not written from segmentation).
-- Plugins include IAS, MNE, Dipole Scan, Kalman (`zef_kf_start`), Dynamical plot queue, GMM (SP/JL), and **NSE tool** (`zef_nse_tool_start`).
+- Inverse/Multi menus follow the **legacy-like reduced set**: IAS / IAS ROI, RAMUS, EXP IAS RAMUS, MNE, Dipole Scan, Kalman (`zef_kf_start`), GMM (SP/JL), NSE tool (`zef_nse_tool_start`), … — not SL1, EXP Lasso, DTI, strip, ROI, patch, or source-tree (those stay on `multicompartment_head`).
 - Forward INI lists isotropic/anisotropic lead-field entry points (`zef_eeg_lead_field_isotropic`, …).
 
 ## Workflow context
 
-Choose this profile when meshing a multi-compartment head and using NSE / microvessel fields (`src/forward/nse`). Plugin set aligns with `multicompartment_head_legacy` plus NSE. Segmentation INI is an empty template—import anatomy separately.
+Choose this profile when you want NSE / microvessel **parameter rows** (`mvd_length`, `nse_sigma`) and a **reduced** Inverse/Multi/Forward menu (same family as `multicompartment_head_legacy`: EXP IAS RAMUS present; SL1, EXP Lasso, DTI, strip/ROI/patch/source-tree dropped). The default `multicompartment_head` profile already lists **NSE tool** — this folder is not “default plus NSE”. Segmentation INI is an empty template—import anatomy separately.
 
 ## Usage instructions
 

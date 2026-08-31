@@ -13,7 +13,7 @@ function zef = zef_update_transform(zef)
 %   if the field is missing). Then runs the script zef_init_transform to
 %   refresh the table. nargout==0 → assignin base. Does not replot.
 %
-%   See also zef_init_transform, zef_update_transform_parameters.
+%   See also zef_init_transform.
 if nargin == 0
     zef = evalin('base','zef');
 end

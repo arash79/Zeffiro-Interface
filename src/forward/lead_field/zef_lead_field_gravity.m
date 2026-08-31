@@ -1,4 +1,4 @@
-function [L_gravity,  bg_data, source_locations, source_directions] = lead_field_gravity(nodes,elements,rho,sensors,varargin)
+function [L_gravity,  bg_data, source_locations, source_directions] = zef_lead_field_gravity(nodes,elements,rho,sensors,varargin)
 %LEAD_FIELD_GRAVITY  Scalar gravity potential lead field from mass density rho.
 %
 %   Zeffiro Interface.
@@ -7,8 +7,11 @@ function [L_gravity,  bg_data, source_locations, source_directions] = lead_field
 %
 %   Called as zef_lead_field_gravity from the asteroid profile scripts and
 %   from zef_lead_field_matrix_gravity (types 3–4). Uses zef.source_model
-%   from the base workspace. rho plays the role of sigma: 1-col isotropic or
-%   6-col tensor, optional prism cell.
+%   and zef.gravity_field_type from the base workspace. rho plays the role
+%   of sigma: 1-col isotropic or 6-col tensor, optional prism cell.
+%   Geometry is converted mm→m for the Newtonian kernels; returned
+%   source_locations stay in the session millimetre frame.
+%   Type 3 is V/||r||, type 4 is V r/||r||^3, then both × G.
 %
 %   [L_gravity, bg_data, source_locations, source_directions] = ...
 %       zef_lead_field_gravity(nodes, elements, rho, sensors, varargin)
@@ -119,29 +122,30 @@ K = size(tetrahedra,1);
 K3 = length(source_ind);
 K4 = length(gravity_ind);
 
-tilavuus = zef_tetra_volume(nodes, tetrahedra, true);
+% Physics in metres; source_locations stay in the session (mm) frame.
+nodes_m = nodes / 1000;
+sensors_m = sensors(:,1:3) / 1000;
+tilavuus = zef_tetra_volume(nodes_m, tetrahedra, true);
+c_tet = 0.25*(nodes_m(tetrahedra(:,1),:) + nodes_m(tetrahedra(:,2),:) + nodes_m(tetrahedra(:,3),:) + nodes_m(tetrahedra(:,4),:));
 
-c_tet = 0.25*(nodes(tetrahedra(:,1),:) + nodes(tetrahedra(:,2),:) + nodes(tetrahedra(:,3),:) + nodes(tetrahedra(:,4),:));
-
-[eit_ind, eit_count] = zef_make_gravity_dec(nodes,tetrahedra,gravity_ind,source_ind);
+[eit_ind, ~] = zef_make_gravity_dec(nodes,tetrahedra,gravity_ind,source_ind);
 
 h = zef_waitbar(0,K4,'Lead field.');
+gtype = evalin('base','zef.gravity_field_type');
 
-if evalin('base','zef.gravity_field_type') == 4
+if gtype == 4
 
     L_gravity = zeros(3*L, K3);
-    %tilavuus_vec_aux = zeros(1, K3);
     bg_data = zeros(3*L,1);
 
     for i = 1 : K4
 
-        r_aux_vec = tilavuus(gravity_ind(i))./sum((repmat(c_tet(gravity_ind(i),:),L,1) - sensors).^3,2);
-        aux_vec = (repmat(c_tet(gravity_ind(i),:),L,1) - sensors).*repmat(r_aux_vec,1,3);
+        diff_vec = c_tet(gravity_ind(i),:) - sensors_m;
+        aux_vec = zef_gravity_newton_kernel(diff_vec, tilavuus(gravity_ind(i)), 4);
         L_gravity(:,eit_ind(i)) = L_gravity(:,eit_ind(i)) + aux_vec(:);
 
-        %tilavuus_vec_aux(eit_ind(i)) = tilavuus_vec_aux(eit_ind(i)) + tilavuus(gravity_ind(i))*eit_count(eit_ind(i));
 
-        if mod(i,floor(K4/50))==0
+        if mod(i,max(1,floor(K4/50)))==0
             time_val = toc;
             zef_waitbar(i,K4,h,['Lead field. Ready approx: ' datestr(datevec(now+(K4/i - 1)*time_val/86400)) '.']);
         end
@@ -149,33 +153,30 @@ if evalin('base','zef.gravity_field_type') == 4
 
     for i = 1 : K
 
-        r_aux_vec = tilavuus(i)./sum((repmat(c_tet(i,:),L,1) - sensors).^3,2);
-        aux_vec = (repmat(c_tet(i,:),L,1) - sensors).*repmat(r_aux_vec,1,3);
+        diff_vec = c_tet(i,:) - sensors_m;
+        aux_vec = zef_gravity_newton_kernel(diff_vec, tilavuus(i), 4);
         bg_data = bg_data + rho_tetrahedra(1,i)*aux_vec(:);
 
-        %tilavuus_vec_aux(eit_ind(i)) = tilavuus_vec_aux(eit_ind(i)) + tilavuus(gravity_ind(i))*eit_count(eit_ind(i));
 
-        if mod(i,floor(K/50))==0
+        if mod(i,max(1,floor(K/50)))==0
             time_val = toc;
             zef_waitbar(i,K,h,['Background. Ready approx: ' datestr(datevec(now+(K/i - 1)*time_val/86400)) '.']);
         end
     end
 
-elseif evalin('base','zef.gravity_field_type') == 3
+elseif gtype == 3
 
     L_gravity = zeros(L, K3);
-    %tilavuus_vec_aux = zeros(1, K3);
-    sensors = evalin('base','zef.sensors(:,1:3)');
     bg_data = zeros(L,1);
 
     for i = 1 : K4
 
-        aux_vec = tilavuus(gravity_ind(i))./sum((repmat(c_tet(gravity_ind(i),:),L,1) - sensors).^2,2);
+        diff_vec = c_tet(gravity_ind(i),:) - sensors_m;
+        aux_vec = zef_gravity_newton_kernel(diff_vec, tilavuus(gravity_ind(i)), 3);
         L_gravity(:,eit_ind(i)) = L_gravity(:,eit_ind(i)) + aux_vec(:);
 
-        %tilavuus_vec_aux(eit_ind(i)) = tilavuus_vec_aux(eit_ind(i)) + tilavuus(gravity_ind(i))*eit_count(eit_ind(i));
 
-        if mod(i,floor(K4/50))==0
+        if mod(i,max(1,floor(K4/50)))==0
             time_val = toc;
             zef_waitbar(i,K4,h,['Lead field. Ready approx: ' datestr(datevec(now+(K4/i - 1)*time_val/86400)) '.']);
         end
@@ -183,12 +184,12 @@ elseif evalin('base','zef.gravity_field_type') == 3
 
     for i = 1 : K
 
-        aux_vec = tilavuus(i)./sum((repmat(c_tet(i,:),L,1) - sensors).^2,2);
+        diff_vec = c_tet(i,:) - sensors_m;
+        aux_vec = zef_gravity_newton_kernel(diff_vec, tilavuus(i), 3);
         bg_data = bg_data + rho_tetrahedra(1,i)*aux_vec(:);
 
-        %tilavuus_vec_aux(eit_ind(i)) = tilavuus_vec_aux(eit_ind(i)) + tilavuus(gravity_ind(i))*eit_count(eit_ind(i));
 
-        if mod(i,floor(K/50))==0
+        if mod(i,max(1,floor(K/50)))==0
             time_val = toc;
             zef_waitbar(i,K,h,['Background. Ready approx: ' datestr(datevec(now+(K/i - 1)*time_val/86400)) '.']);
         end
@@ -200,10 +201,6 @@ close(h);
 
 L_gravity = (6.67408E-11)*L_gravity;
 bg_data = (6.67408E-11)*bg_data;
-
-%for i = length(source_ind)
-%L_gravity_aux(:,i) = L_gravity_aux(:,i); %/tilavuus_vec_aux(i);
-%end
 
 source_locations = (nodes(tetrahedra(source_ind,1),:) + nodes(tetrahedra(source_ind,2),:) + nodes(tetrahedra(source_ind,3),:)+ nodes(tetrahedra(source_ind,4),:))/4;
 source_directions = ones(size(source_locations));

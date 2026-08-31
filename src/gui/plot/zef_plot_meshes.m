@@ -560,9 +560,6 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                 set(h,'facecolor',sensors_color_table(i,:));
                 %April 2021
                 set(h,'edgecolor','none');
-                %set(h,'specularstrength',0.3);
-                %set(h,'diffusestrength',0.7);
-                %set(h,'ambientstrength',0.7);
                 set(h,'facealpha',eval('zef.layer_transparency'));
             end
         elseif electrode_model == 2
@@ -594,9 +591,6 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                     set(h(i),'Tag','sensor');
                 end
                 set(h,'edgecolor','none');
-                %set(h,'specularstrength',0.3);
-                %set(h,'diffusestrength',0.7);
-                %set(h,'ambientstrength',0.7);
                 set(h,'facealpha',eval('zef.layer_transparency'));
                 set(h,'edgealpha',eval('zef.layer_transparency'));
             end
@@ -609,9 +603,6 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                 end
                 %April 2021;
                 set(h,'edgecolor','none')
-                %set(h,'specularstrength',0.3);
-                %set(h,'diffusestrength',0.7);
-                %set(h,'ambientstrength',0.7);
                 set(h,'facealpha',eval('zef.layer_transparency'));
             end
         end
@@ -623,18 +614,12 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
             h=coneplot(sensors(:,1) + aux_scale_val*sensors(:,4),sensors(:,2) + aux_scale_val*sensors(:,5),sensors(:,3) + aux_scale_val*sensors(:,6),2*aux_scale_val*sensors(:,4),2*aux_scale_val*sensors(:,5),2*aux_scale_val*sensors(:,6),0,'nointerp');
             set(h,'facecolor',eval(['zef.' sensor_tag '_color']));
             set(h,'edgecolor','none');
-            %set(h,'specularstrength',0.3);
-            %set(h,'diffusestrength',0.7);
-            %set(h,'ambientstrength',0.7);
             set(h,'facealpha',eval('zef.layer_transparency'));
             if size(sensors,2) == 9
                 sensors(:,7:9) = sensors(:,7:9)./repmat(sqrt(sum(sensors(:,7:9).^2,2)),1,3);
                 h=coneplot(sensors(:,1) + aux_scale_val*sensors(:,7),sensors(:,2) + aux_scale_val*sensors(:,8),sensors(:,3) + aux_scale_val*sensors(:,9),2*aux_scale_val*sensors(:,7),2*aux_scale_val*sensors(:,8),2*aux_scale_val*sensors(:,9),0,'nointerp');
                 set(h,'facecolor', 0.9*[1 1 1]);
                 set(h,'edgecolor','none');
-                %set(h,'specularstrength',0.3);
-                %set(h,'diffusestrength',0.7);
-                %set(h,'ambientstrength',0.7);
                 set(h,'facealpha',eval('zef.layer_transparency'));
             end
         end
@@ -726,14 +711,12 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                                 aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                                 I_aux_rec = find(aux_rec > 0);
                                 reconstruction(I_aux_rec) = 0;
-                                %reconstruction = reconstruction./max(abs(reconstruction(:)));
                             end
 
                             if eval('zef.reconstruction_type') == 5
                                 aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                                 I_aux_rec = find(aux_rec <= 0);
                                 reconstruction(I_aux_rec) = 0;
-                                %reconstruction = reconstruction./max(abs(reconstruction(:)));
                             end
 
                             if ismember(eval('zef.reconstruction_type'), [2 3 4 5 6 7])
@@ -795,11 +778,6 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                                 min_rec = min_rec - 1e-15;
                             end
                             set(gca,'CLim',[min_rec max_rec]);
-                            %set(h_surf_2{ab_ind},'specularstrength',0.2);
-                            %set(h_surf_2{ab_ind},'specularexponent',0.8);
-                            %set(h_surf_2{ab_ind},'SpecularColorReflectance',0.8);
-                            %set(h_surf_2{ab_ind},'diffusestrength',1);
-                            %set(h_surf_2{ab_ind},'ambientstrength',1);
                             if eval('zef.brain_transparency') < 1 || eval('zef.use_parcellation')
                                 f_alpha_aux = zeros(size(reuna_p{i},1),1);
                                 if eval('zef.inv_scale') == 1
@@ -830,14 +808,9 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
 
                             if ismember(i,aux_active_compartment_ind) && cb_done == 0 && ismember(eval('zef.visualization_type'),[3])
                                 cb_done = 1;
-                                h_colorbar = colorbar('EastOutside','Position',colorbar_position,'Units','Normalized');
-                                set(h_colorbar,'Tag','rightColorbar');
-                                h_axes_text = axes('position',[0.0325 0.95 0.5 0.05],'visible','off');
-                                set(h_axes_text,'tag','image_details');
-                                h_text = findall(gcf,'Tag','time_text');
-                                set(h_text,'String',['Time: ' num2str(eval('zef.inv_time_1') + eval('zef.inv_time_2')/2 + frame_step*(f_ind - 1)*eval('zef.inv_time_3'),'%0.6f') ' s, Frame: ' num2str(f_ind) ' / ' num2str(length_reconstruction_cell) '.']);
-                                set(h_text,'visible','on','Tag','time_text');
-                                set(h_axes_text,'layer','bottom');
+                                h_colorbar = zef_figure_place_colorbar(eval('zef.h_axes1'));
+                                h_fig = eval('zef.h_zeffiro');
+                                zef_figure_time_label(h_fig, ['Time: ' num2str(eval('zef.inv_time_1') + eval('zef.inv_time_2')/2 + frame_step*(f_ind - 1)*eval('zef.inv_time_3'),'%0.6f') ' s, Frame: ' num2str(f_ind) ' / ' num2str(length_reconstruction_cell) '.']);
                                 axes(eval('zef.h_axes1'));
                             end
 
@@ -865,11 +838,9 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                             if ismember(i,aux_active_compartment_ind) && eval('zef.use_inflated_surfaces') && not(isempty(reuna_p_inf))
                                 h_surf_2{i} = trisurf(reuna_t{i},reuna_p_inf{i}(:,1),reuna_p_inf{i}(:,2),reuna_p_inf{i}(:,3),reconstruction,'edgecolor','none');
                                 set(h_surf_2{i},'Tag','reconstruction');
-                                %[h_contour{i},h_contour_text{i}] = zef_plot_contour(zef,eval('zef.contour_set'),reconstruction,reuna_t{i},reuna_p_inf{i});
                             else
                                 h_surf_2{i} = trisurf(reuna_t{i},reuna_p{i}(:,1),reuna_p{i}(:,2),reuna_p{i}(:,3),reconstruction,'edgecolor','none');
                                 set(h_surf_2{i},'Tag','reconstruction');
-                                %[h_contour{i},h_contour_text{i}] = zef_plot_contour(zef,eval('zef.contour_set'),reconstruction,reuna_t{i},reuna_p{i});
                             end
 
                             if ismember(eval('zef.volumetric_distribution_mode'),[1, 3])
@@ -880,11 +851,6 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                                 min_rec = min_rec - 1e-15;
                             end
                             set(gca,'CLim',gather([min_rec max_rec]));
-                            %set(h_surf_2{i},'specularstrength',0.2);
-                            %set(h_surf_2{i},'specularexponent',0.8);
-                            %set(h_surf_2{i},'SpecularColorReflectance',0.8);
-                            %set(h_surf_2{i},'diffusestrength',1);
-                            %set(h_surf_2{i},'ambientstrength',1);
                             if eval('zef.brain_transparency') < 1 || eval('zef.use_parcellation')
                                 f_alpha_aux = zeros(size(reuna_p{i},1),1);
                                 if eval('zef.inv_scale') == 1
@@ -909,14 +875,9 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                             end
 
                             cb_done = 1;
-                            h_colorbar = colorbar('EastOutside','Position',[0.65 0.647 0.01 0.29],'Units','Normalized');
-                            set(h_colorbar,'Tag','rightColorbar');
-                            h_axes_text = axes('position',[0.0325 0.95 0.5 0.05],'visible','off');
-                            set(h_axes_text,'tag','image_details');
-                            h_text = findall(gcf,'Tag','time_text');
-                            set(h_text,'String',['Time: ' num2str(eval('zef.inv_time_1') + eval('zef.inv_time_2')/2 + frame_step*(f_ind - 1)*eval('zef.inv_time_3'),'%0.6f') ' s, Frame: ' num2str(f_ind) ' / ' num2str(length_reconstruction_cell) '.']);
-                            set(h_text,'visible','on','Tag','time_text');
-                            set(h_axes_text,'layer','bottom');
+                            h_colorbar = zef_figure_place_colorbar(eval('zef.h_axes1'));
+                            h_fig = eval('zef.h_zeffiro');
+                            zef_figure_time_label(h_fig, ['Time: ' num2str(eval('zef.inv_time_1') + eval('zef.inv_time_2')/2 + frame_step*(f_ind - 1)*eval('zef.inv_time_3'),'%0.6f') ' s, Frame: ' num2str(f_ind) ' / ' num2str(length_reconstruction_cell) '.']);
                             axes(eval('zef.h_axes1'));
 
                             lighting phong;
@@ -929,13 +890,8 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                             [min_n_aux, min_t_aux] = zef_minimal_mesh(reuna_p{i},reuna_t{i});
                             h_surf = trimesh(min_t_aux,min_n_aux(:,1),min_n_aux(:,2),min_n_aux(:,3),'edgecolor','none','facecolor',color_str);
                             set(h_surf,'Tag','surface');
-                            %set(h_surf,'specularstrength',0.1);
-                            %set(h_surf,'diffusestrength',0.5);
-                            %set(h_surf,'ambientstrength',0.85);
                             set(h_surf,'facealpha',eval('zef.layer_transparency'));
-                            %if not(eval('zef.visualization_type')==3);
                             lighting phong;
-                            %end
                         end
 
                     end
@@ -946,6 +902,7 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
         if loop_count == 1
             view(eval('zef.azimuth'),eval('zef.elevation'));
             axis('image');
+            zef_figure_sync_plot(eval('zef.h_zeffiro'));
         end
         camva(zef.h_axes1,eval('zef.cam_va'));
 
@@ -997,7 +954,6 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                         return;
                 end
                 f_ind_aux = f_ind_aux + 1;
-                %zef_waitbar(f_ind_aux,number_of_frames,h_waitbar,['Frame ' int2str(f_ind_aux) ' of ' int2str(number_of_frames) '.'])
 
                 if ismember(eval('zef.visualization_type'),[3])
                     % Movie frames: same Component mapping as the static
@@ -1041,14 +997,12 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                             aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                             I_aux_rec = find(aux_rec > 0);
                             reconstruction(I_aux_rec) = 0;
-                            %reconstruction = reconstruction./max(abs(reconstruction(:)));
                         end
 
                         if eval('zef.reconstruction_type') == 5
                             aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                             I_aux_rec = find(aux_rec <= 0);
                             reconstruction(I_aux_rec) = 0;
-                            %reconstruction = reconstruction./max(abs(reconstruction(:)));
                         end
 
                         if ismember(eval('zef.reconstruction_type'), [2 3 4 5 6 7])
@@ -1067,7 +1021,6 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                             end
                         end
 
-                        %delete(h_surf_2{ab_ind});
 
                         if eval('zef.use_parcellation')
                             reconstruction_aux = zeros(size(reconstruction));
@@ -1089,19 +1042,11 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                             reconstruction = reconstruction_aux;
                         end
 
-                        %axes(eval('zef.h_axes1'));
-                        %h_surf_2{ab_ind} = trisurf(reuna_t{i},reuna_p{i}(:,1),reuna_p{i}(:,2),reuna_p{i}(:,3),reconstruction,'edgecolor','none');
                         set(h_surf_2{ab_ind},'CData',reconstruction);
                         if ismember(eval('zef.volumetric_distribution_mode'),[1, 3])
                             zef_plot_cone_field(zef,eval('zef.h_axes1'),f_ind);
                         end
 
-                        %set(gca,'CLim',[min_rec max_rec]);
-                        %set(h_surf_2{ab_ind},'specularstrength',0.2);
-                        %set(h_surf_2{ab_ind},'specularexponent',0.8);
-                        %set(h_surf_2{ab_ind},'SpecularColorReflectance',0.8);
-                        %set(h_surf_2{ab_ind},'diffusestrength',1);
-                        %set(h_surf_2{ab_ind},'ambientstrength',1);
                         if eval('zef.brain_transparency') < 1 || eval('zef.use_parcellation')
                             f_alpha_aux = zeros(size(reuna_p{i},1),1);
                             if eval('zef.inv_scale') == 1
@@ -1138,24 +1083,11 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                     reconstruction = reconstruction(:);
 
                     axes(eval('zef.h_axes1'));
-                    %h_surf_2{ab_ind} = trisurf(reuna_t{i},reuna_p{i}(:,1),reuna_p{i}(:,2),reuna_p{i}(:,3),reconstruction,'edgecolor','none');
                     set(h_surf_2{i},'CData',gather(reconstruction));
-                    if ismember(i,aux_active_compartment_ind) && eval('zef.use_inflated_surfaces') && not(isempty(reuna_p_inf))
-                        %[h_contour{i},h_contour_text{i}] = zef_plot_contour(zef,eval('zef.contour_set'),reconstruction,reuna_t{i},reuna_p_inf{i});
-                    else
-                        %[h_contour{i},h_contour_text{i}] = zef_plot_contour(zef,eval('zef.contour_set'),reconstruction,reuna_t{i},reuna_p{i});
-                    end
                     if ismember(eval('zef.volumetric_distribution_mode'),[1, 3])
                         zef_plot_cone_field(zef,eval('zef.h_axes1'),f_ind);
                     end
 
-                    %set(h_surf_2{i},'edgecolor','none','facecolor','flat','facelighting','flat','CDataMapping','scaled');
-                    %set(gca,'CLim',gather([min_rec max_rec]));
-                    %set(h_surf_2{i},'specularstrength',0.2);
-                    %set(h_surf_2{i},'specularexponent',0.8);
-                    %set(h_surf_2{i},'SpecularColorReflectance',0.8);
-                    %set(h_surf_2{i},'diffusestrength',1);
-                    %set(h_surf_2{i},'ambientstrength',1);
                     if eval('zef.brain_transparency') < 1 || eval('zef.use_parcellation')
                         f_alpha_aux = zeros(size(reuna_p{i},1),1);
                         if eval('zef.inv_scale') == 1
@@ -1197,18 +1129,11 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                 % scaled by frame_step / movie_fps.
                 camorbit(zef.h_axes1,frame_step*eval('zef.orbit_1')/movie_fps,frame_step*eval('zef.orbit_2')/movie_fps);
 
-                %delete(h_text);
-                %delete(h_axes_text);
-                axes(h_axes_text);% = axes('position',[0.0325 0.95 0.5 0.05],'visible','off');
-                %set(h_axes_text,'tag','image_details');
                 if ismember(eval('zef.visualization_type'),[3])
-                    set(h_text,'string', ['Time: ' num2str(eval('zef.inv_time_1') + eval('zef.inv_time_2')/2 + frame_step*(f_ind - 1)*eval('zef.inv_time_3'),'%0.6f') ' s, Frame: ' num2str(f_ind) ' / ' num2str(length_reconstruction_cell) '.']);
+                    zef_figure_time_label(eval('zef.h_zeffiro'), ['Time: ' num2str(eval('zef.inv_time_1') + eval('zef.inv_time_2')/2 + frame_step*(f_ind - 1)*eval('zef.inv_time_3'),'%0.6f') ' s, Frame: ' num2str(f_ind) ' / ' num2str(length_reconstruction_cell) '.']);
                 elseif ismember(eval('zef.visualization_type'),[5])
-                    set(h_text,'string', ['Time: ' num2str(eval('zef.top_time_1') + eval('zef.top_time_2')/2 + frame_step*(f_ind - 1)*eval('zef.top_time_3'),'%0.6f') ' s, Frame: ' num2str(f_ind) ' / ' num2str(length_reconstruction_cell) '.']);
+                    zef_figure_time_label(eval('zef.h_zeffiro'), ['Time: ' num2str(eval('zef.top_time_1') + eval('zef.top_time_2')/2 + frame_step*(f_ind - 1)*eval('zef.top_time_3'),'%0.6f') ' s, Frame: ' num2str(f_ind) ' / ' num2str(length_reconstruction_cell) '.']);
                 end
-
-                set(h_text,'visible','on');
-                set(h_axes_text,'layer','bottom');
 
                 drawnow limitrate;
 
@@ -1238,9 +1163,6 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                     if not(isempty(min_n_aux))
                         h_surf = trimesh(min_t_aux,min_n_aux(:,1),min_n_aux(:,2),min_n_aux(:,3),'edgecolor','none','facecolor',color_str);
                         set(h_surf,'Tag','surface');
-                        %set(h_surf,'specularstrength',0.1);
-                        %set(h_surf,'diffusestrength',0.5);
-                        %set(h_surf,'ambientstrength',0.85);
                         set(h_surf,'facealpha',eval('zef.layer_transparency'));
                         lighting phong;
                     end
@@ -1250,6 +1172,7 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
 
         view(eval('zef.azimuth'),eval('zef.elevation'));
         axis('image');
+        zef_figure_sync_plot(eval('zef.h_zeffiro'));
         camva(zef.h_axes1,eval('zef.cam_va'));
         if eval('zef.axes_visible')
             set(eval('zef.h_axes1'),'visible','on');
@@ -1297,6 +1220,7 @@ end
 
 rotate3d on;
 camva(zef.h_axes1,eval('zef.cam_va'));
+zef_figure_sync_plot(eval('zef.h_zeffiro'));
 
 end
 

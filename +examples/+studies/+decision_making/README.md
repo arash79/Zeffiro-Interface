@@ -11,7 +11,7 @@ Focal-epilepsy decision-making study: build/process training data, find reconstr
 | `zef_process_training_data_focal_epilepsy.m` | Process training measurements |
 | `zef_find_reconstructions_focal_epilepsy.m` | Invert / store reconstructions |
 | `zef_decision_script_focal_epilepsy.m` | Cluster + final reconstruction + show |
-| `+helpers/` | Clustering / display helpers |
+| `+helpers/` | Clustering / final recon / resection-distance UI; functions `zef_rec_maximizer`, `zef_distance_to_resection` (see `+helpers/README.md`) |
 
 ## Code functionality
 
@@ -21,7 +21,7 @@ Scripts expect a loaded `zef` with Data Bank nodes already populated (EEG/MEG le
 
 ## Workflow context
 
-After mesh, lead field, and Data Bank setup. Helpers live in `+helpers/` (`zef_rec_maximizer` is the only function; the rest are scripts that read workspace `zef` / `z_inverse_*`).
+After mesh, lead field, and Data Bank setup. Helpers live in `+helpers/`: scripts that read workspace `zef` / `z_inverse_*`, plus two functions (`zef_rec_maximizer`, `zef_distance_to_resection`). `zef_show_results_*` opens resection-distance `uifigure`s; it does not overlay the Figure tool.
 
 ## Usage instructions
 
@@ -37,7 +37,7 @@ run('+examples/+studies/+decision_making/zef_decision_script_focal_epilepsy.m');
 
 ## Important notes
 
-Edit paths in `zef_parameters_focal_epilepsy.m` before any run. The script sets `project_file_name` to a Dropbox path then **overwrites** it to a concatenated `[this_folder/data]/~/Dropbox/...` string that will not resolve. Point `project_file_name` at a real `.mat` **after** the `folder_name` assignment, or put files in `+decision_making/data/`. Also sets `credibility_data_file_name`, `snr_vec = 10`, `training_data_size = 50`, `frame_number = 1`, clustering tolerances, etc.
+Edit paths in `zef_parameters_focal_epilepsy.m` before any run. Place your project `.mat` and optional credibility dataset in `+decision_making/data/` (not shipped; gitignored). Defaults are `project.mat` and `credibility_dataset`. Also sets `snr_vec = 10`, `training_data_size = 50`, `frame_number = 1`, clustering tolerances, etc.
 
 ## Developer guidance
 

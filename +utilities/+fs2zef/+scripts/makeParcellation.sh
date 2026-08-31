@@ -193,4 +193,4 @@ fi
 
 echo
 
-echo "✅ All available regions have been segmented in $output_dir."
+echo "All available regions have been segmented in $output_dir."

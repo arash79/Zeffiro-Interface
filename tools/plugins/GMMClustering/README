@@ -1,5 +1,0 @@
-This folder contains the legacy GMM clustering tooling kept for compatibility.
-The currently active GMM entry point in the profile INI files is
-`GMModelApp_start` (the "GMModeling App (JL)" tree). The older standalone
-`GMMclustering_start.m` / `GMMclustering_PlotOpt_start.m` launch scripts have
-been removed.

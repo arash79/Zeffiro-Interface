@@ -1,42 +1,54 @@
-# external/fieldtrip
+# `external/fieldtrip`
 
-## Purpose of this folder
+## Folder purpose
 
-This folder is responsible for placeholder folders for optional external solver/toolbox submodules within the Zeffiro Interface project.
+Optional **FieldTrip** toolbox (git submodule) for MEG/EEG I/O and related helpers. Zeffiro’s own electrode parsers are `core.io.electrodes`; Duneuro conversion (`utilities.duneuro2zef`) accepts FieldTrip-like measurement structs (`avg` field) but does not require this clone. Empty until `zeffiro_setup` populates it.
 
-## Contents
+## Main contents
 
-This folder currently contains no tracked source or asset files. It is kept as a placeholder for runtime or optional dependency content.
+| Item | Role |
+|------|------|
+| Vendor tree (after clone) | FieldTrip release sources |
+| `ft_defaults.m` | `.gitmodules` `startupscript` |
 
-## How this folder fits into the overall workflow
+`.gitmodules`: `https://github.com/fieldtrip/fieldtrip.git`, branch `release`.
 
-Zeffiro Interface starts in `zeffiro_interface.m`, adds the project runtime paths, and then calls into folders like this one as the GUI, examples, plugins, or numerical routines require placeholder folders for optional external solver/toolbox submodules.
+## Code functionality
 
-## GUI usage
+On successful clone, `zef_start_config` contains:
 
-There is no direct GUI entry point here; these folders are dependency locations populated by setup when optional submodules are installed.
+```matlab
+if isequal(zef.zeffiro_restart, 0), addpath('external/fieldtrip'); end;
+run ( 'external/fieldtrip/ft_defaults.m' );
+```
 
-## Programmatic usage
+`ft_defaults` sets FieldTrip’s own path. That is **not** `genpath` of the whole Zeffiro `external/` tree.
 
-From MATLAB, start from the project root and initialize paths with either `zeffiro_interface` or `addpath(genpath(projectRoot))` when you only need utility functions.
+## Workflow context
 
-This folder has no directly callable MATLAB source files. Use the files here through the surrounding GUI, data import, profile, or documentation workflow.
+```
+zeffiro_setup → addpath + ft_defaults
+  → optional FieldTrip readers in user scripts / duneuro exports
+  → Zeffiro session still uses zef.L / zef.sensors after conversion
+```
 
-## Examples
+Duneuro import: [`../../+utilities/+duneuro2zef/README.md`](../../+utilities/+duneuro2zef/README.md). Electrode `.dat`: [`../../+core/+io/+electrodes/README.md`](../../+core/+io/+electrodes/README.md).
 
-GUI example: use the surrounding Zeffiro workflow that references this folder's assets or configuration files.
+## Usage instructions
 
-MATLAB example: load or inspect these files with standard MATLAB I/O functions such as `load`, `readmatrix`, or `fileread` when appropriate.
+```matlab
+zeffiro_setup("submodules", "fieldtrip");
+```
 
-## Dependencies and assumptions
+After `zeffiro_interface`, `which ft_defaults` should resolve under `external/fieldtrip` if clone succeeded.
 
-- The Zeffiro project root should be available on the MATLAB path before calling source files directly.
-- Many routines assume a populated `zef` struct created by `zeffiro_interface` and updated by GUI callbacks.
-- Optional dependency folders may be empty until `zeffiro_setup` initializes the configured submodules.
+## Important notes
 
-## Notes for developers
+- Empty until clone.
+- FieldTrip on the path can shadow similarly named utilities — keep `addpath` to this folder as written by `zeffiro_setup`, not a manual `genpath(external)`.
+- Vendor documentation and license remain FieldTrip’s.
 
-- Keep documentation synchronized with behavior when adding or moving files; this repository now expects every folder to have a current `README.md`.
-- Preserve numerical algorithms, GUI callback contracts, and `zef` field names unless a coordinated migration updates all callers.
-- Prefer package-qualified functions in `+...` folders and avoid adding package directories themselves directly to the MATLAB path.
-- Treat `.fig`, `.mlapp`, `.mat`, and sample data files as part of the public workflow: document required fields and formats when they change.
+## Developer guidance
+
+- Prefer `utilities.duneuro2zef` / `core.io.electrodes` for supported Zeffiro I/O; call FieldTrip only when the user already has FT data.
+- Pitfall: running `ft_defaults` twice from mixed path setups (FieldTrip also on MATLAB’s userpath).

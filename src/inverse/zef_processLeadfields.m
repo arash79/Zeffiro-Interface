@@ -18,7 +18,10 @@ function [L,n_interp, procFile] = zef_processLeadfields(zef)
 %   [L, n_interp, procFile] = zef_processLeadfields(zef)
 %
 %   Inputs
-%     zef - session struct; if omitted or numeric placeholder, loaded from base.
+%     zef - session struct; if omitted, or if a numeric sentinel is passed
+%           (historical plugins passed source_direction_mode), loaded from
+%           base. The numeric value is ignored; zef.source_direction_mode
+%           is used.
 %
 %   Outputs
 %     L        - lead field (n_sensors x n_columns) after mode-specific processing.
@@ -39,20 +42,15 @@ function [L,n_interp, procFile] = zef_processLeadfields(zef)
 %   See also zef_process_inversion, zef_inverse_extract_bundle,
 %            zef_postProcessInverse, zef_source_interpolation.
 
-source_direction_mode = [];
-if nargin == 0 || isnumeric(zef)
-    if isnumeric(zef)
-        zef = evalin('base','zef');
-        source_direction_mode = zef.source_direction_mode;
-    else
-        zef = evalin('base','zef');
-    end
+% nargin==0: load zef from base (docstring). A numeric first argument is
+% the historical plugin sentinel (callers passed source_direction_mode);
+% the numeric value is ignored and zef.source_direction_mode is used.
+if nargin < 1 || isnumeric(zef)
+    zef = evalin('base', 'zef');
 end
 
-source_directions = eval('zef.source_directions');
-if isempty(source_direction_mode)
+source_directions = zef.source_directions;
 source_direction_mode = zef.source_direction_mode;
-end
 
 s_ind_2=[];
 s_ind_3=[];

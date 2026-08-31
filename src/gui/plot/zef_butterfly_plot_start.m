@@ -9,15 +9,14 @@ function zef = zef_butterfly_plot_start(zef)
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Function. Called via zef_tool_start from zef_butterfly_plot. Runs
-%   zef_butterfly_plot_app (uicontrol figure), names it 'ZEFFIRO
-%   Interface: Butterfly plot', zef_init_butterfly_plot, and enables
+%   zef_butterfly_plot_app (uicontrol figure named 'ZEFFIRO Interface:
+%   Butterfly plot'), zef_init_butterfly_plot, and enables
 %   h_bf_data_segment only when zef.measurements is a cell. Does not
 %   draw until **Plot**.
 %
 %   See also zef_butterfly_plot_app, zef_init_butterfly_plot.
 zef_butterfly_plot_app;
 
-set(zef.h_butterfly_plot,'Name','ZEFFIRO Interface: Butterfly plot');
 set(findobj(zef.h_butterfly_plot.Children,'-property','FontUnits'),'FontUnits','pixels')
 set(findobj(zef.h_butterfly_plot.Children,'-property','FontSize'),'FontSize',9);
 zef_init_butterfly_plot;

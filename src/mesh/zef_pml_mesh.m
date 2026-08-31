@@ -90,8 +90,4 @@ X = outer_radius*X/s;
 Y = outer_radius*Y/s;
 Z = outer_radius*Z/s;
 
-%figure(1); clf;
-%scatter3(X(:),Y(:),Z(:));
-%axis equal
-
 end

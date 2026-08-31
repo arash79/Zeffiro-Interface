@@ -16,7 +16,7 @@ type,segmentation,name,Cingulate cortex,merge,0,filename,./data/segmentations/mu
 type,segmentation,name,Cingulate cortex,merge,1,filename,./data/segmentations/multicompartment_head_project/CC_Mid_posterior.asc,parameter_name,sigma,parameter_value,0.14,activity,0,inflate,200
 type,segmentation,name,Cingulate cortex,merge,1,filename,./data/segmentations/multicompartment_head_project/CC_Central.asc,parameter_name,sigma,parameter_value,0.14,activity,0,inflate,200
 type,segmentation,name,Cingulate cortex,merge,1,filename,./data/segmentations/multicompartment_head_project/CC_Mid_Anterior.asc,parameter_name,sigma,parameter_value,0.14,activity,0,inflate,200
-type,segmentation,name,Cingulate cortex,merge,1,filename,merge,1,./data/segmentations/multicompartment_head_project/CC_Anterior.asc,parameter_name,sigma,parameter_value,0.14,activity,0,inflate,200
+type,segmentation,name,Cingulate cortex,merge,1,filename,./data/segmentations/multicompartment_head_project/CC_Anterior.asc,parameter_name,sigma,parameter_value,0.14,activity,0,inflate,200
 type,segmentation,name,Ventral DC,merge,0,filename,./data/segmentations/multicompartment_head_project/LVentral_DC.asc,parameter_name,sigma,parameter_value,0.33,activity,2,inflate,200
 type,segmentation,name,Ventral DC,merge,1,filename,./data/segmentations/multicompartment_head_project/RVentral_DC.asc,parameter_name,sigma,parameter_value,0.33,activity,2,inflate,200
 type,segmentation,name,Amygdala,merge,0,filename,./data/segmentations/multicompartment_head_project/lh.Amygdala.asc,parameter_name,sigma,parameter_value,0.33,activity,2,inflate,200

@@ -7,8 +7,8 @@ function [ electrode_data, electrode_labels ] = from_dat(file, kwargs)
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Parser used by Import → Import electrodes when the chosen file has
-%   extension .dat. Bundled examples such as ProneFreeSurfer/ascii/electrodes.dat
-%   and data/electrodes use this layout. Same numeric contract as
+%   extension .dat. Bundled layouts under data/electrodes/ use this
+%   layout. Same numeric contract as
 %   core.io.electrodes.from_csv: N-by-3 point electrodes or N-by-6 CEM.
 %
 %   Each non-empty line must have 3, 4, 6, or 7 whitespace-separated fields:
@@ -24,7 +24,9 @@ function [ electrode_data, electrode_labels ] = from_dat(file, kwargs)
 %   zero after parsing, those three columns are dropped so the result
 %   is N-by-3. Unlike from_csv, a 6-column line cannot carry a label
 %   (use 7 columns for label + CEM). Impedance must be strictly positive
-%   on CEM rows (from_csv allows 0).
+%   on CEM rows (from_csv allows 0). File columns stay
+%   [inner_radius outer_radius impedance]; the returned matrix is the
+%   attach / zef_cem_electrode order [outer inner impedance].
 %
 %   [data, labels] = core.io.electrodes.from_dat(file)
 %   [data, labels] = core.io.electrodes.from_dat(file, "MISSING_LABEL", "S")
@@ -153,9 +155,10 @@ function [ electrode_data, electrode_labels ] = from_dat(file, kwargs)
 
             end % if
 
-            electrode_data (li, 4) = inner_radius;
+            % Attach / zef_cem_electrode layout: col4 = outer, col5 = inner.
+            electrode_data (li, 4) = outer_radius;
 
-            electrode_data (li, 5) = outer_radius;
+            electrode_data (li, 5) = inner_radius;
 
             electrode_data (li, 6) = impedance;
 

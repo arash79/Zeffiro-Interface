@@ -40,7 +40,6 @@ u = u/6;
 
 for i = 1 : 4
 
-    %u_perm = u(t(:,i),:);
 
 % Face area of the tetra face opposite vertex i, in the (entry_ind) plane:
 % (1/6) u-weighted curl contribution (u already divided by 6 above).

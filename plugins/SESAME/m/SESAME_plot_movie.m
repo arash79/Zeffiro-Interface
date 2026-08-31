@@ -1,0 +1,69 @@
+%SESAME_PLOT_MOVIE  Plot SESAME dipole estimates on h_axes1 (one frame or movie).
+%
+%   Copyright © 2018- Joonas Lahtinen, Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Script. Plot-dipoles button. Packs SESAME_time_serie into
+%   zef.inv_rec_source and zef_plot_source(2). Multi-frame: loops
+%   with the Figure-tool time_text caption. Does not rerun the sampler.
+%
+%   See also SESAME_inversion, zef_plot_source.
+
+if size(zef.SESAME_time_serie,2) == 1
+    d_est = zef.SESAME_time_serie{1}.estimated_dipoles;
+    zef.inv_rec_source = repmat(zef.inv_rec_source(1,:),length(d_est),1);
+    zef.inv_rec_source(:,1:3) = zef.SESAME_time_serie{1}.dipole_positions;
+        zef.inv_rec_source(1,9) = str2num(zef.SESAME_App.h_inv_rec_source_9.Value);
+        zef.inv_rec_source(1,8) = str2num(zef.SESAME_App.h_inv_rec_source_8.Value);
+    for d_ind = 1 : length(d_est)
+        zef.inv_rec_source(d_ind,4:6) = zef.SESAME_time_serie{1}.QV_estimated(1+3*(d_ind-1):3*d_ind)/zef.SESAME_time_serie{1}.Q_estimated(d_ind);
+    end
+
+    zef.inv_rec_source(:,7)=zef.inv_rec_source(1,8)*zef.SESAME_time_serie{1}.Q_estimated;
+
+    zef.h_rec_source = zef_plot_source(2);
+
+    clear d_est d_ind
+else
+    h_axes_text = findobj(evalin('base','zef.h_zeffiro'),'tag','image_details');
+    zef_boolean = 1;
+    for zef_j = 1:size(zef.SESAME_time_serie,2)
+        zef_time_val = evalin('base','zef.inv_time_1') + evalin('base','zef.inv_time_2')/2 + evalin('base','zef.inv_time_3')*(zef_j-1);
+        d_est = zef.SESAME_time_serie{zef_j}.estimated_dipoles;
+        zef.inv_rec_source = zeros(length(d_est),9);
+        zef.inv_rec_source(1,9) = str2num(zef.SESAME_App.h_inv_rec_source_9.Value);
+        zef.inv_rec_source(1,8) = str2num(zef.SESAME_App.h_inv_rec_source_8.Value);
+        if size(zef.SESAME_time_serie{zef_j}.dipole_positions,1)>0
+            zef.inv_rec_source(:,1:3) = zef.SESAME_time_serie{zef_j}.dipole_positions;
+            for d_ind = 1 : length(d_est)
+                zef.inv_rec_source(d_ind,4:6) = mean(zef.SESAME_time_serie{zef_j}.QV_estimated(1+3*(d_ind-1):3*d_ind,:),2);
+                zef.inv_rec_source(d_ind,7) = zef.inv_rec_source(1,8)*norm(zef.inv_rec_source(d_ind,4:6));
+                zef.inv_rec_source(d_ind,4:6) = zef.inv_rec_source(d_ind,4:6)./zef.inv_rec_source(d_ind,7);
+            end
+
+            zef.h_rec_source = zef_plot_source(2);
+            zef_boolean = 1;
+        else
+            h_axes1 = evalin('base','zef.h_axes1');
+            hold(h_axes1,'on');
+            quiver3(h_axes1,[],[],[],[],[],[])
+            hold(h_axes1,'off');
+            zef_boolean = 0;
+        end
+
+        if not(isempty(h_axes_text))
+            delete(h_axes_text);
+            h_axes_text = [];
+        end
+        zef_figure_time_label(evalin('base','zef.h_zeffiro'), ...
+            ['Time: ' num2str(zef_time_val,'%0.6f') ' s, Frame: ' num2str(zef_j) ' / ' num2str(size(zef.SESAME_time_serie,2)) '.']);
+        axes(evalin('base','zef.h_axes1'));
+        if zef_boolean == 1
+            pause(0.5)
+        else
+            pause(0.01)
+        end
+    end
+    clear d_est d_ind zef_j zef_boolean zef_time_val h_axes_text h_text h_axes1
+end

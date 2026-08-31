@@ -21,10 +21,13 @@ function [electrode_data, electrode_labels] = from_csv(file, kwargs)
 %   be in the project length unit (typically millimetres). Impedance is
 %   in ohms.
 %
-%   Point-electrode files return N-by-3. CEM files return N-by-6:
-%   [x y z inner_radius outer_radius impedance]. inner_radius is the
-%   metal disc; outer_radius is the gel/contact patch. Lead-field
-%   assembly (zef_build_electrodes) treats 6-column sensors as CEM.
+%   Point-electrode files return N-by-3. CEM files return N-by-6 in the
+%   attach / zef_cem_electrode order:
+%   [x y z outer_radius inner_radius impedance].
+%   CSV column names stay inner_radius / outer_radius; only the stored
+%   matrix swaps them so zef_attach_sensors_volume (col4 < d, col5 ≥ d)
+%   keeps a non-empty annulus. zef_build_electrodes never sees this
+%   6-column import matrix — it receives the attached 4-column table.
 %
 %   [data, labels] = core.io.electrodes.from_csv(file)
 %   [data, labels] = core.io.electrodes.from_csv(file, "MISSING_LABEL", "S")
@@ -164,9 +167,10 @@ function [electrode_data, electrode_labels] = from_csv(file, kwargs)
 
         end % for
 
-        electrode_data(:,4) = inner_radii ;
+        % Attach / zef_cem_electrode layout: col4 = outer, col5 = inner.
+        electrode_data(:,4) = outer_radii ;
 
-        electrode_data(:,5) = outer_radii ;
+        electrode_data(:,5) = inner_radii ;
 
         electrode_data(:,6) = impedances ;
 

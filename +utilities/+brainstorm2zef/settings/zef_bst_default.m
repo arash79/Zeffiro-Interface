@@ -18,9 +18,6 @@
 zef_bst.mesh_resolution = 3;
 zef_bst.compartment_list = {'Scalp','OuterSkull','InnerSkull','Cortex','Other','white','subcortical'};
 zef_bst.refine_surface = {'Scalp','OuterSkull','InnerSkull','Cortex','Other','white','subcortical'};
-% Alternative compartment lists (commented out):
-%zef_bst.compartment_list = {'Tissues','Deskian-Killiany','Thalamus'};
-%zef_bst.refine_surface = {'Tissues','Deskian-Killiany'};
 
 % Refinement settings
 zef_bst.refine_surface_mode = 2; 

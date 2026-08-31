@@ -35,9 +35,6 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
 %   compute_transforms  - Compute affine transforms for alignment (default: true)
 %   reference_volume    - Reference .mgz for transforms (default: 'orig.mgz')
 %   include_surfaces    - Include cortical surfaces (lh/rh pial, white) (default: true)
-%   include_skull_skin  - Declared (default: true) but not read by this
-%                         function; skull/skin only appear if those labels
-%                         exist in the chosen .mgz files
 %   electrode_file      - Path to electrode file (default: built-in)
 %   merge_left_right    - Merge L/R compartments in import file (default: true)
 %                         true: name=base only, merge=0/1; false: name=L/R, merge=0 all
@@ -63,7 +60,7 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
 %   Then:
 %     5. Generate unified ZEF import file from ALL meshes
 %     6. Import with zeffiro_interface(..., 'import_to_new_project', zef_file)
-%        or 'import_to_existing_project' (not zef_import)
+%        or 'import_to_existing_project'
 %
 % REQUIREMENTS:
 %   - FREESURFER_HOME environment variable set
@@ -96,7 +93,6 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
         options.compute_transforms (1,1) logical = true
         options.reference_volume (1,1) string = 'orig.mgz'
         options.include_surfaces (1,1) logical = true
-        options.include_skull_skin (1,1) logical = true
         options.electrode_file (1,1) string = ""
         options.merge_left_right (1,1) logical = true
         options.verbose (1,1) logical = true
@@ -112,9 +108,9 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
     
     if options.verbose
         fprintf('\n');
-        fprintf('═══════════════════════════════════════════════════════════════\n');
+        fprintf('===============================================================\n');
         fprintf('  FreeSurfer to Zeffiro Pipeline\n');
-        fprintf('═══════════════════════════════════════════════════════════════\n\n');
+        fprintf('===============================================================\n\n');
     end
     
     %% Step 1: Setup and Validate Environment
@@ -141,7 +137,7 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
     end
     
     if options.verbose
-        fprintf('✅ Environment ready\n\n');
+        fprintf('Environment ready\n\n');
     end
     
     %% Step 2: Validate Inputs
@@ -180,12 +176,12 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
     end
     
     if options.verbose
-        fprintf('✅ Subject: %s\n', subject_id);
-        fprintf('✅ Segmentation files: %d\n', numel(segmentation_files));
+        fprintf('Subject: %s\n', subject_id);
+        fprintf('Segmentation files: %d\n', numel(segmentation_files));
         for i = 1:numel(segmentation_files)
             fprintf('   %d. %s\n', i, segmentation_files(i));
         end
-        fprintf('✅ Output: %s\n\n', output_dir);
+        fprintf('Output: %s\n\n', output_dir);
     end
     
     %% Step 3: Process Each Segmentation File
@@ -200,7 +196,7 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
         
         if options.verbose
             fprintf('\n[%d/%d] Processing: %s\n', i, numel(segmentation_files), seg_file);
-            fprintf('────────────────────────────────────────────────────────────\n');
+            fprintf('------------------------------------------------------------\n');
         end
         
         % Run parcellation script
@@ -220,7 +216,7 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
             output_info.warnings{end+1} = sprintf('Failed: %s', seg_file);
         else
             if options.verbose
-                fprintf('✅ Completed: %s\n', seg_file);
+                fprintf('Completed: %s\n', seg_file);
             end
         end
     end
@@ -261,7 +257,7 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
                     end
                     
                     if options.verbose
-                        fprintf('✅ Converted: %s\n', surf);
+                        fprintf('Converted: %s\n', surf);
                     end
                 end
             end
@@ -337,7 +333,7 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
                 'verbose', false);
             output_info.zef_import_file{end+1} = zef_file_ascii;
             if options.verbose
-                fprintf('✅ Generated: %s\n', zef_file_ascii);
+                fprintf('Generated: %s\n', zef_file_ascii);
             end
         end
         
@@ -360,7 +356,7 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
                 'verbose', false);
             output_info.zef_import_file{end+1} = zef_file_mesh;
             if options.verbose
-                fprintf('✅ Generated: %s\n', zef_file_mesh);
+                fprintf('Generated: %s\n', zef_file_mesh);
             end
         end
         
@@ -382,14 +378,14 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
     output_info.elapsed_time = toc(start_time);
     
     if options.verbose
-        fprintf('═══════════════════════════════════════════════════════════════\n');
+        fprintf('===============================================================\n');
         fprintf('  PIPELINE COMPLETE\n');
-        fprintf('═══════════════════════════════════════════════════════════════\n\n');
-        fprintf('📊 SUMMARY:\n');
+        fprintf('===============================================================\n\n');
+        fprintf('SUMMARY:\n');
         fprintf('   Meshes created: %d\n', numel(output_info.meshes_created));
         fprintf('   Warnings: %d\n', numel(output_info.warnings));
         fprintf('   Elapsed time: %.1f seconds\n', output_info.elapsed_time);
-        fprintf('\n📁 OUTPUT:\n');
+        fprintf('\nOUTPUT:\n');
         fprintf('   Directory: %s\n', output_dir);
         if iscell(output_info.zef_import_file)
             fprintf('   Import files:\n');
@@ -399,13 +395,10 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
         else
             fprintf('   Import file: %s\n', output_info.zef_import_file);
         end
-        fprintf('\n🚀 NEXT STEP:\n');
+        fprintf('\nNEXT STEP:\n');
         fprintf('   Import into Zeffiro Interface:\n');
         if iscell(output_info.zef_import_file) && ~isempty(output_info.zef_import_file)
-            fprintf('   ASCII:  >> zef = zef_import(''%s'');\n', output_info.zef_import_file{1});
-            if numel(output_info.zef_import_file) > 1
-                fprintf('   Mesh:   >> zef = zef_import(''%s'');\n', output_info.zef_import_file{2});
-            end
+            fprintf('   >> zef = zeffiro_interface(''import_to_new_project'', ''%s'');\n', output_info.zef_import_file{1});
         end
         fprintf('\n');
     end

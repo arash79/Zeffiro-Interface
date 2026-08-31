@@ -6,8 +6,8 @@ function [tetra,labels_tetra] = zef_hexa_to_tetra(hexa,varargin)
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Same local stencil as the mode-2 lattice in zef_create_fem_mesh /
-%   zef_fem_mesh (no parity flip). Used by utilities.duneuro2zef.convert_mesh
+%   Same local stencil as the mode-2 lattice in zef_create_fem_mesh
+%   (no parity flip). Used by utilities.duneuro2zef.convert_mesh
 %   when DUNEuro supplies hexahedral elements.
 %
 %   [tetra, labels_tetra] = zef_hexa_to_tetra(hexa)
@@ -27,7 +27,7 @@ function [tetra,labels_tetra] = zef_hexa_to_tetra(hexa,varargin)
 %     The loop body contains `i = i + 6`, which MATLAB's for-loop then
 %     overwrites on the next iteration; it does not skip cubes.
 %
-%   See also zef_create_fem_mesh, zef_fem_mesh.
+%   See also zef_create_fem_mesh.
 
 labels_hexa = [];
 h = zef_waitbar(0,1,'Mesh conversion.');

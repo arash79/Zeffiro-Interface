@@ -13,7 +13,7 @@ Examples that build a FEM mesh from the bundled multicompartment segmentation. P
 
 `zef_meshing_example`: `zeffiro_interface(..., 'import_to_existing_project', input_project_path)` → `copy_fields` of meshing kwargs onto `zef` → `zef_create_finite_element_mesh` → `zef_save`. Optional kwargs include `start_mode`, `input_project_path`, `mesh_resolution` (default 4.5), `refinement_surface_compartments`, `use_gpu`. Writes `data/meshing_example.mat` by default (`output_project_dir` / `output_project_file`).
 
-`zef_meshing_example_thalamus_refinement`: different import path (`scripts/scripts_for_importing/multicompartment_head_project/import_segmentation.zef`), surface refinement on scalp/skull (18, 17), volume refinement on compartment 7 (thalamus), `mesh_resolution = 3`. Saves `data/example_project.mat`. No kwargs.
+`zef_meshing_example_thalamus_refinement`: same bundled `.zef` as the default example, surface refinement on scalp/skull (18, 17), volume refinement on compartment 7 (thalamus), `mesh_resolution = 3`. Saves `data/example_project.mat`. No kwargs.
 
 ## Workflow context
 
@@ -32,7 +32,7 @@ zef = examples.meshing.zef_meshing_example_thalamus_refinement();
 
 ## Important notes
 
-The thalamus variant uses `scripts/...` (not `data/segmentations/...`). If that scripts tree is missing, import fails — prefer `zef_meshing_example` with an explicit `input_project_path`.
+Both examples import `data/segmentations/multicompartment_head_project/import_segmentation.zef`. Override with `input_project_path` on `zef_meshing_example` when needed.
 
 ## Developer guidance
 

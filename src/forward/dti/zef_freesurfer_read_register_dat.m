@@ -7,7 +7,8 @@ function T = zef_freesurfer_read_register_dat(filepath)
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Skips header lines; first four numeric 4-token rows become T. Stored on
-%   zef as freesurfer_register_transform (FA voxel → mesh tkRAS).
+%   zef as freesurfer_register_transform (tkRAS of the anatomical target
+%   → tkRAS of the movable/DWI volume; FreeSurfer RegisterDat).
 %
 %   T = zef_freesurfer_read_register_dat(filepath)
 %

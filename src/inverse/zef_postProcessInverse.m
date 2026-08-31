@@ -46,7 +46,7 @@ z_vec=z_inverse{f_ind};
     end
 
     if ismember(source_direction_mode,[2])
-        z_vec_aux = (z_vec(s_ind_4) + z_vec(n_interp+s_ind_4) + z_vec(2*n_interp+s_ind_4))/3;%sould all be the same value
+        z_vec_aux = (z_vec(s_ind_4) + z_vec(n_interp+s_ind_4) + z_vec(2*n_interp+s_ind_4))/3;
         z_vec(s_ind_4) = z_vec_aux.*source_directions(s_ind_4,1);
         z_vec(n_interp+s_ind_4) = z_vec_aux.*source_directions(s_ind_4,2);
         z_vec(2*n_interp+s_ind_4) = z_vec_aux.*source_directions(s_ind_4,3);
@@ -63,10 +63,6 @@ z_vec=z_inverse{f_ind};
         z_aux(s_ind_2) = z_vec;
     end
 
-%    if number_of_frames > 1
-        z{f_ind} = z_aux;
-%     else
-%         z = z_aux;
-%     end
+    z{f_ind} = z_aux;
 
 end

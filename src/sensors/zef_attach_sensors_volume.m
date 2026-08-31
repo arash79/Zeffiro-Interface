@@ -11,7 +11,7 @@ function  [sensors_attached_volume] = zef_attach_sensors_volume(zef,sensors,vara
 %   couple them. MEG (2, 3) returns [] — coils stay at zef.sensors xyz.
 %
 %   Callers: every EEG/EIT/TES *_make_all / *_lead_field path, plotters
-%   (Visualize volume/surfaces and Frame/Movie), zef_smooth_electrodes,
+%   (Visualize volume/surfaces and Frame/Movie), zef_smoothing_step,
 %   LF-bank recompute. The Mesh-vis checkbox Attach electrodes is only a
 %   *plot* flag; the forward path always attaches.
 %
@@ -29,9 +29,10 @@ function  [sensors_attached_volume] = zef_attach_sensors_volume(zef,sensors,vara
 %                d from the (snapped) centre satisfies col5 ≤ d < col4,
 %                i.e. col4 is the outer radius and col5 the inner radius.
 %            That [outer, inner] order matches zef_cem_electrode (called
-%            from zef_process_meshes as create_patch_sensor for EEG). CSV
-%            import stores [inner, outer] in columns 4–5; process_meshes
-%            overwrites those columns from the Segmentation-tool radius
+%            from zef_process_meshes as create_patch_sensor for EEG) and
+%            the Import parsers (DAT/CSV files list inner then outer;
+%            from_dat / from_csv swap those two columns). process_meshes
+%            may overwrite those columns from the Segmentation-tool radius
 %            widgets before a typical lead-field run.
 %
 %   attach_type (varargin{1}, default 'mesh')
@@ -139,11 +140,9 @@ if not(bypass_functions)
       sensors_attached_get_functions{i_ind} = [I_get_functions(i_ind)*ones(size(sensors_attached_get_functions{i_ind},1),1) sensors_attached_get_functions{i_ind}];
     end
 end
-%*****************************
 
 if ismember(zef.imaging_method,[1,4,5])
 
-    %if ismember(attach_type,{'geometry','points'});
     if not(isequal(zef.reuna_type{end,1},-1))
         geometry_triangles = zef.reuna_t{end-electrode_surface_index+1};
         geometry_nodes = zef.reuna_p{end-electrode_surface_index+1};
@@ -156,11 +155,6 @@ if ismember(zef.imaging_method,[1,4,5])
         zef.surface_triangles = {zef.surface_triangles};
     end
     use_depth_electrodes =zef.use_depth_electrodes;
-
-    %if eval('zef.use_gpu')
-    %    nodes = gpuArray(nodes);
-    %    sensors = gpuArray(sensors);
-    %end
 
     % 6 columns → complete electrode model (radii + impedance). 3 columns
     % (or attach_type 'points') → point electrodes: only xyz is snapped.

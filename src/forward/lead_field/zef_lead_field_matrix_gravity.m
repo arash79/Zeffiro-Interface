@@ -8,18 +8,14 @@
 %   gravity_field_type 1 or 2 → zef_lead_field_gravity_grad; 3 or 4 →
 %   zef_lead_field_gravity. Density is zef.rho(:,1). Source tetrahedra are a
 %   random subset of brain_ind of length min(n_sources, numel(brain_ind)).
-%   Nodes are not converted mm→m (unlike EEG). Optional interpolation if
-%   source_interpolation_on. Profile scripts usually call the gravity FEM
-%   directly rather than this dispatcher.
+%   Nodes are converted mm→m inside the gravity FEM kernels (like EEG).
+%   Optional interpolation if source_interpolation_on. Profile scripts
+%   usually call the gravity FEM directly rather than this dispatcher.
 %
 %   Side effects: writes zef.L, inv_bg_data, source_positions,
 %   source_directions, lead_field_time; removes nodes_aux/sensors_aux/aux_vec.
 %
 %   See also zef_lead_field_gravity, zef_gravity_lead_field_scalar.
-
-%[zef.rho,zef.brain_ind] = zef_rho([]);
-
-
 
 tic;
 
@@ -63,44 +59,15 @@ if isempty(zef.source_ind) || not(zef.n_sources == zef.n_sources_old) || not(zef
     zef.n_sources_mod = 0;
 end
 zef.sensors_aux = zef.sensors;
-zef.nodes_aux = zef.nodes;%/1000;
-%if ismember(zef.imaging_method,[1,4,5]) & size(zef.sensors,2) == 3
-%zef.sensors_aux = zef.sensors_attached_volume(:,1:3)/1000;
-%elseif ismember(zef.imaging_method,[2,3])
-zef.sensors_aux(:,1:3) = zef.sensors_aux(:,1:3);%/1000;
-%else
-%zef.sensors_aux = zef.sensors_attached_volume;
-%end
+zef.nodes_aux = zef.nodes;
 
 zef.lf_param.dipole_mode = 1;
 
-% if zef.imaging_method == 0
-% if size(zef.sensors,2) == 6
-% zef.lf_param.impedances = zef.sensors(:,6);
-% end
-% if evalin('base','zef.prism_layers') && not(isempty(zef.prisms))
-% [zef.L, zef.source_positions, zef.source_directions] = lead_field_eeg_fem(zef.nodes_aux,{zef.tetra,zef.prisms},{zef.rho(:,1),zef.rho_prisms},zef.sensors_aux,zef.brain_ind,zef.source_ind,zef.lf_param);
-% else
-% [zef.L, zef.source_positions, zef.source_directions] = lead_field_eeg_fem(zef.nodes_aux,zef.tetra,zef.rho(:,1),zef.sensors_aux,zef.brain_ind,zef.source_ind,zef.lf_param);
-% end
-% end
-%
 if ismember(zef.gravity_field_type,[1,2])
     [zef.L, zef.inv_bg_data, zef.source_positions, zef.source_directions] = zef_lead_field_gravity_grad(zef.nodes_aux,zef.tetra,zef.rho(:,1),zef.sensors_aux,zef.brain_ind,zef.source_ind,zef.lf_param);
 end
 
-% if zef.imaging_method == 3;
-% if evalin('base','zef.prism_layers') && not(isempty(zef.prisms))
-% [zef.L, zef.source_positions, zef.source_directions] = lead_field_meg_grad_fem(zef.nodes_aux,{zef.tetra,zef.prisms},{zef.rho(:,1),zef.rho_prisms},zef.sensors_aux,zef.brain_ind,zef.source_ind,zef.lf_param);
-% else
-% [zef.L, zef.source_positions, zef.source_directions] = lead_field_meg_grad_fem(zef.nodes_aux,zef.tetra,zef.rho(:,1),zef.sensors_aux,zef.brain_ind,zef.source_ind,zef.lf_param);
-% end
-% end
-
 if ismember(zef.gravity_field_type,[3,4])
-    % if size(zef.sensors,2) == 6
-    % zef.lf_param.impedances = zef.sensors(:,6);
-    % end
     [zef.L, zef.inv_bg_data, zef.source_positions, zef.source_directions] = zef_lead_field_gravity(zef.nodes_aux,zef.tetra,zef.rho(:,1),zef.sensors_aux,zef.brain_ind,zef.source_ind,zef.lf_param);
 end
 
@@ -109,7 +76,6 @@ zef = rmfield(zef,{'nodes_aux','sensors_aux','aux_vec'});
 zef.lead_field_time = toc;
 
 if zef.location_unit == 1
-    %zef.source_positions = 1000*zef.source_positions;
     zef.location_unit_current = 1;
 end
 

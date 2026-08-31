@@ -1,1 +1,0 @@
-This folder contains the three-layer asteroid model of asteroid_radar_project.mat and asteroid_gravity_project.mat, composed of asteroid 25143 Itokawa together with a mantle layer and an ellipsoidal void.

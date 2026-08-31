@@ -7,7 +7,6 @@ function [L_tes, S_tes, dof_positions, dof_directions, dof_ind, dof_count] = lea
     p_nearest_neighbour_inds, ...
     varargin ...
     )
-
 %LEAD_FIELD_TES_FEM  FEM transcranial electrical stimulation lead field (types 5, 10).
 %
 %   Zeffiro Interface.
@@ -16,18 +15,22 @@ function [L_tes, S_tes, dof_positions, dof_directions, dof_ind, dof_count] = lea
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Called as zef_lead_field_tes_fem from zef_lead_field_matrix. Stiffness and
-%   electrode transfer as in EEG, then the tetrahedral current-density gradient
-%   zef_tetra_gradient_field maps the transfer potentials to (Jx,Jy,Jz) per
-%   source tetra, averaged into DOF bins from zef_decompose_dof_space.
-%   Stimulation matrix S_tes is the mean-zero electrode map
-%   (I - 11'/L) * C^{-1} * (I + B'*R) after inverting the Schur block Aux_mat.
+%   electrode transfer as in EEG (zef_transfer_matrix), then the tetrahedral
+%   current-density gradient zef_tetra_gradient_field maps the transfer
+%   potentials to (Jx,Jy,Jz) per source tetra, averaged into DOF bins from
+%   zef_decompose_dof_space. Stimulation matrix S_tes is the mean-zero
+%   electrode map (I - 11'/L) * C^{-1} * (I + B'*R) after inverting the
+%   Schur block Aux_mat.
+%
+%   Schur handle (opposite of EEG): finite Z → C(:,i) - B'*T; inf Z → C(:,i).
 %
 %   [L_tes, S_tes, dof_positions, dof_directions, dof_ind, dof_count] = ...
 %       zef_lead_field_tes_fem(zef, nodes, elements, sigma, electrodes, ...
 %       p_nearest_neighbour_inds, brain_ind, source_ind, lf_param)
 %
-%   Input: same geometry/sigma/electrode conventions as zef_lead_field_eeg_fem
-%   (nodes in metres). lf_param.impedances used when electrodes have 4 columns.
+%   Input: same geometry/sigma conventions as zef_lead_field_eeg_fem
+%   (nodes in metres). Electrodes: PEM [n × 3] metres, or CEM [n × 4]
+%   attachment indices (not metres). lf_param.impedances when CEM.
 %
 %   Output
 %     L_tes           - [n_electrodes × 3*n_dof] current-density lead field
@@ -188,11 +191,10 @@ tilavuus = zef_tetra_volume(nodes, tetrahedra, true);
 
 A = zef_stiffness_matrix(nodes, tetrahedra, tilavuus, sigma_tetrahedra);
 
-% Sampsa 28.3.2022: zef_massmatrix_2d zef_diagonal_matrix zef_boundary_integral
-% TODO START Tässä kannattaisi rakentaa kolme matriisia. Massamatriisi kertaa
-% diagonaali painotettuna impedanssidiagonaalilla ja reunaintegraalimatriisi
-% painotettuna impedanssidiagonaalilla. Huom massamatriisista on sekä piste-
-% että pinta-alaan perustuvat versiot
+% Point / buried CEM rows → boundary triangles (same as EEG).
+if isequal(electrode_model, 'CEM')
+    ele_ind = zef_pem2cem(ele_ind, tetrahedra);
+end
 
 % Calculate electrode matrices B and C based on A
 
@@ -204,8 +206,6 @@ A = zef_stiffness_matrix(nodes, tetrahedra, tilavuus, sigma_tetrahedra);
     ele_ind, ...
     A ...
     );
-
-% Sampsa 28.3.2022: zef_massmatrix_2d zef_diagonal_matrix zef_boundary_integral END TODO
 
 % Calculate gradient field
 
@@ -263,9 +263,7 @@ if not(impedance_inf == 0)
 end
 
 clear S r p x aux_vec inv_M_r a b;
-% zef_waitbar(0,1,h,'Interpolation.');
 
-%if isequal(electrode_model,'CEM')
 Aux_mat = inv(Aux_mat);
 R_tes = R_tes*Aux_mat;
 
@@ -298,20 +296,20 @@ clear R_tes;
 K3 = length(dof_count);
 L_tes = zeros(3*K3,L);
 
-% 25.06.2020
-for i = 1 : K
-    L_tes(3*(dof_ind(i)-1)+1,:) =  L_tes(3*(dof_ind(i)-1)+1,:) + R_tes_1(i,:);
-    L_tes(3*(dof_ind(i)-1)+2,:) =  L_tes(3*(dof_ind(i)-1)+2,:) + R_tes_2(i,:);
-    L_tes(3*(dof_ind(i)-1)+3,:) =  L_tes(3*(dof_ind(i)-1)+3,:) + R_tes_3(i,:);
-end
+S_dof = sparse(dof_ind(:), (1:K)', 1, K3, K);
+dc = dof_count(:);
 
-for i = 1 : K3
-    L_tes(3*(i-1)+1,:) = L_tes(3*(i-1)+1,:)/dof_count(i);
-    L_tes(3*(i-1)+2,:) = L_tes(3*(i-1)+2,:)/dof_count(i);
-    L_tes(3*(i-1)+3,:) = L_tes(3*(i-1)+3,:)/dof_count(i);
-end
+L_tes(1:3:end,:) = (S_dof * R_tes_1) ./ dc;
+clear R_tes_1;
 
-clear R_tes_1 R_tes_2 R_tes_3;
+L_tes(2:3:end,:) = (S_dof * R_tes_2) ./ dc;
+clear R_tes_2;
+
+L_tes(3:3:end,:) = (S_dof * R_tes_3) ./ dc;
+clear R_tes_3;
+
+clear S_dof dc;
+
 
 dof_directions = ones(size(dof_positions));
 

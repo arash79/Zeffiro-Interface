@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+<style>
+.s{fill:none;stroke:#323E48;stroke-width:5.5;stroke-linecap:round;stroke-linejoin:round}
+.f{fill:#323E48}
+</style>
+
+<circle cx="41" cy="41" r="22" class="s"/>
+<path d="M57 57l21 21" class="s"/>
+<path d="M41 31v20M31 41h20" class="s"/>
+
+</svg>

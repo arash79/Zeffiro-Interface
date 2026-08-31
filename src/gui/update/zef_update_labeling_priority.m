@@ -52,9 +52,6 @@ if use_settings
 
 end
 
-%labeling_priority_vec_1 = fliplr(labeling_priority_vec);
-%labeling_priority_vec = labeling_priority_vec_2(labeling_priority_vec_1);
-
 items = cell(n_compartments,1);
 for i = 1 : n_compartments
     zef.([zef.compartment_tags{zef.reuna_mesh_ind(labeling_priority_vec(i))} '_labeling_priority']) = i;

@@ -1,7 +1,4 @@
 function x = zef_KDMD(x,K,M,D,use_gpu)
-
-
-
 %ZEF_KDMD  Apply (K + D M D) x (NSE implicit viscous/mass block).
 %
 %   Zeffiro Interface.

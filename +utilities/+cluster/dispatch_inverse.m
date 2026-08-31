@@ -38,7 +38,7 @@ if method_info.execution_kind == "class"
 elseif method_info.execution_kind == "legacy"
     result = i_dispatch_legacy(bundle, method_info, result);
 else
-    error("utilities.cluster:UnsupportedExecutionKind", ...
+    error("utilities:cluster:UnsupportedExecutionKind", ...
         "Unsupported execution kind '%s'.", method_info.execution_kind);
 end
 
@@ -58,7 +58,6 @@ zef_shim.gpu_count = bundle.gpu_count;
 zef_shim.normalize_data = bundle.normalize_data;
 zef_shim.inv_time_interval_averaging = false;
 
-% waitbar_title = "Cluster inverse: " + bundle.method_id;
 waitbar_title = char("Cluster inverse: " + bundle.method_id);
 waitbar_handle = zef_waitbar(0, waitbar_title);
 cleanup_obj = onCleanup(@() i_safe_close_waitbar(waitbar_handle));
@@ -116,7 +115,7 @@ end
 
 function result = i_dispatch_legacy(bundle, method_info, result)
 if ~isfield(bundle, "legacy_zef")
-    error("utilities.cluster:MissingLegacyZef", ...
+    error("utilities:cluster:MissingLegacyZef", ...
         "Legacy dispatch requires bundle.legacy_zef.");
 end
 
@@ -144,7 +143,7 @@ switch func_name
     case "exp_iteration"
         [z, info] = feval(func_name, zef_legacy);
     otherwise
-        error("utilities.cluster:UnsupportedLegacyFunction", ...
+        error("utilities:cluster:UnsupportedLegacyFunction", ...
             "Legacy function '%s' is not supported in dispatcher.", func_name);
 end
 

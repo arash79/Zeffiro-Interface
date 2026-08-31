@@ -5,9 +5,8 @@
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Script (base-workspace zef). Not a Mesh-tool button — the make_all
-%   callback in zef_mesh_tool is commented out. Default INI Script cells call
-%   zef_eeg_lead_field_isotropic instead, which assumes the mesh already exists.
+%   Script (base-workspace zef). Not a Mesh-tool button. Default INI Script
+%   cells call zef_eeg_lead_field_isotropic, which assumes the mesh already exists.
 %
 %   Steps: lead_field_type=1; force source_interpolation_on and the Mesh-tool
 %   checkbox; zef_create_finite_element_mesh; zef_postprocess_finite_element_mesh;

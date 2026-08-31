@@ -1,8 +1,4 @@
 function [L, source_positions,source_directions] = zef_lead_field_filter(L,source_positions,source_directions,filter_quantile,varargin)
-
-
-
-
 %ZEF_LEAD_FIELD_FILTER  Drop lead-field columns whose column-norm exceeds a quantile.
 %
 %   Zeffiro Interface.

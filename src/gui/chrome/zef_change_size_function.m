@@ -1,0 +1,113 @@
+function [p_vec_window,relative_size] = zef_change_size_function(object_handle, current_size, varargin)
+%ZEF_CHANGE_SIZE_FUNCTION  Scale child Positions and FontSize with the figure.
+%
+%   Zeffiro Interface.
+%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   See: https://github.com/sampsapursiainen/zeffiro_interface
+%   Licensed under the GNU General Public License v3.0 (see LICENSE).
+%
+%   Figure-tool resize. Children with public Position are scaled by the
+%   ratio of the new Position to current_size. FontSize scales with height.
+%   exclude_type (cell of Type or Tag, e.g. {'Colorbar','image_details'})
+%   is skipped. If relative_size is supplied, those fractions of the new
+%   window size are applied instead. scale_positions (default 1) can disable
+%   Position updates while still scaling fonts.
+%
+%   [p_vec_window, relative_size] = zef_change_size_function(h, current_size)
+%   [p_vec_window, relative_size] = zef_change_size_function(h, current_size, ...
+%       relative_size, exclude_type, scale_positions)
+%
+%   See also zef_size_change.
+
+relative_size = [];
+exclude_type = cell(0);
+scale_positions = 1;
+if not(isempty(varargin))
+    if length(varargin) > 0 %#ok<ISMT>
+        relative_size = varargin{1};
+    end
+    if length(varargin) > 1
+        exclude_type = varargin{2};
+    end
+    if length(varargin) > 2
+        scale_positions = varargin{3};
+    end
+end
+
+p_vec_window = get(object_handle(1),'Position');
+
+if and(prod(p_vec_window)>0,prod(current_size)>0)
+
+    if and(not(isempty(p_vec_window)),not(isempty(current_size)))
+
+
+        h = findall(object_handle,'-property','Position');
+        h = setdiff(h,object_handle);
+
+
+        for i = 1 : length(exclude_type)
+            h = setdiff(h, findobj(h,'Type',exclude_type{i}));
+            h = setdiff(h, findobj(h,'Tag',exclude_type{i}));
+        end
+
+        for i = 1 : length(h)
+
+            try
+                typ = lower(char(h(i).Type));
+                if any(strcmp(typ, {'uimenu', 'uicontextmenu'}))
+                    continue
+                end
+            catch
+            end
+
+            p_vec_object = [];
+            find_pos = findprop(h(i),'Position');
+            if not(isempty(find_pos))
+                if isequal(find_pos.GetAccess,'public')
+                    p_vec_object = get(h(i),'Position');
+                end
+            end
+            if numel(p_vec_object) ~= 4
+                continue
+            end
+
+            p_vec_parent = [];
+            find_parent = findprop(h(i).Parent,'Position');
+            if not(isempty(find_parent))
+                if isequal(find_parent.GetAccess,'public')
+                    p_vec_parent = get(h(i).Parent,'Position');
+                end
+            end
+
+            find_fontsize = findprop(h(i),'FontSize');
+            if not(isempty(find_fontsize))
+                if not(isempty(find_fontsize))
+                    if isequal(find_fontsize.GetAccess,'public')
+                        fontsize_object = get(h(i),'FontSize');
+                        set(h(i),'FontSize',fontsize_object*p_vec_window(4)./current_size(4));
+                    end
+                end
+            end
+
+            if length(p_vec_parent)==4
+
+                if not(isempty(relative_size))
+                    if scale_positions
+                        set(h(i),'Position',relative_size{i}.*p_vec_window([3 4 3 4]));
+                    end
+                else
+                    if    length(p_vec_object)==4
+                        p_vec = [p_vec_object(1).*p_vec_window(3)./current_size(3) p_vec_object(2).*p_vec_window(4)./current_size(4) p_vec_object(3).*p_vec_window(3)./current_size(3) p_vec_object(4).*p_vec_window(4)./current_size(4)];
+                        if scale_positions
+                            h(i).Position = p_vec;
+                        end
+                    end
+                end
+
+            end
+        end
+
+    end
+
+end
+end

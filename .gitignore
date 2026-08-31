@@ -1,9 +1,63 @@
-data/Sub01FG*
+# OS
 .DS_Store
 **/.DS_Store
-check.m
-compartment_wise.m
-compute_Q.m
-kalman_custom_q_driver.m
-kalman_primer.m
-run_eloreta_shalpr_snr_sweep.m
+Thumbs.db
+Desktop.ini
+
+# Local audit / agent scratch (never ship)
+.audit/
+
+# MATLAB editor / compiler artifacts
+*.asv
+*.m~
+*.autosave
+*.mlapp.bak
+octave-workspace
+slprj/
+sccprj/
+codegen/
+matlab_crash_dump.*
+*.mexa64
+*.mexmaci64
+*.mexmaca64
+*.mexw64
+*.mexw32
+*.mexglx
+
+# Python (scripts/)
+.pytest_cache/
+**/__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editor personal state
+.idea/
+*.swp
+*~
+
+# Secrets / local environment
+.env
+.env.*
+*.pem
+id_rsa
+
+# Session logs and unshipped local projects (created at runtime)
+data/log/
+data/default_project.mat
+data/Sub01FG*
+data/lead_field_example.mat
++examples/+studies/+decision_making/data/
+
+# Generated TeX
+documentation/*.aux
+documentation/*.log
+documentation/*.out
+documentation/*.toc
+documentation/*.fls
+documentation/*.fdb_latexmk
+documentation/*.synctex.gz
+documentation/*.pdf
+
+# Local MATLAB path dumps
+pathdef.m

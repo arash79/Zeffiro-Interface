@@ -11,6 +11,16 @@ function [submissions, bundles] = eloreta_workflow(zef_inputs, cluster_profile, 
 %   zef_inputs is a struct array or cell of zef structs. Each entry is passed
 %   to zef_inverse_extract_bundle with opts.MethodId (default "eloreta") and
 %   opts.MethodParams, then batch-submitted via submit_inverse_jobs.
+%
+%   Name-value opts
+%     MethodId    - registry id (default "eloreta")
+%     MethodParams - struct copied onto the inverter
+%     WorkDir     - working directory for batch jobs (default pwd)
+%     BundleDir   - where bundle MAT files are written (default pwd/cluster_bundles)
+%     ResultDir   - where result MAT files are written (default pwd/cluster_results)
+%
+%   Needs Parallel Computing Toolbox and a configured cluster_profile
+%   (see utilities.cluster.configure_cluster_profile).
 
 arguments
     zef_inputs
@@ -27,7 +37,7 @@ if isstruct(zef_inputs)
 elseif iscell(zef_inputs)
     zef_cell = zef_inputs;
 else
-    error("utilities.cluster.examples:InvalidInput", ...
+    error("utilities:cluster:examples:InvalidInput", ...
         "zef_inputs must be a struct array or a cell array of structs.");
 end
 

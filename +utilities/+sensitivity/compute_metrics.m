@@ -11,7 +11,10 @@ function metrics = compute_metrics(z, source_positions, source_indices, diff_typ
 %
 %   z is a cell of per-probe reconstructions (3 dirs per source unless mode 3).
 %   Computes distance, angle, magnitude, dispersion (sources within radius of
-%   peak), and max_ind per probe. diff_type is "L2" or "minabs".
+%   peak), and max_ind per probe. diff_type is "L2" (Euclidean) or "minabs"
+%   (min |Δx|,|Δy|,|Δz|). Distance and magnitude are then scaled by 1/sqrt(3)
+%   (same factor as examples.studies.santtus_peeling_article.helpers.zef_rec_diff).
+%   The repository does not further justify that scale factor.
 
 arguments
     z (1,:) cell
@@ -26,18 +29,18 @@ end
 
 n_full = size(source_positions, 1);
 if any(source_indices > n_full)
-    error("utilities.sensitivity:compute_metrics:IndexOutOfRange", ...
+    error("utilities:sensitivity:compute_metrics:IndexOutOfRange", ...
         "source_indices contains values exceeding size(source_positions, 1) = %d.", n_full);
 end
 
 mode = opts.SourceDirectionMode;
 if mode == 3
     if isempty(opts.SourceDirections)
-        error("utilities.sensitivity:compute_metrics:MissingSourceDirections", ...
+        error("utilities:sensitivity:compute_metrics:MissingSourceDirections", ...
             "source_direction_mode = 3 requires opts.SourceDirections (n_full x 3) so per-probe directions can be evaluated.");
     end
     if size(opts.SourceDirections, 1) ~= n_full || size(opts.SourceDirections, 2) ~= 3
-        error("utilities.sensitivity:compute_metrics:DirectionsShapeMismatch", ...
+        error("utilities:sensitivity:compute_metrics:DirectionsShapeMismatch", ...
             "opts.SourceDirections must be %d x 3 to match source_positions.", n_full);
     end
     probes_per_source = 1;
@@ -50,7 +53,7 @@ n_rec = probes_per_source * n_used;
 n_full_cols = 3 * n_full;
 
 if numel(z) ~= n_rec
-    error("utilities.sensitivity:compute_metrics:LengthMismatch", ...
+    error("utilities:sensitivity:compute_metrics:LengthMismatch", ...
         "Expected numel(z) = %d (probes_per_source * numel(source_indices)) but got %d.", ...
         n_rec, numel(z));
 end

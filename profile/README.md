@@ -20,7 +20,7 @@ System fields are stripped on project save (`zef_remove_system_fields`).
 |--------|-------------|
 | `multicompartment_head/` | Default head demo menus/parameters |
 | `multicompartment_head_legacy/` | Legacy EXP IAS RAMUS–style Inverse tools; some modern entries dropped |
-| `multicompartment_head_nse/` | NSE / hemodynamic Multi tools enabled |
+| `multicompartment_head_nse/` | Head profile with extra NSE parameters (`mvd_length`, `nse_sigma`); **reduced** plugin menu (legacy-like), not “default plus NSE” |
 | `asteroid_gravity/` | Gravity forward/inverse demos |
 | `asteroid_radar/` | Wave/radar pipeline demos |
 
@@ -50,10 +50,10 @@ Plugin settings can be written back via `zef_save_plugin_settings` → `profile/
 ```
 zeffiro_interface.ini → profile_name
   → profile/<name>/*.ini → menus, defaults, forward scripts
-tools/plugins callbacks named in zeffiro_plugins.ini
+plugins callbacks named in zeffiro_plugins.ini
 ```
 
-Class inverse ids (`zef_inverse_run`) are registered in `utilities.cluster.inverse_method_registry`, **not** in these INIs.
+Class inverse **ids** (`zef_inverse_run`) are registered in `utilities.cluster.inverse_method_registry`, not in these INIs. Head profiles still list four Inverse-tools **callbacks** that open the class dialog: `zef_eloreta_start`, `zef_ukfnmm_start`, `zef_halpr_start`, `zef_grouplasso_start`. Asteroid INIs do not include those rows.
 
 ## Usage instructions
 
@@ -67,8 +67,9 @@ Open Edit → parameter / segmentation / system / plugin settings dialogs to App
 
 ## Important notes
 
-- Asteroid profiles drop many head-only tools (Kalman, NSE, DTI, …).
-- `_legacy` adds EXP IAS RAMUS-style entries and may omit App Designer Lasso paths.
+- Asteroid profiles drop many head-only tools (Kalman, NSE, DTI, …) and add Wireframe / SESAME on some menus.
+- `_legacy` adds EXP IAS RAMUS on Inverse tools and drops SL1, EXP Lasso, DTI, and synthetic-source patch. NSE is already on the **default** head menu; `_nse` is not “legacy plus NSE”.
+- Default `multicompartment_head` already lists **NSE tool**. `_nse` mainly adds `mvd_length` / `nse_sigma` in the parameter INI and uses the reduced (legacy-like) plugin list.
 - Forward Script cells are a trust boundary — treat INI edits like code review.
 - No `zeffiro_interface('profile_name',…)` name-value is guaranteed; prefer INI or documented fields.
 

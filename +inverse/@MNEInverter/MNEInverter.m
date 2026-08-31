@@ -44,6 +44,11 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
         % Cached linear operator W so each frame is W*f.
         precomputed_inverse_operator (:,:) {mustBeA(precomputed_inverse_operator,["double","gpuArray"])} = []
 
+        % Fingerprint of the lead field, theta and noise_cov that W was built
+        % from. invert discards W on any mismatch. See
+        % inverse.precompute_cache_key.
+        precomputed_cache_key struct = struct([])
+
     end % properties
 
     properties (SetObservable) %properties whose value changes we want to inspect
@@ -128,8 +133,8 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
             self.theta = args.theta;
             self.noise_cov = args.noise_cov;
             self.initial_prior_steering_db = args.initial_prior_steering_db;
-            self.thetaSetted = args.thetaSetted;
-            self.noise_covSetted = args.noise_covSetted;
+            self.thetaSetted = args.thetaSetted || ~isempty(args.theta);
+            self.noise_covSetted = args.noise_covSetted || ~isempty(args.noise_cov);
             self.computing_parameters = args.computing_parameters;
 
             % Initialize listeners (independent PropListener function do
@@ -147,11 +152,12 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
         % The 'initialize' function is run on Zeffiro Interface befor the
         % inversion is calculated. This allows us to compute and set
         % parameters that do not change between time steps.
-        function self = initialize(self,L,f_data)
+        function self = initialize(self,L,f_data,source_direction_mode)
         %initialize  Estimate MNE prior variance theta and noise covariance from data.
         %
         %   noise_cov: sample covariance if multiple frames, else SNR-scaled identity.
         %   theta: per-DOF prior from data power, SNR, and column norms of L.
+        %   source_direction_mode 1/2: interleaved Cartesian triples; 3: per-column.
     
         arguments
     
@@ -160,6 +166,8 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
             L (:,:) {mustBeA(L,["double","gpuArray"])}
     
             f_data (:,:) {mustBeA(f_data,["double","gpuArray"])}
+
+            source_direction_mode = 1
     
         end
 
@@ -187,13 +195,31 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
         end
         data_power = max(data_power, data_floor);
 
-        % Per-source prior: θ ∝ (1-p²) 10^(steer_dB/10) data_power / ‖L_triplet‖²
-        self.theta = mean( ...
-            (1-noise_p2) * 10.^(self.initial_prior_steering_db/10) * data_power ...
-            ./ repelem(sum(reshape(sum(L.^2),3,[])),3));
+        % Per-source prior: θ_j ∝ (1-p²) 10^(steer_dB/10) data_power / ‖L_triplet‖²
+        % so Γ = diag(θ) is the standard Dale/Lin depth weight. An earlier
+        % mean(...) around this expression collapsed θ to a scalar and
+        % silently turned every class-path MNE/WMNE run into unweighted MNE.
+        % Leave a user-supplied theta (thetaSetted) alone.
+        if isempty(self.theta) || ~self.thetaSetted
+            col_energy = zef_leadfield_column_energy(L, source_direction_mode);
+            self.theta = (1-noise_p2) * 10.^(self.initial_prior_steering_db/10) ...
+                * data_power ./ col_energy;
+        end
         end % initialize function
 
         %- - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+        function key = cacheKey(self, L)
+            %cacheKey  Fingerprint of L plus every setting W depends on.
+            %
+            %   W = (theta.*L)' / ((theta.*L)*L' + noise_cov), so theta and
+            %   noise_cov both belong in the key alongside the lead field.
+            key = inverse.precompute_cache_key(L, { ...
+                gather(double(self.theta)), ...
+                gather(double(self.noise_cov))});
+        end
+
+        %- - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         function self = precompute(self, L)
             %precompute  Cache W = (theta.*L)' / ((theta.*L)*L' + noise_cov).
@@ -204,20 +230,20 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
 
             L_modified = L .* self.theta;
             self.precomputed_inverse_operator = L_modified' / (L_modified * L' + self.noise_cov);
+            self.precomputed_cache_key = self.cacheKey(L);
         end
 
         %- - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-        % Declare the inverse method defined in the file invert, in this same
-        % folder.
-
         function [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
             %invert  Minimum-norm reconstruction for one frame: z = W*f or direct formula.
             %
-            %   Called from utilities.inverse.run_frame_loop. Inverse tools →
-            %   Minimum norm estimation uses zef_find_mne_reconstruction.
-            %   Registry ids mne and wmne both select this class; weighting
-            %   is always theta (there is no unweighted branch).
+            %   Defined in this classdef (there is no separate invert.m in the
+            %   @MNEInverter folder). Called from utilities.inverse.run_frame_loop.
+            %   Inverse tools → Minimum norm estimation uses
+            %   zef_find_mne_reconstruction. Registry ids mne and wmne both
+            %   select this class; weighting is always applied (no unweighted
+            %   branch).
             %
             %   If precompute stored W, z = W*f. Otherwise L_modified = L.*theta
             %   (column scaling) and z solves the weighted normal equations
@@ -247,18 +273,24 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
             %When inversion starts, we do not change the inversion
             %parameters anymore
             self.computing_parameters = false;
-        
-            % Initialize waitbar with a cleanup object that automatically closes the
-            % waitbar, if there is an interruption with Ctrl + C or when this function
-            % exits.
-        
-            if self.number_of_frames <= 1
-                h = zef_waitbar(0,'MNE Reconstruction.');
-                cleanup_fn = @(wb) close(wb);    
-                cleanup_obj = onCleanup(@() cleanup_fn(h));
+
+            % W is only valid for the lead field, theta and noise_cov it was
+            % built from. Drop it on any mismatch so a settings change between
+            % precompute and invert cannot silently reuse the old operator.
+            if ~isempty(self.precomputed_inverse_operator) ...
+                    && ~isequaln(self.precomputed_cache_key, self.cacheKey(L))
+                self.precomputed_inverse_operator = [];
+                self.precomputed_cache_key = struct([]);
             end
-        
-            if ~isempty(self.precomputed_inverse_operator)
+
+            has_cache = ~isempty(self.precomputed_inverse_operator);
+            if ~has_cache && self.number_of_frames <= 1
+                h = zef_waitbar(0,'MNE Reconstruction.');
+                cleanup_fn = @(wb) close(wb);
+                cleanup_obj = onCleanup(@() cleanup_fn(h)); %#ok<NASGU>
+            end
+
+            if has_cache
                 reconstruction = self.precomputed_inverse_operator * f;
                 if opts.use_gpu && gpuDeviceCount > 0
                     reconstruction = gather(reconstruction);
@@ -268,14 +300,15 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
 
             % Get needed parameters from self and others.
             L_modified = L.*self.theta;
-            
+            C = self.noise_cov;
+
             % Set matrices as gpuARRAYS for faster matrix algebraic
             % computations
             if opts.use_gpu && gpuDeviceCount > 0
                 L_modified = gpuArray(L_modified);
                 L = gpuArray(L);
                 f = gpuArray(f);
-                C = gpuArray(self.noise_cov);
+                C = gpuArray(C);
             end
 
             % Compute the reconstruction
@@ -312,6 +345,7 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
                 self.noise_cov = [];
             end
             self.precomputed_inverse_operator = [];
+            self.precomputed_cache_key = struct([]);
         end
 
     end % methods

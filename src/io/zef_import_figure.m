@@ -97,17 +97,8 @@ if not(isequal(file_name,0));
     scale_factor_x = figure_width/(max_x-min_x);
     scale_factor_y = figure_height/(max_y-min_y);
     scale_factor = min(scale_factor_x, scale_factor_y);
-    %if scale_factor_y < scale_factor_x
-    %  h_fig.Position(3) = (scale_factor_y/scale_factor_x)*h_fig.Position(3);
-    %else
-    %  h_fig.Position(4) = (scale_factor_x/scale_factor_y)*h_fig.Position(4);
-    %end
 
     for i = 1 : length(h_c)
-        % if find(ismember(properties(h_c(i)),'OuterPosition'))
-        %h_c(i).OuterPosition = scale_param*scale_factor*h_c(i).OuterPosition;
-        %h_c(i).OuterPosition(1) = h_c(i).OuterPosition(1) - scale_param*scale_factor*min_x + (1-scale_param*scale_factor*(max_x-min_x))/2;
-        %h_c(i).OuterPosition(2) = h_c(i).OuterPosition(2) - scale_param*scale_factor*min_y + (1-scale_param*scale_factor*(max_y-min_y))/2;
         if find(ismember(properties(h_c(i)),'Position'))
             if not(isequal(get(h_c(i),'Type'),'colorbar'))
                 h_c(i).Position = scale_param*scale_factor*h_c(i).Position;
@@ -119,7 +110,6 @@ if not(isequal(file_name,0));
             h_c(i).FontSize = scale_param*scale_factor*h_c(i).FontSize;
         end
     end
-    % h_fig.Position(4) = h_fig.Position(4) - (1-scale_param)*figure_width/8;
 
     h_fig.Units = 'normalized';
     for i = 1 : length(h_c)

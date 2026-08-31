@@ -64,7 +64,7 @@ if isempty(fieldnames(zef))
         if evalin("base","exist('zef', 'var');")
             zeffiro_path = fileparts(which('zeffiro_interface'));
             if ~isempty(zeffiro_path)
-                run([zeffiro_path filesep 'src' filesep 'core' filesep 'zef_close_all.m']);
+                run([zeffiro_path filesep 'src' filesep 'app' filesep 'zef_close_all.m']);
             end
         end
         
@@ -214,7 +214,6 @@ zef.mesh_resolution = zef_bst.mesh_resolution;
 zef.use_fem_mesh_inflation = zef_bst.inflation_on;
 zef.fem_mesh_inflation_strength = zef_bst.inflation_strength;
 
-%if zef.([zef.temp_var_0 '_on'])
 zef.max_surface_face_count = zef_bst.surface_mesh_density;
 zef.priority_mode = zef_bst.priority_mode;
 zef.extensive_relabeling = zef_bst.extensive_relabeling;

@@ -39,8 +39,7 @@ Parent overview: [`../README.md`](../README.md).
 
 - Changing **Profile:** alone only stores `zef.profile_name` — reload INIs explicitly.
 - No `zeffiro_interface.ini` in this folder (lives only in `profile/`).
-- `FindSyntheticGravityData` is related by physics but is **not** listed in this profile’s plugins INI.
 
 ## Developer guidance
 
-Keep the five-INI layout aligned with other `profile/*` folders. When adding gravity-related plugins or forward rows, document defaults here and wire start scripts under `tools/plugins/` / `src/forward/`. Parent inventory: [`../README.md`](../README.md).
+Keep the five-INI layout aligned with other `profile/*` folders. When adding gravity-related plugins or forward rows, document defaults here and wire start scripts under `plugins/` / `src/forward/`. Parent inventory: [`../README.md`](../README.md).

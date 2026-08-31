@@ -125,7 +125,7 @@ h_text_5 = uicontrol('Style','text','Parent',h_fig,'Units','normalized','String'
 h_text_6 = uicontrol('Style','text','Parent',h_fig,'Units','normalized','String','Run type:','HorizontalAlignment','left','Position',[0.375 0.22 0.25 0.1],'BackgroundColor',[0.94 0.94 0.94]);
 
 h_axes = uiaxes('Parent',h_fig,'visible','on','Units','normalized','Position',[0.05 0.80 0.30 0.16],'FontSize',0.587962962962963,'Tag','image_axes','BackgroundColor',[0.94 0.94 0.94],'Visible','off');
-imagesc(h_axes,imread(fullfile(folder_name, 'fig', 'zeffiro_logo.png'), 'BackgroundColor', [0.94 0.94 0.94]));
+imagesc(h_axes,imread(fullfile(folder_name, 'assets', 'fig', 'zeffiro_logo_compass.png'), 'BackgroundColor', [0.94 0.94 0.94]));
 
 addprop(h_fig,'settings_file_name');
 set(h_fig,'settings_file_name',file_name);

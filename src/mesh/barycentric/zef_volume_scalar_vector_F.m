@@ -11,7 +11,7 @@ function v = zef_volume_scalar_vector_F(nodes, tetra, scalar_field)
 %
 %   v = zef_volume_scalar_vector_F(nodes, tetra, scalar_field)
 %
-%   See also zef_volume_scalar_vector, zef_nse_poisson.
+%   See also zef_nse_poisson.
 
 N = size(nodes,1);
 

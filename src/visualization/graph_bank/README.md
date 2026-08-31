@@ -10,7 +10,7 @@ Plot functions for the **Graph:** dropdown in **ZEFFIRO Interface: Mesh visualiz
 |------|------|-------------|
 | `zef_histogram.m` | `cla` then histogram | `log10` of the parameter vector, 200 bins |
 | `zef_logarithmic_distribution.m` | `cla` then `plot` | Same bins, then `log10(counts)` |
-| `zef_logarithmic_histogram.m` | `cla` then histogram | `log10` of the parameter, log y-axis. **Filename vs function:** first function line is named `zef_logarithmic_distribution`; MATLAB still calls it by filename |
+| `zef_logarithmic_histogram.m` | `cla` then histogram | `log10` of the parameter, log y-axis |
 | `zef_plot_dof_space.m` | `hold on` scatter3 | `zef.source_positions` (dummy argument unused) |
 
 ## Code functionality
@@ -38,7 +38,6 @@ zef_plot_dof_space([]);   % dummy arg unused
 
 - Input is the currently selected Mesh-vis **Parameter:** vector (`zef_plot_graph` passes it).
 - `zef_plot_dof_space` ignores that vector; source interpolation must already have run.
-- Filename/function-name mismatch in `zef_logarithmic_histogram.m` is intentional in this tree.
 
 ## Developer guidance
 

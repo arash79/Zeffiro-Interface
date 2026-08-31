@@ -1,21 +1,26 @@
-%Copyright © 2018- Sampsa Pursiainen & ZI Development Team
-%See: https://github.com/sampsapursiainen/zeffiro_interface
 function h_source = zef_plot_source(source_type)
-%ZEF_PLOT_SOURCE  Dipole glyphs on Figure-tool axes1 (quiver3).
+%ZEF_PLOT_SOURCE  3-D arrows for synthetic (type 1) or reconstructed (type 2) dipoles.
 %
 %   Zeffiro Interface.
 %   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Function. source_type 1 = synthetic (zef.inv_synth_source columns
-%   1:3 position, 4:6 orientation, 7 amplitude, 9 length, 10 color
-%   index); else reconstructed (zef.inv_rec_source, length in column 8,
-%   color in 9). Deletes prior h_synth_source / h_rec_source. Draws on
-%   zef.h_axes1. Color cell is k,r,g,b,y,m,c. Does not tag patches
-%   (transparency sliders do not affect these quivers).
+%   h_source = zef_plot_source(source_type)
 %
-%   See also zef_plot_3D_arrow, zef_plot_roi.
+%   Plot-sources uses type 1 (zef.inv_synth_source). Type 2 reads
+%   zef.inv_rec_source. Deletes previous h_synth_source / h_rec_source.
+%   Reads base zef; draws on h_axes1 via zef_plot_3D_arrow.
+%
+%   See also zef_plot_3D_arrow, zef_plot_source_intensity, zef_update_fss.
+
+arrow_scale = 1;
+arrow_type = 1;
+arrow_shape = 10;
+arrow_length = 1;
+arrow_head_size = 2;
+arrow_n_polygons = 100;
+
 if source_type == 1
     h_axes1 = evalin('base','zef.h_axes1');
     if isfield(evalin('base','zef'),'h_synth_source')
@@ -24,10 +29,9 @@ if source_type == 1
             delete(h_synth_source)
         end
     end
-    s_width = 3;
     color_cell = {'k','r','g','b','y','m','c'};
-    s_length = evalin('base','zef.inv_synth_source(1,9)');
-    source_color = color_cell{evalin('base','zef.inv_synth_source(1,10)')};
+    s_length = evalin('base','zef.inv_synth_source(:,9)');
+    source_color = color_cell(evalin('base','zef.inv_synth_source(:,10)'));
     s_p = evalin('base','zef.inv_synth_source(:,1:3)');
     s_o = evalin('base','zef.inv_synth_source(:,4:6)');
     s_o = s_o./repmat(sqrt(sum(s_o.^2,2)),1,3);
@@ -36,11 +40,23 @@ if source_type == 1
     s_o = repmat(s_a,1,3).*s_o;
     s_o = repmat(s_length,1,3).*s_o;
     h_axes1 = evalin('base','zef.h_axes1');
+    zef_plot_meshes([]);
     hold(h_axes1,'on');
     h_synth_source = zeros(size(s_p,1),1);
+    arrow_scale = 3*sqrt(s_length);
     for i = 1 : size(s_p,1)
-        h_synth_source(i) = quiver3(h_axes1,s_p(i,1),s_p(i,2),s_p(i,3),s_length*s_o(i,1),s_length*s_o(i,2),s_length*s_o(i,3), 0, 'linewidth',s_width,'color',source_color,'marker','o');
+        h_synth_source(i) = zef_plot_3D_arrow(s_p(i,1),s_p(i,2),s_p(i,3),s_o(i,1),s_o(i,2),s_o(i,3),arrow_scale(i),arrow_type,source_color{i},arrow_shape,arrow_length,arrow_head_size,arrow_n_polygons);
     end
+    x_scale = h_axes1.XAxis.TickValues(2) - h_axes1.XAxis.TickValues(1);
+    y_scale = h_axes1.YAxis.TickValues(2) - h_axes1.YAxis.TickValues(1);
+    z_scale = h_axes1.ZAxis.TickValues(2) - h_axes1.ZAxis.TickValues(1);
+    h_axes1.XAxis.TickValues = [floor(h_axes1.XAxis.Limits(1)/x_scale):ceil(h_axes1.XAxis.Limits(2)/x_scale)]*x_scale;
+    h_axes1.YAxis.TickValues = [floor(h_axes1.YAxis.Limits(1)/y_scale):ceil(h_axes1.YAxis.Limits(2)/y_scale)]*y_scale;
+    h_axes1.ZAxis.TickValues = [floor(h_axes1.ZAxis.Limits(1)/z_scale):ceil(h_axes1.ZAxis.Limits(2)/z_scale)]*z_scale;
+    h_axes1.XAxis.TickLabels = num2cell(h_axes1.XAxis.TickValues);
+    h_axes1.YAxis.TickLabels = num2cell(h_axes1.YAxis.TickValues);
+    h_axes1.ZAxis.TickLabels = num2cell(h_axes1.ZAxis.TickValues);
+
     hold(h_axes1,'off');
     h_source = h_synth_source;
 else
@@ -51,7 +67,6 @@ else
             delete(h_rec_source)
         end
     end
-    s_width = 3;
     color_cell = {'k','r','g','b','y','m','c'};
     s_length = evalin('base','zef.inv_rec_source(1,8)');
     source_color = color_cell{evalin('base','zef.inv_rec_source(1,9)')};
@@ -66,8 +81,18 @@ else
     hold(h_axes1,'on');
     h_rec_source = zeros(size(s_p,1),1);
     for i = 1 : size(s_p,1)
-        h_rec_source(i) = quiver3(h_axes1,s_p(i,1),s_p(i,2),s_p(i,3),s_length*s_o(i,1),s_length*s_o(i,2),s_length*s_o(i,3), 0, 'linewidth',s_width,'color',source_color,'marker','o');
+        h_rec_source(i) = zef_plot_3D_arrow(s_p(i,1),s_p(i,2),s_p(i,3),s_o(i,1),s_o(i,2),s_o(i,3),s_length*arrow_scale,arrow_type,source_color,arrow_shape,arrow_length,arrow_head_size,arrow_n_polygons);
     end
+    x_scale = h_axes1.XAxis.TickValues(2) - h_axes1.XAxis.TickValues(1);
+    y_scale = h_axes1.YAxis.TickValues(2) - h_axes1.YAxis.TickValues(1);
+    z_scale = h_axes1.ZAxis.TickValues(2) - h_axes1.ZAxis.TickValues(1);
+    h_axes1.XAxis.TickValues = [floor(h_axes1.XAxis.Limits(1)/x_scale):ceil(h_axes1.XAxis.Limits(2)/x_scale)]*x_scale;
+    h_axes1.YAxis.TickValues = [floor(h_axes1.YAxis.Limits(1)/y_scale):ceil(h_axes1.YAxis.Limits(2)/y_scale)]*y_scale;
+    h_axes1.ZAxis.TickValues = [floor(h_axes1.ZAxis.Limits(1)/z_scale):ceil(h_axes1.ZAxis.Limits(2)/z_scale)]*z_scale;
+    h_axes1.XAxis.TickLabels = num2cell(h_axes1.XAxis.TickValues);
+    h_axes1.YAxis.TickLabels = num2cell(h_axes1.YAxis.TickValues);
+    h_axes1.ZAxis.TickLabels = num2cell(h_axes1.ZAxis.TickValues);
+
     hold(h_axes1,'off');
     h_source = h_rec_source;
 end

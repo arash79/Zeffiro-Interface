@@ -32,19 +32,21 @@ classdef UKFNMMInverter < inverse.CommonInverseParameters
 %   invoke after utilities.inverse.run_frame_loop.
 %
 %   Spatial-filter note: the author's README names the spatial stage SKF,
-%   but commit 0b33ef8c calls plugins.ClassKF.kf_update on modified_L
-%   rather than plugins.ClassKF.kf_sL_update. That committed spatial
-%   behaviour is preserved; see README.md in this folder.
+%   but commit 0b33ef8c calls inverse.kf.kf_update on modified_L
+%   rather than inverse.kf.kf_sL_update. That spatial kernel is preserved.
+%   After RTS, smoother maps the U-space state to physical dipoles
+%   (p = V S^{+} x_U) before NMM uses the original L.
 %
 %   There is no dedicated SKF–NMM–UKF publication or DOI in this
 %   repository. The Standardized Kalman spatial filter that this method
 %   was branched from is described in Lahtinen et al., Clinical
 %   Neurophysiology 168 (2024), DOI 10.1016/j.clinph.2024.09.021.
 %
-%   Registry ids: "ukfnmm", "ukf_nmm". There is no Inverse-tools GUI for
-%   this class; invoke it through zef_inverse_run / dispatch_inverse.
+%   Registry ids: "ukfnmm", "ukf_nmm". Inverse tools → UKF-NMM opens a
+%   class-inverter dialog that calls zef_inverse_run. Distinct from the
+%   legacy Kalman plugin.
 %
-%   See also inverse.KalmanInverter, plugins.ClassKF,
+%   See also inverse.KalmanInverter, inverse.kf,
 %            utilities.inverse.run_frame_loop.
 
     properties
@@ -64,11 +66,11 @@ classdef UKFNMMInverter < inverse.CommonInverseParameters
         score_threshold (1,1) double {mustBeNonnegative} = 0.2
 
         %
-        % UKF spread parameter alpha (van der Merwe). The introducing
-        % implementation uses 5, which is larger than the usual 1e-3
-        % range; that value is preserved.
+        % UKF spread parameter alpha (van der Merwe). Default 1 is at the
+        % upper end of the recommended [1e-3, 1] range. The introducing
+        % implementation used 5 (σ-points ~16σ for 11 JR parameters).
         %
-        alpha (1,1) double {mustBePositive} = 5
+        alpha (1,1) double {mustBePositive} = 1
 
         %
         % UKF secondary scaling parameter kappa.
@@ -77,10 +79,9 @@ classdef UKFNMMInverter < inverse.CommonInverseParameters
 
         %
         % UKF prior-covariance weight parameter beta. 2 is optimal for
-        % Gaussians; the introducing implementation uses 0 and that
-        % default is preserved.
+        % Gaussians (van der Merwe). The introducing implementation used 0.
         %
-        beta (1,1) double = 0
+        beta (1,1) double = 2
 
         %
         % Evolution prior (process-noise) model for the spatial Kalman
@@ -141,13 +142,13 @@ classdef UKFNMMInverter < inverse.CommonInverseParameters
 
         %
         % Previous spatial-filter mean. Required by
-        % plugins.ClassKF.class_kf_predict.
+        % inverse.kf.class_kf_predict.
         %
         prev_step_reconstruction = []
 
         %
         % Previous spatial-filter covariance. Required by
-        % plugins.ClassKF.class_kf_predict.
+        % inverse.kf.class_kf_predict.
         %
         prev_step_posterior_cov = []
 
@@ -166,10 +167,16 @@ classdef UKFNMMInverter < inverse.CommonInverseParameters
         %
         % Per-source SVD-modified lead field used as the spatial Kalman
         % observation model. Built in initialize. NMM back-projection
-        % uses the original lead field passed to smoother, matching the
-        % introducing framework call.
+        % uses the original lead field after mapping the KF state from
+        % U-space to physical dipoles (p = V S^{-1} x_U).
         %
         modified_L = []
+
+        %
+        % 3×3×n_sources maps from per-source U-space KF state to physical
+        % dipole moments. L_n = U S V' ⇒ x_U = S V' p ⇒ p = V S^{-1} x_U.
+        %
+        u_to_dipole = []
 
         %
         % Spatial-filter posterior covariances, one cell per frame, stored
@@ -235,11 +242,11 @@ classdef UKFNMMInverter < inverse.CommonInverseParameters
 
                 args.score_threshold = 0.2
 
-                args.alpha = 5
+                args.alpha = 1
 
                 args.kappa = 0
 
-                args.beta = 0
+                args.beta = 2
 
                 args.evolution_prior_model = "Sensitivity scaling"
 
@@ -270,6 +277,8 @@ classdef UKFNMMInverter < inverse.CommonInverseParameters
                 args.time_series = []
 
                 args.modified_L = []
+
+                args.u_to_dipole = []
 
                 args.posterior_covs = cell(0)
 
@@ -327,6 +336,7 @@ classdef UKFNMMInverter < inverse.CommonInverseParameters
             self.reconstruction = args.reconstruction;
             self.time_series = args.time_series;
             self.modified_L = args.modified_L;
+            self.u_to_dipole = args.u_to_dipole;
             self.posterior_covs = args.posterior_covs;
             self.n_temporal_postprocess_runs = args.n_temporal_postprocess_runs;
 

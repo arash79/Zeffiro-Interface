@@ -197,21 +197,18 @@ for k = 1 : length(compartment_tags)
                     aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                     I_aux_rec = find(aux_rec > 0);
                     reconstruction(I_aux_rec) = 0;
-                    %reconstruction = reconstruction./max(abs(reconstruction(:)));
                 end
 
                 if eval('zef.reconstruction_type') == 5
                     aux_rec = rec_x.*n_vec_aux(:,1) + rec_y.*n_vec_aux(:,2) + rec_z.*n_vec_aux(:,3);
                     I_aux_rec = find(aux_rec <= 0);
                     reconstruction(I_aux_rec) = 0;
-                    %reconstruction = reconstruction./max(abs(reconstruction(:)));
                 end
 
                 if ismember(eval('zef.reconstruction_type'), [2 3 4 5 7])
                     reconstruction = zef_smooth_field(reuna_t{i}, reconstruction, size(reuna_p{i}(:,1),1),3);
                 end
 
-                %reconstruction = (max(reconstruction/max_abs_reconstruction,0));
 
                 p_counter = 0;
                 for p_ind = selected_list
@@ -309,7 +306,6 @@ for f_ind = frame_start + frame_step : frame_step : frame_stop
             reconstruction = zef_smooth_field(reuna_t{i}, reconstruction, size(reuna_p{i}(:,1),1),3);
         end
 
-        %reconstruction = (max(reconstruction/max_abs_reconstruction,0));
 
         p_counter = 0;
         for p_ind = selected_list

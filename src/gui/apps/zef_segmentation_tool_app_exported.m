@@ -60,31 +60,6 @@ properties (Access = public)
         h_menu_sensors_visibility       matlab.ui.container.Menu
     end
 
-
-    % -------------------------------------------------------------------------
-    % Private helper: legacy CreateFcn support for App Designer callbacks
-    % -------------------------------------------------------------------------
-    methods (Access = private)
-        function local_CreateFcn(app, hObject, eventdata, createfcn, appdata)
-            % Store application data on the graphics object for use in callbacks.
-            if ~isempty(appdata)
-               names = fieldnames(appdata);
-               for i = 1:length(names)
-                   name = char(names(i));
-                   setappdata(hObject, name, getfield(appdata, name));
-               end
-            end
-            % Run the create function (handle or string) if provided.
-            if ~isempty(createfcn)
-               if isa(createfcn, 'function_handle')
-                   createfcn(hObject, eventdata);
-               else
-                   eval(createfcn);
-               end
-            end
-        end
-    end
-
     % -------------------------------------------------------------------------
     % Component initialization: build segmentation tool figure and all controls
     % -------------------------------------------------------------------------

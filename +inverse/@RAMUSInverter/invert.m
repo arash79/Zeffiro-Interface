@@ -16,7 +16,10 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
 %   For each decomposition and resolution level, runs n_map_iterations(mr_ind)
 %   IAS-style MAP updates on the coarse lead-field columns, then scatters
 %   the result onto the full grid with multires_ind. The accumulator is
-%   divided by n_decompositions * n_levels * scaling_vec.
+%   divided by n_decompositions * n_levels * scaling_vec. Each MAP step
+%   forms Wd = L_sub .* d_sqrt' and A = Wd*Wd' + S_mat. The n_dof×n_sensors
+%   filter W is built only when dSPM/sLORETA weighting needs it; otherwise
+%   z = d_sqrt .* (Wd' * (A \ f)).
 %
 %   Inputs
 %     f, L - frame and full-resolution processed lead field.
@@ -111,47 +114,57 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
         multires_ind = multires_ind(:);
         L_sub = L(:,multires_dec);
         
-        if dec_ind == 1
+        % Fresh hyperprior on every (decomposition, level), matching
+        % zef_ramus_iteration. d_sqrt is the prior standard deviation.
         if strcmp(self.hyperprior,"Inverse gamma")
             [beta, theta0] = zef_find_ig_hyperprior(modified_SNR,...
             self.hyperprior_tail_length_db,L_sub,size(L_sub,2),normalize_data,balance_spatially,self.hyperprior_weight);
-            d_sqrt = theta0./(beta-1);
+            d_sqrt = sqrt(theta0./(beta-1));
         elseif strcmp(self.hyperprior,"Gamma")
             [beta, theta0] = zef_find_g_hyperprior(modified_SNR,...
             self.hyperprior_tail_length_db,L_sub,size(L_sub,2),normalize_data,balance_spatially,self.hyperprior_weight);
-            d_sqrt = theta0.*beta;
-        end
-        else
-            d_sqrt = d_sqrt(multires_dec);
+            d_sqrt = sqrt(theta0.*beta);
         end
 
-        for i = 1:self.n_map_iterations(mr_ind)
-    
-            W = L_sub .* repmat( d_sqrt' , size(L_sub,1), 1);
-            W = d_sqrt.*( W' * inv( W * W' + S_mat ) );
-            
-            if strcmp(method_type, "dSPM each step")
-                dspm_vec = sum(W.^2, 2);
-                dspm_vec = sqrt(dspm_vec);
-                W = W./dspm_vec;
-            elseif strcmp(method_type, "dSPM last step")
-                if i == self.n_map_iterations(mr_ind)
+        n_it = self.n_map_iterations(mr_ind);
+        for i = 1:n_it
+
+            % IAS MAP filter on the sub-grid. Skip forming W when only z = W*f
+            % is required (None / non-final last-step), matching IASInverter.
+            Wd = L_sub .* d_sqrt';
+            A = Wd * Wd' + S_mat;
+            need_full_W = strcmp(method_type, "dSPM each step") ...
+                || strcmp(method_type, "sLORETA each step") ...
+                || (i == n_it && (strcmp(method_type, "dSPM last step") ...
+                || strcmp(method_type, "sLORETA last step")));
+            if need_full_W
+                W = d_sqrt.*( Wd' * inv( A ) );
+
+                if strcmp(method_type, "dSPM each step")
                     dspm_vec = sum(W.^2, 2);
                     dspm_vec = sqrt(dspm_vec);
                     W = W./dspm_vec;
-                end
-            elseif strcmp(method_type, "sLORETA each step")
-                sloreta_vec = sqrt(sum(W.*L_sub', 2));
-                W = W./sloreta_vec(:,ones(size(W,2),1));
-            elseif strcmp(method_type, "sLORETA last step")
-                if i == self.n_map_iterations(mr_ind)
+                elseif strcmp(method_type, "dSPM last step")
+                    if i == n_it
+                        dspm_vec = sum(W.^2, 2);
+                        dspm_vec = sqrt(dspm_vec);
+                        W = W./dspm_vec;
+                    end
+                elseif strcmp(method_type, "sLORETA each step")
                     sloreta_vec = sqrt(sum(W.*L_sub', 2));
                     W = W./sloreta_vec(:,ones(size(W,2),1));
+                elseif strcmp(method_type, "sLORETA last step")
+                    if i == n_it
+                        sloreta_vec = sqrt(sum(W.*L_sub', 2));
+                        W = W./sloreta_vec(:,ones(size(W,2),1));
+                    end
                 end
+
+                z_vec_sub = W*f;
+            else
+                z_vec_sub = d_sqrt .* (Wd' * (A \ f));
             end
-        
-            z_vec_sub = W*f;
-            
+
             if opts.use_gpu && gpuDeviceCount > 0
                 z_vec_sub = gather(z_vec_sub);
             end

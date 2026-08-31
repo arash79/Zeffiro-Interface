@@ -10,7 +10,7 @@
 %   Affine transform. Affine is mat2str of a 4-by-4 (eye(4) if missing).
 %   Sets current_parameters='transform' for zef_update_parameters.
 %
-%   See also zef_update_transform_parameters, zef_init_transform.
+%   See also zef_update_parameters, zef_init_transform.
 zef.aux_data_1 = cell(0);
 zef.aux_data_2 = {{'Scaling','scaling'},{'X-shift','x_correction'},{'Y-shift','y_correction'},{'Z-shift','z_correction'},{'Xy-rotation','xy_rotation'},{'Yz-rotation','yz_rotation'},{'Zx-rotation','zx_rotation'},{'Affine transform','affine_transform'}};
 zef_i = evalin('base','zef.current_transform');

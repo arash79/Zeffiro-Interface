@@ -20,8 +20,8 @@ function [reconstruction, self] = smoother(self, z_inverse, L)
 %   Inputs
 %     z_inverse - cell, one n_dof×1 spatial vector per frame (same order
 %                 as invert).
-%     L         - original lead field used by NMM back-projection, not
-%                 modified_L.
+%     L         - original lead field used by NMM back-projection after
+%                 mapping the spatial KF state from U-space to dipoles.
 %
 %   Outputs
 %     reconstruction - cell of NMM-constrained frames, same length as
@@ -52,6 +52,8 @@ function [reconstruction, self] = smoother(self, z_inverse, L)
     if self.smoother_type == "RTS" || self.smoother_type == "Sample RTS"
         self.reconstruction = i_rts_pass(self, L);
     end
+
+    self.reconstruction = i_map_u_space_to_dipoles(self.u_to_dipole, self.reconstruction);
 
     [recon_mat, time_series, self] = self.UKF_estimate_NMM_parameters(L);
     self.time_series = time_series;
@@ -87,6 +89,25 @@ if ~all(isfinite(z_mat(:)))
 end
 end
 
+function p = i_map_u_space_to_dipoles(M, x)
+%I_MAP_U_SPACE_TO_DIPOLES  p = V S^{+} x_U per source triplet.
+if isempty(M)
+    p = x;
+    return
+end
+n_src = size(M, 3);
+n_dof = size(x, 1);
+if n_src * 3 ~= n_dof
+    error("UKFNMMInverter:UToDipoleSizeMismatch", ...
+        "u_to_dipole has %d sources but reconstruction has %d rows.", n_src, n_dof);
+end
+p = x;
+for n = 1:n_src
+    ind = (3 * n - 2):(3 * n);
+    p(ind, :) = M(:, :, n) * x(ind, :);
+end
+end
+
 function reconstruction = i_rts_pass(self, L)
 n_frames = self.number_of_frames;
 if n_frames < 2
@@ -106,7 +127,7 @@ end
 Q = self.evolution_cov;
 if self.smoother_type == "Sample RTS"
     z = self.reconstruction;
-    if i_is_identity(A)
+    if inverse.kf.is_identity_transition(A)
         dZ = z(:, 2:n_frames) - z(:, 1:n_frames-1);
     else
         dZ = z(:, 2:n_frames) - A * z(:, 1:n_frames-1);
@@ -131,7 +152,7 @@ for f_ind = n_frames:-1:1
 
     P = self.posterior_covs{f_ind};
     m = self.reconstruction(:, f_ind);
-    if i_is_identity(A)
+    if inverse.kf.is_identity_transition(A)
         P_ = P + Q;
         m_ = m;
         G = P / P_;
@@ -152,10 +173,6 @@ for f_ind = n_frames:-1:1
 end
 
 clear cleanup_wb;
-end
-
-function tf = i_is_identity(A)
-tf = isdiag(A) && all(abs(diag(A) - 1) < eps);
 end
 
 function i_safe_close_waitbar(h)

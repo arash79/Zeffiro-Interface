@@ -16,7 +16,14 @@ Synthesizes dipole-probe measurements from `zef.L`, runs `zef_inverse_run`, and 
 
 ## Code functionality
 
-`method_capability` strategies: `linear_static` (CSM/MNE/eLORETA), `iterative_static` (dipole scan, beamformer, IAS, RAMUS, HALpR), `stateful_dynamic` (Kalman), or `unsupported`. `run_monte_carlo` sets `zef_local.inv_data_mode = 'raw'` so each realization is a measurement matrix, not filtered EEG. Errors `MissingLeadField` if `zef.L` is empty.
+`method_capability(method_id)` returns a struct with `strategy`, optional `prep_hooks`, and `notes`. `run_monte_carlo` sets `zef_local.inv_data_mode = 'raw'` so each realization is a measurement matrix, not filtered EEG. Errors `MissingLeadField` if `zef.L` is empty.
+
+| Strategy | Registry ids | Monte Carlo behaviour |
+|----------|----------------|------------------------|
+| `linear_static` | `csm`, `dspm`, `sloreta`, `sloreta3d`, `sbl`, `mne`, `wmne`, `eloreta` | Cached linear operator; bounded probe batches |
+| `iterative_static` | `dipolescan` / `dipole_scan`, `beamformer`, `ias`, `ramus` (`prep_hooks`: `ramus_decomposition`), `halpr`, `grouplasso` / `group_lasso` | Per-frame / per-source iterations; RAMUS auto-builds multires if empty |
+| `stateful_dynamic` | `kalman`, `kf` | One probe per frame with a **fresh** inverter (state must not leak across probes) |
+| `unsupported` | All `legacy_*` ids; `ukfnmm` / `ukf_nmm`; anything else | Falls through to `otherwise`. Use the class-based equivalent from `utilities.cluster.inverse_method_registry`. |
 
 `synthesize_measurements`: `L` must have **3 columns per source**. `SourceDirectionMode` 1 = three unit axes, 2 = normal (still 3 cols in `L`), 3 = one probe along `SourceDirections` (n_sources × 3). `compute_metrics` reconstruction cells must match probe count (3 per source unless mode 3).
 
@@ -42,7 +49,7 @@ Key `run_monte_carlo` options (defaults): `NumberOfRuns` 1; `NoiseLevelDb` -30 (
 
 ## Important notes
 
-Does not replace GUI inverse plugins. Cluster path needs Parallel Computing Toolbox / configured profile.
+Does not replace GUI inverse plugins. Cluster path needs Parallel Computing Toolbox / configured profile. UKFNMM and every `legacy_*` id are **unsupported** here — `method_capability` will not invent a batching strategy for them.
 
 ## Developer guidance
 

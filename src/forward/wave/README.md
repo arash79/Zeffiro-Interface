@@ -10,11 +10,11 @@ Time-domain electromagnetic **wave FEM** used by the asteroid **radar** / GPU-To
 |------|--------|
 | System assembly | `create_system` — load mesh + permittivity, refine, assemble `C`/`A`/`R`, save mats |
 | Time stepping | `compute_data`, `compute_data_gpu`, `B_prod`, `B_T_prod`, `mat_vec` |
-| Sources / BC | `boundary_source`, `boundary_point_source`, `surface_integral`, `free_boundary` |
+| Sources / BC | `boundary_source`, `boundary_point_source`, `surface_integral` |
 | Born / difference | `make_born_approximation_qam`, `make_born_approximation_amp`, `make_difference_data_qam`, `make_difference_data_amp` |
 | Jacobian I/O | `save_jacobian_data`, `save_jacobian_data_complex`, `load_jacobian_data`, `load_jacobian_data_complex`, `combine_data_complex`, `combine_data_sincos` |
-| Pulse / demod | `bh_window`, `mh_window`, `qam_demod`, `calc_cf_and_bw` |
-| Wave-local mesh | `refine_mesh` (8-way split; **not** `zef_mesh_refinement`), `tetra_in_compartment`, `make_interp_mat`, `array_min` |
+| Pulse / demod | `bh_window`, `qam_demod` |
+| Wave-local mesh | `refine_mesh` (8-way split; **not** `zef_mesh_refinement`), `make_interp_mat` |
 
 ## Code functionality
 

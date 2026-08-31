@@ -11,10 +11,10 @@ function self = precompute(self, L)
 %   takes the per-call whitening path.
 %
 %   Chalf = sqrtm(noise_cov), whitening = Chalf \ I, L_w = whitening*L.
-%   Each 3-column source block is SVD'd into U, S, V pages. When
-%   reg_type is "Basic", singular values are Tikhonov-regularized.
+%   Each 3-column source block is SVD'd into U, S, V pages via pagesvd.
+%   When reg_type is "Basic", singular values are Tikhonov-regularized.
 %   Lead field must have a multiple of 3 columns (error otherwise).
-%   gpuArray L is gathered before the SVD loop.
+%   gpuArray L is gathered before pagesvd.
 %
 %   Input  L  - n_sensors×(3 n_sources) processed lead field.
 %   Output self with precomputed_L_w, precomputed_whitening,
@@ -30,6 +30,11 @@ self.precomputed_whitening = [];
 self.precomputed_U_pages = [];
 self.precomputed_S_diag = [];
 self.precomputed_V_pages = [];
+self.precomputed_cache_key = struct([]);
+
+% Fingerprint L as the caller passed it, before the gather below, so that the
+% key matches the one invert builds from the same argument.
+cache_key = self.cacheKey(L);
 
 if isempty(self.noise_cov)
     return;
@@ -60,27 +65,19 @@ self.precomputed_L_w = self.precomputed_whitening * L;
 reg_on = ~strcmp(self.reg_type, "None");
 reg_param = self.reg_parameter;
 
-U_pages = zeros(n_ch, 3, n_sources);
-S_diag  = zeros(3, n_sources);
-V_pages = zeros(3, 3, n_sources);
-
-for i = 1:n_sources
-    ind3 = 3*i - [2, 1, 0];
-    LF = self.precomputed_L_w(:, ind3);
-    [U, S, V] = svd(LF, 'econ');
-
-    s = diag(S);
-    if reg_on
-        s = s + reg_param;
-    end
-
-    U_pages(:, :, i) = U;
-    S_diag(:, i)     = s;
-    V_pages(:, :, i) = V;
+% Batched thin SVD of every 3-column source block. pagesvd on the reshaped
+% lead field is equivalent to svd(...,'econ') per page (same invert output)
+% and avoids MATLAB loop overhead plus per-source n_ch×3 copies.
+L_pages = reshape(self.precomputed_L_w, n_ch, 3, n_sources);
+[U_pages, S_vec, V_pages] = pagesvd(L_pages, "econ", "vector");
+S_diag = reshape(S_vec, 3, n_sources);
+if reg_on
+    S_diag = S_diag + reg_param;
 end
 
 self.precomputed_U_pages = U_pages;
 self.precomputed_S_diag  = S_diag;
 self.precomputed_V_pages = V_pages;
+self.precomputed_cache_key = cache_key;
 
 end

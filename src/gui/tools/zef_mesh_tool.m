@@ -40,7 +40,6 @@ if isfield(zef,'h_mesh_tool')
 end
 
 zef_data = zef_mesh_tool_app_exported;
-%zef_data.h_mesh_tool.Visible=zef.use_display;
 zef = zef_assign_data(zef, zef_data);
 
 zef.h_mesh_tool.CloseRequestFcn = 'zef.h_mesh_tool.Visible=''off'';';
@@ -53,10 +52,7 @@ set(zef.h_run_forward_simulation,'ButtonPushedFcn','zef_run_forward_simulation;'
 
 set(zef.h_save_forward_simulation_profile,'ButtonPushedFcn','zef.forward_simulation_table = zef.h_forward_simulation_table.Data; writecell(zef.forward_simulation_table,[zef.program_path ''/profile/'' zef.profile_name ''/zeffiro_forward_simulation.ini''],''filetype'',''text'',''delimiter'','','')');
 
-%set(zef.h_plot_condition,'ButtonPushedFcn','zef_plot_condition;');
-%set(zef.h_make_all,'ButtonPushedFcn','if zef.downsample_surfaces == 1; zef_downsample_surfaces; end; zef.source_interpolation_on = 1; set(zef.h_source_interpolation_on,''value'',1); zef_postprocess_fem_mesh;  zef.n_sources_mod = 1; zef.source_ind = []; zef_update_fig_details;zef_process_meshes; zef_attach_sensors_volume(zef.sensors);zef_lead_field_matrix;');
 set(zef.h_pushbutton21,'ButtonPushedFcn','zef_create_finite_element_mesh;');
-%set(zef.h_pushbutton14,'ButtonPushedFcn','zef_delete_original_field;zef_process_meshes;zef_attach_sensors_volume(zef.sensors);zef_lead_field_matrix;');
 set(zef.h_interpolate,'ButtonPushedFcn','zef_source_interpolation;');
 set(zef.h_field_downsampling,'ButtonPushedFcn','zef_field_downsampling;');
 set(zef.h_surface_downsampling,'ButtonPushedFcn','zef_surface_downsampling;');
@@ -67,8 +63,6 @@ set(zef.h_source_interpolation_on,'value',zef.source_interpolation_on);
 set(zef.h_downsample_surfaces,'value',zef.downsample_surfaces);
 set(zef.h_inflate_n_iterations,'value',zef.inflate_n_iterations);
 set(zef.h_inflate_strength,'value',zef.inflate_strength);
-
-set(zef.h_downsample_surfaces,'value',zef.downsample_surfaces);
 
 set(zef.h_popupmenu6,'Items',{'mm','cm','m'});
 zef.h_popupmenu6.ItemsData = [1:length(zef.h_popupmenu6.Items)];
@@ -117,26 +111,9 @@ set(zef.h_inflate_strength,'ValueChangedFcn','zef_update_mesh_tool;');
 set(zef.h_mesh_tool,'DeleteFcn','zef_closereq;');
 
 zef.h_mesh_tool.Units = 'normalized';
-%zef.h_mesh_tool.Position(1:2) = [0.2 0.2];
 zef.h_mesh_tool.Units = 'pixels';
 zef = zef_ui_tag_handles(zef);
 zef.h_mesh_tool.AutoResizeChildren = 'on';
-
-%if zef.h_segmentation_tool_toggle == 1
-
-    %zef.h_mesh_tool.Position = [zef.segmentation_tool_default_position(1)+ 0.505*zef.segmentation_tool_default_position(3) , ...
-     %   zef.segmentation_tool_default_position(2)+0.75*zef.segmentation_tool_default_position(4),...
-      %  0.75*0.505*zef.segmentation_tool_default_position(3),...
-      %  0.4*zef.segmentation_tool_default_position(4)];
-
-%else
-
- %   zef.h_mesh_tool.Position = [zef.segmentation_tool_default_position(1) + zef.segmentation_tool_default_position(3), ...
-  %      zef.segmentation_tool_default_position(2)+0.6*zef.segmentation_tool_default_position(4),...
-   %     0.75*zef.segmentation_tool_default_position(3),...
-   %     0.4*zef.segmentation_tool_default_position(4)];
-
-%end
 
 ref = zef.segmentation_tool_default_position;
 zef.h_mesh_tool.Position = [ref(1) + ref(3) - 780, ref(2) + ref(4) - 500, 780, 500];

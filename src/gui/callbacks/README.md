@@ -2,7 +2,7 @@
 
 ## Folder purpose
 
-Click, selection, and apply handlers for Segmentation tables, Settings profile dialogs, a few Figure-tool toggles, plus geometry/prior helpers used by mesh and inverse code. Complements `src/gui/update` (widget → field sync) and `src/core/zef_update.m` (bulk table sync).
+Click, selection, and apply handlers for Segmentation tables, Settings profile dialogs, and a few Figure-tool toggles. Complements `src/gui/update` (widget → field sync) and `src/app/zef_update.m` (bulk table sync). Inverse priors live in `src/inverse`. Mesh geometry predicates live in `src/mesh`.
 
 ## Main contents
 
@@ -28,17 +28,13 @@ Table selection: `zef_parameter_profile_table_selection`, `zef_segmentation_prof
 
 `zef_forward_simulation_table_selection` (script table for Run script)
 
-### Inverse priors (not menu-only)
+### Session lookup
 
-`zef_find_gaussian_prior`, `zef_find_g_hyperprior`, `zef_find_ig_hyperprior` — used by IAS/RAMUS/HBSampler/EXP and `+inverse` IAS/RAMUS inverters
+`zef_find_compartment` — tag lookup for the current session
 
-### Geometry helpers
+### Misc
 
-`zef_find_active_compartment_ind`, `zef_find_relative_resolution`, `zef_find_adjacent_tetra`, `zef_find_intersecting_triangle` (uses `zef_3by3_solver`), `zef_find_subdomain_ind`, plus thinner helpers (`zef_find_compartment`, `zef_find_enclosed_volume`, `zef_find_object_handles`)
-
-### Legacy / misc
-
-`zef_switch_color`, `zef_switch_onoff`, `zef_delete_original_field`, `zef_delete_original_surface_meshes`, `zef_find_synthetic_eit_data`, `zef_add_package` (unused from default menus)
+`zef_delete_original_field`, `zef_delete_original_surface_meshes`, `zef_find_synthetic_eit_data`
 
 ## Code functionality
 
@@ -69,11 +65,11 @@ zef_toggle_figure_controls;
 ## Important notes
 
 - Delete paths usually require the relevant **On** flag unchecked; selection row order may be reversed vs tag order.
-- Prior helpers are shared with class inverters — changing formulas affects both GUI plugins and `+inverse`.
-- `zef_find_synthetic_eit_data` opens a legacy `.fig`; menu strings may still say `find_synthetic_eit_data`.
+- Prior helpers live in `src/inverse`; mesh predicates in `src/mesh`. Changing those formulas still affects both GUI plugins and `+inverse`.
+- `zef_find_synthetic_eit_data` opens `assets/fig/tools/zef_find_synthetic_eit_data.fig`. Compute runs `zef_synthetic_eit_data` → `zef_compute_eit_data`.
 
 ## Developer guidance
 
-- Wire new menu items in `src/gui/tools`; put slider sync in `src/gui/update`; keep bulk table sync in `src/core/zef_update`.
-- Document geometry helper callers when moving files — lead field and mesh postprocess depend on several `zef_find_*` routines.
-- Pitfall: treating this folder as “UI only” and breaking inverse priors or mesh predicates.
+- Wire new menu items in `src/gui/tools`; put slider sync in `src/gui/update`; keep bulk table sync in `src/app/zef_update`.
+- This folder is UI CRUD/selection only. Mesh geometry predicates (`zef_find_active_compartment_ind`, `zef_find_intersecting_triangle`, …) live in `src/mesh`. Inverse SNR / hyperprior helpers (`zef_find_gaussian_prior`, `zef_find_g_hyperprior`, `zef_find_ig_hyperprior`) live in `src/inverse`. Do not add FEM or inverse math here.
+- Pitfall: adding a new `zef_find_*` numerical helper next to these click handlers because older trees used to mix the two.

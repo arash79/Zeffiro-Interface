@@ -1,7 +1,4 @@
 function zef = zef_tes_lead_field_isotropic(zef)
-
-
-
 %ZEF_TES_LEAD_FIELD_ISOTROPIC  TES / tES isotropic lead field (type 5); Mesh-tool Script.
 %
 %   Zeffiro Interface.
@@ -10,7 +7,7 @@ function zef = zef_tes_lead_field_isotropic(zef)
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Default INI Script "tES lead field with isotropic electrical conductivity".
-%   Same body as zef_tes_lead_field. Requires mesh + electrodes; uses
+%   zef_tes_lead_field is an alias of this function. Requires mesh + electrodes; uses
 %   zef.sigma(:,1). Writes zef.L and zef.S.
 %
 %   zef = zef_tes_lead_field_isotropic(zef)

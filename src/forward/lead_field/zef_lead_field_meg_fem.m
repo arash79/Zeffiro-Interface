@@ -7,7 +7,6 @@ function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_fem( ...
     p_nearest_neighbour_inds, ...
     varargin ...
     )
-
 %LEAD_FIELD_MEG_FEM  FEM MEG magnetometer lead field (types 2, 7).
 %
 %   Zeffiro Interface.
@@ -20,6 +19,10 @@ function [L_meg, dipole_locations, dipole_directions] = lead_field_meg_fem( ...
 %   St. Venant), and forms B-field columns at magnetometer locations.
 %   Sensor rows: positions(:,1:3) metres, orientations(:,4:6). Isotropic
 %   sigma(:,1) or anisotropic sigma(:,3:8).
+%
+%   PCG for the stiffness system is inlined here (same Jacobi / SSOR /
+%   ichol-nofill loops as zef_transfer_matrix). This file does not call
+%   zef_transfer_matrix.
 %
 %   [L_meg, dipole_locations, dipole_directions] = zef_lead_field_meg_fem( ...
 %       zef, nodes, elements, sigma, sensors, p_nearest_neighbour_inds, ...
@@ -177,23 +180,22 @@ for i = 1 : 4
     grad_1 = cross(nodes(tetrahedra(:,ind_m(i,2)),:)'-nodes(tetrahedra(:,ind_m(i,1)),:)', nodes(tetrahedra(:,ind_m(i,3)),:)'-nodes(tetrahedra(:,ind_m(i,1)),:)')/2;
     grad_1 = repmat(sign(dot(grad_1,(nodes(tetrahedra(:,i),:)'-nodes(tetrahedra(:,ind_m(i,1)),:)'))),3,1).*grad_1;
 
+    % σ∇ψ_i is independent of the magnetometer index j.
+    cross_mat_aux = zeros(size(tetra_c));
+    cross_mat_aux(1,:) = sigma_tetrahedra(1,:).*grad_1(1,:) + sigma_tetrahedra(4,:).*grad_1(2,:) + sigma_tetrahedra(5,:).*grad_1(3,:);
+    cross_mat_aux(2,:) = sigma_tetrahedra(4,:).*grad_1(1,:) + sigma_tetrahedra(2,:).*grad_1(2,:) + sigma_tetrahedra(6,:).*grad_1(3,:);
+    cross_mat_aux(3,:) = sigma_tetrahedra(5,:).*grad_1(1,:) + sigma_tetrahedra(6,:).*grad_1(2,:) + sigma_tetrahedra(3,:).*grad_1(3,:);
+    tet_i = tetrahedra(:,i);
+
     for j = 1 : L
 
-        cross_mat_aux = zeros(size(tetra_c));
-        cross_mat_aux(1,:) = sigma_tetrahedra(1,:).*grad_1(1,:) + sigma_tetrahedra(4,:).*grad_1(2,:) + sigma_tetrahedra(5,:).*grad_1(3,:);
-        cross_mat_aux(2,:) = sigma_tetrahedra(4,:).*grad_1(1,:) + sigma_tetrahedra(2,:).*grad_1(2,:) + sigma_tetrahedra(6,:).*grad_1(3,:);
-        cross_mat_aux(3,:) = sigma_tetrahedra(5,:).*grad_1(1,:) + sigma_tetrahedra(6,:).*grad_1(2,:) + sigma_tetrahedra(3,:).*grad_1(3,:);
-        sensor_mat_aux = repmat(sensors(1:3,j),1,size(tetra_c,2)) - tetra_c;
+        sensor_mat_aux = sensors(1:3,j) - tetra_c;
         cross_mat = cross(cross_mat_aux, sensor_mat_aux);
-        power_vec = sqrt(sum(sensor_mat_aux.^2));
+        power_vec = sqrt(sum(sensor_mat_aux.^2, 1));
         power_vec = (power_vec.^2).*power_vec;
-        dot_vec = dot(cross_mat,repmat(sensors(4:6,j),1,size(tetra_c,2)))./(3*power_vec);
-        b_vec = zeros(N,1);
-        for b_vec_ind = 1 : K2
-            b_vec(tetrahedra(b_vec_ind,i)) = b_vec(tetrahedra(b_vec_ind,i))+ dot_vec(b_vec_ind);
-        end
-        %b_vec = sparse(tetrahedra(:,i),ones(K2,1),dot_vec',N,1);
-        B(:,j) = B(:,j) + b_vec;
+        ori = sensors(4:6,j);
+        dot_vec = (ori(1)*cross_mat(1,:) + ori(2)*cross_mat(2,:) + ori(3)*cross_mat(3,:))./(3*power_vec);
+        B(:,j) = B(:,j) + accumarray(tet_i, dot_vec(:), [N, 1]);
 
         load_vec_count = load_vec_count + 1;
         if mod(load_vec_count, floor(4*L/50))==0
@@ -229,71 +231,13 @@ A = A_aux;
 clear A_aux;
 
 
-% Face-interior stencil (same construction as zef_fi_dipoles): G_fi maps
-% nodal potentials to FI dipole strengths; T_fi marks the two adjacent tets.
-%Form G_fi and T_fi
-%*******************************
-%*******************************
+% Face-interior stencil: same dipoles as zef_fi_dipoles (shared-face pairs).
 
-%An auxiliary matrix for picking up the correct nodes from tetrahedra
-ind_m = [ 2 3 4 ;
-    3 4 1 ;
-    4 1 2 ;
-    1 2 3 ];
-
-% Next find nodes that share a face
-Ind_cell = cell(1,3);
-
-for i = 1 : 4
-    % Find the global node indices for each tetrahedra
-    % that correspond to indices ind_m(i,:) and set them to increasing order
-    Ind_mat_fi_1 = sort(tetrahedra(brain_ind,ind_m(i,:)),2);
-    for j = i + 1 : 4
-        % The same for indices ind_m(j,:)
-        Ind_mat_fi_2 = sort(tetrahedra(brain_ind,ind_m(j,:)),2);
-        % Set both matrices in one variable, including element index and which node it corresponds
-        Ind_mat = sortrows([ Ind_mat_fi_1 brain_ind(:) i*ones(K,1) ; Ind_mat_fi_2 brain_ind(:) j*ones(K,1) ]);
-        % Find the rows that have the same node indices, i.e. share a face
-        I = find(sum(abs(Ind_mat(1:end-1,1:3)-Ind_mat(2:end,1:3)),2)==0);
-        Ind_cell{i}{j} = [ Ind_mat(I,4) Ind_mat(I+1,4)  Ind_mat(I,5) Ind_mat(I+1,5) ]; %% Make this better
-
-    end
-end
-
-clear Ind_mat_fi_1 Ind_mat_fi_2;
-% Set the node indices and element indices in one matrix
-Ind_mat = [ Ind_cell{1}{2} ; Ind_cell{1}{3} ; Ind_cell{1}{4} ; Ind_cell{2}{3} ; Ind_cell{2}{4} ; Ind_cell{3}{4} ];
-clear Ind_cell;
-% Drop the double and triple rows
-[Ind_mat_fi_2,I] = unique(Ind_mat(:,1:2),'rows');
-clear Ind_mat_fi_2;
-Ind_mat = Ind_mat(I,:);
-% Here we check that all of the elements were from brain layer
-Ind_mat = Ind_mat(find(sum(ismember(Ind_mat(:,1:2),brain_ind),2)),:);
-
-M_fi = size(Ind_mat,1);
-%D = sparse([Ind_mat(:,1) ; Ind_mat(:,2)], repmat([1:M]',2,1), [ones(M,1) ; -ones(M,1)], K2, M);
-
-% Set nodes that share the face
-tetrahedra_aux_ind_1 = sub2ind([K2 4], Ind_mat(:,1), Ind_mat(:,3));
-nodes_aux_vec_1 = nodes(tetrahedra(tetrahedra_aux_ind_1),:);
-tetrahedra_aux_ind_2 = sub2ind([K2 4], Ind_mat(:,2), Ind_mat(:,4));
-nodes_aux_vec_2 = nodes(tetrahedra(tetrahedra_aux_ind_2),:);
-
-%fi_source locations, moments and directions
-fi_source_directions = (nodes_aux_vec_2 - nodes_aux_vec_1);
-fi_source_moments = sqrt(sum(fi_source_directions.^2,2));
-fi_source_directions = fi_source_directions./repmat(sqrt(sum(fi_source_directions.^2,2)),1,3);
-fi_source_locations = (1/2)*(nodes_aux_vec_1 + nodes_aux_vec_2);
-
-clear nodes_aux_vec_1 nodes_aux_vec_2;
-
-% Formulate matrix G
-G_fi = sparse([tetrahedra(tetrahedra_aux_ind_1) ; tetrahedra(tetrahedra_aux_ind_2)], ...
-    repmat([1:M_fi]',2,1),[1./fi_source_moments(:) ; -1./fi_source_moments(:)],N,M_fi);
-T_fi = sparse(repmat([1:M_fi]',2,1),[Ind_mat(:,1);Ind_mat(:,2)],ones(2*M_fi,1), M_fi, K2);
-
-clear I tetrahedra_aux_ind_1 tetrahedra_aux_ind_2;
+[T_fi, G_fi, fi_source_moments, fi_source_directions, fi_source_locations, M_fi] = zef_fi_dipoles( ...
+    nodes, ...
+    tetrahedra, ...
+    brain_ind ...
+    );
 
 %Form G_ew and T_ew
 if source_model == core.types.ZefSourceModel.Hdiv
@@ -368,7 +312,7 @@ clear cross_mat;
 
 zef_waitbar(0,1,h,'PCG iteration.');
 
-if eval('zef.use_gpu')==1 && evalin('base','zef.gpu_count') > 0
+if zef_session_wants_gpu(zef)
     precond_vec = gpuArray(1./full(diag(A)));
     A = gpuArray(A);
 
@@ -546,6 +490,8 @@ end
 
 
 if isequal(lower(direction_mode),'cartesian') || isequal(lower(direction_mode),'normal')
+
+    zef_require_meg_cartesian_interpolation(source_model);
 
     c_tet = (nodes(tetrahedra(:,1),:) + nodes(tetrahedra(:,2),:) + nodes(tetrahedra(:,3),:)+ nodes(tetrahedra(:,4),:))/4;
     dipole_locations = c_tet(source_nonzero_ind,:);

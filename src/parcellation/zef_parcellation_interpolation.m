@@ -178,15 +178,10 @@ for p_ind = p_selected + 1
             MdlKDT = KDTreeSearcher(source_positions);
             source_interpolation_ind = knnsearch(MdlKDT,center_points);
 
-            %zef_waitbar(p_counter,length(p_selected),h,['Interp. 1. ' num2str(p_counter) '/' num2str(length(p_selected))  '.' ]);
-
             source_interpolation_ind = source_interpolation_ind(:);
 
             distance_vec = sum((source_positions(source_interpolation_ind,:)-center_points).^2,2);
 
-            %if not(isempty(rand_perm_aux))
-            %source_interpolation_ind{1} = rand_perm_aux(source_interpolation_ind{1});
-            %end
             parcellation_interpolation_ind{p_ind-1}{1} =  find(mean(sqrt(reshape(distance_vec(center_points_ind), length(cortex_ind), 4)),2)<p_tolerance);
             parcellation_interpolation_ind{p_ind-1}{1} = brain_cortex_ind(parcellation_interpolation_ind{p_ind-1}{1});
 
@@ -223,16 +218,9 @@ for ab_ind = 1 : length(aux_brain_ind)
 
         else
 
-            %if ismember(aux_brain_ind(ab_ind),cortex_surface_ind_aux)
-
             source_positions = parcellation_p(find(p_points_ind_aux == p_ind),:);
 
             if not(isempty(source_positions))
-
-                %aux_point_ind = unique(gather(source_interpolation_ind{1}));
-                %source_positions = source_positions_aux(:,aux_point_ind);
-
-                %s_ind_1{ab_ind} = aux_point_ind;
 
                 center_points = eval(['zef.reuna_p{' int2str(aux_brain_ind(ab_ind)) '}']);
 
@@ -243,19 +231,13 @@ for ab_ind = 1 : length(aux_brain_ind)
                 MdlKDT = KDTreeSearcher(source_positions);
                 source_interpolation_ind = knnsearch(MdlKDT,center_points);
 
-                %zef_waitbar(p_counter,length(p_selected),h,['Interp. 2: ' num2str(p_counter) '/' num2str(length(p_selected))  ',' num2str(ab_ind) '/' num2str(length(aux_brain_ind)) '.']);
-
                 source_interpolation_ind = source_interpolation_ind(:);
 
                 distance_vec = sum((source_positions(source_interpolation_ind,:)-center_points).^2,2);
 
-                %if not(isempty(rand_perm_aux))
-                %source_interpolation_ind{2}{ab_ind} = rand_perm_aux(source_interpolation_ind{2});
-                %end
                 parcellation_interpolation_ind{p_ind-1}{2}{ab_ind} = find(mean(sqrt(distance_vec(triangles)),2)<p_tolerance);
 
             end
-            %end
         end
     end
 end

@@ -33,9 +33,6 @@ properties (Access = public)
         h_menu_import_segmentation_update_from_folder  matlab.ui.container.Menu
         h_menu_new_segmentation_from_folder_legacy  matlab.ui.container.Menu
         h_menu_import_segmentation_update_from_folder_legacy  matlab.ui.container.Menu
-        h_menu_import_new_project_from_folder  matlab.ui.container.Menu
-        h_menu_import_project_update_from_folder  matlab.ui.container.Menu
-        h_menu_import_volume_data       matlab.ui.container.Menu
         h_menu_import_measurement_data  matlab.ui.container.Menu
         h_menu_import_noise_data        matlab.ui.container.Menu
         h_menu_import_reconstruction    matlab.ui.container.Menu
@@ -94,33 +91,6 @@ properties (Access = public)
         h_menu_help                     matlab.ui.container.Menu
         h_menu_documentation            matlab.ui.container.Menu
         h_menu_about                    matlab.ui.container.Menu
-        h_menu_logo                     matlab.ui.control.Image
-        CheckBox                        matlab.ui.control.CheckBox
-    end
-
-
-    % -------------------------------------------------------------------------
-    % Private helper: legacy CreateFcn support for App Designer callbacks
-    % -------------------------------------------------------------------------
-    methods (Access = private)
-        function local_CreateFcn(app, hObject, eventdata, createfcn, appdata)
-            % Store any application data on the graphics object for callbacks.
-            if ~isempty(appdata)
-               names = fieldnames(appdata);
-               for i = 1:length(names)
-                   name = char(names(i));
-                   setappdata(hObject, name, getfield(appdata, name));
-               end
-            end
-            % Execute the create function (handle or string) if provided.
-            if ~isempty(createfcn)
-               if isa(createfcn, 'function_handle')
-                   createfcn(hObject, eventdata);
-               else
-                   eval(createfcn);
-               end
-            end
-        end
     end
 
     % -------------------------------------------------------------------------
@@ -231,21 +201,6 @@ properties (Access = public)
             % Create h_menu_import_segmentation_update_from_folder_legacy
             app.h_menu_import_segmentation_update_from_folder_legacy = uimenu(app.h_menu_import);
             app.h_menu_import_segmentation_update_from_folder_legacy.Text = 'Import segmentation update from folder (legacy)';
-
-            % Create h_menu_import_new_project_from_folder
-            app.h_menu_import_new_project_from_folder = uimenu(app.h_menu_import);
-            app.h_menu_import_new_project_from_folder.Visible = 'off';
-            app.h_menu_import_new_project_from_folder.Text = 'Import new ASCII project from folder';
-
-            % Create h_menu_import_project_update_from_folder
-            app.h_menu_import_project_update_from_folder = uimenu(app.h_menu_import);
-            app.h_menu_import_project_update_from_folder.Visible = 'off';
-            app.h_menu_import_project_update_from_folder.Text = 'Import ASCII project update from folder';
-
-            % Create h_menu_import_volume_data
-            app.h_menu_import_volume_data = uimenu(app.h_menu_import);
-            app.h_menu_import_volume_data.Visible = 'off';
-            app.h_menu_import_volume_data.Text = 'Import volume data';
 
             % Create h_menu_import_measurement_data
             app.h_menu_import_measurement_data = uimenu(app.h_menu_import);
@@ -485,18 +440,13 @@ properties (Access = public)
             app.h_menu_about = uimenu(app.h_menu_help);
             app.h_menu_about.Text = 'About';
 
-            % Create CheckBox
-            app.CheckBox = uicheckbox(app.h_zeffiro_menu);
-            app.CheckBox.Visible = 'off';
-            app.CheckBox.Position = [43 346 81 22];
-
-            % Create logo image (ZEFFIRO compass logo).
-            app.h_menu_logo = uiimage(app.h_zeffiro_menu);
-            app.h_menu_logo.Position = [18 80 764 229];
-            app.h_menu_logo.ImageSource = 'zeffiro_logo_compass.png';
-
-            % Make the figure visible after all components are created.
-            app.h_zeffiro_menu.Visible = 'on';
+            % Stay hidden. The unified shell owns navigation; this
+            % uifigure is only the live uimenu callback owner.
+            app.h_zeffiro_menu.Visible = 'off';
+            try
+                app.h_zeffiro_menu.HandleVisibility = 'off';
+            catch
+            end
         end
     end
 
@@ -515,9 +465,27 @@ properties (Access = public)
                 createComponents(app);
                 registerApp(app, app.h_zeffiro_menu);
             else
-                % Instance already running: bring its figure to front and return it.
-                figure(runningApp.h_zeffiro_menu);
+                % Reuse the existing menu owner. Do not figure() it: that
+                % exposes the legacy menu-bar window when the unified shell
+                % already owns navigation.
                 app = runningApp;
+                raise_menu = true;
+                try
+                    zef_live = evalin('base', 'zef');
+                    if isstruct(zef_live) && isfield(zef_live, 'h_zeffiro') ...
+                            && zef_ui_is_unified(zef_live.h_zeffiro)
+                        raise_menu = false;
+                    end
+                catch
+                end
+                if raise_menu
+                    figure(runningApp.h_zeffiro_menu);
+                else
+                    try
+                        runningApp.h_zeffiro_menu.Visible = 'off';
+                    catch
+                    end
+                end
             end
 
             % If no output requested, do not leave app in base workspace.

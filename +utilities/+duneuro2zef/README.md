@@ -9,9 +9,11 @@ Convert a Duneuro/FieldTrip-style export folder into Zeffiro tetra mesh, source 
 | Entry | Role |
 |-------|------|
 | `run.m` / `Duneuro2Zeffiro_convert.m` | Convert files → `output_folder` `.mat`s |
+| `Duneuro2Zeffiro_settings.m` | Interactive / default settings overlay used by the convert path |
 | `import_duneuro_project.m` | Conversion + `zef_import_segmentation` on bundled `.zef` |
 | `convert_mesh.m` | Hexa → tetra (`zef_hexa_to_tetra`) |
 | `process_source_space` / `process_sensors` / `process_eeg_data` / `process_meg_data` | Modality processors |
+| `process_resection_points.m` | Optional `resection_points.dat` → Zeffiro resection coords |
 | `EEG_to_databank` / `MEG_to_databank` | Data-bank population |
 | `get_default_config` / `validate_config` / `find_files` | Config helpers |
 | `Duneuro2Zeffiro_import.zef` | Import recipe (hard-codes `data/converted/` style paths) |

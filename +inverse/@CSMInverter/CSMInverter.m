@@ -8,7 +8,7 @@ classdef CSMInverter < inverse.CommonInverseParameters & handle
 %
 %   method_type selects the algorithm. dSPM and sLORETA share a precomputed
 %   minimum-norm backbone P = L'/(L*L'+S) with per-source standardization d;
-%   3D sLORETA applies block-wise sqrtm corrections per dipole triplet. SBL runs
+%   3D sLORETA applies block-wise G^{-1/2} corrections per dipole triplet. SBL runs
 %   iterative gamma updates from the data covariance.
 %
 %   See also inverse.MNEInverter, inverse.ELORETAInverter.
@@ -37,6 +37,17 @@ classdef CSMInverter < inverse.CommonInverseParameters & handle
 
         % Cached standardization vector for dSPM/sLORETA
         precomputed_d (:,1) {mustBeA(precomputed_d,["double","gpuArray"])} = []
+
+        % Cached 3×3 G^{-1/2} pages for sLORETA 3D (3 x 3 x n_sources)
+        precomputed_Minv {mustBeA(precomputed_Minv,["double","gpuArray"])} = []
+
+        % Fingerprint of the lead field and of every setting precompute baked
+        % into the caches above: method_type, theta0 and signal_to_noise_ratio.
+        % P depends on the latter two through S = (10^(-SNR/20)^2 / theta0) I,
+        % the sLORETA scaling uses theta0 directly, and d has a different
+        % definition per method_type. invert discards the caches on any
+        % mismatch. See inverse.precompute_cache_key.
+        precomputed_cache_key struct = struct([])
 
     end % properties
 
@@ -102,6 +113,20 @@ classdef CSMInverter < inverse.CommonInverseParameters & handle
 
             self.theta0 = args.theta0;
 
+        end
+
+        function key = cacheKey(self, L)
+            %cacheKey  Fingerprint of L plus every setting the caches depend on.
+            %
+            %   P depends on theta0 and signal_to_noise_ratio through
+            %   S = (10^(-SNR/20)^2 / theta0) I, and the standardization
+            %   vector d is defined differently for each method_type, so all
+            %   three belong in the key. Used by precompute to stamp the
+            %   caches and by invert to validate them.
+            key = inverse.precompute_cache_key(L, { ...
+                self.method_type, ...
+                gather(double(self.theta0)), ...
+                double(self.signal_to_noise_ratio)});
         end
 
         % Declare the initialize and inverse method defined in the files invert and initialize in this same

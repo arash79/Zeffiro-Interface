@@ -64,10 +64,6 @@ z_vec=z_inverse{f_ind};
         z_aux(s_ind_2) = z_vec;
     end
 
-%    if number_of_frames > 1
-        z{f_ind} = z_aux;
-%     else
-%         z = z_aux;
-%     end
+    z{f_ind} = z_aux;
 
 end

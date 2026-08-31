@@ -1,8 +1,8 @@
 # inverse.DipoleScanInverter
 
-## Folder purpose
+Instead of reconstructing a distributed current, a dipole scan asks: if there were one dipole *here*, how well would it explain the sensors? Each location gets a goodness-of-fit, not a current amplitude. Peaks in the reconstruction are therefore “this is a plausible single-dipole site”, not “this is how strong the source is”.
 
-Class package for **dipole scanning**: per-source fits on whitened data that store **goodness-of-fit** (not dipole amplitudes) in the reconstruction vector. Registry ids: `dipolescan`, `dipole_scan`.
+Registry ids: `dipolescan`, `dipole_scan`.
 
 ## Main contents
 

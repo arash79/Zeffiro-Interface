@@ -142,18 +142,12 @@ if plot_mode == 3
                 hold(evalin('base','zef.h_axes1'),'on');
             end
         end
-        %set(evalin('base','zef.h_axes1'),'xticklabel',[]);
         set(evalin('base','zef.h_axes1'),'ticklength',[0 0]);
         set(evalin('base','zef.h_axes1'),'xlim',[x_vals(1) x_vals(end)]);
         set(evalin('base','zef.h_axes1'),'ylim',[0 1.05*max(y_vals(:))]);
         set(evalin('base','zef.h_axes1'),'ygrid','on');
         legend(parcellation_list(selected_list(color_perm)))
-        %x_labels = text(x_vals-0.25,-0.01*max(y_vals)*ones(size(x_vals)),parcellation_list(selected_list),'Parent',evalin('base','zef.h_axes1'));
-        %y_label = text(1.01*(length(x_vals)+1),1.05*max(y_vals)/2,y_string,'Parent',evalin('base','zef.h_axes1'));
-        %set(x_labels,'HorizontalAlignment','right','VerticalAlignment','top', 'Rotation',90, 'Fontsize', 8);
         hold(evalin('base','zef.h_axes1'),'off');
-        %set(x_labels,'HorizontalAlignment','right','VerticalAlignment','top', 'Rotation',90, 'Fontsize', 8);
-        %set(y_label,'HorizontalAlignment','right','VerticalAlignment','top', 'Rotation',90, 'Fontsize', 8);
 
     end
 

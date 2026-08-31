@@ -63,18 +63,18 @@ function report = validate_environment(options)
         report.valid = false;
         report.errors{end+1} = 'FREESURFER_HOME is not set';
         if options.verbose
-            fprintf('❌ FREESURFER_HOME: NOT SET\n');
+            fprintf('FREESURFER_HOME: NOT SET\n');
         end
     else
         if ~isfolder(FREESURFER_HOME)
             report.valid = false;
             report.errors{end+1} = sprintf('FREESURFER_HOME points to non-existent directory: %s', FREESURFER_HOME);
             if options.verbose
-                fprintf('❌ FREESURFER_HOME: %s (DOES NOT EXIST)\n', FREESURFER_HOME);
+                fprintf('FREESURFER_HOME: %s (DOES NOT EXIST)\n', FREESURFER_HOME);
             end
         else
             if options.verbose
-                fprintf('✅ FREESURFER_HOME: %s\n', FREESURFER_HOME);
+                fprintf('FREESURFER_HOME: %s\n', FREESURFER_HOME);
             end
             
             % Check for build-stamp.txt
@@ -82,7 +82,7 @@ function report = validate_environment(options)
             if ~isfile(build_stamp)
                 report.warnings{end+1} = 'build-stamp.txt not found - FreeSurfer may not be properly installed';
                 if options.verbose
-                    fprintf('⚠️  build-stamp.txt: NOT FOUND\n');
+                    fprintf('build-stamp.txt: NOT FOUND\n');
                 end
             end
         end
@@ -96,17 +96,17 @@ function report = validate_environment(options)
         if isempty(SUBJECTS_DIR)
             report.warnings{end+1} = 'SUBJECTS_DIR is not set';
             if options.verbose
-                fprintf('⚠️  SUBJECTS_DIR: NOT SET\n');
+                fprintf('SUBJECTS_DIR: NOT SET\n');
             end
         elseif ~isfolder(SUBJECTS_DIR)
             report.warnings{end+1} = sprintf('SUBJECTS_DIR does not exist: %s', SUBJECTS_DIR);
             if options.verbose
-                fprintf('⚠️  SUBJECTS_DIR: %s (DOES NOT EXIST)\n', SUBJECTS_DIR);
+                fprintf('SUBJECTS_DIR: %s (DOES NOT EXIST)\n', SUBJECTS_DIR);
             end
         else
             report.subjects_dir = SUBJECTS_DIR;
             if options.verbose
-                fprintf('✅ SUBJECTS_DIR: %s\n', SUBJECTS_DIR);
+                fprintf('SUBJECTS_DIR: %s\n', SUBJECTS_DIR);
             end
         end
     end
@@ -118,11 +118,11 @@ function report = validate_environment(options)
             report.valid = false;
             report.errors{end+1} = sprintf('FreeSurfer bin directory not found: %s', FS_BIN);
             if options.verbose
-                fprintf('❌ FreeSurfer bin: NOT FOUND\n');
+                fprintf('FreeSurfer bin: NOT FOUND\n');
             end
         else
             if options.verbose
-                fprintf('✅ FreeSurfer bin: %s\n', FS_BIN);
+                fprintf('FreeSurfer bin: %s\n', FS_BIN);
             end
         end
     end
@@ -144,11 +144,11 @@ function report = validate_environment(options)
             report.valid = false;
             report.errors{end+1} = sprintf('Required binary not found: %s', bin_name);
             if options.verbose
-                fprintf('❌ %s: NOT FOUND\n', bin_name);
+                fprintf('%s: NOT FOUND\n', bin_name);
             end
         else
             if options.verbose
-                fprintf('✅ %s: FOUND\n', bin_name);
+                fprintf('%s: FOUND\n', bin_name);
             end
         end
     end
@@ -169,11 +169,11 @@ function report = validate_environment(options)
         if ~found
             report.warnings{end+1} = sprintf('Optional binary not found: %s', bin_name);
             if options.verbose
-                fprintf('⚠️  %s: NOT FOUND\n', bin_name);
+                fprintf('%s: NOT FOUND\n', bin_name);
             end
         else
             if options.verbose
-                fprintf('✅ %s: FOUND\n', bin_name);
+                fprintf('%s: FOUND\n', bin_name);
             end
         end
     end
@@ -181,7 +181,7 @@ function report = validate_environment(options)
     % Summary
     if options.verbose
         fprintf('\n=== Validation Summary ===\n');
-        fprintf('Status: %s\n', iff(report.valid, '✅ VALID', '❌ INVALID'));
+        fprintf('Status: %s\n', iff(report.valid, 'VALID', 'INVALID'));
         fprintf('Errors: %d\n', numel(report.errors));
         fprintf('Warnings: %d\n', numel(report.warnings));
         

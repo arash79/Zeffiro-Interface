@@ -5,7 +5,6 @@ function [stensil, signs, source_moments, source_directions, source_locations, n
     ,              ...
     brain_ind  ...
     )
-
 %ZEF_FI_DIPOLES  Face-interior dipole stencils for H(div) sources.
 %
 %   Zeffiro Interface.
@@ -16,8 +15,8 @@ function [stensil, signs, source_moments, source_directions, source_locations, n
 %   Finds pairs of brain tetrahedra that share a face. Each pair defines a
 %   face-interior dipole: location at the midpoint of the two opposite
 %   vertices, direction along that segment, moment equal to the segment
-%   length. zef_lead_field_matrix uses the stencil to keep only tetrahedra
-%   with four neighbours (interior, not on the cortex surface).
+%   length. Interior occupancy (four brain-face neighbours) is computed
+%   separately in zef_lead_field_matrix without building G_fi.
 %
 %   [stensil, signs, source_moments, source_directions, source_locations, n_of_adj_tetra] = ...
 %       zef_fi_dipoles(nodes, tetrahedra, brain_ind)
@@ -38,94 +37,72 @@ function [stensil, signs, source_moments, source_directions, source_locations, n
 %   See also zef_ew_dipoles, zef_lead_field_matrix.
 
 
-wb = zef_waitbar(0,1,'Face intersecting dipoles.');
-
-% Define cleanup operations
-
-cleanup_fn = @(h) close(h);
-cleanup_obj = onCleanup(@() cleanup_fn(wb));
-
 % Matrix sizes
 
 n_of_nodes = size(nodes, 1);
 n_of_tetra_in_brain = length(brain_ind);
 n_of_tetra = size(tetrahedra, 1);
 
-% Iterate to find nodes that share a face. But first initialize a storage
-% tuple that can be arranged later.
+% Shared faces among brain tetrahedra: one unique-key pass over all 4
+% faces per tet, then pair the two incidences of each interior face.
+% Equivalent to the previous 6 sortrows of opposite-face combinations;
+% neighbour tet sets and opposite-vertex node pairs are the same.
 
-Ind_cell = cell(1,3);
-
-for node_i = 1 : 4
-
-    % From the tetra in the brain, take faces (node index triples)
-    % constructed from the neighbours of node node_i in the same tetrahedron
-    % and sort the node indices in increasing order.
-
-    tetra_faces_1 = sort(tetrahedra(brain_ind, tetra_face_opposite_to(node_i)), 2);
-
-    for node_j = node_i + 1 : 4
-
-        % Take another face (node index triplet) from the same tetrahedra
-        % and perform a similar sorting operation.
-
-        tetra_faces_2 = sort(tetrahedra(brain_ind, tetra_face_opposite_to(node_j)), 2);
-
-        % Sort faces starting from the leftmost column, so that any
-        % identical faces (node index triples) end up at the same row
-        % index, with the help of brain_indices and vectors of node
-        % indices.
-
-        % matrix of (face (triple), corresponding tetrahedron index, extremal node)
-
-        sorted_tetra_faces = sortrows([                                ...
-            tetra_faces_1 brain_ind(:) node_i*ones(n_of_tetra_in_brain,1) ; ...
-            tetra_faces_2 brain_ind(:) node_j*ones(n_of_tetra_in_brain,1)   ...
-            ]);
-
-        % Find the rows that have the same node triplets, i.e. share a
-        % face by subtracting and finding zeros.
-
-        I = find(                                   ...
-            0 == sum(                               ...
-            abs(                                ...
-            sorted_tetra_faces(1:end-1,1:3) ...
-            -                               ...
-            sorted_tetra_faces(2:end,1:3)   ...
-            )                                   ...
-            ,                                       ...
-            2                                   ...
-            )                                       ...
-            );
-
-        % Feed the indices into storage tuple.
-
-        Ind_cell{node_i}{node_j} = [  ...
-            sorted_tetra_faces(I,4)   ...
-            sorted_tetra_faces(I+1,4) ...
-            sorted_tetra_faces(I,5)   ...
-            sorted_tetra_faces(I+1,5) ...
-            ];
-
+if isempty(brain_ind)
+    sorted_tetra_faces = zeros(0, 4);
+else
+    face_opp = [
+        2 3 4
+        1 3 4
+        1 2 4
+        1 2 3
+        ];
+    keys = zeros(4 * n_of_tetra_in_brain, 3);
+    owners = zeros(4 * n_of_tetra_in_brain, 1);
+    opp = zeros(4 * n_of_tetra_in_brain, 1);
+    for f = 1:4
+        sl = (f - 1) * n_of_tetra_in_brain + (1:n_of_tetra_in_brain);
+        keys(sl, :) = sort(tetrahedra(brain_ind, face_opp(f, :)), 2);
+        owners(sl) = brain_ind;
+        opp(sl) = f;
     end
+    [~, ~, ic] = unique(keys, 'rows');
+    counts = accumarray(ic, 1);
+
+    % Only faces with exactly two incidences yield a dipole: one incidence is
+    % a boundary face of the brain submesh, and more than two means the
+    % submesh is non-manifold, where the midpoint-of-opposite-vertices
+    % construction below is not defined. Boundary faces are expected and
+    % silent, but a non-manifold face costs the caller source positions with
+    % nothing else to signal it, so say so. The upstream formulation paired
+    % consecutive duplicates instead, which on a 4-way shared face emitted
+    % dipoles between arbitrary members of the group.
+    n_non_manifold = nnz(counts > 2);
+    if n_non_manifold > 0
+        warning('zef_fi_dipoles:nonManifoldFaces', ...
+            ['%d face(s) of the brain submesh are shared by more than two ' ...
+            'tetrahedra, so no face-interior dipole is defined there and ' ...
+            'they are skipped. Check the mesh for duplicated or ' ...
+            'overlapping elements.'], n_non_manifold);
+    end
+
+    row_ok = counts(ic) == 2;
+    ic_s = ic(row_ok);
+    owners_s = owners(row_ok);
+    opp_s = opp(row_ok);
+    [ic_s, ord] = sort(ic_s);
+    owners_s = owners_s(ord);
+    opp_s = opp_s(ord);
+    a = owners_s(1:2:end);
+    b = owners_s(2:2:end);
+    oa = opp_s(1:2:end);
+    ob = opp_s(2:2:end);
+    swap = a > b;
+    tmp = a(swap); a(swap) = b(swap); b(swap) = tmp;
+    tmp = oa(swap); oa(swap) = ob(swap); ob(swap) = tmp;
+    [~, Iu] = unique([a b], 'rows');
+    sorted_tetra_faces = [a(Iu) b(Iu) oa(Iu) ob(Iu)];
 end
-
-% Set the node and element indices in one matrix.
-
-sorted_tetra_faces = [
-    Ind_cell{1}{2} ; Ind_cell{1}{3} ; Ind_cell{1}{4} ; ...
-    Ind_cell{2}{3} ; Ind_cell{2}{4} ;                  ...
-    Ind_cell{3}{4}
-    ];
-
-% Drop the double and triple rows.
-
-[~, I] = unique(sorted_tetra_faces(:,1:2),'rows');
-sorted_tetra_faces = sorted_tetra_faces(I,:);
-
-% Check that all of the elements were from a brain layer.
-
-sorted_tetra_faces = sorted_tetra_faces(find(sum(ismember(sorted_tetra_faces(:,1:2),brain_ind),2)),:);
 
 % Set node pairs that share a face.
 
@@ -172,26 +149,5 @@ stensil = sparse(                                       ...
     ,                                                       ...
     n_of_tetra                                          ...
     );
-
-zef_waitbar(1,1, wb);
-
-end
-
-function face = tetra_face_opposite_to(node_ind)
-
-% Returns the node index triple corresponding to the face opposite to the
-% given node index.
-
-arguments
-    node_ind (1,1) double { mustBeInteger, mustBePositive }
-end
-
-all_node_inds = [1, 2, 3, 4];
-
-if not(ismember(node_ind, all_node_inds))
-    error('Tetrahedra only have node indices from 1 to 4.');
-end
-
-face = setdiff(all_node_inds, node_ind);
 
 end

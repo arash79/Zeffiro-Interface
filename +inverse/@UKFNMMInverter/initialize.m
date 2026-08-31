@@ -10,11 +10,13 @@ function self = initialize(self, L, f_data)
 %   Resets filter state so a new run does not reuse the previous mean or
 %   covariance. Builds:
 %     - noise_cov from SNR (or trace-normalises a user matrix)
-%     - theta0 from early-frame data variance and per-triplet lead-field
-%       energy
+%     -     theta0 from early-frame data variance and zef_leadfield_column_energy
+%       (interleaved xyz triples)
 %     - evolution_cov / evolution_var from evolution_prior_model
 %     - modified_L by replacing each source's three lead-field columns
 %       with the thin SVD left vectors U
+%     - u_to_dipole = V S^{+} so NMM can recover physical dipoles from
+%       the U-space Kalman state
 %     - identity A when state_transition_model_A is empty
 %
 %   Requires a 3-component (xyz) source layout: size(L,2) must be
@@ -60,6 +62,7 @@ function self = initialize(self, L, f_data)
     self.posterior_covs = cell(0);
     self.n_temporal_postprocess_runs = 0;
     self.modified_L = [];
+    self.u_to_dipole = [];
 
     external_Q = [];
     if strcmp(self.evolution_prior_model, "User supplied Q")
@@ -87,7 +90,7 @@ function self = initialize(self, L, f_data)
             data_var = noise_p2;
         end
     end
-    sensitivity = repelem(sum(reshape(sum(L.^2), 3, [])), 3);
+    sensitivity = zef_leadfield_column_energy(L, 1);
     if any(~isfinite(sensitivity)) || any(sensitivity <= 0)
         error("UKFNMMInverter:InvalidLeadFieldSensitivity", ...
             "Per-source lead-field energy is zero or non-finite; cannot form theta0.");
@@ -141,14 +144,14 @@ function self = initialize(self, L, f_data)
             f = diff(f_data')';
             f = sum(f.^2, 2) ./ sum(f_data.^2, 2);
             S = max(S.^2, noise_p2 / (1 - noise_p2));
-            self.evolution_cov = (mean(f ./ S) * 10^(self.evolution_prior_db / 20)) * eye(size(L, 2));
+            self.evolution_cov = (mean(f ./ S) * 10^(self.evolution_prior_db / 20)) * speye(size(L, 2));
         case "Reworked original"
             self.evolution_cov = self.time_step * (svds(L, 1).^(2) / sum(L(:).^2)) ...
-                * 10^(self.evolution_prior_db / 20) * eye(size(L, 2));
+                * 10^(self.evolution_prior_db / 20) * speye(size(L, 2));
     end
 
     if isempty(self.state_transition_model_A)
-        self.state_transition_model_A = eye(size(L, 2));
+        self.state_transition_model_A = speye(size(L, 2));
     else
         if ~isequal(size(self.state_transition_model_A), [size(L, 2), size(L, 2)])
             error("UKFNMMInverter:BadTransitionSize", ...
@@ -157,7 +160,7 @@ function self = initialize(self, L, f_data)
         end
     end
 
-    self.modified_L = i_build_modified_lead_field(L);
+    [self.modified_L, self.u_to_dipole] = i_build_modified_lead_field(L);
 end
 
 function i_require_triplet_lead_field(L)
@@ -175,24 +178,32 @@ if n_sensors < 3
 end
 end
 
-function modified_L = i_build_modified_lead_field(L)
+function [modified_L, u_to_dipole] = i_build_modified_lead_field(L)
 %I_BUILD_MODIFIED_LEAD_FIELD  Replace each xyz triplet with thin SVD U.
 %
 %   For source n, L_n = L(:, 3n-2:3n) is n_sensors-by-3. svd(..., "econ")
 %   returns U of size n_sensors-by-3 when n_sensors >= 3, which replaces
-%   those columns. U is orthonormal and spans the same column space as
-%   L_n. This is the committed spatial observation model of 0b33ef8c, not
-%   sLORETA standardization.
+%   those columns as the Kalman observation model (y = U x_U). Physical
+%   dipoles satisfy L_n p = U S V' p, so x_U = S V' p and
+%   p = V S^{+} x_U (tiny singular values dropped).
 n_sources = size(L, 2) / 3;
 modified_L = L;
+u_to_dipole = zeros(3, 3, n_sources);
 for n = 1:n_sources
     s_ind = 3 * n - [2, 1, 0];
-    [u, ~, ~] = svd(L(:, s_ind), "econ");
+    [u, S, V] = svd(L(:, s_ind), "econ");
     if size(u, 2) ~= 3 || size(u, 1) ~= size(L, 1)
         error("UKFNMMInverter:ModifiedLeadFieldShape", ...
             "SVD of source %d produced U of size %s; expected %d-by-3.", ...
             n, mat2str(size(u)), size(L, 1));
     end
     modified_L(:, s_ind) = u;
+    s = diag(S);
+    smax = max(s);
+    tol = max(smax, eps) * eps * numel(s);
+    sinv = zeros(size(s));
+    keep = s > tol;
+    sinv(keep) = 1 ./ s(keep);
+    u_to_dipole(:, :, n) = V * diag(sinv);
 end
 end

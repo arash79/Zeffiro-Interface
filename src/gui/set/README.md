@@ -10,12 +10,11 @@ Helpers that **push `zef` state onto graphics objects** (figure tool axes, color
 |------|------|
 | `zef_set_size_change_function` | Hook `SizeChangedFcn` → `zef_change_size_function` |
 | `zef_set_sliders_plot` / `zef_set_sliders_print` | Init time/colorscale sliders for plot vs print |
-| `zef_set_color` / `zef_set_compartment_color` / `zef_set_sensor_color` | Patch/line colors from table selections |
+| `zef_set_compartment_color` / `zef_set_sensor_color` | Patch/line colors from table selections |
 | `zef_set_lights` | Scene lighting from slider vector |
-| `zef_set_linear_colorbar_ticks` | Colorbar tick formatting |
 | `zef_set_surface_resolution` / `zef_set_timepointline` | Mesh/time UI helpers |
 | `zef_set_position` | Segmentation tool window placement |
-| `zef_set_menu_size` / `zef_set_figure_current_size` | Window geometry bookkeeping |
+| `zef_set_figure_current_size` | Figure-tool window geometry bookkeeping |
 
 ## Code functionality
 
@@ -43,4 +42,4 @@ Usually invoked from callbacks, not typed by end users.
 
 - Keep color application consistent with compartment table columns (RGB in `zef`).
 - New figure-tool chrome: add a `zef_set_*` rather than embedding graphics code in update scripts.
-- Coordinate with `zef_change_size_function` in helpers for responsive layouts.
+- Coordinate with `zef_change_size_function` in `src/gui/chrome` for responsive layouts.

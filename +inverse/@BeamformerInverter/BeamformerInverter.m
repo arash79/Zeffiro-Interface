@@ -10,6 +10,7 @@ classdef BeamformerInverter < inverse.CommonInverseParameters & handle
 %   are Mahalanobis-whitened (C\\L). Weights w = (L' C^{-1} L + lambda I)^{-1} L' C^{-1} f
 %   with optional UNG / unit-gain normalization. Unit-gain constrained mode picks
 %   optimal orientation via dominant eigenvector of L'*L (Rayleigh–Ritz).
+%   precompute caches the linear operator B so each frame is z = B*f.
 %
 %   See also inverse.DipoleScanInverter.
 %
@@ -57,6 +58,16 @@ classdef BeamformerInverter < inverse.CommonInverseParameters & handle
         % causes action.
         %
         computing_parameters (1,1) {mustBeNumericOrLogical} = false
+
+        % Cached linear operator B so each frame is z = B*f. Built by
+        % precompute from regularized error_cov, L, and the current method /
+        % lead-field regularization / normalization settings.
+        precomputed_inverse_operator (:,:) {mustBeA(precomputed_inverse_operator,["double","gpuArray"])} = []
+
+        % Fingerprint of the lead field, orientation split and settings B was
+        % built from. invert discards B on any mismatch. See
+        % inverse.precompute_cache_key.
+        precomputed_cache_key struct = struct([])
 
     end % properties
     properties (SetObservable)
@@ -154,7 +165,40 @@ classdef BeamformerInverter < inverse.CommonInverseParameters & handle
 
         self = initialize(self, L, f_data)
 
+        self = precompute(self, L, procFile)
+
         [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
+
+        function key = cacheKey(self, L, procFile)
+            %cacheKey  Fingerprint of L plus every setting B depends on.
+            %
+            %   B is assembled from the ridge-regularized error_cov, the
+            %   beamformer variant, the lead-field regularization and
+            %   normalization choices, and the fixed/free orientation split
+            %   taken from procFile.
+            if nargin < 3 || ~isstruct(procFile)
+                s_ind_0 = []; s_ind_4 = [];
+            else
+                s_ind_0 = i_field(procFile, "s_ind_0");
+                s_ind_4 = i_field(procFile, "s_ind_4");
+            end
+            key = inverse.precompute_cache_key(L, { ...
+                self.method_type, ...
+                double(self.cov_reg_parameter), ...
+                double(self.leadfield_reg_parameter), ...
+                self.leadfield_reg_type, ...
+                self.leadfield_normalization, ...
+                gather(double(self.error_cov)), ...
+                s_ind_0, s_ind_4});
+
+            function v = i_field(s, name)
+                if isfield(s, name) && ~isempty(s.(name))
+                    v = double(s.(name)(:));
+                else
+                    v = [];
+                end
+            end
+        end
 
         % Function that ZI runs after all inversions are done for each
         % desired time steps. With this function, one can reset the
@@ -166,6 +210,8 @@ classdef BeamformerInverter < inverse.CommonInverseParameters & handle
             if not(self.error_covSetted)
                 self.error_cov = [];
             end
+            self.precomputed_inverse_operator = [];
+            self.precomputed_cache_key = struct([]);
         end
 
     end % methods

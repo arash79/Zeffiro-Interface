@@ -14,7 +14,8 @@ NSE mass/Laplacian products live in `../barycentric/`, not here.
 
 | File | Role |
 |------|------|
-| `zef_stiffness_matrix.m` | Assemble `A` from `nodes`, `tetra`, packed conductivity `σ` (6×T) |
+| `zef_stiffness_matrix.m` | Assemble `A` from `nodes`, `tetrahedra`, tet `volume`, packed conductivity `tensor` (6×T) |
+| `zef_p1_unweighted_gradient_products.m` | Packed ∫∇ψ_i·∇ψ_j dV (EIT Jacobian `D_A`; no off-diagonal σ products) |
 
 ## Code functionality
 
@@ -33,17 +34,19 @@ Assembly: local vertices i ≤ j into `sparse(...)`; off-diagonals add `A_part +
 ## Workflow context
 
 ```
-zef_build_electrodes → zef_stiffness_matrix → zef_transfer_matrix (PCG) → lead_field_*_fem → zef.L
+zef_tetra_volume → zef_stiffness_matrix → zef_build_electrodes → zef_transfer_matrix (PCG) → lead_field_*_fem → zef.L
 ```
 
-Callers: `zef_lead_field_eeg_fem` and other `src/forward/lead_field` assemblers.
+Callers: `zef_lead_field_eeg_fem`, `zef_lead_field_meg_fem`, `zef_lead_field_tes_fem` (and sibling FEM cores) in `src/forward/lead_field`. Electrode coupling **augments** the already-assembled `A`; it is not an input to stiffness.
 
 ## Usage instructions
 
 Not usually called alone. Prefer modality `make_all` / `zef_lead_field_matrix`. Direct use:
 
 ```matlab
-A = zef_stiffness_matrix(nodes, tetra, sigma_packed);
+volume = zef_tetra_volume(nodes, tetrahedra, true);   % abs volumes, metres on the LF path
+A = zef_stiffness_matrix(nodes, tetrahedra, volume, tensor);
+% tensor is 6×T: rows σ_xx, σ_yy, σ_zz, σ_xy, σ_xz, σ_yz
 ```
 
 ## Important notes

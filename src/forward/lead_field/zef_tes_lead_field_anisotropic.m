@@ -1,7 +1,4 @@
 function zef = zef_tes_lead_field_anisotropic(zef)
-
-
-
 %ZEF_TES_LEAD_FIELD_ANISOTROPIC  TES / tES anisotropic lead field (type 10).
 %
 %   Zeffiro Interface.

@@ -9,8 +9,8 @@ function zef = zef_update_fig_details(zef)
 %   Function. Called at the end of zef_figure_tool and after Visualize
 %   volume/surfaces. Does not redraw axes1.
 %
-%   **Sensors:** list (Tag='sensor_visible_color') — color swatches for
-%   rows of current_sensors where *_visible_list is true.
+%   **Sensors:** list (Tag='sensor_visible_color') — one row per sensor in
+%   the current set. Visibility flags affect 3-D drawing, not this list.
 %
 %   **Compartments:** list (Tag='compartment_visible_color') — swatches
 %   for tags with *_on and *_visible, reversed to match Segmentation-tool
@@ -21,132 +21,254 @@ function zef = zef_update_fig_details(zef)
 %
 %   nargout==0 → assignin('base','zef',zef).
 %
-%   See also zef_figure_tool, zef_colored_list, zef_set_compartment_color.
+%   See also zef_figure_tool, zef_colored_list, zef_sensor_list_items.
 if nargin == 0
     zef = evalin('base','zef');
 end
 
-sensor_names = {};
-sensor_colors = zeros(0, 3);
-if isfield(zef, 'current_sensors') && ~isempty(zef.current_sensors) ...
-        && isfield(zef, [zef.current_sensors '_points'])
-    points = zef.([zef.current_sensors '_points']);
-    vis_list = [];
-    if isfield(zef, [zef.current_sensors '_visible_list'])
-        vis_list = zef.([zef.current_sensors '_visible_list']);
-    end
-    name_list = {};
-    if isfield(zef, [zef.current_sensors '_name_list'])
-        name_list = zef.([zef.current_sensors '_name_list']);
-    end
-    color_table = [];
-    if isfield(zef, [zef.current_sensors '_color_table'])
-        color_table = zef.([zef.current_sensors '_color_table']);
-    end
-    if size(vis_list, 1) == size(points, 1)
-        for i = 1:size(points, 1)
-            if vis_list(i)
-                nm = '';
-                if numel(name_list) >= i
-                    nm = char(string(name_list{i}));
-                end
-                rgb = [0.7 0.7 0.7];
-                if size(color_table, 1) >= i
-                    rgb = color_table(i, :);
-                end
-                sensor_names{end+1} = nm; %#ok<AGROW>
-                sensor_colors(end+1, :) = rgb; %#ok<AGROW>
-            end
-        end
-    end
-end
+[sensor_names, sensor_colors, n_sensors] = zef_sensor_list_items(zef);
 if isfield(zef, 'h_sensor_visible_color') && isvalid(zef.h_sensor_visible_color)
     zef_colored_list('set', zef.h_sensor_visible_color, sensor_names, sensor_colors);
 end
 
 comp_names = {};
 comp_colors = zeros(0, 3);
-if isfield(zef, 'compartment_tags')
+n_compartments = 0;
+if isfield(zef, 'compartment_tags') && iscell(zef.compartment_tags)
+    n_compartments = numel(zef.compartment_tags);
+    tagged = {};
+    tagged_rgb = zeros(0, 3);
     for i = numel(zef.compartment_tags):-1:1
         tag = zef.compartment_tags{i};
-        is_on = isfield(zef, [tag '_on']) && zef.([tag '_on']);
-        is_vis = isfield(zef, [tag '_visible']) && zef.([tag '_visible']);
-        if is_on && is_vis
-            nm = tag;
-            if isfield(zef, [tag '_name'])
-                nm = char(string(zef.([tag '_name'])));
-            end
-            rgb = [0.7 0.7 0.7];
-            if isfield(zef, [tag '_color'])
-                rgb = zef.([tag '_color']);
-            end
-            comp_names{end+1} = nm; %#ok<AGROW>
-            comp_colors(end+1, :) = rgb; %#ok<AGROW>
+        nm = tag;
+        if isfield(zef, [tag '_name'])
+            nm = char(string(zef.([tag '_name'])));
         end
+        rgb = [0.7 0.7 0.7];
+        if isfield(zef, [tag '_color'])
+            rgb = zef.([tag '_color']);
+        end
+        tagged{end+1} = nm; %#ok<AGROW>
+        tagged_rgb(end+1, :) = rgb; %#ok<AGROW>
     end
+    comp_names = tagged;
+    comp_colors = tagged_rgb;
 end
 if isfield(zef, 'h_compartment_visible_color') && isvalid(zef.h_compartment_visible_color)
     zef_colored_list('set', zef.h_compartment_visible_color, comp_names, comp_colors);
 end
 
-zef.aux_field = {['Nodes: ' num2str(size(zef.nodes,1))],...
-    ['Tetrahedra: ' num2str(size(zef.tetra,1))],...
+zef.aux_field = {['Nodes: ' num2str(local_count_rows(zef, 'nodes'))], ...
+    ['Tetrahedra: ' num2str(local_count_rows(zef, 'tetra'))], ...
     };
 
-if eval('zef.on_screen') == 0
+on_screen = local_scalar(zef, 'on_screen', 0);
+if on_screen == 0
     zef.aux_field = [zef.aux_field, {'Visualization: '}];
 end
-if eval('zef.on_screen') == 1
+if on_screen == 1
     zef.aux_field = [zef.aux_field, {'Visualization: Volume'}];
 end
-if eval('zef.on_screen') == 2
+if on_screen == 2
     zef.aux_field = [zef.aux_field, {'Visualization: Surfaces'}];
 end
-if eval('zef.inv_scale') == 1
+inv_scale = local_scalar(zef, 'inv_scale', 2);
+if inv_scale == 1
     zef.aux_field = [zef.aux_field, {'Scale: Logarithmic'}];
 end
-if eval('zef.inv_scale') == 2
+if inv_scale == 2
     zef.aux_field = [zef.aux_field, {'Scale: Linear'}];
 end
-if eval('zef.inv_scale') == 3
+if inv_scale == 3
     zef.aux_field = [zef.aux_field, {'Scale: Square root'}];
 end
-if eval('zef.source_direction_mode') == 1
+src_dir = local_scalar(zef, 'source_direction_mode', 1);
+if src_dir == 1
     zef.aux_field = [zef.aux_field, {'Field basis: Cartesian'}];
 end
-if eval('zef.source_direction_mode') == 2
+if src_dir == 2
     zef.aux_field = [zef.aux_field, {'Field basis: Normal'}];
 end
-if eval('zef.source_direction_mode') == 3
+if src_dir == 3
     zef.aux_field = [zef.aux_field, {'Field basis: Mesh'}];
 end
-if eval('zef.reconstruction_type') == 1
+rec_type = local_scalar(zef, 'reconstruction_type', 1);
+if rec_type == 1
     zef.aux_field = [zef.aux_field, {'Field: Amplitude'}];
 end
-if eval('zef.reconstruction_type') == 2
+if rec_type == 2
     zef.aux_field = [zef.aux_field, {'Field: Normal'}];
 end
-if eval('zef.reconstruction_type') == 3
+if rec_type == 3
     zef.aux_field = [zef.aux_field, {'Field: Tangential'}];
 end
-if eval('zef.reconstruction_type') == 4
+if rec_type == 4
     zef.aux_field = [zef.aux_field, {'Field: Normal (+)'}];
 end
-if eval('zef.reconstruction_type') == 5
+if rec_type == 5
     zef.aux_field = [zef.aux_field, {'Field: Normal (-)'}];
 end
-if eval('zef.reconstruction_type') == 6
+if rec_type == 6
     zef.aux_field = [zef.aux_field, {'Field: Value'}];
 end
-if eval('zef.reconstruction_type') == 7
+if rec_type == 7
     zef.aux_field = [zef.aux_field, {'Field: Amplitude smoothed'}];
 end
 
 if isfield(zef, 'h_system_information') && isvalid(zef.h_system_information)
     zef_colored_list('set', zef.h_system_information, zef.aux_field, []);
 end
-zef = rmfield(zef,'aux_field');
+
+try
+    h_fig = [];
+    if isfield(zef, 'h_zeffiro') && isvalid(zef.h_zeffiro)
+        h_fig = zef.h_zeffiro;
+    end
+    if ~isempty(h_fig)
+        unified = false;
+        try
+            unified = zef_ui_is_unified(h_fig);
+        catch
+        end
+        cc = findall(h_fig, 'Tag', 'status_compartments_count');
+        if ~isempty(cc) && isvalid(cc(1))
+            set(cc(1), 'String', num2str(n_compartments));
+            if unified && n_compartments > 0
+                set(cc(1), 'Visible', 'off');
+            else
+                set(cc(1), 'Visible', 'on');
+            end
+        end
+        sc = findall(h_fig, 'Tag', 'status_sensors_count');
+        if ~isempty(sc) && isvalid(sc(1))
+            set(sc(1), 'String', num2str(n_sensors));
+            if unified && n_sensors > 0
+                set(sc(1), 'Visible', 'off');
+            else
+                set(sc(1), 'Visible', 'on');
+            end
+        end
+        icc = findall(h_fig, 'Tag', 'status_comp_icon');
+        if ~isempty(icc) && isvalid(icc(1))
+            if unified && n_compartments > 0
+                set(icc(1), 'Visible', 'off');
+            end
+        end
+        ics = findall(h_fig, 'Tag', 'status_sens_icon');
+        if ~isempty(ics) && isvalid(ics(1))
+            if unified && n_sensors > 0
+                set(ics(1), 'Visible', 'off');
+            end
+        end
+        rd = findall(h_fig, 'Tag', 'status_ready');
+        if ~isempty(rd) && isvalid(rd(1))
+            set(rd(1), 'String', 'Ready', 'Visible', 'on');
+        end
+        dt = findall(h_fig, 'Tag', 'status_details_text');
+        if ~isempty(dt) && isvalid(dt(1))
+            if ~unified
+                set(dt(1), 'Visible', 'off');
+            else
+            vis = '-';
+            if isfield(zef, 'on_screen')
+                if zef.on_screen == 1
+                    vis = 'Volume';
+                elseif zef.on_screen == 2
+                    vis = 'Surfaces';
+                end
+            end
+            scn = 'Linear';
+            if isfield(zef, 'inv_scale')
+                if zef.inv_scale == 1
+                    scn = 'Logarithmic';
+                elseif zef.inv_scale == 3
+                    scn = 'Square root';
+                end
+            end
+            set(dt(1), 'String', { ...
+                sprintf('Nodes: %d', local_count_rows(zef, 'nodes')); ...
+                sprintf('Tetrahedra: %d', local_count_rows(zef, 'tetra')); ...
+                sprintf('Visualization: %s', vis); ...
+                sprintf('Scale: %s', scn)}, 'Visible', 'on');
+            end
+        end
+        local_show_status_lists(h_fig, n_compartments, n_sensors);
+    end
+catch
+end
+try
+    zef = rmfield(zef,'aux_field');
+catch
+end
 
 if nargout == 0
     assignin('base','zef',zef);
+end
+
+end
+
+function local_show_status_lists(h_fig, n_comp, n_sens)
+
+if isempty(h_fig) || ~isvalid(h_fig)
+    return
+end
+try
+    unified = zef_ui_is_unified(h_fig);
+catch
+    unified = false;
+end
+if ~unified
+    return
+end
+pairs = { ...
+    'compartment_visible_color', n_comp; ...
+    'sensor_visible_color', n_sens};
+for i = 1:size(pairs, 1)
+    lst = findall(h_fig, 'Tag', pairs{i, 1});
+    if isempty(lst) || ~isvalid(lst(1))
+        continue
+    end
+    host = lst(1);
+    try
+        if strcmpi(char(lst(1).Type), 'uihtml') && ~isempty(lst(1).Parent)
+            host = lst(1).Parent;
+        end
+    catch
+    end
+    n = pairs{i, 2};
+    try
+        if n > 0
+            host.Visible = 'on';
+            if isprop(lst(1), 'Visible')
+                lst(1).Visible = 'on';
+            end
+        end
+    catch
+    end
+end
+
+end
+
+function n = local_count_rows(zef, field)
+
+n = 0;
+try
+    if isstruct(zef) && isfield(zef, field) && ~isempty(zef.(field))
+        n = size(zef.(field), 1);
+    end
+catch
+end
+
+end
+
+function v = local_scalar(zef, field, default)
+
+v = default;
+try
+    if isstruct(zef) && isfield(zef, field) && ~isempty(zef.(field))
+        v = zef.(field);
+    end
+catch
+end
+
 end

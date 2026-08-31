@@ -41,4 +41,4 @@ Parent overview: [`../README.md`](../README.md).
 
 ## Developer guidance
 
-Keep CSV column order consistent with other `profile/*/zeffiro_*.ini` files. Plugin inventory for this default set: `tools/plugins/README.md`. Parent: [`../README.md`](../README.md).
+Keep CSV column order consistent with other `profile/*/zeffiro_*.ini` files. Plugin inventory for this default set: `plugins/README.md`. Parent: [`../README.md`](../README.md).

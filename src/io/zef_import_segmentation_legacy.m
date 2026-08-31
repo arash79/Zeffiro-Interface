@@ -392,14 +392,12 @@ if not(isequal(file_name,0));
                             eval(['zef.' name_cell{j} '_priority = zef_data;']);
                         end
 
-                        %if not(isequal(ini_cell{1}{n_columns*(i-1)+6},'0'))
                         aux_var = ini_cell{1}{n_columns*(i-1)+6};
                         if isstr(aux_var)
                             aux_var = str2num(aux_var);
                         end
                         assignin('base', 'zef_data', aux_var);
                         eval(['zef.' name_cell{j} '_sources = zef_data;']);
-                        %end
 
                         if not(isequal(ini_cell{1}{n_columns*(i-1)+7},'0'))
                             aux_var = ini_cell{1}{n_columns*(i-1)+7};

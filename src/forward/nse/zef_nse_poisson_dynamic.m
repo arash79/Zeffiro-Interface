@@ -25,7 +25,7 @@ if not(isfield(nse_field,'nse_type'))
     nse_field.nse_type = 1;
 end
 
-nse_field.time_integration: 1 → 1 quadrature step, 2 → 2, 3 → 4
+% nse_field.time_integration: 1 -> 1 quadrature step, 2 -> 2, 3 -> 4
 % (the widget is not a 1:1 step count).
 if nse_field.time_integration == 1
     n_q_steps = 1;
@@ -163,11 +163,6 @@ I_u = I_mu(i_node_ind,i_node_ind);
 S_mu = I_mu + nse_field.viscosity_smoothing.^2*K_1;
 S_u = I_u + nse_field.velocity_smoothing.^2*K_1(i_node_ind,i_node_ind);
 
-% F = zef_surface_scalar_matrix_FGn(v_1_nodes,v_1_tetra,1,1,ones(size(v_1_tetra,1),1));
-% F = F + zef_surface_scalar_matrix_FGn(v_1_nodes,v_1_tetra,2,2,ones(size(v_1_tetra,1),1));
-% F = F + zef_surface_scalar_matrix_FGn(v_1_nodes,v_1_tetra,3,3,ones(size(v_1_tetra,1),1));
-% F = F(i_node_ind, i_node_ind);
-
 C = zef_volume_scalar_matrix_FF(v_1_nodes, v_1_tetra, nse_field.rho*ones(size(v_1_tetra,1),1));
 C = C(i_node_ind,i_node_ind);
 
@@ -175,20 +170,6 @@ L = zef_volume_scalar_matrix_GG(v_1_nodes,v_1_tetra,1,1,ones(size(v_1_tetra,1),1
 L = L + zef_volume_scalar_matrix_GG(v_1_nodes,v_1_tetra,2,2,ones(size(v_1_tetra,1),1));
 L = L + zef_volume_scalar_matrix_GG(v_1_nodes,v_1_tetra,3,3,ones(size(v_1_tetra,1),1));
 L = L(i_node_ind, i_node_ind);
-
-% L_11 = zef_volume_scalar_matrix_GG(v_1_nodes,v_1_tetra,1,1,ones(size(v_1_tetra,1),1));
-% L_22 = zef_volume_scalar_matrix_GG(v_1_nodes,v_1_tetra,2,2,ones(size(v_1_tetra,1),1));
-% L_33 = zef_volume_scalar_matrix_GG(v_1_nodes,v_1_tetra,3,3,ones(size(v_1_tetra,1),1));
-% L_12 = zef_volume_scalar_matrix_GG(v_1_nodes,v_1_tetra,1,2,ones(size(v_1_tetra,1),1));
-% L_13 = zef_volume_scalar_matrix_GG(v_1_nodes,v_1_tetra,1,3,ones(size(v_1_tetra,1),1));
-% L_23 = zef_volume_scalar_matrix_GG(v_1_nodes,v_1_tetra,2,3,ones(size(v_1_tetra,1),1));
-
-% L_11 = L_11(i_node_ind, i_node_ind);
-% L_22 = L_22(i_node_ind, i_node_ind);
-% L_33 = L_33(i_node_ind, i_node_ind);
-% L_12 = L_12(i_node_ind, i_node_ind);
-% L_13 = L_13(i_node_ind, i_node_ind);
-% L_23 = L_23(i_node_ind, i_node_ind);
 
 c_vec = c_vec(i_node_ind);
 
@@ -361,15 +342,9 @@ for i = 1 : n_time
             g_mu_2 = Q_2_v1*mu_vec(i_node_ind);
             g_mu_3 = Q_3_v1*mu_vec(i_node_ind);
 
-            %g_u_T_g_mu_1 = q_1_u_1.*g_mu_1 + q_1_u_2.*g_mu_2 + q_1_u_3.*g_mu_3;
-            %g_u_T_g_mu_2 = q_2_u_1.*g_mu_1 + q_2_u_2.*g_mu_2 + q_2_u_3.*g_mu_3;
-            %g_u_T_g_mu_3 = q_3_u_1.*g_mu_1 + q_3_u_2.*g_mu_2 + q_3_u_3.*g_mu_3;
-
             g_u_g_mu_1 = q_1_u_1.*g_mu_1 + q_2_u_1.*g_mu_2 + q_3_u_1.*g_mu_3;
             g_u_g_mu_2 = q_1_u_2.*g_mu_1 + q_2_u_2.*g_mu_2 + q_3_u_2.*g_mu_3;
             g_u_g_mu_3 = q_1_u_3.*g_mu_1 + q_2_u_3.*g_mu_2 + q_3_u_3.*g_mu_3;
-
-            %friction_vec = 2*Q_1'*g_u_T_g_mu_1 + 2*Q_2'*g_u_T_g_mu_2 + 2*Q_3'*g_u_T_g_mu_3;
 
             friction_vec = 2*Q_1'*g_u_g_mu_1 + 2*Q_2'*g_u_g_mu_2 + 2*Q_3'*g_u_g_mu_3;
 
@@ -405,8 +380,6 @@ for i = 1 : n_time
 
             p_2 = p_1;
             p_1 = p;
-            max(p_1);
-            min(p_1);
             y_2 = y_1;
             y_1 = y_0;
 
@@ -537,23 +510,15 @@ for i = 1 : n_time
         u_2_2(i_node_ind,1) = u_2;
         u_3_2 = zeros(size(K_1,1),1);
         u_3_2(i_node_ind,1) = u_3;
-%         collect1{i}=gather(u_1_2);
-%         collect2{i}=gather(u_2_2);
-%         collect3{i}=gather(u_3_2);
-       % trace_strain_rate2 = rateofshear(adj1,dist1,u_1_2,u_2_2,u_3_2);
-%        trace_strain_rate = Q_1_v12*u_1_2;
         trace_strain_rate = 4.*(Q_1_v12*u_1_2).^2 + 4.*(Q_2_v12*u_2_2).^2 + 4.*(Q_3_v12*u_3_2).^2 + 2.*(Q_2_v12*u_1_2+Q_1_v12*u_2_2).^2 +...
             2.*(Q_3_v12*u_1_2+Q_1_v12*u_3_2).^2+2.*(Q_3_v12*u_2_2+Q_2_v12*u_3_2).^2;
         trace_strain_rate = sqrt((1/2).*trace_strain_rate);
-% if i >= n_time*0.5
     if nse_field.viscosity_model == 2
 
-%         trace_strain_rate = abs(Q_1_v2*u_1) + abs(Q_2_v2*u_2) + abs(Q_3_v2*u_3);
         mu_vec = nse_field.mu*trace_strain_rate.^(nse_field.viscosity_exponent-1);
 
     elseif nse_field.viscosity_model == 3
 
-%         trace_strain_rate = abs(Q_1_v2*u_1) + abs(Q_2_v2*u_2) + abs(Q_3_v2*u_3);
         mu_vec = nse_field.mu + nse_field.viscosity_delta.*(1 + (nse_field.viscosity_relaxation_time*trace_strain_rate).^nse_field.viscosity_transition).^((nse_field.viscosity_exponent-1)./nse_field.viscosity_transition);
 
 
@@ -572,8 +537,6 @@ for i = 1 : n_time
 
          lambda_g = zeros(size(K_1,1),1);
          n_g = zeros(size(K_1,1),1);
-%          trace_strain_rate2 = abs(Q_1_v2*u_1) + abs(Q_2_v2*u_2) + abs(Q_3_v2*u_3);
-%          trace_strain_rate = rateofshear(kk,u_1_2,u_2_2,u_3_2);
          lambda_g(trace_strain_rate>0.01) = 0.0345 + 0.25.*exp(-(1+trace_strain_rate(trace_strain_rate>0.01)./50).*exp(-3.*(trace_strain_rate(trace_strain_rate>0.01)).^-1));
          n_g(trace_strain_rate>0.01) = 1 - 0.45.*exp(-(1+trace_strain_rate(trace_strain_rate>0.01)./50).*exp(-4.*(trace_strain_rate(trace_strain_rate>0.01)).^-1));
          mu_vec(trace_strain_rate>0.01) = 0.1*lambda_g(trace_strain_rate>0.01).*trace_strain_rate(trace_strain_rate>0.01).^(n_g(trace_strain_rate>0.01)-1);
@@ -586,11 +549,8 @@ for i = 1 : n_time
         mu_vec(mu_vec>0.056) = 0.056;
         mu_vec(mu_vec<0.00345)=0.00345;
     end
-% end
 
-
-    if ismember(nse_field.viscosity_model,[2 3 4 5 6])%2 3 4 5 6
-
+    if ismember(nse_field.viscosity_model,[2 3 4 5 6])
         if nse_field.viscosity_smoothing > 0
             if nse_field.use_gpu
                 mu_vec = pcg_iteration_gpu(S_mu,I_mu*mu_vec,nse_field.pcg_tol,nse_field.pcg_maxit,DM_S_mu);

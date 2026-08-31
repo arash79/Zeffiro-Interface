@@ -1,7 +1,4 @@
 function zef = zef_eeg_lead_field_anisotropic(zef)
-
-
-
 %ZEF_EEG_LEAD_FIELD_ANISOTROPIC  EEG anisotropic lead field (type 6, sigma(:,3:8)).
 %
 %   Zeffiro Interface.

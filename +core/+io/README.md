@@ -35,7 +35,7 @@ core.gui.menu_tool.import_electrodes_callback  →  zef.sensors / *_points
 mesh attach / forward (src/mesh, src/forward)  →  zef.L
 ```
 
-Contrast with `src/io` (projects, logs, nodisplay save) and converter packages under `+utilities` (FreeSurfer, Brainstorm, DUNEuro).
+Contrast with `src/io` (projects, logs) and converter packages under `+utilities` (FreeSurfer, Brainstorm, DUNEuro).
 
 ## Usage instructions
 
@@ -49,7 +49,7 @@ Contrast with `src/io` (projects, logs, nodisplay save) and converter packages u
 
 - CSV vs DAT impedance validation differs (CSV may allow `0`; DAT requires `> 0` for CEM lines).
 - No unit conversion inside parsers.
-- CEM column order in files is `[inner, outer, impedance]`; later attachment code may reorder.
+- CEM files list `[inner, outer, impedance]`; parsers return `[outer, inner, impedance]` for attachment.
 
 ## Developer guidance
 

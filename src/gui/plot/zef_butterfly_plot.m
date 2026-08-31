@@ -1,5 +1,5 @@
 function zef = zef_butterfly_plot(zef)
-%ZEF_BUTTERFLY_PLOT  Multi-tools → **Butterfly plot**.
+%ZEF_BUTTERFLY_PLOT  Forward tools → **Butterfly plot**.
 %
 %   Zeffiro Interface.
 %   Copyright © 2018- Sampsa Pursiainen & ZI Development Team

@@ -5,10 +5,9 @@
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Unused from current menus (Mesh-tool wiring to this name is commented
-%   out). Real callers: zef_init at startup, and every lead-field builder
-%   in src/forward/lead_field (EEG/MEG/EIT/tES/gravity) plus
-%   tools/plugins/LFBankTool zef_combine_lead_fields.
+%   Not a menu callback. Callers: zef_init at startup, lead-field builders
+%   in src/forward/lead_field (EEG/MEG/EIT/tES/gravity), and
+%   plugins/LFBankTool zef_combine_lead_fields.
 %
 %   Script (not a function). Sets these zef fields to []:
 %     source_positions_original_field

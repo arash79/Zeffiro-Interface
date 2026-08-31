@@ -58,11 +58,6 @@ function [zef,MethodClassObj] = zef_process_inversion(zef,MethodClassObj)
     % Get needed parameters from zef.
 
     source_direction_mode = zef.source_direction_mode;
-
-    %no method use this?:
-    %source_directions = eval('zef.source_directions');
-
-    %these ok for now
     zef.reconstruction_information.source_direction_mode = zef.source_direction_mode;
     zef.reconstruction_information.source_directions = zef.source_directions;
 
@@ -81,12 +76,6 @@ function [zef,MethodClassObj] = zef_process_inversion(zef,MethodClassObj)
     if zef.use_gpu && zef.gpu_count > 0
         L = gpuArray(L);
     end
-
-    % The inverse result, which will be post-processed.
-    %
-    % TODO: can we transpose this cell bc then you can transform it to matrix
-    % with cell2mat without much extra effort. Many other softwares uses the
-    % matrix format.
 
     [z_inverse, MethodClassObj] = utilities.inverse.run_frame_loop( ...
         zef, ...

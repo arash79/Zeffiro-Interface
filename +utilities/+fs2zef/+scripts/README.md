@@ -48,7 +48,7 @@ Prefer the MATLAB entry point:
 utilities.fs2zef.run(...);  % orchestrates bash + MATLAB stages
 ```
 
-Manual debug:
+Manual invocation:
 
 ```bash
 export SUBJECTS_DIR=/path/to/subjects

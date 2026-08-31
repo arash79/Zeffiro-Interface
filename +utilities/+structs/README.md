@@ -27,7 +27,7 @@ Behavior:
 
 ## Workflow context
 
-Used early in session construction when CLI/name-value options overlay defaults. Related but separate: profile INI loading and `zef_init` field defaults under `src/core`.
+Used early in session construction when CLI/name-value options overlay defaults. Related but separate: profile INI loading and `zef_init` field defaults under `src/app`.
 
 ## Usage instructions
 

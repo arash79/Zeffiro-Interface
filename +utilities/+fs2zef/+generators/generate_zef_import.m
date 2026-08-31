@@ -526,7 +526,6 @@ function rgb = lookup_color(compartment_names, lut)
     end
 
     if ~isempty(idx)
-        % rgb = double([lut.R(idx), lut.G(idx), lut.B(idx)]) / 255.0;
         rgb = round(double([lut.R(idx), lut.G(idx), lut.B(idx)]) / 255.0, 3);
     else
         warning('Color not found for compartment: "%s"', strjoin(cellstr(query_names), '", "'));

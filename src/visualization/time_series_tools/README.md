@@ -6,13 +6,18 @@
 
 ## Main contents
 
-| Family | Representative files | Typical `plot_mode` |
-|--------|----------------------|---------------------|
-| Full curves | `zef_time_series_plot`, `zef_time_series_plot_sqrt` | 3 |
-| Energy (per-ROI scalar) | `zef_max_energy_*`, `zef_mean_energy_*` | 1 |
-| Corr / cov / DTW matrices | `zef_corr_*`, `zef_cov_*`, `zef_dtw_*` (+ weighting variants) | 2 |
-| Std-named family | `zef_std_*` | 1 or 2 (see notes) |
-| Boxplot | `zef_parcellation_boxplot_amplitude` | 4 |
+Every `.m` in this folder is a Plot-list candidate. Labels come from the `Description:` help line.
+
+| File | Family (see notes for filename ≠ math) |
+|------|----------------------------------------|
+| `zef_time_series_plot.m` / `zef_time_series_plot_sqrt.m` | Full curves (`plot_mode` 3) |
+| `zef_max_energy_no_scaling.m` / `_mean_scaling.m` / `_max_scaling.m` | Per-ROI energy (`plot_mode` 1) |
+| `zef_mean_energy_no_scaling.m` / `_mean_scaling.m` / `_max_scaling.m` | Mean-energy family (see mismatch table) |
+| `zef_corr_no_scaling.m` / `_mean_scaling.m` / `_max_scaling.m` / `_mean_scaling_mean_weighting.m` / `_max_scaling_max_weighting.m` | Correlation matrices (`plot_mode` 2) |
+| `zef_cov_no_scaling.m` / `_mean_scaling.m` / `_max_scaling.m` | Covariance / DTW family (see mismatch table) |
+| `zef_dtw_no_scaling.m` / `_mean_scaling.m` / `_max_scaling.m` | Dynamic time warping matrices |
+| `zef_std_no_scaling.m` / `_mean_scaling.m` / `_max_scaling.m` | Std-named family (see mismatch table) |
+| `zef_parcellation_boxplot_amplitude.m` | Boxplot (`plot_mode` 4) |
 
 The Parcellation list is built by `zef_init_parcellation`: `dir` of this folder; list label comes from the help line `Description: …`.
 
@@ -42,7 +47,7 @@ reconstruction → zef_parcellation_time_series
     → Plot → zef_plot_parcellation_time_series → feval(selected)
 ```
 
-Also used from analysis scripts (Kalman helpers, `kalman_custom_q_driver.m`, compartment studies).
+Also used from analysis scripts under `+examples/+studies`.
 
 ## Usage instructions
 

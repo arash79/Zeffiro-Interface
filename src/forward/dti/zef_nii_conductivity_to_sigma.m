@@ -209,7 +209,7 @@ if ~isempty(apply_to_compartments)
     if isfield(zef, 'domain_labels') && ~isempty(zef.domain_labels) && ...
        isfield(zef, 'compartment_tags') && ~isempty(zef.compartment_tags)
 
-        % Build active compartment index map (same logic as zef_sigma)
+        % Build active compartment index map (same as mesh postprocess)
         aux_compartment_ind = zeros(length(zef.compartment_tags), 1);
         i_active = 0;
         for k = 1:length(zef.compartment_tags)
@@ -249,7 +249,7 @@ end
 % -------------------------------------------------------------------------
 % Step 7: Write isotropic tensors to zef.sigma_anisotropy
 %
-% Format used by zef_sigma and the lead-field solvers:
+% Format used by the anisotropic lead-field solvers (zef.sigma(:,3:8)):
 %   [sigma11, sigma22, sigma33, sigma12, sigma13, sigma23]
 % For isotropic conductivity sigma:
 %   [sigma, sigma, sigma, 0, 0, 0]
@@ -264,12 +264,11 @@ end
 % tetrahedra to zef.sigma(:,3:5) would zero σ11/σ22/σ33 and make the
 % FEM stiffness matrix singular → all-NaN lead field.
 %
-% NOTE: zef_lead_field_matrix uses zef.sigma(:,3:8) directly for the
-% anisotropic solver (lead_field_type == 6) and never calls zef_sigma().
-% zef.sigma must therefore already hold valid conductivity values for
-% every tetrahedron before the lead field is computed.  Out-of-FOV
-% tetrahedra retain the parametric compartment conductivity that was
-% stored in zef.sigma when the mesh was post-processed.
+% NOTE: zef_lead_field_matrix uses zef.sigma(:,3:8) for anisotropic
+% lead_field_type 6–10. zef.sigma must already hold valid conductivity
+% for every tetrahedron before the lead field is computed. Out-of-FOV
+% tetrahedra retain the parametric compartment conductivity stored in
+% zef.sigma when the mesh was post-processed.
 % Only write tetrahedra that (a) are in-bounds AND (b) have a positive
 % NIfTI conductivity.  An in-bounds voxel whose value is 0 (e.g. a
 % background-masked region of the NIfTI) would zero the diagonal of the
@@ -297,18 +296,13 @@ if isfield(zef, 'sigma') && ~isempty(zef.sigma) && ...
 end
 
 % Only update sigma_anisotropy for in-bounds, positive-conductivity tetra.
-% Out-of-FOV rows remain all-zeros so that the zef_sigma() iso_mask
-% fallback can substitute the parametric compartment conductivity for
-% those tetrahedra if zef_sigma() is called in the future.
+% Out-of-FOV rows stay all-zeros; those tetra keep existing zef.sigma.
 zef.sigma_anisotropy(in_bounds_update, 1) = s_in;
 zef.sigma_anisotropy(in_bounds_update, 2) = s_in;
 zef.sigma_anisotropy(in_bounds_update, 3) = s_in;
 zef.sigma_anisotropy(in_bounds_update, 4) = 0;
 zef.sigma_anisotropy(in_bounds_update, 5) = 0;
 zef.sigma_anisotropy(in_bounds_update, 6) = 0;
-
-% Clear sigma_bypass so zef_sigma() recomputes using sigma_anisotropy
-zef.sigma_bypass = false;
 
 % -------------------------------------------------------------------------
 % Step 8: Summary report
@@ -329,7 +323,6 @@ fprintf('  Conductivity range   : [%.4g, %.4g] S/m\n', s_min, s_max);
 fprintf('  Conductivity mean    : %.4g S/m\n', s_mean);
 fprintf('  Out-of-FOV elements  : %d (skipped; existing zef.sigma preserved)\n', n_skipped);
 fprintf('  zef.sigma_anisotropy : updated [%d × 6]\n', M);
-fprintf('  zef.sigma_bypass     : false (recomputation will occur on next solve)\n');
 fprintf('----------------------------------------------\n');
 
 % -------------------------------------------------------------------------

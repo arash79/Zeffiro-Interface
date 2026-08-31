@@ -12,17 +12,16 @@ Under `multicompartment_head_project/`:
 |------|----------|
 | Boundaries | `outer_skin`, `outer_skull`, `inner_skull` |
 | Cortex / WM | `lh.pial`, `rh.pial`, `lh.wm`, `rh.wm`, cerebellum cortex/WM |
-| Subcortical / CSF / vessels / CC / brainstem | Many `lh.` / `rh.` prefixed ASC files |
+| Subcortical / CSF / CC / brainstem | `lh.` / `rh.` paired ASC files plus unprefixed CC / ventral DC / brainstem |
 | Parcellation | `lh_labels_36`, `rh_labels_36`, `color_table_{lh,rh}_36.mat` |
-| Sensors | `electrodes.dat`, `meg_points.dat`, `meg_directions.dat` |
+| Sensors | `electrodes.dat` |
 | Manifest | `import_segmentation.zef` |
-| Offline regenerators | `fs2zef.sh`, `create_colortable.m`, `create_points.m`, `creat_points.m` (legacy typo name), `read_annotation.m` |
 
 See `multicompartment_head_project/README.md` for file-level detail.
 
 ## Code functionality
 
-Data + offline regeneration scripts. Import parsers live under `src/io`. Production FreeSurfer conversion for new subjects: `utilities.fs2zef`.
+Data only. Import parsers live under `src/io`. Production FreeSurfer conversion for new subjects: `utilities.fs2zef`.
 
 ## Workflow context
 
@@ -48,10 +47,9 @@ Or GUI Import to a new project and browse to this folder’s manifest.
 ## Important notes
 
 - Coordinates are typically **mm**.
-- ASC inventory is large (~60+ surfaces); do not delete label/color_table pairs.
-- Regenerators assume FreeSurfer/`SUBJECTS_DIR` and are not required for normal demos.
+- The shipped inventory matches `import_segmentation.zef`; do not delete label/color_table pairs used by that manifest.
 
 ## Developer guidance
 
-- Prefer regenerating via `fs2zef` rather than hand-editing dozens of ASC files.
+- Prefer regenerating via `utilities.fs2zef` rather than hand-editing dozens of ASC files.
 - Pitfall: importing without turning compartments **On** before meshing.

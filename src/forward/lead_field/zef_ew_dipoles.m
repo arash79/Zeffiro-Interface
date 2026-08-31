@@ -5,7 +5,6 @@ function [stensil, signs, source_moments, source_directions, source_locations, n
     ,               ...
     brain_ind   ...
     )
-
 %ZEF_EW_DIPOLES  Edge-Whitney dipole stencils for Whitney-type source models.
 %
 %   Zeffiro Interface.
@@ -26,13 +25,6 @@ function [stensil, signs, source_moments, source_directions, source_locations, n
 %
 %   See also zef_fi_dipoles, zef_whitney_interpolation.
 
-
-wb = zef_waitbar(0,1, 'Edgewise dipoles');
-
-% Define cleanup operations
-
-cleanup_fn = @(h) close(h);
-cleanup_obj = onCleanup(@() cleanup_fn(wb));
 
 % Matrix sizes
 
@@ -101,7 +93,5 @@ stensil = sparse(                   ...
     ,                                   ...
     n_of_tetra                              ...
     );
-
-zef_waitbar(1,1,wb);
 
 end

@@ -17,7 +17,7 @@ tES here means: choose electrode currents `y` so FEM map `zef.L` produces desire
 
 | Call | File | Used by |
 |------|------|---------|
-| `zef_ES_recursive_search(zef, num_lattice, recursive_instances)` | `tools/plugins/ZeffiroESWorkbench/m/zef_ES_recursive_search.m` | GUI HPO method 2 |
+| `zef_ES_recursive_search(zef, num_lattice, recursive_instances)` | `plugins/ZeffiroESWorkbench/m/zef_ES_recursive_search.m` | GUI HPO method 2 |
 | `examples.studies.tES_hyperparameter_optimization.zef_ES_recursive_search(zef, num_lattice)` | this folder | Study only (two args) |
 
 Study sets `zef.ES_step_size = num_lattice`, uses hard-coded window of 40, calls `helpers.zef_ES_centralize_recursive_search`. Each pass after the first: `zef_ES_objective_function` → best `(sr, sc)` → helper shrinks α/ε (8th arg `0` = allow window outside original min/max) → `zef_ES_find_currents(...)`. Shrinkage:
@@ -38,11 +38,11 @@ Requires a Zeffiro session with TES/EEG lead field, synthetic target sources, an
 zef = examples.studies.tES_hyperparameter_optimization.zef_ES_recursive_search(zef, num_lattice);
 ```
 
-Always use the `examples.studies…` prefix; bare `zef_ES_recursive_search` resolves to the **plugin** via `genpath` on `tools/plugins`.
+Always use the `examples.studies…` prefix; bare `zef_ES_recursive_search` resolves to the **plugin** via `genpath` on `plugins`.
 
 ## Important notes
 
-Helper in `+helpers/` is a copy of the plugin helper. Plugin recursive search calls the plugin helper (no package prefix); this study calls the packaged helper. Workbench manual: `tools/plugins/ZeffiroESWorkbench/README.md`.
+Helper in `+helpers/` is a copy of the plugin helper. Plugin recursive search calls the plugin helper (no package prefix); this study calls the packaged helper. Workbench manual: `plugins/ZeffiroESWorkbench/README.md`.
 
 ## Developer guidance
 

@@ -96,7 +96,6 @@ parfor  j = 1 : size(path_data,1)
             aux_data_sin = sum(aux_vec_sin(:,n_t_data + 1 : 2*n_t_data),1);
             aux_data_cos = aux_data_cos(ind_data_0:data_resample_val:ind_data_1);
             aux_data_sin = aux_data_sin(ind_data_0:data_resample_val:ind_data_1);
-            %aux_data = aux_data(ind_data_0:ind_data_1);
             aux_mat_cos(1, :, ast_ind_coarse(interp_vec(ast_ind(i)))) = aux_mat_cos(1, :, ast_ind_coarse(interp_vec(ast_ind(i)))) + aux_data_cos;
             aux_mat_sin(1, :, ast_ind_coarse(interp_vec(ast_ind(i)))) = aux_mat_sin(1, :, ast_ind_coarse(interp_vec(ast_ind(i)))) + aux_data_sin;
         end

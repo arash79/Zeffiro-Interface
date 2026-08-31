@@ -40,9 +40,6 @@
 %     7. Refresh *_original_surface_mesh from the baked geometry.
 %     8. rmfield temporaries; zef_update; clear zef_i, zef_k.
 %
-%   Duplicate name: src/forward/lead_field/zef_apply_transform.m (no
-%   opening zef_update_transform, uses evalin). Mesh tool calls this name.
-%
 %   See also zef_process_meshes, zef_add_transform, zef_mesh_tool.
 
 zef = zef_update_transform(zef);

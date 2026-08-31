@@ -25,7 +25,7 @@ set(zef.h_segmentation_profile_table,'columnformat',{'char','char',{'number','st
 set(zef.h_menu_segmentation_profile_table_add_row,'MenuSelectedFcn','zef.h_segmentation_profile_table.Data{end+1,1} = []; zef.h_segmentation_profile_table.Data = [zef.h_segmentation_profile_table.Data(1:zef.segmentation_profile_row_selected(1),:) ; zef.h_segmentation_profile_table.Data(end,:) ; zef.h_segmentation_profile_table.Data(zef.segmentation_profile_row_selected(1)+1:end-1,:)];');
 set(zef.h_menu_segmentation_profile_table_add_column,'MenuSelectedFcn','zef.h_segmentation_profile_table.Data{1,end+1} = []; zef.h_segmentation_profile_table.Data = [zef.h_segmentation_profile_table.Data(:,1:zef.segmentation_profile_column_selected(1))  zef.h_segmentation_profile_table.Data(:,end)  zef.h_segmentation_profile_table.Data(:,zef.segmentation_profile_column_selected(1)+1:end-1)];');
 
-set(zef.h_menu_segmentation_profile_table_delete_rows,'MenuSelectedFcn','zef.h_segmentation_profile_table.Data = zef.h_segmentation_profile_table.Data(find(not(ismember([1:size(zef.h_segmentation_profile_table.Data,2)],zef.segmentation_profile_row_selected))),:);');
+set(zef.h_menu_segmentation_profile_table_delete_rows,'MenuSelectedFcn','zef.h_segmentation_profile_table.Data = zef.h_segmentation_profile_table.Data(find(not(ismember([1:size(zef.h_segmentation_profile_table.Data,1)],zef.segmentation_profile_row_selected))),:);');
 set(zef.h_menu_segmentation_profile_table_delete_columns,'MenuSelectedFcn','zef.h_segmentation_profile_table.Data = zef.h_segmentation_profile_table.Data(:,find(not(ismember([1:size(zef.h_segmentation_profile_table.Data,2)],zef.segmentation_profile_column_selected))));');
 
 zef.h_segmentation_profile.Name = 'ZEFFIRO Interface: Segmentation profile';

@@ -12,8 +12,13 @@ Convert a **Brainstorm** protocol into a Zeffiro project (compartments + FEM mes
 | `zef_bst_plugin_start.m` | GUI “ZEFFIRO-Brainstorm plugin” |
 | `zef_bst_create_project.m` | Surfaces → compartments (no mesh yet) |
 | `zef_bst_default_fem_mesh_create.m` | Discovered mesh-create script (`zef_bst_*_fem_mesh_create.m`) |
-| `zef_bst_init` / `zef_bst_get_settings` / validators | Defaults and checks |
-| `zef_bst_edit_project.m` | Edit / reload flows (run_type nuances) |
+| `zef_bst_init.m` | Default conductivities / DOF / compartment list |
+| `zef_bst_get_settings.m` / `zef_bst_settings_file.m` / `zef_bst_get_settings_file_name.m` | Resolve and load settings scripts |
+| `zef_bst_validate_environment.m` / `zef_bst_validate_settings.m` | Fail-fast checks |
+| `zef_bst_get_run_type.m` / `zef_bst_get_input_mode.m` / `zef_bst_get_project_file_name.m` | Config getters |
+| `zef_bst_find_compartment.m` / `zef_bst_normalize_compartment_name.m` / `zef_bst_get_compartment_property.m` / `zef_bst_compartment_settings.m` / `zef_bst_create_compartment_data.m` | Compartment name matching and payload build |
+| `zef_bst_get_atlas_surfaces.m` | Scout / atlas surface export |
+| `zef_bst_edit_project.m` | Edit / reload flows (`run_type` nuances) |
 | `settings/` | Preset scripts (e.g. `zef_bst_default.m`) |
 | `projects/` | Optional dump target for saved `.mat` / compartment dumps |
 | Adapters in `src/io/import/zef_bst_2_zef_*` | Low-level BST → Zeffiro field mapping |

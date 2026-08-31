@@ -5,16 +5,49 @@ function [dist_vec, angle_vec, mag_vec, dispersion_vec] = zef_rec_diff( ...
     diff_type, ...
     dispersion_radius ...
 )
-%ZEF_REC_DIFF  Example script: Rec diff.
+%ZEF_REC_DIFF  Exhaustive xyz-probe localization errors for one inverse run.
 %
 %   Zeffiro Interface.
 %   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
+%   For every source position and unit axis (x, y, z):
+%     1. Write a synthetic measurement column with zef_find_source_legacy
+%        (legacy Find-synthetic-source path; needs zef.L and source geometry).
+%     2. Optionally add AWGN at noise_db dB (mustBeNonpositive; 0 = no noise).
+%     3. Set inv_data_mode = 'raw' and call inverse_method(zef).
+%     4. Score the reconstruction peak against the true position/direction.
 %
-%   Run with the project root on the MATLAB path.
+%   This is not random location jitter. Monte Carlo over noise is done by the
+%   callers (zef_sensitivity_map_mne / zef_sensitivity_map_dipoleScan), which
+%   invoke this function once per realization.
 %
+%   [dist_vec, angle_vec, mag_vec, dispersion_vec] = zef_rec_diff(zef, ...
+%       inverse_method, noise_db, diff_type, dispersion_radius)
+%
+%   Inputs
+%     zef             - session with L (sensors × 3 n_sources) and source_positions.
+%     inverse_method  - function_handle, e.g. @zef_find_mne_reconstruction
+%                       or @zef_dipoleScan. Must accept zef and return a cell
+%                       of reconstructions, one column per probe.
+%     noise_db        - additive noise in dB, ≤ 0. Default 0.
+%     diff_type       - "L2" (Euclidean) or "minabs" (min |Δx|,|Δy|,|Δz|).
+%                       Distances are then scaled by 1/sqrt(3), matching
+%                       utilities.sensitivity.compute_metrics.
+%     dispersion_radius - sphere radius around the peak (same unit as
+%                       source_positions) used for the energy-weighted RMS
+%                       spread. Default 1.5.
+%
+%   Outputs (each length 3*n_sources, column-major xyz per source)
+%     dist_vec, angle_vec (degrees), mag_vec, dispersion_vec
+%
+%   Side effects: waitbar; overwrites zef.measurements, inv_synth_source,
+%   inv_data_mode. Does not assignin the base workspace.
+%
+%   See also examples.studies.santtus_peeling_article.helpers.zef_sensitivity_map_mne.
+
+    arguments
 
         zef (1,1) struct
 

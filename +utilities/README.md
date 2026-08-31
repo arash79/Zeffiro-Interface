@@ -2,7 +2,17 @@
 
 ## Folder purpose
 
-MATLAB package glue between Zeffiro sessions and everything that is not the GUI runtime: importing anatomy from Brainstorm / FreeSurfer / SimNIBS / Duneuro, dispatching class inverse jobs (local or cluster), and small I/O/struct helpers. Call as `utilities.*` after `zeffiro_interface` (or `addpath` of the project root). Do not `addpath('+utilities')`.
+MATLAB package glue that is **not** the GUI runtime. The package name `utilities.*` is a stable public API ([ADR-004](../docs/adr/ADR-004-utilities-package-name.md)). Internally it hosts three kinds of modules:
+
+| Kind | Packages |
+|------|----------|
+| Domain I/O (anatomy converters) | `fs2zef`, `sn2zef`, `brainstorm2zef`, `duneuro2zef` |
+| Inverse runtime | `cluster`, `inverse` (frame loop), `sensitivity` |
+| True utilities | `io`, `structs`, `dev` |
+
+Call as `utilities.*` after `zeffiro_interface` (or `addpath` of the project root). Do not `addpath('+utilities')`.
+
+Inverse formulas: [docs/methods.md](../docs/methods.md). Bundle fields: [`+cluster/SCHEMA.md`](+cluster/SCHEMA.md).
 
 ## Main contents
 
@@ -12,15 +22,13 @@ MATLAB package glue between Zeffiro sessions and everything that is not the GUI 
 | `utilities.inverse` | `run_frame_loop` for class inverters |
 | `utilities.fs2zef` / `sn2zef` / `brainstorm2zef` / `duneuro2zef` | Anatomy converters (`run` / `import_*`) |
 | `utilities.sensitivity` | Monte Carlo on inverse methods |
-| `utilities.leadfield` | `lf_tag_from_lf_type` (types 1–5) |
 | `utilities.structs` | `copy_fields` (startup name-value args → `zef`) |
-| `utilities.io` | `abspath`, `read_gitmodules`, EDF reconstruction helper |
-| `utilities.plotting` | Paper-style figure helpers for studies |
-| `utilities.dev` | Lint / indent / dependency copy for maintainers |
+| `utilities.io` | `float_is_int`, `is_eof`, `read_gitmodules` |
+| `utilities.dev` | Lint / indent for maintainers |
 
 ## Code functionality
 
-`zef_inverse_run` extracts a bundle in `src/inverse`, then `utilities.cluster.dispatch_inverse(bundle)` either constructs `inverse.*Inverter` + `utilities.inverse.run_frame_loop` + post-process, or `feval`s a legacy function with `zef` in base. Register method ids in `+cluster/inverse_method_registry.m`. Batch/HPC: `submit_inverse_jobs`, `collect_inverse_results`, plus `configure_cluster_profile`, `create_batch_job`, `run_inverse_job`, `with_zef_in_base` (Parallel Computing Toolbox; MATLAB cluster profiles, not Zeffiro INI profiles).
+`zef_inverse_run` extracts a bundle in `src/inverse`, then `utilities.cluster.dispatch_inverse(bundle)` either constructs `inverse.*Inverter` + `utilities.inverse.run_frame_loop` + post-process, or `feval`s a legacy function with `zef` in base. Register method ids in `+cluster/inverse_method_registry.m`. Batch/HPC: `submit_inverse_jobs`, `collect_inverse_results`, plus `configure_cluster_profile`, `run_inverse_job`, `with_zef_in_base` (Parallel Computing Toolbox; MATLAB cluster profiles, not Zeffiro INI profiles).
 
 Converters write a Zeffiro-style folder (surfaces, `import_segmentation.zef`, often `electrodes.dat`). Entry points: `utilities.fs2zef.run`, `sn2zef.run`, `brainstorm2zef.run` / `zef_bst_plugin_start`, `duneuro2zef.run` / `import_duneuro_project`.
 
@@ -44,7 +52,6 @@ utilities.fs2zef.run(...)   % see +fs2zef/README.md for arguments
 ## Important notes
 
 - SimNIBS `meshLoadGmsh4.m` is vendor code; do not re-attribute it. FreeSurfer environment helpers live under `+fs2zef/+environment`.
-- `lf_tag_from_lf_type` maps lead_field_type **1–5**; anisotropic 6–10 are not in that map.
 - Verified registry ids: see `+inverse/README.md`. Examples: `+utilities/+cluster/+examples/`.
 
 ## Developer guidance

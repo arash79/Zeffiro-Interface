@@ -30,7 +30,7 @@ function zef = zef_set_figure_tool_sliders(zef, varargin)
 %   zef = zef_set_figure_tool_sliders(zef)
 %   zef = zef_set_figure_tool_sliders(zef, set_mode)
 %
-%   See also zef_figure_tool, zef_load, zef_reset_color_sliders.
+%   See also zef_figure_tool, zef_load.
 set_mode = 1;
 
 if not(isempty(varargin))
@@ -48,9 +48,6 @@ if eval('isfield(zef,''h_axes1'');')
             eval('zef.h_update_zoom.Value = 7;');
             eval('zef.h_update_transparency_reconstruction.Value = 0;');
             eval('zef.h_update_transparency_surface.Value = 0;');
-            eval('zef.h_update_transparency_sensor.Value = 0;');
-            eval('zef.h_update_transparency_cones.Value = 0;');
-            eval('zef.h_update_transparency_additional.Value = 0;');
             eval('zef.h_update_transparency_sensor.Value = 0;');
             eval('zef.h_update_transparency_cones.Value = 0;');
             eval('zef.h_update_transparency_additional.Value = 0;');
@@ -76,9 +73,6 @@ if eval('isfield(zef,''h_axes1'');')
             eval('zef.h_update_zoom.Value = zef.update_zoom;');
             eval('zef.h_update_transparency_reconstruction.Value = zef.update_transparency_reconstruction;');
             eval('zef.h_update_transparency_surface.Value = zef.update_transparency_surface;');
-            eval('zef.h_update_transparency_sensor.Value = zef.update_transparency_sensor;');
-            eval('zef.h_update_transparency_cones.Value = zef.update_transparency_cones;');
-            eval('zef.h_update_transparency_additional.Value = zef.update_transparency_additional;');
             eval('zef.h_update_transparency_sensor.Value = zef.update_transparency_sensor;');
             eval('zef.h_update_transparency_cones.Value = zef.update_transparency_cones;');
             eval('zef.h_update_transparency_additional.Value = zef.update_transparency_additional;');

@@ -1,76 +1,76 @@
 # Zeffiro Interface
 
-## Folder purpose
+Zeffiro is MATLAB software for building a finite-element model of the head (or another piecewise-constant volume) and for solving the associated electromagnetic **forward** and **inverse** problems.
 
-Repository root for Zeffiro, a MATLAB application for finite-element modeling of the human head and for solving EEG, MEG, EIT, and TES forward and inverse problems. You import tissue surfaces, build a tetrahedral mesh, compute a lead field (sources → sensors), then reconstruct neural activity or related fields from measurements. Session state is a single struct named `zef`, usually in the MATLAB base workspace.
+In plain language: you import tissue surfaces, fill them with tetrahedra, compute how candidate sources would look at the sensors, then reconstruct activity from measurements. The same machinery also covers electrical impedance tomography (EIT), transcranial electrical stimulation (TES / tES), and a few specialized pipelines (gravity, radar/wave, hemodynamics).
 
-## Main contents
+The project is aimed at researchers, students, and developers who need a scriptable FEM pipeline with a working GUI. You do not need to already know EEG source localization to start, but you will meet that vocabulary quickly; [docs/glossary.md](docs/glossary.md) introduces it.
 
-| Path | Role |
-|------|------|
-| `zeffiro_interface.m` | Startup and CLI name-value arguments |
-| `zeffiro_setup.m` | First-time path / toolbox / `zef_start_config` setup |
-| `zeffiro_downloader.m` | Fresh-install helper: shallow-clone repo, set profile INI, optional setup |
-| `src/` | Procedural `zef_*` runtime: GUI, mesh, forward, I/O |
-| `+core/`, `+inverse/`, `+utilities/`, `+plugins/` | Refactored MATLAB packages (call as `core.*`, `inverse.*`, …) |
-| `tools/plugins/` | GUI Inverse / Forward / Multi tools plugins |
+Session state is a single MATLAB struct named `zef`, usually in the base workspace. Almost every window and script reads and writes fields of that struct.
+
+## What a typical session looks like
+
+```text
+import tissue surfaces
+        ↓
+create a labeled tetrahedral mesh
+        ↓
+attach sensors
+        ↓
+assemble a lead field  (zef.L)
+        ↓
+import or synthesize measurements
+        ↓
+run an inverse method  (zef.reconstruction)
+        ↓
+visualize / export
+```
+
+1. Import anatomy (a `.zef` segmentation, or **Import** in the GUI).
+2. Import electrodes or another sensor set.
+3. Mesh tool → **Create FEM mesh**.
+4. Mesh tool forward-simulation table → **Run script** (or `zef_lead_field_matrix` / `zef_eeg_make_all`) so `zef.L` exists.
+5. Invert: either an **Inverse tools** plugin, or the programmable path `zef_inverse_run`.
+6. Draw the result in the Figure / mesh-visualization tools.
+
+Those two inverse paths are **not** the same code. Most Inverse-tools menus still call legacy functions under `plugins/`. Four entries labelled **(class solver)** (eLORETA, UKF-NMM, HALpR, Group Lasso) open a dialog whose Start button calls `zef_inverse_run` and constructs `inverse.*Inverter`. Scripts and cluster jobs use that class path directly. See [docs/architecture.md](docs/architecture.md) and [ADR-002](docs/adr/ADR-002-dual-inverse-tracks.md).
+
+## Major pieces of the repository
+
+| Path | What lives there |
+|------|------------------|
+| `zeffiro_interface.m` | Launch and CLI name-value arguments |
+| `zeffiro_setup.m` | Optional git submodules; writes `src/app/zef_start_config.m` |
+| `src/` | Procedural `zef_*` runtime: session, GUI, mesh, forward, I/O |
+| `+core/`, `+inverse/`, `+utilities/` | Packages `core.*`, `inverse.*`, `utilities.*` |
+| `plugins/` | GUI Inverse / Forward / Multi tools (INI-discovered) |
 | `profile/` | INI files for menus and default parameters |
-| `data/`, `assets/`, `documentation/` | Example data, GUI assets, typeset manual |
-| `+examples/`, `+tests/` | Scripts and unit tests |
-| `external/` | Optional git submodules |
-| `scripts/` | Maintainer utilities (STL QA, contributing notes) — not on runtime path |
+| `data/` | Example segmentations, electrode caps, optional projects |
+| `+examples/`, `+tests/` | Worked scripts and MATLAB unit tests |
+| `docs/` | Architecture, getting started, conventions, methods |
+| `documentation/` | Typeset scientific manual (LuaLaTeX) |
+| `external/` | Optional third-party git submodules |
+| `assets/` | GUI icons and figures |
 
-### Root lab / batch scripts (not product entry points)
+`src/app` (start, update, close) is not the `+core` package. Do not `addpath` a `+package` folder yourself; add the **project root** so MATLAB can resolve `core.*` / `inverse.*` / `utilities.*`.
 
-| File | Role |
-|------|------|
-| `kalman_primer.m` | Synthesize two-dipole Blackman–Harris measurements on live `zef.L` → `zef.measurements` |
-| `kalman_custom_q_driver.m` | Lab Kalman batch: load project + **precomputed Q `.mat`** from disk; runs KF/sLORETA/W **without** relying on `zef_KF`’s diagonal Q |
-| `compute_Q.m` | Build process-noise `Q` (diagonal or DTI FA/tractography) from live `zef`; no invert |
-| `compartment_wise.m` | Lab batch: ICBM152 projects → parcellation CSVs from sensitivity stats |
-| `run_eloreta_shalpr_snr_sweep.m` | Lab SNR sweep: sLORETA / Dipole Scan / eLORETA / SHALpR via `zef_run_inverse_pipeline` |
-| `check.m` | Micro-benchmark (`rand` GEMM `timeit`) — no Zeffiro API |
+## Requirements
 
-These scripts often use **hard-coded absolute paths** and project filenames from a lab machine; edit before running on a clean clone.
+- MATLAB **R2023a** or newer. `arguments` blocks and App Designer `uifigure` only need R2021a, but the inverse precompute paths call `pageeig` (R2023a) and `pagesvd` (R2021b), so R2023a is the real floor. MATLAB R2025a defaults new figures to docked windows; Zeffiro forces standalone windows through `zef_window_manager`.
+- Optional: Parallel Computing Toolbox, a CUDA GPU (`zef.use_gpu`), Statistics Toolbox (GMM / UKFNMM k-means), Optimization / CVX (tES workbench).
+- Git, if you want optional toolboxes under `external/` (`zeffiro_setup`).
 
-`src/core` (lifecycle: start, update, close) is not the same as the `+core` package.
+## Install and start
 
-## Code functionality
-
-`zeffiro_interface` adds the project root (so packages resolve), `genpath(src)`, plugin folders, `profile/`, and `assets/` to the path; runs `zeffiro_setup` unless skipped; calls `zef_start` (opens segmentation, figure, mesh, mesh-visualization, and menu tools); and may load `data/default_project.mat` if present.
-
-Almost every function reads and writes fields of `zef`. GUI widgets are `zef.h_*`. Compartments use short tags (e.g. `d1`) and fields such as `d1_on`, `d1_points`, `d1_sigma`. Key fields after meshing / forward / inverse: `nodes`, `tetra`, `domain_labels`, `reuna_p` / `reuna_t`, `sensors` / `s_points` / `s_name_list`, `L`, `reconstruction`, `compartment_tags`. `zef_update` copies table and widget values into these fields.
-
-## Workflow context
-
-```mermaid
-flowchart LR
-  IMP[Import segmentation] --> SURF[Compartment surfaces]
-  SURF --> MESH[Create FEM mesh]
-  MESH --> LF[Lead field]
-  LF --> INV[Inverse]
-  INV --> VIZ[Figure tool]
-```
-
-1. Import anatomy (`.zef` or Import menu). 2. Import electrodes. 3. Mesh tool → **Create FEM mesh**. 4. Forward-simulation table **Run script** (or `zef_eeg_make_all` / `zef_lead_field_matrix`) → `zef.L`. 5. Inverse via GUI plugins (`tools/plugins`) or `zef_inverse_run` / `+inverse` classes. 6. Visualize in Figure / mesh-visualization tools.
-
-Menus under **Inverse tools** still call legacy plugin iterations. Class solvers:
-
-```matlab
-[zef, run_result] = zef_inverse_run(zef, 'eloreta', 'execution', 'local');
-```
-
-Default profile is `multicompartment_head` (`profile/zeffiro_interface.ini`).
-
-## Usage instructions
-
-Needs MATLAB with `arguments` blocks and App Designer `uifigure` (R2021a+ practical floor). Optional: Parallel Computing Toolbox, CUDA (`zef.use_gpu`), Statistics / Optimization toolboxes.
+Clone the repository, `cd` into it, and from MATLAB:
 
 ```matlab
 zef = zeffiro_interface;
 ```
 
-Batch / headless:
+That adds `src/`, `plugins/`, `profile/`, and `assets/` to the path, runs `zeffiro_setup` unless you skip it, opens the core tools, and loads `data/default_project.mat` **if that file exists**. Fresh clones often do not ship it; that is expected.
+
+Headless / batch:
 
 ```matlab
 zef = zeffiro_interface('start_mode', 'nodisplay', ...
@@ -78,24 +78,59 @@ zef = zeffiro_interface('start_mode', 'nodisplay', ...
     'multicompartment_head_project', 'import_segmentation.zef'));
 ```
 
-`start_mode` is `"display"`, `"nodisplay"`, or `"default"`. See `help zeffiro_interface` for all arguments. If `zef` already exists in the base workspace, use `zef_close_all` or `'zeffiro_restart', true`.
+`start_mode` is `"display"`, `"nodisplay"`, or `"default"`. Hidden figures may still be created in nodisplay mode. If `zef` already exists in the base workspace, close it with `zef_close_all` or pass `'zeffiro_restart', true`.
 
-Do not add `+core` or `+inverse` to the path yourself—call `zeffiro_interface` from the project root.
+`help zeffiro_interface` lists every name-value argument.
 
-## Important notes
+A slower but more complete first walk-through is [docs/getting-started.md](docs/getting-started.md). Scripted mesh and lead-field demos live in [`+examples/`](+examples/README.md).
 
-- Fresh clones often lack `data/default_project.mat`; that is expected.
-- Hidden windows may still be created in nodisplay mode.
-- Root lab scripts (`kalman_custom_q_driver.m`, `kalman_primer.m`, `compute_Q.m`, …) use machine-local paths — edit before running.
-- Electrode formats: `+core/+io/+electrodes/README.md`. Mesh details: `src/mesh/README.md`. Lead fields: `src/forward/lead_field/README.md`. Inverse: `+inverse/README.md`, `src/inverse/README.md`.
-- Worked scripts: `+examples/`. Tests: `runtests('+tests')`.
-- Folder-level `README.md` files throughout the tree are the maintainer map; start at this root file, then open the README in the subsystem you need.
+To clone from MATLAB into a new folder (shallow clone, then optional `zeffiro_setup`):
 
-## Developer guidance
+```matlab
+zeffiro_downloader('install_directory', pwd, 'run_setup', true)
+```
 
-- Do not `addpath` a `+package` folder; add the project root.
-- GUI callbacks should assign `zef` and call `zef_update` when tables change.
-- `src/core/zef_start_config.m` is generated by `zeffiro_setup`; do not hand-edit it as source of truth.
-- Third-party copies keep original licenses; do not re-attribute them.
-- MATLAB `help` for a file is the comment block immediately after `function` / `classdef` (or at the top of a script).
-- Parent READMEs give workflow; child READMEs go into implementation.
+That helper is for a **fresh** install, not for updating an existing working tree. `help zeffiro_downloader` lists the name-value arguments (`branch_name`, `profile_name`, `submodules`, …). The default branch is `master` (the official GitHub default). Pass `'branch_name', 'main_development_branch'` to clone the live upstream development line. Git arguments are shell-quoted; `git_address` must be an `https`/`git@`/`ssh`/`file` URL.
+
+## Documentation map
+
+Start at the layer that matches the question:
+
+| Question | Document |
+|----------|----------|
+| How do I run it once? | [docs/getting-started.md](docs/getting-started.md) |
+| What does this word / field mean? | [docs/glossary.md](docs/glossary.md), [docs/zef-state.md](docs/zef-state.md) |
+| mm vs m, `L` orientation, indexing | [docs/conventions.md](docs/conventions.md) |
+| Where does the code live? | [docs/architecture.md](docs/architecture.md) |
+| Why is the inverse ill-posed? Which solver? | [docs/methods.md](docs/methods.md) |
+| Something failed | [docs/troubleshooting.md](docs/troubleshooting.md) |
+| Where do I put a new solver / plugin? | [docs/developer-guide.md](docs/developer-guide.md) |
+| Why two inverse tracks? | [docs/adr/](docs/adr/) |
+| Numbers vs upstream Zeffiro | [docs/upstream.md](docs/upstream.md) |
+| Equations in print form | [`documentation/`](documentation/README.md) |
+| How to contribute | [CONTRIBUTING.md](CONTRIBUTING.md) |
+
+Folder-level `README.md` files under `src/`, `+inverse`, `plugins/`, and so on describe that directory’s implementation. MATLAB `help` on a function is the comment block immediately after `function` / `classdef`.
+
+## Tests
+
+From the project root, after `zeffiro_interface` has put packages on the path:
+
+```matlab
+import matlab.unittest.TestSuite
+run(TestSuite.fromPackage('tests', 'IncludingSubpackages', true))
+```
+
+`runtests('+tests')` does **not** discover the nested `tests.unit` / `tests.integration` / `tests.smoke` packages. Details: [`+tests/README.md`](+tests/README.md).
+
+This tree does not ship GitHub Actions or other hosted CI. Run the suite locally after path setup.
+
+## Cite, license, issues
+
+Method-specific papers (eLORETA, RAMUS, Kalman, HALpR, …) are listed in [CITATION.md](CITATION.md). This repository does not currently ship a single official `CITATION.cff` for the software as a whole.
+
+Zeffiro is licensed under the [GNU GPL v3](LICENSE). Bundled fonts, optional submodules, and other third-party notices: [THIRD_PARTY.md](THIRD_PARTY.md).
+
+Upstream project: [github.com/sampsapursiainen/zeffiro_interface](https://github.com/sampsapursiainen/zeffiro_interface). Report issues there (or on the fork you are working from).
+
+Default GUI profile is `multicompartment_head` (`profile/zeffiro_interface.ini`).

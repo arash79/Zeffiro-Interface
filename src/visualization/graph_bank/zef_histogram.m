@@ -9,8 +9,7 @@ function zef_histogram(parameter_vec)
 %   Function. Mesh visualization → Plot graph. cla zef.h_axes1 (base).
 %   200 bins, gray faces. evalin('base','zef.h_axes1').
 
-axes(evalin('base','zef.h_axes1')
-);
+axes(evalin('base','zef.h_axes1'));
 
 h_axes = evalin('base','zef.h_axes1');
 cla(h_axes,'reset');

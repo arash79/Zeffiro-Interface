@@ -23,10 +23,17 @@ function zef = zef_lead_field_matrix(zef)
 %   Source model: core.types.ZefSourceModel.from(zef.source_model). Continuous
 %   Whitney/H(div)/St. Venant keep nearest_source_neighbour_inds; discrete
 %   models clear them. Direction mode 1/2/3 → cartesian/normal/face_based.
-%   Preconditioner 1/2 → cholinc/ssor; defaults cholinc_tol=0.001, pcg_tol=1e-8.
+%   Preconditioner 1/2 → lf_param.precond 'cholinc'/'ssor'. On CPU that
+%   selects ichol(nofill) vs SSOR inside zef_transfer_matrix (EEG/TES) and
+%   the inlined MEG/EIT PCG. GPU always uses Jacobi (1./diag(A)) and
+%   ignores precond. solver_tolerance → pcg_tol (zef_init default 1e-6;
+%   missing-field fallback here is 1e-8). preconditioner_tolerance is
+%   copied to cholinc_tol but is not read by the PCG (ichol is nofill).
 %
-%   Coordinates: copies nodes/sensors to *_aux and divides mm by 1000 before
-%   FEM. EEG/EIT/TES with 3-column sensors use sensors_attached_volume(:,1:3).
+%   Coordinates: copies nodes to nodes_aux /1000 (metres). Sensor scaling
+%   is zef_lead_field_sensors_aux for types 1–10: PEM EEG/EIT/TES (1,4,5
+%   and anisotropic 6,9,10) use attached xyz/1000; MEG (2,3 and anisotropic
+%   7,8) use zef.sensors xyz/1000; CEM attachment tables stay unscaled.
 %   After the solve, location_unit 1/2/3 scales source_positions back to
 %   mm/cm/m. If source_interpolation_on, calls zef_source_interpolation.
 %
@@ -90,13 +97,6 @@ else
 end
 
 zef.brain_activity_inds = [];
-zef.aux_vec_sources = zeros(length(zef.compartment_tags),1);
-
-for zef_i = 1 : length(zef.compartment_tags)
-    zef.aux_vec_sources(zef_i) = eval(['isequal(zef.' zef.compartment_tags{zef_i} '_sources_old, zef.' zef.compartment_tags{zef_i} '_sources);']);
-end
-
-% if not(zef.source_space_lock_on) && ( isempty(zef.source_ind) || not(zef.n_sources == zef.n_sources_old) || ismember(false,zef.aux_vec_sources) )
 
 if isempty(zef.non_source_ind)
     zef.brain_activity_inds = zef.brain_ind;
@@ -115,18 +115,11 @@ if ~ isfield(zef, 'acceptable_source_depth')
     zef.acceptable_source_depth = 0; % mm
 end
 
-[T_fi, G_fi, ~, ~, ~, ~] = zef_fi_dipoles( ...
-    zef.nodes, ...
-    zef.tetra, ...
-    zef.brain_ind ...
-    );
+% Interior source tetrahedra are those with four brain-face neighbours.
+% This is the same occupancy test as sum(T_fi,1)==4 from zef_fi_dipoles,
+% but only the neighbour count is needed here (G_fi is discarded).
 
-% Also restrict to tetra which have 4 neighbours to make sure we are not on
-% the surface, but in the brain.
-
-valid_source_inds_builder = full(find(sum(T_fi,1) == 4))';
-
-clear T_fi;
+valid_source_inds_builder = tets_with_four_brain_neighbours(zef.tetra, zef.brain_ind);
 
 [~, ~, ~, zef.brain_activity_inds] = zef_deep_nodes_and_tetra( ...
     zef.nodes, ...
@@ -166,18 +159,14 @@ clear zef_i;
 zef.source_ind = zef.brain_activity_inds(zef.source_ind);
 zef.n_sources_mod = 0;
 
-%end % if
-
 zef.sensors_aux = zef.sensors;
 zef.nodes_aux = zef.nodes/1000;
 
-if ismember(zef.lead_field_type,[1,4,5]) & size(zef.sensors,2) == 3
-    zef.sensors_aux = zef.sensors_attached_volume(:,1:3)/1000;
-elseif ismember(zef.lead_field_type,[2,3])
-    zef.sensors_aux(:,1:3) = zef.sensors_aux(:,1:3)/1000;
-else
-    zef.sensors_aux = zef.sensors_attached_volume;
+attached = [];
+if isfield(zef, 'sensors_attached_volume')
+    attached = zef.sensors_attached_volume;
 end
+zef.sensors_aux = zef_lead_field_sensors_aux(zef.lead_field_type, zef.sensors, attached);
 
 zef.lf_param.dipole_mode = 1;
 
@@ -285,6 +274,9 @@ if zef.lead_field_type == 5
 end
 
 %%%SP 11/2025 START: anisotropic lead fields
+if ismember(zef.lead_field_type, 6:10)
+    zef_require_anisotropic_conductivity(zef);
+end
 if zef.lead_field_type == 6
 
     if size(zef.sensors,2) == 6
@@ -379,8 +371,13 @@ if zef.lead_field_type == 10
 end
 %%%SP 11/2025 END: anisotropic lead fields
 
+if ~ismember(zef.lead_field_type, 1:10)
+    warning('zef_lead_field_matrix:UnknownType', ...
+        'lead_field_type %g is not in 1–10; zef.L was not updated.', ...
+        zef.lead_field_type);
+end
 
-zef = rmfield(zef,{'nodes_aux','sensors_aux','aux_vec_sources'});
+zef = rmfield(zef,{'nodes_aux','sensors_aux'});
 
 clear optimization_system_type;
 
@@ -526,3 +523,41 @@ switch core.types.ZefSourceModel.from(source_model)
 end % switch
 
 end % function
+
+function valid = tets_with_four_brain_neighbours(tetrahedra, brain_ind)
+% Interior brain tetrahedra: every face is shared with another brain tet.
+% Equivalent to full(find(sum(T_fi,1)==4))' from zef_fi_dipoles.
+
+if isempty(brain_ind)
+    valid = zeros(0, 1);
+    return
+end
+
+n_tet = size(tetrahedra, 1);
+n_brain = numel(brain_ind);
+face_opp = [
+    2 3 4
+    1 3 4
+    1 2 4
+    1 2 3
+    ];
+
+keys = zeros(4 * n_brain, 3);
+owners = zeros(4 * n_brain, 1);
+for f = 1:4
+    sl = (f - 1) * n_brain + (1:n_brain);
+    keys(sl, :) = sort(tetrahedra(brain_ind, face_opp(f, :)), 2);
+    owners(sl) = brain_ind;
+end
+
+[~, ~, ic] = unique(keys, 'rows');
+counts = accumarray(ic, 1);
+
+if any(counts > 2)
+    error('Non-manifold tetrahedral mesh: a face belongs to more than two brain tetrahedra.');
+end
+
+pair_owners = owners(counts(ic) == 2);
+n_neighbours = accumarray(pair_owners, 1, [n_tet, 1]);
+valid = find(n_neighbours == 4);
+end

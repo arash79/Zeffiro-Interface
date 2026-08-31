@@ -11,6 +11,9 @@ function [submissions, bundles] = kalman_workflow(zef_inputs, cluster_profile, o
 %   zef_inputs is a struct array or cell of zef structs. Each entry is passed
 %   to zef_inverse_extract_bundle with opts.MethodId (default "kalman") and
 %   opts.MethodParams, then batch-submitted via submit_inverse_jobs.
+%
+%   Name-value opts match eloreta_workflow: MethodId, MethodParams, WorkDir,
+%   BundleDir, ResultDir. This is the class Kalman path, not plugins/Kalman.
 
 arguments
     zef_inputs
@@ -27,7 +30,7 @@ if isstruct(zef_inputs)
 elseif iscell(zef_inputs)
     zef_cell = zef_inputs;
 else
-    error("utilities.cluster.examples:InvalidInput", ...
+    error("utilities:cluster:examples:InvalidInput", ...
         "zef_inputs must be a struct array or a cell array of structs.");
 end
 

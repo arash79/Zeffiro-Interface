@@ -1,42 +1,44 @@
-# external/OSQP
+# `external/OSQP`
 
-## Purpose of this folder
+## Folder purpose
 
-This folder is responsible for placeholder folders for optional external solver/toolbox submodules within the Zeffiro Interface project.
+Optional **OSQP MATLAB** quadratic-program solver (git submodule `osqp-matlab`). Reserved as an alternative QP engine. First-party inverse and ES Workbench code does **not** currently call `osqp` by name; the folder exists so `zeffiro_setup` can put OSQP on the path when a future or local wrapper `which`s it. Empty until cloned. Not Zeffiro-owned source.
 
-## Contents
+## Main contents
 
-This folder currently contains no tracked source or asset files. It is kept as a placeholder for runtime or optional dependency content.
+| Item | Role |
+|------|------|
+| Vendor tree (after clone) | OSQP MATLAB interface |
+| This README | Why the submodule exists |
 
-## How this folder fits into the overall workflow
+`.gitmodules`: `https://github.com/osqp/osqp-matlab.git`, branch `master`. No `startupscript`.
 
-Zeffiro Interface starts in `zeffiro_interface.m`, adds the project runtime paths, and then calls into folders like this one as the GUI, examples, plugins, or numerical routines require placeholder folders for optional external solver/toolbox submodules.
+## Code functionality
 
-## GUI usage
+`zeffiro_setup` `addpath('external/OSQP')` after a successful clone. No `run()` of a vendor startup file. There is no `zef_osqp_*` wrapper in `plugins/` at the time this README was written — confirm with `grep` before assuming a GUI path.
 
-There is no direct GUI entry point here; these folders are dependency locations populated by setup when optional submodules are installed.
+## Workflow context
 
-## Programmatic usage
+```
+.gitmodule OSQP → zeffiro_setup → zef_start_config addpath
+  → optional local/experimental QP code
+```
 
-From MATLAB, start from the project root and initialize paths with either `zeffiro_interface` or `addpath(genpath(projectRoot))` when you only need utility functions.
+tES optimization in production uses MATLAB Optimization Toolbox and/or CVX (SDPT3/SeDuMi), plus optional Gurobi/MOSEK wrappers in ES Workbench — not this tree.
 
-This folder has no directly callable MATLAB source files. Use the files here through the surrounding GUI, data import, profile, or documentation workflow.
+## Usage instructions
 
-## Examples
+```matlab
+zeffiro_setup("submodules", "OSQP");
+```
 
-GUI example: use the surrounding Zeffiro workflow that references this folder's assets or configuration files.
+## Important notes
 
-MATLAB example: load or inspect these files with standard MATLAB I/O functions such as `load`, `readmatrix`, or `fileread` when appropriate.
+- Empty placeholder is expected.
+- Do not rewrite OSQP’s own documentation here.
+- Cloning OSQP does not change Inverse-tools menus.
 
-## Dependencies and assumptions
+## Developer guidance
 
-- The Zeffiro project root should be available on the MATLAB path before calling source files directly.
-- Many routines assume a populated `zef` struct created by `zeffiro_interface` and updated by GUI callbacks.
-- Optional dependency folders may be empty until `zeffiro_setup` initializes the configured submodules.
-
-## Notes for developers
-
-- Keep documentation synchronized with behavior when adding or moving files; this repository now expects every folder to have a current `README.md`.
-- Preserve numerical algorithms, GUI callback contracts, and `zef` field names unless a coordinated migration updates all callers.
-- Prefer package-qualified functions in `+...` folders and avoid adding package directories themselves directly to the MATLAB path.
-- Treat `.fig`, `.mlapp`, `.mat`, and sample data files as part of the public workflow: document required fields and formats when they change.
+- If you add an OSQP backend, wrap it in first-party `zef_*` code and mention the caller in this README and in `plugins/ZeffiroESWorkbench/m/README.md`.
+- Pitfall: assuming ES Workbench “QP” dropdown equals this submodule.

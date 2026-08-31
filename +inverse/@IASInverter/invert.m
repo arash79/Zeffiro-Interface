@@ -80,28 +80,37 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
             date_str = display_waitbar(h,i,self.n_map_iterations,update_freq,date_str,time_val);
         end
 
-        % IAS MAP filter: W = diag(d_sqrt) * L' * inv(L diag(d_sqrt^2) L' + C)
-        W = L .* repmat( d_sqrt' , size(L,1), 1);
-        W = d_sqrt.*( W' * inv( W * W' + S_mat ) );
-        
-        if strcmp(method_type, "dSPM each step")
-            dspm_vec = sum(W.^2, 2);
-            dspm_vec = sqrt(dspm_vec);
-            W = W./dspm_vec;
-        elseif strcmp(method_type, "dSPM last step")
-            if i == self.n_map_iterations
+        % IAS MAP filter: W = diag(d_sqrt) * L' * inv(L diag(d_sqrt^2) L' + C).
+        % Skip forming W when only z = W*f is required (None / non-final last-step).
+        Wd = L .* d_sqrt';
+        A = Wd * Wd' + S_mat;
+        need_full_W = strcmp(method_type, "dSPM each step") ...
+            || (i == self.n_map_iterations && (strcmp(method_type, "dSPM last step") ...
+            || strcmp(method_type, "sLORETA last step")));
+        if need_full_W
+            W = d_sqrt.*( Wd' * inv( A ) );
+
+            if strcmp(method_type, "dSPM each step")
                 dspm_vec = sum(W.^2, 2);
                 dspm_vec = sqrt(dspm_vec);
                 W = W./dspm_vec;
+            elseif strcmp(method_type, "dSPM last step")
+                if i == self.n_map_iterations
+                    dspm_vec = sum(W.^2, 2);
+                    dspm_vec = sqrt(dspm_vec);
+                    W = W./dspm_vec;
+                end
+            elseif strcmp(method_type, "sLORETA last step")
+                if i == self.n_map_iterations
+                    sloreta_vec = sqrt(sum(W.*L', 2));
+                    W = W./sloreta_vec(:,ones(size(W,2),1));
+                end
             end
-        elseif strcmp(method_type, "sLORETA last step")
-            if i == self.n_map_iterations
-                sloreta_vec = sqrt(sum(W.*L', 2));
-                W = W./sloreta_vec(:,ones(size(W,2),1));
-            end
+
+            z_vec = W*f;
+        else
+            z_vec = d_sqrt .* (Wd' * (A \ f));
         end
-    
-        z_vec = W*f;
         
         if opts.use_gpu && gpuDeviceCount > 0
             z_vec = gather(z_vec);

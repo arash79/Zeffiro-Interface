@@ -13,7 +13,7 @@ function [bh_vec, d_bh_vec] = bh_window(t, T, carrier_cycles_per_pulse_cycle, ca
 %
 %   [bh_vec, d_bh_vec] = bh_window(t, T, carrier_cycles_per_pulse_cycle, carrier_mode)
 %
-%   See also mh_window, qam_demod.
+%   See also qam_demod.
 
 
 

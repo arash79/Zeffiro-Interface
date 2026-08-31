@@ -7,7 +7,6 @@ function [L_eit, bg_data, dof_positions, dof_directions, dof_ind, dof_count] = l
     p_nearest_neighbour_inds, ...
     varargin ...
     )
-
 %LEAD_FIELD_EIT_FEM  FEM electrical impedance tomography lead field (types 4, 9).
 %
 %   Zeffiro Interface.
@@ -16,8 +15,9 @@ function [L_eit, bg_data, dof_positions, dof_directions, dof_ind, dof_count] = l
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Called as zef_lead_field_eit_fem from zef_lead_field_matrix. Builds CEM/PEM
-%   electrode patterns, conductivity stiffness, transfer/Schur system, and
-%   the EIT Jacobian with respect to tetrahedral conductivity. Also returns
+%   electrode patterns, conductivity stiffness, an inlined transfer/Schur PCG
+%   (not zef_transfer_matrix; GPU Jacobi, CPU SSOR/ichol nofill), and the EIT
+%   Jacobian with respect to tetrahedral conductivity. Also returns
 %   background electrode data and the nearest-source binning from
 %   zef_make_eit_dec / zef_decompose_dof_space (zef.redo_eit_dec).
 %
@@ -26,7 +26,8 @@ function [L_eit, bg_data, dof_positions, dof_directions, dof_ind, dof_count] = l
 %       p_nearest_neighbour_inds, brain_ind, source_ind, lf_param)
 %
 %   Input: nodes in metres; sigma isotropic 1-col or anisotropic 6-col as in
-%   EEG FEM. Electrodes PEM [n × 3] or CEM [n × 4]; impedances in lf_param.
+%   EEG FEM. Electrodes: PEM [n × 3] metres, or CEM [n × 4] attachment
+%   indices (not metres). Impedances in lf_param.
 %
 %   Output
 %     L_eit           - EIT lead field / Jacobian (sensors × source DOFs)
@@ -102,12 +103,9 @@ if size(electrodes,2) == 4
     impedance_inf = 1;
 else
     electrode_model = 'PEM';
-    L = size(electrodes,1);
-    ele_ind = zeros(L,1);
-    for i = 1 : L
-        [min_val, min_ind] = min(sum((repmat(electrodes(i,:),N,1)' - nodes').^2));
-        ele_ind(i) = min_ind;
-    end
+    error('zef_lead_field_eit_fem:PEMNotSupported', ...
+        ['EIT lead fields require CEM electrodes (4-column attachment table). ', ...
+         'Point-electrode (PEM) EIT is not implemented.']);
 end
 
 n_varargin = length(varargin);
@@ -159,7 +157,7 @@ K = length(brain_ind);
 
 clear electrodes;
 A = spalloc(N,N,0);
-D_A = zeros(K,10);
+D_A = zef_p1_unweighted_gradient_products(nodes, tetrahedra, brain_ind);
 
 Aux_mat = [nodes(tetrahedra(:,1),:)'; nodes(tetrahedra(:,2),:)'; nodes(tetrahedra(:,3),:)'] - repmat(nodes(tetrahedra(:,4),:)',3,1);
 ind_m = [1 4 7; 2 5 8 ; 3 6 9];
@@ -176,20 +174,15 @@ ind_m = [ 2 3 4 ;
 h=zef_waitbar(0,waitbar_length,'System matrices.');
 waitbar_ind = 0;
 
-D_A_count = 0;
-% Assemble conductivity-weighted stiffness A and the unweighted gradient
-% products D_A. D_A(:,1:10) stores the unique (i,j) node-pair integrals of
-% ∇ψ_i·∇ψ_j / (9V) on brain tetrahedra; the Jacobian loop below uses those
-% as the 4×4 local conductivity derivative (no σ). Face-area vectors as in
-% zef_volume_gradient (signed cross products / 2), not true ∇ψ.
+% Assemble conductivity-weighted stiffness A. Unweighted ∇ψ·∇ψ products
+% for the Jacobian live in D_A (zef_p1_unweighted_gradient_products).
+% Face-area vectors as in zef_volume_gradient (signed cross products / 2).
 for i = 1 : 4
 
     grad_1 = cross(nodes(tetrahedra(:,ind_m(i,2)),:)'-nodes(tetrahedra(:,ind_m(i,1)),:)', nodes(tetrahedra(:,ind_m(i,3)),:)'-nodes(tetrahedra(:,ind_m(i,1)),:)')/2;
     grad_1 = repmat(sign(dot(grad_1,(nodes(tetrahedra(:,i),:)'-nodes(tetrahedra(:,ind_m(i,1)),:)'))),3,1).*grad_1;
 
     for j = i : 4
-
-        D_A_count = D_A_count + 1;
 
         if i == j
             grad_2 = grad_1;
@@ -199,7 +192,6 @@ for i = 1 : 4
         end
 
         entry_vec = zeros(1,size(tetrahedra,1));
-        entry_vec_2 = zeros(1,size(tetrahedra,1));
         for k = 1 : 6
             switch k
                 case 1
@@ -224,16 +216,11 @@ for i = 1 : 4
 
             if k <= 3
                 entry_vec = entry_vec + sigma_tetrahedra(k,:).*grad_1(k_1,:).*grad_2(k_2,:)./(9*tilavuus);
-                entry_vec_2 = entry_vec_2 + grad_1(k_1,:).*grad_2(k_2,:)./(9*tilavuus);
-
             else
                 entry_vec = entry_vec + sigma_tetrahedra(k,:).*(grad_1(k_1,:).*grad_2(k_2,:) + grad_1(k_2,:).*grad_2(k_1,:))./(9*tilavuus);
-                entry_vec_2 = entry_vec_2 + grad_1(k_1,:).*grad_2(k_2,:)./(9*tilavuus);
             end
 
         end
-
-        D_A(:, D_A_count) = D_A(:, D_A_count) + entry_vec_2(brain_ind)';
 
         A_part = sparse(tetrahedra(:,i),tetrahedra(:,j), entry_vec',N,N);
         clear entry_vec;
@@ -253,6 +240,11 @@ for i = 1 : 4
 end
 
 clear A_part grad_1 grad_2 ala sigma_tetrahedra;
+
+% Point / buried CEM rows → boundary triangles (same as EEG/TES).
+if isequal(electrode_model, 'CEM')
+    ele_ind = zef_pem2cem(ele_ind, tetrahedra);
+end
 
 % Complete electrode model: triangle areas ala, then B (nodes×electrodes)
 % and C (electrodes×electrodes) from 1/Z. Infinite impedance is rejected
@@ -331,7 +323,7 @@ clear A_aux A_part;
 % (Schur). Non-converged PCG returns L_eit = [].
 zef_waitbar(0,L-1,h,'PCG iteration.');
 
-if eval('zef.use_gpu')==1 && evalin('base','zef.gpu_count') > 0
+if zef_session_wants_gpu(zef)
     precond_vec = gpuArray(1./full(diag(A)));
     A = gpuArray(A);
 
@@ -542,8 +534,8 @@ end
 % EIT Jacobian: for each brain tetra i, form the 4×4 local ∇ψ·∇ψ matrix
 % from D_A, pull nodal potentials on that tet, and accumulate
 %   -R * Φ_tet * G_local * Φ_tet' * Current_pattern
-% into the source bin dof_ind(i). Volume weighting of the bins is commented
-% out (tilavuus_vec_aux). zef.redo_eit_dec==0 reuses zef.eit_ind/eit_count.
+% into the source bin dof_ind(i). zef.redo_eit_dec==0 reuses
+% zef.eit_ind/eit_count.
 Current_pattern = eval('zef.current_pattern');
 bg_data = Aux_mat*Current_pattern;
 bg_data = Aux_mat_6 * bg_data;
@@ -555,8 +547,6 @@ L_eit_aux = zeros(size(Current_pattern,2)*L,K3);
 zef_waitbar(0,K,h,'Interpolation.');
 
 tic;
-
-tilavuus_vec_aux = zeros(length(source_ind),1);
 
 for i = 1 : K
 
@@ -575,8 +565,6 @@ for i = 1 : K
 
     L_eit_aux(:,dof_ind(i)) = L_eit_aux(:,dof_ind(i)) + Aux_mat_5(:);
 
-    %tilavuus_vec_aux(dof_ind(i)) = tilavuus_vec_aux(dof_ind(i)) + tilavuus(brain_ind(i))*dof_count(dof_ind(i));
-
     if mod(i,floor(K/50))==0
         time_val = toc;
         zef_waitbar(i,K,h,['Interpolation. Ready: ' datestr(datevec(now+(K/i - 1)*time_val/86400)) '.']);
@@ -586,10 +574,6 @@ end
 zef_waitbar(K,K,h);
 
 close(h);
-
-%for i = length(source_ind)
-%L_eit_aux(:,i) = L_eit_aux(:,i)/tilavuus_vec_aux(i);
-%end
 
 L_eit = L_eit_aux;
 

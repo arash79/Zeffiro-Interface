@@ -45,25 +45,41 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
 
     end
 
+    fixed_orientation_source_inds = procFile.s_ind_4;
+    free_orientation_source_inds = setdiff(1:length(procFile.s_ind_0), procFile.s_ind_4);
+
+    % The caches are only valid for the lead field, noise_cov and
+    % regularization they were built from. The cached path never looks at the
+    % L passed in, so a stale factorization would otherwise be applied to a
+    % different model without any warning.
+    if ~isempty(self.precomputed_L_w) ...
+            && ~isequaln(self.precomputed_cache_key, self.cacheKey(L))
+        self.precomputed_L_w = [];
+        self.precomputed_whitening = [];
+        self.precomputed_U_pages = [];
+        self.precomputed_S_diag = [];
+        self.precomputed_V_pages = [];
+        self.precomputed_cache_key = struct([]);
+    end
+
+    % Fast path: if precompute(L) was called, all per-source SVDs and the
+    % Mahalanobis whitening of L have been cached. Apply them in one batched
+    % matrix multiply per frame. Skip the nested waitbar — the cached path
+    % is a few milliseconds and run_frame_loop already reports frame progress.
+
+    has_cache = ~isempty(self.precomputed_L_w) && ~isempty(self.precomputed_U_pages);
+    if has_cache
+        z_vec = i_invert_cached(self, f, fixed_orientation_source_inds, free_orientation_source_inds);
+        return;
+    end
+
     % Initialize waitbar with a cleanup object that automatically closes the
     % waitbar, if there is an interruption with Ctrl + C or when this function
-    % exits.
+    % exits. Only used by the legacy per-source path below.
     if self.number_of_frames <= 1
         h = zef_waitbar(0,'Dipole Scan reconstruction.');
         cleanup_fn = @(wb) close(wb);
         cleanup_obj = onCleanup(@() cleanup_fn(h));
-    end
-
-    fixed_orientation_source_inds = procFile.s_ind_4;
-    free_orientation_source_inds = setdiff(1:length(procFile.s_ind_0), procFile.s_ind_4);
-
-    % Fast path: if precompute(L) was called, all per-source SVDs and the
-    % Mahalanobis whitening of L have been cached. Apply them in one batched
-    % matrix multiply per frame.
-
-    if ~isempty(self.precomputed_L_w) && ~isempty(self.precomputed_U_pages)
-        z_vec = i_invert_cached(self, f, fixed_orientation_source_inds, free_orientation_source_inds);
-        return;
     end
 
     % Legacy per-call path: kept for back-compat when invert is called
@@ -233,14 +249,21 @@ end
 
 free_inds = free_inds(:);
 n_free = numel(free_inds);
+n_sources = size(self.precomputed_U_pages, 3);
 
-U_free = self.precomputed_U_pages(:, :, free_inds);
-S_free = self.precomputed_S_diag(:, free_inds);
-V_free = self.precomputed_V_pages(:, :, free_inds);
-
-% alpha(:, k) = U_free(:,:,k)' * f_w  for every free source k.
-alpha_3d = pagemtimes(U_free, 'transpose', f_w, 'none');
-alpha = reshape(alpha_3d, 3, n_free);
+% Project onto every source page, then gather free columns. Slicing
+% U_pages(:,:,free_inds) first would copy an n_ch×3×n_free array per frame.
+alpha_3d = pagemtimes(self.precomputed_U_pages, 'transpose', f_w, 'none');
+alpha_all = reshape(alpha_3d, 3, n_sources);
+if n_free == n_sources
+    alpha = alpha_all;
+    S_free = self.precomputed_S_diag;
+    V_free = self.precomputed_V_pages;
+else
+    alpha = alpha_all(:, free_inds);
+    S_free = self.precomputed_S_diag(:, free_inds);
+    V_free = self.precomputed_V_pages(:, :, free_inds);
+end
 
 gof_free = (sum(alpha.^2, 1) / data_norm_sqr).';
 

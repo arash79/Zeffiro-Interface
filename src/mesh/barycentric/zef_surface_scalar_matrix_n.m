@@ -8,12 +8,11 @@ function M = zef_surface_scalar_matrix_n(nodes, tetra, n_ind, scalar_field, weig
 %
 %   n = −∇ψ_f / ||∇ψ_f|| on each skin face (outward relative to the
 %   opposite vertex). All 3×3 face vertex pairs are accumulated (not
-%   symmetrized). Wrapper FFn is unused; NSE uses the vector form
-%   zef_surface_scalar_vector_Fn instead.
+%   symmetrized). NSE uses this for B1_* traction mass in zef_nse_matrices.
 %
 %   M = zef_surface_scalar_matrix_n(nodes, tetra, n_ind, scalar_field, weighting)
 %
-%   See also zef_surface_scalar_matrix_FFn, zef_surface_mesh.
+%   See also zef_nse_matrices, zef_surface_mesh.
 
 ind_m = [ 2 4 3 ;
     1 3 4 ;

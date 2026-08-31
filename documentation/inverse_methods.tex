@@ -9,18 +9,21 @@ There are two live tracks. They share \(L\) and \(y\) but not the solver
 code.
 
 \begin{itemize}
-\item \textbf{Inverse tools menus.} Rows of
+\item \textbf{Inverse tools menus (legacy).} Most rows of
       \ccode{profile/<name>/zeffiro\_plugins.ini} open the legacy plugins
-      under \ccode{tools/plugins} (\ccode{zef\_CSM\_iteration},
+      under \ccode{plugins} (\ccode{zef\_CSM\_iteration},
       \ccode{zef\_KF}, \ccode{zef\_ias\_iteration}, \ldots).
 \item \textbf{Class / cluster.} \ccode{zef\_inverse\_run} looks up an id in
       \ccode{utilities.cluster.inverse\_method\_registry}, then
       \ccode{utilities.inverse.run\_frame\_loop} calls
       \ccode{inverse.*Inverter} in the \ccode{+inverse} package.
+      Four head-profile Inverse-tools entries labelled
+      \texttt{(class solver)} (eLORETA, UKF-NMM, HALpR, Group Lasso)
+      open \ccode{zef\_open\_class\_inverse} and run this path.
 \end{itemize}
 
-No default-profile Inverse-tools button constructs an
-\ccode{inverse.*Inverter}. Example of the class path:
+Asteroid profiles omit those four rows. Kalman DTI structural \(Q\) remains
+on the legacy plugin only. Example of the class path:
 
 \begin{lstlisting}[style=unnumberedlines, language=Matlab]
 [zef, r] = zef_inverse_run(zef, "eloreta", "execution", "local");
@@ -61,9 +64,10 @@ If \(\alpha\) is empty at \ccode{initialize},
 \end{equation}
 
 \ccode{precompute} caches \(T\). \ccode{invert} applies \(z = Tf\) for one
-frame (optional GPU). The GUI eLORETA path, if present, is a plugin; the
-default head profile Inverse tools list does not include a class-eLORETA
-button.
+frame (optional GPU). Head profiles list Inverse tools $\to$
+\texttt{eLORETA (class solver)} (\ccode{zef\_eloreta\_start}), which opens
+the class dialog and calls \ccode{zef\_inverse\_run}. Asteroid profiles
+do not register that row.
 
 References: Pascual-Marqui (2007), \texttt{arXiv:0710.3341}; Pascual-Marqui
 (2011), \emph{Philosophical Transactions of the Royal Society A}, 369(1952),
@@ -85,7 +89,8 @@ Kalman & Filter types on \ccode{method\_type}. DTI-informed process noise
 UKFNMM & Spatial Kalman on a per-source SVD-modified lead field, then
 Jansen--Rit NMM with UKF parameter estimation
 (\ccode{inverse.UKFNMMInverter}; ids \ccode{ukfnmm}/\ccode{ukf\_nmm}).
-No Inverse-tools GUI. See \ccode{+inverse/@UKFNMMInverter/README.md}. \\
+Head profiles: Inverse tools $\to$ \texttt{UKF-NMM (class solver)}.
+See \ccode{+inverse/@UKFNMMInverter/README.md}. \\
 Beamformer & Per-source LCMV (and related) weights. \\
 Dipole scan & SVD or related one-dipole fits per location. \\
 RAMUS & Needs a multiresolution decomposition
@@ -95,6 +100,6 @@ Group LASSO currently forces \ccode{use\_multiresolution = false}. \\
 \end{tabularx}
 
 Folder READMEs under \ccode{+inverse/@*Inverter} and
-\ccode{tools/plugins} are the API source of truth when this chapter and the
+\ccode{plugins} are the API source of truth when this chapter and the
 code disagree.
 }

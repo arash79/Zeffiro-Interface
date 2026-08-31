@@ -10,10 +10,12 @@ function self = precompute(self, L)
 %   precompute method. invert reuses precomputed_P and precomputed_d so
 %   each frame is a matrix–vector product.
 %
-%   Only method_type "dSPM" and "sLORETA" run this body. "sLORETA 3D" and
-%   "SBL" clear the caches and return. S = (10^(-SNR/20)^2 / theta0) I.
+%   Only method_type "dSPM", "sLORETA", and "sLORETA 3D" run this body. "SBL"
+%   clears the caches and returns. S = (10^(-SNR/20)^2 / theta0) I.
 %   dSPM: d_i = 1/sqrt(sum((P S).*P, 2)) i.e. 1/sqrt((P S P')_ii).
 %   sLORETA: d = 1./sqrt(sum(P.'.*L,1))' (diagonal of P L).
+%   sLORETA 3D: stores P and 3×3 G^{-1/2} pages for interleaved (x,y,z)
+%   triplets (d unused). Eigenvalues are floored as in eLORETA.
 %
 %   Input
 %     L  - n_sensors×n_dof lead field after zef_processLeadfields (same
@@ -29,8 +31,10 @@ end
 
 self.precomputed_P = [];
 self.precomputed_d = [];
+self.precomputed_Minv = [];
+self.precomputed_cache_key = struct([]);
 
-if ~ismember(self.method_type, ["dSPM", "sLORETA"])
+if ~ismember(self.method_type, ["dSPM", "sLORETA", "sLORETA 3D"])
     return;
 end
 
@@ -40,11 +44,23 @@ P = L'/(L*L' + S_mat);
 
 if self.method_type == "dSPM"
     d = 1./sqrt(sum(((P*S_mat).*P),2));
-else
+elseif self.method_type == "sLORETA"
     d = 1./sqrt(sum(P.'.*L,1))';
+else
+    d = [];
 end
 
 self.precomputed_P = P;
 self.precomputed_d = d;
+self.precomputed_cache_key = self.cacheKey(L);
+
+if self.method_type == "sLORETA 3D" && mod(size(L,2), 3) == 0
+    n = size(L, 2) / 3;
+    if isa(P, "gpuArray")
+        self.precomputed_Minv = zef_sloreta3d_build_minv(gather(P), gather(L), 1:n);
+    else
+        self.precomputed_Minv = zef_sloreta3d_build_minv(P, L, 1:n);
+    end
+end
 
 end

@@ -20,7 +20,6 @@ if isfield(zef,'h_mesh_visualization_tool')
 end
 
 zef_data = zef_mesh_visualization_tool_app_exported;
-%zef_data.h_mesh_visualization_tool.Visible = zef.use_display;
 
 zef.fieldnames = fieldnames(zef_data);
 for zef_i = 1:length(zef.fieldnames)
@@ -155,26 +154,10 @@ zef = zef_ui_tag_handles(zef);
 
 clear zef_data;
 
-% if zef.h_segmentation_tool_toggle == 1
-% 
-%     zef.h_mesh_visualization_tool.Position = [zef.segmentation_tool_default_position(1) + 1.75*0.505*zef.segmentation_tool_default_position(3), ...
-%         zef.segmentation_tool_default_position(2),...
-%         0.5*0.505*zef.segmentation_tool_default_position(3),...
-%         zef.segmentation_tool_default_position(4)];
-% 
-% else
-% 
-%     zef.h_mesh_visualization_tool.Position = [zef.segmentation_tool_default_position(1) + 1.75*zef.segmentation_tool_default_position(3), ...
-%         zef.segmentation_tool_default_position(2),...
-%         0.5*zef.segmentation_tool_default_position(3),...
-%         zef.segmentation_tool_default_position(4)];
-% 
-% end
-
 ref = zef.segmentation_tool_default_position;
 zef.h_mesh_visualization_tool.Position = [ref(1) + ref(3) - 680, ref(2) + ref(4) - 600, 680, 600];
 zef_window_manager('standalone', zef.h_mesh_visualization_tool);
-zef_ui_apply_size(zef.h_mesh_visualization_tool, 700, 620, 640, 580);
+zef_ui_apply_size(zef.h_mesh_visualization_tool, 760, 640, 680, 580);
 try
     zef.h_mesh_visualization_tool.Scrollable = 'off';
 catch

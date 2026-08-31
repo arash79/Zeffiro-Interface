@@ -155,8 +155,6 @@ for i = 1 : length(zef.reuna_p)
 end
 
 domain_labels = double(zef.domain_labels_with_subdomains);
-% [priority_val, priority_ind] = min(priority_vec_aux(domain_labels),[],2);
-% priority_ind = sub2ind(size(domain_labels),[1:size(domain_labels,1)]',priority_ind);
 
 nodes = zef.nodes;
 tetra_aux = zef.tetra;
@@ -241,16 +239,12 @@ if optimizer_flag == 1
 end
 
 domain_labels_with_subdomains = domain_labels;
-%[priority_val, priority_ind] = min(priority_vec_aux(domain_labels),[],2);
-%priority_ind = sub2ind(size(domain_labels),[1:size(domain_labels,1)]',priority_ind);
-%[domain_labels] = submesh_ind_1(domain_labels(priority_ind));
 [domain_labels] = submesh_ind_1(domain_labels);
 active_compartment_ind = zef_find_active_compartment_ind(zef,domain_labels);
 
 if eval('zef.exclude_box')
     % Drop the outermost domain (largest label), usually the PML/air box.
-   %I = find(not(ismember(domain_labels,find(pml_vec,1))));
-I = find(not(ismember(domain_labels,max(domain_labels,[],'all'))));
+    I = find(not(ismember(domain_labels,max(domain_labels,[],'all'))));
     I_2 = zeros(size(tetra,1),1);
     I_2(I) = [1:length(I)];
     active_compartment_ind = I_2(active_compartment_ind);

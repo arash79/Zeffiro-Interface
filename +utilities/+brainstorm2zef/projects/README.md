@@ -10,7 +10,6 @@ This directory contains **no executable converter logic**. Conversion, compartme
 
 | Item | Role |
 |------|------|
-| `README.txt` | Short human note: “projects created by the brainstorm2zef plugin” |
 | `README.md` | This documentation |
 | *(generated `.mat` / projects)* | Appear after successful conversions (not shipped in git) |
 | *(optional dumps)* | e.g. compartment settings / surface mesh mats when `run_type` reload paths are used |
@@ -81,7 +80,6 @@ zef_load('…/projects/my_bst_subject.mat');
 - Empty folder after clone is expected.
 - Requires Brainstorm on the MATLAB path and an initialized protocol (`bst_get('ProtocolInfo').SUBJECTS`).
 - `run` does not close the Zeffiro session automatically — call `zef_close_all(results.zef)` when finished.
-- `README.txt` is a one-line legacy pointer; keep it consistent with this README’s purpose statement.
 
 ## Developer guidance
 

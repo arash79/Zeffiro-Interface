@@ -11,7 +11,7 @@
 %   empty zef.<sensor_tags{j}>_<param> arrays. Does not open
 %   Settings → Parameter profile (that is zef_open_parameter_profile).
 %
-%   See also zef_open_parameter_profile, zef_update_parameter_distributions.
+%   See also zef_open_parameter_profile.
 for zef_i = 1 : size(zef.parameter_profile,1)
 
     for zef_j = 1 : length(zef.compartment_tags)

@@ -7,8 +7,8 @@ function [stats, run_result] = zef_sensitivity_run(zef, method_id, opts)
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Validates lead field and source_positions, resolves active sources via
-%   zef_processLeadfields, runs method-specific prep hooks (RAMUS/HALpR/
-%   GroupLasso multires decomposition when needed), executes
+%   zef_processLeadfields, runs method-specific prep hooks (RAMUS
+%   multiresolution decomposition when needed), executes
 %   utilities.sensitivity.run_monte_carlo locally or on a cluster, and
 %   returns aggregated statistics plus per-run results.
 %
@@ -146,16 +146,6 @@ for h = 1:numel(capability.prep_hooks)
         case "ramus_decomposition"
             method_params = i_ramus_preflight(zef, method_params, n_interp);
 
-        case "halpr_decomposition"
-            if i_field_or_default(method_params, "use_multiresolution", false)
-                method_params = i_multires_preflight(zef, method_params, n_interp, "HALpR");
-            end
-
-        case "grouplasso_decomposition"
-            if i_field_or_default(method_params, "use_multiresolution", false)
-                method_params = i_multires_preflight(zef, method_params, n_interp, "GroupLasso");
-            end
-
         otherwise
             warning("zef_sensitivity_run:UnknownPrepHook", ...
                 "Capability hook '%s' is not implemented; skipping.", hook);
@@ -177,22 +167,6 @@ sparsity = double(i_field_or_default(method_params, "sparsity_factor", 10));
 
 method_params = i_invoke_make_multires(zef, method_params, n_dec, n_lev, sparsity, ...
     "RAMUS", n_interp);
-
-end
-
-function method_params = i_multires_preflight(zef, method_params, n_interp, label)
-%I_MULTIRES_PREFLIGHT Auto-build the multiresolution decomposition for HALpR / GroupLasso.
-
-if i_field_nonempty(method_params, "multiresolution_dec")
-    return
-end
-
-n_dec = double(i_field_or_default(method_params, "multiresolution_decomposition_number", 10));
-n_lev = double(i_field_or_default(method_params, "multiresolution_levels_number", 10));
-sparsity = double(i_field_or_default(method_params, "multiresolution_sparsity_factor", 10));
-
-method_params = i_invoke_make_multires(zef, method_params, n_dec, n_lev, sparsity, ...
-    label, n_interp);
 
 end
 

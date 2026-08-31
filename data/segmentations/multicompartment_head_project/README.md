@@ -5,23 +5,14 @@ Sample **multicompartment head** anatomy used by Zeffiro demos and by `zeffiro_i
 ## Main contents
 
 - `import_segmentation.zef` — import recipe consumed by `zef_import_segmentation`
-- `*.asc` — compartment and hemisphere surfaces (inner/outer skull, cortex, subcortical labels)
+- `*.asc` — compartment and hemisphere surfaces listed in that recipe (inner/outer skull, cortex, subcortical labels)
 - `electrodes.dat` — sample electrode coordinates for this anatomy
-- `color_table_*.mat` — parcellation colortables produced by `create_colortable.m`
-- `fs2zef.sh` — shell helper used when regenerating this sample from FreeSurfer
-
-MATLAB helpers (not on the startup path):
-
-| File | Role |
-|------|------|
-| `create_colortable.m` | Script: read `dir_name/label/*.annot` via FreeSurfer `read_annotation`, write `color_table_{lh,rh}_{76,36}.mat` |
-| `create_points.m` | Script: ASCII label tables → `*_point_*.dat` (note: `lh_point_36.dat` is overwritten) |
-| `creat_points.m` | Historical misspelling; one-file variant writing `lh_point.dat` |
-| `read_annotation.m` | **Third-party** FreeSurfer `Read_Brain_Annotation` (Bruce Fischl / MGH) |
+- `color_table_*.mat` — 36-parcel parcellation colortables
+- `lh_labels_36.asc` / `rh_labels_36.asc` — parcel point tables paired with the colortables
 
 ## Code functionality
 
-This folder is **data plus a few one-off conversion scripts**, not a runtime library. The importer does not run `create_points.m` or `create_colortable.m`; those are offline regenerators if you rebuild the sample from a FreeSurfer subject.
+This folder is **data**, not a runtime library. The importer reads only paths named in `import_segmentation.zef`. To rebuild a similar sample from a FreeSurfer subject, use `utilities.fs2zef`.
 
 ## Workflow context
 
@@ -39,8 +30,8 @@ zef = zeffiro_interface('start_mode', 'nodisplay', ...
 ## Important notes
 
 - `.asc` coordinates match the project's millimetre RAS-like frame used by `zef_import_asc`.
-- `read_annotation.m` is MGH-licensed FreeSurfer code; keep its copyright block intact.
+- Grey-matter rows in the manifest point at `lh.pial` / `rh.pial` plus the 36-parcel tables.
 
 ## Developer guidance
 
-Prefer regenerating via `utilities.fs2zef` / `fs2zef.sh` rather than hand-editing many `.asc` files. Keep offline helper scripts out of the MATLAB path.
+Prefer regenerating via `utilities.fs2zef` rather than hand-editing many `.asc` files. Keep this folder's filenames in sync with `import_segmentation.zef`.

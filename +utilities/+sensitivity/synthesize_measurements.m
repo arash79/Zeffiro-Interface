@@ -8,9 +8,15 @@ function F = synthesize_measurements(L, source_indices, amp, noise_db, opts)
 %
 %   F = synthesize_measurements(L, source_indices, amp, noise_db, opts)
 %
-%   L must have 3 columns per source (x,y,z). Builds unit or fixed-orientation
-%   probes per opts.SourceDirectionMode (1=3 dirs, 2=normal, 3=intrinsic from
-%   opts.SourceDirections), scales by amp, adds noise at noise_db dB SNR.
+%   L must have 3 columns per source (x,y,z). Empty source_indices means
+%   every source. Builds probes per opts.SourceDirectionMode:
+%     1 — three unit axes (default)
+%     2 — still three columns of L (normal constraint is in the lead field)
+%     3 — one probe along opts.SourceDirections (n_sources × 3)
+%   Columns are scaled by 1e-3 * amp (default amp 10). If noise_db ≠ 0,
+%   adds AWGN with sigma = 10^(noise_db/20) (noise_db ≤ 0).
+%
+%   Output F is sensors × probes. Called from run_monte_carlo.
 
 arguments
     L (:,:) {mustBeA(L, ["double", "gpuArray"])}
@@ -23,7 +29,7 @@ end
 
 n_cols = size(L, 2);
 if mod(n_cols, 3) ~= 0
-    error("utilities.sensitivity:synthesize_measurements:BadLeadFieldShape", ...
+    error("utilities:sensitivity:synthesize_measurements:BadLeadFieldShape", ...
         "Lead field has %d columns; expected a multiple of 3 (3 columns per source in zef.L layout).", n_cols);
 end
 n_sources_total = n_cols / 3;
@@ -33,18 +39,18 @@ if isempty(source_indices)
 end
 
 if any(source_indices > n_sources_total)
-    error("utilities.sensitivity:synthesize_measurements:IndexOutOfRange", ...
+    error("utilities:sensitivity:synthesize_measurements:IndexOutOfRange", ...
         "source_indices contains values exceeding the number of available sources (%d).", n_sources_total);
 end
 
 mode = opts.SourceDirectionMode;
 if mode == 3
     if isempty(opts.SourceDirections)
-        error("utilities.sensitivity:synthesize_measurements:MissingSourceDirections", ...
+        error("utilities:sensitivity:synthesize_measurements:MissingSourceDirections", ...
             "source_direction_mode = 3 requires opts.SourceDirections (n_sources_total x 3) so probes can be built along intrinsic directions.");
     end
     if size(opts.SourceDirections, 1) ~= n_sources_total || size(opts.SourceDirections, 2) ~= 3
-        error("utilities.sensitivity:synthesize_measurements:DirectionsShapeMismatch", ...
+        error("utilities:sensitivity:synthesize_measurements:DirectionsShapeMismatch", ...
             "opts.SourceDirections must be %d x 3 to match the %d sources implied by L.", ...
             n_sources_total, n_sources_total);
     end

@@ -12,9 +12,10 @@ function hauk_map = zef_sensitivity_map_dipoleScan( ...
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Repeatedly perturbs dipole locations, runs dipole-scan reconstructions,
-%   and records localization error metrics (distance, angle, magnitude, dispersion).
-%   Dipole scan fits best single dipole per time frame by residual minimization.
+%   Repeats zef_rec_diff(..., @zef_dipoleScan, ...) n_reconstructions times
+%   (independent noise draws when noise_level < 0). Each trial probes every
+%   source × xyz axis; it does not jitter source positions. Dipole scan stores
+%   goodness-of-fit, not current amplitude, in the reconstruction cell.
 %
 
     arguments
@@ -37,7 +38,8 @@ function hauk_map = zef_sensitivity_map_dipoleScan( ...
     project_struct = zef_dipole_start(project_struct);
     project_struct.number_of_frames = 3 * size(project_struct.source_positions, 1);
 
-    % Run Monte Carlo sensitivity analysis.
+    % Run Monte Carlo sensitivity analysis (one zef_rec_diff per noise draw).
+    for i = 1 : n_reconstructions
 
         [dist_vec, angle_vec, mag_vec, dispersion_vec] = examples.studies.santtus_peeling_article.helpers.zef_rec_diff( ...
             project_struct, ...

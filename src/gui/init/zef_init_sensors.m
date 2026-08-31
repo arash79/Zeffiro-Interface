@@ -7,7 +7,7 @@
 %
 %   Script. Clears sensor_tags, sets current_sensors and current_tag to
 %   's', and calls zef_create_sensors(zef,'s'). Does not fill UITables
-%   (see zef_init_sensors_name_table / zef_init_sensors_table).
+%   (see zef_init_sensors_name_table).
 %
 %   See also zef_create_sensors, zef_init_sensors_name_table.
 zef.sensor_tags = cell(0);

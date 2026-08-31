@@ -9,6 +9,7 @@ Convert FreeSurfer `mri/*.mgz` label volumes (and optional `surf/` meshes) into 
 | Area | Role |
 |------|------|
 | `run.m` | Public pipeline entry |
+| `FREESURFER_ENV_VARS.m` | String list of env names `setup_freesurfer_env` may set (`SUBJECTS_DIR`, `FSFAST_HOME`, …). Does **not** include `FREESURFER_HOME`, which `run` still requires separately. |
 | `+scripts/makeParcellation.sh` | FreeSurfer marching-cubes / convert |
 | `+environment/` | `setup_freesurfer_env`, `validate_environment` |
 | `+readers/` / `+generators/` / `+transforms/` | I/O, `.zef` generation, CRAS affine |
@@ -22,7 +23,7 @@ Convert FreeSurfer `mri/*.mgz` label volumes (and optional `surf/` meshes) into 
 
 **`run(subject_id, segmentation_files, output_dir, options…)`:** validate env → shell parcellation → transforms → write surfaces + `import_segmentation.zef` (+ electrodes copy).
 
-Options include `output_format` (`ascii`/`stl`/`both`), `merge_left_right`, `include_surfaces`, `electrode_file`, `verbose`. Some declared options (e.g. `include_skull_skin`) may be unused — check Gaps in code comments.
+Options include `output_format` (`ascii`/`stl`/`both`), `merge_left_right`, `include_surfaces`, `electrode_file`, `verbose`.
 
 ## Workflow context
 

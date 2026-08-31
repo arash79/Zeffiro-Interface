@@ -1,7 +1,4 @@
 function zef = zef_eeg_lead_field_isotropic(zef)
-
-
-
 %ZEF_EEG_LEAD_FIELD_ISOTROPIC  EEG isotropic lead field (type 1); default Mesh-tool Script.
 %
 %   Zeffiro Interface.
@@ -12,7 +9,7 @@ function zef = zef_eeg_lead_field_isotropic(zef)
 %   This is the Script cell in profile/multicompartment_head/zeffiro_forward_simulation.ini
 %   ("EEG lead field with isotropic electrical conductivity"). Mesh tool →
 %   Run script evals this name. Requires an existing FEM mesh and zef.sensors;
-%   uses zef.sigma(:,1). Same body as zef_eeg_lead_field.
+%   uses zef.sigma(:,1). zef_eeg_lead_field is an alias of this function.
 %
 %   zef = zef_eeg_lead_field_isotropic(zef)
 %

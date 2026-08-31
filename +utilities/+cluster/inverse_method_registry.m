@@ -106,7 +106,7 @@ elseif id == "legacy_exp"
     method_info.execution_kind = "legacy";
     method_info.legacy_function = "exp_iteration";
 else
-    error("utilities.cluster:UnknownInverseMethod", ...
+    error("utilities:cluster:UnknownInverseMethod", ...
         "Unknown inverse method id '%s'.", method_id);
 end
 

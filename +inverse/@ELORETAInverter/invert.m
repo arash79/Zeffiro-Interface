@@ -44,6 +44,15 @@ if self.number_of_frames <= 1
     cleanup_obj = onCleanup(@() cleanup_fn(h)); %#ok<NASGU>
 end
 
+% T is only valid for the lead field and settings it was built from, so a
+% settings change between precompute and invert must rebuild it rather than
+% silently reuse the old operator.
+if ~isempty(self.precomputed_inverse_operator) ...
+        && ~isequaln(self.precomputed_cache_key, self.cacheKey(L, procFile))
+    self.precomputed_inverse_operator = [];
+    self.precomputed_cache_key = struct([]);
+end
+
 if isempty(self.precomputed_inverse_operator)
     self = self.precompute(L, procFile);
 end

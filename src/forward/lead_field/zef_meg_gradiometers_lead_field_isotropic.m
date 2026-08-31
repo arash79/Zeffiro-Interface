@@ -6,7 +6,6 @@
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Script. Default INI row for gradiometers with isotropic conductivity.
-%   Same body as zef_meg_gradiometers_lead_field.
 %
 %   See also zef_lead_field_matrix, zef_run_forward_simulation.
 

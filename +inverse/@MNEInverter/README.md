@@ -1,8 +1,8 @@
 # inverse.MNEInverter
 
-## Folder purpose
+Minimum-norm estimation picks, among all source vectors that fit the sensors, one with small weighted energy. That is the classic distributed solution when you do not want a sparse prior. In this class the weight \(\theta\) is always applied (there is no unweighted switch); registry ids `mne` and `wmne` both construct `inverse.MNEInverter`.
 
-Class package for **weighted minimum-norm estimation (MNE / wMNE)**. Implements `inverse.MNEInverter`, used by the programmatic/cluster path (`zef_inverse_run` with ids `mne` / `wmne`). The GUI MNE tool still calls legacy `zef_find_mne_reconstruction`, not this class.
+The GUI MNE tool still calls legacy `zef_find_mne_reconstruction`, not this class. Why regularization is needed: [docs/methods.md](../../docs/methods.md).
 
 ## Main contents
 
@@ -48,7 +48,7 @@ Requires prior `zef.L`, `zef.source_interpolation_ind`, and `zef.measurements`.
 
 - SetObservable `theta` / `noise_cov`: user-set values are kept; auto-estimated ones are cleared in `terminateComputation`.
 - GUI and class paths are parallel — do not assume menu Start uses this class.
-- Defaults for sampling frequency / time window come from the constructor `arguments` block (often 1024 Hz, window 1).
+- Constructing `inverse.MNEInverter()` yourself uses the classdef defaults (`sampling_frequency` 1025 Hz, `time_step` 1 s), not `zef_init` (`inv_sampling_frequency` 20000, `inv_time_3` 0.001). `zef_inverse_run` copies the session fields via `withPropertiesFromZef`.
 
 ## Developer guidance
 

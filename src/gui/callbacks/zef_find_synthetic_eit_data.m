@@ -5,40 +5,47 @@
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Script (not a function). Unused from menus: Forward tools →
-%   **Generate synthetic EIT data** is wired to find_synthetic_eit_data
-%   (no first-party .m of that name). This script is the opener for
-%   assets/fig/tools/zef_find_synthetic_eit_data.fig. Call it as
-%   zef_find_synthetic_eit_data with zef in the workspace.
+%   Script. Forward tools → **Generate synthetic EIT data** opens
+%   assets/fig/tools/zef_find_synthetic_eit_data.fig into
+%   zef.h_find_synthetic_source, copies tagged h_* widgets onto zef,
+%   runs zef_init_find_synthetic_eit_data, and wires Compute / Plot ROI.
 %
-%   Opens the fig into zef.h_find_synthetic_source (mac/pc/else branches
-%   are identical), sets Name to "ZEFFIRO Interface: Find synthetic EIT
-%   data", scales FontSize to zef.font_size, runs
-%   zef_init_find_synthetic_eit_data, and uistacks ROI / compute / plot
-%   controls to the top.
-%
-%   See also zef_init_find_synthetic_eit_data, zef_update_find_synthetic_eit_data.
+%   See also zef_init_find_synthetic_eit_data, zef_synthetic_eit_data.
 
-% Load the .fig template from fig/tools/ (path added at startup in zeffiro_interface.m).
+zef.h_find_synthetic_source = open('zef_find_synthetic_eit_data.fig');
 
-
-
-if ismac
-    zef.h_find_synthetic_source = open('zef_find_synthetic_eit_data.fig');
-elseif ispc
-    zef.h_find_synthetic_source = open('zef_find_synthetic_eit_data.fig');
-else
-    zef.h_find_synthetic_source = open('zef_find_synthetic_eit_data.fig');
-end
-
-% Set window title and scale fonts to match application settings.
 set(zef.h_find_synthetic_source,'Name','ZEFFIRO Interface: Find synthetic EIT data');
 zef_ui_ready(zef.h_find_synthetic_source);
 
-% Initialize tool-specific state and callbacks.
+h_all = findall(zef.h_find_synthetic_source);
+for zef_i = 1 : numel(h_all)
+    zef_tag = '';
+    try
+        zef_tag = strtrim(char(get(h_all(zef_i),'Tag')));
+    catch
+    end
+    if startsWith(zef_tag,'h_')
+        zef.(zef_tag) = h_all(zef_i);
+    end
+end
+
 zef_init_find_synthetic_eit_data;
 
-% Bring ROI and action controls to the top of the uistack for proper layering.
+if isfield(zef,'h_inv_compute_data') && isgraphics(zef.h_inv_compute_data)
+    try
+        set(zef.h_inv_compute_data,'Callback','zef_update_find_synthetic_eit_data; zef_synthetic_eit_data;');
+    catch
+        set(zef.h_inv_compute_data,'ButtonPushedFcn','zef_update_find_synthetic_eit_data; zef_synthetic_eit_data;');
+    end
+end
+if isfield(zef,'h_inv_plot_roi') && isgraphics(zef.h_inv_plot_roi)
+    try
+        set(zef.h_inv_plot_roi,'Callback','zef_update_find_synthetic_eit_data; zef_plot_roi;');
+    catch
+        set(zef.h_inv_plot_roi,'ButtonPushedFcn','zef_update_find_synthetic_eit_data; zef_plot_roi;');
+    end
+end
+
 uistack(flipud([zef.h_inv_roi_sphere_1;  zef.h_inv_roi_sphere_2;
     zef.h_inv_roi_sphere_3; zef.h_inv_roi_sphere_4; zef.h_inv_roi_perturbation;
     zef.h_inv_compute_data; zef.h_inv_plot_roi ]),'top');

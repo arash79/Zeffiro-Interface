@@ -15,7 +15,7 @@ function zef_toggle_edges
 %
 %   See also zef_toggle_figure_controls, zef_figure_tool.
 
-h = zef_ui_axes(gcf);
+h = zef_ui_axes();
 if isempty(h)
     return
 end

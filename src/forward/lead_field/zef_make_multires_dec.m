@@ -21,7 +21,7 @@ function [multires_dec, multires_ind, multires_count] = zef_make_multires_dec(va
 %     multires_ind   - nearest coarse index for every fine source
 %     multires_count - occupancy of each coarse source
 %
-%   See also zef_source_interpolation, zef_kron_reduction.
+%   See also zef_source_interpolation.
 
 if not(isempty(varargin))
     n_decompositions = varargin{1};
@@ -69,7 +69,6 @@ for n_rep = 1 : n_decompositions
         source_interpolation_aux = zeros(size_source_points,1);
 
         aux_ind = randperm(size_center_points);
-        %aux_ind = sort(aux_ind);
         source_points = source_points_aux(:,aux_ind(1:size_source_points));
         ones_vec = ones(size(source_points,2),1);
 

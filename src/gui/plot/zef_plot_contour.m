@@ -108,7 +108,6 @@ for j = 1 : length(rel_val)
                 node_ind = node_neighbor(find(ismember(node_neighbor, edges_contour{loop_start}(1)),1));
             end
             if not(isempty(node_ind))
-                %loop_nodes = loop_nodes + 1;
                 nodes_found = nodes_found + 1;
                 nodes_edge_3(nodes_found) = node_ind;
                 edges_contour{loop_start}(edges_found,2) = node_ind;

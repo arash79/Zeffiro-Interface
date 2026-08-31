@@ -1,0 +1,139 @@
+# `tests.unit` — kernel and chrome unit tests
+
+## Folder purpose
+
+MATLAB class-based unit tests for **isolated** inverse kernels, source-model types, and a few GUI chrome primitives. These tests do not start a full Zeffiro session, do not require a real head mesh, and do not go through HPC `parcluster`. They construct small synthetic `L` / measurements (or real `uifigure` widgets) and assert numerical or API contracts.
+
+Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`](../README.md).
+
+## Main contents
+
+### Inverse kernels (`+inverse`)
+
+| Class | What it actually checks |
+|-------|-------------------------|
+| `ELORETAInverterTest` | `inverse.ELORETAInverter` on `zef_processLeadfields` output: `numel(z)==size(L,2)`, finite fixed-point `T`, recovering a column of `L`, explicit `alpha` kept, scale stability |
+| `ELORETAInverterOptTest` | Block-page `precompute` vs the dense `W^{-1}` loop (average-reference on/off, mixed/all fixed orientation) |
+| `CSMInverterSLoretaTest` | `method_type` `"sLORETA"` vs `d .* (P*f)/sqrt(theta0)`; `"sLORETA 3D"` vs per-source `sqrtm` loop; local `zef_inverse_run` smoke |
+| `DipoleScanMNEOptTest` | Dipole Scan `pagesvd` vs SVD loop; mixed/fixed orientation; MNE `W*f` vs plugin-style kernel; dispatch smoke |
+| `BeamformerInverterOptTest` | Cached `B*f` vs per-source loop across LCMV / UNG / unit-gain × regularization × column-norm settings; LCMV recovers an exact noiseless source when \(C=I\); missing `error_cov` errors |
+| `InverseScientificIdentityTest` | Dipole-scan GoF \(=1\) at a known source; eLORETA \(W_i^{-1}=(L_i^\top M^{-1}L_i)^{-1/2}\); Kalman identity-\(A\) test, mixed-diagonal predict, constant-state tracking, class RTS |
+| `DownloaderSafetyTest` | `zeffiro_downloader` quotes git arguments, restores cwd, rejects non-URL remotes |
+| `StiffnessMatrixIdentityTest` | P1 stiffness on the unit tet matches \(\nabla\lambda_i\cdot(\sigma\nabla\lambda_j)V\); anisotropic \(\sigma_{xy}/\sigma_{xz}/\sigma_{yz}\) and a random SPD tensor; two-tet assembly |
+| `ProjectLoadLegacyTest` | Single-struct MAT files are not overwritten; non-struct singles error; `zef_remove_system_fields` drops `gpu_count` / `path_cell` and keeps `save_file` |
+| `BuildElectrodesCEMTest` | P1 CEM `A,B,C` vs analytic triangle mass; two-triangle \(C_{ee}=1/Z\); infinite-\(Z\) early return; point fallback |
+| `DTIActiveCompartmentMapTest` | Active-compartment map skips off tags; iso fallback uses that map, not tag position |
+| `FAToConductivityOrientationTest` | Model-3 FA→σ principal axis follows `v1`; missing `v1` defaults to \(+\hat x\) |
+| `Pem2cemParityTest` | Triangle CEM rows copied; point rows expand; buried 4-row barycentric errors |
+| `EITPEMNotSupportedTest` | 3-column EIT electrodes error `PEMNotSupported` |
+| `ElectrodeImportColumnOrderTest` | CSV/DAT CEM output is `[outer inner Z]`; attach annulus is non-empty |
+| `RapMusicScanTest` | RAP-MUSIC recovers two known dipoles with distinct orientations; mode-3 scalar columns; `zef_blocked_source_index` is `n_interp` rows, not `n_interp/3` |
+| `LeadfieldColumnEnergyTest` | Mode 1/2 triplet energy; mode 3 is not `reshape(...,3,[])`; Kalman `T=1` and `number_of_noise_steps` cap |
+| `DropNanSourceColumnsTest` | Interleaved NaN y-column drops the whole xyz triplet |
+| `IASInverterOptTest` | IAS `invert` vs legacy `W = d.*(W'*inv(A))`; `d_sqrt = sqrt(θ)` (prior std, not variance) |
+| `RAMUSInverterOptTest` | Same kernel comparison on `inverse.RAMUSInverter` with synthetic multires `dec` / `ind` / `cnt` lattices |
+| `KalmanApproxRtsStandardizationTest` | Scaled Denman–Beavers `P^{-1/2}`; approx RTS multiplies `Z*m` |
+| `MegCartesianInterpolationGuardTest` | Cartesian MEG interpolation refuses St. Venant |
+| `EegFaceBasedDirectionModeTest` | EEG `face_based` errors instead of skipping `L` |
+| `SessionWantsGpuTest` | FEM GPU gate does not `evalin('base','zef.gpu_count')` |
+| `LeadFieldSensorsAuxTest` | Types 1–10 PEM `/1000`, MEG xyz `/1000`, CEM unscaled; anisotropic MEG refuses EEG table |
+| `PemReferenceLoadTest` | Infinite-Z PEM zeros electrode 1 only inside a PCG block |
+| `EITGradientProductTest` | `D_A` matches `∫∇ψ_i·∇ψ_j`; inherited off-diagonal junk is not present |
+| `DTITensorRotationTest` | Row-vector affine conversion; `RσR'`; interpolator 90° axis; blocked `kron(I,Q)` |
+| `GravityNewtonKernelTest` | Newtonian \(1/r\), \(r/r^3\), \(n\cdot g\), \(\partial_n g\); inherited component-power kernels disagree |
+| `DTIResolveMesh2VoxelTest` | `register.dat` without orig.mgz errors; NIfTI-only returns empty |
+| `MCMCPosteriorMeanDivisorTest` | Post-burn-in mean is \((n_{\mathrm{iter}}-n_{\mathrm{burn}})n_{\mathrm{chains}}\) |
+| `KalmanRtsStoredDTest` | RTS applies stored filter \(D_t\); exponent 1 vs 1/2 differs |
+| `ForensicPassFixesTest` | Source contracts: plugin sLORETA \(\sqrt{\,}\), MNE cutoffs, ReconstructionTool handle, segmentation delete-rows, epilepsy package name, no `!git pull`, confined import scripts |
+| `ImportConfinedScriptTest` | `.zef` script rows `run` only under the import folder |
+| `HALpRInverterTest` | `L1_optimization` vs sparse-D reference (IAS and Standardized); q=1/q=2 invert; q=2 zero-frame and polarity; `halpr` local dispatch |
+| `GroupLassoInverterTest` | `LG_optimization` vs sparse-D reference (IAS / EM / Standardized); invert vs frozen MAP loop; non-triplet `L` errors; `grouplasso` local dispatch |
+| `UKFNMMInverterTest` | Construct, U-space→dipole map, van der Merwe defaults, `initialize` sizes, per-frame `invert`, smoother NMM **once**, RTS |
+| `ClassGMMOptTest` | Mahalanobis / E-step / weighted EM of `inverse.gmm` vs original formulas; package isolation from retired `plugins.ClassGMM` |
+| `KalmanStandardizationExponentTest` | Class Kalman sLORETA exponent default 1/2 vs legacy `zef.standardization_exponent` (default 1); bitwise match when the exponent is aligned |
+| `MNEDepthWeightingTest` | Class MNE `theta` stays a per-source Dale/Lin vector, not `mean(theta)` |
+| `RAMUSAggregationTest` | Scatter/average identities: divide by `n_dec * n_levels * sum(sparsity.^[0:n_levels-1])`; `multiresolution_count` unused |
+| `PrecomputeCacheKeyTest` | CSM / MNE / eLORETA / Beamformer / DipoleScan cached operators invalidate when `L` or settings change |
+
+### Mesh, FEM interpolation, lead-field kernels
+
+| Class | What it actually checks |
+|-------|-------------------------|
+| `CreateFemMeshStencilTest` | Vectorized cube→tet fill vs the upstream i_x/i_y/i_z loop (5-tet and 6-tet stencils, parity diagonals) |
+| `FiDipolesFacePairingTest` | Unique-key FI face pairing vs upstream `sortrows` on a Kuhn cube grid |
+| `MeshRefinementEdgeIndexTest` | Mid-edge node numbering: `unique`/`ismember` vs the upstream sequential loop |
+| `NearestNeighbourGroupTest` | `accumarray` neighbour groups vs `find(p_nn==i)` in H(div)/Whitney interpolation |
+| `MEGGradiometerDistanceLawTest` | Gradiometer load uses \(\|r_{\mathrm{sensor}}-r_{\mathrm{centroid}}\|^{-3}\), not the overwritten directional vector |
+| `MEGLoadVectorVectorizationTest` | Magnetometer/gradiometer `accumarray` nodal load vs the upstream tetra loop |
+| `TesDofAveragingTest` | TES current-density DOF average: sparse incidence vs the scatter loops |
+| `VolumeScalarMatrixUFGTest` | NSE `uFG` convection kernel vs a dense triple-loop oracle (`zef_barycentric_weighting` `'uFG'`) |
+| `AnisotropicConductivityGuardTest` | Lead-field types 6–10 error unless `sigma(:,3:8)` is present |
+
+### Types and chrome
+
+| Class | What it actually checks |
+|-------|-------------------------|
+| `ZefSourceModelLoadTest` | `core.types.ZefSourceModel.from` on names, integers, `core.ZefSourceModel`, structs; saved legacy enum `.mat` loads without warning |
+| `ParcellationColormapTest` | `zef_parcellation_colormap` returns `[]` when base `zef.parcellation_colormap` is missing, else the stored matrix |
+| `WaitbarTest` | `zef_waitbar` lifecycle on R2025a+: `0` is progress not `groot`; nested `(i,N,h,msg)` keeps one handle; teardown restores `WindowStyle` |
+| `ColoredListTest` | `zef_colored_list` HTML / `uihtml` (and table) backends: names, colors, selection |
+| `UiThemeTest` | `zef_ui_theme` tokens (font ≥ 11 px, teal accent, shell geometry), window-label stripping, layout resize on real figures |
+| `ClassInverseDialogTest` | eLORETA / UKF-NMM dialogs expose method tags (`zef_inv_*`); `noise_cov` absent on eLORETA; four class-solver `zef_*_start` names resolve |
+| `FigureViewContainmentTest` | Figure-tool axes stay inside the visualization slot after layout |
+| `GuiResponsivenessTest` | Resize must not install listener storms or recenter the window |
+| `WindowPlacementTest` | Clamp / centre helpers keep windows on the work area |
+| `SensorListSyncTest` | Figure-tool sensor count matches listed rows |
+| `PluginIniResolutionTest` | Every Start function named in `profile/multicompartment_head/zeffiro_plugins.ini` exists on the path |
+
+## Code functionality
+
+Typical inverse test:
+
+1. Seed RNG in `TestMethodSetup`.
+2. Build `L`, `F`, `procFile`, source positions either via `tests.support.createSyntheticInverseZef` + `zef_processLeadfields`, or a local `i_synth` helper (mode-1 Cartesian, 3 columns per source).
+3. Construct `inverse.*Inverter`, call `initialize` → optional `precompute` → `invert`.
+4. Compare against an in-file reference loop, or against a second inverter configured to the old algorithm.
+5. Close waitbars in `TestMethodTeardown` where the kernel opens one.
+
+HALpR / GroupLasso call `L1_optimization` / `LG_optimization` from `plugins/EXP/common` (on `genpath(plugins)` after `zeffiro_interface`). Those tests fail if EXP is not on the path.
+
+Chrome tests create **real** `figure` / `uifigure` windows (`Visible` often `'off'`), track them in a `Figures` property, and delete them in teardown. `WaitbarTest` and `UiThemeTest` also snapshot `groot` `defaultFigureWindowStyle` because `zef_window_manager('init')` sets it to `'normal'`.
+
+## Workflow context
+
+```
+tests.support.createSyntheticInverseZef
+        ↓
+  inverse.*Inverter / inverse.gmm / core.types / src/gui/chrome
+        ↓
+  assertions (shape, finite, 1e-12 vs reference, error id)
+```
+
+Dispatch smoke inside a unit class (`zef_inverse_run(..., 'execution', 'local')`) still uses the class track (`src/inverse` → `utilities.cluster.dispatch_inverse`). Full registry / cluster / class-vs-legacy coverage lives in [`../+integration/README.md`](../+integration/README.md). End-to-end and layout guards: [`../+smoke/README.md`](../+smoke/README.md).
+
+## Usage instructions
+
+Project root must be on the path. Do **not** `addpath('+tests')`.
+
+```matlab
+cd /path/to/zeffiro_interface
+zef = zeffiro_interface('start_mode','nodisplay');  % path + plugins (EXP)
+runtests('tests.unit.ELORETAInverterTest')
+runtests('+tests/+unit')
+```
+
+## Important notes
+
+- Synthetic `L` is random (seeded). These tests protect **implementation opts and API contracts**, not localization accuracy on a real head.
+- `ClassVsLegacyTest` is **not** here — it is an integration test and does not assert numerical equality.
+- `ParcellationColormapTest` mutates base-workspace `zef` and restores it; do not run it in parallel with a live GUI session that owns that variable.
+- GPU branches in `UKFNMMInverterTest` fall back or skip when no GPU is present; they are not a CUDA validation suite.
+- `ClassInverseDialogTest` and `PluginIniResolutionTest` need `zeffiro_interface` path setup so `plugins/ELORETA` (and siblings) are on the path. The dialog test mutates base-workspace `zef` and restores it.
+
+## Developer guidance
+
+- New `@*Inverter` kernel change: add or extend a class here that compares against a frozen reference loop (see `IASInverterOptTest` / `ELORETAInverterOptTest`).
+- New registry id: also add an integration dispatch test; a unit invert smoke is not enough.
+- Prefer `tests.support.createSyntheticInverseZef` when the test needs a full `zef` struct. Use a local `i_synth` when you only need `L`/`F`/`procFile`.
+- Pitfall: `addpath('+tests/+unit')` breaks `tests.unit.*` resolution. Add the repository root only.
+- Keep teardown deleting figures and waitbars; leftover `uifigure`s poison later chrome tests.

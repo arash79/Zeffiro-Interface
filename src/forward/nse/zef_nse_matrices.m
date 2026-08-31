@@ -1,7 +1,4 @@
 function [nse_mat] = zef_nse_matrices(nodes,tetra,rho,mu)
-
-
-
 %ZEF_NSE_MATRICES  Assemble barycentric NSE operator matrices on a tetra mesh.
 %
 %   Zeffiro Interface.
@@ -22,7 +19,7 @@ function [nse_mat] = zef_nse_matrices(nodes,tetra,rho,mu)
 %     mu    - [n_tet × 1] viscosity
 %
 %   Output nse_mat fields: M, F mass; L_ij viscous GG; Q_i divergence FG;
-%   B1_* / B2 / B3_* surface traction; N row-normalized node adjacency.
+%   B1_* / B2 surface traction; N row-normalized node adjacency.
 %
 %   See also zef_nse_iteration, zef_volume_barycentric.
 
@@ -51,18 +48,6 @@ nse_mat.B1_3 = zef_surface_scalar_matrix_n(nodes,tetra,3);
 nse_mat.B2 = zef_surface_scalar_matrix_Dn(nodes,tetra,1,1);
 nse_mat.B2 = nse_mat.B2 + zef_surface_scalar_matrix_Dn(nodes,tetra,2,2);
 nse_mat.B2 = nse_mat.B2 + zef_surface_scalar_matrix_Dn(nodes,tetra,3,3);
-
-nse_mat.B3_11 = zef_surface_scalar_matrix_Dn(nodes,tetra,1,1);
-nse_mat.B3_21 = zef_surface_scalar_matrix_Dn(nodes,tetra,2,1);
-nse_mat.B3_31 = zef_surface_scalar_matrix_Dn(nodes,tetra,3,1);
-
-nse_mat.B3_12 = zef_surface_scalar_matrix_Dn(nodes,tetra,1,2);
-nse_mat.B3_22 = zef_surface_scalar_matrix_Dn(nodes,tetra,2,2);
-nse_mat.B3_32 = zef_surface_scalar_matrix_Dn(nodes,tetra,3,2);
-
-nse_mat.B3_13 = zef_surface_scalar_matrix_Dn(nodes,tetra,1,3);
-nse_mat.B3_23 = zef_surface_scalar_matrix_Dn(nodes,tetra,2,3);
-nse_mat.B3_33 = zef_surface_scalar_matrix_Dn(nodes,tetra,3,3);
 
 [I,J,V] = find(nse_mat.M);
 

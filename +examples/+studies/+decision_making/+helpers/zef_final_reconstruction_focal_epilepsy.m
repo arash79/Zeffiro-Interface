@@ -50,7 +50,5 @@ zef.reconstruction{1} = z_inverse_results{k};
 
 [z_cluster_centres_aux,z_dipole_moments_aux,~,GMModel] = zef_cluster_reconstruction(zef);
 [~, max_ind] = max(sqrt(sum(z_dipole_moments_aux.^2,2)));
-%  z_final_cluster_centre = z_cluster_centres_aux(max_ind,:);
 z_final_max_deviation = max(sqrt(eigs(GMModel.Sigma(:,:,max_ind))));
 z_final_mean_deviation = (mean(sqrt(eigs(GMModel.Sigma(:,:,max_ind)))));
-%dist_vec_final = sqrt(sum((z_final_cluster_centre - z_final_max_point).^2,2));

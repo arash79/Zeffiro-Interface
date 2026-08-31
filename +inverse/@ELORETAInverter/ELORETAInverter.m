@@ -63,6 +63,12 @@ classdef ELORETAInverter < inverse.CommonInverseParameters & handle
         precomputed_W_inv_diag (:,1) {mustBeA(precomputed_W_inv_diag,["double","gpuArray"])} = []
 
         %
+        % Fingerprint of the lead field and settings T was built from. invert
+        % rebuilds T on any mismatch. See inverse.precompute_cache_key.
+        %
+        precomputed_cache_key struct = struct([])
+
+        %
         % Number of iterations used by fixed-point updates.
         %
         n_iterations_used (1,1) double {mustBeNonnegative} = 0
@@ -154,6 +160,25 @@ classdef ELORETAInverter < inverse.CommonInverseParameters & handle
 
         [reconstruction, self] = invert(self, f, L, procFile, source_direction_mode, source_positions, opts)
 
+        function key = cacheKey(self, L, procFile)
+            %cacheKey  Fingerprint of L plus every setting T depends on.
+            %
+            %   The fixed-point iteration behind T = W^{-1} L' M^{-1} reads
+            %   alpha, the average-reference flag, both stopping criteria, and
+            %   the fixed-orientation source set from procFile.
+            if nargin < 3 || ~isstruct(procFile) || ~isfield(procFile, "s_ind_4")
+                fixed_inds = [];
+            else
+                fixed_inds = double(procFile.s_ind_4(:));
+            end
+            key = inverse.precompute_cache_key(L, { ...
+                gather(double(self.regularization_parameter)), ...
+                logical(self.apply_average_reference), ...
+                double(self.n_max_iterations), ...
+                double(self.convergence_tolerance), ...
+                fixed_inds});
+        end
+
         function self = terminateComputation(self)
             %terminateComputation  Clear auto-estimated alpha/noise_cov and cached T.
             if not(self.regularization_parameterSetted)
@@ -164,6 +189,7 @@ classdef ELORETAInverter < inverse.CommonInverseParameters & handle
             end
             self.precomputed_inverse_operator = [];
             self.precomputed_W_inv_diag = [];
+            self.precomputed_cache_key = struct([]);
             self.n_iterations_used = 0;
             self.final_residual = Inf;
         end

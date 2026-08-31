@@ -18,7 +18,7 @@ end
 
 n_runs = numel(runs);
 if n_runs == 0
-    error("utilities.sensitivity:aggregate_statistics:NoRuns", ...
+    error("utilities:sensitivity:aggregate_statistics:NoRuns", ...
         "runs must contain at least one realisation.");
 end
 
@@ -97,7 +97,7 @@ for r = 1:numel(runs)
 end
 
 if n_rec == 0
-    error("utilities.sensitivity:aggregate_statistics:AllRunsEmpty", ...
+    error("utilities:sensitivity:aggregate_statistics:AllRunsEmpty", ...
         "All Monte-Carlo realisations are empty; no metrics to aggregate.");
 end
 

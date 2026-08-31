@@ -14,10 +14,10 @@ function zef = zef_source_interpolation(zef)
 %   the modality wrappers. Inverse zef_processLeadfields requires
 %   zef.source_interpolation_ind{1}.
 %
-%   Drops columns of L (and matching source_positions / source_directions)
-%   whose column-sum of abs is NaN. Then three nearest-neighbour maps in the
-%   current location_unit (cm positions are ×10; metre positions are written
-%   back ×1000 into zef.source_positions):
+%   Drops NaN lead-field columns via zef_drop_nan_source_columns (whole
+%   xyz triplets when size(L,2)==3*n_positions). Then three nearest-
+%   neighbour maps in the current location_unit (cm positions are ×10;
+%   metre positions are written back ×1000 into zef.source_positions):
 %     {1} source positions → 4 nodes of each active tetrahedron
 %     {2}{compartment} sources → triangles of each active source surface
 %     {3} source positions → combined surface-triangle centroids
@@ -37,18 +37,8 @@ if nargin == 0
     zef = evalin('base','zef');
 end
 
-if eval('isequal(size(zef.L,2),size(zef.source_directions,1))')
-    eval('zef.source_directions=zef.source_directions(find(not(isnan(sum(abs(zef.L),1)))),:);');
-elseif eval('isequal(size(zef.L,2),3*size(zef.source_directions,1))')
-    eval('zef.source_directions=zef.source_directions(find(not(isnan(sum(abs(zef.L(:,1:3:end)),1)))),:);');
-end
-if eval('isequal(size(zef.L,2),size(zef.source_positions,1))')
-    eval('zef.source_positions=zef.source_positions(find(not(isnan(sum(abs(zef.L),1)))),:);');
-    eval('zef.L=zef.L(:,find(not(isnan(sum(abs(zef.L),1)))))');
-elseif eval('isequal(size(zef.L,2),3*size(zef.source_positions,1))')
-    eval('zef.source_positions=zef.source_positions(find(not(isnan(sum(abs(zef.L(:,1:3:end)),1)))),:);');
-    eval('zef.L=zef.L(:,find(not(isnan(sum(abs(zef.L),1)))));');
-end
+[zef.L, zef.source_positions, zef.source_directions] = zef_drop_nan_source_columns( ...
+    zef.L, zef.source_positions, zef.source_directions);
 
 source_interpolation_ind = [];
 active_compartment_ind = eval('zef.active_compartment_ind');

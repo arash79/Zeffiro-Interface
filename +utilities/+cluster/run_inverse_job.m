@@ -41,7 +41,7 @@ try
 
     loaded = load(bundle_path);
     if ~isfield(loaded, "bundle")
-        error("utilities.cluster:InvalidBundleFile", ...
+        error("utilities:cluster:InvalidBundleFile", ...
             "Bundle file '%s' does not contain variable 'bundle'.", bundle_path);
     end
 

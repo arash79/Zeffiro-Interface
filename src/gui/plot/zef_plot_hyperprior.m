@@ -54,12 +54,8 @@ amplitude_val = 10.^(-pm_val/20);
 
 h_loglog = loglog(evalin('base','zef.h_axes1'),sqrt(t),plot_vec,'k');
 set(h_loglog,'linewidth',2);
-%y_lim_vec = [eps_val eps_val*(plot_vec/eps_val).^(1.05)];
 x_lim_vec = [10.^(-min_amp_exp/2) 10.^(max_amp_exp/2) ];
 y_lim_vec = [eps_val max_val];
-
-%y_lim_vec = double(y_lim_vec);
-%x_lim_vec = double(x_lim_vec);
 
 set(evalin('base','zef.h_axes1'),'xgrid','on');
 set(evalin('base','zef.h_axes1'),'ygrid','on');
@@ -81,7 +77,6 @@ h_line = line(evalin('base','zef.h_axes1'),x_lim_vec,[plot_vec(min_ind) plot_vec
 set(h_line,'color',[0 0 0],'linewidth',2,'linestyle',':');
 hold(evalin('base','zef.h_axes1'),'off');
 legend(evalin('base','zef.h_axes1'),{'Hyperprior density','Mean','Tail reference','Amplitude reference'},'Location','SouthWest');
-%set(evalin('base','zef.h_axes1'),'fontsize',evalin('base','zef.font_size'))
 
 h_text = text(x_lim_vec(1)*10.^(0.7*(log10(x_lim_vec(2))-log10(x_lim_vec(1)))),...
     y_lim_vec(1)*10.^(0.10*(log10(y_lim_vec(2))-log10(y_lim_vec(1)))),...

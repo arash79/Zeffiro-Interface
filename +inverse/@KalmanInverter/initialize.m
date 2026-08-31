@@ -1,4 +1,4 @@
-function self = initialize(self,L,f_data)
+function self = initialize(self,L,f_data,source_direction_mode)
 %initialize  Set Kalman noise covariance, initial prior theta0, and process noise Q.
 %
 %   Zeffiro Interface.
@@ -16,7 +16,9 @@ function self = initialize(self,L,f_data)
 %   temporal differences of f_data; "User supplied Q" requires evolution_cov to match
 %   size(L,2).
 %
-%   Inputs:  L — lead field; f_data — m×T measurements.
+%   Inputs:  L — lead field; f_data — m×T measurements;
+%            source_direction_mode — 1/2 Cartesian triples (class interleaved),
+%            3 per-column energy. Default 1 when omitted.
 %   Output:  self with priors and transition model A (identity if unset).
 
     arguments
@@ -27,10 +29,14 @@ function self = initialize(self,L,f_data)
 
         f_data (:,:) {mustBeA(f_data,["double","gpuArray"])}
 
+        source_direction_mode = 1
+
     end
 
     self.prev_step_posterior_cov = [];
     self.prev_step_reconstruction = [];
+    self.posterior_covs = cell(0);
+    self.filter_standardization_D = cell(0);
 
     external_Q = [];
     if strcmp(self.evolution_prior_model, "User supplied Q")
@@ -51,10 +57,21 @@ function self = initialize(self,L,f_data)
         self.noise_cov = size(L,1)*self.noise_cov/trace(self.noise_cov);
     end
     
-    % Initial prior θ₀: data variance on the first noise-only frames, depth-weighted
-    % by per-triplet lead-field energy, steered in dB.
-    self.theta0 = (1-noise_p2)*10.^(self.initial_prior_steering_db/10)*mean(var(f_data(:,1:self.number_of_noise_steps),0,2))./repelem(sum(reshape(sum(L.^2),3,[])),3);
+    n_noise = min(double(self.number_of_noise_steps), size(f_data, 2));
+    n_noise = max(n_noise, 1);
+    if n_noise < 2
+        data_power = mean(f_data(:, 1).^2);
+    else
+        data_power = mean(var(f_data(:, 1:n_noise), 0, 2));
+    end
+    col_energy = zef_leadfield_column_energy(L, source_direction_mode);
+    self.theta0 = (1-noise_p2)*10.^(self.initial_prior_steering_db/10)*data_power./col_energy;
 
+    needs_temporal_diff = ismember(self.evolution_prior_model, ...
+        ["Sensitivity scaling", "Avg. sensit. scaling", "SVD-based", "Avg. SVD-based"]);
+    if needs_temporal_diff && size(f_data, 2) < 2
+        self.evolution_var = transpose((1-noise_p2) * 10^(self.evolution_prior_db/20) ./ col_energy);
+    else
     switch self.evolution_prior_model
         case "User supplied Q"
             if isempty(external_Q)
@@ -80,12 +97,12 @@ function self = initialize(self,L,f_data)
             % => E[dy^2] -> sqrt(E[dy^2])
         f = sqrt(mean(diff(f_data').^2,2))*10^(self.evolution_prior_db/20);
         f = [f;f(end)];
-        self.evolution_var =  transpose((1-noise_p2)*f./repelem(sum(reshape(sum(L.^2),3,[])),3));
+        self.evolution_var =  transpose((1-noise_p2)*f./col_energy);
     case "Avg. sensit. scaling"
         %case 1 but spatial sensitivity is averaged
         f = sqrt(mean(diff(f_data').^2,2))*10^(self.evolution_prior_db/20);
         f = [f;f(end)];
-        self.evolution_var =  transpose((1-noise_p2)*f/mean(repelem(sum(reshape(sum(L.^2),3,[])),3)));
+        self.evolution_var =  transpose((1-noise_p2)*f/mean(col_energy));
         case "SVD-based"
         %Mathematically quarantees a good tracking but numerically instable
         %in 2024
@@ -100,14 +117,15 @@ function self = initialize(self,L,f_data)
         f = diff(f_data')';
         f = sum(f.^2,2)./sum(f_data.^2,2);         
         S = max(S.^2,noise_p2/(1-noise_p2));
-        self.evolution_cov =  (mean(f./S)*10^(self.evolution_prior_db/20))*eye(size(L,2));
+        self.evolution_cov =  (mean(f./S)*10^(self.evolution_prior_db/20))*speye(size(L,2));
     case "Reworked original"
-        self.evolution_cov = self.time_step*(svds(L,1).^(2)/sum(L(:).^2))*10^(self.evolution_prior_db/20)*eye(size(L,2));
+        self.evolution_cov = self.time_step*(svds(L,1).^(2)/sum(L(:).^2))*10^(self.evolution_prior_db/20)*speye(size(L,2));
+    end
     end
 
     if isempty(self.state_transition_model_A)
-        % Transition matrix is Identity matrix
-        self.state_transition_model_A = eye(size(L,2));
+        % Transition matrix is Identity matrix (sparse; same as dense I)
+        self.state_transition_model_A = speye(size(L,2));
     end
 
 end

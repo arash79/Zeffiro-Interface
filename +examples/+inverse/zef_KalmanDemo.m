@@ -9,18 +9,11 @@
 %   create_measurement calls examples.forward.lead_field_example (n_sources
 %   2000, EEG) then two dipoles (cortical / thalamic). runKalman sets
 %   filter_type=1, kf_smoothing=1, number_of_frames=26, then zef_KF.
-%   Save and visualization cells are commented.
 %
 
 zef = zef_KalmanDemo_create_measurement();
 %%
 zef = zef_KalmanDemo_runKalman(zef);
-%%
-%zef = zef_KalmanDemo_save(zef);
-%% Visualization
-%(!!!) Under maintenance (!!!)
-%zef = zef_Kalman_visualization(project_struct);
-%%
 
 function project_struct = zef_KalmanDemo_runKalman(project_struct)
 %ZEF_KALMANDEMO_RUNKALMAN  Legacy zef_KF on the demo session (filter_type 1).
@@ -47,16 +40,6 @@ function project_struct = zef_KalmanDemo_runKalman(project_struct)
     [project_struct] = zef_KF(project_struct);
 
 end % function
-
-function project_struct = zef_KalmanDemo_save(project_struct)
-%ZEF_KALMANDEMO_SAVE  zef_save to data/example_project.mat then zef_close_all.
-%
-%   Commented out in the script body (not run by default).
-
-    % zef_KalmanDemo_save - Save project struct and close Zeffiro windows.
-    zef_save(project_struct, 'example_project.mat', 'data/');
-    zef_close_all(project_struct);
-end
 
 function project_struct = zef_KalmanDemo_create_measurement()
 %ZEF_KALMANDEMO_CREATE_MEASUREMENT  EEG lead field + two synthetic P20/N20 dipoles.
@@ -129,27 +112,3 @@ function project_struct = zef_KalmanDemo_create_measurement()
     project_struct.measurements = project_struct.measurements + (10^(-noise_dB/20)*sqrt(sum(project_struct.measurements.^2,2)./sum(noise.^2,2))).*noise;
 
 end % function
-
-function project_struct = zef_KalmanDemo_visualize(project_struct)
-%ZEF_KALMANDEMO_VISUALIZE  Show surfaces (visualization_type 3). Unused by the script.
-
-    % zef_KalmanDemo_visualize - Display reconstruction in Zeffiro GUI.
-    zef.h_zeffiro.Visible = 1;
-    zef.use_display = 1;
-    project_struct.visualization_type = 3;
-    zef_visualize_surfaces(project_struct)
-end
-
-function project_struct = zef_Kalman_visualization(project_struct)
-%ZEF_KALMAN_VISUALIZATION  zef_figure_tool then zef_visualize_surfaces. Marked under maintenance.
-
-    % zef_Kalman_visualization - Open figure tool and visualize surfaces.
-    zef_figure_tool
-    project_struct.h_zeffiro.Visible = 1;
-    project_struct.use_display = 1;
-    project_struct.visualization_type = 3;
-    project_struct.cp2_on = 0;
-    project_struct.cp_on = 0;
-    project_struct.cp3_on = 0;
-    zef_visualize_surfaces
-end
