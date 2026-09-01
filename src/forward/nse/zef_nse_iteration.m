@@ -290,10 +290,6 @@ for t_ind = 1 : length(zef.nse_field.t_data)
 
 end
 
-% Properly delete waitbar by clearing DeleteFcn first
-if ~isempty(h_waitbar) && isvalid(h_waitbar)
-    set(h_waitbar, 'DeleteFcn', '');
-    delete(h_waitbar);
-end
+zef_close_waitbar(h_waitbar);
 
 end

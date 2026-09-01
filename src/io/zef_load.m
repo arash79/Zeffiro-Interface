@@ -307,8 +307,7 @@ if not(isequal(file_name,0))
     try
         if ~isempty(h_waitbar) && isvalid(h_waitbar)
             zef_waitbar(1, 1, h_waitbar, 'Updating interface.');
-            set(h_waitbar, 'DeleteFcn', '');
-            delete(h_waitbar);
+            zef_close_waitbar(h_waitbar);
         end
     catch
     end

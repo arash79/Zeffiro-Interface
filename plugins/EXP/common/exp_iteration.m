@@ -264,4 +264,4 @@ for f_ind = 1 : number_of_frames
 end
 
 z = zef_postProcessInverse(z, procFile);
-close(h);
+zef_close_waitbar(h);

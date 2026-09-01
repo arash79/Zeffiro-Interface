@@ -75,5 +75,5 @@ for f_ind = 1: number_of_frames
         P_store{f_ind} = gather(P(1:size(L,2)*(smoothing-1),1:size(L,2)*(smoothing-1)));
     end
 end
-close(h);
+zef_close_waitbar(h);
 end

@@ -76,8 +76,7 @@ end
 if ~isfield(zef,'freesurfer_fa_data') || isempty(zef.freesurfer_fa_data)
     if ~isempty(h_waitbar) && isvalid(h_waitbar)
         try
-            set(h_waitbar, 'DeleteFcn', '');
-            delete(h_waitbar);
+            zef_close_waitbar(h_waitbar);
         catch
         end
     end
@@ -89,8 +88,7 @@ end
 if ~isfield(zef,'freesurfer_v1_data') || isempty(zef.freesurfer_v1_data)
     if ~isempty(h_waitbar) && isvalid(h_waitbar)
         try
-            set(h_waitbar, 'DeleteFcn', '');
-            delete(h_waitbar);
+            zef_close_waitbar(h_waitbar);
         catch
         end
     end
@@ -102,8 +100,7 @@ end
 if ~isfield(zef,'freesurfer_register_transform') || isempty(zef.freesurfer_register_transform)
     if ~isempty(h_waitbar) && isvalid(h_waitbar)
         try
-            set(h_waitbar, 'DeleteFcn', '');
-            delete(h_waitbar);
+            zef_close_waitbar(h_waitbar);
         catch
         end
     end
@@ -114,8 +111,7 @@ end
 if ~isfield(zef,'nodes') || isempty(zef.nodes)
     if ~isempty(h_waitbar) && isvalid(h_waitbar)
         try
-            set(h_waitbar, 'DeleteFcn', '');
-            delete(h_waitbar);
+            zef_close_waitbar(h_waitbar);
         catch
         end
     end
@@ -137,20 +133,20 @@ has_ref_center = (isfield(zef,'dti_ref_center') && ~isempty(zef.dti_ref_center) 
                  (isfield(zef,'dti_ref_geometry') && ~isempty(zef.dti_ref_geometry));
 
 if ~has_dwi_tkr
-    if ~isempty(h_waitbar) && isvalid(h_waitbar), try set(h_waitbar,'DeleteFcn',''); delete(h_waitbar); catch, end, end
+    zef_close_waitbar(h_waitbar);
     error(['DWI vox2ras-tkr not available. Load fa.nii.gz in the DTI Conductivity Tool ' ...
            '(auto-extracted on load), or ensure freesurfer_fa_info is populated.']);
 end
 if ~has_ref_vox2ras
-    if ~isempty(h_waitbar) && isvalid(h_waitbar), try set(h_waitbar,'DeleteFcn',''); delete(h_waitbar); catch, end, end
+    zef_close_waitbar(h_waitbar);
     error('Reference vox2ras not available. Load a Reference MRI file (e.g. orig.mgz) in the DTI Conductivity Tool.');
 end
 if ~has_ref_tkr
-    if ~isempty(h_waitbar) && isvalid(h_waitbar), try set(h_waitbar,'DeleteFcn',''); delete(h_waitbar); catch, end, end
+    zef_close_waitbar(h_waitbar);
     error('Reference vox2ras-tkr not available. Load a Reference MRI file (e.g. orig.mgz) in the DTI Conductivity Tool.');
 end
 if ~has_ref_center
-    if ~isempty(h_waitbar) && isvalid(h_waitbar), try set(h_waitbar,'DeleteFcn',''); delete(h_waitbar); catch, end, end
+    zef_close_waitbar(h_waitbar);
     error('Reference center not available. Load a Reference MRI file (e.g. orig.mgz) in the DTI Conductivity Tool.');
 end
 
@@ -186,13 +182,7 @@ if nargin < 2 || isempty(seed_point)
 else
     % Validate seed point format
     if ~isequal(size(seed_point), [1, 3]) && ~isequal(size(seed_point), [3, 1])
-        if ~isempty(h_waitbar) && isvalid(h_waitbar)
-            try
-                set(h_waitbar, 'DeleteFcn', '');
-                delete(h_waitbar);
-            catch
-            end
-        end
+        zef_close_waitbar(h_waitbar);
         error('Seed point must be [1×3] or [3×1] vector');
     end
     seed_point = seed_point(:)';  % Ensure row vector
@@ -333,8 +323,7 @@ try
 catch ME
     if ~isempty(h_waitbar) && isvalid(h_waitbar)
         try
-            set(h_waitbar, 'DeleteFcn', '');
-            delete(h_waitbar);
+            zef_close_waitbar(h_waitbar);
         catch
         end
     end
@@ -401,8 +390,7 @@ try
 catch ME
     if ~isempty(h_waitbar) && isvalid(h_waitbar)
         try
-            set(h_waitbar, 'DeleteFcn', '');
-            delete(h_waitbar);
+            zef_close_waitbar(h_waitbar);
         catch
         end
     end
@@ -484,8 +472,7 @@ end
 if n_valid == 0
     if ~isempty(h_waitbar) && isvalid(h_waitbar)
         try
-            set(h_waitbar, 'DeleteFcn', '');
-            delete(h_waitbar);
+            zef_close_waitbar(h_waitbar);
         catch
         end
     end
@@ -650,10 +637,8 @@ if ~isempty(h_waitbar)
         zef_waitbar(1, 1, h_waitbar, sprintf('Completed! Plotted %d streamlines.', idx));
         drawnow;
         pause(0.5);
-        % Properly delete waitbar by clearing DeleteFcn first
         if isvalid(h_waitbar)
-            set(h_waitbar, 'DeleteFcn', '');
-            delete(h_waitbar);
+            zef_close_waitbar(h_waitbar);
         end
     catch
     end

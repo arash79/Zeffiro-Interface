@@ -85,5 +85,5 @@ I_2 = find(I==0);
 I(I_2) = label_vec(end);
 
 if close_waitbar
-close(h);
+zef_close_waitbar(h);
 end

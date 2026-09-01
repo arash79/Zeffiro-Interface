@@ -464,9 +464,7 @@ function [ sigma_out, sigma_std ] = conductivity_loop( ...
 
     wb = zef_waitbar ( 0, 1, waitbar_title ) ;
 
-    cleanup_fn = @(hh) close ( hh ) ;
-
-    cleanup_obj = onCleanup ( @() cleanup_fn(wb) ) ;
+    cleanup_obj = onCleanup ( @() zef_close_waitbar(wb) ) ;
 
     % Start iterating over time frames.
 

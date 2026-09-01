@@ -47,5 +47,5 @@ for f_ind = 1: number_of_frames
     end
     z_inverse{f_ind} = gather(m);
 end
-close(h);
+zef_close_waitbar(h);
 end

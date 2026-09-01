@@ -24,7 +24,7 @@ function [z,Var_loc,reconstruction_information] = RAP_MUSIC_iteration
 %   See also zef_rap_music_scan, zef_blocked_source_index, zef_subspace_corr.
 
 h = zef_waitbar(0,1,['RAP MUSIC.']);
-cleanup_wb = onCleanup(@() close(h));
+cleanup_wb = onCleanup(@() zef_close_waitbar(h));
 snr_val = evalin('base','zef.inv_snr');
 std_lhood = 10^(-snr_val/20);
 lambda_L = evalin('base','zef.RAPMUSIC_leadfield_lambda');

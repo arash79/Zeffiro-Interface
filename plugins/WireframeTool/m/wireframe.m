@@ -215,7 +215,7 @@ end
 
 m_triangles = m_triangles(:,[1 3 2]);
 
-close(h_w);
+zef_close_waitbar(h_w);
 
 end
 

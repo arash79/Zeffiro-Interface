@@ -109,7 +109,7 @@ A = A_aux;
 wbtitle = 'Stencil PCG iteration';
 wb = zef_waitbar(0,1, wbtitle);
 
-cleanupfn = @(h) close(h);
+cleanupfn = @zef_close_waitbar;
 cleanupobj = onCleanup(@() cleanupfn(wb));
 
 % Initialize transfer matrix T and Schur_complement

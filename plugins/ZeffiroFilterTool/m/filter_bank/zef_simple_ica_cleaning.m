@@ -35,6 +35,6 @@ for i = 1 : size_f
 
 end
 
-close(h);
+zef_close_waitbar(h);
 
 processed_data = f_2';

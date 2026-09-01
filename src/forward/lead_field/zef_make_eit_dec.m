@@ -36,6 +36,6 @@ eit_count = accumarray(i_c,1);
 
 zef_waitbar(1,1,h,'Field decomposition');
 
-close(h);
+zef_close_waitbar(h);
 
 end

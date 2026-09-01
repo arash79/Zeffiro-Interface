@@ -242,6 +242,6 @@ for ab_ind = 1 : length(aux_brain_ind)
     end
 end
 
-close(h)
+zef_close_waitbar(h)
 
 end

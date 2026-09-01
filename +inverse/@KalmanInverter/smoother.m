@@ -43,7 +43,7 @@ end
 Q = self.evolution_cov;
 
 h = zef_waitbar(0,'Smoothing');
-cleanup_wb = onCleanup(@() i_close_wb(h));
+cleanup_wb = onCleanup(@() zef_close_waitbar(h));
 if strcmp(self.smoother_type,"RTS")
     % RTS: P_ = A P A' + Q, G = P A' / P_, m_s = m + G (m_s - A m) backward in time.
     reconstruction = cell(0);
@@ -133,13 +133,4 @@ else
 end
 clear cleanup_wb;
 
-end
-
-function i_close_wb(h)
-try
-    if ~isempty(h) && isgraphics(h)
-        close(h);
-    end
-catch
-end
 end

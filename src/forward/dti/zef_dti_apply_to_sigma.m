@@ -176,9 +176,7 @@ try
         'principal_direction', principal_direction, ...
         'mean_diffusivity', mean_diffusivity);
 catch ME
-    if ~isempty(h_waitbar) && isvalid(h_waitbar)
-        try set(h_waitbar, 'DeleteFcn', ''); delete(h_waitbar); catch, end
-    end
+    zef_close_waitbar(h_waitbar);
     error('FA to conductivity conversion failed: %s', ME.message);
 end
 
@@ -225,9 +223,7 @@ try
         h_waitbar, ...
         T_mesh2voxel);
 catch ME
-    if ~isempty(h_waitbar) && isvalid(h_waitbar)
-        try set(h_waitbar, 'DeleteFcn', ''); delete(h_waitbar); catch, end
-    end
+    zef_close_waitbar(h_waitbar);
     error('Interpolation failed: %s', ME.message);
 end
 
@@ -399,13 +395,10 @@ if ~isempty(h_waitbar) && isvalid(h_waitbar)
         zef_waitbar(1, 1, h_waitbar, ...
             sprintf('Done! Updated %d tetrahedra.', n_up));
         drawnow; pause(0.5);
-        set(h_waitbar, 'DeleteFcn', ''); delete(h_waitbar);
     catch
-        try
-            if isvalid(h_waitbar), set(h_waitbar,'DeleteFcn',''); delete(h_waitbar); end
-        catch, end
     end
 end
+zef_close_waitbar(h_waitbar);
 
 % ========================================================================
 % STEP 10: RETURN OR ASSIGN TO BASE WORKSPACE

@@ -22,12 +22,17 @@ function h_waitbar = zef_waitbar(varargin)
 %   h = zef_waitbar(ratio, message)
 %   zef_waitbar('theme')
 %
-%   close(h) and delete(h) both destroy the window. A new initialize call
-%   reuses the existing singleton figure so nested processes keep a valid
-%   handle. Updating a deleted handle recreates it. Redraws smaller than
-%   about 1% are skipped except at 0%, 100%, or when the message changes.
+%   close(h) destroys the window when this caller owns it. A new initialize
+%   call reuses the existing singleton figure so nested processes keep a
+%   valid handle. Nested initialize from a different function increments a
+%   nest count; close() from that nested caller only decrements, so the
+%   parent handle stays valid. MATLAB's close() is skipped when identifying
+%   the closer so nest counting sees the real caller. delete(h) and
+%   zef_delete_waitbar still force-destroy. Updating a deleted handle
+%   recreates it. Redraws smaller than about 1% are skipped except at 0%,
+%   100%, or when the message changes.
 %
-%   See also zef_delete_waitbar, uifigure, zef_window_manager.
+%   See also zef_waitbar, zef_close_waitbar, uifigure, zef_window_manager.
 
 if nargin == 1 && (ischar(varargin{1}) || isstring(varargin{1})) ...
         && strcmpi(strtrim(char(varargin{1})), 'theme')
@@ -52,7 +57,7 @@ end
 
 menu = local_find_menu();
 opts = local_menu_options(menu);
-opts.caller = local_caller_name();
+[opts.caller, opts.owner] = local_caller_identity();
 
 if strcmp(action, 'init') || ~local_is_valid(h_in)
     h_waitbar = local_create(opts, msg, menu);
@@ -335,19 +340,33 @@ end
 
 end
 
-function name = local_caller_name()
-name = 'unknown';
+function [file_name, owner] = local_caller_identity()
+file_name = 'unknown';
+owner = 'unknown';
 try
     st = dbstack('-completenames');
     for i = 1:numel(st)
-        if ~strcmp(st(i).name, 'zef_waitbar') && ~startsWith(st(i).name, 'local_')
-            [~, name, ext] = fileparts(st(i).file);
-            name = [name ext]; %#ok<AGROW>
-            return
+        if local_is_waitbar_frame(st(i))
+            continue
         end
+        [~, file_name, ext] = fileparts(st(i).file);
+        file_name = [file_name ext]; %#ok<AGROW>
+        owner = st(i).name;
+        return
     end
 catch
 end
+end
+
+function tf = local_is_waitbar_frame(frame)
+n = frame.name;
+tf = strcmp(n, 'zef_waitbar') || startsWith(n, 'zef_waitbar/') ...
+    || strcmp(n, 'zef_close_waitbar') || startsWith(n, 'zef_close_waitbar/') ...
+    || contains(n, 'close_waitbar') ...
+    || strcmp(n, 'close') || startsWith(n, 'close/') ...
+    || strcmp(n, 'closereq') ...
+    || startsWith(n, 'local_') || contains(n, 'onCleanup') ...
+    || startsWith(n, '@');
 end
 
 %% Create / paint
@@ -441,6 +460,7 @@ end
 end
 
 function fig = local_reset(fig, opts, msg)
+local_bump_nest(fig, opts);
 fig.Name = local_task_name(opts.task_id);
 fig.Tag = 'progress_bar';
 fig.CloseRequestFcn = @(src, ~) local_on_close(src);
@@ -509,9 +529,15 @@ end
 local_addprop(fig, 'ZefWaitbarStartTime');
 local_addprop(fig, 'ZefWaitbarCurrentProgress');
 local_addprop(fig, 'ZefWaitbarValue');
+local_addprop(fig, 'ZefWaitbarNestLevel');
+local_addprop(fig, 'ZefWaitbarOwner');
+local_addprop(fig, 'ZefWaitbarNestedOwners');
 fig.ZefWaitbarStartTime = now;
 fig.ZefWaitbarCurrentProgress = 0;
 fig.ZefWaitbarValue = 0;
+fig.ZefWaitbarNestLevel = 1;
+fig.ZefWaitbarOwner = opts.owner;
+fig.ZefWaitbarNestedOwners = {};
 fig.CloseRequestFcn = @(src, ~) local_on_close(src);
 fig.DeleteFcn = '';
 
@@ -803,15 +829,90 @@ function name = local_task_name(~)
 name = 'ZEFFIRO Interface: Progress';
 end
 
-function local_on_close(src)
-% Clear CloseRequestFcn / DeleteFcn first so delete does not re-enter
-% (same pattern as zef_close_all on ZEFFIRO figures).
+function local_bump_nest(fig, opts)
+% Nested initialize from a different function shares the singleton. Record
+% that extra owner so close() from it decrements once; a second close from
+% the same nested function (explicit close + onCleanup) must not destroy
+% the parent.
 try
-    if isvalid(src)
-        src.CloseRequestFcn = '';
-        src.DeleteFcn = '';
-        delete(src);
+    owner = '';
+    if isprop(fig, 'ZefWaitbarOwner') && ~isempty(fig.ZefWaitbarOwner)
+        owner = char(string(fig.ZefWaitbarOwner));
     end
+    caller = '';
+    if isfield(opts, 'owner') && ~isempty(opts.owner)
+        caller = char(string(opts.owner));
+    end
+    if isempty(caller) || strcmp(caller, owner)
+        return
+    end
+    local_addprop(fig, 'ZefWaitbarNestLevel');
+    local_addprop(fig, 'ZefWaitbarNestedOwners');
+    nest = 1;
+    if ~isempty(fig.ZefWaitbarNestLevel)
+        nest = double(fig.ZefWaitbarNestLevel);
+    end
+    nested = {};
+    if ~isempty(fig.ZefWaitbarNestedOwners)
+        nested = fig.ZefWaitbarNestedOwners;
+        if ~iscell(nested)
+            nested = {};
+        end
+    end
+    fig.ZefWaitbarNestedOwners = [nested, {caller}];
+    fig.ZefWaitbarNestLevel = nest + 1;
+catch
+end
+end
+
+function local_on_close(src)
+% Nested close() drops that caller from ZefWaitbarNestedOwners. A second
+% close from the same nested function is a no-op. The original owner, or
+% an unknown closer (window X), destroys the figure.
+try
+    if ~isvalid(src)
+        return
+    end
+    [~, closer] = local_caller_identity();
+    nested = {};
+    try
+        if isprop(src, 'ZefWaitbarNestedOwners') && ~isempty(src.ZefWaitbarNestedOwners)
+            nested = src.ZefWaitbarNestedOwners;
+            if ~iscell(nested)
+                nested = {};
+            end
+        end
+    catch
+        nested = {};
+    end
+    owner = '';
+    try
+        if isprop(src, 'ZefWaitbarOwner') && ~isempty(src.ZefWaitbarOwner)
+            owner = char(string(src.ZefWaitbarOwner));
+        end
+    catch
+        owner = '';
+    end
+    idx = [];
+    if ~isempty(nested)
+        idx = find(strcmp(nested, closer), 1, 'last');
+    end
+    if ~isempty(idx)
+        nested(idx) = [];
+        src.ZefWaitbarNestedOwners = nested;
+        nest = 1;
+        if isprop(src, 'ZefWaitbarNestLevel') && ~isempty(src.ZefWaitbarNestLevel)
+            nest = double(src.ZefWaitbarNestLevel);
+        end
+        src.ZefWaitbarNestLevel = max(1, nest - 1);
+        return
+    end
+    if ~(strcmp(closer, owner) || strcmp(closer, 'unknown') || isempty(closer))
+        return
+    end
+    src.CloseRequestFcn = '';
+    src.DeleteFcn = '';
+    delete(src);
 catch
 end
 end

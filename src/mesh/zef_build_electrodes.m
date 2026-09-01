@@ -67,7 +67,7 @@ wbi = 0;
 
 % Cleanup operations
 
-cleanup_fn = @(h) close(h);
+cleanup_fn = @zef_close_waitbar;
 cleanup_obj = onCleanup(@() cleanup_fn(wb));
 
 % Consider the PEM case

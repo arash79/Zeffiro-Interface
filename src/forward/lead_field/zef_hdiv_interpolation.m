@@ -65,7 +65,7 @@ wb = zef_waitbar(0,1, wbtitle);
 
 % Define cleanup operations, in case of an interruption.
 
-cleanupfn = @(h) close(h);
+cleanupfn = @zef_close_waitbar;
 cleanupobj = onCleanup(@() cleanupfn(wb));
 
 % Dipoles and their adjacency and weight matrices T and G.
@@ -358,7 +358,7 @@ end
 wbtitle = 'Lead field H(div) interpolation';
 wb = zef_waitbar(0,1, wbtitle);
 
-cleanupfn = @(h) close(h);
+cleanupfn = @zef_close_waitbar;
 cleanupobj = onCleanup(@() cleanupfn(wb));
 
 face_node_inds = [

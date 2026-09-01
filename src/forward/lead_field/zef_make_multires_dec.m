@@ -93,4 +93,4 @@ for n_rep = 1 : n_decompositions
 
 end
 
-close(h)
+zef_close_waitbar(h)

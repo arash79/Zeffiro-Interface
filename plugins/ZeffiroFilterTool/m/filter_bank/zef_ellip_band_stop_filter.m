@@ -67,7 +67,7 @@ if size(f,2) > 1 && center_frequency > 0
 
         end
 
-        close(h);
+        zef_close_waitbar(h);
 
     end
 end

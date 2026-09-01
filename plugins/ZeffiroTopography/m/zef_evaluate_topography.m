@@ -82,6 +82,6 @@ else
     z = z./max(aux_norm_vec);
 end;
 
-close(h);
+zef_close_waitbar(h);
 
 end

@@ -57,5 +57,5 @@ for f_ind = number_of_frames:-1:1
     m_s_store{f_ind} = m_s;
 end
 
-close(h);
+zef_close_waitbar(h);
 end

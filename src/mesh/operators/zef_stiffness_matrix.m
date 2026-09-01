@@ -46,7 +46,7 @@ wb = zef_waitbar(0,1,'Stiffness matrix.');
 
 % Automatic closing of waitbar.
 
-fn = @(h) close(h);
+fn = @zef_close_waitbar;
 
 cuo = onCleanup(@() fn(wb));
 

@@ -427,7 +427,7 @@ zef.name_tags = name_tags;
 zef.domain_labels_with_subdomains = double(domain_labels);
 zef.reuna_distance_vec = distance_vec;
 
-close(h);
+zef_close_waitbar(h);
 
 if nargout == 0
     assignin('base','zef',zef);

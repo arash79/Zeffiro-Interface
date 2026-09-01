@@ -30,10 +30,7 @@ function   [domain_labels, distance_vec, label_vec] = zef_mesh_relabeling(zef, t
 %                              outward; tets of the exterior that share ≥3
 %                              faces with the interior are pulled inward.
 %     h                      - optional waitbar. If omitted a new one is
-%                              opened and closed here. nargin < 5 is treated
-%                              as "no h" even though distance_vec is the 5th
-%                              argument (the nargin < 5 branch is unused by
-%                              current callers).
+%                              opened and closed here.
 %
 %   Outputs
 %     domain_labels  - T×1, clamped to n_compartments. Without priority,
@@ -51,11 +48,11 @@ if nargin < 5
     priority_mode = zef.priority_mode; 
 end
 
-if nargin < 6
-h = zef_waitbar(0,'Mesh re-labeling.')
-close_waitbar = true;
+if nargin < 7
+    h = zef_waitbar(0,'Mesh re-labeling.');
+    close_waitbar = true;
 else
-close_waitbar = false;
+    close_waitbar = false;
 end
 
 I = zeros(size(nodes,1), 1);
@@ -194,5 +191,9 @@ I_8 = intersect(find(domain_labels >= n_compartments), find(non_associated_label
 domain_labels(I_8) = domain_labels_original(I_8);
 end
 domain_labels = min(n_compartments, domain_labels);
+
+if close_waitbar
+    zef_close_waitbar(h);
+end
 
 end

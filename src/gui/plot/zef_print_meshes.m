@@ -1141,11 +1141,7 @@ if ismember(eval('zef.on_screen'), [0,1]) && not(eval('zef.visualization_type')=
     end
     close(h_fig_aux);
     if  iscell(volumetric_distribution) &  eval('zef.visualization_type') == 2
-        % Properly delete waitbar by clearing DeleteFcn first
-        if ~isempty(h_waitbar) && isvalid(h_waitbar)
-            set(h_waitbar, 'DeleteFcn', '');
-            delete(h_waitbar);
-        end
+        zef_close_waitbar(h_waitbar);
     end
     %**************************************************************************
     %**************************************************************************
@@ -2559,11 +2555,7 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
     end
     close(h_fig_aux);
     if  iscell(volumetric_distribution) &  eval('zef.visualization_type') == 3
-        % Properly delete waitbar by clearing DeleteFcn first
-        if ~isempty(h_waitbar) && isvalid(h_waitbar)
-            set(h_waitbar, 'DeleteFcn', '');
-            delete(h_waitbar);
-        end
+        zef_close_waitbar(h_waitbar);
     end
 
     if iscell(eval('zef.top_reconstruction')) &&  eval('zef.visualization_type') == 5 & is_video & file_index == 4
@@ -2572,11 +2564,7 @@ if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
         movefile(avi_file_temp, avi_file, 'f');
     end
     if  iscell(eval('zef.top_reconstruction')) &&  eval('zef.visualization_type') == 5
-        % Properly delete waitbar by clearing DeleteFcn first
-        if ~isempty(h_waitbar) && isvalid(h_waitbar)
-            set(h_waitbar, 'DeleteFcn', '');
-            delete(h_waitbar);
-        end
+        zef_close_waitbar(h_waitbar);
     end
     %**************************************************************************
 

@@ -197,7 +197,7 @@ elseif gtype == 3
 
 end
 
-close(h);
+zef_close_waitbar(h);
 
 L_gravity = (6.67408E-11)*L_gravity;
 bg_data = (6.67408E-11)*bg_data;

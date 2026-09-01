@@ -48,7 +48,7 @@ function [z_vec, self] = invert(self, f_data, L, procFile, source_direction_mode
 
 if self.number_of_frames <= 1
     h = zef_waitbar(0,'HALpR Reconstruction.');
-    cleanup_fn = @(wb) close(wb);
+    cleanup_fn = @zef_close_waitbar;
     cleanup_obj = onCleanup(@() cleanup_fn(h));
 end
 
@@ -187,6 +187,6 @@ if opts.use_gpu == 1 && gpuDeviceCount > 0
 end
 
 if self.number_of_frames <= 1
-    close(h);
+    zef_close_waitbar(h);
 end
 end

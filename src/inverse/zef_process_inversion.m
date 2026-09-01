@@ -51,7 +51,7 @@ function [zef,MethodClassObj] = zef_process_inversion(zef,MethodClassObj)
 
     waitbar_handle = zef_waitbar(0, waitbar_title);
 
-    cleanup_fn = @(h) close(h);
+    cleanup_fn = @zef_close_waitbar;
 
     cleanup_obj = onCleanup(@() cleanup_fn(waitbar_handle));
 

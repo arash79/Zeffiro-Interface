@@ -353,7 +353,7 @@ if zef_session_wants_gpu(zef)
             L_meg_ew(i,:) = L_meg_ew(i,:) + x'*G_ew;
         end
         if tol_val < relres_vec(i)
-            close(h);
+            zef_close_waitbar(h);
             'Error: PCG iteration did not converge.'
             L_meg = [];
             return
@@ -444,7 +444,7 @@ else
 
 
         if not(isempty(find(tol_val < relres_vec)))
-            close(h);
+            zef_close_waitbar(h);
             'Error: PCG iteration did not converge.'
             L_meg = [];
             return
@@ -547,4 +547,4 @@ end
 
 zef_waitbar(1,1,h);
 
-close(h);
+zef_close_waitbar(h);

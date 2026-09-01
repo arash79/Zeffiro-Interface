@@ -49,7 +49,7 @@ source_direction_mode = eval('zef.source_direction_mode');
 [L,n_interp, procFile] = zef_processLeadfields(zef);
 
 if ~ismember(source_direction_mode, [1, 2])
-    close(h);
+    zef_close_waitbar(h);
     error('zef:DipoleScan:UnsupportedDirectionMode', ...
         ['Plugin dipole scan supports source_direction_mode 1 and 2 ' ...
         '(blocked Cartesian triples after zef_processLeadfields). Mode %g is not implemented.'], ...
@@ -100,7 +100,7 @@ end
 z = zef_postProcessInverse(z, procFile);
 z = zef_normalizeInverseReconstruction(z);
 
-close(h);
+zef_close_waitbar(h);
 end
 
 function scan = i_precompute_scan(scan, L)

@@ -243,10 +243,6 @@ nse_field.mu_vessels{1} = nse_field.mu*ones(size(nse_field.bp_vessels{1}));
 
 zef_waitbar(3,3,h_waitbar,'NSE solver');
 
-% Properly delete waitbar by clearing DeleteFcn first
-if ~isempty(h_waitbar) && isvalid(h_waitbar)
-    set(h_waitbar, 'DeleteFcn', '');
-    delete(h_waitbar);
-end
+zef_close_waitbar(h_waitbar);
 
 end

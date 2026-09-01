@@ -51,7 +51,7 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
 
     if self.number_of_frames <= 1
         h = zef_waitbar(0,'IAS Reconstruction.');
-        cleanup_fn = @(wb) close(wb);
+        cleanup_fn = @zef_close_waitbar;
         cleanup_obj = onCleanup(@() cleanup_fn(h));
     end
 

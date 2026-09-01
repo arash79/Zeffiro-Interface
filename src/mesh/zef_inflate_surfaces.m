@@ -169,7 +169,7 @@ for compartment_counter = 1 : compartment_length
 end
 
 if waitbar_opened
-    close(h);
+    zef_close_waitbar(h);
 end
 
 end

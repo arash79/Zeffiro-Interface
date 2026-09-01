@@ -11,7 +11,7 @@ function zef_delete_waitbar
 %   are swallowed so teardown (zef_close_all) cannot fail because of a
 %   stale waitbar.
 %
-%   See also zef_waitbar, zef_close_all.
+%   See also zef_waitbar, zef_close_waitbar, zef_close_all.
 
 h_waitbar = findall(groot, '-property', 'ZefWaitbarStartTime');
 if isempty(h_waitbar)

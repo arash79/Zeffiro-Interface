@@ -247,7 +247,7 @@ zef.y_ES_interval.alpha     = alpha;
 zef.y_ES_interval.epsilon   = epsilon;
 
 if exist('wait_bar_temp') %#ok<EXIST>
-    close(wait_bar_temp)
+    zef_close_waitbar(wait_bar_temp)
 end
 
 if nargout == 0

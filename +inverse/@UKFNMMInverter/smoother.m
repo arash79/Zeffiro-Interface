@@ -141,7 +141,7 @@ if isempty(Q)
 end
 
 h = zef_waitbar(0, 'Smoothing');
-cleanup_wb = onCleanup(@() i_safe_close_waitbar(h));
+cleanup_wb = onCleanup(@() zef_close_waitbar(h));
 
 reconstruction = zeros(size(L, 2), n_frames);
 m_s = [];
@@ -173,13 +173,4 @@ for f_ind = n_frames:-1:1
 end
 
 clear cleanup_wb;
-end
-
-function i_safe_close_waitbar(h)
-try
-    if ~isempty(h) && isgraphics(h)
-        close(h);
-    end
-catch
-end
 end

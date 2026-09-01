@@ -60,7 +60,7 @@ zef_shim.inv_time_interval_averaging = false;
 
 waitbar_title = char("Cluster inverse: " + bundle.method_id);
 waitbar_handle = zef_waitbar(0, waitbar_title);
-cleanup_obj = onCleanup(@() i_safe_close_waitbar(waitbar_handle));
+cleanup_obj = onCleanup(@() zef_close_waitbar(waitbar_handle));
 
 [z_inverse, MethodClassObj] = utilities.inverse.run_frame_loop( ...
     zef_shim, ...
@@ -102,16 +102,6 @@ result.reconstruction_information = i_collect_method_info(MethodClassObj);
 clear cleanup_obj;
 end
 
-function i_safe_close_waitbar(waitbar_handle)
-%I_SAFE_CLOSE_WAITBAR Close waitbar only when handle is valid.
-try
-    if ~isempty(waitbar_handle) && isgraphics(waitbar_handle)
-        close(waitbar_handle);
-    end
-catch
-    % Do not let cleanup-time UI errors mask inversion results.
-end
-end
 
 function result = i_dispatch_legacy(bundle, method_info, result)
 if ~isfield(bundle, "legacy_zef")

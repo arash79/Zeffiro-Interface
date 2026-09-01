@@ -41,5 +41,5 @@ for f_ind = 1:number_of_frames
     x_ensemble = x_f + K *(f + v' - L*x_f);
     z_inverse{f_ind} = mean(x_ensemble,2);
 end
-close(h);
+zef_close_waitbar(h);
 end

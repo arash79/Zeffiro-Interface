@@ -496,7 +496,7 @@ A_aux = A(perm_vec,perm_vec);
 A = A_aux;
 clear A_aux A_part;
 
-close(h);
+zef_close_waitbar(h);
 h = zef_waitbar(0,1,'PCG iteration.');
 
 if evalin('base','zef.use_gpu')==1 && evalin('base','zef.gpu_count') > 0
@@ -559,7 +559,7 @@ if evalin('base','zef.use_gpu')==1 && evalin('base','zef.gpu_count') > 0
             end
         end
         if tol_val < relres_vec(i)
-            close(h);
+            zef_close_waitbar(h);
             'Error: PCG iteration did not converge.'
             L_eit = [];
             return
@@ -634,7 +634,7 @@ else
             end
         end
         if tol_val < relres_vec(i)
-            close(h);
+            zef_close_waitbar(h);
             'Error: PCG iteration did not converge.'
             L_eit = [];
             return
@@ -651,7 +651,7 @@ else
 end
 
 clear S r p x aux_vec inv_M_r a b;
-close(h);
+zef_close_waitbar(h);
 
 Current_pattern = evalin('base','zef.current_pattern');
 

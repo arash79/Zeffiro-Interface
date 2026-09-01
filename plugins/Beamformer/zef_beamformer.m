@@ -559,7 +559,7 @@ z = zef_normalizeInverseReconstruction(z);
 Var_loc = zef_postProcessInverse(Var_loc, procFile);
 Var_loc = zef_normalizeInverseReconstruction(Var_loc);
 
-close(h);
+zef_close_waitbar(h);
 end
 
 function [C_sqrt, C_dec, L_whitened] = i_factor_cov(C, L, need_sqrtm, need_Cdec)

@@ -60,4 +60,4 @@ end
 credibility_data = credibility_data_aux./(n_data*n_snr);
 
 save(credibility_data_file_name,'credibility_data','-v7.3');
-%zef_close_all
+zef_close_waitbar(h_waitbar);

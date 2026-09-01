@@ -87,7 +87,7 @@ else
     end
     n_val = max(abs(meas_data));
     meas_data = meas_data + max(abs(meas_data)).*randn(size(meas_data,1),size(noise_level,1))*noise_level+max(abs(meas_data),[],'all').*randn(size(meas_data))*bg_noise_level;
-    close(h);
+    zef_close_waitbar(h);
 end
 if nargout == 0
     assignin('base', 'zef', zef);

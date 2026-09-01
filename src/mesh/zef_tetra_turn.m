@@ -149,7 +149,7 @@ while not(isempty(tetra_ind)) & iter_ind_aux_0 < eval('zef.mesh_optimization_rep
 
 end
 
-close(h)
+zef_close_waitbar(h)
 
 if min(condition_number) < max(0,thresh_val*max(condition_number))
     flag_val = -1;

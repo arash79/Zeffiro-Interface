@@ -15,7 +15,7 @@ Shell around a Zeffiro session: start, default fields, the GUI↔`zef` synchroni
 | `zef_plugin.m` | **script** | reads `profile/<profile>/zeffiro_plugins.ini` |
 | `zef_start_new_project.m` | **script** | `zeffiro_interface('zeffiro_restart', true)` then delete compartments |
 | `zef_remove_system_fields.m` | function | `zef_data = zef_remove_system_fields(zef, zef_data)` strips machine fields listed in `profile/zeffiro_interface.ini` plus a hard-coded set |
-| `zef_waitbar.m` / `zef_delete_waitbar.m` | function | custom progress figure |
+| `zef_waitbar.m` / `zef_close_waitbar.m` / `zef_delete_waitbar.m` | function | custom progress figure; nested close via `zef_close_waitbar` |
 | `zef_arrange_windows.m` | function | tile / maximize / minimize / close |
 | `zef_clipping_plane.m` | function | half-space (or slab) node mask for plots |
 | `zef_remove_object_handles.m` | function | strip `h_*` graphics before `.mat` save |
@@ -32,7 +32,7 @@ Shell around a Zeffiro session: start, default fields, the GUI↔`zef` synchroni
 
 **Defaults in `zef_init`:** include `n_sources=10000`, `mesh_resolution=3` (examples often use `4.5`), `source_direction_mode=2` (Normal), `preconditioner=2` (CPU SSOR; GPU Jacobi ignores this), `source_model=2` (H(div)), `location_unit=1` (mm), `solver_tolerance=1e-6`, `reconstruction_type=7` (Amplitude smoothed).
 
-**Waitbar:** compact standalone `uifigure`; nested callers pass vectors (`current./max`); redraws smaller than ~1% are skipped except 0%, 100%, or message change. Menu-tool properties `ZefUseWaitbar` and `ZefAlwaysShowWaitbar` control visibility.
+**Waitbar:** compact standalone `uifigure`; nested callers pass vectors (`current./max`); redraws smaller than ~1% are skipped except 0%, 100%, or message change. Menu-tool properties `ZefUseWaitbar` and `ZefAlwaysShowWaitbar` control visibility. The window is a singleton: nested jobs reuse it. Close with `zef_close_waitbar` (never `delete`) so a nested close only drops the nest count and the parent handle stays valid.
 
 **Plugins:** `zef_plugin` reads CSV rows `{label, parent Tag, callback}` from the profile INI. Parent Tags: `inverse_tools`, `forward_tools`, `multi_tools`, `settings`. Each callback is suffixed with `; zef_ui_ready_new_windows; zef_update;`. Accelerators `0–9` then `A–Z` are assigned in order. Do not edit `zef_plugin.m` to add a plugin; edit the INI.
 

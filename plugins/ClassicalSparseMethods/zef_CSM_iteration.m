@@ -219,6 +219,6 @@ end
 z = zef_postProcessInverse(z, procFile);
 z = zef_normalizeInverseReconstruction(z);
 
-close(h)
+zef_close_waitbar(h)
 ;
 end

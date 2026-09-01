@@ -365,5 +365,5 @@ for t=t_start:T
     end
 end     %end of t loop
 
-close(h);
+zef_close_waitbar(h);
 end

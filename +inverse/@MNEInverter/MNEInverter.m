@@ -286,7 +286,7 @@ classdef MNEInverter < inverse.CommonInverseParameters & handle
             has_cache = ~isempty(self.precomputed_inverse_operator);
             if ~has_cache && self.number_of_frames <= 1
                 h = zef_waitbar(0,'MNE Reconstruction.');
-                cleanup_fn = @(wb) close(wb);
+                cleanup_fn = @zef_close_waitbar;
                 cleanup_obj = onCleanup(@() cleanup_fn(h)); %#ok<NASGU>
             end
 

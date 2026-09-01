@@ -105,10 +105,6 @@ end
 
 end
 
-% Properly delete waitbar by clearing DeleteFcn first
-if ~isempty(h_waitbar) && isvalid(h_waitbar)
-    set(h_waitbar, 'DeleteFcn', '');
-    delete(h_waitbar);
-end
+zef_close_waitbar(h_waitbar);
 
 end

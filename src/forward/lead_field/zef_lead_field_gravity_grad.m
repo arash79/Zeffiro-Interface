@@ -226,7 +226,7 @@ elseif gtype == 1
 
 end
 
-close(h);
+zef_close_waitbar(h);
 
 L_eit = (6.67408E-11)*L_eit;
 bg_data = (6.67408E-11)*bg_data;

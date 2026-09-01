@@ -75,7 +75,7 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 |-------|-------------------------|
 | `ZefSourceModelLoadTest` | `core.types.ZefSourceModel.from` on names, integers, `core.ZefSourceModel`, structs; saved legacy enum `.mat` loads without warning |
 | `ParcellationColormapTest` | `zef_parcellation_colormap` returns `[]` when base `zef.parcellation_colormap` is missing, else the stored matrix |
-| `WaitbarTest` | `zef_waitbar` lifecycle on R2025a+: `0` is progress not `groot`; nested `(i,N,h,msg)` keeps one handle; teardown restores `WindowStyle` |
+| `WaitbarTest` | `zef_waitbar` lifecycle on R2025a+: `0` is progress not `groot`; nested `(i,N,h,msg)` keeps one handle; nested initialize+close (including stiffness/adjacency/source_tetra and double-close) does not invalidate the parent; `zef_close_waitbar` ignores stale handles; teardown restores `WindowStyle` |
 | `ColoredListTest` | `zef_colored_list` HTML / `uihtml` (and table) backends: names, colors, selection |
 | `UiThemeTest` | `zef_ui_theme` tokens (font ≥ 11 px, teal accent, shell geometry), window-label stripping, layout resize on real figures |
 | `ClassInverseDialogTest` | eLORETA / UKF-NMM dialogs expose method tags (`zef_inv_*`); `noise_cov` absent on eLORETA; four class-solver `zef_*_start` names resolve |

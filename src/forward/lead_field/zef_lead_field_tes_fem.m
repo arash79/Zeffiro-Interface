@@ -317,4 +317,4 @@ L_tes = L_tes';
 S_tes = S_tes';
 
 zef_waitbar(1,1,h);
-close(h);
+zef_close_waitbar(h);

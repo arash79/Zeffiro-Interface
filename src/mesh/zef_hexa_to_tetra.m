@@ -64,6 +64,6 @@ for i = 1 : n_cubes
 
 end
 
-close(h)
+zef_close_waitbar(h)
 
 end

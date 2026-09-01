@@ -76,9 +76,7 @@ function [dist_vec, angle_vec, mag_vec, dispersion_vec] = zef_rec_diff( ...
     % Initialize waitbar and cleanup for progress display.
     h_waitbar = zef_waitbar(0, 'Creating synthetic measurements');
 
-    cleanup_fn = @(wb) i_safe_close_waitbar(wb);
-
-    cleanup_ob = onCleanup(@() cleanup_fn(h_waitbar));
+    cleanup_ob = onCleanup(@() zef_close_waitbar(h_waitbar));
 
     n_sources = size(zef.source_positions, 1);
     zef.measurements = zeros(size(zef.L, 1), 3*n_sources);
@@ -183,19 +181,6 @@ function [dist_vec, angle_vec, mag_vec, dispersion_vec] = zef_rec_diff( ...
     end % for
 
 end % function
-
-function i_safe_close_waitbar(wb)
-% Close a waitbar handle if it's still a valid figure; ignore otherwise.
-% Headless / nodisplay sessions often leave wb as [] or an already-deleted handle,
-% which makes close(wb) error during onCleanup teardown.
-    try
-        if ~isempty(wb) && ishghandle(wb) && isvalid(wb)
-            close(wb);
-        end
-    catch
-        % Swallow: cleanup must not throw.
-    end
-end
 
 function the_dispersion = dispersion_fn( ...
     source_positions, ...

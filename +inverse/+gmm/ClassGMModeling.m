@@ -43,7 +43,7 @@ import inverse.gmm.*
 
 % Initialize waitbar and ensure cleanup on exit
 h = zef_waitbar(0,['Gaussian mixture model.']);
-cleanup_fn = @(wb) close(wb);
+cleanup_fn = @zef_close_waitbar;
 cleanup_obj = onCleanup(@() cleanup_fn(h));
 
 % Store time-variable parameters for subsequent processing

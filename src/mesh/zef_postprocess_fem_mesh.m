@@ -65,6 +65,9 @@ if isempty(zef)
 end
 
 h = zef_waitbar(0,1,'Mesh post-processing');
+% Nested mesh steps share this singleton; close after results are written
+% and never let a stale handle discard the mesh.
+wb_cleanup = onCleanup(@() zef_close_waitbar(h));
 
 % Profile rows that are Segmentation / Scalar / On become per-compartment vectors.
 parameter_profile = eval('zef.parameter_profile');
@@ -196,7 +199,7 @@ end
 
 
 if eval('zef.refinement_volume_on_2');
-    zef_waitbar(0,1,h,'Volume refinement.');
+    h = zef_waitbar(0,1,h,'Volume refinement.');
     n_refinement = zef.refinement_volume_number_2;
     refinement_compartments_aux = zef.refinement_volume_compartments_2;
 
@@ -213,7 +216,7 @@ if eval('zef.refinement_volume_on_2');
     for i = 1 : n_refinement
 
         [nodes,tetra,domain_labels,distance_vec] = zef_mesh_refinement(zef,nodes,tetra,domain_labels,distance_vec,refinement_compartments);
-        zef_waitbar(i,n_refinement,h,'Volume refinement.');
+        h = zef_waitbar(i,n_refinement,h,'Volume refinement.');
 
     end
 
@@ -256,12 +259,12 @@ if eval('zef.exclude_box')
     nodes = nodes(unique_vec_1,:);
 end
 
-zef_waitbar(0,1,h,'Surface triangles.');
+h = zef_waitbar(0,1,h,'Surface triangles.');
 unique_domain_labels = unique(domain_labels);
 n_unique_domain_labels = length(unique_domain_labels);
 surface_triangles = cell(0);
 for zef_j = 1 : n_unique_domain_labels
-    zef_waitbar(zef_j,n_unique_domain_labels,h,'Surface triangles.');
+    h = zef_waitbar(zef_j,n_unique_domain_labels,h,'Surface triangles.');
 I_aux = find(domain_labels <= unique_domain_labels(zef_j));
 surface_triangles{unique_domain_labels(zef_j)} = double(zef_surface_mesh(tetra(I_aux,:)));
 end
@@ -281,8 +284,6 @@ clear tetra_vec;
 condition_number = zef_condition_number(nodes,tetra);
 [submesh_ind] = zef_find_subdomain_ind(domain_labels, domain_labels_with_subdomains);
 submesh_ind = submesh_ind(active_compartment_ind);
-
-close(h);
 
 zef.domain_labels_with_subdomains = double(domain_labels_with_subdomains);
 zef.domain_labels = double(domain_labels);
@@ -305,5 +306,7 @@ end
 if nargout == 0
     assignin('base','zef',zef);
 end
+
+zef_close_waitbar(h);
 
 end

@@ -51,8 +51,7 @@ if not(isempty(active_compartment_ind)) && not(isempty(source_positions)) && not
     h = zef_waitbar(0,1,['Interpolation 1.']);
 
     % Ensure waitbar is closed on normal exit or error; prevents stalls/crashes
-    cleanupfn = @(x) safe_close_waitbar(x);
-    cleanupobj = onCleanup(@() cleanupfn(h));
+    cleanupobj = onCleanup(@() zef_close_waitbar(h));
 
     if eval('zef.location_unit_current') == 2
         source_positions = 10*source_positions;
@@ -167,19 +166,4 @@ if not(isempty(active_compartment_ind)) && not(isempty(source_positions)) && not
 
 end
 
-end
-
-function safe_close_waitbar(h)
-% Safely close waitbar figure; prevents stalls/crashes from invalid handles.
-    try
-        if ~isempty(h) && isvalid(h)
-            % Disable callbacks before deletion to avoid callback recursion
-            % on rapidly opening/closing waitbars in long pipelines.
-            h.CloseRequestFcn = '';
-            h.DeleteFcn = '';
-            delete(h);
-        end
-    catch
-        % Ignore close errors
-    end
 end

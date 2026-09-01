@@ -638,7 +638,7 @@ if not(isequal(file_name,0))
 
         end
 
-        delete(h);
+        zef_close_waitbar(h);
 
     end
 end

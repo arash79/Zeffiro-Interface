@@ -185,7 +185,7 @@ classdef UKFNMMInverterTest < matlab.unittest.TestCase
                 "time_step", 0.01, ...
                 "evolution_prior_model", "Reworked original");
             h = zef_waitbar(0, "UKFNMM frame loop test");
-            cleanup = onCleanup(@() i_close(h));
+            cleanup = onCleanup(@() zef_close_waitbar(h));
             [z_cell, inverter] = utilities.inverse.run_frame_loop( ...
                 zef_shim, inverter, L, procFile, 1, source_positions, h, "UKFNMM test");
             testCase.verifyEqual(numel(z_cell), 6);
@@ -206,7 +206,7 @@ classdef UKFNMMInverterTest < matlab.unittest.TestCase
                 "evolution_prior_model", "Reworked original", ...
                 "number_of_noise_steps", 2);
             h = zef_waitbar(0, "UKFNMM NMM test");
-            cleanup = onCleanup(@() i_close(h));
+            cleanup = onCleanup(@() zef_close_waitbar(h));
             [z_cell, inverter] = utilities.inverse.run_frame_loop( ...
                 zef_shim, inverter, L, procFile, 1, source_positions, h, "UKFNMM NMM");
             testCase.verifyEqual(inverter.n_temporal_postprocess_runs, 0);
@@ -237,7 +237,7 @@ classdef UKFNMMInverterTest < matlab.unittest.TestCase
                 "evolution_prior_model", "Reworked original", ...
                 "number_of_noise_steps", 2);
             h = zef_waitbar(0, "UKFNMM RTS test");
-            cleanup = onCleanup(@() i_close(h));
+            cleanup = onCleanup(@() zef_close_waitbar(h));
             [z_cell, inverter] = utilities.inverse.run_frame_loop( ...
                 zef_shim, inverter, L, procFile, 1, source_positions, h, "UKFNMM RTS");
             testCase.verifyEqual(numel(inverter.posterior_covs), 8);
@@ -259,7 +259,7 @@ classdef UKFNMMInverterTest < matlab.unittest.TestCase
                 "evolution_prior_model", "Reworked original", ...
                 "number_of_noise_steps", 2);
             h = zef_waitbar(0, "UKFNMM Sample RTS test");
-            cleanup = onCleanup(@() i_close(h));
+            cleanup = onCleanup(@() zef_close_waitbar(h));
             [z_cell, inverter] = utilities.inverse.run_frame_loop( ...
                 zef_shim, inverter, L, procFile, 1, source_positions, h, "UKFNMM SRTS");
             [z_nmm, inverter] = inverter.smoother(z_cell, L);
@@ -480,14 +480,5 @@ for n = 1:n_sources
     s_ind = 3 * n - [2, 1, 0];
     [u, ~, ~] = svd(L(:, s_ind), "econ");
     modified_L(:, s_ind) = u;
-end
-end
-
-function i_close(h)
-try
-    if ~isempty(h) && isgraphics(h)
-        close(h);
-    end
-catch
 end
 end

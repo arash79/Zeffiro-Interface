@@ -149,7 +149,7 @@ for zef_k = 1 : zef.number_of_compartments
     end
 end
 
-close(zef.h);
+zef_close_waitbar(zef.h);
 
 if isfield(zef,'temp_patch_data')
     zef = rmfield(zef,'temp_patch_data');

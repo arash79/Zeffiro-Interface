@@ -242,6 +242,10 @@ end
 zef = zef_turn_compartment_onoff(zef, compartment_on_vec);
 zef = zef_process_meshes(zef);
 
+if exist('h_waitbar', 'var')
+    zef_close_waitbar(h_waitbar);
+end
+
 if ~isempty(zef_bst.labeling_priority)
     try
         zef = zef_update_labeling_priority(zef, [], zef_bst.labeling_priority);

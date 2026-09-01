@@ -393,4 +393,4 @@ training_data.snr_vec = snr_vec;
 
 save(training_data_file_name,'training_data','-v7.3')
 ;
-%zef_close_all
+zef_close_waitbar(h_waitbar);

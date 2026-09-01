@@ -183,7 +183,7 @@ for f_ind = 1 : number_of_frames
 
     z_vec = z_vec / zef_mcmc_posterior_mean_divisor(n_iter_process, n_burn_in, parallel_processes);
 
-    close(h)
+    zef_close_waitbar(h)
 
     z_inverse{f_ind} = z_vec;
 
@@ -192,6 +192,6 @@ end
 [z] = zef_postProcessInverse(z_inverse, procFile);
 [z] = zef_normalizeInverseReconstruction(z);
 
-close(h);
+zef_close_waitbar(h);
 
 end

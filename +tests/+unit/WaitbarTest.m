@@ -218,6 +218,137 @@ classdef WaitbarTest < matlab.unittest.TestCase
             testCase.verifyFalse(isvalid(h));
         end
 
+        function closeWaitbarOnInvalidDoesNotThrow(testCase)
+            zef_close_waitbar([]);
+            h = zef_waitbar(0, 1, 'temp');
+            delete(h);
+            zef_close_waitbar(h);
+            leftover = findall(groot, '-property', 'ZefWaitbarStartTime');
+            testCase.verifyEmpty(leftover);
+        end
+
+        function nestedStiffnessAndAdjacencyKeepParent(testCase)
+            h = zef_waitbar(0, 1, 'Lead field.');
+            testCase.addTeardown(@() local_delete(h));
+            nodes = [1 0 0; 0 1 0; 0 0 1; 0 0 0];
+            tetra = [1 2 3 4];
+            A = zef_adjacency_matrix(nodes, tetra);
+            testCase.verifyEqual(size(A), [4 4]);
+            testCase.verifyTrue(isvalid(h));
+            vol = abs(zef_tetra_volume(nodes, tetra, true));
+            tensor = [1; 1; 1; 0; 0; 0];
+            S = zef_stiffness_matrix(nodes, tetra, vol, tensor);
+            testCase.verifyEqual(size(S, 1), 4);
+            testCase.verifyTrue(isvalid(h));
+            close(h);
+            leftover = findall(groot, '-property', 'ZefWaitbarStartTime');
+            testCase.verifyEmpty(leftover);
+        end
+
+        function nestedSourceTetraKeepsParent(testCase)
+            h = zef_waitbar(0, 1, 'parent');
+            testCase.addTeardown(@() local_delete(h));
+            nodes = [0 0 0; 1 0 0; 0 1 0; 0 0 1];
+            tetra = [1 2 3 4];
+            zef_source_tetra([0.1 0.1 0.1], tetra, nodes, 1);
+            testCase.verifyTrue(isvalid(h));
+            leftover = findall(groot, '-property', 'ZefWaitbarStartTime');
+            testCase.verifyEqual(numel(leftover), 1);
+            close(h);
+            leftover = findall(groot, '-property', 'ZefWaitbarStartTime');
+            testCase.verifyEmpty(leftover);
+        end
+
+        function nestedDoubleCloseDoesNotDestroyParent(testCase)
+            h = zef_waitbar(0, 1, 'parent pipeline');
+            testCase.addTeardown(@() local_delete(h));
+            nestedDoubleCloseJob();
+            testCase.verifyTrue(isvalid(h));
+            close(h);
+            testCase.verifyFalse(isvalid(h));
+            leftover = findall(groot, '-property', 'ZefWaitbarStartTime');
+            testCase.verifyEmpty(leftover);
+        end
+
+        function ownerCloseDestroysEvenIfNestedForgot(testCase)
+            h = zef_waitbar(0, 1, 'parent pipeline');
+            testCase.addTeardown(@() local_delete(h));
+            nestedInitNoCloseJob();
+            testCase.verifyTrue(isvalid(h));
+            close(h);
+            testCase.verifyFalse(isvalid(h));
+            leftover = findall(groot, '-property', 'ZefWaitbarStartTime');
+            testCase.verifyEmpty(leftover);
+        end
+
+        function sequentialInitFromSameCallerClosesOnce(testCase)
+            % Two initialize calls from one function reuse the singleton as
+            % a replacement, not a nest. One close must still destroy it.
+            h1 = zef_waitbar(0, 1, 'first');
+            h2 = zef_waitbar(0, 1, 'second');
+            testCase.verifyEqual(h1, h2);
+            close(h2);
+            testCase.verifyFalse(isvalid(h1));
+            leftover = findall(groot, '-property', 'ZefWaitbarStartTime');
+            testCase.verifyEmpty(leftover);
+        end
+
+        function nestedInitCloseKeepsParentHandle(testCase)
+            % zef_tetra_turn / zef_fix_negatives initialize+close while a
+            % parent pipeline waitbar is open. The parent handle must stay
+            % valid so later close(h) does not throw Invalid figure handle.
+            h = zef_waitbar(0, 1, 'Mesh post-processing');
+            testCase.addTeardown(@() local_delete(h));
+            nestedWaitbarJob();
+            testCase.verifyTrue(isvalid(h));
+            leftover = findall(groot, '-property', 'ZefWaitbarStartTime');
+            testCase.verifyEqual(numel(leftover), 1);
+            h = zef_waitbar(0, 1, h, 'Surface triangles.');
+            for i = 1:5
+                h = zef_waitbar(i, 5, h, 'Surface triangles.');
+            end
+            testCase.verifyTrue(isvalid(h));
+            testCase.verifyEqual(local_progress(h), 100, 'AbsTol', 1e-6);
+            close(h);
+            testCase.verifyFalse(isvalid(h));
+            leftover = findall(groot, '-property', 'ZefWaitbarStartTime');
+            testCase.verifyEmpty(leftover);
+        end
+
+        function tetraTurnNestedCloseKeepsParent(testCase)
+            h = zef_waitbar(0, 1, 'Mesh post-processing');
+            testCase.addTeardown(@() local_delete(h));
+            zef = struct('mesh_optimization_repetitions', 1);
+            nodes = [0 0 0; 1 0 0; 0 1 0; 0 0 1];
+            tetra = [1 2 3 4];
+            [tetra_out, flag_val] = zef_tetra_turn(zef, nodes, tetra, 0);
+            testCase.verifyEqual(size(tetra_out, 2), 4);
+            testCase.verifyTrue(ismember(flag_val, [-1 1]));
+            testCase.verifyTrue(isvalid(h));
+            leftover = findall(groot, '-property', 'ZefWaitbarStartTime');
+            testCase.verifyEqual(numel(leftover), 1);
+            close(h);
+            leftover = findall(groot, '-property', 'ZefWaitbarStartTime');
+            testCase.verifyEmpty(leftover);
+        end
+
+        function fixNegativesNestedCloseKeepsParent(testCase)
+            h = zef_waitbar(0, 1, 'Mesh post-processing');
+            testCase.addTeardown(@() local_delete(h));
+            zef = struct('meshing_threshold', 0.5, 'mesh_optimization_repetitions', 1);
+            nodes = [0 0 0; 1 0 0; 0 1 0; 0 0 1];
+            tetra = [1 2 3 4];
+            [nodes_out, flag_val] = zef_fix_negatives(zef, nodes, tetra);
+            testCase.verifyEqual(size(nodes_out), size(nodes));
+            testCase.verifyTrue(ismember(flag_val, [-1 1]));
+            testCase.verifyTrue(isvalid(h));
+            leftover = findall(groot, '-property', 'ZefWaitbarStartTime');
+            testCase.verifyEqual(numel(leftover), 1);
+            close(h);
+            leftover = findall(groot, '-property', 'ZefWaitbarStartTime');
+            testCase.verifyEmpty(leftover);
+        end
+
         function newInitReusesSingletonHandle(testCase)
             h1 = zef_waitbar(0, 1, 'first');
             h2 = zef_waitbar(0, 1, 'second');
@@ -383,6 +514,26 @@ classdef WaitbarTest < matlab.unittest.TestCase
 
     end
 
+end
+
+function nestedInitNoCloseJob()
+zef_waitbar(0, 1, 'nested forgot');
+end
+
+function nestedDoubleCloseJob()
+h = zef_waitbar(0, 1, 'nested');
+zef_close_waitbar(h);
+zef_close_waitbar(h);
+end
+
+function nestedWaitbarJob()
+% Distinct stack frame from WaitbarTest methods so nest counting treats
+% this as a nested owner (same pattern as zef_tetra_turn).
+h = zef_waitbar(0, 1, 'Mesh optimization.');
+zef_waitbar(1, 2, h, 'Mesh optimization.');
+if isvalid(h)
+    close(h);
+end
 end
 
 function v = local_progress(h)

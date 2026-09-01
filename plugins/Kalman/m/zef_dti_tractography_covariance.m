@@ -266,7 +266,7 @@ if ~isempty(h_wb) && isvalid(h_wb)
     try
         zef_waitbar(1, 1, h_wb, 'Tractography covariance complete.');
         pause(0.3);
-        if isvalid(h_wb), set(h_wb, 'DeleteFcn', ''); delete(h_wb); end
+        zef_close_waitbar(h_wb);
     catch, end
 end
 

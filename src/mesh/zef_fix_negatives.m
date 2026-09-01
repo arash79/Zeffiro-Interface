@@ -129,11 +129,9 @@ if fix_length > 0
 
     end
 
-    % Properly delete waitbar by clearing DeleteFcn first
-    if ~isempty(h_waitbar) && isvalid(h_waitbar)
-        set(h_waitbar, 'DeleteFcn', '');
-        delete(h_waitbar);
-    end
+    % close() via zef_close_waitbar participates in nest counting. delete()
+    % would destroy a parent pipeline waitbar that this call reused.
+    zef_close_waitbar(h_waitbar);
 
 end
 
