@@ -17,11 +17,13 @@ classdef SessionWantsGpuTest < matlab.unittest.TestCase
         end
 
         function testFemFilesDoNotEvalinGpuCount(testCase)
+            root = fileparts(which("zeffiro_interface"));
+            testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
             files = [ ...
                 "zef_lead_field_meg_fem.m", ...
                 "zef_lead_field_meg_grad_fem.m", ...
                 "zef_lead_field_eit_fem.m"];
-            folder = fullfile("src", "forward", "lead_field");
+            folder = fullfile(root, "src", "forward", "lead_field");
             for k = 1:numel(files)
                 src = fileread(fullfile(folder, files(k)));
                 testCase.verifyFalse(contains(src, "evalin('base','zef.gpu_count')"), files(k));

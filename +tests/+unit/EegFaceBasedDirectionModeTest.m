@@ -2,10 +2,35 @@ classdef EegFaceBasedDirectionModeTest < matlab.unittest.TestCase
 %EEGFACEBASEDDIRECTIONMODETEST  EEG face_based / mesh-based must error, not skip L.
 
     methods (Test)
-        function testSourceContainsExplicitError(testCase)
-            src = fileread(fullfile("src", "forward", "lead_field", "zef_lead_field_eeg_fem.m"));
-            testCase.verifyTrue(contains(src, "zef_lead_field_eeg_fem:UnsupportedDirectionMode"));
-            testCase.verifyTrue(contains(src, "face_based is not implemented"));
+        function faceBasedErrorsBeforeAssemblingL(testCase)
+            zef = struct( ...
+                "source_model", 1, ...
+                "use_gpu", false, ...
+                "gpu_count", 0);
+            nodes = [0 0 0; 1 0 0; 0 1 0; 0 0 1];
+            elements = [1 2 3 4];
+            sigma = 0.33;
+            electrodes = [0 0 0];
+            lf_param = struct("direction_mode", "face_based");
+            testCase.verifyError( ...
+                @() zef_lead_field_eeg_fem( ...
+                    zef, nodes, elements, sigma, electrodes, [], "pbo", lf_param), ...
+                "zef_lead_field_eeg_fem:UnsupportedDirectionMode");
+        end
+
+        function meshBasedDefaultErrors(testCase)
+            zef = struct( ...
+                "source_model", 1, ...
+                "use_gpu", false, ...
+                "gpu_count", 0);
+            nodes = [0 0 0; 1 0 0; 0 1 0; 0 0 1];
+            elements = [1 2 3 4];
+            sigma = 0.33;
+            electrodes = [0 0 0];
+            testCase.verifyError( ...
+                @() zef_lead_field_eeg_fem( ...
+                    zef, nodes, elements, sigma, electrodes, [], "pbo"), ...
+                "zef_lead_field_eeg_fem:UnsupportedDirectionMode");
         end
     end
 end

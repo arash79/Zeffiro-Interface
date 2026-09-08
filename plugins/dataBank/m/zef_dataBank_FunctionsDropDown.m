@@ -7,10 +7,11 @@ function zef = zef_dataBank_FunctionsDropDown(zef)
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   FunctionsDropDown.ValueChangedFcn in zef_open_dataBank. Hides
-%   combinePanel, importPanel, and mag2gragPanel, then:
-%     'combine Lf'     → combinePanel Visible On
-%     'Import/Export'  → importPanel moved to combinePanel.Position, Visible On
-%     'mag2grad'       → empty case
+%   combinePanel, importPanel, and mag2gragPanel, then shows one of:
+%     'combine Lf'     → combinePanel
+%     'Import/Export'  → importPanel
+%     'mag2grad'       → mag2gragPanel
+%   The three panels share a layout slot, so they do not copy Position.
 %
 %   zef = zef_dataBank_FunctionsDropDown(zef)
 %
@@ -36,10 +37,10 @@ switch zef.dataBank.app.FunctionsDropDown.Value
         zef.dataBank.app.combinePanel.Visible='On';
 
     case 'Import/Export'
-        zef.dataBank.app.importPanel.Position=zef.dataBank.app.combinePanel.Position;
         zef.dataBank.app.importPanel.Visible='On';
 
     case 'mag2grad'
+        zef.dataBank.app.mag2gragPanel.Visible='On';
 
 end
 

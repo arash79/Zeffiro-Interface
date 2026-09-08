@@ -205,9 +205,17 @@ classdef WaitbarTest < matlab.unittest.TestCase
         end
 
         function useWaitbarFalseStillReturnsValidHandle(testCase)
-            menuFig = local_fake_menu();
+            clear zef_waitbar
+            menuFig = local_ensure_menu();
+            had_prop = isprop(menuFig, 'ZefUseWaitbar');
+            old_use = true;
+            if had_prop
+                old_use = menuFig.ZefUseWaitbar;
+            else
+                addprop(menuFig, 'ZefUseWaitbar');
+            end
             menuFig.ZefUseWaitbar = false;
-            testCase.addTeardown(@() local_delete(menuFig));
+            testCase.addTeardown(@() local_restore_use_waitbar(menuFig, had_prop, old_use));
             h = zef_waitbar(0, 1, 'hidden');
             testCase.addTeardown(@() local_delete(h));
             testCase.verifyTrue(isvalid(h));
@@ -557,6 +565,25 @@ for i = 1:numel(h)
         catch
         end
     end
+end
+end
+
+function menuFig = local_ensure_menu()
+found = findall(groot, 'ZefTool', 'zef_menu_tool');
+found = found(arrayfun(@(h) isgraphics(h) && isvalid(h), found));
+if ~isempty(found)
+    menuFig = found(1);
+    return
+end
+menuFig = local_fake_menu();
+end
+
+function local_restore_use_waitbar(menuFig, had_prop, old_use)
+if ~isgraphics(menuFig) || ~isvalid(menuFig)
+    return
+end
+if had_prop
+    menuFig.ZefUseWaitbar = old_use;
 end
 end
 

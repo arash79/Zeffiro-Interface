@@ -157,8 +157,11 @@ local_field(fig, 'h_time_series_tools_list', pad, y - series_h, inner, series_h)
 y = y - series_h - gap;
 
 plot_w = 108;
-local_by_string(fig, 'Plot', pad, pad, plot_w, btn_h);
-local_field(fig, 'h_parcellation_plot_type', pad + plot_w + gap, pad, inner - plot_w - gap, btn_h);
+dd_w = min(220, max(160, inner - plot_w - gap));
+pair = plot_w + gap + dd_w;
+bx = pad + max(0, (inner - pair) / 2);
+local_by_string(fig, 'Plot', bx, pad, plot_w, btn_h);
+local_field(fig, 'h_parcellation_plot_type', bx + plot_w + gap, pad, dd_w, btn_h);
 
 ctrls = findall(fig, 'Type', 'uicontrol');
 for i = 1:numel(ctrls)
@@ -309,6 +312,37 @@ try
     h.Position = [x, y, max(40, w), ht];
     h.FontUnits = 'pixels';
     h.FontSize = 11;
+    try
+        th = zef_ui_theme();
+        fg = th.color.buttonText;
+        txt = '';
+        try
+            txt = strtrim(char(h.String));
+        catch
+        end
+        if isempty(txt)
+            try
+                txt = strtrim(char(getappdata(h, 'ZefButtonLabel')));
+            catch
+            end
+        end
+        if any(strcmpi(txt, {'Plot', 'Interpolate'}))
+            fg = th.color.primaryText;
+        end
+        h.ForegroundColor = fg;
+        caps = findall(h.Parent, 'Type', 'uicontrol', 'Style', 'text');
+        for zef_j = 1:numel(caps)
+            ud = [];
+            try
+                ud = caps(zef_j).UserData;
+            catch
+            end
+            if ~isempty(ud) && isequal(ud, h)
+                caps(zef_j).ForegroundColor = fg;
+            end
+        end
+    catch
+    end
     try
         caps = findall(h.Parent, 'Type', 'uicontrol', 'Style', 'text');
         for zef_i = 1:numel(caps)

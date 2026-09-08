@@ -38,7 +38,7 @@ local_fix_labels(fig);
 root = uigridlayout(fig, [2 2]);
 root.Tag = 'zef_ui_root';
 root.ColumnWidth = {'1.08x', '1x'};
-root.RowHeight = {'1x', '0.28x'};
+root.RowHeight = {'fit', '1x'};
 root.Padding = [10 10 10 10];
 root.ColumnSpacing = 12;
 root.RowSpacing = 10;
@@ -48,11 +48,11 @@ try
 catch
 end
 
-left = uigridlayout(root, [3 1]);
+left = uigridlayout(root, [4 1]);
 left.Tag = 'zef_mv_left';
 left.Layout.Row = 1;
 left.Layout.Column = 1;
-left.RowHeight = {'fit', 'fit', '1x'};
+left.RowHeight = {'fit', 'fit', 'fit', '1x'};
 left.RowSpacing = 8;
 left.Padding = [0 0 0 0];
 try
@@ -128,9 +128,11 @@ end
 local_move_named(fig, mode_row, 'CuttingplanemodeLabel');
 local_move_named(fig, mode_row, 'h_cp_mode');
 
-right = uigridlayout(root, [1 1]);
+right = uigridlayout(root, [2 1]);
 right.Layout.Row = 1;
 right.Layout.Column = 2;
+right.RowHeight = {'fit', '1x'};
+right.RowSpacing = 8;
 right.Padding = [0 0 0 0];
 try
     right.BackgroundColor = theme.color.bg;
@@ -138,6 +140,7 @@ catch
 end
 
 view = local_section(right, theme, [12 1]);
+view.Tag = 'zef_mv_view';
 view.RowHeight = repmat({26}, 1, 12);
 local_pair_row(fig, view, 'PlotcolormapDropDownLabel', {'h_frame_start', 'h_frame_stop', 'h_frame_step'});
 local_pair_row(fig, view, 'CuttingplanecoeffEditFieldLabel', {'h_edit80', 'h_edit81', 'h_edit82'});
@@ -151,6 +154,7 @@ local_labeled(fig, view, 'ColormapLabel', 'h_inv_colormap');
 local_labeled(fig, view, 'PlotthresholdLabel', 'h_inv_dynamic_range');
 local_labeled(fig, view, 'TransparencyrecsurfLabel', {'h_brain_transparency', 'h_layer_transparency'});
 local_labeled(fig, view, 'SubmeshLabel', 'h_submesh_num');
+uilabel(right, 'Text', '', 'BackgroundColor', theme.color.bg);
 
 bottom = uigridlayout(root, [3 2]);
 bottom.Layout.Row = 2;
@@ -336,7 +340,7 @@ end
 function local_clip_row(fig, parent, row, check_name, edit_names)
 
 wrap = uigridlayout(parent, [1 1 + numel(edit_names)]);
-wrap.ColumnWidth = [{'fit'}, repmat({'1x'}, 1, numel(edit_names))];
+wrap.ColumnWidth = [{36}, repmat({'1x'}, 1, numel(edit_names))];
 wrap.RowHeight = {26};
 wrap.Padding = [0 0 0 0];
 wrap.ColumnSpacing = 6;
@@ -353,11 +357,14 @@ if ~isempty(h) && isvalid(h)
     try
         txt = char(h.Text);
         if contains(txt, '1')
-            h.Text = 'Clip plane 1';
+            h.Text = 'P1';
+            h.Tooltip = 'Clip plane 1';
         elseif contains(txt, '2')
-            h.Text = 'Clip plane 2';
+            h.Text = 'P2';
+            h.Tooltip = 'Clip plane 2';
         elseif contains(txt, '3')
-            h.Text = 'Clip plane 3';
+            h.Text = 'P3';
+            h.Tooltip = 'Clip plane 3';
         end
     catch
     end
@@ -377,7 +384,7 @@ function local_pair_row(fig, parent, label_name, field_names)
 
 n = numel(field_names);
 rowg = uigridlayout(parent, [1 2]);
-rowg.ColumnWidth = {'fit', '1x'};
+rowg.ColumnWidth = {148, '1x'};
 rowg.Padding = [0 0 0 0];
 rowg.ColumnSpacing = 8;
 try
@@ -428,7 +435,7 @@ end
 function local_labeled(fig, parent, label_name, field_name)
 
 rowg = uigridlayout(parent, [1 2]);
-rowg.ColumnWidth = {'fit', '1x'};
+rowg.ColumnWidth = {148, '1x'};
 rowg.Padding = [0 0 0 0];
 rowg.ColumnSpacing = 8;
 try

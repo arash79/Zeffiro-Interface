@@ -47,6 +47,8 @@ try
             zef_figure_tool_layout(h);
         end
         laid_out = true;
+    elseif startsWith(tag, 'zef_class_inverse_') || strcmp(tag, 'zef_about')
+        laid_out = true;
     elseif contains(name, 'Mesh visualization tool')
         zef_layout_mesh_visualization_tool(h);
         laid_out = true;
@@ -70,14 +72,24 @@ try
         laid_out = true;
     elseif contains(lower(name), 'leadfield processing') ...
             || contains(lower(name), 'lead field processing') ...
+            || contains(regexprep(lower(name), '\s', ''), 'leadfieldprocessing') ...
             || contains(lower(name), 'reconstruction tool')
         zef_layout_bank_tool(h);
+        laid_out = true;
+    elseif contains(lower(name), 'strip tool')
+        zef_layout_strip_tool(h);
         laid_out = true;
     elseif contains(lower(name), 'nse tool')
         zef_layout_nse_tool(h);
         laid_out = true;
     elseif contains(lower(name), 'filter tool')
         zef_layout_filter_tool(h);
+        laid_out = true;
+    elseif contains(lower(name), 'databank') || contains(lower(name), 'data bank')
+        zef_layout_data_bank(h);
+        laid_out = true;
+    elseif contains(lower(name), 'find synthetic') && contains(lower(name), 'roi')
+        zef_layout_fss_roi(h);
         laid_out = true;
     elseif contains(lower(name), 'find synthetic source') ...
             && ~contains(lower(name), 'legacy') && ~contains(lower(name), 'eit') ...

@@ -19,7 +19,7 @@ MATLAB logic: `plugins/WireframeTool/m/` (`zef_wireframe_creator_start`, `zef_wi
 
 ## Workflow context
 
-Asteroid profiles: **Multi tools → Wireframe creator tool** (`zef_wireframe_creator_start`). Not in the default profile — call the start script from MATLAB. Title: **ZEFFIRO Interface: Wireframe creator tool**.
+Default and asteroid profiles: **Multi tools → Wireframe creator tool** (`zef_wireframe_creator_start`). Title: **ZEFFIRO Interface: Wireframe creator tool**.
 
 ## Usage instructions
 

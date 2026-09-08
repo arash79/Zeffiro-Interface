@@ -232,12 +232,23 @@ try
     is_primary = any(strcmpi(txt, { ...
         'Visualize volume', 'Create FEM mesh', 'Plot graph', 'Play', ...
         'Run script', 'Apply', 'Save', 'Plot', 'Start', 'Run', 'Start inversion', ...
-        'Find currents', 'Interpolate', 'Plot hyperprior'})) ...
+        'Find currents', 'Interpolate', 'Plot hyperprior', ...
+        'Plot processed data', 'Combine data/leadfields', 'Combine', ...
+        'Plot signal', 'Simulate measurements', 'Plot source', ...
+        'Apply transformation', 'Compute lead fields', 'Apply to Mesh', ...
+        'Create synthetic data', 'Plot source(s)', 'Create wireframe', ...
+        'Plot wireframe', 'Solve system'})) ...
         || (contains(lower(txt), 'create') && contains(lower(txt), 'fem')) ...
         || strcmp(char(obj.Tag), 'zef_about_close') ...
         || strcmp(char(obj.Tag), 'zef_confirm_yes');
     if strcmp(char(obj.Tag), 'playbutton')
         is_primary = true;
+    end
+    try
+        if isappdata(obj, 'ZefPrimary') && isequal(getappdata(obj, 'ZefPrimary'), true)
+            is_primary = true;
+        end
+    catch
     end
 catch
 end
@@ -330,17 +341,8 @@ local_set(obj, 'FontSize', theme.font.size);
 local_set(obj, 'FontColor', theme.color.text);
 local_set(obj, 'ForegroundColor', theme.color.text);
 try
-    n_data = 0;
-    try
-        n_data = size(obj.Data, 1);
-    catch
-    end
     obj.RowStriping = 'on';
-    if n_data < 2
-        obj.BackgroundColor = theme.color.tableRow;
-    else
-        obj.BackgroundColor = [theme.color.tableRow; theme.color.tableAlt];
-    end
+    obj.BackgroundColor = [theme.color.tableRow; theme.color.tableAlt];
 catch
     local_set(obj, 'BackgroundColor', theme.color.tableRow);
 end
@@ -349,12 +351,23 @@ try
 catch
 end
 try
+    removeStyle(obj);
+catch
+end
+try
     st = uistyle('FontColor', theme.color.text, ...
+        'BackgroundColor', theme.color.tableRow, ...
         'FontName', theme.font.name, 'FontSize', theme.font.size, ...
         'HorizontalAlignment', 'left');
-    removeStyle(obj);
     addStyle(obj, st);
 catch
+    try
+        st = uistyle('FontColor', theme.color.text, ...
+            'FontName', theme.font.name, 'FontSize', theme.font.size, ...
+            'HorizontalAlignment', 'left');
+        addStyle(obj, st);
+    catch
+    end
 end
 try
     hst = uistyle('BackgroundColor', theme.color.tableHeader, ...
@@ -416,6 +429,19 @@ switch style
         catch
         end
         if length(tag) > 4 && strcmp(tag(end-3:end), '_cap')
+            cap_fg = theme.color.buttonText;
+            try
+                btn = obj.UserData;
+                if ~isempty(btn) && isgraphics(btn) && isvalid(btn) ...
+                        && isappdata(btn, 'ZefRoundPrimary') ...
+                        && isequal(getappdata(btn, 'ZefRoundPrimary'), true)
+                    cap_fg = theme.color.primaryText;
+                end
+            catch
+            end
+            local_set(obj, 'ForegroundColor', cap_fg);
+            local_set(obj, 'FontName', theme.font.name);
+            local_set(obj, 'FontSize', fit_fs);
             return
         end
         local_set(obj, 'FontSize', fit_fs);

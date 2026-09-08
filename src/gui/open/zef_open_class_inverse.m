@@ -10,7 +10,7 @@ function zef = zef_open_class_inverse(zef, spec)
 %   (consumed by CommonInverseParameters.withPropertiesFromZef) and onto
 %   MethodParams for the named registry id. Start calls zef_inverse_run.
 %   Callers: zef_eloreta_window, zef_ukfnmm_window, zef_halpr_window,
-%   zef_grouplasso_window. Does not change legacy plugin inversion functions.
+%   zef_grouplasso_window, and the zef_*_class_window wrappers.
 %
 %   zef = zef_open_class_inverse(zef, spec)
 %
@@ -24,7 +24,8 @@ function zef = zef_open_class_inverse(zef, spec)
 %   The figure is stored as zef.h_class_inverse_fig (not assignin unless
 %   the caller does that).
 %
-%   See also zef_inverse_run, zef_eloreta_start, utilities.cluster.inverse_method_registry.
+%   See also zef_inverse_run, zef_eloreta_start, zef_class_inverse_method_fields,
+%            utilities.cluster.inverse_method_registry.
 
 if nargin == 0
     zef = evalin('base', 'zef');
@@ -48,14 +49,21 @@ fig = uifigure( ...
     'Color', theme.color.bg, ...
     'Visible', 'off');
 try
-    fig.Position = [100 100 460 620];
+    fig.Position = [100 100 720 420];
 catch
 end
+
+common = local_common_fields(zef);
+method_fields = spec.method_fields;
+n_common = numel(common);
+n_method = numel(method_fields);
+two_col = (n_common + n_method) >= 14 || n_method >= 6;
 
 root = uigridlayout(fig, [3 1], 'Tag', 'zef_ui_root', ...
     'Padding', [theme.space.pad theme.space.pad theme.space.pad theme.space.pad], ...
     'RowHeight', {'fit', '1x', 'fit'}, ...
     'ColumnWidth', {'1x'}, ...
+    'RowSpacing', 8, ...
     'BackgroundColor', theme.color.bg);
 title_lab = uilabel(root, 'Text', spec.title, ...
     'FontWeight', 'bold', 'FontSize', theme.font.sizeTitle, ...
@@ -63,46 +71,64 @@ title_lab = uilabel(root, 'Text', spec.title, ...
 title_lab.Layout.Row = 1;
 title_lab.Layout.Column = 1;
 
-scroll = uigridlayout(root, [1 1], ...
-    'Padding', [0 0 0 0], 'RowHeight', {'fit'}, 'ColumnWidth', {'1x'}, ...
+body = uigridlayout(root, [1 1 + double(two_col)], ...
+    'Padding', [0 0 0 0], ...
+    'ColumnSpacing', 12, ...
+    'RowHeight', {'1x'}, ...
     'BackgroundColor', theme.color.bg);
+if two_col
+    body.ColumnWidth = {'1x', '1x'};
+else
+    body.ColumnWidth = {'1x'};
+end
+body.Layout.Row = 2;
+body.Layout.Column = 1;
 try
-    scroll.Scrollable = 'on';
+    body.Scrollable = 'on';
 catch
 end
-scroll.Layout.Row = 2;
-scroll.Layout.Column = 1;
-
-common = local_common_fields(zef);
-method_fields = spec.method_fields;
-n_rows = numel(common) + numel(method_fields);
-form = uigridlayout(scroll, [max(1, n_rows) 2], ...
-    'Padding', [0 0 0 0], ...
-    'RowHeight', repmat({'fit'}, 1, max(1, n_rows)), ...
-    'ColumnWidth', {160, '1x'}, ...
-    'ColumnSpacing', theme.space.gap, ...
-    'RowSpacing', 8, ...
-    'BackgroundColor', theme.color.bg);
 
 widgets = struct();
-row = 1;
-for i = 1:numel(common)
-    [widgets, row] = local_add_field(form, widgets, common{i}, zef, theme, row);
+n_left = n_common + n_method * double(~two_col);
+left = local_section(body, theme, 'Shared parameters', n_left);
+left.Layout.Column = 1;
+row = 2;
+for i = 1:n_common
+    [widgets, row] = local_add_field(left, widgets, common{i}, zef, theme, row);
 end
-for i = 1:numel(method_fields)
-    [widgets, row] = local_add_field(form, widgets, method_fields{i}, zef, theme, row); %#ok<NASGU>
+if two_col
+    right = local_section(body, theme, 'Method parameters', n_method);
+    right.Layout.Column = 2;
+    row = 2;
+    for i = 1:n_method
+        [widgets, row] = local_add_field(right, widgets, method_fields{i}, zef, theme, row); %#ok<NASGU>
+    end
+else
+    for i = 1:n_method
+        [widgets, row] = local_add_field(left, widgets, method_fields{i}, zef, theme, row);
+    end
 end
 
-actions = uigridlayout(root, [1 2], ...
-    'Padding', [0 0 0 0], 'ColumnWidth', {'1x', 120}, ...
+actions = uigridlayout(root, [2 1], ...
+    'Padding', [0 0 0 0], 'ColumnWidth', {'1x'}, ...
+    'RowHeight', {'fit', 32}, ...
+    'RowSpacing', 6, ...
     'BackgroundColor', theme.color.bg);
 actions.Layout.Row = 3;
 actions.Layout.Column = 1;
 hint = uilabel(actions, 'Text', ['Class/cluster solver (zef_inverse_run). ' ...
         'This is not the Inverse-tools plugin algorithm. See docs/adr/ADR-002-dual-inverse-tracks.md.'], ...
     'FontColor', theme.color.textMuted, 'WordWrap', 'on');
+hint.Layout.Row = 1;
 hint.Layout.Column = 1;
-start_btn = uibutton(actions, 'Text', 'Start', ...
+btn_row = uigridlayout(actions, [1 3], ...
+    'Padding', [0 0 0 0], 'ColumnWidth', {'1x', 120, '1x'}, ...
+    'RowHeight', {32}, ...
+    'BackgroundColor', theme.color.bg);
+btn_row.Layout.Row = 2;
+uilabel(btn_row, 'Text', '');
+start_btn = uibutton(btn_row, 'Text', 'Start', ...
+    'Tag', 'zef_inv_start', ...
     'BackgroundColor', theme.color.primary, 'FontColor', theme.color.primaryText);
 start_btn.Layout.Column = 2;
 
@@ -111,10 +137,51 @@ fig.UserData = ud;
 start_btn.ButtonPushedFcn = @(src, evt) local_run(fig);
 
 zef.h_class_inverse_fig = fig;
+n_form = n_common + n_method;
+if two_col
+    n_form = max(n_common, n_method);
+    need_w = 760;
+else
+    need_w = 560;
+end
+need_h = 52 + 28 + n_form * 34 + 88;
 try
-    zef_ui_apply_size(fig, 460, 620, 380, 360);
+    zef_ui_apply_size(fig, need_w, need_h, max(480, round(0.88 * need_w)), ...
+        max(280, min(need_h, round(0.92 * need_h))));
 catch
 end
+try
+    zef_ui_ready(fig);
+catch
+end
+try
+    drawnow;
+    zef_ui_ensure_visible(fig);
+catch
+end
+try
+    fig.Visible = 'on';
+    zef_ui_place_window(fig);
+    zef_window_manager('raise', fig);
+catch
+end
+
+end
+
+function card = local_section(parent, theme, heading, n_fields)
+
+n_fields = max(1, n_fields);
+card = uigridlayout(parent, [n_fields + 2 2], ...
+    'Padding', [8 8 8 8], ...
+    'ColumnWidth', {188, '1x'}, ...
+    'RowHeight', [{22}, repmat({28}, 1, n_fields), {'1x'}], ...
+    'RowSpacing', 6, ...
+    'ColumnSpacing', theme.space.gap, ...
+    'BackgroundColor', theme.color.panel);
+lab = uilabel(card, 'Text', heading, ...
+    'FontWeight', 'bold', 'FontColor', theme.color.header);
+lab.Layout.Row = 1;
+lab.Layout.Column = [1 2];
 
 end
 
@@ -163,8 +230,18 @@ function [widgets, row] = local_add_field(form, widgets, spec, zef, theme, row)
 if ~isfield(spec, 'scope') || isempty(spec.scope)
     spec.scope = 'method';
 end
+n_rows = 2;
+try
+    rh = form.RowHeight;
+    n_rows = numel(rh);
+catch
+end
+if row > n_rows
+    extra = row - n_rows;
+    form.RowHeight = [form.RowHeight, repmat({28}, 1, extra)];
+end
 lab = uilabel(form, 'Text', spec.label, 'FontColor', theme.color.text, ...
-    'HorizontalAlignment', 'left');
+    'HorizontalAlignment', 'right', 'WordWrap', 'off');
 lab.Layout.Row = row;
 lab.Layout.Column = 1;
 kind = 'numeric';

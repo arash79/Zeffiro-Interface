@@ -72,6 +72,10 @@ file_right.RowSpacing = 8;
 file_right.Padding = [0 0 0 0];
 local_put(file_right, local_h('h_dti_load_button'), 1, 1);
 local_put(file_right, local_h('h_dti_clear_button'), 2, 1);
+try
+    setappdata(local_h('h_dti_load_button'), 'ZefPrimary', true);
+catch
+end
 
 model_p = local_panel(root, theme, 'Conversion Model');
 model_g = local_grid(model_p, [4 1], theme);
@@ -112,7 +116,10 @@ help_ani = local_label(fig, 'Minimum FA');
 local_hide(help_scale);
 local_hide(help_ani);
 
-local_put(model_g, local_h('h_dti_update_conversion_model_button'), 4, 1);
+upd_c = local_grid(model_g, [1 3], theme);
+upd_c.ColumnWidth = {'1x', 'fit', '1x'};
+upd_c.Padding = [0 0 0 0];
+local_put(upd_c, local_h('h_dti_update_conversion_model_button'), 1, 2);
 
 interp_p = local_panel(root, theme, 'Interpolation');
 interp_g = local_grid(interp_p, [3 1], theme);
@@ -135,12 +142,15 @@ if ~isempty(help_i)
     catch
     end
 end
-local_put(interp_g, local_h('h_dti_update_interpolation_model_button'), 3, 1);
+upd_i = local_grid(interp_g, [1 3], theme);
+upd_i.ColumnWidth = {'1x', 'fit', '1x'};
+upd_i.Padding = [0 0 0 0];
+local_put(upd_i, local_h('h_dti_update_interpolation_model_button'), 1, 2);
 
 comp_p = local_panel(root, theme, 'Compartment Selection');
 comp_g = local_grid(comp_p, [2 3], theme);
 comp_g.ColumnWidth = {168, '1x', 140};
-comp_g.RowHeight = {22, '1x'};
+comp_g.RowHeight = {32, '1x'};
 comp_g.Padding = [8 8 8 8];
 comp_g.ColumnSpacing = 8;
 local_put(comp_g, local_label(fig, 'Apply to compartments'), 1, 1);
@@ -154,7 +164,11 @@ if ~isempty(help_c)
     end
 end
 local_put(comp_g, local_h('h_dti_compartments'), [1 2], 2);
-local_put(comp_g, local_h('h_dti_apply_button'), [1 2], 3);
+local_put(comp_g, local_h('h_dti_apply_button'), 1, 3);
+try
+    setappdata(local_h('h_dti_apply_button'), 'ZefPrimary', true);
+catch
+end
 
 info_p = local_panel(root, theme, 'Information');
 info_g = local_grid(info_p, [1 1], theme);
@@ -164,12 +178,24 @@ local_put(info_g, local_h('h_dti_info_text'), 1, 1);
 local_hide(local_h('h_dti_status_text'));
 local_hide(local_label(fig, 'Status:'));
 
+try
+    pans = findall(fig, 'Type', 'uipanel');
+    for i = 1:numel(pans)
+        if isequal(pans(i).Parent, fig) && isempty(pans(i).Children)
+            delete(pans(i));
+        end
+    end
+catch
+end
+
 zef_ui_hide_orphans(fig);
 scr = get(groot, 'ScreenSize');
-def_h = min(860, max(640, round(0.82 * scr(4))));
-zef_ui_apply_size(fig, 760, def_h, 640, 560);
+def_h = min(980, max(720, round(0.86 * scr(4))));
+zef_ui_apply_size(fig, 820, def_h, 680, 620);
 try
     fig.AutoResizeChildren = 'off';
+    drawnow;
+    zef_ui_ensure_visible(fig);
 catch
 end
 

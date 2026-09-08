@@ -65,6 +65,7 @@ else
     if size(alpha, 3) > 1
         alpha = alpha(:, :, 1);
     end
+
 end
 fg = reshape(double(fg(1:3)), 1, 1, 3);
 bg = reshape(double(bg(1:3)), 1, 1, 3);
@@ -75,10 +76,9 @@ else
 end
 if sz > 0 && (size(rgb, 1) ~= sz || size(rgb, 2) ~= sz)
     try
-        a2 = imresize(alpha, [sz sz], 'bilinear');
-        a2 = min(1, a2 * 1.22);
+        a2 = local_downscale_alpha(alpha, sz);
         if ismember(name, {'gizmo'})
-            img2 = imresize(img, [sz sz], 'bilinear');
+            img2 = imresize(img, [sz sz], 'bicubic');
             bg2 = repmat(bg, sz, sz);
             rgb = bg2 .* (1 - a2) + img2 .* a2;
         else
@@ -88,12 +88,29 @@ if sz > 0 && (size(rgb, 1) ~= sz || size(rgb, 2) ~= sz)
         end
     catch
         try
-            rgb = imresize(rgb, [sz sz], 'bilinear');
+            rgb = imresize(rgb, [sz sz], 'bicubic');
         catch
         end
     end
+
 end
 out = max(0, min(1, rgb));
+
+end
+
+function a2 = local_downscale_alpha(alpha, sz)
+%LOCAL_DOWNSCALE_ALPHA  Preserve thin strokes when shrinking line icons.
+%
+%   Direct bilinear 384→16 collapses 5.5 px SVG strokes to <1 px. Step
+%   the mask down, then contrast-stretch so ink stays readable at toolbar
+%   sizes.
+
+src = alpha;
+while min(size(src, 1), size(src, 2)) > sz * 2
+    src = imresize(src, 0.5, 'bilinear');
+end
+a2 = imresize(src, [sz sz], 'bicubic');
+a2 = min(1, max(0, (a2 - 0.06) * 1.65));
 
 end
 

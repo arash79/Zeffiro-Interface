@@ -78,8 +78,26 @@ zef.reconstructionTool.app.FunctionDropDown.Items=zef.reconstructionTool.funtion
 zef.reconstructionTool.app.FunctionDropDown.Items=extractBetween(zef.reconstructionTool.funtions, 'Tool_', '.m');
 
 try
-    zef_ui_adopt_app(zef.reconstructionTool.app.UIFigure, ...
-        'ZEFFIRO Interface: Reconstruction Tool');
-catch
+    app = zef.reconstructionTool.app;
+    fig = [];
+    ps = properties(app);
+    for zef_i = 1:numel(ps)
+        try
+            v = app.(ps{zef_i});
+            if isa(v, 'matlab.ui.Figure') && isvalid(v)
+                fig = v;
+                break
+            end
+        catch
+        end
+    end
+    setappdata(fig, 'ZefBankApp', app);
+    drawnow;
+    pause(0.05);
+    zef_ui_adopt_app(fig, 'ZEFFIRO Interface: Reconstruction Tool');
+    zef_layout_bank_tool(fig);
+    zef_ui_apply_theme(fig);
+catch ME
+    warning('Zeffiro:BankLayout', '%s', ME.message);
 end
 

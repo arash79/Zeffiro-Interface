@@ -27,7 +27,7 @@ end
 
 root = uigridlayout(fig, [4 1]);
 root.Tag = 'zef_ui_root';
-root.RowHeight = {'1.1x', '1.3x', 'fit', 76};
+root.RowHeight = {'1.2x', '1.4x', 'fit', 40};
 root.Padding = [12 12 12 12];
 root.RowSpacing = 8;
 try
@@ -37,7 +37,7 @@ catch
 end
 
 tree_row = uigridlayout(root, [2 2]);
-tree_row.ColumnWidth = {'1x', 220};
+tree_row.ColumnWidth = {'1x', 168};
 tree_row.RowHeight = {22, '1x'};
 tree_row.ColumnSpacing = 10;
 tree_row.Padding = [0 0 0 0];
@@ -46,6 +46,7 @@ try
 catch
 end
 lab_tree = local_label(fig, 'Source tree');
+local_header_style(lab_tree, theme);
 local_put(tree_row, lab_tree, 1, 1);
 tr = local_first(findall(fig, 'Type', 'uitree'));
 local_put(tree_row, tr, 2, 1);
@@ -108,7 +109,9 @@ try
     src.BackgroundColor = theme.color.bg;
 catch
 end
-local_put(src, local_label(fig, 'Source parameters'), 1, 1);
+lab_src = local_label(fig, 'Source parameters');
+local_header_style(lab_src, theme);
+local_put(src, lab_src, 1, 1);
 local_put(src, src_tbl, 2, 1);
 try
     zef_ui_fit_table(src_tbl);
@@ -117,14 +120,16 @@ catch
 end
 
 sig = uigridlayout(root, [2 1]);
-sig.RowHeight = {22, local_table_h(sig_tbl, 120)};
+sig.RowHeight = {22, local_table_h(sig_tbl, 64)};
 sig.Padding = [0 0 0 0];
 sig.RowSpacing = 4;
 try
     sig.BackgroundColor = theme.color.bg;
 catch
 end
-local_put(sig, local_label(fig, 'Signal parameters'), 1, 1);
+lab_sig = local_label(fig, 'Signal parameters');
+local_header_style(lab_sig, theme);
+local_put(sig, lab_sig, 1, 1);
 local_put(sig, sig_tbl, 2, 1);
 try
     zef_ui_fit_table(sig_tbl);
@@ -132,23 +137,35 @@ try
 catch
 end
 
-act = uigridlayout(root, [2 2]);
-act.RowHeight = {32, 32};
-act.ColumnWidth = {'1x', '1x'};
-act.RowSpacing = 6;
+act = uigridlayout(root, [1 6]);
+act.Tag = 'zef_src_act';
+act.RowHeight = {32};
+act.ColumnWidth = {'1x', 118, 132, 108, 168, '1x'};
 act.ColumnSpacing = 8;
 act.Padding = [0 0 0 0];
 try
     act.BackgroundColor = theme.color.bg;
 catch
 end
-local_put(act, local_button(fig, 'Plot signal'), 1, 1);
-local_put(act, local_button(fig, 'Simulate signal'), 1, 2);
-local_put(act, local_button(fig, 'Plot source'), 2, 1);
-local_put(act, local_button(fig, 'Simulate measurements'), 2, 2);
+plot_sig = local_button(fig, 'Plot signal');
+local_put(act, plot_sig, 1, 2);
+local_put(act, local_button(fig, 'Simulate signal'), 1, 3);
+local_put(act, local_button(fig, 'Plot source'), 1, 4);
+local_put(act, local_button(fig, 'Simulate measurements'), 1, 5);
+try
+    setappdata(plot_sig, 'ZefPrimary', true);
+catch
+end
 
 zef_ui_hide_orphans(fig);
-zef_ui_apply_size(fig, 720, 720, 560, 600);
+src_h = local_table_h(src_tbl, 220);
+sig_h = local_table_h(sig_tbl, 72) + 26;
+try
+    root.RowHeight = {'1x', src_h, sig_h, 40};
+catch
+end
+need_h = 24 + 160 + src_h + sig_h + 40 + 24;
+zef_ui_apply_size(fig, 720, max(620, min(760, need_h)), 560, 520);
 try
     fig.AutoResizeChildren = 'off';
 catch
@@ -167,7 +184,11 @@ try
     n = size(tbl(1).Data, 1);
 catch
 end
-ht = max(88, 34 + min(max(n, 1), 8) * 24 + 16);
+if n < 1
+    ht = max(64, fallback);
+    return
+end
+ht = max(88, 34 + min(n, 16) * 24 + 28);
 
 end
 
@@ -186,6 +207,20 @@ catch
         h.Layout = matlab.ui.layout.GridLayoutOptions('Row', row, 'Column', col);
     catch
     end
+end
+
+end
+
+function local_header_style(h, theme)
+
+if isempty(h) || ~(isgraphics(h(1)) && isvalid(h(1)))
+    return
+end
+try
+    h.FontWeight = 'bold';
+    h.FontColor = theme.color.header;
+    h.FontSize = theme.font.size;
+catch
 end
 
 end

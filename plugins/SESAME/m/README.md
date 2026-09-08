@@ -1,6 +1,6 @@
 ## Folder purpose
 
-Asteroid Inverse tools → **SESAME**: sequential Monte Carlo over a small number of equivalent dipoles (Poisson prior on count, neighbour-graph location moves). Not in the default head INI. No `inverse.*Inverter`.
+Asteroid Inverse tools → **SESAME**: sequential Monte Carlo over a small number of equivalent dipoles (Poisson prior on count, neighbour-graph location moves). Also on the default head INI. No `inverse.*Inverter`.
 
 ## Main contents
 

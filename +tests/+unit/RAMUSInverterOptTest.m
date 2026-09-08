@@ -98,7 +98,9 @@ classdef RAMUSInverterOptTest < matlab.unittest.TestCase
         end
 
         function testSkipFullFilterWhenUnused(testCase)
-            ramus_src = fileread(fullfile("+inverse", "@RAMUSInverter", "invert.m"));
+            root = fileparts(which("zeffiro_interface"));
+            testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
+            ramus_src = fileread(fullfile(root, "+inverse", "@RAMUSInverter", "invert.m"));
             testCase.verifyTrue(contains(ramus_src, "Wd' * (A \ f)"));
             testCase.verifyTrue(contains(ramus_src, "need_full_W"));
         end

@@ -47,7 +47,9 @@ classdef GravityNewtonKernelTest < matlab.unittest.TestCase
         end
 
         function millimetreNodesScaledToMetresInLeadField(testCase)
-            src = fileread(fullfile("src", "forward", "lead_field", ...
+            root = fileparts(which("zeffiro_interface"));
+            testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
+            src = fileread(fullfile(root, "src", "forward", "lead_field", ...
                 "zef_lead_field_gravity.m"));
             testCase.verifyTrue(contains(src, "nodes / 1000"));
             testCase.verifyTrue(contains(src, "zef_gravity_newton_kernel"));

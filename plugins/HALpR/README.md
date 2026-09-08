@@ -16,7 +16,7 @@ zef_halpr_start → zef_halpr_window → zef_open_class_inverse
 zef_inverse_run(..., "halpr") → inverse.HALpRInverter → L1_optimization
 ```
 
-Registered on `multicompartment_head`, `_legacy`, and `_nse`. Not on asteroid profiles.
+Registered on all bundled profiles, including asteroid gravity/radar.
 
 ## Main contents
 

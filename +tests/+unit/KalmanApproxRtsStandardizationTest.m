@@ -23,11 +23,13 @@ classdef KalmanApproxRtsStandardizationTest < matlab.unittest.TestCase
         end
 
         function testSmootherAppliesZTimesMMatchingFilterD(testCase)
-            src = fileread(fullfile("+inverse", "@KalmanInverter", "smoother.m"));
+            root = fileparts(which("zeffiro_interface"));
+            testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
+            src = fileread(fullfile(root, "+inverse", "@KalmanInverter", "smoother.m"));
             testCase.verifyTrue(contains(src, "P_invsqrt * m_s"));
             testCase.verifyFalse(contains(src, "P_sqrtm_right\m_s"));
             testCase.verifyFalse(contains(src, "P_sqrtm_right \ m_s"));
-            filt = fileread(fullfile("+inverse", "+kf", "kf_sL_update_approx.m"));
+            filt = fileread(fullfile(root, "+inverse", "+kf", "kf_sL_update_approx.m"));
             testCase.verifyTrue(contains(filt, "D = w_t .* P_invsqrt"));
             testCase.verifyTrue(contains(filt, "spd_invsqrt_denman_beavers"));
         end

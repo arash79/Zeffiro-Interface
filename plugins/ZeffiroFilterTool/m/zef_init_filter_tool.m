@@ -78,14 +78,32 @@ for zef_i = 1 : length(zef.aux_field)
 end
 for zef_i = 1 : length(zef.filter_file_list)
     zef.aux_field = help(zef.filter_file_list{zef_i});
-    zef.aux_idx_1 = strfind(zef.aux_field, 'Description:');
+    zef.aux_idx_1 = [];
+    desc_hits = strfind(zef.aux_field, 'Description:');
+    for zef_k = 1:numel(desc_hits)
+        at = desc_hits(zef_k);
+        if at == 1 || ismember(zef.aux_field(at - 1), [sprintf('\n') sprintf('\r') '%'])
+            zef.aux_idx_1 = at;
+            break
+        end
+    end
     zef.aux_idx_2 = strfind(zef.aux_field, 'Input:');
-    if ~isempty(zef.aux_idx_1) && ~isempty(zef.aux_idx_2) ...
-            && zef.aux_idx_2(1) > zef.aux_idx_1(1)
-        zef.aux_field = zef.aux_field(zef.aux_idx_1(1):zef.aux_idx_2(1));
+    if ~isempty(zef.aux_idx_1)
+        zef.aux_idx_2 = zef.aux_idx_2(zef.aux_idx_2 > zef.aux_idx_1);
+    end
+    if ~isempty(zef.aux_idx_1) && ~isempty(zef.aux_idx_2)
+        zef.aux_field = zef.aux_field(zef.aux_idx_1:zef.aux_idx_2(1));
         zef.filter_name_list{zef_i} = strtrim(zef.aux_field(13:end-1));
+        zef.filter_name_list{zef_i} = strtrim(regexprep( ...
+            zef.filter_name_list{zef_i}, '\s+', ' '));
     else
         zef.filter_name_list{zef_i} = zef.filter_file_list{zef_i};
+    end
+    if strncmp(zef.filter_name_list{zef_i}, 'zef_', 4)
+        pretty = regexprep(zef.filter_name_list{zef_i}(5:end), '_', ' ');
+        if ~isempty(pretty)
+            zef.filter_name_list{zef_i} = [upper(pretty(1)) pretty(2:end)];
+        end
     end
 end
 [zef.filter_name_list zef.aux_field] = sort(zef.filter_name_list);

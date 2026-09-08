@@ -27,7 +27,7 @@ end
 
 root = uigridlayout(fig, [3 1]);
 root.Tag = 'zef_ui_root';
-root.RowHeight = {68, '1x', 188};
+root.RowHeight = {56, '1x', 148};
 root.Padding = [12 12 12 12];
 root.RowSpacing = 10;
 try

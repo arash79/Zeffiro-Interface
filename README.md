@@ -33,7 +33,7 @@ visualize / export
 5. Invert: either an **Inverse tools** plugin, or the programmable path `zef_inverse_run`.
 6. Draw the result in the Figure / mesh-visualization tools.
 
-Those two inverse paths are **not** the same code. Most Inverse-tools menus still call legacy functions under `plugins/`. Four entries labelled **(class solver)** (eLORETA, UKF-NMM, HALpR, Group Lasso) open a dialog whose Start button calls `zef_inverse_run` and constructs `inverse.*Inverter`. Scripts and cluster jobs use that class path directly. See [docs/architecture.md](docs/architecture.md) and [ADR-002](docs/adr/ADR-002-dual-inverse-tracks.md).
+Those two inverse paths are **not** the same code. Inverse-tools items without **(class solver)** in the label still call legacy functions under `plugins/`. Entries labelled **(class solver)** open a dialog whose Start button calls `zef_inverse_run` and constructs `inverse.*Inverter`. Scripts and cluster jobs use that class path directly. See [docs/architecture.md](docs/architecture.md) and [ADR-002](docs/adr/ADR-002-dual-inverse-tracks.md).
 
 ## Major pieces of the repository
 
@@ -51,6 +51,8 @@ Those two inverse paths are **not** the same code. Most Inverse-tools menus stil
 | `documentation/` | Typeset scientific manual (LuaLaTeX) |
 | `external/` | Optional third-party git submodules |
 | `assets/` | GUI icons and figures |
+| `website/` | Optional static project homepage (not on the MATLAB path) |
+| `scripts/` | Maintainer tools (tests, STL QA, icon rasterization; not on the MATLAB path) |
 
 `src/app` (start, update, close) is not the `+core` package. Do not `addpath` a `+package` folder yourself; add the **project root** so MATLAB can resolve `core.*` / `inverse.*` / `utilities.*`.
 

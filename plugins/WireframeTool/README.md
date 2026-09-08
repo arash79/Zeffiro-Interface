@@ -2,7 +2,7 @@
 
 Builds a **printable wireframe surface** from the FEM tetrahedral mesh and a filling vector derived from permittivity `zef.epsilon(:,1)`. GPU-ToRRe-3D microwave geometry, not an EEG tool. Writes `zef.wireframe_triangles`, `zef.wireframe_nodes`, interpolated filling / shape / permittivity vectors.
 
-**Not in the default profile.** Asteroid profiles register **Multi tools → Wireframe creator tool**. Otherwise call `zef_wireframe_creator_start` from MATLAB.
+**On the default profile** as Multi tools → Wireframe creator tool. Asteroid profiles register the same row. You can also call `zef_wireframe_creator_start` from MATLAB.
 
 ## Main contents
 
@@ -25,7 +25,7 @@ Widgets (ValueChangedFcn → `zef.wireframe_*`): edge threshold (default 1.2), p
 
 ## Workflow context
 
-Asteroid profiles: **Multi tools → Wireframe creator tool**, callback `zef_wireframe_creator_start`. Default profile: call that start script. Title: **ZEFFIRO Interface: Wireframe creator tool**.
+Default and asteroid profiles: **Multi tools → Wireframe creator tool**, callback `zef_wireframe_creator_start`. Title: **ZEFFIRO Interface: Wireframe creator tool**.
 
 ## Usage instructions
 
@@ -35,7 +35,7 @@ zef.wireframe_filling_vec = zef_wireframe_filling_vec(zef.epsilon(:,1), zef.wire
 ```
 
 1. Ensure mesh, domain labels, and permittivity are set.
-2. Open Wireframe creator tool (asteroid menu) or call `zef_wireframe_creator_start`.
+2. Open Wireframe creator tool from Multi tools, or call `zef_wireframe_creator_start`.
 3. Create, then Plot.
 
 ## Important notes

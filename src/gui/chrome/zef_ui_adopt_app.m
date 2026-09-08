@@ -38,38 +38,6 @@ if has_layout
         local_stretch_grids(h);
     catch
     end
-    try
-        lname = lower(char(h.Name));
-        if contains(lname, 'gaussian mixture')
-            scr = get(groot, 'ScreenSize');
-            ht = min(900, max(780, scr(4) - 48));
-            try
-                h.Resize = 'on';
-            catch
-            end
-            zef_ui_apply_size(h, 640, ht, 560, 740);
-            try
-                h.Position(4) = ht;
-            catch
-            end
-            gs = findall(h, 'Type', 'uigridlayout');
-            for gi = 1:numel(gs)
-                try
-                    if strcmp(char(gs(gi).Tag), 'zef_ui_root')
-                        gs(gi).Scrollable = 'off';
-                        continue
-                    end
-                    rh = gs(gi).RowHeight;
-                    if numel(rh) >= 10
-                        gs(gi).Scrollable = 'on';
-                    end
-                catch
-                end
-            end
-            zef_ui_adapt_grid(h);
-        end
-    catch
-    end
     return
 end
 try
@@ -129,18 +97,36 @@ function local_stretch_grids(fig)
 gs = findall(fig, 'Type', 'uigridlayout');
 for i = 1:numel(gs)
     try
+        tg = '';
+        try
+            tg = char(gs(i).Tag);
+        catch
+        end
+        if any(strcmp(tg, {'zef_bank_cur', 'zef_bank_foot', 'zef_ui_root', ...
+                'zef_src_act', 'zef_filter_plot'}))
+            continue
+        end
         cw = gs(i).ColumnWidth;
         if ~iscell(cw) || numel(cw) < 2
             continue
         end
-        cw{end} = '1x';
-        if numel(cw) == 2
-            cw = {'fit', '1x'};
-        elseif numel(cw) == 4
-            cw = {'fit', '1x', 'fit', '1x'};
-        elseif numel(cw) == 6
-            cw = {'fit', '1x', 'fit', '1x', 'fit', '1x'};
+        has_px = false;
+        first_flex = false;
+        for k = 1:numel(cw)
+            if isnumeric(cw{k})
+                has_px = true;
+                break
+            end
         end
+        try
+            first_flex = (ischar(cw{1}) || isstring(cw{1})) ...
+                && contains(char(string(cw{1})), 'x');
+        catch
+        end
+        if has_px || first_flex
+            continue
+        end
+        cw{end} = '1x';
         gs(i).ColumnWidth = cw;
     catch
     end

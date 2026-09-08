@@ -6,9 +6,9 @@ Use this page when you are comparing reconstructions, lead fields, or saved proj
 
 ## Two inverse tracks
 
-Most Inverse-tools menus still call functions under `plugins/`. Scripts, cluster jobs, and the four **(class solver)** menus call class solvers in `+inverse` through `zef_inverse_run`. Those tracks do not share solver code and can differ on the same data. Details: [ADR-002](adr/ADR-002-dual-inverse-tracks.md), [methods.md](methods.md).
+Inverse-tools menus without **(class solver)** still call functions under `plugins/`. Scripts, cluster jobs, and **(class solver)** menus call class solvers in `+inverse` through `zef_inverse_run`. Those tracks do not share solver code and can differ on the same data. Details: [ADR-002](adr/ADR-002-dual-inverse-tracks.md), [methods.md](methods.md).
 
-Four Inverse-tools entries (eLORETA, UKF-NMM, HALpR, Group Lasso) are labelled **(class solver)** in the default head profile. Other Inverse-tools items remain plugin algorithms.
+Default profiles label class-track Inverse-tools entries **(class solver)**. Matching legacy menus, when present, remain plugin algorithms.
 
 ## Methods whose numbers differ from upstream
 
@@ -43,7 +43,7 @@ Units, CEM column layout, and PCG behaviour: [conventions.md](conventions.md). C
 Unimplemented paths error rather than producing an empty or silently wrong `L`:
 
 - MEG St. Venant interpolation in cartesian source space
-- EEG `face_based` direction mode
+- EEG `face_based` / default `mesh based` direction mode (errors before stiffness/PCG; upstream still runs PCG then skips interpolation)
 - Buried complete-electrode-model contacts
 - PEM EIT
 

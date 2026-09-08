@@ -42,9 +42,27 @@ zef.LeadFieldProcessingTool.app.refreshButton.ButtonPushedFcn='zef_LeadfieldProc
 zef.LeadFieldProcessingTool.app.BankTable.CellEditCallback='zef_LeadfieldProcessingTool_BankTableLabelUpdate';
 
 try
-    zef_ui_adopt_app(zef.LeadFieldProcessingTool.app.UIFigure, ...
-        'ZEFFIRO Interface: Lead Field Processing Tool');
-    zef_ui_fit_table(findall(zef.LeadFieldProcessingTool.app.UIFigure, 'Type', 'uitable'));
-catch
+    app = zef.LeadFieldProcessingTool.app;
+    fig = [];
+    ps = properties(app);
+    for zef_i = 1:numel(ps)
+        try
+            v = app.(ps{zef_i});
+            if isa(v, 'matlab.ui.Figure') && isvalid(v)
+                fig = v;
+                break
+            end
+        catch
+        end
+    end
+    setappdata(fig, 'ZefBankApp', app);
+    drawnow;
+    pause(0.05);
+    zef_ui_adopt_app(fig, 'ZEFFIRO Interface: Lead Field Processing Tool');
+    zef_layout_bank_tool(fig);
+    zef_ui_apply_theme(fig);
+    zef_ui_fit_table(findall(fig, 'Type', 'uitable'));
+catch ME
+    warning('Zeffiro:BankLayout', '%s', ME.message);
 end
 

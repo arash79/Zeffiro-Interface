@@ -124,7 +124,9 @@ classdef UKFNMMInverterTest < matlab.unittest.TestCase
         end
 
         function testSmootherMapsUSpaceBeforeNMM(testCase)
-            src = fileread(fullfile("+inverse", "@UKFNMMInverter", "smoother.m"));
+            root = fileparts(which("zeffiro_interface"));
+            testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
+            src = fileread(fullfile(root, "+inverse", "@UKFNMMInverter", "smoother.m"));
             testCase.verifyTrue(contains(src, "i_map_u_space_to_dipoles"));
             testCase.verifyTrue(contains(src, "self.u_to_dipole"));
         end

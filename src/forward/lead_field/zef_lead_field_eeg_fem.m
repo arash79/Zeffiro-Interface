@@ -61,6 +61,7 @@ function [L_eeg, dipole_locations, dipole_directions] = lead_field_eeg_fem( ...
 %     dipole_locations   - [n × 3] metres (from G)
 %     dipole_directions  - [] in cartesian/normal mode
 %
+%   Errors if direction_mode is not cartesian or normal (before assembling L).
 %   Errors if PCG returns empty T (typical: non-SPD DTI tensors).
 %
 %   See also zef_lead_field_matrix, zef_transfer_matrix, zef_lead_field_interpolation.
@@ -190,7 +191,10 @@ end
 K = length(brain_ind);
 
 if not(isequal(lower(direction_mode),'cartesian') || isequal(lower(direction_mode),'normal'))
-    source_model = 1;
+    error('zef_lead_field_eeg_fem:UnsupportedDirectionMode', ...
+        ['EEG lead-field interpolation requires cartesian or normal direction_mode; ' ...
+         'got ''%s''. source_direction_mode 3 / face_based is not implemented for EEG.'], ...
+        direction_mode);
 end
 
 % Convert source model to new format.
@@ -277,42 +281,33 @@ if isempty(T)
         tol_val);
 end
 
-% Interpolation.
+% Interpolation (cartesian / normal only; other modes error above).
 
-if isequal(lower(direction_mode),'cartesian') || isequal(lower(direction_mode),'normal')
+dipole_locations = [];
+dipole_directions = [];
 
-    dipole_locations = [];
-    dipole_directions = [];
+regparam = 1e-6;
 
-    regparam = 1e-6;
+[G, dipole_locations] = zef_lead_field_interpolation( ...
+    nodes, ...
+    tetrahedra, ...
+    brain_ind, ...
+    source_model, ...
+    source_ind, ...
+    p_nearest_neighbour_inds, ...
+    optimization_system_type, ...
+    regparam ...
+    );
 
-    [G, dipole_locations] = zef_lead_field_interpolation( ...
-        nodes, ...
-        tetrahedra, ...
-        brain_ind, ...
-        source_model, ...
-        source_ind, ...
-        p_nearest_neighbour_inds, ...
-        optimization_system_type, ...
-        regparam ...
-        );
+% Construct lead field with transfer matrix, Schur complement and
+% interpolation matrix G.
 
-    % Construct lead field with transfer matrix, Schur complement and
-    % interpolation matrix G.
+L_eeg = Schur_complement \ (T' * G);
 
-    L_eeg = Schur_complement \ (T' * G);
+% Set "correct" zero potential level. Corresponds to multiplying L_eeg with
+% restriction matrix R, seen in relevant articles such as
+% <https://iopscience.iop.org/article/10.1088/0031-9155/57/4/999/pdf>.
 
-    % Set "correct" zero potential level. Corresponds to multiplying L_eeg with
-    % restriction matrix R, seen in relevant articles such as
-    % <https://iopscience.iop.org/article/10.1088/0031-9155/57/4/999/pdf>.
+L_eeg = L_eeg - mean(L_eeg, 1);
 
-    L_eeg = L_eeg - mean(L_eeg, 1);
-
-else
-    error('zef_lead_field_eeg_fem:UnsupportedDirectionMode', ...
-        ['EEG lead-field interpolation requires cartesian or normal direction_mode; ' ...
-         'got ''%s''. source_direction_mode 3 / face_based is not implemented for EEG.'], ...
-        direction_mode);
-
-end % if
 end % function

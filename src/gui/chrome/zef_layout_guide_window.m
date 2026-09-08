@@ -16,7 +16,9 @@ if nargin < 1 || isempty(fig) || ~isgraphics(fig) || ~isvalid(fig)
     return
 end
 if ~isempty(findall(fig, 'Tag', 'zef_ui_root'))
-    zef_ui_bind_min_size(fig, 360, 280);
+    if ~isappdata(fig, 'ZefMinSize')
+        zef_ui_bind_min_size(fig, 360, 280);
+    end
     return
 end
 
@@ -98,7 +100,7 @@ lname = lower(name);
 if contains(lname, 'parcellation')
     zef_ui_apply_size(fig, 560, 780, 500, 700);
 else
-    if ~contains(lname, 'ias roi')
+    if ~contains(lname, 'ias roi') && ~isappdata(fig, 'ZefFssRoiLayout')
         try
             zef_layout_guide_form(fig);
         catch
@@ -130,7 +132,8 @@ else
     end
     try
         if ~(contains(lname, 'preconditioned') || contains(lname, 'iterative relaxation') ...
-                || contains(lname, 'ias roi') || contains(lname, 'multiresolution'))
+                || contains(lname, 'ias roi') || contains(lname, 'multiresolution') ...
+                || contains(lname, 'databank') || contains(lname, 'data bank'))
             zef_ui_fit_dropdowns(fig);
         end
     catch
@@ -312,6 +315,9 @@ function local_known_tool_size(fig, lname)
 if nargin < 2 || isempty(lname)
     return
 end
+if isappdata(fig, 'ZefGuideForm')
+    return
+end
 p = [0 0 360 360];
 try
     orig = fig.Units;
@@ -329,7 +335,7 @@ elseif contains(lname, 'find synthetic source') && ~contains(lname, 'legacy') ..
 elseif contains(lname, 'es workbench')
     zef_ui_apply_size(fig, 580, 900, 500, 760);
 elseif contains(lname, 'databank') || contains(lname, 'data bank')
-    zef_ui_apply_size(fig, 1480, 700, 1100, 540);
+    zef_ui_apply_size(fig, 920, 620, 720, 480);
 elseif contains(lname, 'find synthetic') && contains(lname, 'eit')
     zef_ui_apply_size(fig, 680, 460, 580, 420);
 elseif contains(lname, 'source tree')
@@ -343,15 +349,6 @@ elseif contains(lname, 'nse tool')
         fig.AutoResizeChildren = 'off';
     catch
     end
-    scr = get(groot, 'ScreenSize');
-    def_w = min(max(p(3), 1180), min(round(0.99 * scr(3)), scr(3) - 8));
-    def_h = min(max(p(4), 940), min(round(0.99 * scr(4)), scr(4) - 8));
-    zef_ui_apply_size(fig, def_w, def_h, 1040, 760);
-    try
-        fig.AutoResizeChildren = 'off';
-        fig.Scrollable = 'on';
-    catch
-    end
 elseif contains(lname, 'dti conductivity')
     scr = get(groot, 'ScreenSize');
     zef_ui_apply_size(fig, 720, min(1045, round(0.82 * scr(4))), 700, 640);
@@ -360,15 +357,9 @@ elseif contains(lname, 'beamformer')
 elseif contains(lname, 'dipole scan')
     zef_ui_apply_size(fig, 640, max(p(4), 680), 520, 580);
 elseif contains(lname, 'ias roi')
-    zef_ui_apply_size(fig, 660, 820, 600, 790);
+    zef_ui_apply_size(fig, 660, 640, 600, 520);
 elseif contains(lname, 'multiresolution')
-    cur_h = 720;
-    try
-        fig.Units = 'pixels';
-        cur_h = max(fig.Position(4), 720);
-    catch
-    end
-    zef_ui_apply_size(fig, 640, cur_h, 560, cur_h);
+    zef_ui_apply_size(fig, 560, 720, 500, 640);
 elseif contains(lname, 'preconditioned') || contains(lname, 'iterative relaxation')
     zef_ui_apply_size(fig, 1320, 540, 1080, 460);
 elseif contains(lname, 'strip tool')
@@ -384,7 +375,7 @@ elseif contains(lname, 'find synthetic source (legacy)')
 elseif contains(lname, 'source patch')
     zef_ui_apply_size(fig, 700, 440, 580, 400);
 elseif contains(lname, 'find synthetic') && contains(lname, 'roi')
-    zef_ui_apply_size(fig, 660, 660, 560, 600);
+    zef_ui_apply_size(fig, 680, 540, 560, 480);
 elseif contains(lname, 'filter tool')
     zef_ui_apply_size(fig, 720, 860, 700, 720);
     try
@@ -393,6 +384,8 @@ elseif contains(lname, 'filter tool')
     end
 elseif contains(lname, 'sesame')
     zef_ui_apply_size(fig, 540, 560, 520, 520);
+elseif contains(lname, 'dynamical plot') || contains(lname, 'plot queue')
+    zef_ui_apply_size(fig, 720, 560, 600, 480);
 end
 
 end
@@ -415,7 +408,8 @@ tf = contains(lname, 'dti conductivity') || contains(lname, 'nse tool') ...
     || contains(lname, 'gm modeling') || contains(lname, 'ias roi') ...
     || contains(lname, 'multiresolution') ...
     || contains(lname, 'source patch') || contains(lname, 'source (legacy)') ...
-    || contains(lname, 'source roi') || contains(lname, 'strip tool');
+    || contains(lname, 'source roi') || contains(lname, 'strip tool') ...
+    || contains(lname, 'find synthetic') && contains(lname, 'roi');
 
 end
 
@@ -530,7 +524,21 @@ try
             catch
             end
         end
-        zef_ui_bind_min_size(fig, 600, min(fig.Position(4), 790));
+        zef_ui_bind_min_size(fig, 600, min(fig.Position(4), 640));
+    elseif y > pad + 20
+        delta = floor(y - pad);
+        new_h = max(520, H - delta);
+        delta = H - new_h;
+        if delta > 8
+            fig.Position(4) = new_h;
+            for i = 1:numel(hs)
+                try
+                    hs(i).Position(2) = hs(i).Position(2) - delta;
+                catch
+                end
+            end
+            zef_ui_bind_min_size(fig, 600, min(new_h, 560));
+        end
     end
 catch
 end
@@ -555,6 +563,17 @@ if contains(lname, 'mesh visualization') || contains(lname, 'segmentation tool')
 end
 try
     if ~isempty(findall(fig, 'Tag', 'zef_ui_root'))
+        return
+    end
+catch
+end
+% Modern App Designer uifigures manage their own layout with uigridlayout
+% and AutoResizeChildren.  Applying the legacy GUIDE proportional-scaling
+% callback destroys their responsive layout and reintroduces clipping and
+% wasted space.  Skip the recapture for uifigures so the tool-specific
+% layout or the App Designer grid remains in control.
+try
+    if matlab.ui.internal.isUIFigure(fig)
         return
     end
 catch
@@ -1056,6 +1075,25 @@ try
             pp = pans(i).Position;
             remain = max(160, fw - gp(1) - 12);
             pans(i).Position(3) = min(max(pp(3), 280), remain);
+        end
+    end
+    % Dropdowns that live inside panels must not be wider than the panel.
+    dds = findall(fig, 'Type', 'uidropdown');
+    for i = 1:numel(dds)
+        dd = dds(i);
+        try
+            pan = ancestor(dd, 'uipanel');
+            if isempty(pan) || ~isscalar(pan) || ~isgraphics(pan) || ~strcmpi(char(pan.Type), 'uipanel')
+                continue
+            end
+            pp = getpixelposition(pan, true);
+            p = dd.Position;
+            max_w = max(40, pp(3) - p(1) - 12);
+            max_w = min(max_w, max(40, fw - 16 - (pp(1) + p(1))));
+            if p(3) > max_w
+                dd.Position = [p(1) p(2) max_w p(4)];
+            end
+        catch
         end
     end
 catch

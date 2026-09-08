@@ -881,25 +881,27 @@ for i = 1:3
             ic.Position = [x, body_y + max(0, (body_h - 28) / 2), 28, 28];
             ic.BackgroundColor = theme.color.panel;
             try
-                ikey = [i, 28];
+                ikey = [i, 28, 22];
                 prev = getappdata(ic, 'ZefStatusIconKey');
                 if ~isequal(prev, ikey)
                     if i == 1
                         boxc = zef_ui_roundrect(28, 28, 6, theme.color.panelAlt, ...
                             theme.color.border, theme.color.panel);
-                        ink = zef_ui_icons(icon_keys{i}, 16, theme.color.text, theme.color.panelAlt);
+                        ink = zef_ui_icons(icon_keys{i}, 20, theme.color.text, theme.color.panelAlt);
                         if ~isempty(ink)
-                            r0 = 6; c0 = 6;
-                            boxc(r0:r0 + 15, c0:c0 + 15, :) = ink;
+                            r0 = 4; c0 = 4;
+                            ih = min(20, size(ink, 1));
+                            iw = min(20, size(ink, 2));
+                            boxc(r0:r0 + ih - 1, c0:c0 + iw - 1, :) = ink(1:ih, 1:iw, :);
                         end
                         ic.CData = boxc;
                     else
-                        ink = zef_ui_icons(icon_keys{i}, 18, theme.color.text, theme.color.panel);
+                        ink = zef_ui_icons(icon_keys{i}, 22, theme.color.text, theme.color.panel);
                         full = repmat(reshape(theme.color.panel, 1, 1, 3), 28, 28);
                         if ~isempty(ink)
-                            r0 = 5; c0 = 5;
-                            ih = min(18, size(ink, 1));
-                            iw = min(18, size(ink, 2));
+                            r0 = 3; c0 = 3;
+                            ih = min(22, size(ink, 1));
+                            iw = min(22, size(ink, 2));
                             full(r0:r0 + ih - 1, c0:c0 + iw - 1, :) = ink(1:ih, 1:iw, :);
                         end
                         ic.CData = full;
@@ -921,7 +923,7 @@ for i = 1:3
             cnt.Position = [x + 36, body_y + max(0, (body_h - 28) / 2), max(36, wcol - 42), 28];
             try
             cnt.FontUnits = 'pixels';
-            cnt.FontSize = 24;
+            cnt.FontSize = 16;
             catch
             end
         end

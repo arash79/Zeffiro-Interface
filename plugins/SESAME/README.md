@@ -31,10 +31,9 @@ Writes: `zef.reconstruction` (cell of 3-component source vectors; dipoles placed
 
 | Profile | Path |
 |---------|------|
-| `multicompartment_head` | **not in this INI** |
-| `_legacy`, `_nse` | **not in those INIs** |
-| asteroid_radar | Inverse tools → **SESAME** |
-| asteroid_gravity | Inverse tools → **SESAME** (INI row has a space after the comma: `SESAME, inverse_tools, SESAME_App_run`) |
+| `multicompartment_head` | Inverse tools → **SESAME** |
+| `_legacy`, `_nse` | Inverse tools → **SESAME** |
+| asteroid_radar / asteroid_gravity | Inverse tools → **SESAME** |
 
 INI callback: `SESAME_App_run` (script). Window title: `ZEFFIRO Interface: SESAME App`.
 

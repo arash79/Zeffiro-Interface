@@ -2,7 +2,7 @@
 
 Object-oriented EEG/MEG (and related) inverse solvers. Each `@*Inverter` implements at least `invert` and inherits band-pass, frames, and SNR handling from `inverse.CommonInverseParameters`.
 
-This is the **programmable / cluster** track, also reached from four Inverse-tools **(class solver)** dialogs. Other Inverse-tools menus still call **legacy** functions under `plugins/`. Both write `zef.reconstruction`. Why the methods exist mathematically: [docs/methods.md](../docs/methods.md).
+This is the **programmable / cluster** track, also reached from Inverse-tools **(class solver)** dialogs. Other Inverse-tools menus still call **legacy** functions under `plugins/`. Both write `zef.reconstruction`. Why the methods exist mathematically: [docs/methods.md](../docs/methods.md).
 
 Discovery is **not** a folder scan: `utilities.cluster.inverse_method_registry` maps string ids → class names.
 
@@ -67,7 +67,7 @@ Full list: `utilities.cluster.inverse_method_registry`. GUI Inverse-tools button
 | Track | Entry | Implementation |
 |-------|-------|------------------|
 | Class / cluster | `zef_inverse_run` → `dispatch_inverse` | `@*Inverter` here |
-| Class-solver Inverse tools | eLORETA / UKF-NMM / HALpR / Group Lasso **(class solver)** → `zef_open_class_inverse` → `zef_inverse_run` | same `@*Inverter` classes |
+| Class-solver Inverse tools | **(class solver)** menus → `zef_open_class_inverse` → `zef_inverse_run` | same `@*Inverter` classes |
 | Legacy GUI | other Inverse-tools menus | `plugins/*` iterations |
 | Tests | `+tests` | ClassVsLegacy, ELORETA*, EndToEndSynthetic, ClassInverseDialog, … |
 

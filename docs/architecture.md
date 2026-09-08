@@ -6,7 +6,7 @@ If you have not run the software yet, start with [getting-started.md](getting-st
 
 ## How a session is wired
 
-One struct, `zef`, holds the project. Most GUI Inverse-tools menus call `zef_*` plugin start scripts that mutate that struct. Four **(class solver)** menus open `zef_open_class_inverse` and call `zef_inverse_run`. Scripts can call the same `zef_*` names, or the class path `zef_inverse_run` directly.
+One struct, `zef`, holds the project. Inverse-tools menus without **(class solver)** in the label call `zef_*` plugin start scripts that mutate that struct. Menus labelled **(class solver)** open `zef_open_class_inverse` and call `zef_inverse_run`. Scripts can call the same `zef_*` names, or the class path `zef_inverse_run` directly.
 
 ```text
 User / GUI / script
@@ -18,8 +18,8 @@ User / GUI / script
         +-- src/sensors       attach electrodes / coils
         +-- src/forward       FEM → zef.L
         +-- plugins/*         Inverse-tools / domain GUI
-              most → legacy *_iteration  ─────────────────┐
-              four (class solver) → zef_inverse_run       │
+              legacy menus → *_iteration  ────────────────┐
+              (class solver) → zef_inverse_run            │
         +-- src/inverse                                   │
               zef_inverse_run → utilities.cluster         │  both write
                     → inverse.*Inverter                   │  zef.reconstruction
@@ -69,7 +69,8 @@ Zeffiro-Interface/
 ├── documentation/           LaTeX scientific manual
 ├── docs/                    Architecture and developer guides
 ├── external/                Optional git submodules
-└── scripts/                 Maintainer tools (not on MATLAB path)
+├── scripts/                 Maintainer tools (not on MATLAB path)
+└── website/                 Optional static homepage (not on MATLAB path)
 ```
 
 `src/app` is **not** `+core`. `plugins/` is **not** a MATLAB `+package`. `inverse.gmm` / `inverse.kf` are **not** GUI plugins.
@@ -85,7 +86,7 @@ zeffiro_interface
   → import anatomy (src/io) + sensors
   → src/mesh (Create FEM mesh)
   → src/forward (zef.L)
-  → inverse: plugins/* (legacy iterations, or four class-solver dialogs)
+  → inverse: plugins/* (legacy iterations, or (class solver) dialogs)
              OR  zef_inverse_run → inverse.*Inverter
   → src/gui/plot + src/visualization
 ```
@@ -132,13 +133,13 @@ Session state is the struct `zef`, usually in the base workspace. GUI widgets ar
 
 Profile `zeffiro_plugins.ini` CSV: `label, parent_menu_tag, callback`. Parent tags: `inverse_tools`, `forward_tools`, `multi_tools`, `settings`. `zef_plugin` appends `; zef_ui_ready_new_windows; zef_update;`.
 
-Class inverse ids are **not** in that INI; they are in `utilities.cluster.inverse_method_registry`. Head-profile INIs do list four **callbacks** (`zef_eloreta_start`, …) that open `zef_open_class_inverse` rather than a legacy iteration.
+Class inverse ids are **not** in that INI; they are in `utilities.cluster.inverse_method_registry`. Profile INIs list **(class solver)** callbacks (`zef_eloreta_start`, `zef_mne_class_start`, …) that open `zef_open_class_inverse` rather than a legacy iteration.
 
 Retired directory names (`tools/plugins`, `src/core`, `src/gui/helpers`, `src/auxiliary`, `+plugins`) and the removed `plugins/GithubPusher` helper must stay absent from git. `tests.smoke.ArchitectureLayoutTest` fails if they reappear. A local leftover copy on disk is not part of the published tree and is not on the MATLAB path.
 
 ## Known constraints
 
-- Dual inverse tracks stay separate ([ADR-002](adr/ADR-002-dual-inverse-tracks.md)). Inverse-tools buttons are not class inverters except the four labelled **(class solver)** entries.
+- Dual inverse tracks stay separate ([ADR-002](adr/ADR-002-dual-inverse-tracks.md)). Inverse-tools buttons are not class inverters except entries labelled **(class solver)**.
 - `preconditioner_tolerance` / `cholinc_tol` are stored and unused. GPU PCG is Jacobi; CPU is SSOR or no-fill `ichol`. MEG and EIT copy those loops instead of calling `zef_transfer_matrix` ([conventions.md](conventions.md)).
 - Buried CEM and PEM EIT have no solver; they error ([upstream.md](upstream.md)).
 - Default Forward tools still offer several synthetic-source windows (current, legacy, patch, ROI). That overlap is supported, not accidental.

@@ -12,7 +12,7 @@ function zef = zef_dataBank_exportButtonPress(zef)
 %   object, tries load(data.Properties.Source) — the Source lives on
 %   data.data for a matfile payload). Otherwise save(..., '-struct',
 %   'tree') of zef.dataBank.tree. Tree exportMenu is a separate stub
-%   ('sorry, this is not implemented,yet') and does not call this.
+%   and does not call this.
 %
 %   zef = zef_dataBank_exportButtonPress(zef)
 %

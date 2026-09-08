@@ -38,16 +38,16 @@ f = uifigure( ...
     'WindowStyle', 'normal', ...
     'Resize', 'on', ...
     'Color', theme.color.bg, ...
-    'Position', [120 120 420 248], ...
+    'Position', [120 120 460 340], ...
     'Visible', 'off');
 try
     zef_window_manager('standalone', f);
 catch
 end
 
-gl = uigridlayout(f, [6 1]);
+gl = uigridlayout(f, [8 1]);
 gl.Tag = 'zef_ui_root';
-gl.RowHeight = {36, 'fit', 'fit', 'fit', 'fit', 36};
+gl.RowHeight = {36, 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 36};
 gl.Padding = [22 18 22 18];
 gl.RowSpacing = 8;
 gl.BackgroundColor = theme.color.bg;
@@ -60,6 +60,31 @@ uilabel(gl, 'Text', 'Forward and inverse interface for complex geometries.', ...
     'WordWrap', 'on');
 uilabel(gl, 'Text', ['Version: ' ver_str], ...
     'FontColor', theme.color.textMuted, 'HorizontalAlignment', 'center');
+uilabel(gl, 'Text', 'Lead contact: Sampsa Pursiainen', ...
+    'FontColor', theme.color.text, 'HorizontalAlignment', 'center', ...
+    'WordWrap', 'on');
+contact = uieditfield(gl, 'text', ...
+    'Value', 'sampsa.pursiainen@tuni.fi', ...
+    'Editable', 'off', ...
+    'HorizontalAlignment', 'center', ...
+    'FontColor', theme.color.text, ...
+    'BackgroundColor', theme.color.bg, ...
+    'Tag', 'zef_about_contact');
+try
+    contact.Layout.Row = 5;
+    contact.Layout.Column = 1;
+catch
+end
+link = uibutton(gl, 'Text', 'github.com/sampsapursiainen/zeffiro_interface', ...
+    'Tag', 'zef_about_link', ...
+    'ButtonPushedFcn', @(src, ~) web('https://github.com/sampsapursiainen/zeffiro_interface', '-browser'));
+try
+    link.Layout.Row = 6;
+    link.Layout.Column = 1;
+    link.FontColor = theme.color.accent;
+    link.BackgroundColor = theme.color.bg;
+catch
+end
 uilabel(gl, 'Text', 'Copyright © 2018–2026 Sampsa Pursiainen & ZI Development Team', ...
     'FontColor', theme.color.textMuted, 'HorizontalAlignment', 'center', ...
     'WordWrap', 'on');
@@ -107,14 +132,7 @@ try
 catch
 end
 try
-    zef_ui_bind_min_size(f, 360, 220);
-catch
-end
-try
-    setappdata(f, 'ZefMaxSize', [640, 360]);
-    if isprop(f, 'MaxSize')
-        f.MaxSize = [640, 360];
-    end
+    zef_ui_bind_min_size(f, 400, 300);
 catch
 end
 try

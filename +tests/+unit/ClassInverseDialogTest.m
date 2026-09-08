@@ -1,10 +1,32 @@
 classdef ClassInverseDialogTest < matlab.unittest.TestCase
-%CLASSINVERSEDIALOGTEST  eLORETA / UKF-NMM dialogs expose method parameters.
+%CLASSINVERSEDIALOGTEST  Class-solver parameter dialogs expose method controls.
 
     properties
         Figures = gobjects(0)
         HadZef = false
         OldZef = []
+        HadBaseZef = false
+        OldBaseZef = []
+    end
+
+    methods (TestClassSetup)
+        function setupPath(testCase)
+            testCase.HadBaseZef = evalin('base', 'exist(''zef'',''var'')') == 1;
+            if testCase.HadBaseZef
+                testCase.OldBaseZef = evalin('base', 'zef');
+            end
+            zeffiro_interface('start_mode', 'nodisplay', 'zeffiro_restart', true);
+        end
+    end
+
+    methods (TestClassTeardown)
+        function restoreBaseZef(testCase)
+            if testCase.HadBaseZef
+                assignin('base', 'zef', testCase.OldBaseZef);
+            else
+                evalin('base', 'clear zef');
+            end
+        end
     end
 
     methods (TestMethodSetup)
@@ -69,11 +91,111 @@ classdef ClassInverseDialogTest < matlab.unittest.TestCase
             testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_evolution_prior_model'));
         end
 
+        function mneDialogHasMethodControls(testCase)
+            zef = evalin('base', 'zef');
+            zef = zef_mne_class_window(zef);
+            fig = zef.h_class_inverse_fig;
+            testCase.Figures(end+1) = fig; %#ok<AGROW>
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_ui_root'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_initial_prior_steering_db'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_inv_snr'));
+        end
+
+        function iasDialogHasMethodControls(testCase)
+            zef = evalin('base', 'zef');
+            zef = zef_ias_class_window(zef);
+            fig = zef.h_class_inverse_fig;
+            testCase.Figures(end+1) = fig; %#ok<AGROW>
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_ui_root'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_method_type'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_hyperprior'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_hyperprior_mode'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_n_map_iterations'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_hyperprior_tail_length_db'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_hyperprior_weight'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_amplitude_db'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_prior_over_measurement_db'));
+        end
+
+        function ramusDialogHasMethodControls(testCase)
+            zef = evalin('base', 'zef');
+            zef = zef_ramus_class_window(zef);
+            fig = zef.h_class_inverse_fig;
+            testCase.Figures(end+1) = fig; %#ok<AGROW>
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_ui_root'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_method_type'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_hyperprior'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_hyperprior_mode'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_n_map_iterations'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_number_of_multiresolution_levels'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_sparsity_factor'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_number_of_decompositions'));
+        end
+
+        function csmDialogHasMethodControls(testCase)
+            zef = evalin('base', 'zef');
+            zef = zef_csm_class_window(zef);
+            fig = zef.h_class_inverse_fig;
+            testCase.Figures(end+1) = fig; %#ok<AGROW>
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_ui_root'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_method_type'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_SBL_number_of_iterations'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_theta0'));
+        end
+
+        function kalmanDialogHasMethodControls(testCase)
+            zef = evalin('base', 'zef');
+            zef = zef_kalman_class_window(zef);
+            fig = zef.h_class_inverse_fig;
+            testCase.Figures(end+1) = fig; %#ok<AGROW>
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_ui_root'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_method_type'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_evolution_prior_model'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_number_of_ensembles'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_use_smoothing'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_smoother_type'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_standardization_exponent'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_evolution_prior_db'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_initial_prior_steering_db'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_number_of_noise_steps'));
+        end
+
+        function beamformerDialogHasMethodControls(testCase)
+            zef = evalin('base', 'zef');
+            zef = zef_beamformer_class_window(zef);
+            fig = zef.h_class_inverse_fig;
+            testCase.Figures(end+1) = fig; %#ok<AGROW>
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_ui_root'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_method_type'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_cov_reg_parameter'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_leadfield_reg_parameter'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_leadfield_reg_type'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_leadfield_normalization'));
+        end
+
+        function dipolescanDialogHasMethodControls(testCase)
+            zef = evalin('base', 'zef');
+            zef = zef_dipolescan_class_window(zef);
+            fig = zef.h_class_inverse_fig;
+            testCase.Figures(end+1) = fig; %#ok<AGROW>
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_ui_root'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_method_type'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_reg_type'));
+            testCase.verifyNotEmpty(findall(fig, 'Tag', 'zef_inv_reg_parameter'));
+        end
+
         function pluginStartNamesResolve(testCase)
             testCase.verifyNotEmpty(which('zef_eloreta_start'));
             testCase.verifyNotEmpty(which('zef_ukfnmm_start'));
             testCase.verifyNotEmpty(which('zef_halpr_start'));
             testCase.verifyNotEmpty(which('zef_grouplasso_start'));
+            testCase.verifyNotEmpty(which('zef_mne_class_start'));
+            testCase.verifyNotEmpty(which('zef_ias_class_start'));
+            testCase.verifyNotEmpty(which('zef_ramus_class_start'));
+            testCase.verifyNotEmpty(which('zef_csm_class_start'));
+            testCase.verifyNotEmpty(which('zef_kalman_class_start'));
+            testCase.verifyNotEmpty(which('zef_beamformer_class_start'));
+            testCase.verifyNotEmpty(which('zef_dipolescan_class_start'));
         end
     end
 end

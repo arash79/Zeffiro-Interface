@@ -19,6 +19,7 @@ classdef ClusterRunnerTest < matlab.unittest.TestCase
             if ~isfolder(tmp_dir)
                 mkdir(tmp_dir);
             end
+            testCase.addTeardown(@() local_rmdir(tmp_dir));
             bundle_path = fullfile(tmp_dir, "bundle.mat");
             result_path = fullfile(tmp_dir, "result.mat");
             save(bundle_path, "bundle");
@@ -30,4 +31,10 @@ classdef ClusterRunnerTest < matlab.unittest.TestCase
         end
     end
 
+end
+
+function local_rmdir(tmp_dir)
+if isfolder(tmp_dir)
+    rmdir(tmp_dir, "s");
+end
 end

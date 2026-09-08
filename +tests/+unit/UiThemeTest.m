@@ -8,6 +8,28 @@ classdef UiThemeTest < matlab.unittest.TestCase
 
     properties
         Figures = gobjects(0)
+        HadBaseZef = false
+        OldBaseZef = []
+    end
+
+    methods (TestClassSetup)
+        function setupPath(testCase)
+            testCase.HadBaseZef = evalin('base', 'exist(''zef'',''var'')') == 1;
+            if testCase.HadBaseZef
+                testCase.OldBaseZef = evalin('base', 'zef');
+            end
+            zeffiro_interface('start_mode', 'nodisplay', 'zeffiro_restart', true);
+        end
+    end
+
+    methods (TestClassTeardown)
+        function restoreBaseZef(testCase)
+            if testCase.HadBaseZef
+                assignin('base', 'zef', testCase.OldBaseZef);
+            else
+                evalin('base', 'clear zef');
+            end
+        end
     end
 
     methods (TestMethodTeardown)
@@ -510,7 +532,8 @@ classdef UiThemeTest < matlab.unittest.TestCase
             uibutton(f, 'Text', 'Apply');
             zef_layout_form_dialog(f);
             testCase.verifyGreaterThanOrEqual(f.Position(3), 500);
-            testCase.verifyGreaterThanOrEqual(f.Position(4), 560);
+            testCase.verifyGreaterThanOrEqual(f.Position(4), 420);
+            testCase.verifyLessThanOrEqual(f.Position(4), 520);
         end
 
         function coreAppWindowsKeepDefaultSizeAndResize(testCase)
@@ -550,8 +573,15 @@ classdef UiThemeTest < matlab.unittest.TestCase
                 testCase.verifyNotEmpty(findall(f, 'Tag', 'zef_ui_root'));
                 f.Position(3:4) = cases{i, 5};
                 drawnow;
+                pause(0.25);
+                drawnow;
                 testCase.verifyNotEmpty(findall(f, 'Tag', 'zef_ui_root'));
-                testCase.verifyGreaterThan(f.Position(3), def(1) - 1);
+                % apply_size caps the first size to the work area. A later
+                % Position assignment is not forced back onto the screen;
+                % the window must not collapse below the work-area cap.
+                testCase.verifyGreaterThanOrEqual(f.Position(3), ...
+                    min(cases{i, 5}(1), work(3)) - 1, ...
+                    sprintf('%s large width', f.Name));
             end
         end
 

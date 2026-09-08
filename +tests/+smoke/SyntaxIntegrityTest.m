@@ -3,15 +3,11 @@ classdef SyntaxIntegrityTest < matlab.unittest.TestCase
 %
 %   A file that does not parse throws the instant anything reaches it, so a
 %   single stray character can silently disable a menu item or plot callback
-%   that no other test exercises. Nine such files shipped in this tree at
-%   once (a closing parenthesis pushed onto its own line in seven plotting
-%   and import helpers, a deleted "if" line in zef_print_meshes that left a
-%   surplus "end", and a documentation line in zef_nse_poisson_dynamic that
-%   lost its leading "%"), all of them introduced by an automated
-%   documentation/reformatting pass rather than by hand. checkcode is used
-%   rather than a runtime call because it needs neither a MATLAB path entry
-%   nor a resolvable function name, so scripts, class files and plugin
-%   helpers are all covered.
+%   that no other test exercises. checkcode is used rather than a runtime
+%   call because it needs neither a MATLAB path entry nor a resolvable
+%   function name, so scripts, class files and plugin helpers are all
+%   covered. The first two tests pin the checkcode parse-error ids this
+%   class relies on.
 %
 %   See also tests.smoke.ArchitectureLayoutTest.
 

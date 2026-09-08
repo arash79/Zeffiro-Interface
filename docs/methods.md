@@ -58,7 +58,7 @@ Both tracks read `zef.L` and measurements and write `zef.reconstruction`. They d
 | GUI Inverse tools | Menu → plugin Start | `plugins/*` iterations (`zef_KF`, `zef_ias_iteration`, …) |
 | Class / cluster | `zef_inverse_run(zef, id, …)` | `inverse.*Inverter` via `utilities.cluster.dispatch_inverse` |
 
-Four default-profile Inverse-tools entries are labelled **(class solver)** and *do* construct class inverters: eLORETA, UKF-NMM, HALpR, Group Lasso. Their Start button calls `zef_inverse_run` via `zef_open_class_inverse`. Every other Inverse-tools item still runs a legacy `plugins/*` iteration. Kalman DTI structural process-noise \(Q\) exists only on `plugins/Kalman`. See [ADR-002](adr/ADR-002-dual-inverse-tracks.md). Asteroid profiles do not register those four rows.
+Inverse-tools entries labelled **(class solver)** construct class inverters. Their Start button calls `zef_inverse_run` via `zef_open_class_inverse`. Every other Inverse-tools item still runs a legacy `plugins/*` iteration. Kalman DTI structural process-noise \(Q\) exists only on `plugins/Kalman`. See [ADR-002](adr/ADR-002-dual-inverse-tracks.md).
 
 Registry ids (case-insensitive) are listed in `utilities.cluster.inverse_method_registry`. Ids such as `"sloreta"` select **class** `CSMInverter` but do **not** by themselves set `method_type` to sLORETA — pass `MethodParams`.
 
@@ -67,7 +67,7 @@ Registry ids (case-insensitive) are listed in `utilities.cluster.inverse_method_
 | Registry id | Plugin | Typical use |
 |-------------|--------|-------------|
 | `legacy_music` | MUSIC | Subspace correlation map (SVD of a rank-1 window-mean covariance; see plugin README) |
-| `legacy_rap_music` | RAP-MUSIC | Recursively peeled MUSIC with RAP projector \(P=I-QQ'\), oriented \(a=L(r)u\); **no menu** on any profile; cluster/registry only |
+| `legacy_rap_music` | RAP-MUSIC | Recursively peeled MUSIC with RAP projector \(P=I-QQ'\), oriented \(a=L(r)u\); Inverse tools → **RAP-MUSIC** (`RAPMUSIC_start`) |
 | `legacy_sesame` | SESAME | Sequential Monte Carlo dipole sampling (asteroid menus; optional `external/SESAME`) |
 | `legacy_sl1` | Standardized L1 MAP | Hierarchical \(\ell_1\) via `quadprog` |
 | `legacy_relax` | Preconditioned relaxation | Block-preconditioned MAP iteration |

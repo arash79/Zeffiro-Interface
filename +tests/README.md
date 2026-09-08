@@ -20,7 +20,7 @@ Classes are listed by short name; fully qualified names are `tests.unit.ELORETAI
 | Class / file | Covers |
 |--------------|--------|
 | `ClassGMMOptTest` | `inverse.gmm` Mahalanobis/E-step opts vs original formulas; package isolation; `computeGMM` wrapper |
-| `ClassInverseDialogTest` | eLORETA / UKF-NMM class-solver dialogs expose method widgets; four `zef_*_start` names resolve |
+| `ClassInverseDialogTest` | Class-solver dialogs expose method widgets; class-solver `zef_*_start` names resolve |
 | `ClassVsLegacyTest` | `dspm` vs `legacy_csm` both nonempty recon — **not** numerical equality |
 | `CSMInverterSLoretaTest` | sLORETA / sLORETA 3D vs reference formulas; local `zef_inverse_run` dispatch |
 | `DipoleScanMNEOptTest` | Dipole Scan `pagesvd` vs SVD loop; MNE `W*f`; legacy MNE/dipole kernels; dispatch smoke |

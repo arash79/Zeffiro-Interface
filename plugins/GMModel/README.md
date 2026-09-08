@@ -31,7 +31,7 @@ Writes: `zef.GMModel.cluster_centres`, `dipole_moments`, `Param`. Does **not** o
 
 INI callback: `zef_GMModel_start`. Window title: `ZEFFIRO Interface: Gaussian Mixture Model tool`.
 
-`inverse.gmm` is unused from this GUI. The four **(class solver)** Inverse-tools entries call `zef_inverse_run`; this GMM window does not.
+`inverse.gmm` is unused from this GUI. Inverse-tools **(class solver)** entries call `zef_inverse_run`; this GMM window does not.
 
 ## Usage instructions
 

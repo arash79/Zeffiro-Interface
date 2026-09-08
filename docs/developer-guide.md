@@ -58,7 +58,7 @@ MATLAB does not hide `src/` internals (everything is on `genpath`). Ownership is
 
 ## How to add a class inverse method
 
-Most Inverse-tools menus still call `plugins/*` iterations. The programmable / cluster path is a class under `+inverse` plus a registry id. Four existing menus (eLORETA, UKF-NMM, HALpR, Group Lasso) already open a class dialog; do not point additional Inverse-tools Start buttons at a new class unless that product change is intended ([ADR-002](adr/ADR-002-dual-inverse-tracks.md)).
+Inverse-tools menus without **(class solver)** still call `plugins/*` iterations. The programmable / cluster path is a class under `+inverse` plus a registry id. Existing **(class solver)** menus already open a class dialog. Do not point a legacy Start button at a class inverter unless that product change is intended ([ADR-002](adr/ADR-002-dual-inverse-tracks.md)).
 
 1. Add `+inverse/@NewInverter/` with `classdef NewInverter < inverse.CommonInverseParameters`. Implement at least `invert`. Add `initialize` / `precompute` / `smoother` only if the frame loop needs them (`utilities.inverse.run_frame_loop` calls them when they exist).
 2. Register the id in `+utilities/+cluster/inverse_method_registry.m` (case-insensitive string → `execution_kind` `"class"` and `class_name` `"inverse.NewInverter"`).
@@ -81,7 +81,7 @@ Use this only when the menu should run `zef_inverse_run`, not a legacy `*_iterat
 
 1. Add `plugins/NewTool/zef_newtool_start.m` that calls `zef_tool_start(zef, 'zef_newtool_window', …)`.
 2. Add `zef_newtool_window.m` that fills `spec.method_id`, `spec.title`, `spec.method_fields`, then `zef = zef_open_class_inverse(zef, spec)`. Field structs: `name`, `label`, `kind` (`numeric` / `dropdown` / `checkbox`), `value`, `items`, `scope` (`method` → `MethodParams`, `zef` → session fields).
-3. Add a CSV row `Label (class solver),inverse_tools,zef_newtool_start` to each `profile/*/zeffiro_plugins.ini` that should show it. Asteroid profiles currently omit the four existing rows.
+3. Add a CSV row `Label (class solver),inverse_tools,zef_newtool_start` to each `profile/*/zeffiro_plugins.ini` that should show it.
 4. Do not reimplement the frame loop in the plugin folder. The dialog’s Start already calls `zef_inverse_run`.
 
 `zef_open_class_inverse` lives in `src/gui/open/`. It requires `zef.L` and `zef.measurements` before invert. Widget tags are `zef_inv_<name>` (used by `tests.unit.ClassInverseDialogTest`).

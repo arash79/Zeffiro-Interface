@@ -38,10 +38,12 @@ If a folder README and `architecture.md` disagree, treat **implementation plus t
 
 The LaTeX manual under `documentation/` may lag the code. Folder READMEs and MATLAB `help` win for GUI paths and signatures.
 
+The optional project homepage under [`website/`](../website/) copies these guides into its Docs section at build time. Edit files here, not the generated `website/content/docs/` copies.
+
 ## Notes that bite newcomers
 
 - `src/app` is not `+core`. `plugins/` is not a `+package`. `inverse.gmm` / `inverse.kf` are not GUI plugins.
-- Dual inverse tracks are intentional ([ADR-002](adr/ADR-002-dual-inverse-tracks.md)): most Inverse-tools menus still call legacy `plugins/*` iterations; four **(class solver)** menus and `zef_inverse_run` construct `inverse.*Inverter`.
+- Dual inverse tracks are intentional ([ADR-002](adr/ADR-002-dual-inverse-tracks.md)): Inverse-tools menus without **(class solver)** still call legacy `plugins/*` iterations; **(class solver)** menus and `zef_inverse_run` construct `inverse.*Inverter`.
 - `location_unit` is `1` mm, `2` cm, `3` m (Mesh tool labels in `zef_mesh_tool`).
 - `<tag>_sources` Activity: `-1` Bounding box / PML, `0` Inactive, `1` Constrained field, `2` Unconstrained field, `3` Active surface. Source placement uses `{1, 2}` only — `3` is **not** PML.
 - Electrodes: `zef.sensors` is `N×3` (PEM) or `N×6` (CEM). FEM cores see PEM as snapped xyz in metres, and CEM as a **4-column index table** from `zef_attach_sensors_volume` — not metres. Details: [conventions.md](conventions.md).

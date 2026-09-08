@@ -2,7 +2,7 @@ function zef = zef_open_dataBank(zef)
 %ZEF_OPEN_DATABANK  Build the Data Bank window and wire buttons.
 %
 %   Zeffiro Interface.
-%   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
+%   Copyright 2018- Sampsa Pursiainen & ZI Development Team
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
@@ -13,6 +13,11 @@ function zef = zef_open_dataBank(zef)
 %
 
 zef.dataBank.app=zef_dataBank_app;
+
+try
+    setappdata(zef.dataBank.app.DataBank, 'ZefDataBankApp', zef.dataBank.app);
+catch
+end
 
 zef = zef_dataBank_init(zef);
 
@@ -58,7 +63,8 @@ zef.dataBank.app.exportButton.ButtonPushedFcn='zef_dataBank_exportButtonPress;';
 zef.dataBank.app.loadMenu.MenuSelectedFcn='zef.dataBank.loadParents=false; zef_dataBank_getHashForMenu;zef_dataBank_setData;';
 zef.dataBank.app.loadwithparentsMenu.MenuSelectedFcn='zef.dataBank.loadParents=true; zef_dataBank_getHashForMenu;zef_dataBank_setData;';
 zef.dataBank.app.deleteMenu.MenuSelectedFcn='zef.dataBank.selectMultiple=false; zef_dataBank_getHashForMenu; zef.dataBank.tree=zef_dataBank_delete(zef.dataBank.tree, zef.dataBank.hash,zef.dataBank.save2disk); zef_dataBank_refreshTree,   zef.dataBank.selectMultiple=false;';
-zef.dataBank.app.exportMenu.MenuSelectedFcn="disp('sorry, this is not implemented,yet')";
+zef.dataBank.app.exportMenu.MenuSelectedFcn = ...
+    "disp('Tree-menu export is not implemented. Use the Export button to save a node or the whole tree.')";
 zef.dataBank.app.modifyMenu.MenuSelectedFcn=strcat('zef.dataBank.selectMultiple=true;', 'zef_dataBank_getHashForMenu;', ...
     'zef.dataBank.workingHashes=zef_dataBank_hashToWorkingSpace(zef.dataBank.hash, zef.dataBank.workingHashes);', ...
     '[zef.dataBank.app.currentTable.Data, zef.dataBank.app.currentTable.ColumnName]=zef_dataBank_WorkingSpaceInfo(zef.dataBank.tree, zef.dataBank.workingHashes);');
@@ -68,7 +74,7 @@ zef.dataBank.app.showinformationMenu.MenuSelectedFcn='zef_dataBank_getHashForMen
 zef.dataBank.app.showworkingHashes.ButtonPushedFcn = '[zef.dataBank.app.currentTable.Data, zef.dataBank.app.currentTable.ColumnName]=zef_dataBank_WorkingSpaceInfo(zef.dataBank.tree, zef.dataBank.workingHashes);';
 zef.dataBank.app.loadMenuData.MenuSelectedFcn='zef.dataBank.loadParents=false; zef_dataBank_getHashForMenu;zef_dataBank_setData;';
 zef.dataBank.app.loadwithparentsMenuData.MenuSelectedFcn='zef.dataBank.loadParents=true; zef_dataBank_getHashForMenu;zef_dataBank_setData;';
-zef.dataBank.app.showinformationMenuData.MenuSelectedFcn='zef_dataBank_getHashForTableMenu; disp(zef.dataBank.tree.(zef.dataBank.hash{1})); disp(zef.dataBank.tree.(zef.dataBank.hash{1}).data);';
+zef.dataBank.app.showinformationMenuData.MenuSelectedFcn='zef_dataBank_getHashForMenu; zef_dataBank_getHashForTableMenu; disp(zef.dataBank.tree.(zef.dataBank.hash{1})); disp(zef.dataBank.tree.(zef.dataBank.hash{1}).data);';
 zef.dataBank.app.deleteMenuData.MenuSelectedFcn=strcat('zef.dataBank.selectMultiple=false;', 'zef_dataBank_getHashForTableMenu;', ...
     'zef.dataBank.tree=zef_dataBank_delete(zef.dataBank.tree, zef.dataBank.hash, zef.dataBank.save2disk);','  zef_dataBank_refreshTree;', ...
     'zef.dataBank.selectMultiple=false;', ...
@@ -79,7 +85,13 @@ zef.dataBank.app.modifyMenuData.MenuSelectedFcn=strcat('zef.dataBank.selectMulti
     '[zef.dataBank.app.currentTable.Data, zef.dataBank.app.currentTable.ColumnName]=zef_dataBank_WorkingSpaceInfo(zef.dataBank.tree, zef.dataBank.workingHashes);');
 
 set(zef.dataBank.app.DataBank,'AutoResizeChildren','off');
-zef_set_size_change_function(zef.dataBank.app.DataBank,2);
+try
+    panels = findall(zef.dataBank.app.DataBank, 'Type', 'uipanel');
+    for zef_i = 1:numel(panels)
+        panels(zef_i).AutoResizeChildren = 'off';
+    end
+catch
+end
 % load all data and stuff
 
 if ~isfield(zef.dataBank, 'tree')
@@ -94,86 +106,187 @@ zef.dataBank.selectMultiple=false;
 [zef.dataBank.app.currentTable.Data, zef.dataBank.app.currentTable.ColumnName]=zef_dataBank_showCurrent(zef, zef.dataBank.app.Entrytype.Value);
 [zef.dataBank.app.DataTable.Data, zef.dataBank.app.DataTable.ColumnName, zef.dataBank.DataTableHashList]=zef_databank_showAll(zef.dataBank.tree, zef.dataBank.app.Entrytype.Value);
 
+% Hide off-screen legacy panels until the layout pass places them.
 try
-    btns = [zef.dataBank.app.addButton, zef.dataBank.app.showButton, ...
-        zef.dataBank.app.showcurrentButton, zef.dataBank.app.showworkingHashes];
-    for zef_i = 1:numel(btns)
-        p = btns(zef_i).Position;
-        p(1) = 8;
-        p(3) = 150;
-        btns(zef_i).Position = p;
-    end
+    zef.dataBank.app.importPanel.Visible = 'off';
+    zef.dataBank.app.mag2gragPanel.Visible = 'off';
     zef.dataBank.app.showworkingHashes.Tooltip = 'Show working hashes';
-    cb = zef.dataBank.app.combineButton;
-    lab = strtrim(char(string(cb.Text)));
-    need = max(150, 8 * numel(lab) + 20);
-    p = cb.Position;
-    p(3) = max(p(3), need);
-    cb.Position = p;
-    cb.Tooltip = lab;
+    zef.dataBank.app.combineButton.Tooltip = strtrim(char(string( ...
+        zef.dataBank.app.combineButton.Text)));
+catch
+end
+
+try
+    app = zef.dataBank.app;
+    zef_ui_apply_size(app.DataBank, 980, 640, 840, 520);
+    zef_ui_bind_min_size(app.DataBank, 840, 520);
+    zef_layout_data_bank(app.DataBank);
+catch
+end
+
+end
+
+function local_databank_app_resize(~, ~, prev, app)
+try
+    if isa(prev, 'function_handle')
+        prev(app.DataBank, []);
+    elseif (ischar(prev) || isstring(prev)) && strlength(prev) > 0
+        evalin('base', char(prev));
+    end
 catch
 end
 try
-    zef_ui_apply_size(zef.dataBank.app.DataBank, 1280, 640, 960, 500);
-    zef_ui_fit_dropdowns(zef.dataBank.app.DataBank);
+    local_databank_clamp_controls(app);
+catch
+end
+try
+    local_databank_fix_working_label(app);
+catch
+end
+end
+
+function local_databank_clamp_controls(app)
+if nargin < 1 || (~isstruct(app) && ~isobject(app)) || ~isprop(app, 'DataBank')
+    return
+end
+try
+    fig = app.DataBank;
+    fig.Units = 'pixels';
+    fw = fig.Position(3);
+
+    dd = app.FunctionsDropDown;
+    p = dd.Position;
+    dd.Position = [p(1) p(2) min(max(p(3), 220), max(80, fw - 16 - p(1))) p(4)];
+
+    cm = app.combineMenu;
+    p = cm.Position;
+    longest = 0;
     try
-        fig = zef.dataBank.app.DataBank;
-        fig.Units = 'pixels';
-        fw = fig.Position(3);
-        dd = zef.dataBank.app.FunctionsDropDown;
-        p = dd.Position;
-        dd.Position = [p(1) p(2) max(p(3), 220) p(4)];
-        cm = zef.dataBank.app.combineMenu;
-        p = cm.Position;
-        longest = 0;
-        try
-            items = cm.Items;
-            for zef_k = 1:numel(items)
-                longest = max(longest, numel(char(string(items{zef_k}))));
-            end
-        catch
+        items = cm.Items;
+        for zef_k = 1:numel(items)
+            longest = max(longest, numel(char(string(items{zef_k}))));
         end
-        need = max(p(3), min(520, 36 + 7 * max(longest, 24)));
-        extra = need - p(3);
-        if extra > 0
-            room = max(0, fw - 16 - (p(1) + p(3)));
-            grow = min(extra, room);
-            if grow > 0
-                cm.Position = [p(1) p(2) p(3) + grow p(4)];
-            end
-        end
-        try
-            pan = zef.dataBank.app.combinePanel;
-            pan.Units = 'pixels';
-            pp = pan.Position;
-            remain = max(160, fw - pp(1) - 12);
-            pan.Position(3) = min(max(pp(3), 280), remain);
-        catch
-        end
-        try
-            zef.dataBank.app.combineMenu.Tooltip = strjoin(string(zef.dataBank.app.combineMenu.Items), newline);
-        catch
-        end
-        cb = zef.dataBank.app.combineButton;
-        p = cb.Position;
-        lab = strtrim(char(string(cb.Text)));
-        need = max(p(3), min(220, 8 * numel(lab) + 24));
-        cb.Position = [p(1) p(2) need p(4)];
-        cb.Tooltip = lab;
     catch
     end
-    zef_set_size_change_function(zef.dataBank.app.DataBank, 2);
-    zef_ui_bind_min_size(zef.dataBank.app.DataBank, 960, 500);
+    need = max(p(3), min(520, 36 + 7 * max(longest, 24)));
     try
-        gs = findall(zef.dataBank.app.DataBank, 'Type', 'uigridlayout');
-        for zef_i = 1:numel(gs)
-            cw = gs(zef_i).ColumnWidth;
-            if iscell(cw) && numel(cw) >= 3
-                cw{end} = '1x';
-                gs(zef_i).ColumnWidth = cw;
-            end
-        end
+        pan = app.combinePanel;
+        pan.Units = 'pixels';
+        pp = pan.Position;
+        % Shrink the panel so it stays inside the figure.
+        remain = max(160, fw - pp(1) - 12);
+        pan.Position(3) = min(max(pp(3), 280), remain);
+        % The dropdown is inside the panel; account for both the figure edge
+        % and the panel's internal right edge.
+        max_cm_w = max(80, fw - 16 - (pp(1) + p(1)));
+        max_cm_w = min(max_cm_w, max(40, pp(3) - p(1) - 12));
+        need = min(need, max_cm_w);
     catch
+        need = min(need, max(80, fw - 16 - p(1)));
+    end
+    if need ~= p(3)
+        cm.Position = [p(1) p(2) need p(4)];
+    end
+    try
+        app.combineMenu.Tooltip = strjoin(string(app.combineMenu.Items), newline);
+    catch
+    end
+
+    cb = app.combineButton;
+    p = cb.Position;
+    lab = strtrim(char(string(cb.Text)));
+    need = max(p(3), min(220, 8 * numel(lab) + 24));
+    room = max(80, fw - 12 - p(1));
+    cb.Position = [p(1) p(2) min(need, room) p(4)];
+    cb.Tooltip = lab;
+catch
+end
+
+% Generic safety pass for any dropdown, button, spinner, or label that still
+% extends past the right edge.
+try
+    fig = app.DataBank;
+    fig.Units = 'pixels';
+    fw = fig.Position(3);
+    ctr = [findall(fig, 'Type', 'uidropdown'); findall(fig, 'Type', 'uibutton'); ...
+        findall(fig, 'Type', 'uispinner'); findall(fig, 'Type', 'uilabel')];
+    for zef_k = 1:numel(ctr)
+        try
+            if ~strcmpi(char(ctr(zef_k).Visible), 'on')
+                continue
+            end
+            gp = getpixelposition(ctr(zef_k), true);
+            if numel(gp) < 4
+                continue
+            end
+            over = (gp(1) + gp(3)) - (fw - 8);
+            if over > 0 && gp(3) > 40
+                p = ctr(zef_k).Position;
+                p(3) = max(40, p(3) - over);
+                ctr(zef_k).Position = p;
+            end
+        catch
+        end
+    end
+catch
+end
+end
+
+function local_databank_fix_working_label(app)
+
+if nargin < 1 || isempty(app)
+    return
+end
+try
+    lab = app.dataLabel;
+    tbl = app.currentTable;
+    tp = double(tbl.Position);
+    lp = double(lab.Position);
+    inner_h = inf;
+    try
+        pan = app.DataPanel;
+        inner_h = double(pan.Position(4)) - 26;
+    catch
+    end
+    top_need = max(lp(4), 22) + 4;
+    if isfinite(inner_h) && (tp(2) + tp(4) + top_need) > inner_h && tp(2) > 8
+        tbl.Position(4) = max(48, inner_h - top_need - tp(2));
+        tp = double(tbl.Position);
+    end
+    lab.Position = [tp(1), tp(2) + tp(4) + 4, max(lp(3), 90), max(lp(4), 22)];
+catch
+end
+try
+    dd = app.FunctionsDropDown;
+    fl = app.FunctionsLabel;
+    dp = double(dd.Position);
+    lp = double(fl.Position);
+    fl.Position = [max(8, dp(1) - lp(3) - 8), dp(2), lp(3), lp(4)];
+catch
+end
+try
+    fig = app.DataBank;
+    fig.Units = 'pixels';
+    fw = double(fig.Position(3));
+    ctr = [app.FunctionsDropDown; app.combineMenu; app.combineButton];
+    for i = 1:numel(ctr)
+        try
+            gp = getpixelposition(ctr(i), true);
+            over = (gp(1) + gp(3)) - (fw - 8);
+            if over > 0
+                ctr(i).Position(3) = max(40, ctr(i).Position(3) - over);
+            end
+        catch
+        end
+    end
+catch
+end
+try
+    if app.importPanel.Position(2) < 0
+        app.importPanel.Visible = 'off';
+    end
+    if app.mag2gragPanel.Position(2) < 0
+        app.mag2gragPanel.Visible = 'off';
     end
 catch
 end

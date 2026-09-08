@@ -783,4 +783,19 @@ h45 = uicontrol(...
 
 zef.strip_tool.h_encapsulation_thickness = h45;
 
+names = fieldnames(zef.strip_tool);
+for zef_i = 1:numel(names)
+    try
+        h = zef.strip_tool.(names{zef_i});
+        if ~isgraphics(h) || ~isvalid(h) || ~isprop(h, 'Tag')
+            continue
+        end
+        if strcmpi(char(h.Type), 'figure')
+            continue
+        end
+        h.Tag = names{zef_i};
+    catch
+    end
+end
+
 end

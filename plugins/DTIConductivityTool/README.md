@@ -41,9 +41,9 @@ Apply steps:
 
 | ItemsData | Label on the tool | What `zef_freesurfer_fa_to_conductivity` does |
 |-----------|-------------------|-----------------------------------------------|
-| 1 | Volume Fraction (Tuch et al.) | Mix extra-/intra-cellular σ, then σ_par = σ_iso(1+2 FA), σ_perp = σ_iso(1−FA) |
-| 2 | Effective Medium Theory | Tuch linear map σ = 0.844 (d − 0.124) with d_par = MD(1+2 FA) |
-| 3 | Direct Scaling | σ_par = scale(1+2 FA), σ_perp = scale(1−FA) |
+| 1 | Volume Fraction (Tuch et al.) | Mix extra-/intra-cellular σ, then σ_par = σ_iso(1+2 α), σ_perp = σ_iso(1−α) with α = Westin C_L(FA), not FA itself |
+| 2 | Effective Medium Theory | Tuch linear map σ = 0.844 (d − 0.124) with d_par = MD(1+2 α), d_perp = MD(1−α), α = C_L |
+| 3 | Direct Scaling | σ_par = scale(1+2 α), σ_perp = scale(1−α), α = C_L |
 
    Interpolation: **Nearest Neighbor** / **Trilinear** (stored id `'radius_average'`; 8-voxel `griddedInterpolant`, not a ball mean). The Radius spinner is unused.
 2. Select compartments under **Apply to compartments**.

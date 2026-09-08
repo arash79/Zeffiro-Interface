@@ -34,6 +34,7 @@ Shared **window chrome**: theme tokens, layout, docking, themed controls, and fi
 | `zef_ui_interact.m` | Pointer, hover, and press feedback for traditional chrome. |
 | `zef_ui_window_label.m` | Window title helper for themed tools. |
 | `zef_ui_tag_handles.m` | Tag widget handles after App export merge. |
+| `zef_ui_ensure_visible.m` | Grow a figure when controls overflow the client area (capped to the screen). Not a work-area clamp; that is `zef_ui_clamp_position`. |
 
 ### Layout functions (`zef_ui_ready` dispatch)
 
@@ -46,7 +47,14 @@ Shared **window chrome**: theme tokens, layout, docking, themed controls, and fi
 | `zef_layout_parcellation_tool.m` | Parcellation tool |
 | `zef_layout_filter_tool.m` | Filter tool two-column grid |
 | `zef_layout_fss.m` | Find synthetic source |
-| `zef_layout_form_dialog.m` | App Designer label-and-field option windows |
+| `zef_layout_fss_roi.m` | Find synthetic extended source (ROI) |
+| `zef_layout_strip_tool.m` | Strip tool |
+| `zef_layout_data_bank.m` | Data Bank |
+| `zef_layout_bank_tool.m` | Lead-field / reconstruction bank tools |
+| `zef_layout_lf_bank.m` | Multi lead field tool |
+| `zef_layout_dti_tool.m` | DTI conductivity tool |
+| `zef_layout_nse_tool.m` | NSE tool |
+| `zef_layout_source_tree.m` | Source tree tool |
 | `zef_layout_form_dialog.m` | App Designer label-and-field option windows |
 | `zef_layout_table_dialog.m` | Settings windows that are mostly a `uitable` |
 | `zef_layout_guide_window.m` / `zef_layout_guide_form.m` | Traditional `figure()` tools / compact GUIDE forms |
@@ -105,7 +113,7 @@ cdata = zef_ui_icons('forward', 20);
 zef_window_manager('init');    % standalone figures (R2025a+ factory is docked)
 ```
 
-`zef_ui_ready(h)` picks a layout from figure `Name` / `Tag` (Figure tool, Mesh visualization, Mesh tool, Segmentation, Parcellation, settings/profile/options dialogs, then a generic GUIDE form). Theme is always applied afterward. Waitbars (`Tag` `progress_bar`) and the hidden Menu tool skip the generic min-size inflate.
+`zef_ui_ready(h)` picks a layout from figure `Name` / `Tag` (Figure tool, Mesh visualization, Mesh tool, Segmentation, Parcellation, DTI, lead-field banks, Data Bank, strip/filter/NSE/source-tree, FSS/ROI, settings/profile/options dialogs, then a generic GUIDE form). Theme is always applied afterward. Waitbars (`Tag` `progress_bar`) and the hidden Menu tool skip the generic min-size inflate.
 
 ## Important notes
 

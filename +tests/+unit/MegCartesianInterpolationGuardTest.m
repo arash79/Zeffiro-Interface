@@ -19,8 +19,10 @@ classdef MegCartesianInterpolationGuardTest < matlab.unittest.TestCase
         end
 
         function testMegFemCallSitesGuardCartesian(testCase)
-            mag = fileread(fullfile("src", "forward", "lead_field", "zef_lead_field_meg_fem.m"));
-            grad = fileread(fullfile("src", "forward", "lead_field", "zef_lead_field_meg_grad_fem.m"));
+            root = fileparts(which("zeffiro_interface"));
+            testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
+            mag = fileread(fullfile(root, "src", "forward", "lead_field", "zef_lead_field_meg_fem.m"));
+            grad = fileread(fullfile(root, "src", "forward", "lead_field", "zef_lead_field_meg_grad_fem.m"));
             testCase.verifyTrue(contains(mag, "zef_require_meg_cartesian_interpolation"));
             testCase.verifyTrue(contains(grad, "zef_require_meg_cartesian_interpolation"));
         end

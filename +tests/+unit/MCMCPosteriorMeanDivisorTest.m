@@ -18,7 +18,9 @@ classdef MCMCPosteriorMeanDivisorTest < matlab.unittest.TestCase
         end
 
         function pluginUsesHelperAndPriorMeanInit(testCase)
-            src = fileread(fullfile("plugins", "HBSampler", "m", "zef_mcmc.m"));
+            root = fileparts(which("zeffiro_interface"));
+            testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
+            src = fileread(fullfile(root, "plugins", "HBSampler", "m", "zef_mcmc.m"));
             testCase.verifyTrue(contains(src, "zef_mcmc_posterior_mean_divisor"));
             testCase.verifyTrue(contains(src, "theta_init"));
             testCase.verifyFalse(contains(src, "theta{j} = theta0.*ones"));

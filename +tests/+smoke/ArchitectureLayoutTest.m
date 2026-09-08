@@ -6,7 +6,25 @@ classdef ArchitectureLayoutTest < matlab.unittest.TestCase
 %   src/sensors, src/visualization/colormaps, src/io, src/forward/solvers;
 %   that inverse.gmm / inverse.kf exist and plugins.ClassGMM / ClassKF do
 %   not; and that retired folders tools/plugins, src/core, src/gui/helpers,
-%   src/auxiliary, +plugins, and plugins/GithubPusher are absent.
+%   src/auxiliary, +plugins, and plugins/GithubPusher are absent, as are
+%   local dump folders, root screenshot helpers, and Untitled.mat.
+%   Startup must not invoke !git pull.
+
+    methods (TestClassSetup)
+        function setupPath(testCase)
+            zeffiro_interface('start_mode', 'nodisplay', 'zeffiro_restart', true);
+        end
+    end
+
+    methods (TestClassTeardown)
+        function cleanupPath(testCase)
+            try
+                zef_close_all;
+            catch
+            end
+            evalin('base', 'clear zef zef_data zef_i zef_j zef_k');
+        end
+    end
 
     methods (Test)
         function publicEntryPointsResolveToOwnedFolders(testCase)
@@ -63,6 +81,20 @@ classdef ArchitectureLayoutTest < matlab.unittest.TestCase
             testCase.verifyFalse(isfolder(fullfile(root, '+plugins')));
             testCase.verifyTrue(isfolder(fullfile(root, 'src', 'app')));
             testCase.verifyTrue(isfolder(fullfile(root, 'src', 'gui', 'chrome')));
+            testCase.verifyFalse(isfile(fullfile(root, 'scripts', 'zef_gui_audit.m')));
+            testCase.verifyFalse(isfile(fullfile(root, 'Untitled.mat')));
+            testCase.verifyFalse(isfile(fullfile(root, 'capture_main_windows.m')));
+            testCase.verifyFalse(isfile(fullfile(root, 'diagnose_layout.m')));
+            testCase.verifyFalse(isfolder(fullfile(root, 'gui_refine_output')));
+            testCase.verifyFalse(isfolder(fullfile(root, 'plugins', 'SensitivityTool')));
+        end
+
+        function startupDoesNotPullGit(testCase)
+            root = fileparts(which('zeffiro_interface'));
+            testCase.assumeNotEmpty(root);
+            src = fileread(fullfile(root, 'src', 'app', 'zef_start.m'));
+            testCase.verifyFalse(contains(src, '!git pull'));
+            testCase.verifyTrue(contains(src, 'Zeffiro:GitPullDisabled'));
         end
     end
 end

@@ -62,21 +62,23 @@ end
 try
     if contains(name, 'Mesh visualization')
         if numel(root.RowHeight) >= 2
-            bottom_share = '0.28x';
-            if H < 580
-                bottom_share = '0.26x';
-            elseif H > 720
-                bottom_share = '0.32x';
-            end
-            root.RowHeight = {'1x', bottom_share};
+            root.RowHeight = {'fit', '1x'};
         end
         leftg = findall(fig, 'Tag', 'zef_mv_left');
         if ~isempty(leftg)
-            leftg(1).RowHeight = {'fit', 'fit', '1x'};
+            if numel(leftg(1).RowHeight) >= 4
+                leftg(1).RowHeight = {'fit', 'fit', 'fit', '1x'};
+            else
+                leftg(1).RowHeight = {'fit', 'fit', '1x'};
+            end
         end
         clip = findall(fig, 'Tag', 'zef_mv_clip');
         actions = findall(fig, 'Tag', 'zef_mv_actions');
         scene = findall(fig, 'Tag', 'zef_mv_scene');
+        viewg = findall(fig, 'Tag', 'zef_mv_view');
+        if ~isempty(viewg)
+            viewg(1).RowHeight = repmat({26}, 1, numel(viewg(1).RowHeight));
+        end
         if ~isempty(clip)
             clip(1).RowHeight = {28, 28, 28, 28};
         end
@@ -96,10 +98,10 @@ try
             end
         end
     elseif contains(name, 'Segmentation')
-        header = 68;
-        footer = max(140, min(200, round(0.22 * H)));
+        header = 56;
+        footer = max(120, min(168, round(0.18 * H)));
         if H < 520
-            footer = 120;
+            footer = 108;
         end
         if numel(root.RowHeight) >= 3
             root.RowHeight = {header, '1x', footer};
@@ -141,40 +143,53 @@ try
         end
         right = findall(fig, 'Tag', 'zef_mesh_right');
         if ~isempty(right)
-            if H < 540
-                right(1).RowHeight = {'1x', 80, 36};
+            if numel(right(1).RowHeight) >= 4
+                if H < 540
+                    right(1).RowHeight = {20, 140, '1x', 36};
+                elseif H > 700
+                    right(1).RowHeight = {22, 260, '1x', 36};
+                else
+                    right(1).RowHeight = {22, 200, '1x', 36};
+                end
+            elseif H < 540
+                right(1).RowHeight = {140, '1x', 36};
             else
-                right(1).RowHeight = {'1x', 96, 36};
+                right(1).RowHeight = {200, '1x', 36};
             end
         end
         tbl = findall(fig, 'Tag', 'h_forward_simulation_table');
         if ~isempty(tbl)
             try
-                tbl(1).ColumnWidth = {200, '2.8x', '2.2x'};
+                tbl(1).ColumnWidth = {220, '2.6x', '2.0x'};
             catch
             end
         end
+    elseif contains(lower(name), 'databank') || contains(lower(name), 'data bank')
+        if numel(root.ColumnWidth) >= 2
+            left = max(200, min(260, round(0.22 * W)));
+            root.ColumnWidth = {left, '1x'};
+        end
+        top = findall(fig, 'Tag', 'zef_db_top');
+        if ~isempty(top)
+            if W < 880
+                top(1).ColumnWidth = {'1x', '1x', '1.5x'};
+            else
+                top(1).ColumnWidth = {'1.05x', '1x', '1.4x'};
+            end
+        end
     elseif contains(lower(name), 'nse tool')
-        sz = [1180, 951];
-        if isappdata(fig, 'ZefNseContent')
-            tmp = getappdata(fig, 'ZefNseContent');
-            if numel(tmp) >= 2
-                sz = tmp;
+        body = findall(fig, 'Tag', 'zef_nse_body');
+        if ~isempty(body)
+            if W < 1020
+                body(1).ColumnWidth = {'1x', '1x', 280};
+            else
+                body(1).ColumnWidth = {'1x', '1x', 320};
             end
         end
         try
-            if W >= sz(1) - 8
-                root.ColumnWidth = {'1x'};
-            else
-                root.ColumnWidth = {sz(1)};
-            end
-            if H >= sz(2) - 8
-                root.RowHeight = {'1x'};
-                root.Scrollable = 'off';
-            else
-                root.RowHeight = {sz(2)};
-                root.Scrollable = 'on';
-            end
+            root.RowHeight = {'1x'};
+            root.ColumnWidth = {'1x'};
+            root.Scrollable = 'on';
         catch
         end
     elseif isappdata(fig, 'ZefTableFitH') && numel(root.RowHeight) >= 2
@@ -197,16 +212,84 @@ try
             root.ColumnWidth = {'1x', '1x'};
         end
         leftg = findall(fig, 'Tag', 'zef_filter_left');
-        if ~isempty(leftg) && H < 720
-            leftg(1).RowHeight = {20, '1x', 28, 30, 30, 30, 20, '1x', 32, 36, 36};
-        elseif ~isempty(leftg)
-            leftg(1).RowHeight = {22, '1x', 32, 32, 32, 32, 22, '1x', 32, 36, 36};
+        if ~isempty(leftg)
+            if H < 560
+                leftg(1).RowHeight = {20, '1x', 64, 20, 112, 32};
+            else
+                leftg(1).RowHeight = {22, '1x', 72, 22, 140, 36};
+            end
         end
         rightg = findall(fig, 'Tag', 'zef_filter_right');
-        if ~isempty(rightg) && H < 720
-            rightg(1).RowHeight = {34, 34, 30, 24, 24, 24, 24, 30, 30, 30, 20, '1x', 30, 30, 34, 30};
-        elseif ~isempty(rightg)
-            rightg(1).RowHeight = {36, 36, 32, 26, 26, 26, 26, 32, 32, 32, 22, '1x', 32, 32, 36, 32};
+        if ~isempty(rightg)
+            if H < 560
+                rightg(1).RowHeight = {32, 24, 24, 24, 24, 28, 20, '1x', 32, 32};
+            else
+                rightg(1).RowHeight = {36, 26, 26, 26, 26, 32, 22, '1x', 36, 36};
+            end
+        end
+    elseif contains(lower(name), 'source tree')
+        if numel(root.RowHeight) >= 4
+            sig_h = 72;
+            if H < 600
+                sig_h = 64;
+            end
+            try
+                rh = root.RowHeight;
+                if numel(rh) >= 3
+                    rh{3} = sig_h;
+                    rh{4} = 40;
+                    root.RowHeight = rh;
+                end
+            catch
+            end
+        end
+    elseif contains(lower(name), 'leadfield processing') ...
+            || contains(lower(name), 'lead field processing') ...
+            || contains(lower(name), 'reconstruction tool')
+        if numel(root.RowHeight) >= 6
+            cur_h = 88;
+            if H < 480
+                cur_h = 72;
+            end
+            try
+                rh = root.RowHeight;
+                rh{2} = cur_h;
+                rh{3} = 36;
+                rh{6} = 44;
+                root.RowHeight = rh;
+            catch
+            end
+        end
+        foot = findall(fig, 'Tag', 'zef_bank_foot');
+        if ~isempty(foot)
+            try
+                n_col = numel(foot(1).ColumnWidth);
+                if contains(lower(name), 'reconstruction')
+                    foot(1).ColumnWidth = {'1x', 'fit', '1x'};
+                elseif W < 860 && n_col >= 11
+                    foot(1).ColumnWidth = {'1x', 92, 'fit', 'fit', 'fit', 64, 'fit', 64, 'fit', 96, '1x'};
+                elseif W < 860 && n_col >= 10
+                    foot(1).ColumnWidth = {'1x', 92, 'fit', 'fit', 'fit', 64, 'fit', 64, 96, '1x'};
+                elseif n_col >= 11
+                    foot(1).ColumnWidth = {'1x', 104, 'fit', 'fit', 'fit', 72, 'fit', 72, 'fit', 104, '1x'};
+                elseif n_col >= 10
+                    foot(1).ColumnWidth = {'1x', 104, 'fit', 'fit', 'fit', 72, 'fit', 72, 104, '1x'};
+                end
+            catch
+            end
+        end
+        cur = findall(fig, 'Tag', 'zef_bank_cur');
+        if ~isempty(cur)
+            try
+                n_btn = numel(findall(cur(1), 'Type', 'uibutton'));
+                n_btn = max(1, n_btn);
+                bw = 104;
+                if W < 720
+                    bw = 92;
+                end
+                cur(1).ColumnWidth = [{'1x'}, repmat({bw}, 1, n_btn), {'1x'}];
+            catch
+            end
         end
     elseif contains(lower(name), 'find synthetic source') ...
             && ~contains(lower(name), 'legacy')
@@ -265,6 +348,30 @@ try
         end
     end
 catch
+end
+
+local_reflow(fig);
+
+end
+
+function local_reflow(fig)
+
+gs = findall(fig, 'Type', 'uigridlayout');
+for i = 1:numel(gs)
+    try
+        cw = gs(i).ColumnWidth;
+        if ~isempty(cw)
+            gs(i).ColumnWidth = cw;
+        end
+    catch
+    end
+    try
+        rh = gs(i).RowHeight;
+        if ~isempty(rh)
+            gs(i).RowHeight = rh;
+        end
+    catch
+    end
 end
 
 end

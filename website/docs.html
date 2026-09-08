@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Docs — Zeffiro Interface</title>
+    <meta
+      name="description"
+      content="Zeffiro Interface documentation: getting started, conventions, methods, troubleshooting, and architecture from the repository docs/ folder."
+    />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+    <link rel="stylesheet" href="/src/css/main.css" />
+    <link rel="stylesheet" href="/src/css/docs.css" />
+  </head>
+  <body data-page="docs">
+    <div data-header></div>
+    <noscript>
+      <nav aria-label="Primary">
+        <a href="index.html">Overview</a>
+        <a href="features.html">Features</a>
+        <a href="docs.html">Docs</a>
+        <a href="community.html">Community</a>
+      </nav>
+      <p>Enable JavaScript to browse the documentation. Source files live in the repository docs/ folder.</p>
+    </noscript>
+    <main id="main" class="docs-page">
+      <button class="docs-nav-open" type="button" data-docs-open aria-expanded="false" aria-controls="docs-sidebar">
+        Documentation menu
+      </button>
+      <div class="docs-backdrop" data-docs-backdrop></div>
+      <div class="docs-shell">
+        <aside class="docs-sidebar" id="docs-sidebar">
+          <div class="docs-sidebar-head">
+            <p class="docs-sidebar-title">Docs</p>
+            <button class="docs-nav-close" type="button" data-docs-close aria-label="Close documentation menu">Close</button>
+          </div>
+          <div class="docs-search">
+            <label class="docs-search-label" for="docs-search">Search documentation</label>
+            <input id="docs-search" data-docs-search type="search" placeholder="Search docs" autocomplete="off" />
+            <div class="docs-results" data-docs-results hidden></div>
+          </div>
+          <nav class="docs-nav" data-docs-nav aria-label="Documentation"></nav>
+        </aside>
+        <div class="docs-main" data-docs-article></div>
+        <aside class="docs-toc" data-docs-toc aria-label="On this page"></aside>
+      </div>
+    </main>
+    <div data-footer></div>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script type="module" src="/src/js/boot.js"></script>
+  </body>
+</html>

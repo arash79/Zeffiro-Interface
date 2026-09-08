@@ -16,7 +16,9 @@ classdef DTIResolveMesh2VoxelTest < matlab.unittest.TestCase
         end
 
         function applyNoLongerSwallowsMesh2VoxelErrors(testCase)
-            src = fileread(fullfile("src", "forward", "dti", ...
+            root = fileparts(which("zeffiro_interface"));
+            testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
+            src = fileread(fullfile(root, "src", "forward", "dti", ...
                 "zef_dti_apply_to_sigma.m"));
             testCase.verifyTrue(contains(src, "zef_dti_resolve_mesh2voxel"));
             testCase.verifyFalse(contains(src, "T_mesh2voxel = [];"));

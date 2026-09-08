@@ -56,7 +56,7 @@ This plugin does **not** construct `inverse.KalmanInverter`. Class ids `kalman` 
 ## Important notes
 
 - DTI structural `Q` exists only in this plugin path, not in `inverse.KalmanInverter`.
-- Asteroid profiles do not register this menu entry.
+- Asteroid profiles do not register this **legacy** menu (`zef_kf_start`). They do register **Kalman (class solver)** (`zef_kalman_class_start`), which is a different track.
 
 ## Developer guidance
 

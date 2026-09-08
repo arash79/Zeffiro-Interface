@@ -33,11 +33,35 @@ try
     work = zef_ui_screen_workarea(pos);
     max_w = max(min_w, work(3));
     max_h = max(min_h, work(4));
-    w = min(max(min_w, def_w), max_w);
-    ht = min(max(min_h, def_h), max_h);
+    w = min(max(160, def_w), max_w);
+    ht = min(max(120, def_h), max_h);
+    try
+        if isprop(h, 'MinSize')
+            h.MinSize = [1, 1];
+        end
+    catch
+    end
+    try
+        if isappdata(h, 'ZefMinSize')
+            rmappdata(h, 'ZefMinSize');
+        end
+    catch
+    end
     pos(3) = w;
     pos(4) = ht;
     pos = zef_ui_clamp_position(pos, work);
+    h.Position = pos;
+    try
+        if isprop(h, 'InnerPosition')
+            ip = double(h.InnerPosition);
+            if numel(ip) >= 4
+                ip(3) = w;
+                ip(4) = ht;
+                h.InnerPosition = ip;
+            end
+        end
+    catch
+    end
     h.Position = pos;
     h.Units = orig;
 catch

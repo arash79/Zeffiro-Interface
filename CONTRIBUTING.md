@@ -68,10 +68,11 @@ The typeset manual under `documentation/` can lag the code. Folder READMEs and `
 
 ## Backward compatibility
 
-- Dual inverse tracks stay separate ([ADR-002](docs/adr/ADR-002-dual-inverse-tracks.md)). Pointing Inverse-tools Start buttons at class inverters is a product change (Kalman DTI `Q` in particular). Numerical differences versus upstream: [docs/upstream.md](docs/upstream.md).
+- Dual inverse tracks stay separate ([ADR-002](docs/adr/ADR-002-dual-inverse-tracks.md)). Do not replace a legacy Start button with a class inverter (Kalman DTI `Q` in particular). A separate Inverse-tools row labelled **(class solver)** is the supported way to expose `zef_inverse_run`. Numerical differences versus upstream: [docs/upstream.md](docs/upstream.md).
 - Keep `core.ZefSourceModel` at `+core/` so older `.mat` files load.
 - Do not resurrect retired directories that `ArchitectureLayoutTest` asserts absent: `tools/plugins`, `src/core`, `src/gui/helpers`, `src/auxiliary`, `+plugins`.
 - Do not restore `plugins/GithubPusher` (credential-in-URL git helper). Use ordinary git / GitHub from a terminal.
+- Do not commit `gui_audit_output/`, `gui_refine_output/`, `Untitled.mat`, or other local MATLAB desktop saves. They are gitignored.
 
 ## Reporting bugs
 

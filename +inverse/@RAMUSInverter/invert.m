@@ -50,9 +50,8 @@ function [z_vec, self] = invert(self, f, L, procFile, source_direction_mode, sou
     end
 
     if isempty(self.multiresolution_dec)
-        % multi-solver sensitivity work: clearer message that points to both
-        % the in-class builder and the auto-build path provided by
-        % m/sensitivity/zef_sensitivity_run (RAMUS preflight hook).
+        % Empty decomposition: callers must build it here or via
+        % zef_sensitivity_run (ramus_decomposition preflight hook).
         error("inverse:RAMUSInverter:NoMultiresDec", ...
             "RAMUS multiresolution decomposition is empty. Either call self.make_multires_dec() (with self.number_of_decompositions / number_of_multiresolution_levels / sparsity_factor set), or invoke through zef_sensitivity_run, which auto-builds the decomposition for you via the 'ramus_decomposition' preflight hook.");
     end

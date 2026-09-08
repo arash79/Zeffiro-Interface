@@ -18,7 +18,11 @@ Parent: `Zeffiro_Modern_Icons/`. Consumer of rasters: `src/gui/chrome/zef_ui_ico
 
 ## Usage instructions
 
-Open in a vector editor; export square PNG with transparency to `../../<stem>.png`. Keep viewBox/padding consistent across the family so toolbar sizes look even.
+Open in a vector editor; export square PNG with transparency to `../../<stem>.png`, or regenerate the whole set from the SVG masters with:
+
+    python3 scripts/refresh_zef_ui_icons.py [size]
+
+The default size is 128 px. The script requires `svglib` and `reportlab` (install with `pip install --user svglib`) and macOS `sips` to rasterize the intermediate PDFs. Keep viewBox/padding consistent across the family so toolbar sizes look even.
 
 ## Important notes
 

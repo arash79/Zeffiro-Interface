@@ -34,7 +34,7 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `RAMUSInverterOptTest` | Same kernel comparison on `inverse.RAMUSInverter` with synthetic multires `dec` / `ind` / `cnt` lattices |
 | `KalmanApproxRtsStandardizationTest` | Scaled Denman–Beavers `P^{-1/2}`; approx RTS multiplies `Z*m` |
 | `MegCartesianInterpolationGuardTest` | Cartesian MEG interpolation refuses St. Venant |
-| `EegFaceBasedDirectionModeTest` | EEG `face_based` errors instead of skipping `L` |
+| `EegFaceBasedDirectionModeTest` | EEG `face_based` / default `mesh based` throw `UnsupportedDirectionMode` before assembling `L` |
 | `SessionWantsGpuTest` | FEM GPU gate does not `evalin('base','zef.gpu_count')` |
 | `LeadFieldSensorsAuxTest` | Types 1–10 PEM `/1000`, MEG xyz `/1000`, CEM unscaled; anisotropic MEG refuses EEG table |
 | `PemReferenceLoadTest` | Infinite-Z PEM zeros electrode 1 only inside a PCG block |
@@ -44,7 +44,6 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `DTIResolveMesh2VoxelTest` | `register.dat` without orig.mgz errors; NIfTI-only returns empty |
 | `MCMCPosteriorMeanDivisorTest` | Post-burn-in mean is \((n_{\mathrm{iter}}-n_{\mathrm{burn}})n_{\mathrm{chains}}\) |
 | `KalmanRtsStoredDTest` | RTS applies stored filter \(D_t\); exponent 1 vs 1/2 differs |
-| `ForensicPassFixesTest` | Source contracts: plugin sLORETA \(\sqrt{\,}\), MNE cutoffs, ReconstructionTool handle, segmentation delete-rows, epilepsy package name, no `!git pull`, confined import scripts |
 | `ImportConfinedScriptTest` | `.zef` script rows `run` only under the import folder |
 | `HALpRInverterTest` | `L1_optimization` vs sparse-D reference (IAS and Standardized); q=1/q=2 invert; q=2 zero-frame and polarity; `halpr` local dispatch |
 | `GroupLassoInverterTest` | `LG_optimization` vs sparse-D reference (IAS / EM / Standardized); invert vs frozen MAP loop; non-triplet `L` errors; `grouplasso` local dispatch |
@@ -78,7 +77,7 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `WaitbarTest` | `zef_waitbar` lifecycle on R2025a+: `0` is progress not `groot`; nested `(i,N,h,msg)` keeps one handle; nested initialize+close (including stiffness/adjacency/source_tetra and double-close) does not invalidate the parent; `zef_close_waitbar` ignores stale handles; teardown restores `WindowStyle` |
 | `ColoredListTest` | `zef_colored_list` HTML / `uihtml` (and table) backends: names, colors, selection |
 | `UiThemeTest` | `zef_ui_theme` tokens (font ≥ 11 px, teal accent, shell geometry), window-label stripping, layout resize on real figures |
-| `ClassInverseDialogTest` | eLORETA / UKF-NMM dialogs expose method tags (`zef_inv_*`); `noise_cov` absent on eLORETA; four class-solver `zef_*_start` names resolve |
+| `ClassInverseDialogTest` | Class-solver dialogs expose method tags (`zef_inv_*`); `noise_cov` absent on eLORETA; class-solver `zef_*_start` names resolve |
 | `FigureViewContainmentTest` | Figure-tool axes stay inside the visualization slot after layout |
 | `GuiResponsivenessTest` | Resize must not install listener storms or recenter the window |
 | `WindowPlacementTest` | Clamp / centre helpers keep windows on the work area |

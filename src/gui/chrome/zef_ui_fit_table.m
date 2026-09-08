@@ -75,22 +75,13 @@ try
 catch
 end
 try
-    tbl.RowStriping = 'on';
-    if ~isempty(theme) && isfield(theme, 'color') ...
-            && isfield(theme.color, 'tableRow')
-        n_data = 0;
-        try
-            n_data = size(tbl.Data, 1);
-        catch
-        end
-        if n_data < 2
-            tbl.BackgroundColor = theme.color.tableRow;
-        else
+        tbl.RowStriping = 'on';
+        if ~isempty(theme) && isfield(theme, 'color') ...
+                && isfield(theme.color, 'tableRow')
             tbl.BackgroundColor = [theme.color.tableRow; theme.color.tableAlt];
+            local_set_tbl(tbl, 'FontColor', theme.color.text);
+            local_set_tbl(tbl, 'ForegroundColor', theme.color.text);
         end
-        local_set_tbl(tbl, 'FontColor', theme.color.text);
-        local_set_tbl(tbl, 'ForegroundColor', theme.color.text);
-    end
 catch
 end
 
@@ -415,7 +406,6 @@ pairs = { ...
     'type', 88; ...
     'unit', 52; ...
     'units', 52; ...
-    'variable', 236; ...
     'sources', 72; ...
     'sensors', 72; ...
     'ref.', 112; ...
@@ -438,11 +428,11 @@ end
 if contains(nm, 'description')
     w = 3.4;
 elseif contains(nm, 'variable')
-    w = 2.4;
+    w = 3.1;
 elseif contains(nm, 'script')
     w = 2.6;
 elseif contains(nm, 'value') || strcmp(nm, 'default')
-    w = 2.8;
+    w = 3.2;
 elseif strcmp(nm, 'param')
     w = 1.8;
 elseif contains(nm, 'parameter name')

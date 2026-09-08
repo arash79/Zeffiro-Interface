@@ -91,27 +91,38 @@ catch
 end
 if contains(lname, 'plugin') && n_rows > 12
     tbl_h = min(800, 48 + n_rows * 26 + 40);
-    need_h = min(940, 48 + tbl_h + 16 + 52);
+    need_h = min(980, 48 + tbl_h + 16 + 52);
 elseif contains(lname, 'export') && n_cols <= 2
     need_w = 480;
     tbl_h = max(140, 36 + max(n_rows, 4) * 26 + 12);
     need_h = max(240, 32 + tbl_h + 16 + 52);
 elseif contains(lname, 'system settings') && n_rows > 12
     tbl_h = min(620, 28 + n_rows * 22 + 10);
-    need_h = min(720, 32 + tbl_h + 16 + 52);
-    need_w = max(need_w, 880);
+    need_h = min(720, 24 + tbl_h + 8 + 48);
+    need_w = max(need_w, 1040);
 elseif n_cols <= 2 && n_rows <= 8 && ~contains(lname, 'settings') ...
         && ~contains(lname, 'profile')
     need_w = 440;
     tbl_h = max(120, 28 + n_rows * 28 + 8);
     need_h = max(200, 24 + tbl_h + 12 + 52);
 elseif n_rows <= 12 && n_cols >= 3
-    tbl_h = max(88, 36 + n_rows * 26 + 12);
-    need_h = max(220, 32 + tbl_h + 16 + 56);
-    need_w = max(need_w, min(960, 120 + n_cols * 110));
+    tbl_h = max(88, 28 + n_rows * 24 + 10);
+    need_h = max(200, 24 + tbl_h + 12 + 52);
+    need_w = max(need_w, min(1020, 140 + n_cols * 120));
+    if n_cols >= 4
+        need_w = max(need_w, 1000);
+    end
 end
 min_w = max(360, round(0.88 * need_w));
 min_h = max(200, min(need_h, round(0.90 * need_h)));
+if (contains(lname, 'settings') || contains(lname, 'profile')) && n_rows > 8
+    need_h = max(need_h, 520);
+    min_h = max(min_h, 400);
+end
+if contains(lname, 'profile') && n_cols >= 3
+    need_h = max(need_h, max(300, 56 + n_rows * 28 + 72));
+    min_h = max(min_h, 260);
+end
 zef_ui_apply_size(fig, need_w, need_h, min_w, min_h);
 zef_ui_bind_min_size(fig, min_w, min_h);
 
@@ -124,14 +135,13 @@ elseif contains(lname, 'export') && n_cols <= 2
     root.RowHeight = {tbl_h, 52};
     table_fit = true;
 elseif contains(lname, 'system settings') && n_rows > 12
-    root.RowHeight = {tbl_h, 56};
-    table_fit = true;
+    root.RowHeight = {'1x', 44};
 elseif n_cols <= 2 && n_rows <= 8 && ~contains(lname, 'settings') ...
         && ~contains(lname, 'profile')
     root.RowHeight = {'fit', 52};
     table_fit = true;
 elseif n_rows <= 12 && n_cols >= 3
-    root.RowHeight = {tbl_h, 56};
+    root.RowHeight = {tbl_h, 52};
     table_fit = true;
 else
     root.RowHeight = {'1x', 56};

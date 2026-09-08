@@ -181,7 +181,7 @@ uicontrol('Style', 'popupmenu', 'Parent', header, 'Units', 'pixels', ...
 
 uicontrol('Style', 'pushbutton', 'Parent', header, 'Units', 'pixels', ...
     'String', '', 'Tag', 'zef_shell_help', ...
-    'Callback', 'web(''https://github.com/sampsapursiainen/zeffiro_interface/wiki'');', ...
+    'Callback', 'web(''https://github.com/sampsapursiainen/zeffiro_interface'');', ...
     'BackgroundColor', theme.color.headerBg, 'ForegroundColor', theme.color.text, ...
     'TooltipString', 'Help', 'FontName', theme.font.name, 'FontSize', theme.font.sizeSmall);
 uicontrol('Style', 'pushbutton', 'Parent', header, 'Units', 'pixels', ...
@@ -651,23 +651,23 @@ pill = zef_ui_find(header, 'zef_shell_theme_pill');
 helpb = zef_ui_find(header, 'zef_shell_help');
 bellb = zef_ui_find(header, 'zef_shell_bell');
 profb = zef_ui_find(header, 'zef_shell_profile');
-y = max(8, round((inner_h - 20) / 2) + 2);
+y = max(8, round((inner_h - 24) / 2) + 1);
 x_right = p(3) - 12;
 right_icons = {profb, 'profile'; bellb, 'bell'; helpb, 'help'};
 for i = 1:size(right_icons, 1)
     hb = right_icons{i, 1};
     if local_ok(hb)
-        hb.Position = [x_right - 20, y, 20, 20];
+        hb.Position = [x_right - 24, y, 24, 24];
         hb.String = '';
         hb.Enable = 'on';
         hb.BackgroundColor = theme.color.headerBg;
-        local_show_icon(hb, right_icons{i, 2}, 16, theme.color.text, theme.color.headerBg);
-        x_right = x_right - 26;
+        local_show_icon(hb, right_icons{i, 2}, 22, theme.color.text, theme.color.headerBg);
+        x_right = x_right - 30;
     end
 end
 if local_ok(pop)
     pop.Visible = 'off';
-    pop.Position = [x_right - 8, y, 8, 20];
+    pop.Position = [x_right - 8, y, 8, 22];
 end
 pill_w = 88;
 pill_h = 22;
@@ -697,8 +697,8 @@ if local_ok(sun)
     end
     sun.Enable = 'on';
     sun.Callback = @local_theme_pill;
-    sun.Position = [pill_x + 8, pill_y + 3, 16, 16];
-    local_show_icon(sun, sun_key, 16, theme.color.text, fillc);
+    sun.Position = [pill_x + 8, pill_y + 2, 20, 20];
+    local_show_icon(sun, sun_key, 18, theme.color.text, fillc);
 end
 if local_ok(lab)
     lab.String = ['Theme  ' char(9662)];
@@ -710,9 +710,9 @@ if local_ok(lab)
 end
 x0 = 16;
 if local_ok(mark)
-    mark.Position = [x0, y, 20, 20];
-    local_show_icon(mark, 'mark', 18, theme.color.accent, theme.color.headerBg);
-    x0 = x0 + 26;
+    mark.Position = [x0, y, 24, 24];
+    local_show_icon(mark, 'mark', 22, theme.color.accent, theme.color.headerBg);
+    x0 = x0 + 28;
 end
 if local_ok(title)
     title.String = 'ZEFFIRO';
@@ -774,7 +774,7 @@ end
 items = local_nav_spec();
 n = size(items, 1);
 top_n = 7;
-icon_s = 20;
+icon_s = 24;
 avail = max(40, p(4) - 2 * pad);
 top_gap = 5;
 group_extra = 16;
@@ -795,6 +795,20 @@ for i = 1:n
     y_top = y_top - item_h - top_gap;
     if i == top_n
         y_top = y_top - group_extra;
+    end
+end
+bot_n = n - top_n;
+if bot_n > 0
+    bot_gap = 5;
+    y_bot = pad;
+    ys_bot = zeros(bot_n, 1);
+    for k = bot_n:-1:1
+        ys_bot(k) = y_bot;
+        y_bot = y_bot + item_h + bot_gap;
+    end
+    top_limit = ys(top_n) - group_extra - item_h;
+    if ys_bot(1) <= top_limit
+        ys(top_n + 1:n) = ys_bot;
     end
 end
 paint_key = {char(theme.mode), logical(show_labels)};
@@ -850,7 +864,7 @@ row.Units = 'pixels';
 rp = row.Position;
 rw = max(1, rp(3));
 rh = max(1, rp(4));
-icon_s = 20;
+icon_s = 24;
 pad_x = 8;
 gap = 8;
 icon_y = max(0, round((rh - icon_s) / 2));
@@ -1004,7 +1018,7 @@ if local_ok(hit)
 end
 if local_ok(ic)
     ic.BackgroundColor = fillc;
-    local_show_icon(ic, key, 20, icon_fg, fillc);
+    local_show_icon(ic, key, 24, icon_fg, fillc);
 end
 if local_ok(btn)
     btn.BackgroundColor = fillc;
@@ -1206,7 +1220,7 @@ function local_place_toolbar(tools, theme, content_w)
 
 p = tools.Position;
 pad = 6;
-icon_w = 20;
+icon_w = 24;
 lab_h = 16;
 top_pad = 8;
 y_icon = max(2, round((p(4) - icon_w) / 2));
@@ -1218,13 +1232,13 @@ sl = zef_ui_find(tools, 'zef_tool_sliders');
 ink = theme.color.text;
 surface = theme.color.workspace;
 right = p(3) - 6;
-icon_hit = 20;
+icon_hit = 24;
 if local_ok(more)
     more.Position = [right - icon_hit, y_icon, icon_hit, icon_hit];
     more.String = '';
     more.Enable = 'on';
     more.BackgroundColor = surface;
-    local_show_icon(more, 'ellipsis', 16, ink, surface);
+    local_show_icon(more, 'ellipsis', 22, ink, surface);
     right = right - icon_hit - 4;
 end
 if local_ok(sl)
@@ -1232,7 +1246,7 @@ if local_ok(sl)
     sl.TooltipString = 'Toggle controls';
     sl.Enable = 'on';
     sl.BackgroundColor = surface;
-    local_show_icon(sl, 'sliders', 16, ink, surface);
+    local_show_icon(sl, 'sliders', 22, ink, surface);
     right = right - icon_hit - 4;
 end
 x_limit = right - 2;
@@ -1354,7 +1368,7 @@ for i = 1:n
     end
     btn.BackgroundColor = fill;
     btn.String = '';
-    local_show_icon(btn, keys{i}, 16, ink, fill);
+    local_show_icon(btn, keys{i}, 22, ink, fill);
     room = x_limit - x - 4;
     need = icon_w + gap_icon_lab + tw(i);
     if show(i) && tw(i) > 0 && local_ok(lab) && room >= need

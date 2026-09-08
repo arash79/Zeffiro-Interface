@@ -80,7 +80,7 @@ Needs Statistics Toolbox `kmeans`.
 
 Also valid: `computeInversionWithZI` on an `inverse.UKFNMMInverter` instance. Cluster dispatch uses the same registry ids.
 
-Head profiles (`multicompartment_head`, `_legacy`, `_nse`) register Inverse tools → **UKF-NMM (class solver)** (`plugins/UKFNMM`, `zef_ukfnmm_start`). That window is `zef_open_class_inverse`; Start calls `zef_inverse_run`. Asteroid profiles do not list it. Do not copy the legacy Kalman app onto this class.
+Head profiles (`multicompartment_head`, `_legacy`, `_nse`) and asteroid profiles register Inverse tools → **UKF-NMM (class solver)** (`plugins/UKFNMM`, `zef_ukfnmm_start`). That window is `zef_open_class_inverse`; Start calls `zef_inverse_run`. Do not copy the legacy Kalman app onto this class.
 
 ## Usage instructions
 

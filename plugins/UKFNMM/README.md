@@ -18,7 +18,7 @@ zef_inverse_run(..., "ukfnmm") → inverse.UKFNMMInverter
 per-frame spatial KF → smoother (optional RTS + NMM/UKF once)
 ```
 
-Registered on `multicompartment_head`, `_legacy`, and `_nse`. Not on asteroid profiles.
+Registered on all bundled profiles, including asteroid gravity/radar.
 
 Needs a 3-component xyz lead field (`size(L,2)` divisible by 3), at least three sensors, and Statistics Toolbox `kmeans` for the NMM clustering stage.
 

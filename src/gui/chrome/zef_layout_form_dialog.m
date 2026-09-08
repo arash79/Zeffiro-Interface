@@ -26,24 +26,19 @@ try
     nm = lower(char(fig.Name));
     force_rebuild = contains(nm, 'kalman') || contains(nm, 'classical sparse') ...
         || contains(nm, 'music') ...
-        || contains(nm, 'forward and inverse') || contains(nm, 'graphics processing') ...
+        || contains(nm, 'graphics processing') ...
         || contains(nm, 'gmm plot') || contains(nm, 'gmm modeling') ...
         || contains(nm, 'gm modeling') || contains(nm, 'beamformer') ...
         || contains(nm, 'dipole scan') || contains(nm, 'rap-music') ...
         || contains(nm, 'gaussian mixture') || contains(nm, 'sesame') ...
-        || contains(nm, 'hierarchical l1') || contains(nm, 'l1/l2');
+        || contains(nm, 'hierarchical l1') || contains(nm, 'l1/l2') ...
+        || contains(nm, 'forward and inverse') || contains(nm, 'wireframe') ...
+        || contains(nm, 'ramus') || contains(nm, 'ias') ...
+        || contains(nm, 'topography') || contains(nm, 'minimum norm');
 catch
 end
 if ~isempty(findall(fig, 'Tag', 'zef_ui_root'))
-    if force_rebuild
-        try
-            local_unwind_root(fig);
-        catch
-            return
-        end
-    else
-        return
-    end
+    return
 end
 
 theme = zef_ui_theme();
@@ -64,7 +59,8 @@ fields = local_visible([local_findall(fig, 'uieditfield'); ...
     local_findall(fig, 'uinumericeditfield'); ...
     local_findall(fig, 'uidropdown'); ...
     local_findall(fig, 'uispinner'); ...
-    local_findall(fig, 'uitextarea')]);
+    local_findall(fig, 'uitextarea'); ...
+    local_findall(fig, 'uilistbox')]);
 checks = local_all_checks(fig);
 btns = local_visible(local_findall(fig, 'uibutton'));
 [btns, extra_btns] = local_split_buttons(btns);
@@ -95,6 +91,14 @@ if numel(labels) + numel(fields) + numel(checks) < 3
 end
 
 pairs = local_pair_rows(labels, fields);
+try
+    nm_fi = lower(char(fig.Name));
+    if contains(nm_fi, 'forward and inverse')
+        pairs = local_drop_duplicate_headers(pairs);
+        local_clarify_fi_labels(pairs, checks);
+    end
+catch
+end
 n_pair = numel(pairs);
 n_labeled = 0;
 for i = 1:n_pair
@@ -108,19 +112,71 @@ if n_labeled < max(3, round(0.5 * numel(fields)))
     return
 end
 n_check = numel(checks);
-n_check_rows = ceil(max(n_check, 1) / 2);
+n_chk_cols = 1 + double(n_check > 1);
+if n_check >= 12
+    n_chk_cols = 3;
+end
+n_check_rows = ceil(max(n_check, 1) / max(n_chk_cols, 1));
 has_axes = ~isempty(axes_list);
+axes_placeholder = false;
+if has_axes
+    axes_placeholder = true;
+    try
+        n_plot = numel(findall(axes_list(1), 'Type', 'line')) ...
+            + numel(findall(axes_list(1), 'Type', 'patch')) ...
+            + numel(findall(axes_list(1), 'Type', 'surface')) ...
+            + numel(findall(axes_list(1), 'Type', 'image')) ...
+            + numel(findall(axes_list(1), 'Type', 'bar')) ...
+            + numel(findall(axes_list(1), 'Type', 'scatter'));
+        axes_placeholder = n_plot < 1;
+    catch
+        axes_placeholder = true;
+    end
+end
 has_panel = ~isempty(fig_panels);
 has_btns = ~isempty(btns);
 has_extra = ~isempty(extra_btns);
 n_form_cols = 1;
-if n_pair >= 18
+if n_pair >= 12
     n_form_cols = 2;
 end
 try
     nm_cols = lower(char(fig.Name));
-    if contains(nm_cols, 'gaussian mixture')
+    if contains(nm_cols, 'graphics processing') && n_pair >= 10
+        n_form_cols = 2;
+    elseif contains(nm_cols, 'kalman') && n_pair >= 10
+        n_form_cols = 2;
+    elseif contains(nm_cols, 'gaussian mixture')
         n_form_cols = 1;
+    end
+catch
+end
+try
+    nm_gpu = lower(char(fig.Name));
+    if contains(nm_gpu, 'graphics processing') && n_check == 1
+        for i = 1:n_pair
+            lab = pairs{i}{1};
+            if ~isempty(lab) && isempty(pairs{i}{2})
+                lt = lower(char(string(lab.Text)));
+                if contains(lt, 'gpu')
+                    pairs{i}{2} = checks(1);
+                    try
+                        lab.Text = '';
+                        lab.Visible = 'off';
+                    catch
+                    end
+                    try
+                        checks(1).Text = 'Use GPU for graphics';
+                        checks(1).WordWrap = 'on';
+                    catch
+                    end
+                    checks = gobjects(0);
+                    n_check = 0;
+                    n_check_rows = 0;
+                    break
+                end
+            end
+        end
     end
 catch
 end
@@ -138,15 +194,27 @@ form_scroll = est_h > max_h_est;
 try
     nm_scroll = lower(char(fig.Name));
     if contains(nm_scroll, 'forward and inverse')
-        form_scroll = false;
-    elseif contains(nm_scroll, 'gaussian mixture')
         form_scroll = true;
+    elseif contains(nm_scroll, 'gaussian mixture') && contains(nm_scroll, '(jl)')
+        form_scroll = true;
+    elseif contains(nm_scroll, 'gaussian mixture')
+        form_scroll = false;
     end
 catch
 end
 has_spacer = false;
+try
+    nm_sp = lower(char(fig.Name));
+    if contains(nm_sp, 'hierarchical prior') && ~contains(nm_sp, 'l1')
+        has_spacer = true;
+    elseif contains(nm_sp, 'graphics processing') && n_form_cols == 1
+        has_spacer = true;
+    end
+catch
+end
 n_root = double(n_pair > 0) + double(n_check > 0) ...
-    + double(has_axes) + double(has_panel) + double(has_extra) + double(has_btns);
+    + double(has_axes) + double(has_panel) + double(has_extra) ...
+    + double(has_spacer) + double(has_btns);
 if n_root < 1
     n_root = 1;
 end
@@ -160,115 +228,237 @@ try
 catch
 end
 row_h = repmat({'fit'}, 1, n_root);
-if form_scroll && n_pair > 0
+if (form_scroll || n_form_cols == 2) && n_pair > 0
     row_h{1} = '1x';
 elseif has_axes
     ax_row = double(n_pair > 0) + double(n_check > 0) + 1;
-    row_h{ax_row} = '1x';
+    if axes_placeholder
+        row_h{ax_row} = 64;
+    else
+        row_h{ax_row} = '1x';
+    end
+elseif has_spacer
+    row_h{n_root - double(has_btns)} = '1x';
 end
 root.RowHeight = row_h;
+try
+    nm_pan = lower(char(fig.Name));
+    if has_panel && contains(nm_pan, 'sesame')
+        pan_row = double(n_pair > 0) + double(n_check > 0) + double(has_axes) + 1;
+        if pan_row <= numel(row_h)
+            row_h{pan_row} = 96;
+            root.RowHeight = row_h;
+        end
+    end
+catch
+end
 try
     root.BackgroundColor = theme.color.bg;
 catch
 end
 
 if n_pair > 0
-    if n_form_cols == 1
-        form = uigridlayout(root, [n_form_rows 2]);
-        form.ColumnWidth = {'fit', '1x'};
-    else
-        form = uigridlayout(root, [n_form_rows 4]);
-        form.ColumnWidth = {'fit', '1x', 'fit', '1x'};
-    end
-    rh = repmat({26}, 1, n_form_rows);
-    for i = 1:n_pair
-        if local_is_textarea(pairs{i}{2})
-            if n_form_cols == 1
-                rh{i} = 120;
-            else
-                rr = i;
-                if i > n_form_rows
-                    rr = i - n_form_rows;
-                end
-                rh{rr} = max(rh{rr}, 120);
-            end
-        end
-    end
-    form.RowHeight = rh;
-    form.RowSpacing = 6;
-    form.ColumnSpacing = 10;
-    form.Padding = [10 16 10 10];
+    lab_w = local_label_width(labels);
     try
-        if form_scroll
-            form.Scrollable = 'on';
-        else
-            form.Scrollable = 'off';
+        nm_lab = lower(char(fig.Name));
+        if contains(nm_lab, 'forward and inverse') || contains(nm_lab, 'hierarchical prior')
+            lab_w = max(lab_w, 200);
         end
-        form.BackgroundColor = theme.color.panel;
     catch
     end
-    for i = 1:n_pair
-        lab = pairs{i}{1};
-        fld = pairs{i}{2};
-        if n_form_cols == 1
-            rr = i;
-            lc = 1;
-            fc = 2;
-        else
-            if i <= n_form_rows
-                rr = i;
-                lc = 1;
-                fc = 2;
+    col_of = ones(n_pair, 1);
+    if n_form_cols == 2
+        mid_x = 400;
+        try
+            mid_x = fig.Position(3) / 2;
+        catch
+        end
+        n_left = 0;
+        n_right = 0;
+        for i = 1:n_pair
+            src = pairs{i}{2};
+            if isempty(src)
+                src = pairs{i}{1};
+            end
+            if ~isempty(src) && local_pos(src, 1) >= mid_x
+                col_of(i) = 2;
+                n_right = n_right + 1;
             else
-                rr = i - n_form_rows;
-                lc = 3;
-                fc = 4;
+                col_of(i) = 1;
+                n_left = n_left + 1;
             end
         end
-        if ~isempty(lab)
-            try
-                lab.Parent = form;
-                try
-                    lab.Layout.Row = rr;
-                    lab.Layout.Column = lc;
-                catch
-                    lab.Layout = matlab.ui.layout.GridLayoutOptions('Row', rr, 'Column', lc);
-                end
-                lab.HorizontalAlignment = 'right';
-                lab.WordWrap = 'off';
-                lab.FontWeight = 'normal';
-                lab.Text = local_clean_label(lab.Text);
-            catch
-            end
-        end
-        if ~isempty(fld)
-            try
-                fld.Parent = form;
-                try
-                    fld.Layout.Row = rr;
-                    fld.Layout.Column = fc;
-                catch
-                    fld.Layout = matlab.ui.layout.GridLayoutOptions('Row', rr, 'Column', fc);
-                end
-                try
-                    if local_is_textarea(fld)
-                        fld.WordWrap = 'on';
+        n_form_rows = max(1, max(n_left, n_right));
+        try
+            if contains(lower(char(fig.Name)), 'forward and inverse')
+                for i = 1:n_pair
+                    fld = pairs{i}{2};
+                    if isempty(fld) || ~(isgraphics(fld) && isvalid(fld))
+                        continue
                     end
-                catch
+                    tg = '';
+                    try
+                        tg = lower(char(string(fld.Tag)));
+                    catch
+                    end
+                    is_post = contains(tg, 'as_opt_5') ...
+                        || (contains(tg, 'refinement') && contains(tg, '_2'));
+                    if ~is_post
+                        try
+                            zef = evalin('base', 'zef');
+                            if isfield(zef, 'h_as_opt_5') && isequal(fld, zef.h_as_opt_5)
+                                is_post = true;
+                            elseif isfield(zef, 'h_refinement_volume_compartments_2') ...
+                                    && isequal(fld, zef.h_refinement_volume_compartments_2)
+                                is_post = true;
+                            elseif isfield(zef, 'h_refinement_surface_number_2') ...
+                                    && isequal(fld, zef.h_refinement_surface_number_2)
+                                is_post = true;
+                            elseif isfield(zef, 'h_refinement_volume_number_2') ...
+                                    && isequal(fld, zef.h_refinement_volume_number_2)
+                                is_post = true;
+                            elseif isfield(zef, 'h_refinement_surface_mode_2') ...
+                                    && isequal(fld, zef.h_refinement_surface_mode_2)
+                                is_post = true;
+                            end
+                        catch
+                        end
+                    end
+                    if is_post
+                        col_of(i) = 2;
+                        try
+                            lab = pairs{i}{1};
+                            if ~isempty(lab) && isgraphics(lab)
+                                txt = char(string(lab.Text));
+                                if ~contains(lower(txt), 'post-process')
+                                    txt = strtrim(regexprep(txt, ':$', ''));
+                                    lab.Text = [txt ' (post-process):'];
+                                end
+                            end
+                        catch
+                        end
+                    end
                 end
-            catch
+                n_left = nnz(col_of == 1);
+                n_right = nnz(col_of == 2);
+                n_form_rows = max(1, max(n_left, n_right));
+            end
+        catch
+        end
+        is_fi = false;
+        try
+            is_fi = contains(lower(char(fig.Name)), 'forward and inverse');
+        catch
+        end
+        if ~is_fi && n_pair >= 8
+            unbalanced = min(n_left, n_right) < max(2, round(0.28 * n_pair));
+            if unbalanced
+                half = ceil(n_pair / 2);
+                col_of = ones(n_pair, 1);
+                col_of((half + 1):end) = 2;
+                n_left = half;
+                n_right = n_pair - half;
+                n_form_rows = max(1, max(n_left, n_right));
             end
         end
+    end
+    lb_h = 64;
+    try
+        if contains(lower(char(fig.Name)), 'forward and inverse')
+            lb_h = 88;
+        end
+    catch
+    end
+    hdr_l = '';
+    hdr_r = '';
+    try
+        if contains(lower(char(fig.Name)), 'kalman') && n_form_cols == 2
+            hdr_l = 'Filter';
+            hdr_r = 'Time window';
+        end
+    catch
+    end
+    if n_form_cols == 1
+        form = uigridlayout(root, [n_form_rows 2]);
+        form.ColumnWidth = {lab_w, '1x'};
+        form.RowHeight = local_col_heights(pairs, 1:n_pair, lb_h);
+        form.RowSpacing = 6;
+        form.ColumnSpacing = 10;
+        form.Padding = [10 16 10 10];
+        try
+            if form_scroll
+                form.Scrollable = 'on';
+            else
+                form.Scrollable = 'off';
+            end
+            form.BackgroundColor = theme.color.panel;
+        catch
+        end
+        local_fill_form_column(form, pairs, 1:n_pair, theme, '');
+    else
+        form = uigridlayout(root, [1 2]);
+        form.ColumnWidth = {'1x', '1x'};
+        form.RowHeight = {'1x'};
+        form.RowSpacing = 0;
+        form.ColumnSpacing = 16;
+        form.Padding = [10 12 10 10];
+        try
+            if form_scroll
+                form.Scrollable = 'on';
+            else
+                form.Scrollable = 'off';
+            end
+            form.BackgroundColor = theme.color.panel;
+        catch
+        end
+        idx_l = find(col_of == 1);
+        idx_r = find(col_of == 2);
+        nL = numel(idx_l) + double(~isempty(hdr_l));
+        nR = numel(idx_r) + double(~isempty(hdr_r));
+        rhL = local_col_heights(pairs, idx_l, lb_h, hdr_l);
+        rhL{end + 1} = '1x';
+        left_form = uigridlayout(form, [max(nL, 1) + 1 2]);
+        left_form.Layout.Column = 1;
+        left_form.ColumnWidth = {lab_w, '1x'};
+        left_form.RowHeight = rhL;
+        left_form.RowSpacing = 6;
+        left_form.ColumnSpacing = 10;
+        left_form.Padding = [0 4 8 0];
+        try
+            left_form.BackgroundColor = theme.color.panel;
+        catch
+        end
+        rhR = local_col_heights(pairs, idx_r, lb_h, hdr_r);
+        rhR{end + 1} = '1x';
+        right_form = uigridlayout(form, [max(nR, 1) + 1 2]);
+        right_form.Layout.Column = 2;
+        right_form.ColumnWidth = {lab_w, '1x'};
+        right_form.RowHeight = rhR;
+        right_form.RowSpacing = 6;
+        right_form.ColumnSpacing = 10;
+        right_form.Padding = [0 4 0 8];
+        try
+            right_form.BackgroundColor = theme.color.panel;
+        catch
+        end
+        local_fill_form_column(left_form, pairs, idx_l, theme, hdr_l);
+        local_fill_form_column(right_form, pairs, idx_r, theme, hdr_r);
     end
 end
 
 if n_check > 0
     n_chk_cols = 1 + double(n_check > 1);
+    if n_check >= 12
+        n_chk_cols = 3;
+    end
+    n_check_rows = ceil(max(n_check, 1) / n_chk_cols);
     chk = uigridlayout(root, [n_check_rows n_chk_cols]);
     if n_chk_cols == 1
         chk.ColumnWidth = {'1x'};
-    else
+    elseif n_chk_cols == 2
         chk.ColumnWidth = {'1x', '1x'};
+    else
+        chk.ColumnWidth = {'1x', '1x', '1x'};
     end
     chk.RowHeight = repmat({28}, 1, n_check_rows);
     chk.Padding = [12 8 12 8];
@@ -292,8 +482,8 @@ if n_check > 0
                     checks(i).Layout.Row = i;
                     checks(i).Layout.Column = 1;
                 else
-                    rr = ceil(i / 2);
-                    cc = 2 - mod(i, 2);
+                    rr = ceil(i / n_chk_cols);
+                    cc = mod(i - 1, n_chk_cols) + 1;
                     checks(i).Layout.Row = rr;
                     checks(i).Layout.Column = cc;
                 end
@@ -331,23 +521,14 @@ if has_panel
 end
 
 if has_extra
-    n_ex = numel(extra_btns);
-    extra_row = uigridlayout(root, [n_ex 1]);
-    extra_row.ColumnWidth = {'1x'};
-    extra_row.RowHeight = repmat({34}, 1, n_ex);
-    extra_row.Padding = [10 4 10 4];
-    extra_row.RowSpacing = 6;
+    local_center_button_row(root, extra_btns, theme);
+end
+
+if has_spacer
+    sp = uilabel(root, 'Text', '');
     try
-        extra_row.BackgroundColor = theme.color.panel;
+        sp.BackgroundColor = theme.color.bg;
     catch
-    end
-    for i = 1:n_ex
-        try
-            extra_btns(i).Parent = extra_row;
-            extra_btns(i).Layout.Row = i;
-            extra_btns(i).Layout.Column = 1;
-        catch
-        end
     end
 end
 
@@ -375,34 +556,7 @@ if has_btns
             end
         end
     else
-    widths = cell(1, n);
-    for i = 1:n
-        widths{i} = local_btn_width(btns(i));
-    end
-    brow = uigridlayout(root, [1 n + 1]);
-    brow.ColumnWidth = [{'1x'}, widths];
-    brow.RowHeight = {34};
-    brow.Padding = [0 0 0 0];
-    brow.ColumnSpacing = 8;
-    try
-        brow.BackgroundColor = theme.color.bg;
-    catch
-    end
-    padlab = uilabel(brow, 'Text', '');
-    try
-        padlab.BackgroundColor = theme.color.bg;
-        padlab.Layout.Row = 1;
-        padlab.Layout.Column = 1;
-    catch
-    end
-    for i = 1:n
-        try
-            btns(i).Parent = brow;
-            btns(i).Layout.Row = 1;
-            btns(i).Layout.Column = i + 1;
-        catch
-        end
-    end
+        local_center_button_row(root, btns, theme);
     end
 end
 
@@ -422,8 +576,13 @@ if exist('form', 'var') || exist('chk', 'var')
     if ~isempty(chk_h) && isgraphics(chk_h) && isvalid(chk_h)
         try
             n_live = numel(local_findall(chk_h, 'uicheckbox'));
-            n_check_rows = max(n_check_rows, ceil(max(n_live, 1) / 2));
-            chk_h.RowHeight = repmat({26}, 1, n_check_rows);
+            n_live_cols = 2;
+            try
+                n_live_cols = max(1, numel(chk_h.ColumnWidth));
+            catch
+            end
+            n_check_rows = max(n_check_rows, ceil(max(n_live, 1) / n_live_cols));
+            chk_h.RowHeight = repmat({28}, 1, n_check_rows);
         catch
         end
     end
@@ -434,7 +593,7 @@ need_h = 180;
 need_w = 400;
 n_form_cols = 1;
 n_form_rows = n_pair;
-if n_pair >= 18
+if n_pair >= 12
     n_form_cols = 2;
     n_form_rows = ceil(n_pair / 2);
 end
@@ -443,6 +602,21 @@ try
     if contains(nm_cols2, 'gaussian mixture')
         n_form_cols = 1;
         n_form_rows = n_pair;
+    elseif contains(nm_cols2, 'kalman') && n_pair >= 10
+        n_form_cols = 2;
+        n_form_rows = ceil(n_pair / 2);
+    elseif contains(nm_cols2, 'graphics processing') && n_pair >= 10
+        n_form_cols = 2;
+        if exist('col_of', 'var')
+            n_form_rows = max(1, max(nnz(col_of == 1), nnz(col_of == 2)));
+        else
+            n_form_rows = ceil(n_pair / 2);
+        end
+    elseif contains(nm_cols2, 'forward and inverse') && exist('col_of', 'var')
+        n_form_cols = 2;
+        n_form_rows = max(1, max(nnz(col_of == 1), nnz(col_of == 2)));
+    elseif exist('col_of', 'var') && n_form_cols == 2
+        n_form_rows = max(1, max(nnz(col_of == 1), nnz(col_of == 2)));
     end
 catch
 end
@@ -450,15 +624,44 @@ try
     orig = fig.Units;
     fig.Units = 'pixels';
     ta_extra = 0;
+    lb_extra = 0;
+    left_lb = 0;
+    right_lb = 0;
     for i = 1:n_pair
         if local_is_textarea(pairs{i}{2})
             ta_extra = ta_extra + 92;
+        elseif local_is_listbox(pairs{i}{2})
+            if n_form_cols == 2 && exist('col_of', 'var') && i <= numel(col_of) && col_of(i) == 2
+                right_lb = right_lb + 1;
+            else
+                left_lb = left_lb + 1;
+            end
         end
     end
-    need_h = 36 + n_form_rows * 32 + ta_extra ...
-        + double(n_check > 0) * (12 + n_check_rows * 32) ...
-        + double(has_axes) * 180 + double(has_panel) * 140 ...
-        + double(has_extra) * (16 + numel(extra_btns) * 40) ...
+    lb_row = 64;
+    try
+        if contains(lower(char(fig.Name)), 'forward and inverse')
+            lb_row = 88;
+        end
+    catch
+    end
+    if n_form_cols == 2
+        lb_extra = max(left_lb, right_lb) * lb_row;
+    else
+        lb_extra = (left_lb + right_lb) * lb_row;
+    end
+    pan_h = 140;
+    try
+        if has_panel && contains(lower(char(fig.Name)), 'sesame')
+            pan_h = 100;
+        end
+    catch
+    end
+    need_h = 36 + n_form_rows * 32 + ta_extra + lb_extra ...
+        + double(n_check > 0) * (16 + n_check_rows * 36) ...
+        + double(has_axes) * (64 * double(axes_placeholder) + 180 * double(~axes_placeholder)) ...
+        + double(has_panel) * pan_h ...
+        + double(has_extra) * 52 ...
         + double(has_btns) * (52 + 40 * double(numel(btns) >= 5));
     if n_form_cols > 1
         need_h = need_h + 12;
@@ -496,7 +699,8 @@ try
         fig.Scrollable = 'off';
     catch
     end
-    if need_h > fig.Position(4) + 8 || contains(lower(char(fig.Name)), 'gaussian mixture')
+    if need_h > fig.Position(4) + 8 || (contains(lower(char(fig.Name)), 'gaussian mixture') ...
+            && contains(lower(char(fig.Name)), '(jl)'))
         try
             if exist('form', 'var') && isgraphics(form) && isvalid(form)
                 form.Scrollable = 'on';
@@ -531,24 +735,33 @@ try
     nm_end = lower(char(fig.Name));
 catch
 end
+packed_min = max(200, min(def_h, round(0.98 * def_h)));
 if contains(nm_end, 'rap-music')
-    zef_ui_apply_size(fig, max(need_w, 560), max(need_h, 400), 480, 360);
+    zef_ui_apply_size(fig, max(need_w, 560), max(need_h, 360), 480, packed_min);
 elseif contains(nm_end, 'sesame')
-    zef_ui_apply_size(fig, max(need_w, 560), max(need_h, 520), 500, 460);
+    zef_ui_apply_size(fig, max(need_w, 560), max(need_h, 360), 500, packed_min);
 elseif contains(nm_end, 'beamformer')
-    zef_ui_apply_size(fig, max(need_w, 640), max(need_h, 660), 560, 620);
+    zef_ui_apply_size(fig, max(need_w, 1000), max(need_h, 420), 800, packed_min);
 elseif contains(nm_end, 'graphics processing')
-    zef_ui_apply_size(fig, max(need_w, 500), max(need_h, 560), 460, max(need_h, 548));
+    zef_ui_apply_size(fig, max(need_w, 640), max(need_h, 420), 520, packed_min);
 elseif contains(nm_end, 'forward and inverse')
-    zef_ui_apply_size(fig, max(need_w, 920), max(need_h, 844), 900, max(760, round(0.92 * def_h)));
+    zef_ui_apply_size(fig, max(need_w, 920), min(max(need_h, 640), 740), 760, 520);
+elseif contains(nm_end, 'kalman')
+    zef_ui_apply_size(fig, max(need_w, 800), max(need_h, 320), 640, packed_min);
+elseif contains(nm_end, 'hierarchical prior')
+    zef_ui_apply_size(fig, max(need_w, 540), max(need_h, 420), 480, packed_min);
+elseif contains(nm_end, 'hierarchical l1') || contains(nm_end, 'l1/l2')
+    zef_ui_apply_size(fig, max(need_w, 680), max(need_h, 420), 560, packed_min);
+elseif contains(nm_end, 'gaussian mixture') && contains(nm_end, '(jl)')
+    zef_ui_apply_size(fig, max(need_w, 560), max(need_h, 420), 480, max(320, round(0.72 * def_h)));
 elseif contains(nm_end, 'gaussian mixture')
-    zef_ui_apply_size(fig, max(need_w, 640), max(need_h, 860), 560, 740);
+    zef_ui_apply_size(fig, max(need_w, 440), max(need_h, 240), 400, packed_min);
 elseif contains(nm_end, 'gmm plot') || contains(nm_end, 'gmm modeling') ...
         || contains(nm_end, 'gm modeling')
-    zef_ui_apply_size(fig, max(need_w, 440), max(need_h, 240), 400, 220);
-elseif n_pair <= 6 && n_check == 0 && ~has_axes && need_w <= 380
-    zef_ui_apply_size(fig, need_w, max(need_h, 160), ...
-        max(320, round(0.90 * need_w)), max(140, round(0.90 * need_h)));
+    zef_ui_apply_size(fig, max(need_w, 440), max(need_h, 240), 400, packed_min);
+elseif n_pair <= 8 && n_check == 0 && ~has_axes && need_w <= 420
+    zef_ui_apply_size(fig, need_w, max(need_h, 200), ...
+        max(320, round(0.90 * need_w)), packed_min);
 else
     min_w = max(360, round(0.88 * def_w));
     if n_form_cols > 1
@@ -557,13 +770,170 @@ else
     if exist('form_scroll', 'var') && form_scroll
         min_h = max(240, round(0.72 * def_h));
     else
-        min_h = max(220, min(def_h, round(0.96 * def_h)));
+        min_h = packed_min;
     end
     if n_check > 0
-        min_h = max(min_h, min(def_h, round(0.98 * def_h)));
+        min_h = max(min_h, packed_min);
         min_w = max(min_w, 460);
     end
     zef_ui_apply_size(fig, def_w, def_h, min_w, min_h);
+end
+
+end
+
+function rh = local_col_heights(pairs, idx, lb_h, hdr)
+
+if nargin < 3 || isempty(lb_h)
+    lb_h = 64;
+end
+if nargin < 4
+    hdr = '';
+end
+extra = double(~isempty(hdr));
+n = numel(idx);
+rh = repmat({26}, 1, max(1, n + extra));
+if extra
+    rh{1} = 22;
+end
+for k = 1:numel(idx)
+    i = idx(k);
+    rr = extra + k;
+    if rr > numel(rh) || i < 1 || i > numel(pairs)
+        continue
+    end
+    fld = pairs{i}{2};
+    lab = pairs{i}{1};
+    if local_is_textarea(fld)
+        rh{rr} = 120;
+    elseif local_is_listbox(fld)
+        rh{rr} = max(rh{rr}, lb_h);
+    elseif isempty(fld) && ~isempty(lab)
+        rh{rr} = 22;
+    end
+    try
+        if ~isempty(lab) && ~isempty(fld)
+            nlab = numel(strtrim(char(string(lab.Text))));
+            if nlab > 26
+                rh{rr} = max(rh{rr}, 40);
+            end
+        end
+    catch
+    end
+end
+
+end
+
+function local_fill_form_column(form, pairs, idx, theme, hdr)
+
+if nargin < 5
+    hdr = '';
+end
+row0 = 0;
+if ~isempty(hdr)
+    row0 = 1;
+    hlab = uilabel(form, 'Text', hdr);
+    try
+        hlab.FontWeight = 'bold';
+        hlab.HorizontalAlignment = 'left';
+        hlab.WordWrap = 'off';
+        hlab.FontColor = theme.color.header;
+        hlab.Layout.Row = 1;
+        hlab.Layout.Column = [1 2];
+    catch
+    end
+end
+for k = 1:numel(idx)
+    i = idx(k);
+    rr = row0 + k;
+    lab = pairs{i}{1};
+    fld = pairs{i}{2};
+    if ~isempty(lab)
+        try
+            lab.Parent = form;
+            try
+                lab.Layout.Row = rr;
+                lab.Layout.Column = 1;
+            catch
+                lab.Layout = matlab.ui.layout.GridLayoutOptions('Row', rr, 'Column', 1);
+            end
+            lab.Text = local_clean_label(lab.Text);
+            if isempty(fld)
+                try
+                    lab.Layout.Column = [1 2];
+                catch
+                end
+                lab.HorizontalAlignment = 'left';
+                lab.FontWeight = 'bold';
+                lab.WordWrap = 'off';
+                try
+                    lab.FontColor = theme.color.header;
+                catch
+                end
+            else
+                vis = 'on';
+                try
+                    vis = char(lab.Visible);
+                catch
+                end
+                if strcmpi(vis, 'off') || isempty(strtrim(char(string(lab.Text))))
+                    lab.Visible = 'off';
+                else
+                    lab.HorizontalAlignment = 'right';
+                    lab.FontWeight = 'normal';
+                    nlab = 0;
+                    try
+                        nlab = numel(strtrim(char(string(lab.Text))));
+                    catch
+                    end
+                    if nlab > 26
+                        lab.WordWrap = 'on';
+                        try
+                            rh = form.RowHeight;
+                            rh{rr} = max(rh{rr}, 40);
+                            form.RowHeight = rh;
+                        catch
+                        end
+                    else
+                        lab.WordWrap = 'off';
+                    end
+                end
+            end
+        catch
+        end
+    end
+    if ~isempty(fld)
+        try
+            fld.Parent = form;
+            try
+                fld.Layout.Row = rr;
+                fld.Layout.Column = 2;
+            catch
+                fld.Layout = matlab.ui.layout.GridLayoutOptions('Row', rr, 'Column', 2);
+            end
+            try
+                if local_is_textarea(fld)
+                    fld.WordWrap = 'on';
+                end
+            catch
+            end
+            try
+                if strcmpi(char(fld.Type), 'uicheckbox')
+                    vis = 'on';
+                    try
+                        if ~isempty(lab)
+                            vis = char(lab.Visible);
+                        end
+                    catch
+                    end
+                    if strcmpi(vis, 'off')
+                        fld.Layout.Column = [1 2];
+                    end
+                end
+            catch
+            end
+        catch
+        end
+    end
 end
 
 end
@@ -664,6 +1034,24 @@ if ~isempty(host)
         host.RowSpacing = 8;
         host.ColumnSpacing = 10;
         host.BackgroundColor = theme.color.panel;
+        rh = host.RowHeight;
+        for r = 1:numel(rh)
+            if isnumeric(rh{r})
+                rh{r} = min(rh{r}, 32);
+            elseif ischar(rh{r}) && contains(rh{r}, 'x')
+                rh{r} = 28;
+            end
+        end
+        host.RowHeight = rh;
+    catch
+    end
+    try
+        n_lab = numel(labs);
+        pref = 28 + max(n_lab, 1) * 34 + 16;
+        pan.Units = 'pixels';
+        if pan.Position(4) > pref + 40
+            pan.Position(4) = pref;
+        end
     catch
     end
     return
@@ -853,6 +1241,115 @@ end
 
 end
 
+function tf = local_is_listbox(fld)
+
+tf = false;
+if isempty(fld) || ~(isgraphics(fld) && isvalid(fld))
+    return
+end
+try
+    tf = strcmpi(char(fld.Type), 'uilistbox');
+catch
+end
+
+end
+
+function local_clarify_fi_labels(pairs, checks)
+
+for i = 1:numel(pairs)
+    lab = pairs{i}{1};
+    fld = pairs{i}{2};
+    if isempty(lab) || ~(isgraphics(lab) && isvalid(lab))
+        continue
+    end
+    tg = '';
+    try
+        if ~isempty(fld)
+            tg = lower(char(string(fld.Tag)));
+        end
+    catch
+    end
+    is_post = contains(tg, 'as_opt_5') ...
+        || (contains(tg, 'refinement') && contains(tg, '_2'));
+    if contains(tg, 'adaptive_refinement_compartments')
+        try
+            lab.Text = 'Adaptive refinement compartments:';
+        catch
+        end
+        continue
+    end
+    if contains(tg, 'labeling_priority')
+        try
+            lab.Text = 'Labeling priority:';
+        catch
+        end
+        continue
+    end
+    if ~is_post
+        continue
+    end
+    try
+        txt = char(string(lab.Text));
+        if ~contains(lower(txt), 'post-process')
+            txt = strtrim(regexprep(txt, ':$', ''));
+            lab.Text = [txt ' (post-process):'];
+        end
+    catch
+    end
+end
+if nargin < 2 || isempty(checks)
+    return
+end
+for i = 1:numel(checks)
+    try
+        tg = lower(char(string(checks(i).Tag)));
+        if ~(contains(tg, 'refinement') && contains(tg, '_2'))
+            continue
+        end
+        txt = char(string(checks(i).Text));
+        if ~contains(lower(txt), 'post-process')
+            txt = strtrim(regexprep(txt, ':$', ''));
+            checks(i).Text = [txt ' (post-process)'];
+        end
+    catch
+    end
+end
+
+end
+
+function pairs = local_drop_duplicate_headers(pairs)
+
+if isempty(pairs)
+    return
+end
+paired = {};
+for i = 1:numel(pairs)
+    if isempty(pairs{i}{1}) || isempty(pairs{i}{2})
+        continue
+    end
+    try
+        paired{end+1} = lower(strtrim(regexprep(char(string(pairs{i}{1}.Text)), ':$', ''))); %#ok<AGROW>
+    catch
+    end
+end
+keep = true(1, numel(pairs));
+for i = 1:numel(pairs)
+    if ~isempty(pairs{i}{2}) || isempty(pairs{i}{1})
+        continue
+    end
+    try
+        t = lower(strtrim(regexprep(char(string(pairs{i}{1}.Text)), ':$', '')));
+        if any(strcmp(t, paired))
+            pairs{i}{1}.Visible = 'off';
+            keep(i) = false;
+        end
+    catch
+    end
+end
+pairs = pairs(keep);
+
+end
+
 function [footer, extra] = local_split_buttons(btns)
 
 footer = gobjects(0, 1);
@@ -966,8 +1463,14 @@ for j = 1:numel(fields)
         if lp(1) > fp(1) - 8
             continue
         end
-        gap = max(0, fp(1) - lp(1));
-        score = dy + 0.01 * gap;
+        gap = max(0, fp(1) - (lp(1) + lp(3)));
+        if gap > 280 && dy > 12
+            continue
+        end
+        if ~local_pair_ok(labels(i), fields(j))
+            continue
+        end
+        score = dy * 8 + 0.12 * gap;
         if score < best_score
             best_score = score;
             best = i;
@@ -1004,7 +1507,7 @@ if ~isempty(unlab) && ~isempty(unused)
                 continue
             end
             dy = abs(lab_y(k) - fld_y(i));
-            if dy < 80 && dy < best_dy
+            if dy < 80 && dy < best_dy && local_pair_ok(labels(unused(k)), row_fld{unlab(i)})
                 best_dy = dy;
                 best = k;
             end
@@ -1020,17 +1523,20 @@ if ~isempty(unlab) && ~isempty(unused)
     end
 end
 
-n_paired = sum(~cellfun(@isempty, row_lab));
-if n_paired >= max(1, round(0.5 * numel(fields)))
-    for i = 1:numel(labels)
-        if used_lab(i)
+for i = 1:numel(labels)
+    if used_lab(i)
+        continue
+    end
+    try
+        if isempty(strtrim(char(string(labels(i).Text))))
             continue
         end
-        try
-            labels(i).Visible = 'off';
-        catch
-        end
+    catch
     end
+    row_lab{end+1} = labels(i); %#ok<AGROW>
+    row_fld{end+1} = []; %#ok<AGROW>
+    row_y(end+1) = local_pos(labels(i), 2); %#ok<AGROW>
+    used_lab(i) = true;
 end
 
 if isempty(row_fld)
@@ -1038,7 +1544,9 @@ if isempty(row_fld)
 end
 keep_row = true(numel(row_fld), 1);
 for i = 1:numel(row_fld)
-    if ~local_keep_field(row_fld{i})
+    if isempty(row_fld{i})
+        keep_row(i) = ~isempty(row_lab{i});
+    elseif ~local_keep_field(row_fld{i})
         keep_row(i) = false;
     end
 end
@@ -1052,6 +1560,37 @@ end
 for i = 1:numel(order)
     k = order(i);
     pairs{end+1} = {row_lab{k}, row_fld{k}}; %#ok<AGROW>
+end
+
+end
+
+function tf = local_pair_ok(lab, fld)
+
+tf = true;
+if isempty(lab) || isempty(fld) || ~(isgraphics(lab) && isvalid(lab)) ...
+        || ~(isgraphics(fld) && isvalid(fld))
+    return
+end
+lt = '';
+try
+    lt = lower(char(string(lab.Text)));
+catch
+end
+items = {};
+try
+    if isprop(fld, 'Items')
+        items = fld.Items;
+    end
+catch
+end
+if isempty(items)
+    return
+end
+joined = lower(strjoin(string(items), ' '));
+if contains(joined, 'relative') && contains(joined, 'absolute')
+    if contains(lt, 'gpu') || contains(lt, 'device') || contains(lt, 'acceleration')
+        tf = false;
+    end
 end
 
 end
@@ -1081,16 +1620,28 @@ end
 function txt = local_clean_label(txt)
 
 try
-    txt = char(string(txt));
+    if iscell(txt)
+        txt = strjoin(cellfun(@char, txt, 'UniformOutput', false), ' ');
+    elseif isstring(txt)
+        txt = strjoin(cellstr(txt), ' ');
+    elseif ischar(txt) && ~isempty(txt) && size(txt, 1) > 1
+        txt = strjoin(cellstr(txt), ' ');
+    else
+        txt = char(string(txt));
+    end
 catch
     txt = '';
     return
 end
+txt = strtrim(regexprep(txt, '\s+', ' '));
 map = { ...
     'Inflation strenth:', 'Inflation strength:'; ...
     'Exclude_box', 'Exclude box'; ...
     'Colormap size :', 'Colormap size:'; ...
-    'Hyperprior tail length (dB)::', 'Hyperprior tail length (dB):'};
+    'Hight-cut frequency (Hz):', 'High-cut frequency (Hz):'; ...
+    'Hyperprior tail length (dB)::', 'Hyperprior tail length (dB):'; ...
+    'Burn in', 'Burn in:'; ...
+    'Burn in:', 'Burn in:'};
 for i = 1:size(map, 1)
     if strcmp(strtrim(txt), map{i, 1})
         txt = map{i, 2};
@@ -1148,10 +1699,42 @@ catch
 end
 w = max(360, min(880, 48 + lab_px + field_px));
 if n_form_cols > 1
-    w = max(w, min(920, 56 + 2 * (lab_px + field_px)));
+    w = max(w, min(1040, 56 + 2 * (lab_px + min(field_px, 280))));
 end
 if n_pair <= 6 && w <= 380
     w = 360;
+end
+
+end
+
+function local_center_button_row(parent, btns, theme)
+
+n = numel(btns);
+if n < 1
+    return
+end
+bw = 80;
+for i = 1:n
+    bw = max(bw, local_btn_width(btns(i)));
+end
+bw = min(168, bw);
+widths = repmat({bw}, 1, n);
+row = uigridlayout(parent, [1 n + 2]);
+row.ColumnWidth = [{'1x'}, widths, {'1x'}];
+row.RowHeight = {34};
+row.Padding = [0 0 0 0];
+row.ColumnSpacing = 8;
+try
+    row.BackgroundColor = theme.color.bg;
+catch
+end
+for i = 1:n
+    try
+        btns(i).Parent = row;
+        btns(i).Layout.Row = 1;
+        btns(i).Layout.Column = i + 1;
+    catch
+    end
 end
 
 end
@@ -1189,7 +1772,7 @@ for i = 1:numel(labels)
     catch
     end
 end
-lab_w = min(220, max(120, round(7.2 * max_n) + 14));
+lab_w = min(240, max(132, round(7.2 * max_n) + 16));
 
 end
 
@@ -1374,7 +1957,7 @@ end
 if ~isempty(chk) && isgraphics(chk) && isvalid(chk)
     try
         n_live = numel(local_findall(chk, 'uicheckbox'));
-        chk.RowHeight = repmat({26}, 1, max(1, ceil(n_live / 2)));
+        chk.RowHeight = repmat({28}, 1, max(1, ceil(n_live / 2)));
     catch
     end
 end
@@ -1421,6 +2004,12 @@ for i = 1:numel(labs)
     end
     if numel(txt) < 3 || ~contains(txt, ':')
         continue
+    end
+    try
+        if ~isempty(form) && isgraphics(form) && numel(form.RowHeight) <= 1
+            continue
+        end
+    catch
     end
     try
         h.Visible = 'on';

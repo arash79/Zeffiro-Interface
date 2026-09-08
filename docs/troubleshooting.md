@@ -31,7 +31,7 @@ or `'zeffiro_restart', true`.
 
 ## Inverse-tools Start does not match `zef_inverse_run`
 
-Expected for most menus: they call `plugins/*` iterations. Four entries labelled **(class solver)** (eLORETA, UKF-NMM, HALpR, Group Lasso) *do* call `zef_inverse_run`. Kalman DTI `Q` exists only on the Kalman plugin. sLORETA registry id still defaults CSM `method_type` to dSPM unless `MethodParams` is set. Asteroid profiles omit the class-solver rows.
+Expected for menus without **(class solver)** in the label: they call `plugins/*` iterations. Entries labelled **(class solver)** *do* call `zef_inverse_run`. Kalman DTI `Q` exists only on the Kalman plugin. sLORETA registry id still defaults CSM `method_type` to dSPM unless `MethodParams` is set.
 
 ## GUI and script see different `zef`
 

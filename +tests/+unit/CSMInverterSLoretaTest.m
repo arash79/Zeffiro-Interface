@@ -54,6 +54,8 @@ classdef CSMInverterSLoretaTest < matlab.unittest.TestCase
                 inv.theta0, procFile);
             rel = max(abs(z - z_ref)) / max(abs(z_ref));
             testCase.verifyLessThanOrEqual(rel, 1e-12);
+            % Inverse-tools CSM (zef_CSM_iteration, csm_type 3, mode 2) uses
+            % the same 1/sqrt surface weights on constrained nodes.
         end
 
         function testCacheInvalidatedWhenTheta0Changes(testCase)

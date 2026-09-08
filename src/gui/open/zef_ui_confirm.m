@@ -66,10 +66,10 @@ try
 catch
 end
 
-gl = uigridlayout(fig, [3 3]);
+gl = uigridlayout(fig, [3 4]);
 gl.Tag = 'zef_ui_root';
 gl.RowHeight = {26, '1x', 36};
-gl.ColumnWidth = {'1x', 96, 96};
+gl.ColumnWidth = {'1x', 96, 96, '1x'};
 gl.Padding = [22 16 22 16];
 gl.RowSpacing = 10;
 gl.ColumnSpacing = 8;
@@ -79,12 +79,12 @@ title_lab = uilabel(gl, 'Text', title, ...
     'FontWeight', 'bold', 'FontSize', theme.font.sizeTitle, ...
     'FontColor', theme.color.text, 'HorizontalAlignment', 'left');
 title_lab.Layout.Row = 1;
-title_lab.Layout.Column = [1 3];
+title_lab.Layout.Column = [1 4];
 q_lab = uilabel(gl, 'Text', question, ...
     'FontColor', theme.color.text, 'WordWrap', 'on', ...
     'HorizontalAlignment', 'left');
 q_lab.Layout.Row = 2;
-q_lab.Layout.Column = [1 3];
+q_lab.Layout.Column = [1 4];
 no_btn = uibutton(gl, 'Text', 'No', 'Tag', 'zef_confirm_no', ...
     'ButtonPushedFcn', @(src, ~) local_finish(src, 'No'));
 no_btn.Layout.Row = 3;

@@ -28,7 +28,6 @@ frame_number = 1;
 max_iter = 10000;
 training_data_size = 50;
 snr_vec = [10];
-frame_number = 1;
 cred_val_rec = 0.95;
 cred_val_points = 0.98;
 max_n_clusters = 100;

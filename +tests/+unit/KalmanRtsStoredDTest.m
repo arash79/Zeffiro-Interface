@@ -50,11 +50,13 @@ classdef KalmanRtsStoredDTest < matlab.unittest.TestCase
         end
 
         function pluginStoresRawMeanForRts(testCase)
-            src = fileread(fullfile("plugins", "Kalman", "m", ...
+            root = fileparts(which("zeffiro_interface"));
+            testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
+            src = fileread(fullfile(root, "plugins", "Kalman", "m", ...
                 "kalman_filter_sLORETA.m"));
             testCase.verifyTrue(contains(src, "z_inverse{f_ind} = gather(m)"));
             testCase.verifyTrue(contains(src, "D_store{f_ind}"));
-            kf = fileread(fullfile("plugins", "Kalman", "m", "zef_KF.m"));
+            kf = fileread(fullfile(root, "plugins", "Kalman", "m", "zef_KF.m"));
             testCase.verifyTrue(contains(kf, "D_store{k} * z_inverse{k}"));
         end
     end

@@ -37,7 +37,7 @@ Edit UI only in App Designer.
 ## Important notes
 
 - DTI structural `Q` is this plugin path only.
-- Asteroid profiles do not register this menu entry.
+- Asteroid profiles do not register this **legacy** menu (`zef_kf_start`). They do register **Kalman (class solver)**.
 
 ## Developer guidance
 

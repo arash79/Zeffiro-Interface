@@ -53,7 +53,7 @@ zeffiro_interface.ini → profile_name
 plugins callbacks named in zeffiro_plugins.ini
 ```
 
-Class inverse **ids** (`zef_inverse_run`) are registered in `utilities.cluster.inverse_method_registry`, not in these INIs. Head profiles still list four Inverse-tools **callbacks** that open the class dialog: `zef_eloreta_start`, `zef_ukfnmm_start`, `zef_halpr_start`, `zef_grouplasso_start`. Asteroid INIs do not include those rows.
+Class inverse **ids** (`zef_inverse_run`) are registered in `utilities.cluster.inverse_method_registry`, not in these INIs. Profile INIs list Inverse-tools **callbacks** that open the class dialog (`zef_eloreta_start`, `zef_mne_class_start`, …). The matching legacy menu, when present, still runs the plugin iteration.
 
 ## Usage instructions
 
@@ -67,7 +67,7 @@ Open Edit → parameter / segmentation / system / plugin settings dialogs to App
 
 ## Important notes
 
-- Asteroid profiles drop many head-only tools (Kalman, NSE, DTI, …) and add Wireframe / SESAME on some menus.
+- Asteroid profiles drop many head-only tools (NSE, DTI, …) and keep Wireframe / SESAME on the menus.
 - `_legacy` adds EXP IAS RAMUS on Inverse tools and drops SL1, EXP Lasso, DTI, and synthetic-source patch. NSE is already on the **default** head menu; `_nse` is not “legacy plus NSE”.
 - Default `multicompartment_head` already lists **NSE tool**. `_nse` mainly adds `mvd_length` / `nse_sigma` in the parameter INI and uses the reduced (legacy-like) plugin list.
 - Forward Script cells are a trust boundary — treat INI edits like code review.

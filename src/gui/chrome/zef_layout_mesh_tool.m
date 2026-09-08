@@ -55,9 +55,9 @@ try
 catch
 end
 
-left = uigridlayout(root, [3 1]);
-left.RowHeight = {'fit', 'fit', '1x'};
-left.RowSpacing = 6;
+left = uigridlayout(root, [4 1]);
+left.RowHeight = {'fit', 'fit', 'fit', 40};
+left.RowSpacing = 8;
 left.Padding = [0 0 0 0];
 try
     left.BackgroundColor = theme.color.bg;
@@ -65,7 +65,7 @@ catch
 end
 
 actions = uigridlayout(left, [3 2]);
-actions.RowHeight = {32, 32, 32};
+actions.RowHeight = {28, 28, 28};
 actions.ColumnWidth = {'1x', '1x'};
 actions.Padding = [8 8 8 8];
 actions.RowSpacing = 6;
@@ -97,10 +97,10 @@ local_move(fig, opts, 'h_source_interpolation_on');
 local_move(fig, opts, 'h_downsample_surfaces');
 
 params = uigridlayout(left, [9 2]);
-params.ColumnWidth = {'1x', 96};
-params.RowHeight = repmat({26}, 1, 9);
-params.Padding = [10 8 10 8];
-params.RowSpacing = 6;
+params.ColumnWidth = {172, 104};
+params.RowHeight = repmat({24}, 1, 9);
+params.Padding = [10 6 10 6];
+params.RowSpacing = 4;
 try
     params.BackgroundColor = theme.color.panel;
 catch
@@ -115,21 +115,43 @@ local_pair(fig, params, 'InflatingiterationsLabel', 'h_inflate_n_iterations');
 local_pair(fig, params, 'CuttingplanecoeffEditFieldLabel_9', 'h_inflate_strength');
 local_pair(fig, params, 'DirectionsDropDownLabel', 'h_popupmenu2');
 
-right = uigridlayout(root, [3 1]);
+hint = uilabel(left, ...
+    'Text', 'Create the FEM mesh, then pick a lead-field profile and run its script.', ...
+    'WordWrap', 'on', 'FontColor', theme.color.textMuted, ...
+    'VerticalAlignment', 'top');
+try
+    hint.Layout.Row = 4;
+catch
+end
+
+right = uigridlayout(root, [4 1]);
 right.Tag = 'zef_mesh_right';
-right.RowHeight = {'1x', 96, 36};
+right.RowHeight = {22, 200, '1x', 36};
 right.RowSpacing = 8;
 right.Padding = [0 0 0 0];
 try
     right.BackgroundColor = theme.color.bg;
 catch
 end
+tbl_lab = uilabel(right, 'Text', 'Lead-field profiles', ...
+    'FontWeight', 'bold', 'FontColor', theme.color.header);
+try
+    tbl_lab.Layout.Row = 1;
+catch
+end
 local_move(fig, right, 'h_forward_simulation_table');
 local_move(fig, right, 'h_forward_simulation_script');
 try
+    scr = findall(fig, 'Tag', 'h_forward_simulation_script');
+    if ~isempty(scr)
+        scr(1).Placeholder = 'Script for the selected profile';
+    end
+catch
+end
+try
     tbl = findall(fig, 'Tag', 'h_forward_simulation_table');
     if ~isempty(tbl)
-        tbl(1).ColumnWidth = {260, '2.4x', '1.4x'};
+        tbl(1).ColumnWidth = {220, '2.6x', '2.0x'};
     end
 catch
 end
@@ -162,7 +184,7 @@ zef_ui_adapt_grid(fig);
 try
     tbl = findall(fig, 'Tag', 'h_forward_simulation_table');
     if ~isempty(tbl)
-        tbl(1).ColumnWidth = {200, '2.8x', '2.2x'};
+        tbl(1).ColumnWidth = {220, '2.6x', '2.0x'};
     end
 catch
 end

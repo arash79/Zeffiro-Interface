@@ -14,7 +14,7 @@ zef_grouplasso_start → zef_grouplasso_window → zef_open_class_inverse
 zef_inverse_run(..., "grouplasso") → inverse.GroupLassoInverter → LG_optimization
 ```
 
-Registered on `multicompartment_head`, `_legacy`, and `_nse`. Not on asteroid profiles.
+Registered on all bundled profiles, including asteroid gravity/radar.
 
 ## Main contents
 

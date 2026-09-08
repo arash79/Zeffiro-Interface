@@ -19,7 +19,7 @@ Needs `zef.tetra`, `zef.nodes`, `zef.domain_labels`, `zef.epsilon` (permittivity
 
 ## Workflow context
 
-Asteroid Multi tools menu where registered. Default head profile: call `zef_wireframe_creator_start` yourself. Separate from EEG/MEG inverse plugins.
+Default and asteroid Multi tools menus. Separate from EEG/MEG inverse plugins.
 
 ## Usage instructions
 

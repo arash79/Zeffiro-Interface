@@ -56,14 +56,18 @@ classdef IASFamilyLastStepTest < matlab.unittest.TestCase
         end
 
         function testPluginIASTypeThreeIsLastStep(testCase)
-            src = fileread(fullfile("plugins", "IASInversion", "m", "zef_ias_iteration.m"));
+            root = fileparts(which("zeffiro_interface"));
+            testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
+            src = fileread(fullfile(root, "plugins", "IASInversion", "m", "zef_ias_iteration.m"));
             testCase.verifyTrue(contains(src, "isequal(ias_type,3)"));
             testCase.verifyFalse(contains(src, "elseif isequal(ias_type,2)"));
         end
 
         function testLastStepDoesNotReferenceTypoProperty(testCase)
-            ias_src = fileread(fullfile("+inverse", "@IASInverter", "invert.m"));
-            ramus_src = fileread(fullfile("+inverse", "@RAMUSInverter", "invert.m"));
+            root = fileparts(which("zeffiro_interface"));
+            testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
+            ias_src = fileread(fullfile(root, "+inverse", "@IASInverter", "invert.m"));
+            ramus_src = fileread(fullfile(root, "+inverse", "@RAMUSInverter", "invert.m"));
             testCase.verifyFalse(contains(ias_src, "n_n_map_iterations"));
             testCase.verifyFalse(contains(ramus_src, "n_n_map_iterations"));
         end

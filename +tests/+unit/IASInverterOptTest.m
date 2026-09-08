@@ -87,8 +87,10 @@ classdef IASInverterOptTest < matlab.unittest.TestCase
         end
 
         function testClassAndPluginSkipFullFilterWhenUnused(testCase)
-            ias_src = fileread(fullfile("+inverse", "@IASInverter", "invert.m"));
-            plugin_src = fileread(fullfile("plugins", "IASInversion", "m", "zef_ias_iteration.m"));
+            root = fileparts(which("zeffiro_interface"));
+            testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
+            ias_src = fileread(fullfile(root, "+inverse", "@IASInverter", "invert.m"));
+            plugin_src = fileread(fullfile(root, "plugins", "IASInversion", "m", "zef_ias_iteration.m"));
             testCase.verifyTrue(contains(ias_src, "Wd' * (A \ f)"));
             testCase.verifyTrue(contains(plugin_src, "Wd' * (A \ f)"));
             testCase.verifyTrue(contains(ias_src, "need_full_W"));

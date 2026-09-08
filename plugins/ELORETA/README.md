@@ -18,7 +18,7 @@ zef_inverse_run(..., "eloreta") → inverse.ELORETAInverter
 zef.reconstruction
 ```
 
-Head profiles (`multicompartment_head`, `_legacy`, `_nse`) register the menu row. Asteroid gravity/radar INIs do **not**.
+Head profiles and asteroid gravity/radar INIs all register the menu row.
 
 ## Main contents
 

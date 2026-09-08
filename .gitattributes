@@ -1,0 +1,21 @@
+# Binary assets — do not treat as text, do not force CRLF/LF conversion.
+*.mat binary
+*.fig binary
+*.mlapp binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.stl binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.asc text
+*.zef text
+
+# Third-party trees and font files are not first-party source for linguist.
+external/** linguist-vendored
+documentation/fonts/** linguist-vendored

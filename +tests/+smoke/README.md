@@ -10,12 +10,12 @@ Fully qualified names are `tests.smoke.<ClassName>`. Parent map: [`../README.md`
 
 | Class | What it actually checks |
 |-------|-------------------------|
-| `ArchitectureLayoutTest` | `which` of public `zef_*` names resolves under the owned folder (`src/app`, `src/gui/chrome`, `src/forward/lead_field`, `src/mesh`, `src/inverse`, `src/sensors`, `src/visualization/colormaps`, `src/io`, `src/forward/solvers`). `inverse.gmm.FitAdvGMM` / `inverse.kf.kf_update` exist; retired `plugins.ClassGMM` / `plugins.ClassKF` do not. Folders `tools/plugins`, `src/core`, `src/gui/helpers`, `src/auxiliary`, `+plugins`, `plugins/GithubPusher` are **gone**; `src/app` and `src/gui/chrome` exist; `plugins/Kalman/m/zef_KF.m` still exists |
+| `ArchitectureLayoutTest` | `which` of public `zef_*` names resolves under the owned folder (`src/app`, `src/gui/chrome`, `src/forward/lead_field`, `src/mesh`, `src/inverse`, `src/sensors`, `src/visualization/colormaps`, `src/io`, `src/forward/solvers`). `inverse.gmm.FitAdvGMM` / `inverse.kf.kf_update` exist; retired `plugins.ClassGMM` / `plugins.ClassKF` do not. Folders `tools/plugins`, `src/core`, `src/gui/helpers`, `src/auxiliary`, `+plugins`, `plugins/GithubPusher` are **gone**; `src/app` and `src/gui/chrome` exist; `plugins/Kalman/m/zef_KF.m` still exists; local dump folders, root screenshot helpers, and `Untitled.mat` stay absent; `zef_start` does not call `!git pull` |
 | `EndToEndSyntheticTest` | `zef_inverse_run(..., "dspm", "execution", "local")` writes nonempty `zef.reconstruction` and `run_result.reconstruction` |
 | `WindowManagementTest` | Real figures: factory docked `WindowStyle`, standalone default after `zef_window_manager('init')`, Position-before-WindowStyle order, arrange/hide/raise/dock-menu, waitbar-like constructor stays `'normal'` |
 | `FindSyntheticSourceROITest` | Headless `zef_ROI_finder` (sphere, empty-sphere snap-to-nearest, flat disk) and finite ROI synthetic measurements; does **not** open the ROI GUI |
 | `SourceTreeJRTest` | Headless Jansen–Rit tree ODE (`zef_simulate_jr_tree`) for a single node: finite `upRaw`, correct sample count, `SourceNoiseStd` honored. Does **not** open Source Tree App Designer |
-| `UpstreamPortRegressionTest` | File-level guards from an upstream port: Kalman burn-in uses `num2str` not `mun2str`; default head `zeffiro_plugins.ini` registers strip tool, source tree, FSS ROI and patch **once**; patch plugin file kept; `zef_plot_sphere.m` is **not** under ROI `plotting_tools/` |
+| `UpstreamPortRegressionTest` | Kalman burn-in uses `num2str` (not the historical `mun2str` typo); default head INI registers strip tool, source tree, FSS ROI, and patch once |
 
 ## Code functionality
 
@@ -27,7 +27,7 @@ Fully qualified names are `tests.smoke.<ClassName>`. Parent map: [`../README.md`
 
 Plugin smokes call **library functions** (`zef_ROI_finder`, `zef_simulate_jr_tree`) with struct inputs, not `*_start` GUI callbacks.
 
-`UpstreamPortRegressionTest` is `fileread` / `isfile` only. It does not execute Kalman or the INI parser. Update it when those exact strings are meant to change.
+`UpstreamPortRegressionTest` pins the Kalman `num2str` burn-in call and the default-profile Forward-tools registrations. `PluginIniResolutionTest` still checks that every INI Start function resolves.
 
 ## Workflow context
 
@@ -56,7 +56,7 @@ runtests('+tests/+smoke')
 
 - `ArchitectureLayoutTest` will fail if you reintroduce `src/core`, `tools/plugins`, or `plugins/GithubPusher` even as an empty stub — those names were retired on purpose.
 - `EndToEndSyntheticTest` uses tiny random `L`. A pass is not a scientific validation of dSPM.
-- `UpstreamPortRegressionTest` uses relative paths (`plugins/...`, `profile/...`) and therefore expects `pwd` to be the project root.
+- `UpstreamPortRegressionTest` locates files from `which('zeffiro_interface')`.
 
 ## Developer guidance
 

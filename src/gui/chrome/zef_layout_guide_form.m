@@ -59,7 +59,7 @@ for i = 1:numel(btns)
     catch
     end
     if contains(txt, 'close') || contains(txt, 'apply') || contains(txt, 'start') ...
-            || contains(txt, 'ok') || contains(txt, 'cancel')
+            || contains(txt, 'ok') || contains(txt, 'cancel') || strcmp(txt, 'run')
         footer(end+1, 1) = btns(i); %#ok<AGROW>
     else
         extra(end+1, 1) = btns(i); %#ok<AGROW>
@@ -187,7 +187,18 @@ for i = 1:numel(items)
             btn = it.h;
             if isgraphics(btn) && isvalid(btn)
                 btn.Units = 'pixels';
-                btn.Position = [x0, y, block, row_h];
+                txt = '';
+                try
+                    if isprop(btn, 'String')
+                        txt = char(string(btn.String));
+                    elseif isprop(btn, 'Text')
+                        txt = char(string(btn.Text));
+                    end
+                catch
+                end
+                bw = min(block, max(spec.btn_w, 28 + round(7.4 * numel(strtrim(txt)))));
+                bx = x0 + max(0, (block - bw) / 2);
+                btn.Position = [bx, y, bw, row_h];
             end
         catch
         end
@@ -197,7 +208,7 @@ for i = 1:numel(items)
         try
             if isgraphics(lab) && isvalid(lab)
                 lab.Units = 'pixels';
-                lab.HorizontalAlignment = 'left';
+                lab.HorizontalAlignment = 'right';
                 lab.FontName = spec.theme.font.name;
                 lab.ForegroundColor = spec.theme.color.text;
                 lab.BackgroundColor = spec.theme.color.bg;
@@ -226,34 +237,9 @@ end
 nb = numel(btns);
 if nb > 0
     total = nb * spec.btn_w + (nb - 1) * 8;
-    x = x0 + block - total;
+    x = x0 + (block - total) / 2;
     x = max(x0, x);
     by = pad;
-    need_y = pad + row_h + spec.row_gap;
-    if y < need_y
-        extra = need_y - y;
-        try
-            fig.Position(4) = H + extra;
-            H = fig.Position(4);
-        catch
-        end
-        for i = 1:numel(items)
-            it = items{i};
-            try
-                if strcmp(it.kind, 'extra') && isgraphics(it.h) && isvalid(it.h)
-                    it.h.Position(2) = it.h.Position(2) + extra;
-                else
-                    if isgraphics(it.lab) && isvalid(it.lab)
-                        it.lab.Position(2) = it.lab.Position(2) + extra;
-                    end
-                    if isgraphics(it.fld) && isvalid(it.fld)
-                        it.fld.Position(2) = it.fld.Position(2) + extra;
-                    end
-                end
-            catch
-            end
-        end
-    end
     for i = 1:nb
         try
             if isgraphics(btns(i)) && isvalid(btns(i))
