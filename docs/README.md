@@ -38,7 +38,7 @@ If a folder README and `architecture.md` disagree, treat **implementation plus t
 
 The LaTeX manual under `documentation/` may lag the code. Folder READMEs and MATLAB `help` win for GUI paths and signatures.
 
-The optional project homepage under [`website/`](../website/) copies these guides into its Docs section at build time. Edit files here, not the generated `website/content/docs/` copies.
+The optional project homepage under [`website/`](../website/) copies these guides into its Docs section at build time. Edit files here, not the generated `website/content/docs/` copies. After a docs change, rebuild `website/dist/` (`npm run build` in `website/`) so the committed Cloudflare snapshot matches.
 
 ## Notes that bite newcomers
 

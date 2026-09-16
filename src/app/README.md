@@ -21,6 +21,7 @@ Shell around a Zeffiro session: start, default fields, the GUI↔`zef` synchroni
 | `zef_clipping_plane.m` | function | half-space (or slab) node mask for plots |
 | `zef_remove_object_handles.m` | function | strip `h_*` graphics before `.mat` save |
 | `zef_gpu_count.m` | function | GPU count, or 0 without Parallel Computing Toolbox |
+| `zef_ensure_parpool.m` | function | Local `parpool` sized to `n_workers` when PCT is present; no-op without it |
 | `zef_start_log.m` | function | rotating logs under `data/log/` |
 | `zef_start_config.m` | generated | overwritten by `zeffiro_setup` (comment header + `addpath` / startup lines); do not hand-edit |
 | `zef_get_profile_parameters.m` | function | On scalar Segmentation/Free-form param names |

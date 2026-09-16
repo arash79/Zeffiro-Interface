@@ -2,7 +2,9 @@
 
 Optional static homepage. It is **not** on the MATLAB path and is not required to run Zeffiro.
 
-Docs pages are copied from [`docs/`](../docs/) when you run the Vite dev server or production build. Edit the repository guides, not the generated copies under `website/content/docs/` (that directory is gitignored).
+Docs pages are copied from [`docs/`](../docs/) when you run the Vite dev server or production build. Edit the repository guides, not the generated copies under `website/content/docs/`.
+
+`website/dist/` and `website/content/docs/` are committed so Cloudflare Pages can publish without a Node build. After changing `docs/` or `website/*.html`, run `npm run build` here and commit the updated `dist/`. **Do not commit `website/node_modules/`.**
 
 ```bash
 cd website

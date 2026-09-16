@@ -18,7 +18,7 @@ This page stops after a mesh, and optionally after `L`. Inverse methods are intr
 ## 1. Prerequisites
 
 - MATLAB **R2023a** or newer. `arguments` blocks, App Designer `uifigure` and `string` only need R2021a, but the batched linear algebra in the inverse precompute paths raises the real floor: `pagesvd` needs R2021b and `pageeig` (Beamformer, eLORETA, and sLORETA 3D precompute) needs R2023a.
-- Optional GPU: Parallel Computing Toolbox plus a CUDA device. Without those, pass `'use_gpu', false` everywhere below.
+- Optional GPU: Parallel Computing Toolbox plus a CUDA device. Without those, pass `'use_gpu', false` everywhere below. The same toolbox is optional for CPU `parfor` (meshing, MEG/EIT transfer). Without it those loops still run, sequentially.
 - Optional Statistics Toolbox: GMM clustering and the UKFNMM class (`kmeans`).
 - Git, only if you want CVX / FieldTrip / other trees under `external/`.
 
@@ -164,7 +164,7 @@ zef.measurements = zef.L * randn(n_col, 1);
 
 `zef.reconstruction` is then a cell, one vector per time frame.
 
-Most GUI **Inverse tools** buttons call legacy plugin iterations. Four menu entries labelled **(class solver)** (eLORETA, UKF-NMM, HALpR, Group Lasso) open `zef_open_class_inverse` and run `zef_inverse_run`. Both tracks write `zef.reconstruction`. Details: [methods.md](methods.md), [`+inverse/README.md`](../+inverse/README.md).
+Most GUI **Inverse tools** buttons call legacy plugin iterations. Every shipped profile also lists **(class solver)** entries (eLORETA, UKF-NMM, HALpR, Group Lasso, MNE, IAS, RAMUS, CSM, Kalman, Beamformer, Dipole Scan). Those open `zef_open_class_inverse` and run `zef_inverse_run`. Both tracks write `zef.reconstruction`. Details: [methods.md](methods.md), [`+inverse/README.md`](../+inverse/README.md).
 
 ## 8. What you should see
 

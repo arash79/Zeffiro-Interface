@@ -184,19 +184,11 @@ zef_waitbar(1,1,h,'Initial mesh.');
 
 clear X Y Z;
 
-% Labeling and later refinement use parfor when GPU is off; size the pool
-% to zef.parallel_processes (Mesh tool / system settings).
+% Labeling and later refinement use parfor when GPU is off. Size a PCT
+% pool to zef.parallel_processes when Parallel Computing Toolbox is present.
+% Without it, parfor in zef_point_in_compartment runs sequentially.
 if not(zef.use_gpu)
-n_parallel = zef.parallel_processes;
-    if isempty(gcp('nocreate'))
-        parpool(n_parallel);
-    else
-        h_pool = gcp;
-        if not(isequal(h_pool.NumWorkers,n_parallel))
-            delete(h_pool)
-            parpool(n_parallel);
-        end
-    end
+    zef_ensure_parpool(zef.parallel_processes);
 end
 
 refinement_surface_on = zef.refinement_surface_on;

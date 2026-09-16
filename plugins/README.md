@@ -12,13 +12,7 @@ Typical plugin folder: start callback (`*_start.m`), `m/` (iteration / math), `m
 
 **Default Forward / Multi / Settings:** Filter tool, Topography, synthetic source (legacy / patch / ROI), Strip tool, Source tree tool, DTI Conductivity, Multi lead field, LeadFieldProcessingTool, ReconstructionTool, Data Bank, Dynamical plot queue, NSE, Wireframe.
 
-**Hardcoded in `zef_menu_tool.m` (not INI):** Find synthetic source, Generate synthetic EIT data, Butterfly plot.
-
-**On disk but not on the default head menu**
-
-| Folder | How it is reached |
-|--------|-------------------|
-| `FindSyntheticSource/` | Hardcoded Forward-tools item (`zef_menu_tool.m`), not an INI row |
+**Hardcoded in `zef_menu_tool.m` (not INI):** Find synthetic source (`plugins/FindSyntheticSource/`), Generate synthetic EIT data, Butterfly plot.
 
 Child READMEs cover each tool’s Start callback, inputs, and `zef` fields. This file is the inventory, not a second copy of those manuals.
 

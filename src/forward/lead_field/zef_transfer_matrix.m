@@ -205,21 +205,7 @@ else % Use CPU instead of GPU
     % Define block size
 
     parallel_processes = eval( 'zef.parallel_processes');
-
-    have_pct = ~isempty(ver('parallel')) && ...
-           license('test','Distrib_Computing_Toolbox');
-
-    if have_pct
-        if isempty(gcp('nocreate'))
-            parpool(parallel_processes);
-        else
-            h_pool = gcp;
-            if ~isequal(h_pool.NumWorkers, parallel_processes)
-                delete(h_pool)
-                parpool(parallel_processes);
-            end
-        end
-    end
+    zef_ensure_parpool(parallel_processes);
 
     processes_per_core = eval( 'zef.processes_per_core');
     tic;

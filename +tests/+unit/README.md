@@ -21,7 +21,8 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `DownloaderSafetyTest` | `zeffiro_downloader` quotes git arguments, restores cwd, rejects non-URL remotes |
 | `StiffnessMatrixIdentityTest` | P1 stiffness on the unit tet matches \(\nabla\lambda_i\cdot(\sigma\nabla\lambda_j)V\); anisotropic \(\sigma_{xy}/\sigma_{xz}/\sigma_{yz}\) and a random SPD tensor; two-tet assembly |
 | `ProjectLoadLegacyTest` | Single-struct MAT files are not overwritten; non-struct singles error; `zef_remove_system_fields` drops `gpu_count` / `path_cell` and keeps `save_file` |
-| `Duneuro2ZefTest` | DUNEuro `eegL` layouts → interleaved `zef.L`; 0-based tets; hex split; mm/m; tensors; extra fields; unsupported inputs; converted MAT is not re-detected as DUNEuro |
+| `ProjectSaveExportTest` | Headless lead-field export and handle stripping |
+| `Duneuro2ZefTest` | DUNEuro `eegL` layouts → interleaved `zef.L`; 0-based tets; hex split; mm/m; tensors; extra fields; unsupported inputs; converted MAT is not re-detected as DUNEuro; `run` matches `convert`; `find_files` size priority; export-folder detection |
 | `BuildElectrodesCEMTest` | P1 CEM `A,B,C` vs analytic triangle mass; two-triangle \(C_{ee}=1/Z\); infinite-\(Z\) early return; point fallback |
 | `DTIActiveCompartmentMapTest` | Active-compartment map skips off tags; iso fallback uses that map, not tag position |
 | `FAToConductivityOrientationTest` | Model-3 FA→σ principal axis follows `v1`; missing `v1` defaults to \(+\hat x\) |
@@ -49,6 +50,7 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `HALpRInverterTest` | `L1_optimization` vs sparse-D reference (IAS and Standardized); q=1/q=2 invert; q=2 zero-frame and polarity; `halpr` local dispatch |
 | `GroupLassoInverterTest` | `LG_optimization` vs sparse-D reference (IAS / EM / Standardized); invert vs frozen MAP loop; non-triplet `L` errors; `grouplasso` local dispatch |
 | `UKFNMMInverterTest` | Construct, U-space→dipole map, van der Merwe defaults, `initialize` sizes, per-frame `invert`, smoother NMM **once**, RTS |
+| `SesameInversionSetupTest` | Headless `SESAME_inversion` with a stub sampler: unique interpolation indices subset sources; writes `zef.SESAME` |
 | `ClassGMMOptTest` | Mahalanobis / E-step / weighted EM of `inverse.gmm` vs original formulas; package isolation from retired `plugins.ClassGMM` |
 | `KalmanStandardizationExponentTest` | Class Kalman sLORETA exponent default 1/2 vs legacy `zef.standardization_exponent` (default 1); bitwise match when the exponent is aligned |
 | `MNEDepthWeightingTest` | Class MNE `theta` stays a per-source Dale/Lin vector, not `mean(theta)` |
@@ -68,6 +70,9 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `TesDofAveragingTest` | TES current-density DOF average: sparse incidence vs the scatter loops |
 | `VolumeScalarMatrixUFGTest` | NSE `uFG` convection kernel vs a dense triple-loop oracle (`zef_barycentric_weighting` `'uFG'`) |
 | `AnisotropicConductivityGuardTest` | Lead-field types 6–10 error unless `sigma(:,3:8)` is present |
+| `ProcessMeshesPipelineTest` | Cube surface translation via `zef_process_meshes`; `zef_create_fem_mesh` fills labeled tets |
+| `EegLeadFieldAssemblyTest` | PEM Whitney EEG FEM on a cube lattice: finite `L`, 2×6, mean-zero columns |
+| `EnsureParpoolTest` | CPU meshing / MEG / EIT / transfer / wave Born go through `zef_ensure_parpool`; those files do not call `gcp` / `parpool` directly |
 
 ### Types and chrome
 

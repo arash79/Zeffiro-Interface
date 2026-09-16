@@ -41,7 +41,7 @@ INI Script cells typically name these wrappers. `zef_eeg_lead_field`, `zef_eit_l
 
 **FEM sketch:** stiffness (`zef_stiffness_matrix`) → `zef_pem2cem` on CEM EEG/TES/EIT → electrode coupling (`zef_build_electrodes` for EEG/TES; EIT still inlines the same integrals with opposite `B` sign) → PCG for nodal potentials → interpolation `G` → modality map (EEG Schur, TES current-density gradient, MEG Biot–Savart, EIT conductivity Jacobian). PEM EIT is rejected with `zef_lead_field_eit_fem:PEMNotSupported` (the inherited PEM branch never built a right-hand side).
 
-EEG and TES call `zef_transfer_matrix` for that PCG. MEG and EIT **inline the same loops** (GPU Jacobi `1./diag(A)`; CPU SSOR or `ichol` nofill). They do not call `zef_transfer_matrix`. Gravity does not use this electrode-transfer PCG. NSE/wave use `src/forward/solvers`.
+EEG and TES call `zef_transfer_matrix` for that PCG. MEG and EIT **inline the same loops** (GPU Jacobi `1./diag(A)`; CPU SSOR or `ichol` nofill). They do not call `zef_transfer_matrix`. CPU PCG `parfor` goes through `zef_ensure_parpool` so missing Parallel Computing Toolbox does not abort (loops then run sequentially). Gravity does not use this electrode-transfer PCG. NSE/wave use `src/forward/solvers`.
 
 ### Interpolation, DOFs, and dipole stencils
 
@@ -59,7 +59,7 @@ EEG and TES call `zef_transfer_matrix` for that PCG. MEG and EIT **inline the sa
 | `zef_fi_dipoles.m` | Face-interior dipole stencils for H(div). |
 | `zef_decompose_dof_space.m` | Map brain tets to a reduced source lattice (`dof_decomposition_type` 1–3). |
 | `zef_lead_field_filter.m` | Drop columns whose column-norm exceeds a quantile (after every EEG/MEG/EIT/TES wrapper). |
-| `zef_transfer_matrix.m` | EEG/TES electrode PCG. GPU Jacobi; CPU SSOR or `ichol` nofill. MEG/EIT do not call this file. |
+| `zef_transfer_matrix.m` | EEG/TES electrode PCG. GPU Jacobi; CPU SSOR or `ichol` nofill. MEG/EIT do not call this file. CPU `parfor` uses `zef_ensure_parpool`. |
 
 ### Gravity (asteroid profiles)
 

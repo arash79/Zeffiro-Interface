@@ -15,7 +15,7 @@ Child READMEs: [`+unit`](+unit/README.md), [`+integration`](+integration/README.
 
 ## Main contents
 
-Classes are listed by short name; fully qualified names are `tests.unit.ELORETAInverterTest`, `tests.integration.ELORETADispatchTest`, `tests.smoke.ArchitectureLayoutTest`, etc.
+Classes are listed by short name; fully qualified names are `tests.unit.ELORETAInverterTest`, `tests.integration.ELORETADispatchTest`, `tests.smoke.ArchitectureLayoutTest`, etc. The tables in [`+unit/README.md`](+unit/README.md), [`+integration/README.md`](+integration/README.md), and [`+smoke/README.md`](+smoke/README.md) are the complete catalogs. This file is the package map.
 
 | Class / file | Covers |
 |--------------|--------|
@@ -59,9 +59,17 @@ Classes are listed by short name; fully qualified names are `tests.unit.ELORETAI
 | `PluginIniResolutionTest` | Default-profile plugin Start functions resolve |
 | `ProfileCellTest` | Profile INI parser matches `readcell`; cache invalidates on rewrite |
 | `ZefSourceModelLoadTest` | `core.types.ZefSourceModel.from` + legacy enum MAT load |
-| `Duneuro2ZefTest` | DUNEuro lead-field layouts, indexing, units, tensors, extra fields, unsupported inputs |
+| `Duneuro2ZefTest` | DUNEuro lead-field layouts, indexing, units, tensors, extra fields, unsupported inputs, `run` / `find_files` |
+| `ProcessMeshesPipelineTest` | Cube surface → labeled tetrahedra |
+| `EegLeadFieldAssemblyTest` | Tiny PEM EEG FEM `L` |
+| `SesameInversionSetupTest` | SESAME Start wrapper with a stub sampler |
+| `EnsureParpoolTest` | CPU `parfor` callers use `zef_ensure_parpool` |
+| `ProjectSaveExportTest` | Lead-field export and handle stripping |
+| `ArchitectureLayoutTest` | Public `zef_*` ownership; retired folders stay gone |
+| `SyntaxIntegrityTest` | Shipped `.m` files parse |
 | `tests.support.createSyntheticInverseZef` | Shared synthetic `zef` fixture for inverse tests (`source_interpolation_ind{1}` is a column) |
 | `tests.support.createSyntheticUKFNMMZef` | Larger xyz/bump `zef` fixture for UKFNMM clustering + NMM |
+| `tests.support.createSyntheticMeshZef` | Closed cube compartment for mesh pipeline tests |
 
 ## Code functionality
 

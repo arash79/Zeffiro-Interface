@@ -14,8 +14,8 @@ function [z] = SESAME_inversion(void)
 %   10^(-SESAME_snr/20). Neighbours from SESAMEneighbours. Side effects:
 %   writes zef.SESAME and zef.SESAME_time_serie{frame} in base; clears
 %   SESAME_time_serie at the start of a run. Returns cell z.
-%   As written, source_positions(s_ind_1,:) runs before s_ind_1 is
-%   assigned (s_ind_1 is not set in this file).
+%   Source nodes are unique(zef.source_interpolation_ind{1}), matching
+%   other legacy inverse plugins. Progress uses zef_waitbar.
 %
 %   See also inverse_SESAME, SESAMEneighbours, SESAME_App_run.
 
@@ -24,7 +24,7 @@ number_of_frames = evalin('base','zef.number_of_frames');
 source_direction_mode = evalin('base','zef.source_direction_mode');
 source_positions = evalin('base','zef.source_positions');
 
-% s_ind_1 is not assigned in this file (would subset source_positions).
+s_ind_1 = unique(evalin('base','zef.source_interpolation_ind{1}'));
 source_positions = source_positions(s_ind_1,:);
 
 [L,n_interp, procFile] = zef_processLeadfields(source_direction_mode);
@@ -52,11 +52,14 @@ end
 %============== CALCULATE NEGHBOURS BEFOREHAND  ==============
 [cfg.neighbours,cfg.neighboursp] = SESAMEneighbours(source_positions);
 
+h = zef_waitbar(0, 1, 'SESAME.');
+wb_cleanup = onCleanup(@() zef_close_waitbar(h)); %#ok<NASGU>
+
 tic;
 for f_ind = 1 : number_of_frames
     time_val = toc;
     if f_ind > 1  && number_of_frames > 1
-        date_str = datestr(datevec(now+(number_of_frames/(f_ind-1) - 1)*time_val/86400));
+        date_str = datestr(datevec(now+(number_of_frames/(f_ind-1) - 1)*time_val/86400)); %#ok<NASGU>
     end;
 
     if size(f_org,2) > 1
@@ -67,10 +70,8 @@ for f_ind = 1 : number_of_frames
         f = f_org;
     end
 
-    if f_ind >= 1
-        % MATLAB waitbar, not zef_waitbar. Handle h is never created here.
-        waitbar(f_ind/number_of_frames,h,['SESAME iteration. Time step ' int2str(f_ind) ' of ' int2str(number_of_frames) '.']);
-    end
+    zef_waitbar(f_ind, number_of_frames, h, ...
+        ['SESAME iteration. Time step ' int2str(f_ind) ' of ' int2str(number_of_frames) '.']);
 
     cfg.t_start = 1;
     cfg.t_stop = size(f,2);
@@ -93,5 +94,4 @@ for f_ind = 1 : number_of_frames
 end
 
 z = zef_postProcessInverse(z, procFile);
-zef_close_waitbar(h);
 end

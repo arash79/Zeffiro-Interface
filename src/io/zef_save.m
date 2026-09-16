@@ -49,6 +49,11 @@ elseif nargin == 4
     zef.save_switch = save_switch;
 end
 
+if nargin >= 3
+    zef.file = char(file_name);
+    zef.file_path = char(path_name);
+end
+
 if zef.save_switch == 1
 
     if nargin < 3

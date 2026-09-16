@@ -51,7 +51,7 @@ The path is relative to `pwd`. `cd` to the repository root, or pass an absolute 
 
 ## GPU warnings at start
 
-`gpu_num` does not match a device: the launcher warns and continues. Pass `'use_gpu', false` without CUDA. `gpuDeviceCount` needs Parallel Computing Toolbox; missing license is treated as no GPU (`zef_gpu_count`).
+`gpu_num` does not match a device: the launcher warns and continues. Pass `'use_gpu', false` without CUDA. `gpuDeviceCount` needs Parallel Computing Toolbox; missing license is treated as no GPU (`zef_gpu_count`). CPU meshing and MEG/EIT transfer `parfor` loops call `zef_ensure_parpool`; without the toolbox they still run, sequentially.
 
 ## Group LASSO / HALpR / RAMUS fail on cluster workers
 

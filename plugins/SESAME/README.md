@@ -41,14 +41,13 @@ There is **no** `inverse.*Inverter`. Registry id `legacy_sesame` dispatches `SES
 
 ## Usage instructions
 
-1. On asteroid profiles: Inverse tools → SESAME.
+1. Inverse tools → **SESAME** (every shipped profile).
 2. Set SNR and sampler count; optionally Apply to update widgets.
 3. Press Start; use Plot dipoles for `SESAME_plot_movie`.
 
 ## Important notes
 
-- `SESAME_inversion` indexes `source_positions(s_ind_1,:)` **before** `s_ind_1` is assigned (that name is not set in this file). The waitbar call uses MATLAB `waitbar(..., h, ...)` on a handle `h` that this file never creates (not `zef_waitbar`). Documented as written; do not treat Start as a working run until those lines are fixed.
-- Default / legacy / NSE profiles do not register this menu entry.
+- `SESAME_inversion` subsets `source_positions` with `unique(zef.source_interpolation_ind{1})`, matching other legacy inverse plugins, and reports progress with `zef_waitbar`.
 - Core download is skipped when `m/inverse_SESAME.m` already exists.
 
 ## Developer guidance

@@ -25,7 +25,7 @@ Typical order:
 3. `make_born_approximation_qam` (or amp) — linearize for inverse.
 4. `save_jacobian_data` — persist Jacobians / time series for radar inverse.
 
-Parameters often come from a local `parameters.m` / profile asteroid radar settings, not from `zef.lead_field_type`.
+Parameters often come from a local `parameters.m` / profile asteroid radar settings, not from `zef.lead_field_type`. Born CPU drivers call `zef_ensure_parpool` so a missing Parallel Computing Toolbox does not abort.
 
 ## Workflow context
 

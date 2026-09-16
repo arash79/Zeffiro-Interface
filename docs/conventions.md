@@ -169,7 +169,7 @@ Gravity uses `zef.gravity_field_type` and a separate dispatcher. NSE and GPU-ToR
 
 ## PCG (lead-field transfer)
 
-EEG and TES electrode potentials are solved in `zef_transfer_matrix`. MEG magnetometer/gradiometer and EIT copy the **same** PCG into their FEM files; they do not call `zef_transfer_matrix`. NSE/wave use a third pair, `pcg_iteration` / `pcg_iteration_gpu` under `src/forward/solvers`. Gravity FEM does not use this electrode-transfer PCG.
+EEG and TES electrode potentials are solved in `zef_transfer_matrix`. MEG magnetometer/gradiometer and EIT copy the **same** PCG into their FEM files; they do not call `zef_transfer_matrix`. NSE/wave use a third pair, `pcg_iteration` / `pcg_iteration_gpu` under `src/forward/solvers`. Gravity FEM does not use this electrode-transfer PCG. CPU `parfor` in those transfer loops, and in mesh labeling, goes through `zef_ensure_parpool`: without Parallel Computing Toolbox the loops still run, sequentially.
 
 | Path | Preconditioner |
 |------|----------------|
@@ -187,7 +187,7 @@ The Forward-and-inverse options initializer (`zef_init_forward_and_inverse_optio
 
 Many mesh scripts (`zef_refinement_step`, `zef_smoothing_step`, …) write into the **caller** workspace. GUI callbacks often `evalin('base','zef')`. If you keep a local copy of `zef` and never `assignin` it, the next click sees stale state.
 
-New numerical code should take `zef` (or extracted arrays) as arguments when practical. See [ADR-001](adr/ADR-001-hybrid-path-and-packages.md).
+New numerical code should take `zef` (or extracted arrays) as arguments when practical. See [ADR-001](adr/ADR-001-hybrid-layout.md).
 
 ## Related
 

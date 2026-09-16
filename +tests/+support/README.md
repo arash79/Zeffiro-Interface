@@ -12,6 +12,7 @@ Parent map: [`../README.md`](../README.md).
 |----------|------------------|----------|
 | `createSyntheticInverseZef` | Almost every inverse test | 4 sensors, 2 sources, `L` is `randn(4,6)` (mode 1: 3 components × 2 sources), 3 measurement frames |
 | `createSyntheticUKFNMMZef` | UKFNMM unit + dispatch tests | Defaults: 8 sensors, 6 sources, 12 frames, `fs=100` Hz, Gaussian bumps in time + 2% noise. Name-value overrides for all of those |
+| `createSyntheticMeshZef` | Mesh pipeline unit tests | Closed 20 mm cube compartment `c1`, refinement off, empty sensors |
 
 ## Code functionality
 
@@ -30,7 +31,7 @@ Returns a **plain struct**, not a GUI session. Important fields:
 | `use_gpu` | `false` |
 | Legacy plugin fields | `csm_type`, `mne_*`, `filter_type`, `kf_*`, `standardization_exponent` so `legacy_*` dispatch can `feval` without missing-field errors |
 
-There is **no** mesh (`nodes` / `tetra`), **no** `h_*` handles, **no** `compartment_tags`. Do not pass this struct to `zef_create_finite_element_mesh` or `zef_lead_field_matrix`.
+There is **no** mesh (`nodes` / `tetra`), **no** `h_*` handles, **no** `compartment_tags`. Do not pass this struct to `zef_create_finite_element_mesh` or `zef_lead_field_matrix`. Use `createSyntheticMeshZef` for the surface→tet pipeline.
 
 ### `createSyntheticUKFNMMZef`
 

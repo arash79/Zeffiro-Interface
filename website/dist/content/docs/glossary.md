@@ -76,7 +76,7 @@ The rest of this page is the project’s own vocabulary for anatomy, sensors, so
 
 **Kalman filter (here).** Time-recursive estimate of `x_t` with process noise `Q`. GUI plugin `zef_KF` and class `inverse.KalmanInverter` are **different implementations**. DTI-informed `Q` exists only on the plugin.
 
-**UKFNMM.** Spatial Kalman on a modified lead field, then Jansen–Rit neural mass model with unscented Kalman parameter estimation. Class `inverse.UKFNMMInverter`. Head-profile Inverse tools → **UKF-NMM (class solver)** opens the class dialog; asteroid profiles do not list it.
+**UKFNMM.** Spatial Kalman on a modified lead field, then Jansen–Rit neural mass model with unscented Kalman parameter estimation. Class `inverse.UKFNMMInverter`. Inverse tools → **UKF-NMM (class solver)** is listed on every shipped profile, including the asteroid ones.
 
 **GMM (here).** Gaussian-mixture clustering of an **already computed** reconstruction. Package `inverse.gmm`, not a registry inverse id.
 

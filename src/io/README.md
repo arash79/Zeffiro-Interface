@@ -10,7 +10,7 @@ Project **save/load** and Import/Export menu helpers for anatomy, sensors, figur
 
 | File | Role |
 |------|------|
-| `zef_save.m` | `save_switch` 1–10: full project, L, sources, sensors, segmentation, volume, overwrite save, reconstruction, figures, print |
+| `zef_save.m` | `save_switch` 1–10: full project, L, sources, sensors, segmentation, volume, overwrite save, reconstruction, figures, print. `zef_save(zef, file, path, switch)` sets `zef.file` / `zef.file_path` as char so headless export does not open a dialog. |
 | `zef_save_system_settings.m` | **Script** → system INI |
 | `zef_save_plugin_settings.m` | **Script** → plugin INI |
 

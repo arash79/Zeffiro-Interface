@@ -4,8 +4,8 @@
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Script. Asteroid INI callback (Inverse tools → SESAME; not in
-%   multicompartment_head). Instantiates SESAME_App, zef_init_SESAME,
+%   Script. Inverse tools → SESAME (all shipped profiles). Instantiates
+%   SESAME_App, zef_init_SESAME,
 %   copies zef fields onto h_<field> widgets, SESAME_core_check, and
 %   sets h_start to zef_update_SESAME; zef.reconstruction =
 %   SESAME_inversion([]). Needs zef.L, measurements, and the SESAME

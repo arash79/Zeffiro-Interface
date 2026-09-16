@@ -262,5 +262,40 @@ classdef Duneuro2ZefTest < matlab.unittest.TestCase
             testCase.verifyError(@() utilities.duneuro2zef.convert(raw), ...
                 'duneuro2zef:SensorLeadFieldMismatch');
         end
+
+        function runMatchesConvertAndEmptyErrors(testCase)
+            raw = struct('eegL', randn(3, 3), 'electrodePositions', eye(3), 'unit', 'mm');
+            [from_run, run_report] = utilities.duneuro2zef.run(raw);
+            from_convert = utilities.duneuro2zef.convert(raw);
+            testCase.verifyEqual(from_run.L, from_convert.L);
+            testCase.verifyTrue(any(strcmp(run_report.imported, 'L')));
+            testCase.verifyError(@() utilities.duneuro2zef.run([]), ...
+                'duneuro2zef:EmptyProject');
+        end
+
+        function findFilesHonoursSizePriority(testCase)
+            folder = tempname;
+            mkdir(folder);
+            testCase.addTeardown(@() rmdir(folder, 's'));
+            fid = fopen(fullfile(folder, 'a.dat'), 'w'); fwrite(fid, 'aa'); fclose(fid);
+            fid = fopen(fullfile(folder, 'b.dat'), 'w'); fwrite(fid, 'bbbb'); fclose(fid);
+            [~, small_name] = utilities.duneuro2zef.find_files('*.dat', folder, 'smallest');
+            [~, large_name] = utilities.duneuro2zef.find_files('*.dat', folder, 'largest');
+            [missing_path, missing_name] = utilities.duneuro2zef.find_files('*.dat', tempname);
+            testCase.verifyEqual(small_name, 'a.dat');
+            testCase.verifyEqual(large_name, 'b.dat');
+            testCase.verifyEqual(missing_path, '');
+            testCase.verifyEqual(missing_name, '');
+        end
+
+        function exportFolderWithLeadFieldIsDuneuro(testCase)
+            folder = tempname;
+            mkdir(folder);
+            testCase.addTeardown(@() rmdir(folder, 's'));
+            LF_EEG = randn(3, 6); %#ok<NASGU>
+            save(fullfile(folder, 'LF_EEG.mat'), 'LF_EEG');
+            testCase.verifyTrue(utilities.duneuro2zef.is_duneuro_project(folder));
+            testCase.verifyFalse(utilities.duneuro2zef.is_duneuro_project(tempname));
+        end
     end
 end

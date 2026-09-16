@@ -44,7 +44,7 @@ Zeffiro-Interface/
 ├── zeffiro_setup.m          Submodules + generated src/app/zef_start_config.m
 ├── zeffiro_downloader.m     Fresh-install helper
 ├── src/                     Procedural zef_* runtime (on genpath)
-│   ├── app/                 Session lifecycle (start, init, update, close)
+│   ├── app/                 Session lifecycle (start, init, update, close; CPU parfor via zef_ensure_parpool)
 │   ├── gui/                 Windows, callbacks, chrome, plot
 │   │   ├── chrome/          Theme, layout, window manager
 │   │   ├── apps/ tools/ callbacks/ update/ plot/ init/ open/ set/

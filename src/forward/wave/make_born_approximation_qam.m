@@ -23,7 +23,7 @@ tic
 
 data_name = 'data_1';
 
-parpool(num_workers);
+zef_ensure_parpool(num_workers);
 
 ast_ind_coarse = unique(interp_vec(ast_ind));
 tet_ast = tetrahedra_1(ast_ind_coarse,6:9);
@@ -105,7 +105,10 @@ parfor  j = 1 : size(path_data,1)
     end
 end
 
-delete(gcp('nocreate'));
+try
+    delete(gcp('nocreate'));
+catch
+end
 
 J_mat = zeros(2*size(path_data,1)*(size(path_data,2)-1), n_jacobian, n_ast);
 

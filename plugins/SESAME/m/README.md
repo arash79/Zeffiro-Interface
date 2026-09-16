@@ -1,6 +1,6 @@
 ## Folder purpose
 
-Asteroid Inverse tools → **SESAME**: sequential Monte Carlo over a small number of equivalent dipoles (Poisson prior on count, neighbour-graph location moves). Also on the default head INI. No `inverse.*Inverter`.
+Inverse tools → **SESAME** (every shipped profile): sequential Monte Carlo over a small number of equivalent dipoles (Poisson prior on count, neighbour-graph location moves). No `inverse.*Inverter`.
 
 ## Main contents
 
@@ -20,11 +20,11 @@ Asteroid Inverse tools → **SESAME**: sequential Monte Carlo over a small numbe
 
 ## Workflow context
 
-Shown in some asteroid profiles, not `multicompartment_head`. Parent README is the user manual. Needs lead field, measurements, and `SESAME_*` / inverse time-band settings.
+Listed on every shipped profile INI. Parent README is the user manual. Needs lead field, measurements, and `SESAME_*` / inverse time-band settings.
 
 ## Usage instructions
 
-Open from the asteroid Inverse tools menu (where registered), or:
+Open from Inverse tools → **SESAME**, or:
 
 ```matlab
 SESAME_App_run
@@ -34,10 +34,10 @@ SESAME_inversion([])
 
 ## Important notes
 
-- `SESAME_inversion` uses `s_ind_1` before it is assigned (as written).
+- Source nodes are `unique(zef.source_interpolation_ind{1})`; progress uses `zef_waitbar`.
 - Core does not read `zef`; all session bridging is in the wrapper.
 - `SESAME_core_check` may hit the network if the core file is deleted.
 
 ## Developer guidance
 
-Keep SMC math in `inverse_SESAME.m` free of `zef` globals. Fix `s_ind_1` ordering before relying on Start. Prefer shipping the core file rather than depending on `webread`.
+Keep SMC math in `inverse_SESAME.m` free of `zef` globals. Prefer shipping the core file rather than depending on `webread`.

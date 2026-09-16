@@ -68,7 +68,7 @@ Registry ids (case-insensitive) are listed in `utilities.cluster.inverse_method_
 |-------------|--------|-------------|
 | `legacy_music` | MUSIC | Subspace correlation map (SVD of a rank-1 window-mean covariance; see plugin README) |
 | `legacy_rap_music` | RAP-MUSIC | Recursively peeled MUSIC with RAP projector \(P=I-QQ'\), oriented \(a=L(r)u\); Inverse tools → **RAP-MUSIC** (`RAPMUSIC_start`) |
-| `legacy_sesame` | SESAME | Sequential Monte Carlo dipole sampling (asteroid menus; optional `external/SESAME`) |
+| `legacy_sesame` | SESAME | Sequential Monte Carlo dipole sampling (Inverse tools on every shipped profile; optional `external/SESAME`) |
 | `legacy_sl1` | Standardized L1 MAP | Hierarchical \(\ell_1\) via `quadprog` |
 | `legacy_relax` | Preconditioned relaxation | Block-preconditioned MAP iteration |
 | `legacy_exp` | EXP Lasso | EXP `exp_iteration` (also used as optimizer by class GroupLasso / HALpR) |
@@ -139,7 +139,7 @@ Related paper for standardized Kalman in this lineage: Lahtinen et al., *Clin. N
 
 ### UKFNMM (`ukfnmm`)
 
-Spatial Kalman on a **per-source SVD-modified** observation matrix (ordinary `kf_update`, not `kf_sL_update`), then Jansen–Rit neural mass model with UKF parameter estimation. Head profiles: Inverse tools → **UKF-NMM (class solver)**. See [`+inverse/@UKFNMMInverter/README.md`](../+inverse/@UKFNMMInverter/README.md) for the documented SKF-name vs `kf_update` discrepancy.
+Spatial Kalman on a **per-source SVD-modified** observation matrix (ordinary `kf_update`, not `kf_sL_update`), then Jansen–Rit neural mass model with UKF parameter estimation. Inverse tools → **UKF-NMM (class solver)** on every shipped profile, including the asteroid ones. See [`+inverse/@UKFNMMInverter/README.md`](../+inverse/@UKFNMMInverter/README.md) for the documented SKF-name vs `kf_update` discrepancy.
 
 ### Beamformer (`beamformer`)
 
@@ -161,7 +161,7 @@ Hierarchical \(\ell_1/\ell_2\) MAP using EXP plugin optimizers (`LG_optimization
 | Single-dipole-like peak, standardized | `eloreta` or sLORETA (`MethodParams.method_type`) |
 | Sparse / hierarchical prior | `ias`, then `ramus` if you have a multiresolution decomposition |
 | Time series with process noise | class `kalman` or GUI Kalman (DTI \(Q\) → GUI only) |
-| Neural mass / parameter tracking | `ukfnmm` (class; Inverse tools → **UKF-NMM (class solver)** on head profiles) |
+| Neural mass / parameter tracking | `ukfnmm` (class; Inverse tools → **UKF-NMM (class solver)** on every shipped profile) |
 | Scanning one dipole per voxel | `dipolescan` (read GoF, not amplitude) |
 | Adaptive spatial filter | `beamformer` |
 
