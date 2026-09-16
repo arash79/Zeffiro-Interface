@@ -72,6 +72,7 @@ Unsupported / malformed inputs fail with `duneuro2zef:*` identifiers (`EmptyProj
 | `convert` / `run` | Semantic conversion → Zeffiro field payload |
 | `import_duneuro_project` | Merge payload into a live `zef` session |
 | `find_files` | Folder glob helper |
+| `private/` | Stage helpers used only by `convert` (field lookup, mesh, L, conductivity, units). Not a public API. |
 
 ## Limitations that have been verified
 
@@ -83,4 +84,4 @@ Unsupported / malformed inputs fail with `duneuro2zef:*` identifiers (`EmptyProj
 
 ## Developer guidance
 
-Keep conversion in `convert.m` as an explicit pipeline: identify → validate → coordinates/indexing/units → mesh/compartments → sensors → sources → lead field → metadata → checks. Do not add filename parsing, channel-index tables, or sample-specific mesh sizes. Tests: `tests.unit.Duneuro2ZefTest` (layout, indexing, units, tensors, detection, extra fields, unsupported inputs).
+Keep `convert.m` as an explicit pipeline: identify → validate → coordinates/indexing/units → mesh/compartments → sensors → sources → lead field → metadata → checks. Stage implementations live in `private/` and must stay behavior-identical to that pipeline. Do not add filename parsing, channel-index tables, or sample-specific mesh sizes. Tests: `tests.unit.Duneuro2ZefTest` (layout, indexing, units, tensors, detection, extra fields, unsupported inputs).

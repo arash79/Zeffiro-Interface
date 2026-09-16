@@ -45,29 +45,14 @@ function [filepath, filename] = find_files(pattern, folder, priority)
         return;
     end
     
-    % Multiple matches - apply priority
     switch lower(priority)
         case 'smallest'
-            % Find file with smallest size (typically lowest resolution)
             [~, idx] = min([files.bytes]);
-            filename = files(idx).name;
-            filepath = fullfile(folder, filename);
-            
         case 'largest'
-            % Find file with largest size (typically highest resolution)
             [~, idx] = max([files.bytes]);
-            filename = files(idx).name;
-            filepath = fullfile(folder, filename);
-            
-        case 'first'
-            % Use first match (alphabetical order)
-            filename = files(1).name;
-            filepath = fullfile(folder, filename);
-            
         otherwise
-            % Default to first
-            filename = files(1).name;
-            filepath = fullfile(folder, filename);
+            idx = 1;
     end
-
+    filename = files(idx).name;
+    filepath = fullfile(folder, filename);
 end

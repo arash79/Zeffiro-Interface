@@ -312,52 +312,21 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
     
     % Generate separate ZEF import files for each subdirectory
     output_info.zef_import_file = {};
+    seg_vol = fullfile(mri_dir, segmentation_files(end));
     
     try
-        % ASCII import file
-        ascii_dir = fullfile(output_dir, 'ascii');
-        if isfolder(ascii_dir)
-            if options.verbose
-                fprintf('Generating ASCII import file...\n');
-            end
-            % Construct path prefix for filenames (relative to project root)
-            ascii_path_prefix = fullfile('.', output_dir, 'ascii');
-            zef_file_ascii = utilities.fs2zef.generators.generate_zef_import(ascii_dir, ...
-                'include_electrodes', true, ...
-                'include_box', true, ...
-                'compute_transforms', options.compute_transforms, ...
-                'reference_volume', ref_vol, ...
-                'segmentation_volume', fullfile(mri_dir, segmentation_files(end)), ...
-                'path_prefix', ascii_path_prefix, ...
-                'merge_left_right', options.merge_left_right, ...
-                'verbose', false);
+        zef_file_ascii = write_format_import( ...
+            fullfile(output_dir, 'ascii'), fullfile('.', output_dir, 'ascii'), ...
+            options, ref_vol, seg_vol, 'ASCII');
+        if strlength(zef_file_ascii) > 0
             output_info.zef_import_file{end+1} = zef_file_ascii;
-            if options.verbose
-                fprintf('Generated: %s\n', zef_file_ascii);
-            end
         end
-        
-        % STL/Mesh import file
-        mesh_dir = fullfile(output_dir, 'mesh');
-        if isfolder(mesh_dir)
-            if options.verbose
-                fprintf('Generating mesh import file...\n');
-            end
-            % Construct path prefix for filenames (relative to project root)
-            mesh_path_prefix = fullfile('.', output_dir, 'mesh');
-            zef_file_mesh = utilities.fs2zef.generators.generate_zef_import(mesh_dir, ...
-                'include_electrodes', true, ...
-                'include_box', true, ...
-                'compute_transforms', options.compute_transforms, ...
-                'reference_volume', ref_vol, ...
-                'segmentation_volume', fullfile(mri_dir, segmentation_files(end)), ...
-                'path_prefix', mesh_path_prefix, ...
-                'merge_left_right', options.merge_left_right, ...
-                'verbose', false);
+
+        zef_file_mesh = write_format_import( ...
+            fullfile(output_dir, 'mesh'), fullfile('.', output_dir, 'mesh'), ...
+            options, ref_vol, seg_vol, 'mesh');
+        if strlength(zef_file_mesh) > 0
             output_info.zef_import_file{end+1} = zef_file_mesh;
-            if options.verbose
-                fprintf('Generated: %s\n', zef_file_mesh);
-            end
         end
         
         if options.verbose
@@ -406,6 +375,30 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
 end % function
 
 %% Helper Functions
+
+function zef_file = write_format_import(format_dir, path_prefix, options, ref_vol, seg_vol, label)
+    % Write import_segmentation.zef for one output format subdirectory.
+
+    zef_file = "";
+    if ~isfolder(format_dir)
+        return
+    end
+    if options.verbose
+        fprintf('Generating %s import file...\n', label);
+    end
+    zef_file = utilities.fs2zef.generators.generate_zef_import(format_dir, ...
+        'include_electrodes', true, ...
+        'include_box', true, ...
+        'compute_transforms', options.compute_transforms, ...
+        'reference_volume', ref_vol, ...
+        'segmentation_volume', seg_vol, ...
+        'path_prefix', path_prefix, ...
+        'merge_left_right', options.merge_left_right, ...
+        'verbose', false);
+    if options.verbose
+        fprintf('Generated: %s\n', zef_file);
+    end
+end
 
 function convert_surface(input_file, output_file)
     % Convert surface file using mris_convert

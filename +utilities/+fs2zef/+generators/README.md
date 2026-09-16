@@ -38,4 +38,4 @@ This package only writes import assets; meshing happens later in Zeffiro.
 
 ## Developer guidance
 
-Keep generator name-values aligned with `run`’s options. When adding row types, update `src/io` docs as well.
+Keep generator name-values aligned with `run`’s options. Filename parsing, LUT lookup, and CSV writing stay as local functions in `generate_zef_import.m` unless a helper is reused elsewhere. When adding row types, update `src/io` docs as well.

@@ -164,13 +164,7 @@ function zef_file = generate_zef_import(output_dir, options)
     if options.include_electrodes
         electrode_path = get_electrode_file(output_dir, options.electrode_file);
         if strlength(electrode_path) > 0
-            % Apply path prefix to electrode file if specified
-            if strlength(options.path_prefix) > 0
-                electrode_path_full = fullfile(options.path_prefix, electrode_path);
-                electrode_path_full = strrep(electrode_path_full, '\', '/');
-            else
-                electrode_path_full = electrode_path;
-            end
+            electrode_path_full = prefixed_import_path(options.path_prefix, electrode_path);
             header_lines{end+1} = sprintf(...
                 'type,sensors,name,Electrodes,filename,%s,filetype,points,modality,EEG', ...
                 electrode_path_full);
@@ -367,15 +361,7 @@ function line = process_mesh_file(mesh_file, output_dir, lut, compartment_maps, 
     
     [~, base_name, ext] = fileparts(mesh_file.name);
     
-    % Construct filename with path prefix if provided
-    if strlength(path_prefix) > 0
-        filename_for_zef = fullfile(path_prefix, mesh_file.name);
-        % Normalize path separators to forward slashes
-        filename_for_zef = strrep(filename_for_zef, '\', '/');
-    else
-        % Use just the filename (backward compatibility)
-        filename_for_zef = mesh_file.name;
-    end
+    filename_for_zef = prefixed_import_path(path_prefix, mesh_file.name);
     
     % Parse compartment name and hemisphere
     [compartment_name, hemisphere] = parse_compartment_name(base_name);
@@ -716,3 +702,13 @@ function write_zef_file(filename, header_lines, seg_lines)
     end
     
 end % function
+
+function out_path = prefixed_import_path(path_prefix, filename)
+    % Join an optional prefix onto a manifest filename (forward slashes).
+
+    if strlength(path_prefix) > 0
+        out_path = strrep(fullfile(path_prefix, filename), '\', '/');
+    else
+        out_path = filename;
+    end
+end

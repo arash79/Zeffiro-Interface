@@ -54,6 +54,22 @@ utilities.fs2zef.run(...)   % see +fs2zef/README.md for arguments
 - SimNIBS `meshLoadGmsh4.m` is vendor code; do not re-attribute it. FreeSurfer environment helpers live under `+fs2zef/+environment`.
 - Verified registry ids: see `+inverse/README.md`. Examples: `+utilities/+cluster/+examples/`.
 
+## Where new code belongs
+
+Do not add files to the `+utilities` root. Choose the package that matches the work:
+
+| Kind of helper | Put it in |
+|----------------|-----------|
+| Anatomy converter | New sibling package `+<name>2zef/` with a public `run` (DUNEuro: `convert` / `import_duneuro_project`). Do **not** nest under `utilities.converters` — public names `utilities.fs2zef.run` and friends are the API ([ADR-004](../docs/adr/ADR-004-utilities-package-name.md)). |
+| Converter internals | Local functions, or `private/` next to that converter (see `+duneuro2zef/private/`). |
+| Inverse method id / HPC dispatch | `+cluster/` registry and job helpers; frame loop stays `+inverse/run_frame_loop.m`. |
+| Monte Carlo localization scores | `+sensitivity/` |
+| Struct merge used at startup | `+structs/` |
+| Path / numeric / `.gitmodules` helpers with no `zef` mutation | `+io/` (not `src/io`, which is session save/load) |
+| Maintainer lint/indent | `+dev/` |
+
+If the helper is specific to mesh, FEM, GUI, or a solver class, it does not belong here — put it next to that domain. Do not invent `misc`, `common`, or `utils2` folders.
+
 ## Developer guidance
 
 Add new method ids only via the registry. Keep converter specifics in their child READMEs. Parent map for maintainers: this file; class solvers: `+inverse/README.md`; bundle extraction: `src/inverse/README.md`.

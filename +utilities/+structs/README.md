@@ -8,14 +8,16 @@ Tiny struct-merge helpers used when applying name-value option structs onto a `z
 
 | File | Role |
 |------|------|
-| `copy_fields.m` | `utilities.structs.copy_fields(to, from, error_on_overwrite)` |
+| `copy_fields.m` | `utilities.structs.copy_fields(from, to, error_on_overwrite=false)` |
 
 ## Code functionality
 
 ```matlab
-to_out = utilities.structs.copy_fields(to, from)
-to_out = utilities.structs.copy_fields(to, from, true)  % error on overwrite
+to_out = utilities.structs.copy_fields(from, to)
+to_out = utilities.structs.copy_fields(from, to, error_on_overwrite=true)
 ```
+
+The first argument is the **source** of fields; the second is the **destination**. Callers copy option structs onto a session: `copy_fields(args, zef)`, `copy_fields(kwargs, project_struct)`.
 
 Behavior:
 
@@ -33,9 +35,9 @@ Used early in session construction when CLI/name-value options overlay defaults.
 
 ```matlab
 opts.inv_snr = 30;
-zef = utilities.structs.copy_fields(zef, opts);
+zef = utilities.structs.copy_fields(opts, zef);
 % strict mode:
-out = utilities.structs.copy_fields(zef, opts, true);
+out = utilities.structs.copy_fields(opts, zef, error_on_overwrite=true);
 if isfield(out, 'copy_fields_error__')
     error(out.copy_fields_error__);
 end

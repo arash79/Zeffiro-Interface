@@ -99,7 +99,7 @@ Switching profile and re-running `zef_plugin` rebuilds the menu. A few Forward-t
 
 ## How to add an anatomy converter
 
-Follow `utilities.fs2zef.run`: a package under `+utilities/+<name>/` with a public `run` entry that writes a folder of surfaces and an `import_segmentation.zef` manifest. Keep millimetre coordinates unless the sibling README states otherwise. DUNEuro is the exception: `utilities.duneuro2zef.convert` maps a MATLAB project into native `zef` fields and is also wired through Open project. Do not put converter math in `src/gui`.
+Follow `utilities.fs2zef.run`: a sibling package under `+utilities/+<name>/` (for example `+sn2zef`, not `utilities.converters.<name>`) with a public `run` entry that writes a folder of surfaces and an `import_segmentation.zef` manifest. Keep millimetre coordinates unless the sibling README states otherwise. DUNEuro is the exception: `utilities.duneuro2zef.convert` maps a MATLAB project into native `zef` fields and is also wired through Open project. Converter stage helpers belong in that package (`private/` or local functions), not in `src/gui`. See `+utilities/README.md`.
 
 ## How to add a core GUI window
 

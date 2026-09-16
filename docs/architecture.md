@@ -110,7 +110,7 @@ Forbidden (still true as a rule; some legacy scripts still `evalin('base','zef')
 | `+inverse` | Class solvers | `src/inverse` helpers, `inverse.gmm/kf` | GUI | `inverse.MNEInverter`, … | `@NewInverter` + registry |
 | `plugins/` | Menu tools | `zef_*`, session | Must not be the only copy of a class kernel | start functions in INI | Folder + INI row |
 | `src/io` | Save/load/import | session, files | Must not restyle GUI | `zef_load`, `zef_save`, `zef_inv_import` | New import next to existing |
-| `+utilities` | Converters, cluster, sensitivity lib | files, `zef_inverse_run` stack | GUI chrome | `utilities.fs2zef.run`, `dispatch_inverse` | New converter package |
+| `+utilities` | Converters, cluster, sensitivity lib | files, `zef_inverse_run` stack | GUI chrome | `utilities.fs2zef.run`, `dispatch_inverse` | New sibling `+<name>2zef/` package (not `utilities.converters`); see `+utilities/README.md` |
 | `+core` | Types + electrode parsers | files | Session lifecycle | `core.types.ZefSourceModel` | Enum members + `from()` |
 | `external/` | Vendor submodules | their licenses | Do not treat as Zeffiro-owned | via `zef_start_config` | `.gitmodules` |
 
