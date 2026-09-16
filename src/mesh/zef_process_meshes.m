@@ -23,7 +23,7 @@ function zef = zef_process_meshes(zef,varargin)
 %     EEG/MEG/EIT/TES lead-field wrappers in src/forward/lead_field
 %     zef_apply_transform (Mesh tool **Apply transform**)
 %     zef_visualize_surfaces / zef_snapshot_movie (explode_param)
-%     zef_save, utilities.brainstorm2zef, utilities.duneuro2zef
+%     zef_save, utilities.brainstorm2zef, utilities.duneuro2zef.convert
 %
 %   GUI: Mesh tool **Create FEM mesh** → zef_create_finite_element_mesh
 %   (verified ButtonPushedFcn on zef.h_pushbutton21). **Apply transform**

@@ -149,7 +149,8 @@ if ~isempty(bg) && isvalid(bg) && strcmpi(char(bg.Type), 'axes')
 end
 bg = axes('Parent', panel, 'Units', 'pixels', 'Tag', 'zef_card_bg', ...
     'HitTest', 'off', 'HandleVisibility', 'off', 'Box', 'off', ...
-    'XTick', [], 'YTick', [], 'Color', outer);
+    'XTick', [], 'YTick', [], 'Color', outer, ...
+    'Toolbar', [], 'Interactions', []);
 try
     bg.PickableParts = 'none';
 catch
@@ -162,14 +163,6 @@ end
 try
     bg.Title.String = '';
     bg.Title.Visible = 'off';
-catch
-end
-try
-    disableDefaultInteractivity(bg);
-catch
-end
-try
-    bg.Toolbar.Visible = 'off';
 catch
 end
 try

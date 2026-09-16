@@ -8,7 +8,7 @@ Accepted.
 
 Converters, cluster inverse dispatch, the class-inverter frame loop, and small I/O helpers are the MATLAB package `utilities.*` at repository-root `+utilities/`.
 
-Public entry points include `utilities.fs2zef.run`, `utilities.sn2zef.run`, `utilities.brainstorm2zef.run`, `utilities.duneuro2zef.run`, `utilities.cluster.dispatch_inverse`, and `utilities.inverse.run_frame_loop`.
+Public entry points include `utilities.fs2zef.run`, `utilities.sn2zef.run`, `utilities.brainstorm2zef.run`, `utilities.duneuro2zef.convert` / `import_duneuro_project`, `utilities.cluster.dispatch_inverse`, and `utilities.inverse.run_frame_loop`.
 
 ## Why
 

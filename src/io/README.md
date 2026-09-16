@@ -20,7 +20,7 @@ Project saves strip GUI handles (`zef_remove_object_handles`), close tools/figs,
 
 | File | Role |
 |------|------|
-| `zef_load.m` | Open project MAT; `zef_start_new_project`; batched load; rebuild sensors/compartments/GUI; converts legacy single-var MAT |
+| `zef_load.m` | Open project MAT; DUNEuro MATLAB dumps are converted via `utilities.duneuro2zef.convert` before merge; batched load; rebuild sensors/compartments/GUI; converts legacy single-var MAT |
 | `zef_merge_project_data.m` | Copy scientific fields from loaded MAT onto live `zef` while **preserving** live unified-shell figures / uicontrols / App objects (strips stale handles from the file) |
 
 ### Import

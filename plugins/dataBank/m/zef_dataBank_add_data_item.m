@@ -10,9 +10,9 @@ function zef = zef_dataBank_add_data_item(zef,data_type,parent_node_name,node_na
 %   Refreshes the uitree, selects the child whose Text equals
 %   parent_node_name (empty → root), sets Entrytype to data_type, then
 %   zef_dataBank_addButtonPress. The new hash is the setdiff of hashList
-%   before/after; that node's .name is set to node_name. Used by duneuro
-%   EEG_to_databank / MEG_to_databank to create a custom parent plus data
-%   and leadfield children (getData has no custom case, so that parent
+%   before/after; that node's .name is set to node_name. Used to create a
+%   custom parent plus data and leadfield children (getData has no custom
+%   case, so that parent
 %   stores only .type).
 %
 %   zef = zef_dataBank_add_data_item(zef, data_type, parent_node_name, node_name)

@@ -2431,15 +2431,17 @@ try
     open_src = getappdata(h_fig, 'ZefFlyoutSource');
 catch
 end
-local_dismiss(h_fig);
 anchor = local_nav_row_of(src);
 if ~local_ok(anchor)
     anchor = src;
 end
 if ~isempty(open_src) && isequal(open_src, anchor)
-    setappdata(h_fig, 'ZefFlyoutSource', []);
+    local_dismiss(h_fig);
     return
 end
+% Switching menus: drop the old flyout but keep overlapping toolbar
+% chrome hidden so those buttons do not flash between the two clicks.
+local_dismiss(h_fig, false);
 
 h_menu = [];
 try
@@ -2476,10 +2478,12 @@ if ~local_ok(h_menu) && local_ok(anchor)
     h_menu = local_lookup_menu(anchor);
 end
 if ~local_ok(h_menu)
+    local_restore_toolbar_after_flyout(h_fig);
     return
 end
 kids = local_menu_children(h_menu);
 if isempty(kids)
+    local_restore_toolbar_after_flyout(h_fig);
     local_invoke_menu(h_menu);
     return
 end
@@ -2748,6 +2752,10 @@ try
     local_store_hit_maps(h_fig);
 catch
 end
+try
+    local_restore_axes(h_fig);
+catch
+end
 
 end
 
@@ -3006,10 +3014,13 @@ end
 
 end
 
-function local_dismiss(h_fig)
+function local_dismiss(h_fig, restore_chrome)
 
 if nargin < 1 || isempty(h_fig) || ~isgraphics(h_fig) || ~isvalid(h_fig)
     return
+end
+if nargin < 2 || isempty(restore_chrome)
+    restore_chrome = true;
 end
 src = [];
 try
@@ -3043,9 +3054,11 @@ if local_ok(src)
     catch
     end
 end
-try
-    local_restore_toolbar_after_flyout(h_fig);
-catch
+if restore_chrome
+    try
+        local_restore_toolbar_after_flyout(h_fig);
+    catch
+    end
 end
 
 end
@@ -3102,59 +3115,114 @@ end
 
 function local_hide_toolbar_for_flyout(h_fig)
 
+% Hide only toolbar buttons / gizmo that overlap a flyout so they cannot
+% paint through the menu. Never hide figure_view, axes1, the logo, or the
+% toolbar strip as a whole: that blanks visualization or chrome the
+% flyout does not cover.
+
 if ~local_ok(h_fig)
     return
 end
+saved = struct('h', gobjects(0), 'vis', {{}});
 try
-    if isappdata(h_fig, 'ZefFlyoutHidChrome') ...
-            && ~isempty(getappdata(h_fig, 'ZefFlyoutHidChrome'))
-        return
+    prev = getappdata(h_fig, 'ZefFlyoutHidChrome');
+    if isstruct(prev) && isfield(prev, 'h')
+        saved = prev;
     end
 catch
 end
-saved = struct('h', gobjects(0), 'vis', {{}});
-hosts = gobjects(0);
-tb = zef_ui_find(h_fig, 'zef_shell_toolbar');
-if local_ok(tb)
-    hosts(end+1) = tb; %#ok<AGROW>
+frs = local_flyout_rects(h_fig);
+if isempty(frs)
+    return
 end
 tools = findall(h_fig, '-regexp', 'Tag', '^zef_tool_');
 giz = findall(h_fig, 'Tag', 'zef_axes_gizmo_img');
-view = findall(h_fig, 'Tag', 'figure_view');
-ax = findall(h_fig, 'Tag', 'axes1');
-logo = findall(h_fig, 'Tag', 'zef_logo_img');
-hosts = [hosts(:); tools(:); giz(:); view(:); ax(:); logo(:)];
+hosts = [tools(:); giz(:)];
 for i = 1:numel(hosts)
     h = hosts(i);
     if ~local_ok(h)
         continue
     end
-    already = false;
-    for j = 1:numel(saved.h)
-        if saved.h(j) == h
-            already = true;
-            break
-        end
-    end
-    if already
+    if ~local_overlaps_any(local_fig_rect(h), frs)
         continue
     end
-    vis = 'on';
-    try
-        vis = char(h.Visible);
-    catch
-    end
-    saved.h(end+1, 1) = h; %#ok<AGROW>
-    saved.vis{end+1, 1} = vis; %#ok<AGROW>
-    try
-        h.Visible = 'off';
-    catch
+    pack = local_chrome_mates(h_fig, h);
+    for k = 1:numel(pack)
+        hk = pack(k);
+        if ~local_ok(hk)
+            continue
+        end
+        already = false;
+        for j = 1:numel(saved.h)
+            if saved.h(j) == hk
+                already = true;
+                break
+            end
+        end
+        if already
+            continue
+        end
+        vis = 'on';
+        try
+            vis = char(hk.Visible);
+        catch
+        end
+        saved.h(end+1, 1) = hk; %#ok<AGROW>
+        saved.vis{end+1, 1} = vis; %#ok<AGROW>
+        try
+            hk.Visible = 'off';
+        catch
+        end
     end
 end
 try
     setappdata(h_fig, 'ZefFlyoutHidChrome', saved);
 catch
 end
+
+end
+
+function frs = local_flyout_rects(h_fig)
+
+frs = zeros(0, 4);
+found = findall(h_fig, '-regexp', 'Tag', '^zef_shell_flyout');
+for i = 1:numel(found)
+    if ~local_ok(found(i))
+        continue
+    end
+    try
+        if ~strcmpi(char(found(i).Type), 'uipanel')
+            continue
+        end
+    catch
+        continue
+    end
+    r = local_fig_rect(found(i));
+    if numel(r) >= 4 && r(3) > 0 && r(4) > 0
+        frs(end + 1, :) = r; %#ok<AGROW>
+    end
+end
+
+end
+
+function tf = local_overlaps_any(r, frs)
+
+tf = false;
+for i = 1:size(frs, 1)
+    if local_rects_overlap(r, frs(i, :))
+        tf = true;
+        return
+    end
+end
+
+end
+
+function tf = local_rects_overlap(a, b)
+
+tf = numel(a) >= 4 && numel(b) >= 4 ...
+    && a(3) > 0 && a(4) > 0 && b(3) > 0 && b(4) > 0 ...
+    && a(1) < b(1) + b(3) && b(1) < a(1) + a(3) ...
+    && a(2) < b(2) + b(4) && b(2) < a(2) + a(4);
 
 end
 
@@ -5071,7 +5139,8 @@ end
 created = true;
 ax = axes('Parent', parent, 'Units', 'pixels', 'Tag', tag, ...
     'HitTest', 'off', 'HandleVisibility', 'off', 'Box', 'off', ...
-    'XTick', [], 'YTick', [], 'Color', outerc);
+    'XTick', [], 'YTick', [], 'Color', outerc, ...
+    'Toolbar', [], 'Interactions', []);
 try
     ax.PickableParts = 'none';
 catch
@@ -5084,14 +5153,6 @@ end
 try
     ax.Title.String = '';
     ax.Title.Visible = 'off';
-catch
-end
-try
-    disableDefaultInteractivity(ax);
-catch
-end
-try
-    ax.Toolbar.Visible = 'off';
 catch
 end
 try

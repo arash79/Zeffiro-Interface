@@ -85,6 +85,11 @@ set(zef.h_menu_import_noise_data                     ,'MenuSelectedFcn','zef.inv
 set(zef.h_menu_import_reconstruction                 ,'MenuSelectedFcn','zef.inv_import_type = 2; zef_inv_import;zef = zef_update(zef);');
 set(zef.h_menu_import_current_pattern                ,'MenuSelectedFcn','zef.inv_import_type = 3; zef_inv_import;zef = zef_update(zef);');
 set(zef.h_menu_import_resection_points              ,'MenuSelectedFcn','zef_import_resection_points;');
+if isfield(zef, 'h_menu_import') && isvalid(zef.h_menu_import)
+    zef.h_menu_import_duneuro = uimenu(zef.h_menu_import, ...
+        'Text', 'Import DUNEuro project', ...
+        'MenuSelectedFcn', 'zef = utilities.duneuro2zef.import_duneuro_project(zef); assignin(''base'',''zef'',zef); zef = zef_update(zef);');
+end
 set(zef.h_menu_reset_lead_field                      ,'MenuSelectedFcn','[zef.yesno] = zef_ui_confirm(''Reset the lead field?''); if isequal(zef.yesno,''Yes''); zef.L = []; end;zef = zef_update(zef);');
 set(zef.h_menu_reset_volume_data                     ,'MenuSelectedFcn','[zef.yesno] = zef_ui_confirm(''Reset volume data?''); if isequal(zef.yesno,''Yes'');zef.nodes=[];zef.nodes_raw=[];zef.tetra=[];zef.tetra_raw=[];zef.domain_labels_aux=[];zef.sigma_vec=[];zef.surface_triangles=cell(0);zef.brain_ind=[];zef.source_ind=[];zef.sigma_prisms=[];zef.prisms=[];end;zef = zef_update(zef);');
 set(zef.h_menu_reset_measurement_data                ,'MenuSelectedFcn','[zef.yesno] = zef_ui_confirm(''Reset the measurement data?''); if isequal(zef.yesno,''Yes''); zef.measurements = []; end;zef = zef_update(zef);');

@@ -12,6 +12,8 @@ function zef = zef_load(zef,file_name,path_name)
 %   settings and profile initialization, recreates sensor and compartment
 %   defaults, and starts the main GUI tools. Legacy single-variable MAT
 %   files (one scalar struct) are expanded in memory; the MAT file is not rewritten.
+%   DUNEuro MATLAB projects (eegL / electrodePositions / related FieldTrip
+%   dumps) are converted with utilities.duneuro2zef.convert before merge.
 %
 %   zef = zef_load(zef)
 %   zef = zef_load(zef, file_name, path_name)
@@ -27,7 +29,8 @@ function zef = zef_load(zef,file_name,path_name)
 %           save_file_path updated.
 %
 %   See also zef_save, zef_start_new_project, zef_apply_system_settings,
-%            zef_create_sensors, zef_create_compartment.
+%            zef_create_sensors, zef_create_compartment,
+%            utilities.duneuro2zef.convert.
 %
 if nargin == 0
     zef = evalin('base','zef');
@@ -72,11 +75,24 @@ if not(isequal(file_name,0))
     I_mf = 1:length(matfile_fieldnames);
     loaded_from_legacy_struct = false;
 
-    % Old projects sometimes store one struct (often named zef). Upstream
-    % load+save('-struct','zef_data') overwrote that file with whatever
-    % zef_data was in this workspace (usually only save_file / path).
-    % Convert in memory and leave the user's MAT file untouched.
-    if isequal(length(matfile_fieldnames), 1)
+    % DUNEuro MATLAB dumps are not native zef field sets. Convert them
+    % before merge so File → Open project yields sensors / L / mesh in
+    % Zeffiro form instead of raw eegL / eegT. Does not load transfer
+    % matrices. Native Zeffiro projects are not classified as DUNEuro.
+    if utilities.duneuro2zef.is_duneuro_project(project_path)
+        try
+            if ~isempty(h_waitbar) && isvalid(h_waitbar)
+                h_waitbar = zef_waitbar(0, 1, h_waitbar, 'Converting DUNEuro project.');
+            end
+        catch
+        end
+        [zef_data, ~] = utilities.duneuro2zef.convert(project_path);
+        zef_data.save_file = file_name;
+        zef_data.save_file_path = path_name;
+        loaded_from_legacy_struct = true;
+        matfile_fieldnames = fieldnames(zef_data);
+        I_mf = 1:numel(matfile_fieldnames);
+    elseif isequal(length(matfile_fieldnames), 1)
         raw = load(project_path);
         payload = raw.(matfile_fieldnames{1});
         if ~(isstruct(payload) && isscalar(payload))
@@ -283,22 +299,10 @@ if not(isequal(file_name,0))
     if zef.use_display && isfield(zef,'h_sensors_table') && isvalid(zef.h_sensors_table)
         if isfield(zef,'sensor_tags') && iscell(zef.sensor_tags) && not(isempty(zef.sensor_tags))
             try
-                zef.aux_field_1 = cell(0);
-                for zef_i = 1 : length(zef.sensor_tags)
-                    zef.aux_field_1{zef_i,1} = zef_i;
-                    zef.aux_field_1{zef_i,2} = eval(['zef.' zef.sensor_tags{zef_i} '_name']);
-                    zef.aux_field_1{zef_i,3} = eval(['zef.' zef.sensor_tags{zef_i} '_imaging_method_name']);
-                    zef.aux_field_1{zef_i,4} = eval(['zef.' zef.sensor_tags{zef_i} '_on']);
-                    zef.aux_field_1{zef_i,5} = eval(['zef.' zef.sensor_tags{zef_i} '_visible']);
-                    zef.aux_field_1{zef_i,6} = eval(['zef.' zef.sensor_tags{zef_i} '_names_visible']);
-                    zef.aux_field_1{zef_i,7} = eval(['not(isempty(zef.' zef.sensor_tags{zef_i} '_points))']);
-                    zef.aux_field_1{zef_i,8} = eval(['not(isempty(zef.' zef.sensor_tags{zef_i} '_directions))']);
+                zef = zef_build_sensors_table(zef);
+                if isfield(zef,'aux_field_1')
+                    zef = rmfield(zef,'aux_field_1');
                 end
-                original_callback = zef.h_sensors_table.CellEditCallback;
-                zef.h_sensors_table.CellEditCallback = '';
-                zef.h_sensors_table.Data = zef.aux_field_1;
-                zef.h_sensors_table.CellEditCallback = original_callback;
-                zef = rmfield(zef,'aux_field_1');
             catch
             end
         end

@@ -177,6 +177,17 @@ Most GUI **Inverse tools** buttons call legacy plugin iterations. Four menu entr
 
 The 3-D view updates from the Mesh visualization / Figure tools, not automatically from `zef_inverse_run`.
 
+## Importing a DUNEuro project
+
+A DUNEuro MATLAB `.mat` file is not a native Zeffiro project. **Project → Open project** still works: `zef_load` detects DUNEuro markers (`eegL`, `electrodePositions`, …) and converts them with `utilities.duneuro2zef`. **Import → Import DUNEuro project** is the same converter with a file picker.
+
+```matlab
+zef = zeffiro_interface('start_mode', 'nodisplay', ...
+    'open_project', 'path/to/duneuro_project.mat');
+```
+
+What is carried over **when the file actually contains it**: tetrahedral (or hexahedral-split) mesh and tissue labels, isotropic/anisotropic conductivity, electrode positions as PEM `N×3` millimetres, source positions, and the EEG/MEG lead field as `zef.L` (sensors × interleaved xyz columns). A dump that only has `eegL`, electrodes, and a transfer matrix still opens: L and sensors are imported; the transfer matrix is skipped. Solver words in the file name (`whitney`, `anisotropic`, …) are not data. Without source coordinates, `zef_processLeadfields` can run but spatial inverse plotting cannot. Details and verified limitations: [`+utilities/+duneuro2zef/README.md`](../+utilities/+duneuro2zef/README.md).
+
 ## Where to go next
 
 - [conventions.md](conventions.md) — millimetres vs metres, matrix orientation, CEM columns

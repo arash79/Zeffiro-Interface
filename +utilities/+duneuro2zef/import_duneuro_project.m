@@ -1,241 +1,125 @@
-% import_duneuro_project.m
-%
-% Main entry point for importing a complete Duneuro project into Zeffiro Interface.
-% This function orchestrates the entire import pipeline:
-%   1. Converts Duneuro files to Zeffiro format
-%   2. Imports converted data into Zeffiro Interface (via .zef file)
-%   3. Configuration is handled automatically by the .zef file (line 19)
-%
-% The function can work in two modes:
-%   - Standalone: Converts files only (without Zeffiro Interface context)
-%   - Integrated: Full import into Zeffiro Interface (requires ZI to be running)
-%
-% Note: Step 3 (configuration) is executed by Duneuro2Zeffiro_settings() which
-% is called automatically from the .zef file line 19, so this function does not
-% call it separately to avoid double configuration.
-%
-% Input:
-%   config - (Optional) Configuration structure. If not provided, uses defaults.
-%            See get_default_config.m for available options.
-%   import_to_zeffiro - (Optional) Logical. If true, imports data into Zeffiro
-%                       Interface after conversion. Default: true if ZI is running.
-%
-% Output:
-%   results - Structure containing:
-%       .success - Logical indicating overall success
-%       .errors - Cell array of error messages
-%       .warnings - Cell array of warning messages
-%       .processed_files - Cell array of successfully processed files
-%       .config - Configuration used (validated)
-%       .import_success - Logical indicating if import step succeeded
-%
-% Usage:
-%   % Full pipeline (convert + import)
-%   results = utilities.duneuro2zef.import_duneuro_project();
-%
-%   % Custom configuration
-%   config = utilities.duneuro2zef.get_default_config();
-%   config.input_folder = 'my_data/duneuro_export';
-%   results = utilities.duneuro2zef.import_duneuro_project(config);
-%
-%   % Convert only (no import)
-%   results = utilities.duneuro2zef.import_duneuro_project([], false);
-%
-% See also: run.m, get_default_config.m, Duneuro2Zeffiro_import.zef
-
-function results = import_duneuro_project(config, import_to_zeffiro)
-%IMPORT_DUNEURO_PROJECT  Convert Duneuro files then zef_import_segmentation.
+function [zef, report] = import_duneuro_project(zef, source)
+%IMPORT_DUNEURO_PROJECT  Convert a DUNEuro project and merge it into a Zeffiro session.
 %
 %   Zeffiro Interface.
 %   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   results = import_duneuro_project(config, import_to_zeffiro)
+%   This is the session entry for DUNEuro import. Open project (zef_load)
+%   calls convert() directly on DUNEuro MAT files so File → Open project
+%   is the same path. This function also supports a folder of DUNEuro
+%   export files and a GUI picker when source is omitted.
 %
-%   Step 1: utilities.duneuro2zef.run(config). Step 2 (if import_to_zeffiro):
-%   requires zef in the base workspace; sets zef.file / file_path to
-%   Duneuro2Zeffiro_import.zef in this package, new_empty_project=0, then
-%   zef_import_segmentation + zef_build_compartment_table and assignin base.
+%   zef = import_duneuro_project(zef, path)
+%   zef = import_duneuro_project(path)            % reads zef from base
+%   zef = import_duneuro_project(zef)             % uigetfile picker
+%   [zef, report] = import_duneuro_project(...)
 %
-%   That .zef uses relative foldername data/converted/ from pwd. Second
-%   argument default: true iff exist('zef','var') in base. Duneuro2Zeffiro_settings
-%   runs as a script line inside the .zef (not called again here).
-%
-%   results adds .import_success. Overall .success is conversion AND import.
-%
+%   See also convert, run, zef_load.
 
-
-    results = struct();
-    results.success = false;
-    results.errors = {};
-    results.warnings = {};
-    results.processed_files = {};
-    results.config = [];
-    results.import_success = false;
-    
-    % Use default configuration if not provided
-    if nargin < 1 || isempty(config)
-        config = utilities.duneuro2zef.get_default_config();
-    end
-    
-    % Determine if we should import to Zeffiro Interface
-    if nargin < 2 || isempty(import_to_zeffiro)
-        % Auto-detect: try to check if ZI is running
-        try
-            import_to_zeffiro = evalin('base', 'exist(''zef'', ''var'')');
-        catch
-            import_to_zeffiro = false;
-        end
-    end
-    
-    %% Step 1: Convert Duneuro files to Zeffiro format
-    if config.verbose
-        fprintf('\n========================================\n');
-        fprintf('Duneuro to Zeffiro Interface Import\n');
-        fprintf('========================================\n\n');
-        fprintf('Step 1/3: Converting Duneuro files...\n');
-    end
-    
-    conversion_results = utilities.duneuro2zef.run(config);
-    results.config = conversion_results.config;
-    results.processed_files = conversion_results.processed_files;
-    results.errors = conversion_results.errors;
-    results.warnings = conversion_results.warnings;
-    
-    if ~conversion_results.success
-        results.success = false;
-        if config.verbose
-            fprintf('\nConversion failed. Aborting import.\n');
-        end
-        return;
-    end
-    
-    if config.verbose
-        fprintf('\nConversion completed successfully\n');
-    end
-    
-    %% Step 2: Import into Zeffiro Interface (if requested and available)
-    if import_to_zeffiro
-        if config.verbose
-            fprintf('\nStep 2/3: Importing data into Zeffiro Interface...\n');
-        end
-        
-        try
-            % Check if Zeffiro Interface is available
-            if ~evalin('base', 'exist(''zef'', ''var'')')
-                error('Zeffiro Interface structure ''zef'' not found in base workspace');
-            end
-            
-            % Get import file path (relative to this function's location)
-            [package_folder, ~, ~] = fileparts(mfilename('fullpath'));
-            import_file = fullfile(package_folder, 'Duneuro2Zeffiro_import.zef');
-            
-            if ~isfile(import_file)
-                error('Import file not found: %s', import_file);
-            end
-            
-            % Get the folder containing the import file
-            [import_folder, import_filename, ~] = fileparts(import_file);
-            
-            % IMPORTANT: The .zef file uses relative paths (data/converted/)
-            % which are resolved relative to the CURRENT WORKING DIRECTORY (pwd)
-            % when zef_import_segmentation processes them.
-            % 
-            % We need to verify that the output folder exists relative to pwd.
-            % If config uses relative paths, they should be relative to pwd.
-            output_folder_check = fullfile(config.output_folder);
-            if ~isfolder(output_folder_check)
-                error(['Output folder not found: %s\n' ...
-                    'Please ensure you are in the project root directory where data/ folder exists.\n' ...
-                    'Current working directory: %s'], output_folder_check, pwd);
-            end
-            
-            % Import using Zeffiro Interface's import system
+    if nargin == 1 && (ischar(zef) || isstring(zef) || isstruct(zef) && ~isfield(zef, 'program_path'))
+        source = zef;
+        if evalin('base', 'exist(''zef'',''var'')')
             zef = evalin('base', 'zef');
-            zef.file = [import_filename, '.zef'];
-            zef.file_path = import_folder;
-            zef.new_empty_project = 0;  % Import to existing project
-            
-            if config.verbose
-                fprintf('Loading import configuration from: %s\n', import_file);
-                fprintf('Working directory (base for relative paths): %s\n', pwd);
-                fprintf('Output folder: %s\n', output_folder_check);
-            end
-            
-            zef = zef_import_segmentation(zef);
-            zef = zef_build_compartment_table(zef);
-            
-            % Update base workspace
-            assignin('base', 'zef', zef);
-            
-            results.import_success = true;
-            
-            if config.verbose
-                fprintf('Import completed successfully\n');
-                fprintf('  Note: Configuration step (Duneuro2Zeffiro_settings) was executed by .zef file\n');
-            end
-            
-        catch ME
-            results.import_success = false;
-            error_msg = sprintf('Error importing into Zeffiro Interface: %s', ME.message);
-            results.errors{end+1} = error_msg;
-            results.warnings{end+1} = 'Data was converted but not imported into Zeffiro Interface';
-            
-            if config.verbose
-                fprintf('Import failed: %s\n', ME.message);
-                fprintf('  Note: Files were converted successfully and are available in: %s\n', ...
-                    config.output_folder);
-            end
+        else
+            error('duneuro2zef:NoSession', ...
+                'Pass a zef session as the first argument, or have zef in the base workspace.');
         end
-    else
-        if config.verbose
-            fprintf('\nStep 2/3: Skipping import (not requested or ZI not available)\n');
-            fprintf('  Converted files are available in: %s\n', config.output_folder);
-            fprintf('  To import later, use Zeffiro Interface import menu with:\n');
-            fprintf('    %s\n', fullfile(fileparts(mfilename('fullpath')), 'Duneuro2Zeffiro_import.zef'));
+    elseif nargin < 1 || isempty(zef)
+        if evalin('base', 'exist(''zef'',''var'')')
+            zef = evalin('base', 'zef');
+        else
+            error('duneuro2zef:NoSession', 'No zef session is available.');
         end
-    end
-    
-    % Note: Step 3 (Configuration) is handled by the .zef file (line 19)
-    % which calls Duneuro2Zeffiro_settings() automatically after import
-    % No need to call it again here to avoid double configuration
-    
-    %% Final summary
-    results.success = conversion_results.success && results.import_success;
-    
-    if config.verbose
-        fprintf('\n========================================\n');
-        fprintf('Import Pipeline Summary\n');
-        fprintf('========================================\n');
-        fprintf('Conversion: %s\n', iif(conversion_results.success, 'Success', 'Failed'));
-        fprintf('Import:     %s\n', iif(results.import_success, 'Success', 'Failed/Skipped'));
-        fprintf('Overall:    %s\n', iif(results.success, 'Success', 'Partial/Failed'));
-        
-        if ~isempty(results.errors)
-            fprintf('\nErrors:\n');
-            for i = 1:length(results.errors)
-                fprintf('  - %s\n', results.errors{i});
-            end
-        end
-        
-        if ~isempty(results.warnings)
-            fprintf('\nWarnings:\n');
-            for i = 1:length(results.warnings)
-                fprintf('  - %s\n', results.warnings{i});
-            end
-        end
-        
-        fprintf('\n');
+        source = [];
     end
 
+    if nargin < 2
+        source = [];
+    end
+
+    if isempty(source)
+        start_path = pwd;
+        if isfield(zef, 'save_file_path') && ~isempty(zef.save_file_path) && ~isequal(zef.save_file_path, 0)
+            start_path = zef.save_file_path;
+        end
+        [file_name, path_name] = uigetfile( ...
+            {'*.mat', 'DUNEuro MATLAB file (*.mat)'}, ...
+            'Import DUNEuro project', start_path);
+        if isequal(file_name, 0)
+            report = struct('cancelled', true);
+            return
+        end
+        source = fullfile(path_name, file_name);
+    end
+
+    [payload, report] = utilities.duneuro2zef.convert(source);
+    zef = local_apply_payload(zef, payload, source);
+
+    if isfield(zef, 'h_sensors_table') && isvalid(zef.h_sensors_table)
+        try
+            zef = zef_build_sensors_table(zef);
+        catch
+        end
+    end
+    if isfield(zef, 'h_compartment_table') && isvalid(zef.h_compartment_table)
+        try
+            zef = zef_build_compartment_table(zef);
+        catch
+        end
+    end
+    try
+        zef = zef_update(zef);
+    catch
+    end
+
+    if nargout == 0
+        assignin('base', 'zef', zef);
+    end
 end
 
-% Helper function for inline if-else
-function result = iif(condition, true_val, false_val)
-    if condition
-        result = true_val;
-    else
-        result = false_val;
+function zef = local_apply_payload(zef, payload, source)
+    names = fieldnames(payload);
+    for i = 1:numel(names)
+        zef.(names{i}) = payload.(names{i});
+    end
+
+    if isfield(payload, 'sensor_tags') && ~isempty(payload.sensor_tags)
+        for i = 1:numel(payload.sensor_tags)
+            zef = zef_create_sensors(zef, payload.sensor_tags{i});
+        end
+        if isfield(payload, 's_points')
+            zef.s_points = payload.s_points;
+        end
+        if isfield(payload, 's_name_list')
+            zef.s_name_list = payload.s_name_list;
+        end
+        if isfield(payload, 's_imaging_method_name')
+            zef.s_imaging_method_name = payload.s_imaging_method_name;
+        end
+        if isfield(payload, 's_name')
+            zef.s_name = payload.s_name;
+        end
+        zef.s_on = 1;
+        zef.s_visible = 1;
+        zef.sensors = payload.sensors;
+        zef.current_sensors = 's';
+    end
+
+    if isfield(payload, 'compartment_tags')
+        for i = 1:numel(payload.compartment_tags)
+            zef = zef_create_compartment(zef, payload.compartment_tags{i});
+        end
+    end
+
+    if ischar(source) || isstring(source)
+        [path_name, file_name, ext] = fileparts(char(source));
+        if ~isempty(file_name)
+            zef.save_file = [file_name, ext];
+            if ~isempty(path_name)
+                zef.save_file_path = [path_name, filesep];
+            end
+        end
     end
 end

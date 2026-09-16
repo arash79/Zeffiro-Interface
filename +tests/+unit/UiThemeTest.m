@@ -1711,6 +1711,11 @@ classdef UiThemeTest < matlab.unittest.TestCase
             pan = findall(f, 'Tag', 'zef_tool_pan');
             testCase.assumeNotEmpty(pan);
             testCase.verifyEqual(char(pan(1).Visible), 'on');
+            ax = findall(f, 'Tag', 'axes1');
+            testCase.assumeNotEmpty(ax);
+            imh = image(ax(1), rand(6, 8, 3));
+            imh.Tag = 'zef_logo_img';
+            n_kids = numel(allchild(ax(1)));
             btn = findall(f, 'Tag', 'zef_nav_project');
             setappdata(btn, 'ZefMenuHandle', root);
             cb = btn.Callback;
@@ -1720,13 +1725,19 @@ classdef UiThemeTest < matlab.unittest.TestCase
             testCase.verifyEqual(char(pan(1).Visible), 'off');
             view = findall(f, 'Tag', 'figure_view');
             if ~isempty(view)
-                testCase.verifyEqual(char(view(1).Visible), 'off');
+                testCase.verifyEqual(char(view(1).Visible), 'on');
             end
+            testCase.verifyEqual(char(ax(1).Visible), 'on');
+            testCase.verifyTrue(isvalid(imh));
+            testCase.verifyEqual(numel(allchild(ax(1))), n_kids);
             zef_ui_shell('dismiss', f);
             testCase.verifyEqual(char(pan(1).Visible), 'on');
             if ~isempty(view)
                 testCase.verifyEqual(char(view(1).Visible), 'on');
             end
+            testCase.verifyEqual(char(ax(1).Visible), 'on');
+            testCase.verifyTrue(isvalid(imh));
+            testCase.verifyEqual(numel(allchild(ax(1))), n_kids);
         end
 
         function flyoutOverflowKeepsThemedItems(testCase)

@@ -2,7 +2,7 @@
 
 ## Folder purpose
 
-Optional **FieldTrip** toolbox (git submodule) for MEG/EEG I/O and related helpers. Zeffiro’s own electrode parsers are `core.io.electrodes`; Duneuro conversion (`utilities.duneuro2zef`) accepts FieldTrip-like measurement structs (`avg` field) but does not require this clone. Empty until `zeffiro_setup` populates it.
+Optional **FieldTrip** toolbox (git submodule) for MEG/EEG I/O and related helpers. Zeffiro’s own electrode parsers are `core.io.electrodes`. DUNEuro MATLAB projects are imported with `utilities.duneuro2zef` (Open project or `import_duneuro_project`); FieldTrip is not required. Empty until `zeffiro_setup` populates it.
 
 ## Main contents
 

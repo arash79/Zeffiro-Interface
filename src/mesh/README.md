@@ -99,7 +99,7 @@ Segmentation tool → surfaces
 Mesh tool Create FEM mesh → zef_create_finite_element_mesh (this folder)
 operators/ → stiffness for src/forward/lead_field FEM
 barycentric/ → NSE (src/forward/nse, plugins/NSE_tool)
-zef_hexa_to_tetra → utilities.duneuro2zef.convert_mesh
+zef_hexa_to_tetra → utilities.duneuro2zef.convert
 ```
 
 Sensors still need attaching (`src/sensors`) after Create FEM mesh. Lead field is a separate Mesh-tool **Run script** / `zef_lead_field_matrix` step.

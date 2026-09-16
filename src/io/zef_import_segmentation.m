@@ -70,8 +70,22 @@ if not(isequal(file_name,0))
 
         for i = 1 : size(ini_cell,1)
 
-            compartment_data = zef.h_compartment_table.Data;
-            sensors_data = zef.h_sensors_table.Data;
+            compartment_data = [];
+            if isfield(zef,'h_compartment_table') && isvalid(zef.h_compartment_table)
+                try
+                    compartment_data = zef.h_compartment_table.Data;
+                catch
+                    compartment_data = [];
+                end
+            end
+            sensors_data = [];
+            if isfield(zef,'h_sensors_table') && isvalid(zef.h_sensors_table)
+                try
+                    sensors_data = zef.h_sensors_table.Data;
+                catch
+                    sensors_data = [];
+                end
+            end
 
             zef_waitbar(i,size(ini_cell,1),h,['Importing ' num2str(i) '/' num2str(size(ini_cell,1)) '.']);
             ini_cell_ind = [ini_cell_ind find(ismember(ini_cell(i,:),'type'),1)];
@@ -444,16 +458,18 @@ if not(isequal(file_name,0))
             elseif isequal(type,'sensors')
 
                 name = (ini_cell{i,find(ismember(ini_cell(i,:),'name'),1)+1});
-                if not(isempty(sensors_data))
-                    if ismember(name,sensors_data(:,2))
-                        sensors_ind = find(ismember(sensors_data(:,2),name));
-                        sensor_tag = sensor_tags{end-sensors_ind+1};
-                    else
-                        zef_add_sensors;
+                sensor_tag = local_sensor_tag_for_name(zef, name);
+                if isempty(sensor_tag)
+                    if not(isempty(sensors_data)) && size(sensors_data,2) >= 2 ...
+                            && ismember(name,sensors_data(:,2))
+                        sensors_ind = find(ismember(sensors_data(:,2),name), 1);
                         sensor_tags = zef.sensor_tags;
-                        sensor_tag = sensor_tags{1};
+                        if sensors_ind <= numel(sensor_tags)
+                            sensor_tag = sensor_tags{sensors_ind};
+                        end
                     end
-                else
+                end
+                if isempty(sensor_tag)
                     zef_add_sensors;
                     sensor_tags = zef.sensor_tags;
                     sensor_tag = sensor_tags{1};
@@ -596,7 +612,10 @@ if not(isequal(file_name,0))
                 end
 
                 eval('zef = zef_apply_parameter_profile(zef);');
-                eval('zef_build_sensors_table;');
+                zef = zef_build_sensors_table(zef);
+                if isfield(zef,'aux_field_1')
+                    zef = rmfield(zef,'aux_field_1');
+                end
 
             % Merge an arbitrary .mat into zef (zef_import_mat_struct).
             elseif isequal(type,'struct')
@@ -647,4 +666,20 @@ if nargout == 0
     assignin('base','zef',zef);
 end
 
+end
+
+function tag = local_sensor_tag_for_name(zef, name)
+tag = '';
+if nargin < 2 || isempty(name) || ~isstruct(zef) ...
+        || ~isfield(zef,'sensor_tags') || ~iscell(zef.sensor_tags)
+    return
+end
+want = char(string(name));
+for i = 1:numel(zef.sensor_tags)
+    t = zef.sensor_tags{i};
+    if isfield(zef, [t '_name']) && isequal(char(string(zef.([t '_name']))), want)
+        tag = t;
+        return
+    end
+end
 end

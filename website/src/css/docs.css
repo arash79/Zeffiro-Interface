@@ -665,7 +665,17 @@ body[data-page="docs"] .site-footer {
   }
 
   .docs-start-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docs-article,
+  .docs-article code,
+  .docs-lede {
+    overflow-wrap: anywhere;
+  }
+
+  .docs-nav-open {
+    max-width: 100%;
   }
 
   .docs-article h1 {
@@ -694,6 +704,18 @@ body[data-page="docs"] .site-footer {
   .docs-article > p {
     text-align: left;
     hyphens: manual;
+  }
+
+  .docs-start-card {
+    min-height: 0;
+  }
+
+  .docs-article .doc-pre {
+    padding: 12px 14px;
+  }
+
+  .docs-article .doc-pre code {
+    font-size: 12.5px;
   }
 }
 

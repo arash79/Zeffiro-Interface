@@ -14,7 +14,7 @@ function [filepath, filename] = find_files(pattern, folder, priority)
 %   [filepath, filename] = find_files(pattern, folder)
 %   [filepath, filename] = find_files(pattern, folder, priority)
 %
-%   Used for hex mesh.mat and sp_vol_rgv_N*.mat in the Duneuro converter.
+%   Used to pick mesh.mat / LF_*.mat / source-grid files in a DUNEuro export folder.
 
     if nargin < 3
         priority = 'first';

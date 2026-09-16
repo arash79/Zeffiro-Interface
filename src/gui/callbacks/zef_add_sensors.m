@@ -17,8 +17,7 @@
 %        That prepends the tag to zef.sensor_tags and fills zef.<tag>_*
 %        defaults (on, name "Sensors N", empty points/directions,
 %        identity affine, imaging_method_name from zef.imaging_method).
-%     2. Clears zef.aux_field_1.
-%     3. zef_build_sensors_table rebuilds h_sensors_table.Data.
+%     2. zef_build_sensors_table rebuilds h_sensors_table.Data (8 columns).
 %
 %   The new set has no sensors until you right-click the Sensors table →
 %   **Add sensor**, or Import → Import electrodes.
@@ -28,5 +27,4 @@
 %   See also zef_delete_sensor_sets, zef_create_sensors, zef_add_sensor_name.
 
 zef = zef_create_sensors(zef,['s' num2str(length(zef.sensor_tags) + 1)]);
-zef.aux_field_1 = cell(0);
-zef_build_sensors_table;
+zef = zef_build_sensors_table(zef);

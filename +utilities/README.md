@@ -20,7 +20,7 @@ Inverse formulas: [docs/methods.md](../docs/methods.md). Bundle fields: [`+clust
 |---------|------|
 | `utilities.cluster` | `dispatch_inverse`, batch submit/collect, registry |
 | `utilities.inverse` | `run_frame_loop` for class inverters |
-| `utilities.fs2zef` / `sn2zef` / `brainstorm2zef` / `duneuro2zef` | Anatomy converters (`run` / `import_*`) |
+| `utilities.fs2zef` / `sn2zef` / `brainstorm2zef` / `duneuro2zef` | Anatomy converters (`run` / `import_*`; DUNEuro also via Open project) |
 | `utilities.sensitivity` | Monte Carlo on inverse methods |
 | `utilities.structs` | `copy_fields` (startup name-value args → `zef`) |
 | `utilities.io` | `float_is_int`, `is_eof`, `read_gitmodules` |
@@ -30,11 +30,11 @@ Inverse formulas: [docs/methods.md](../docs/methods.md). Bundle fields: [`+clust
 
 `zef_inverse_run` extracts a bundle in `src/inverse`, then `utilities.cluster.dispatch_inverse(bundle)` either constructs `inverse.*Inverter` + `utilities.inverse.run_frame_loop` + post-process, or `feval`s a legacy function with `zef` in base. Register method ids in `+cluster/inverse_method_registry.m`. Batch/HPC: `submit_inverse_jobs`, `collect_inverse_results`, plus `configure_cluster_profile`, `run_inverse_job`, `with_zef_in_base` (Parallel Computing Toolbox; MATLAB cluster profiles, not Zeffiro INI profiles).
 
-Converters write a Zeffiro-style folder (surfaces, `import_segmentation.zef`, often `electrodes.dat`). Entry points: `utilities.fs2zef.run`, `sn2zef.run`, `brainstorm2zef.run` / `zef_bst_plugin_start`, `duneuro2zef.run` / `import_duneuro_project`.
+Converters under `fs2zef` / `sn2zef` / `brainstorm2zef` write a Zeffiro-style folder (surfaces, `import_segmentation.zef`, often `electrodes.dat`). Entry points: `utilities.fs2zef.run`, `sn2zef.run`, `brainstorm2zef.run` / `zef_bst_plugin_start`. **DUNEuro is different:** `duneuro2zef.convert` / `import_duneuro_project` map a MATLAB project into native `zef` fields (Open project also detects DUNEuro MAT files). After a folder converter, start Zeffiro with `'import_to_new_project'` pointing at the `.zef`, then mesh as usual. After DUNEuro import, the session already has `zef.L` / sensors / mesh when those were in the file. Child converter READMEs cover flags, coordinates, and outputs.
 
 ## Workflow context
 
-Nothing here is a menu item except where a converter has its own plugin start (Brainstorm). Cluster inverse is the backend of `zef_inverse_run`. After conversion, start Zeffiro with `'import_to_new_project'` pointing at the `.zef`, then mesh as usual. Child converter READMEs cover flags, coordinates, and outputs—not Zeffiro startup.
+Nothing here is a menu item except where a converter has its own plugin start (Brainstorm). Cluster inverse is the backend of `zef_inverse_run`. After conversion, start Zeffiro with `'import_to_new_project'` pointing at the `.zef`, then mesh as usual — except DUNEuro, which Open project converts directly into `zef`. Child converter READMEs cover flags, coordinates, and outputs—not Zeffiro startup.
 
 ## Usage instructions
 

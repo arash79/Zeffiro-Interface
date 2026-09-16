@@ -21,6 +21,7 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `DownloaderSafetyTest` | `zeffiro_downloader` quotes git arguments, restores cwd, rejects non-URL remotes |
 | `StiffnessMatrixIdentityTest` | P1 stiffness on the unit tet matches \(\nabla\lambda_i\cdot(\sigma\nabla\lambda_j)V\); anisotropic \(\sigma_{xy}/\sigma_{xz}/\sigma_{yz}\) and a random SPD tensor; two-tet assembly |
 | `ProjectLoadLegacyTest` | Single-struct MAT files are not overwritten; non-struct singles error; `zef_remove_system_fields` drops `gpu_count` / `path_cell` and keeps `save_file` |
+| `Duneuro2ZefTest` | DUNEuro `eegL` layouts → interleaved `zef.L`; 0-based tets; hex split; mm/m; tensors; extra fields; unsupported inputs; converted MAT is not re-detected as DUNEuro |
 | `BuildElectrodesCEMTest` | P1 CEM `A,B,C` vs analytic triangle mass; two-triangle \(C_{ee}=1/Z\); infinite-\(Z\) early return; point fallback |
 | `DTIActiveCompartmentMapTest` | Active-compartment map skips off tags; iso fallback uses that map, not tag position |
 | `FAToConductivityOrientationTest` | Model-3 FA→σ principal axis follows `v1`; missing `v1` defaults to \(+\hat x\) |
@@ -85,6 +86,7 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `GuiResponsivenessTest` | Resize must not install listener storms or recenter the window |
 | `WindowPlacementTest` | Clamp / centre helpers keep windows on the work area |
 | `SensorListSyncTest` | Figure-tool sensor count matches listed rows |
+| `SensorTableSyncTest` | 8-column sensor-set table; stale 7-column GUI data cannot overwrite imported `Electrodes` / Visible; fs2zef `electrodes.dat` import + save/reload keeps `Electrodes 1` |
 | `PluginIniResolutionTest` | Every Start function named in `profile/multicompartment_head/zeffiro_plugins.ini` exists on the path |
 
 ## Code functionality

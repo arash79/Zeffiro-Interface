@@ -37,7 +37,7 @@ Combine modes (workingHashes, not tree highlight alone): `frobenius` / `fuchs` /
 
 ```
 Multi tools → Data Bank → zef_start_dataBank → zef_open_dataBank
-External: duneuro2zef EEG/MEG_to_databank, decision-making examples, analysis scripts
+External: decision-making examples, analysis scripts
 ```
 
 INI: `Data Bank,multi_tools,zef_start_dataBank`.

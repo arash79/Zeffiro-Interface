@@ -48,6 +48,8 @@ The rest of this page is the project’s own vocabulary for anatomy, sensors, so
 
 **Lead field.** The linear map from candidate sources to sensors, stored as `zef.L`. Entry `L(i,j)` is sensor `i`’s reading from unit source component `j`. Inverse methods consume `L`; they do not assemble it.
 
+**DUNEuro project.** A MATLAB dump from the DUNEuro FEM bindings (lead field `eegL`, optional transfer matrix `eegT`, electrodes, optional mesh). Open project converts it with `utilities.duneuro2zef`. `eegT` is a DUNEuro FEM internal and is not loaded into `zef`; inverse code uses `zef.L`.
+
 **Transfer matrix.** Intermediate FEM solve for electrode (or equivalent) nodal potentials from the sparse stiffness system, before interpolation onto sources. EEG and TES call `zef_transfer_matrix`. MEG and EIT run the same PCG inside their FEM files. GPU uses Jacobi; CPU uses SSOR or no-fill incomplete Cholesky.
 
 **Source model.** How a current dipole is discretized inside a tetrahedron: Whitney, H(div), or St. Venant (`core.types.ZefSourceModel`).

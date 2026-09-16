@@ -59,6 +59,7 @@ Classes are listed by short name; fully qualified names are `tests.unit.ELORETAI
 | `PluginIniResolutionTest` | Default-profile plugin Start functions resolve |
 | `ProfileCellTest` | Profile INI parser matches `readcell`; cache invalidates on rewrite |
 | `ZefSourceModelLoadTest` | `core.types.ZefSourceModel.from` + legacy enum MAT load |
+| `Duneuro2ZefTest` | DUNEuro lead-field layouts, indexing, units, tensors, extra fields, unsupported inputs |
 | `tests.support.createSyntheticInverseZef` | Shared synthetic `zef` fixture for inverse tests (`source_interpolation_ind{1}` is a column) |
 | `tests.support.createSyntheticUKFNMMZef` | Larger xyz/bump `zef` fixture for UKFNMM clustering + NMM |
 

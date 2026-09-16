@@ -7,7 +7,7 @@ function [tetra,labels_tetra] = zef_hexa_to_tetra(hexa,varargin)
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Same local stencil as the mode-2 lattice in zef_create_fem_mesh
-%   (no parity flip). Used by utilities.duneuro2zef.convert_mesh
+%   (no parity flip). Used by utilities.duneuro2zef.convert
 %   when DUNEuro supplies hexahedral elements.
 %
 %   [tetra, labels_tetra] = zef_hexa_to_tetra(hexa)
