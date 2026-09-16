@@ -11,13 +11,24 @@ function varargout = zef_ui_shell(action, varargin)
 %   from the actual menu children at click time. Callbacks, Tags, and
 %   handles are not duplicated.
 %
+%   Nav hover is a figure-level WindowMouseMotion listener. Hit maps and
+%   pointer events use figure-relative pixels so the full row container
+%   (not only the icon or label) matches. Each menu row keeps a create-once
+%   axes image from zef_ui_roundrect (same pattern as zef_ui_card). That
+%   axes is the row's ONLY painted layer: the rounded fill, the composited
+%   icon glyph, and a transparent text object for the label all live in
+%   it. The label/icon/hit uicontrols are kept for tags, Strings, and
+%   callbacks but are never shown, so no second square background can
+%   stack over the chip (which used to read as two overlapping rectangles
+%   with a stepped bottom edge). Toolbar icon/label pairs highlight together.
+%
 %   zef_ui_shell('build', h_fig)
 %   zef_ui_shell('bind', zef)
 %   zef_ui_shell('layout', h_fig)
 %   zef_ui_shell('hide_menu', zef)
 %   zef_ui_shell('hide_companions', zef)
 %   zef_ui_shell('dismiss', h_fig)
-%   zef_ui_shell('theme', h_fig)
+%   zef_ui_shell('theme', h_fig)  % restyle chrome from canonical tokens
 %   zef_ui_shell('raise_figure')
 %
 %   See also zef_figure_tool, zef_menu_tool, zef_ui_theme.
@@ -48,6 +59,8 @@ switch action
         local_raise_figure();
     case 'content_rect'
         [varargout{1:nargout}] = local_content_rect(varargin{:});
+    case {'hits', 'hitmap', 'refresh_hits'}
+        local_store_hit_maps(varargin{:});
     otherwise
         error('zef_ui_shell:UnknownAction', 'Unknown action: %s', action);
 end
@@ -76,10 +89,10 @@ nav = uipanel('Parent', h_fig, 'Units', 'pixels', 'BorderType', 'none', ...
 card = uipanel('Parent', h_fig, 'Units', 'pixels', 'BorderType', 'none', ...
     'BackgroundColor', theme.color.bg, 'ForegroundColor', theme.color.text, ...
     'Title', '', 'Tag', 'zef_shell_card');
-tabs = uipanel('Parent', h_fig, 'Units', 'pixels', 'BorderType', 'none', ...
+tabs = uipanel('Parent', card, 'Units', 'pixels', 'BorderType', 'none', ...
     'BackgroundColor', theme.color.workspace, 'ForegroundColor', theme.color.text, ...
     'Title', '', 'Tag', 'zef_shell_tabs');
-tools = uipanel('Parent', h_fig, 'Units', 'pixels', 'BorderType', 'none', ...
+tools = uipanel('Parent', card, 'Units', 'pixels', 'BorderType', 'none', ...
     'BackgroundColor', theme.color.workspace, 'ForegroundColor', theme.color.text, ...
     'Title', '', 'Tag', 'zef_shell_toolbar');
 footer = uipanel('Parent', h_fig, 'Units', 'pixels', 'BorderType', 'none', ...
@@ -118,6 +131,16 @@ prev = get(h_fig, 'WindowButtonDownFcn');
 setappdata(h_fig, 'ZefShellPrevDownFcn', prev);
 h_fig.WindowButtonDownFcn = @(src, evt) local_window_down(src, evt);
 try
+    prevu = get(h_fig, 'WindowButtonUpFcn');
+    setappdata(h_fig, 'ZefShellPrevUpFcn', prevu);
+    h_fig.WindowButtonUpFcn = @(src, evt) local_window_up(src, evt);
+catch
+end
+try
+    local_install_pointer_release(h_fig);
+catch
+end
+try
     prevk = get(h_fig, 'WindowKeyPressFcn');
     setappdata(h_fig, 'ZefShellPrevKeyFcn', prevk);
     h_fig.WindowKeyPressFcn = @(src, evt) local_window_key(src, evt);
@@ -129,55 +152,20 @@ catch
 end
 local_install_nav_hover(h_fig);
 local_restore_axes(h_fig);
+try
+    zef_ui_interact(h_fig);
+catch
+end
 
 end
 
 function local_build_header(header, theme)
 
-local_make_icon_btn(header, 'zef_shell_header_mark', theme.color.headerBg, false);
-uicontrol('Style', 'text', 'Parent', header, 'Units', 'pixels', ...
-    'String', 'ZEFFIRO', 'HorizontalAlignment', 'left', 'FontWeight', 'bold', ...
-    'ForegroundColor', theme.color.text, 'BackgroundColor', theme.color.headerBg, ...
-    'Tag', 'zef_shell_title', 'FontName', theme.font.name, ...
-    'FontUnits', 'pixels', 'FontSize', theme.font.sizeTitle + 2);
-uicontrol('Style', 'text', 'Parent', header, 'Units', 'pixels', ...
-    'String', 'I N T E R F A C E', 'HorizontalAlignment', 'left', ...
-    'ForegroundColor', theme.color.accent, 'BackgroundColor', theme.color.headerBg, ...
-    'Tag', 'zef_shell_header_sub', 'FontName', theme.font.name, ...
-    'FontUnits', 'pixels', 'FontSize', theme.font.sizeSmall);
-
-sun = local_make_icon_btn(header, 'zef_shell_theme_sun', theme.color.headerBg, false);
+logo = local_make_icon_btn(header, 'zef_shell_header_logo', theme.color.headerBg, false);
 try
-    sun.Enable = 'on';
-    sun.Callback = @local_theme_pill;
-    sun.TooltipString = 'Theme';
-    sun.BusyAction = 'cancel';
+    logo.TooltipString = 'Zeffiro Interface';
 catch
 end
-uicontrol('Style', 'pushbutton', 'Parent', header, 'Units', 'pixels', ...
-    'String', '', 'Tag', 'zef_shell_theme_pill', ...
-    'Callback', @local_theme_pill, 'BackgroundColor', theme.color.headerBg, ...
-    'ForegroundColor', theme.color.text, 'TooltipString', 'Theme');
-uicontrol('Style', 'text', 'Parent', header, 'Units', 'pixels', ...
-    'String', ['Theme  ' char(9662)], 'HorizontalAlignment', 'left', ...
-    'ForegroundColor', theme.color.text, ...
-    'BackgroundColor', theme.color.panel, 'Tag', 'zef_shell_theme_label', ...
-    'FontName', theme.font.name, 'FontUnits', 'pixels', ...
-    'FontSize', theme.font.sizeSmall, 'Enable', 'inactive', ...
-    'ButtonDownFcn', @local_theme_pill);
-
-mode = 'Light';
-try
-    if strcmp(theme.mode, 'dark')
-        mode = 'Dark';
-    end
-catch
-end
-uicontrol('Style', 'popupmenu', 'Parent', header, 'Units', 'pixels', ...
-    'String', {'Light', 'Dark'}, 'Value', 1 + strcmpi(mode, 'Dark'), ...
-    'BackgroundColor', theme.color.inputBg, 'ForegroundColor', theme.color.text, ...
-    'Tag', 'zef_shell_theme', 'Callback', @local_theme_changed, ...
-    'FontName', theme.font.name, 'FontSize', theme.font.sizeSmall);
 
 uicontrol('Style', 'pushbutton', 'Parent', header, 'Units', 'pixels', ...
     'String', '', 'Tag', 'zef_shell_help', ...
@@ -197,7 +185,7 @@ uicontrol('Style', 'pushbutton', 'Parent', header, 'Units', 'pixels', ...
 uicontrol('Style', 'text', 'Parent', header, 'Units', 'pixels', ...
     'String', '', 'Enable', 'inactive', 'Tag', 'zef_header_rule', ...
     'BackgroundColor', theme.color.border);
-for tag = {'zef_shell_help', 'zef_shell_bell', 'zef_shell_profile', 'zef_shell_theme_pill'}
+for tag = {'zef_shell_help', 'zef_shell_bell', 'zef_shell_profile'}
     b = findall(header, 'Tag', tag{1});
     if ~isempty(b)
         try
@@ -228,28 +216,39 @@ for i = 1:size(items, 1)
     key = items{i, 1};
     label = items{i, 2};
     field = items{i, 3};
+    % Clicks are owned solely by the figure-level WindowButtonDownFcn
+    % (hit maps in local_window_down). The row panel must NOT also wire
+    % ButtonDownFcn: both fire for one press and the duplicate toggles
+    % the flyout straight back closed.
     row = uipanel('Parent', nav, 'Units', 'pixels', 'BorderType', 'none', ...
         'Title', '', 'Tag', ['zef_nav_row_' key], 'UserData', field, ...
         'BackgroundColor', theme.color.panel, 'ForegroundColor', theme.color.text, ...
-        'HighlightColor', theme.color.panel, 'ButtonDownFcn', @local_nav_click);
+        'HighlightColor', theme.color.panel);
     try
         row.AutoResizeChildren = 'off';
         row.BorderWidth = 0;
         row.BorderColor = theme.color.panel;
     catch
     end
-    hit = uicontrol('Style', 'pushbutton', 'Parent', row, 'Units', 'pixels', ...
-        'String', '', 'Tag', ['zef_nav_hit_' key], 'UserData', field, ...
+    hit = uicontrol('Style', 'text', 'Parent', row, 'Units', 'pixels', ...
+        'String', '', 'Enable', 'inactive', 'Tag', ['zef_nav_hit_' key], 'UserData', field, ...
         'BackgroundColor', theme.color.panel, 'ForegroundColor', theme.color.panel, ...
-        'Callback', @local_nav_click, 'TooltipString', label);
+        'Callback', @local_nav_click, 'ButtonDownFcn', @local_nav_click, ...
+        'TooltipString', label);
     try
         hit.BusyAction = 'cancel';
     catch
     end
-    ic = local_make_icon_btn(row, ['zef_nav_icon_' key], theme.color.panel, true);
-    ic.UserData = field;
-    ic.Callback = @local_nav_click;
-    ic.TooltipString = label;
+    ic = uicontrol('Style', 'text', 'Parent', row, 'Units', 'pixels', ...
+        'String', '', 'Enable', 'inactive', 'Tag', ['zef_nav_icon_' key], ...
+        'UserData', field, 'BackgroundColor', theme.color.panel, ...
+        'ForegroundColor', theme.color.panel, 'Callback', @local_nav_click, ...
+        'ButtonDownFcn', @local_nav_click, 'TooltipString', label);
+    try
+        ic.BusyAction = 'cancel';
+        ic.CData = [];
+    catch
+    end
     btn = uicontrol('Style', 'text', 'Parent', row, 'Units', 'pixels', ...
         'String', label, 'HorizontalAlignment', 'left', 'Enable', 'inactive', ...
         'Tag', ['zef_nav_' key], 'UserData', field, ...
@@ -305,12 +304,13 @@ function local_build_toolbar(tools, h_fig, theme)
 
 spec = { ...
     'pan', 'Pan', @local_tool_pan, 'pushbutton'; ...
-    'rotate', 'Rotate', @local_tool_rotate, 'pushbutton'; ...
-    'zoom', 'Zoom', @local_tool_zoom, 'pushbutton'; ...
+    'rotate', 'Rotate 3D', @local_tool_rotate, 'pushbutton'; ...
+    'zoom', 'Zoom In', @local_tool_zoom, 'pushbutton'; ...
+    'zoomout', 'Zoom Out', @local_tool_zoomout, 'pushbutton'; ...
     'reset', 'Reset View', @local_tool_reset, 'pushbutton'; ...
     'screenshot', 'Screenshot', @local_tool_screenshot, 'pushbutton'; ...
     'colormap', 'Colormap', @local_tool_colormap, 'pushbutton'; ...
-    'measure', 'Measure', @local_tool_measure, 'pushbutton'; ...
+    'measure', 'Data Cursor', @local_tool_measure, 'pushbutton'; ...
     'annotate', 'Annotate', @local_tool_annotate, 'pushbutton'; ...
     'edges', 'Toggle Edges', @local_tool_edges, 'pushbutton'};
 for i = 1:size(spec, 1)
@@ -363,16 +363,8 @@ end
 
 function local_build_footer(footer, theme)
 
-ver_str = 'Zeffiro Interface';
-try
-    zef = evalin('base', 'zef');
-    if isfield(zef, 'current_version')
-        ver_str = sprintf('Zeffiro Interface v%s', num2str(zef.current_version));
-    end
-catch
-end
 uicontrol('Style', 'text', 'Parent', footer, 'Units', 'pixels', ...
-    'String', ver_str, 'HorizontalAlignment', 'left', ...
+    'String', 'Zeffiro Interface V2', 'HorizontalAlignment', 'left', ...
     'ForegroundColor', theme.color.textMuted, 'BackgroundColor', theme.color.footerBg, ...
     'Tag', 'zef_shell_version', 'FontName', theme.font.name, ...
     'FontUnits', 'pixels', 'FontSize', theme.font.sizeSmall);
@@ -495,9 +487,19 @@ if ~zef_ui_is_unified(h_fig)
     return
 end
 try
-    fly = getappdata(h_fig, 'ZefFlyoutPanel');
-    if ~isempty(fly) && isgraphics(fly) && isvalid(fly)
-        local_dismiss(h_fig);
+    orig_chk = h_fig.Units;
+    h_fig.Units = 'pixels';
+    sz = round(h_fig.Position(3:4));
+    h_fig.Units = orig_chk;
+    prev = getappdata(h_fig, 'ZefShellLayoutSize');
+    if ~isempty(prev) && isequal(prev, sz)
+        % Same size: keep flyouts (creating a panel can re-enter layout).
+    else
+        fly = getappdata(h_fig, 'ZefFlyoutPanel');
+        if local_ok(fly)
+            local_dismiss(h_fig);
+        end
+        setappdata(h_fig, 'ZefShellLayoutSize', sz);
     end
 catch
 end
@@ -509,7 +511,7 @@ pos = h_fig.Position;
 W = max(pos(3), 1);
 H = max(pos(4), 1);
 
-header_h = theme.space.headerH;
+header_h = local_header_height(theme, W);
 footer_h = theme.space.footerH;
 nav_w = theme.space.navW;
 show_labels = W >= 860;
@@ -532,9 +534,10 @@ try
 catch
     rad = 10;
 end
-top_gap = gap;
+top_gap = local_header_gap(theme, W, H);
 try
-    top_gap = theme.space.headerGap;
+    setappdata(h_fig, 'ZefShellHeaderGap', top_gap);
+    setappdata(h_fig, 'ZefShellHeaderH', header_h);
 catch
 end
 
@@ -568,24 +571,20 @@ if local_ok(work)
     work.Units = 'pixels';
     work.Position = [content_x, figure_y, content_w, figure_h];
     try
-        % Do not paint an opaque full-size card over sibling uiaxes;
-        % MATLAB cannot stack uiaxes above a covering panel/uicontrol.
-        work.Visible = 'off';
+        work.Visible = 'on';
+        work.BackgroundColor = theme.color.bg;
+        work.BorderType = 'none';
     catch
     end
-end
-tab_x = content_x;
-tab_w = max(80, content_w);
-if local_ok(tabs)
-    tabs.Units = 'pixels';
-    tabs.Position = [tab_x, figure_y + figure_h - theme.space.tabH, tab_w, theme.space.tabH];
-    local_place_tabs(tabs, theme);
-end
-if local_ok(tools)
-    tools.Units = 'pixels';
-    tools.Position = [tab_x, figure_y + figure_h - theme.space.tabH - theme.space.toolbarH, ...
-        tab_w, theme.space.toolbarH];
-    local_place_toolbar(tools, theme, tab_w);
+    local_adopt(tabs, work);
+    local_adopt(tools, work);
+    view = zef_ui_find(h_fig, 'figure_view');
+    local_adopt(view, work);
+    try
+        zef_ui_card(work, theme);
+    catch
+    end
+    local_place_workspace(work, tabs, tools, view, theme);
 end
 try
     if ~(isappdata(h_fig, 'ZefChromeRaised') ...
@@ -603,6 +602,75 @@ end
 
 h_fig.Units = orig;
 local_restore_axes(h_fig);
+try
+    local_store_hit_maps(h_fig);
+catch
+end
+
+end
+
+function local_place_workspace(work, tabs, tools, view, theme)
+
+if ~local_ok(work)
+    return
+end
+work.Units = 'pixels';
+wp = double(work.Position);
+w = max(1, round(wp(3)));
+h = max(1, round(wp(4)));
+rad = 12;
+tabH = 28;
+toolH = 36;
+try
+    rad = theme.space.cardRadius;
+    tabH = theme.space.tabH;
+    toolH = theme.space.toolbarH;
+catch
+end
+inner_x = rad;
+inner_y = rad;
+inner_w = max(40, w - 2 * rad);
+inner_h = max(40, h - 2 * rad);
+if local_ok(tabs)
+    tabs.Units = 'pixels';
+    tabs.Position = [inner_x, inner_y + inner_h - tabH, inner_w, tabH];
+    local_place_tabs(tabs, theme);
+end
+if local_ok(tools)
+    tools.Units = 'pixels';
+    tools.Position = [inner_x, inner_y + inner_h - tabH - toolH, inner_w, toolH];
+    local_place_toolbar(tools, theme, inner_w);
+end
+if local_ok(view)
+    view.Units = 'pixels';
+    view_h = max(40, inner_h - tabH - toolH);
+    view.Position = [inner_x, inner_y, inner_w, view_h];
+end
+bg = zef_ui_find(work, 'zef_card_bg');
+if local_ok(bg)
+    try
+        uistack(bg, 'bottom');
+    catch
+    end
+end
+
+end
+
+function local_adopt(h, parent)
+
+if ~local_ok(h) || ~local_ok(parent)
+    return
+end
+try
+    if isequal(h.Parent, parent)
+        return
+    end
+catch
+end
+try
+    h.Parent = parent;
+catch
+end
 
 end
 
@@ -632,8 +700,10 @@ gap = theme.space.cardGap;
 x = nav_w + 2 * gap;
 y = theme.space.footerH + 2 * gap + theme.space.statusH;
 w = max(80, W - nav_w - local_right_inset(h_fig) - 2 * gap);
-h = max(80, H - theme.space.headerH - theme.space.footerH - theme.space.statusH ...
-    - theme.space.headerGap - 2 * gap - theme.space.tabH - theme.space.toolbarH);
+header_h = local_header_height(theme, W);
+top_gap = local_header_gap(theme, W, H);
+h = max(80, H - header_h - theme.space.footerH - theme.space.statusH ...
+    - top_gap - 2 * gap - theme.space.tabH - theme.space.toolbarH);
 
 end
 
@@ -641,13 +711,11 @@ function local_place_header(header, theme)
 
 p = header.Position;
 inner_h = p(4);
+logo = zef_ui_find(header, 'zef_shell_header_logo');
 mark = zef_ui_find(header, 'zef_shell_header_mark');
 title = zef_ui_find(header, 'zef_shell_title');
 sub = zef_ui_find(header, 'zef_shell_header_sub');
-sun = zef_ui_find(header, 'zef_shell_theme_sun');
-lab = zef_ui_find(header, 'zef_shell_theme_label');
-pop = zef_ui_find(header, 'zef_shell_theme');
-pill = zef_ui_find(header, 'zef_shell_theme_pill');
+local_delete_legacy_theme_controls(header);
 helpb = zef_ui_find(header, 'zef_shell_help');
 bellb = zef_ui_find(header, 'zef_shell_bell');
 profb = zef_ui_find(header, 'zef_shell_profile');
@@ -665,78 +733,31 @@ for i = 1:size(right_icons, 1)
         x_right = x_right - 30;
     end
 end
-if local_ok(pop)
-    pop.Visible = 'off';
-    pop.Position = [x_right - 8, y, 8, 22];
-end
-pill_w = 88;
-pill_h = 22;
-pill_x = x_right - pill_w;
-pill_y = max(6, round((inner_h - pill_h) / 2));
-fillc = theme.color.panelAlt;
-if local_ok(pill)
-    pill.Position = [pill_x, pill_y, pill_w, pill_h];
-    pill.Callback = @local_theme_pill;
-    try
-        pkey = [pill_w, pill_h];
-        prev = getappdata(pill, 'ZefPillKey');
-        if ~isequal(prev, pkey)
-            pill.CData = zef_ui_roundrect(pill_w, pill_h, 12, fillc, ...
-                theme.color.border, theme.color.headerBg);
-            setappdata(pill, 'ZefPillKey', pkey);
-        end
-        pill.String = '';
-        pill.BackgroundColor = theme.color.headerBg;
-    catch
-    end
-end
-if local_ok(sun)
-    sun_key = 'sun';
-    if strcmp(theme.mode, 'dark')
-        sun_key = 'moon';
-    end
-    sun.Enable = 'on';
-    sun.Callback = @local_theme_pill;
-    sun.Position = [pill_x + 8, pill_y + 2, 20, 20];
-    local_show_icon(sun, sun_key, 18, theme.color.text, fillc);
-end
-if local_ok(lab)
-    lab.String = ['Theme  ' char(9662)];
-    lab.ForegroundColor = theme.color.text;
-    lab.BackgroundColor = fillc;
-    lab.Enable = 'inactive';
-    lab.ButtonDownFcn = @local_theme_pill;
-    lab.Position = [pill_x + 26, pill_y + 1, 58, 20];
-end
-x0 = 16;
 if local_ok(mark)
-    mark.Position = [x0, y, 24, 24];
-    local_show_icon(mark, 'mark', 22, theme.color.accent, theme.color.headerBg);
-    x0 = x0 + 28;
+    mark.Visible = 'off';
 end
 if local_ok(title)
-    title.String = 'ZEFFIRO';
-    title.FontWeight = 'bold';
-    title.BackgroundColor = theme.color.headerBg;
-    try
-        title.FontUnits = 'pixels';
-        title.FontSize = theme.font.sizeTitle + 1;
-    catch
-    end
-    title.Position = [x0, y, 86, 20];
-    x0 = x0 + 88;
+    title.Visible = 'off';
 end
 if local_ok(sub)
-    sub.String = 'I N T E R F A C E';
-    sub.ForegroundColor = theme.color.accent;
-    sub.BackgroundColor = theme.color.headerBg;
+    sub.Visible = 'off';
+end
+if ~local_ok(logo)
+    logo = local_make_icon_btn(header, 'zef_shell_header_logo', theme.color.headerBg, false);
     try
-        sub.FontUnits = 'pixels';
-        sub.FontSize = theme.font.sizeSmall;
-        sub.FontWeight = 'normal';
+        logo.TooltipString = 'Zeffiro Interface';
     catch
     end
-    sub.Position = [x0, y + 1, 152, 16];
+end
+x0 = 12;
+if local_ok(logo)
+    header.Units = 'pixels';
+    max_w = max(64, x_right - x0 - 12);
+    lh = max(20, inner_h - 8);
+    [lw, lh] = local_header_logo_size(max_w, lh);
+    ly = max(1, round((inner_h - lh) / 2));
+    logo.Position = [x0, ly, lw, lh];
+    local_show_header_logo(logo, theme);
 end
 rule = zef_ui_find(header, 'zef_header_rule');
 if local_ok(rule)
@@ -833,7 +854,6 @@ for i = 1:n
     catch
     end
     row.UserData = items{i, 3};
-    row.ButtonDownFcn = @local_nav_click;
     local_nav_layout_row(row, theme, show_labels, key, items{i, 2}, items{i, 3});
     if do_paint
         local_nav_paint_row(row, theme, key, items{i, 2});
@@ -849,6 +869,7 @@ end
 try
     if do_paint
         setappdata(nav, 'ZefNavPaintKey', paint_key);
+        local_prefetch_nav_icons(theme);
     end
 catch
 end
@@ -867,7 +888,9 @@ rh = max(1, rp(4));
 icon_s = 24;
 pad_x = 8;
 gap = 8;
-icon_y = max(0, round((rh - icon_s) / 2));
+icon_y = 0;
+icon_h = rh;
+glyph_y = max(0, round((rh - icon_s) / 2));
 if show_labels
     icon_x = pad_x;
 else
@@ -881,13 +904,21 @@ end
 if local_ok(hit)
     hit.Units = 'pixels';
     hit.Position = [0, 0, rw, rh];
+    try
+        hit.CData = [];
+    catch
+    end
+    try
+        if isappdata(hit, 'ZefNavHitKey')
+            rmappdata(hit, 'ZefNavHitKey');
+        end
+    catch
+    end
     if ~ready
         hit.UserData = field;
+        hit.Enable = 'inactive';
         hit.Callback = @local_nav_click;
-        try
-            hit.ButtonDownFcn = '';
-        catch
-        end
+        hit.ButtonDownFcn = @local_nav_click;
         hit.TooltipString = label;
         try
             if ~isappdata(hit, 'ZefHitStacked')
@@ -900,18 +931,26 @@ if local_ok(hit)
 end
 if local_ok(ic)
     ic.Units = 'pixels';
-    ic.Position = [icon_x, icon_y, icon_s, icon_s];
+    ic_w = icon_s;
+    if show_labels
+        ic_w = icon_s + gap;
+    end
+    ic.Position = [icon_x, icon_y, ic_w, icon_h];
+    try
+        ic.Style = 'text';
+        ic.String = '';
+        ic.CData = [];
+    catch
+    end
     if ~ready
         ic.UserData = field;
         ic.Callback = @local_nav_click;
-        try
-            ic.ButtonDownFcn = '';
-        catch
-        end
-        ic.Enable = 'on';
+        ic.ButtonDownFcn = @local_nav_click;
+        ic.Enable = 'inactive';
         ic.TooltipString = label;
     end
 end
+lab_x = icon_x + icon_s + gap;
 if local_ok(btn)
     btn.Units = 'pixels';
     if ~ready
@@ -929,13 +968,47 @@ if local_ok(btn)
         end
     end
     if show_labels
-        lab_x = icon_x + icon_s + gap;
         lab_w = max(24, rw - lab_x - pad_x);
-        btn.Position = [lab_x, icon_y, lab_w, icon_s];
-        btn.Visible = 'on';
-    else
-        btn.Visible = 'off';
+        btn.Position = [lab_x, 0, lab_w, rh];
     end
+    % The chip axes is the row's only painted layer (fill + icon + text).
+    % A visible label uicontrol would stack a second, square background
+    % over the rounded chip, so the uicontrol is never shown; it is kept
+    % only for its tag, String, and callback identity.
+    btn.Visible = 'off';
+end
+fillc = theme.color.panel;
+icon_fg = theme.color.navIcon;
+try
+    prev_fill = getappdata(row, 'ZefChipFill');
+    if ~isempty(prev_fill)
+        fillc = prev_fill;
+        if isequal(round(fillc * 1000), round(theme.color.navHover * 1000)) ...
+                || isequal(round(fillc * 1000), round(theme.color.navActive * 1000))
+            icon_fg = theme.color.accent;
+        end
+    end
+catch
+end
+r = local_menu_chip_radius(theme, rh);
+local_menu_chip(row, ['zef_nav_bg_' key], fillc, theme.color.panel, r);
+local_nav_blit_icon(row, key, icon_x, glyph_y, icon_s, icon_fg, fillc);
+local_chip_text(row, ['zef_nav_text_' key], label, show_labels, lab_x, rh, theme);
+try
+    ax = getappdata(row, 'ZefChipAx');
+    if local_ok(ax)
+        uistack(ax, 'bottom');
+    end
+    if local_ok(hit)
+        uistack(hit, 'bottom');
+        hit.Visible = 'off';
+    end
+    if local_ok(ic)
+        ic.Visible = 'off';
+        uistack(ic, 'top');
+    end
+    local_nav_delete_glyph(row);
+catch
 end
 try
     setappdata(row, 'ZefNavRowReady', true);
@@ -954,7 +1027,6 @@ ic = zef_ui_find(row, ['zef_nav_icon_' key]);
 btn = zef_ui_find(row, ['zef_nav_' key]);
 h_fig = ancestor(row, 'figure');
 fillc = theme.color.panel;
-ink = theme.color.text;
 icon_fg = theme.color.navIcon;
 hovered = '';
 try
@@ -985,44 +1057,90 @@ elseif is_hover
     fillc = theme.color.navHover;
     icon_fg = theme.color.accent;
 end
-row.BackgroundColor = fillc;
+outer = theme.color.panel;
+row.BackgroundColor = outer;
 try
-    row.HighlightColor = fillc;
-    row.BorderColor = fillc;
+    row.HighlightColor = outer;
+    row.BorderColor = outer;
     row.BorderType = 'none';
     row.BorderWidth = 0;
 catch
 end
+try
+    setappdata(row, 'ZefChipFill', fillc);
+catch
+end
+rp = row.Position;
+r = local_menu_chip_radius(theme, rp(4));
+local_menu_chip(row, ['zef_nav_bg_' key], fillc, outer, r);
 if local_ok(hit)
-    hit.Units = 'pixels';
-    hp = hit.Position;
-    hw = max(8, round(hp(3)));
-    hh = max(8, round(hp(4)));
-    hit.BackgroundColor = fillc;
-    hit.ForegroundColor = fillc;
     try
-        r = min(theme.space.btnRadius, max(3, floor(min(hw, hh) / 2) - 1));
-        nkey = [hw, hh, round(fillc * 1000)];
-        prevk = [];
-        try
-            prevk = getappdata(hit, 'ZefNavHitKey');
-        catch
-        end
-        if ~isequal(prevk, nkey)
-            hit.CData = zef_ui_roundrect(hw, hh, r, fillc, fillc, theme.color.panel);
-            setappdata(hit, 'ZefNavHitKey', nkey);
+        hit.CData = [];
+    catch
+    end
+    try
+        if isappdata(hit, 'ZefNavHitKey')
+            rmappdata(hit, 'ZefNavHitKey');
         end
     catch
     end
+    hit.BackgroundColor = outer;
+    hit.ForegroundColor = outer;
     hit.TooltipString = label;
+    try
+        hit.Visible = 'off';
+    catch
+    end
 end
 if local_ok(ic)
-    ic.BackgroundColor = fillc;
-    local_show_icon(ic, key, 24, icon_fg, fillc);
+    try
+        ic.Style = 'text';
+        ic.String = '';
+        ic.CData = [];
+        ic.Visible = 'off';
+    catch
+    end
+    try
+        ip = ic.Position;
+        glyph_s = 24;
+        gx = ip(1);
+        gy = max(0, round((rp(4) - glyph_s) / 2));
+        local_nav_blit_icon(row, key, gx, gy, glyph_s, icon_fg, fillc);
+    catch
+        local_nav_blit_icon(row, key, 8, 4, 24, icon_fg, fillc);
+    end
 end
 if local_ok(btn)
-    btn.BackgroundColor = fillc;
-    btn.ForegroundColor = ink;
+    % Never paint the label uicontrol: the chip axes is the single
+    % rendered layer, so the row cannot show a square rectangle over
+    % the rounded chip. The uicontrol only carries tag/String/callback.
+    btn.Visible = 'off';
+end
+try
+    local_nav_delete_glyph(row);
+catch
+end
+
+end
+
+function local_install_pointer_release(h_fig)
+
+if ~local_ok(h_fig)
+    return
+end
+try
+    if isappdata(h_fig, 'ZefShellReleaseListener')
+        lh = getappdata(h_fig, 'ZefShellReleaseListener');
+        if ~isempty(lh) && isvalid(lh)
+            return
+        end
+    end
+catch
+end
+try
+    lh = addlistener(h_fig, 'WindowMouseRelease', @(s, e) local_window_up(s, e));
+    setappdata(h_fig, 'ZefShellReleaseListener', lh);
+catch
 end
 
 end
@@ -1042,7 +1160,7 @@ try
 catch
 end
 try
-    lh = addlistener(h_fig, 'WindowMouseMotion', @(s, ~) local_nav_hover(s));
+    lh = addlistener(h_fig, 'WindowMouseMotion', @(s, e) local_nav_hover(s, e));
     setappdata(h_fig, 'ZefNavHoverListener', lh);
     return
 catch
@@ -1061,7 +1179,7 @@ end
 
 function local_nav_motion_wrap(src, evt)
 
-local_nav_hover(src);
+local_nav_hover(src, evt);
 prev = [];
 try
     prev = getappdata(src, 'ZefShellPrevMotionFcn');
@@ -1078,8 +1196,11 @@ end
 
 end
 
-function local_nav_hover(src)
+function local_nav_hover(src, evt)
 
+if nargin < 2
+    evt = [];
+end
 h_fig = ancestor(src, 'figure');
 if ~local_ok(h_fig)
     h_fig = src;
@@ -1087,49 +1208,103 @@ end
 if ~local_ok(h_fig)
     return
 end
-nav = zef_ui_find(h_fig, 'zef_shell_nav');
-if ~local_ok(nav)
+dragging = false;
+try
+    drag = getappdata(h_fig, 'ZefInteractDrag');
+    dragging = ~isempty(drag) && isstruct(drag);
+catch
+end
+if dragging
+    try
+        pt = local_pointer_pt(h_fig, evt);
+        zef_figure_interact(h_fig, 'move', pt);
+    catch
+        try
+            zef_figure_interact(h_fig, 'move');
+        catch
+        end
+    end
     return
 end
-key = '';
+
+hit = [];
 try
-    obj = hittest(h_fig);
-    key = local_nav_key_of(obj);
+    if ~isempty(evt)
+        hit = evt.HitObject;
+    end
 catch
 end
-prev = '';
+
+fly = local_fly_from_hit(hit);
+if ~local_ok(fly)
+    pt = local_pointer_pt(h_fig, evt);
+    if numel(pt) >= 2
+        fly = local_fly_at(h_fig, pt);
+    end
+end
+if local_ok(fly)
+    local_nav_set_hover(h_fig, '');
+    local_set_chrome_hover(h_fig, []);
+    local_set_fly_hover(h_fig, fly);
+    local_set_pointer(h_fig, 'hand');
+    return
+end
+local_set_fly_hover(h_fig, []);
+
+key = local_nav_key_of(hit);
+if isempty(key)
+    pt = local_pointer_pt(h_fig, evt);
+    if numel(pt) >= 2
+        key = local_nav_key_at(h_fig, pt);
+    end
+end
+local_nav_set_hover(h_fig, key);
+if ~isempty(key)
+    local_set_chrome_hover(h_fig, []);
+    local_set_pointer(h_fig, 'hand');
+    return
+end
+
+ch = local_chrome_from_hit(hit);
+if ~local_ok(ch)
+    pt = local_pointer_pt(h_fig, evt);
+    if numel(pt) >= 2
+        ch = local_chrome_at(h_fig, pt);
+    end
+end
+local_set_chrome_hover(h_fig, ch);
+if local_ok(ch)
+    local_set_pointer(h_fig, 'hand');
+    return
+end
+
+pt = local_pointer_pt(h_fig, evt);
+vr = [];
 try
-    prev = char(getappdata(nav, 'ZefNavHoverKey'));
+    vr = getappdata(h_fig, 'ZefViewRect');
 catch
 end
-if strcmp(prev, key)
+if numel(pt) >= 2 && local_in_rect(pt, vr)
+    p = 'arrow';
     try
-        zef_ui_interact(h_fig, 'motion');
+        p = zef_figure_interact(h_fig, 'pointer');
+        if isempty(p)
+            p = 'arrow';
+        end
     catch
     end
+    local_set_pointer(h_fig, p);
     return
 end
-try
-    setappdata(h_fig, 'ZefNavHoverKey', key);
-catch
+if local_is_edit_hit(hit)
+    local_set_pointer(h_fig, 'ibeam');
+    return
 end
-try
-    setappdata(nav, 'ZefNavHoverKey', key);
-catch
+if local_is_clickable_hit(hit)
+    local_set_pointer(h_fig, 'hand');
+    return
 end
-theme = zef_ui_theme();
-items = local_nav_spec();
-for i = 1:size(items, 1)
-    k = items{i, 1};
-    row = zef_ui_find(nav, ['zef_nav_row_' k]);
-    if local_ok(row)
-        local_nav_paint_row(row, theme, k, items{i, 2});
-    end
-end
-try
-    zef_ui_interact(h_fig, 'motion');
-catch
-end
+local_set_pointer(h_fig, 'arrow');
 
 end
 
@@ -1139,7 +1314,8 @@ key = '';
 h = obj;
 spec = local_nav_spec();
 names = spec(:, 1);
-prefixes = {'zef_nav_row_', 'zef_nav_hit_', 'zef_nav_icon_', 'zef_nav_'};
+prefixes = {'zef_nav_row_', 'zef_nav_hit_', 'zef_nav_icon_', ...
+    'zef_nav_glyph_', 'zef_nav_bg_', 'zef_nav_'};
 for i = 1:10
     if ~local_ok(h)
         return
@@ -1164,6 +1340,783 @@ for i = 1:10
     catch
         return
     end
+end
+
+end
+
+function pt = local_pointer_pt(fig, evt)
+
+pt = [];
+if nargin >= 2 && ~isempty(evt)
+    try
+        pt = double(evt.Point);
+    catch
+    end
+end
+if numel(pt) < 2 && local_ok(fig)
+    try
+        if strcmpi(char(fig.Units), 'pixels')
+            pt = double(fig.CurrentPoint);
+        else
+            orig = fig.Units;
+            fig.Units = 'pixels';
+            pt = double(fig.CurrentPoint);
+            fig.Units = orig;
+        end
+    catch
+        pt = [];
+    end
+end
+if numel(pt) >= 2
+    pt = pt(1:2);
+end
+
+end
+
+function tf = local_in_rect(pt, r)
+
+tf = numel(pt) >= 2 && numel(r) >= 4 && r(3) > 0 && r(4) > 0 ...
+    && pt(1) >= r(1) && pt(1) < r(1) + r(3) ...
+    && pt(2) >= r(2) && pt(2) < r(2) + r(4);
+
+end
+
+function r = local_fig_rect(h)
+
+%LOCAL_FIG_RECT  Figure-relative pixel rect, matching CurrentPoint.
+%   getpixelposition(h, true) already returns figure-relative pixels on
+%   supported MATLAB versions; subtracting the figure's screen position
+%   (its own getpixelposition) would double-count the window offset and
+%   break every pointer hit map once the window is not at the origin.
+
+r = [0 0 0 0];
+if ~local_ok(h)
+    return
+end
+try
+    ap = double(getpixelposition(h, true));
+    if numel(ap) >= 4
+        r = ap;
+    end
+catch
+end
+
+end
+
+function key = local_nav_key_at(h_fig, pt)
+
+key = '';
+keys = {};
+rects = zeros(0, 4);
+try
+    keys = getappdata(h_fig, 'ZefNavHitKeys');
+    rects = getappdata(h_fig, 'ZefNavHitRects');
+catch
+end
+stale = false;
+try
+    stored = getappdata(h_fig, 'ZefHitMapFigPos');
+    cur = [];
+    try
+        orig = h_fig.Units;
+        h_fig.Units = 'pixels';
+        cur = round(double(h_fig.Position));
+        h_fig.Units = orig;
+    catch
+    end
+    stale = isempty(stored) || (~isempty(cur) && ~isequal(stored, cur));
+catch
+end
+if stale || ~iscell(keys) || isempty(keys) || size(rects, 1) ~= numel(keys)
+    try
+        local_store_hit_maps(h_fig);
+        keys = getappdata(h_fig, 'ZefNavHitKeys');
+        rects = getappdata(h_fig, 'ZefNavHitRects');
+    catch
+        return
+    end
+end
+if ~iscell(keys)
+    return
+end
+for i = 1:numel(keys)
+    if local_in_rect(pt, rects(i, :))
+        key = keys{i};
+        return
+    end
+end
+
+end
+
+function fly = local_fly_at(h_fig, pt)
+
+fly = [];
+hs = gobjects(0);
+rects = zeros(0, 4);
+try
+    hs = getappdata(h_fig, 'ZefFlyHitH');
+    rects = getappdata(h_fig, 'ZefFlyHitR');
+catch
+end
+for i = 1:numel(hs)
+    if local_ok(hs(i)) && local_in_rect(pt, rects(i, :))
+        fly = hs(i);
+        return
+    end
+end
+
+end
+
+function h = local_chrome_at(h_fig, pt)
+
+h = [];
+hs = gobjects(0);
+rects = zeros(0, 4);
+try
+    hs = getappdata(h_fig, 'ZefChromeHitH');
+    rects = getappdata(h_fig, 'ZefChromeHitR');
+catch
+end
+for i = 1:numel(hs)
+    if local_ok(hs(i)) && i <= size(rects, 1) && local_in_rect(pt, rects(i, :))
+        h = hs(i);
+        return
+    end
+end
+
+end
+
+function h = local_chrome_from_hit(obj)
+
+h = [];
+x = obj;
+tags = {'zef_shell_help', 'zef_shell_bell', 'zef_shell_profile', ...
+    'zef_tool_more', 'zef_tool_sliders'};
+for i = 1:8
+    if ~local_ok(x)
+        return
+    end
+    tag = '';
+    try
+        tag = char(x.Tag);
+    catch
+    end
+    if any(strcmp(tag, tags)) || strncmp(tag, 'zef_tool_', 9) ...
+            || strncmp(tag, 'zef_tab_', 8)
+        try
+            if isprop(x, 'Enable') && strcmpi(char(x.Enable), 'off')
+                return
+            end
+        catch
+        end
+        h = x;
+        return
+    end
+    try
+        if isappdata(x, 'ZefRoundKey')
+            h = x;
+            return
+        end
+    catch
+    end
+    try
+        x = x.Parent;
+    catch
+        return
+    end
+end
+
+end
+
+function fly = local_fly_from_hit(obj)
+
+fly = [];
+h = obj;
+for i = 1:8
+    if ~local_ok(h)
+        return
+    end
+    tag = '';
+    try
+        tag = char(h.Tag);
+    catch
+    end
+    if strcmp(tag, 'zef_fly_item')
+        fly = h;
+        return
+    end
+    if contains(tag, 'zef_shell_flyout') && ~strcmpi(char(h.Type), 'uicontrol')
+        return
+    end
+    try
+        par = h.Parent;
+        ptag = '';
+        try
+            ptag = char(par.Tag);
+        catch
+        end
+        if strcmp(ptag, 'zef_fly_item')
+            fly = par;
+            return
+        end
+        if strcmpi(char(h.Type), 'uicontrol') && contains(ptag, 'zef_shell_flyout')
+            style = lower(char(h.Style));
+            if any(strcmp(style, {'text', 'pushbutton'}))
+                fly = h;
+                return
+            end
+        end
+    catch
+    end
+    try
+        h = h.Parent;
+    catch
+        return
+    end
+end
+
+end
+
+function tf = local_is_edit_hit(obj)
+
+tf = false;
+if ~local_ok(obj)
+    return
+end
+try
+    if strcmpi(char(obj.Type), 'uicontrol') && strcmpi(char(obj.Style), 'edit')
+        tf = true;
+        return
+    end
+catch
+end
+cls = class(obj);
+tf = contains(cls, 'EditField') || contains(cls, 'TextArea') ...
+    || contains(cls, 'Spinner');
+
+end
+
+function tf = local_is_clickable_hit(obj)
+
+tf = false;
+if ~local_ok(obj)
+    return
+end
+try
+    if isprop(obj, 'Enable') && strcmpi(char(obj.Enable), 'off')
+        return
+    end
+catch
+end
+try
+    if strcmpi(char(obj.Type), 'uicontrol')
+        style = lower(char(obj.Style));
+        tf = any(strcmp(style, {'pushbutton', 'togglebutton', 'checkbox', ...
+            'radiobutton', 'slider', 'listbox', 'popupmenu'}));
+        return
+    end
+catch
+end
+cls = class(obj);
+tf = contains(cls, 'Button') || contains(cls, 'CheckBox') ...
+    || contains(cls, 'DropDown') || contains(cls, 'ListBox') ...
+    || contains(cls, 'Slider');
+
+end
+
+function tf = local_chrome_hand_at(h_fig, pt)
+
+tf = local_ok(local_chrome_at(h_fig, pt));
+
+end
+
+function local_set_chrome_hover(h_fig, h)
+
+prev = [];
+try
+    prev = getappdata(h_fig, 'ZefChromeHover');
+catch
+end
+if isequal(prev, h)
+    return
+end
+prev_grp = local_chrome_mates(h_fig, prev);
+next_grp = local_chrome_mates(h_fig, h);
+for i = 1:numel(prev_grp)
+    if local_ok(prev_grp(i)) && ~local_in_handles(prev_grp(i), next_grp)
+        try
+            zef_ui_interact(prev_grp(i), 'paint', 'idle');
+        catch
+        end
+    end
+end
+for i = 1:numel(next_grp)
+    if local_ok(next_grp(i)) && ~local_in_handles(next_grp(i), prev_grp)
+        try
+            zef_ui_interact(next_grp(i), 'paint', 'hover');
+        catch
+        end
+    end
+end
+try
+    setappdata(h_fig, 'ZefChromeHover', h);
+catch
+end
+local_exit_guard_refresh(h_fig);
+
+end
+
+function tf = local_in_handles(h, grp)
+
+tf = false;
+for i = 1:numel(grp)
+    if local_ok(grp(i)) && isequal(grp(i), h)
+        tf = true;
+        return
+    end
+end
+
+end
+
+function hs = local_chrome_mates(h_fig, h)
+
+hs = gobjects(0);
+if ~local_ok(h)
+    return
+end
+hs = h;
+tag = '';
+try
+    tag = char(h.Tag);
+catch
+end
+mate = [];
+if strncmp(tag, 'zef_tool_lab_', 13)
+    mate = zef_ui_find(h_fig, ['zef_tool_' tag(14:end)]);
+elseif strncmp(tag, 'zef_tool_', 9) && ~contains(tag, '_lab_') ...
+        && ~any(strcmp(tag, {'zef_tool_more', 'zef_tool_sliders', 'zef_tool_sep', 'zef_tool_rule'}))
+    mate = zef_ui_find(h_fig, ['zef_tool_lab_' tag(10:end)]);
+end
+if local_ok(mate)
+    hs(end + 1) = mate; %#ok<AGROW>
+end
+
+end
+
+function local_nav_set_hover(h_fig, key)
+
+nav = zef_ui_find(h_fig, 'zef_shell_nav');
+if ~local_ok(nav)
+    return
+end
+if isempty(key)
+    key = '';
+end
+prev = '';
+try
+    prev = char(getappdata(nav, 'ZefNavHoverKey'));
+catch
+end
+if strcmp(prev, key)
+    return
+end
+try
+    setappdata(nav, 'ZefNavHoverKey', key);
+    setappdata(h_fig, 'ZefNavHoverKey', key);
+catch
+end
+theme = zef_ui_theme();
+items = local_nav_spec();
+if ~isempty(prev)
+    local_nav_paint_named(nav, theme, items, prev);
+end
+if ~isempty(key)
+    local_nav_paint_named(nav, theme, items, key);
+end
+local_exit_guard_refresh(h_fig);
+
+end
+
+function local_nav_paint_named(nav, theme, items, key)
+
+row = zef_ui_find(nav, ['zef_nav_row_' key]);
+if ~local_ok(row)
+    return
+end
+label = key;
+for i = 1:size(items, 1)
+    if strcmp(items{i, 1}, key)
+        label = items{i, 2};
+        break
+    end
+end
+local_nav_paint_row(row, theme, key, label);
+
+end
+
+function local_set_fly_hover(h_fig, fly)
+
+prev = [];
+try
+    prev = getappdata(h_fig, 'ZefFlyoutHover');
+catch
+end
+if isequal(prev, fly)
+    return
+end
+if local_ok(prev) && ~local_is_open_fly_item(h_fig, prev)
+    local_flyout_paint(prev, false);
+end
+if local_ok(fly)
+    local_flyout_paint(fly, true);
+end
+try
+    setappdata(h_fig, 'ZefFlyoutHover', fly);
+catch
+end
+local_exit_guard_refresh(h_fig);
+
+end
+
+function local_flyout_paint(item, on)
+
+item = local_fly_item_of(item);
+if ~local_ok(item)
+    return
+end
+tag = '';
+try
+    tag = char(item.Tag);
+catch
+end
+if ~strcmp(tag, 'zef_fly_item')
+    return
+end
+theme = zef_ui_theme();
+outer = theme.color.panel;
+fillc = outer;
+if on
+    fillc = theme.color.navHover;
+end
+try
+    item.BackgroundColor = outer;
+    item.HighlightColor = outer;
+    item.BorderType = 'none';
+catch
+end
+try
+    item.ForegroundColor = theme.color.text;
+catch
+end
+ht = 28;
+try
+    item.Units = 'pixels';
+    ht = item.Position(4);
+catch
+end
+r = local_menu_chip_radius(theme, ht);
+local_menu_chip(item, 'zef_fly_bg', fillc, outer, r);
+% Child uicontrols stay hidden and unpainted: the chip axes (fill +
+% text object) is the item's only rendered layer, so hover can never
+% stack a second rectangle over the rounded chip.
+
+end
+
+function local_exit_guard_refresh(h_fig)
+
+%LOCAL_EXIT_GUARD_REFRESH  Arm/disarm the pointer-outside-window poller.
+%   Traditional figures fire no mouse-exit event, so without this the
+%   last hovered row would stay highlighted when the pointer leaves the
+%   window (e.g. exiting through the left edge of the nav panel).
+
+if ~local_ok(h_fig)
+    return
+end
+active = false;
+try
+    % Only a visible window can be pointer-hovered; synthetic hovers on
+    % hidden figures (tests) must not be polled against the OS pointer.
+    if strcmpi(char(h_fig.Visible), 'on')
+        active = strlength(char(getappdata(h_fig, 'ZefNavHoverKey'))) > 0;
+        if ~active
+            active = local_ok(getappdata(h_fig, 'ZefFlyoutHover'));
+        end
+        if ~active
+            active = local_ok(getappdata(h_fig, 'ZefChromeHover'));
+        end
+    end
+catch
+end
+tm = [];
+try
+    tm = getappdata(h_fig, 'ZefExitGuardTimer');
+catch
+end
+if ~active
+    if ~isempty(tm) && isvalid(tm)
+        try
+            if strcmpi(char(tm.Running), 'on')
+                stop(tm);   % StopFcn deletes (safe inside its own callback)
+            else
+                delete(tm);
+            end
+        catch
+        end
+    end
+    try, rmappdata(h_fig, 'ZefExitGuardTimer'); catch, end
+    return
+end
+if ~isempty(tm) && isvalid(tm)
+    try
+        if strcmpi(char(tm.Running), 'on')
+            return
+        end
+    catch
+    end
+else
+    tm = timer('ExecutionMode', 'fixedSpacing', 'Period', 0.12, ...
+        'BusyMode', 'drop', 'Tag', 'ZefExitGuardTimer', ...
+        'TimerFcn', @(s, ~) local_exit_guard_check(s, h_fig), ...
+        'StopFcn', @(s, ~) local_exit_guard_delete(s));
+    try
+        setappdata(h_fig, 'ZefExitGuardTimer', tm);
+    catch
+    end
+end
+try
+    start(tm);
+catch
+end
+
+end
+
+function local_exit_guard_check(tm, h_fig)
+
+if ~local_ok(tm)
+    return
+end
+if ~local_ok(h_fig)
+    % Figure is gone: stop self; StopFcn deletes the timer object.
+    try, stop(tm); catch, end
+    return
+end
+inside = false;
+pl = [];
+fpos = [];
+try
+    pl = get(0, 'PointerLocation');
+    orig = h_fig.Units;
+    h_fig.Units = 'pixels';
+    fpos = h_fig.Position;
+    h_fig.Units = orig;
+    inside = numel(pl) >= 2 && numel(fpos) >= 4 ...
+        && pl(1) >= fpos(1) && pl(1) < fpos(1) + fpos(3) ...
+        && pl(2) >= fpos(2) && pl(2) < fpos(2) + fpos(4);
+catch
+end
+if inside
+    % Reconcile the hover target with the actual pointer position. OS
+    % mouse-motion events can be coalesced or dropped, so while a hover
+    % is active the guard re-derives it from the pointer at ~8 Hz; the
+    % setters early-exit when nothing changed, so this is cheap.
+    try
+        pt = pl(1:2) - fpos(1:2);
+        fly = local_fly_at(h_fig, pt);
+        if local_ok(fly)
+            local_nav_set_hover(h_fig, '');
+            local_set_chrome_hover(h_fig, []);
+            local_set_fly_hover(h_fig, fly);
+        else
+            key = local_nav_key_at(h_fig, pt);
+            local_set_fly_hover(h_fig, []);
+            local_nav_set_hover(h_fig, key);
+            if isempty(key)
+                local_set_chrome_hover(h_fig, local_chrome_at(h_fig, pt));
+            else
+                local_set_chrome_hover(h_fig, []);
+            end
+        end
+    catch
+    end
+    return
+end
+% Pointer left the window: drop every hover state. The setters refresh
+% the guard, which stops this timer (StopFcn deletes it).
+try
+    local_nav_set_hover(h_fig, '');
+    local_set_chrome_hover(h_fig, []);
+    local_set_fly_hover(h_fig, []);
+catch
+end
+try
+    if isvalid(tm) && strcmpi(char(tm.Running), 'on')
+        stop(tm);
+    end
+catch
+end
+
+end
+
+function local_exit_guard_delete(tm)
+
+try
+    if ~isempty(tm) && isvalid(tm)
+        delete(tm);
+    end
+catch
+end
+
+end
+
+function item = local_fly_item_of(src)
+
+item = src;
+h = src;
+for i = 1:8
+    if ~local_ok(h)
+        return
+    end
+    tag = '';
+    try
+        tag = char(h.Tag);
+    catch
+    end
+    if strcmp(tag, 'zef_fly_item')
+        item = h;
+        return
+    end
+    try
+        h = h.Parent;
+    catch
+        return
+    end
+end
+
+end
+
+function local_set_pointer(h_fig, want)
+
+if ~local_ok(h_fig) || nargin < 2 || isempty(want)
+    return
+end
+cur = '';
+try
+    cur = char(h_fig.Pointer);
+catch
+end
+if ~strcmpi(cur, want)
+    try
+        h_fig.Pointer = want;
+    catch
+    end
+end
+
+end
+
+function local_prefetch_nav_icons(theme)
+
+items = local_nav_spec();
+try
+    for i = 1:size(items, 1)
+        zef_ui_icons(items{i, 1}, 24, theme.color.navIcon, theme.color.panel);
+        zef_ui_icons(items{i, 1}, 24, theme.color.accent, theme.color.navHover);
+    end
+catch
+end
+
+end
+
+function local_store_hit_maps(h_fig)
+
+if ~local_ok(h_fig)
+    return
+end
+items = local_nav_spec();
+nav = zef_ui_find(h_fig, 'zef_shell_nav');
+keys = {};
+rects = zeros(0, 4);
+if local_ok(nav)
+    for i = 1:size(items, 1)
+        row = zef_ui_find(nav, ['zef_nav_row_' items{i, 1}]);
+        if local_ok(row)
+            keys{end + 1} = items{i, 1}; %#ok<AGROW>
+            rects(end + 1, :) = local_fig_rect(row); %#ok<AGROW>
+        end
+    end
+end
+try
+    setappdata(h_fig, 'ZefNavHitKeys', keys);
+    setappdata(h_fig, 'ZefNavHitRects', rects);
+catch
+end
+
+fly_h = gobjects(0);
+fly_r = zeros(0, 4);
+found = findall(h_fig, '-regexp', 'Tag', '^zef_shell_flyout');
+for i = 1:numel(found)
+    if ~local_ok(found(i))
+        continue
+    end
+    kids = [];
+    try
+        kids = getappdata(found(i), 'ZefFlyoutItems');
+    catch
+    end
+    for j = 1:numel(kids)
+        if local_ok(kids(j))
+            fly_h(end + 1) = kids(j); %#ok<AGROW>
+            fly_r(end + 1, :) = local_fig_rect(kids(j)); %#ok<AGROW>
+        end
+    end
+end
+try
+    setappdata(h_fig, 'ZefFlyHitH', fly_h);
+    setappdata(h_fig, 'ZefFlyHitR', fly_r);
+catch
+end
+
+ch_h = gobjects(0);
+ch_r = zeros(0, 4);
+tags = {'zef_shell_help', 'zef_shell_bell', 'zef_shell_profile', ...
+    'zef_tool_more', 'zef_tool_sliders'};
+tool_keys = {'pan', 'rotate', 'zoom', 'zoomout', 'reset', 'screenshot', ...
+    'colormap', 'measure', 'annotate', 'edges'};
+for i = 1:numel(tool_keys)
+    tags{end + 1} = ['zef_tool_' tool_keys{i}]; %#ok<AGROW>
+    tags{end + 1} = ['zef_tool_lab_' tool_keys{i}]; %#ok<AGROW>
+end
+for i = 1:numel(tags)
+    h = zef_ui_find(h_fig, tags{i});
+    if local_ok(h)
+        vis = 'on';
+        try
+            vis = char(h.Visible);
+        catch
+        end
+        if strcmpi(vis, 'on')
+            ch_h(end + 1) = h; %#ok<AGROW>
+            ch_r(end + 1, :) = local_fig_rect(h); %#ok<AGROW>
+        end
+    end
+end
+try
+    setappdata(h_fig, 'ZefChromeHitH', ch_h);
+    setappdata(h_fig, 'ZefChromeHitR', ch_r);
+catch
+end
+try
+    orig = h_fig.Units;
+    h_fig.Units = 'pixels';
+    setappdata(h_fig, 'ZefHitMapFigPos', round(double(h_fig.Position)));
+    h_fig.Units = orig;
+catch
+end
+view = zef_ui_find(h_fig, 'figure_view');
+try
+    if local_ok(view)
+        setappdata(h_fig, 'ZefViewRect', local_fig_rect(view));
+    end
+catch
 end
 
 end
@@ -1219,13 +2172,13 @@ end
 function local_place_toolbar(tools, theme, content_w)
 
 p = tools.Position;
-pad = 6;
-icon_w = 24;
+pad = 4;
+icon_w = 22;
 lab_h = 16;
 top_pad = 8;
 y_icon = max(2, round((p(4) - icon_w) / 2));
 y_lab = max(1, round((p(4) - lab_h) / 2) - 1);
-keys = {'pan', 'rotate', 'zoom', 'reset', 'screenshot', 'colormap', ...
+keys = {'pan', 'rotate', 'zoom', 'zoomout', 'reset', 'screenshot', 'colormap', ...
     'measure', 'annotate', 'edges'};
 more = zef_ui_find(tools, 'zef_tool_more');
 sl = zef_ui_find(tools, 'zef_tool_sliders');
@@ -1245,8 +2198,28 @@ if local_ok(sl)
     sl.Position = [right - icon_hit, y_icon, icon_hit, icon_hit];
     sl.TooltipString = 'Toggle controls';
     sl.Enable = 'on';
-    sl.BackgroundColor = surface;
-    local_show_icon(sl, 'sliders', 22, ink, surface);
+    fill_sl = surface;
+    try
+        hf = ancestor(tools, 'figure');
+        hidden = false;
+        if isappdata(hf, 'ZefFigureControlsVisible')
+            hidden = ~logical(getappdata(hf, 'ZefFigureControlsVisible'));
+        elseif isequal(sl.UserData, 1)
+            hidden = true;
+        else
+            tgb = zef_ui_find(hf, 'togglecontrolsbutton');
+            hidden = ~isempty(tgb) && isvalid(tgb) && isequal(tgb.UserData, 2);
+        end
+        if hidden
+            fill_sl = theme.color.hover;
+            sl.UserData = 1;
+        else
+            sl.UserData = 0;
+        end
+    catch
+    end
+    sl.BackgroundColor = fill_sl;
+    local_show_icon(sl, 'sliders', 22, ink, fill_sl);
     right = right - icon_hit - 4;
 end
 x_limit = right - 2;
@@ -1301,8 +2274,8 @@ if ~tw_ok
     end
 end
 sep_w = 10;
-gap_icon_lab = 3;
-gap_after = 8;
+gap_icon_lab = 2;
+gap_after = 6;
     function tot = total_w()
         tot = 0;
         for k = 1:n
@@ -1313,7 +2286,7 @@ gap_after = 8;
                 tot = tot - gap_icon_lab;
             end
             tot = tot + gap_after;
-            if k == 4
+            if strcmp(keys{k}, 'reset')
                 tot = tot + sep_w;
             end
         end
@@ -1322,7 +2295,7 @@ avail = max(40, x_limit - x0);
 while total_w() > avail && gap_after > 2
     gap_after = gap_after - 1;
 end
-while total_w() > avail && lab_fs > 9
+while total_w() > avail && lab_fs > 8
     lab_fs = lab_fs - 1;
     for i = 1:n
         lab = zef_ui_find(tools, ['zef_tool_lab_' keys{i}]);
@@ -1338,7 +2311,7 @@ while total_w() > avail && lab_fs > 9
         end
     end
 end
-hide_order = 9:-1:1;
+hide_order = n:-1:1;
 hi = 1;
 while total_w() > avail && hi <= numel(hide_order)
     show(hide_order(hi)) = false;
@@ -1394,7 +2367,7 @@ for i = 1:n
         end
         x = x + icon_w + gap_after;
     end
-    if i == 4
+    if strcmp(keys{i}, 'reset')
         sep = zef_ui_find(tools, 'zef_tool_sep');
         if local_ok(sep)
             sep.Position = [x, y_icon + 2, 1, max(12, icon_w - 4)];
@@ -1422,6 +2395,10 @@ if local_ok(tools)
     tools.Units = 'pixels';
     local_place_toolbar(tools, theme, tools.Position(3));
 end
+try
+    local_store_hit_maps(h_fig);
+catch
+end
 
 end
 
@@ -1431,7 +2408,7 @@ p = footer.Position;
 ver = zef_ui_find(footer, 'zef_shell_version');
 copy = zef_ui_find(footer, 'zef_shell_copy');
 if local_ok(ver)
-    ver.Position = [14, 4, min(220, p(3) * 0.28), max(16, p(4) - 8)];
+    ver.Position = [14, 4, min(260, p(3) * 0.32), max(16, p(4) - 8)];
     ver.ForegroundColor = theme.color.textMuted;
 end
 if local_ok(copy)
@@ -1472,6 +2449,23 @@ end
 if ~local_ok(h_menu) && local_ok(anchor)
     try
         h_menu = getappdata(anchor, 'ZefMenuHandle');
+    catch
+    end
+end
+if ~local_ok(h_menu) && local_ok(anchor)
+    % The row's tagged children (label/hit/icon) can carry the handle
+    % too; any hit path inside the row must resolve the same menu.
+    try
+        kids = allchild(anchor);
+        for i = 1:numel(kids)
+            if isappdata(kids(i), 'ZefMenuHandle')
+                cand = getappdata(kids(i), 'ZefMenuHandle');
+                if local_ok(cand)
+                    h_menu = cand;
+                    break
+                end
+            end
+        end
     catch
     end
 end
@@ -1518,15 +2512,28 @@ end
 function kids = local_menu_children(h_menu)
 
 kids = gobjects(0);
+ch = [];
 try
-    ch = allchild(h_menu);
+    ch = h_menu.Children;
 catch
+    try
+        ch = allchild(h_menu);
+    catch
+        return
+    end
+end
+if isempty(ch)
     return
 end
 keep = false(size(ch));
 for i = 1:numel(ch)
     try
-        if ~strcmpi(char(ch(i).Type), 'uimenu')
+        typ = '';
+        try
+            typ = lower(char(ch(i).Type));
+        catch
+        end
+        if ~strcmp(typ, 'uimenu') && ~isa(ch(i), 'matlab.ui.container.Menu')
             continue
         end
         vis = 'on';
@@ -1545,7 +2552,6 @@ for i = 1:numel(ch)
     end
 end
 kids = ch(keep);
-% allchild is reverse visual order; restore menu order.
 kids = flipud(kids(:));
 
 end
@@ -1644,28 +2650,58 @@ end
 item_w = max(48, w - 2 * pad - slider_w);
 items = gobjects(n, 1);
 yy = h - pad - row_h;
+chip_r = local_menu_chip_radius(theme, row_h);
 for i = 1:n
     label = labels{i};
     sub = local_menu_children(kids(i));
-    b = uicontrol('Style', 'text', 'Parent', panel, 'Units', 'pixels', ...
-        'String', ['  ' label], 'HorizontalAlignment', 'left', ...
-        'Enable', 'inactive', 'Position', [pad, yy, item_w, row_h], ...
-        'BackgroundColor', theme.color.panel, 'ForegroundColor', theme.color.text, ...
-        'FontName', theme.font.name, 'FontSize', theme.font.size, ...
-        'FontUnits', 'pixels');
-    setappdata(b, 'ZefMenuHandle', kids(i));
     if isempty(sub)
         cb = @(s, ~) local_leaf_click(s, h_fig);
     else
         cb = @(s, ~) local_sub_click(s, h_fig, level + 1);
     end
+    % The item panel carries its callback as appdata, not ButtonDownFcn:
+    % local_window_down invokes it via the hit map, and a panel
+    % ButtonDownFcn would fire a second time for the same press.
+    row = uipanel('Parent', panel, 'Units', 'pixels', 'BorderType', 'none', ...
+        'Title', '', 'Tag', 'zef_fly_item', 'Position', [pad, yy, item_w, row_h], ...
+        'BackgroundColor', theme.color.panel, 'HighlightColor', theme.color.panel, ...
+        'ForegroundColor', theme.color.text);
+    setappdata(row, 'ZefFlyCb', cb);
+    try
+        row.AutoResizeChildren = 'off';
+        row.BorderWidth = 0;
+        row.BorderColor = theme.color.panel;
+    catch
+    end
+    inset = chip_r;
+    lab_w = max(8, item_w - 2 * inset);
+    b = uicontrol('Style', 'text', 'Parent', row, 'Units', 'pixels', ...
+        'String', ['  ' label], 'HorizontalAlignment', 'left', ...
+        'Enable', 'inactive', 'Position', [inset, 0, lab_w, row_h], ...
+        'BackgroundColor', theme.color.panel, 'ForegroundColor', theme.color.text, ...
+        'FontName', theme.font.name, 'FontSize', theme.font.size, ...
+        'FontUnits', 'pixels', 'Visible', 'off');
+    setappdata(b, 'ZefMenuHandle', kids(i));
+    setappdata(row, 'ZefMenuHandle', kids(i));
     b.Callback = cb;
     b.ButtonDownFcn = cb;
     try
         b.BusyAction = 'cancel';
     catch
     end
-    items(i) = b;
+    local_menu_chip(row, 'zef_fly_bg', theme.color.panel, theme.color.panel, chip_r);
+    try
+        ax = getappdata(row, 'ZefChipAx');
+        if local_ok(ax)
+            uistack(ax, 'bottom');
+        end
+    catch
+    end
+    % The chip axes is the item's only painted layer; the hidden label
+    % uicontrol above keeps String/callback identity, the visible text
+    % lives inside the chip (7 px approximates the legacy 2-space pad).
+    local_chip_text(row, 'zef_fly_text', label, true, inset + 7, row_h, theme);
+    items(i) = row;
     yy = yy - row_h;
 end
 max_off = max(0, need - h);
@@ -1697,7 +2733,19 @@ if level > 1
 end
 uistack(panel, 'top');
 try
+    local_hide_toolbar_for_flyout(h_fig);
+catch
+end
+try
+    setappdata(h_fig, 'ZefFlyoutTic', tic);
+catch
+end
+try
     local_ensure_flyout_wheel(h_fig);
+catch
+end
+try
+    local_store_hit_maps(h_fig);
 catch
 end
 
@@ -1744,10 +2792,15 @@ end
 
 function local_leaf_click(src, h_fig)
 
+src = local_fly_item_of(src);
 if local_dup_click(h_fig, src)
     return
 end
-h_menu = getappdata(src, 'ZefMenuHandle');
+h_menu = [];
+try
+    h_menu = getappdata(src, 'ZefMenuHandle');
+catch
+end
 local_dismiss(h_fig);
 local_invoke_menu(h_menu);
 
@@ -1755,6 +2808,7 @@ end
 
 function local_sub_click(src, h_fig, level)
 
+src = local_fly_item_of(src);
 if local_dup_click(h_fig, src)
     return
 end
@@ -1852,6 +2906,10 @@ for i = 1:numel(items)
         end
     end
     yy = yy - row_h;
+end
+try
+    local_store_hit_maps(ancestor(panel, 'figure'));
+catch
 end
 
 end
@@ -1953,6 +3011,11 @@ function local_dismiss(h_fig)
 if nargin < 1 || isempty(h_fig) || ~isgraphics(h_fig) || ~isvalid(h_fig)
     return
 end
+src = [];
+try
+    src = getappdata(h_fig, 'ZefFlyoutSource');
+catch
+end
 found = findall(h_fig, '-regexp', 'Tag', '^zef_shell_flyout');
 for i = 1:numel(found)
     try
@@ -1967,6 +3030,21 @@ try
     setappdata(h_fig, 'ZefFlyoutPanel', []);
     setappdata(h_fig, 'ZefFlyoutSources', {});
     local_clear_open_items(h_fig);
+catch
+end
+if local_ok(src)
+    try
+        theme = zef_ui_theme();
+        key = local_nav_key_of(src);
+        if ~isempty(key)
+            local_nav_paint_named(zef_ui_find(h_fig, 'zef_shell_nav'), ...
+                theme, local_nav_spec(), key);
+        end
+    catch
+    end
+end
+try
+    local_restore_toolbar_after_flyout(h_fig);
 catch
 end
 
@@ -1998,6 +3076,10 @@ for i = 1:numel(found)
 end
 local_trim_open_items(h_fig, max(0, min_level - 2));
 local_sync_flyout_state(h_fig);
+try
+    local_restore_toolbar_after_flyout(h_fig);
+catch
+end
 
 end
 
@@ -2018,31 +3100,151 @@ end
 
 end
 
+function local_hide_toolbar_for_flyout(h_fig)
+
+if ~local_ok(h_fig)
+    return
+end
+try
+    if isappdata(h_fig, 'ZefFlyoutHidChrome') ...
+            && ~isempty(getappdata(h_fig, 'ZefFlyoutHidChrome'))
+        return
+    end
+catch
+end
+saved = struct('h', gobjects(0), 'vis', {{}});
+hosts = gobjects(0);
+tb = zef_ui_find(h_fig, 'zef_shell_toolbar');
+if local_ok(tb)
+    hosts(end+1) = tb; %#ok<AGROW>
+end
+tools = findall(h_fig, '-regexp', 'Tag', '^zef_tool_');
+giz = findall(h_fig, 'Tag', 'zef_axes_gizmo_img');
+view = findall(h_fig, 'Tag', 'figure_view');
+ax = findall(h_fig, 'Tag', 'axes1');
+logo = findall(h_fig, 'Tag', 'zef_logo_img');
+hosts = [hosts(:); tools(:); giz(:); view(:); ax(:); logo(:)];
+for i = 1:numel(hosts)
+    h = hosts(i);
+    if ~local_ok(h)
+        continue
+    end
+    already = false;
+    for j = 1:numel(saved.h)
+        if saved.h(j) == h
+            already = true;
+            break
+        end
+    end
+    if already
+        continue
+    end
+    vis = 'on';
+    try
+        vis = char(h.Visible);
+    catch
+    end
+    saved.h(end+1, 1) = h; %#ok<AGROW>
+    saved.vis{end+1, 1} = vis; %#ok<AGROW>
+    try
+        h.Visible = 'off';
+    catch
+    end
+end
+try
+    setappdata(h_fig, 'ZefFlyoutHidChrome', saved);
+catch
+end
+
+end
+
+function local_restore_toolbar_after_flyout(h_fig)
+
+if ~local_ok(h_fig)
+    return
+end
+found = findall(h_fig, '-regexp', 'Tag', '^zef_shell_flyout');
+alive = false;
+for i = 1:numel(found)
+    if isvalid(found(i))
+        alive = true;
+        break
+    end
+end
+if alive
+    return
+end
+saved = [];
+try
+    saved = getappdata(h_fig, 'ZefFlyoutHidChrome');
+catch
+end
+if isempty(saved) || ~isstruct(saved) || ~isfield(saved, 'h')
+    return
+end
+for i = 1:numel(saved.h)
+    h = saved.h(i);
+    if ~local_ok(h)
+        continue
+    end
+    vis = 'on';
+    if i <= numel(saved.vis)
+        vis = saved.vis{i};
+    end
+    try
+        h.Visible = vis;
+    catch
+    end
+end
+try
+    rmappdata(h_fig, 'ZefFlyoutHidChrome');
+catch
+end
+
+end
+
 function tf = local_dup_click(h_fig, src)
 
 tf = false;
 if ~local_ok(h_fig)
     return
 end
-last_src = [];
+id = local_click_id(src);
+last_id = [];
 last_t = [];
 try
-    last_src = getappdata(h_fig, 'ZefClickSrc');
+    last_id = getappdata(h_fig, 'ZefClickSrc');
     last_t = getappdata(h_fig, 'ZefClickTic');
 catch
 end
 try
-    setappdata(h_fig, 'ZefClickSrc', src);
+    setappdata(h_fig, 'ZefClickSrc', id);
     setappdata(h_fig, 'ZefClickTic', tic);
 catch
 end
-if ~isempty(last_t) && ~isempty(last_src) && isequal(last_src, src)
+if ~isempty(last_t) && ~isempty(last_id) && isequal(last_id, id)
     try
         tf = toc(last_t) < 0.12;
     catch
         tf = false;
     end
 end
+
+end
+
+function id = local_click_id(src)
+
+key = local_nav_key_of(src);
+if ~isempty(key)
+    id = ['nav:' key];
+    return
+end
+fly = local_fly_item_of(src);
+if local_ok(fly)
+    id = fly;
+    return
+end
+id = src;
 
 end
 
@@ -2083,9 +3285,19 @@ if isempty(found)
     local_clear_open_items(h_fig);
     return
 end
-keep = found(1);
+keep = gobjects(0);
 keep_lv = 0;
 for i = 1:numel(found)
+    if ~local_ok(found(i))
+        continue
+    end
+    try
+        if ~strcmpi(char(found(i).Type), 'uipanel')
+            continue
+        end
+    catch
+        continue
+    end
     lv = local_flyout_level(found(i));
     if lv >= keep_lv
         keep_lv = lv;
@@ -2117,6 +3329,7 @@ end
 
 function local_mark_open_item(h_fig, src)
 
+src = local_fly_item_of(src);
 if ~local_ok(src)
     return
 end
@@ -2140,9 +3353,28 @@ try
 catch
 end
 try
-    theme = zef_ui_theme();
-    src.BackgroundColor = theme.color.hover;
+    local_flyout_paint(src, true);
 catch
+end
+
+end
+
+function tf = local_is_open_fly_item(h_fig, item)
+
+tf = false;
+open = {};
+try
+    open = getappdata(h_fig, 'ZefFlyoutOpenItems');
+catch
+end
+if ~iscell(open)
+    return
+end
+for i = 1:numel(open)
+    if isequal(open{i}, item)
+        tf = true;
+        return
+    end
 end
 
 end
@@ -2166,8 +3398,7 @@ for i = 1:numel(open)
     if i > keep_n
         try
             if local_ok(open{i})
-                theme = zef_ui_theme();
-                open{i}.BackgroundColor = theme.color.panel;
+                local_flyout_paint(open{i}, false);
             end
         catch
         end
@@ -2190,15 +3421,10 @@ try
 catch
 end
 if iscell(open)
-    theme = [];
-    try
-        theme = zef_ui_theme();
-    catch
-    end
     for i = 1:numel(open)
         try
-            if local_ok(open{i}) && ~isempty(theme)
-                open{i}.BackgroundColor = theme.color.panel;
+            if local_ok(open{i})
+                local_flyout_paint(open{i}, false);
             end
         catch
         end
@@ -2235,69 +3461,99 @@ h_fig = ancestor(src, 'figure');
 if isempty(h_fig)
     h_fig = src;
 end
-obj = [];
-try
-    obj = hittest(h_fig);
-catch
-    try
-        obj = h_fig.CurrentObject;
-    catch
-    end
-end
+pt = local_pointer_pt(h_fig, evt);
 keep = false;
+if local_ok(local_fly_at(h_fig, pt)) || ~isempty(local_nav_key_at(h_fig, pt)) ...
+        || local_ok(local_chrome_at(h_fig, pt))
+    keep = true;
+end
 try
-    if ~isempty(obj) && isgraphics(obj)
-        tag = '';
-        try
-            tag = char(obj.Tag);
-        catch
-        end
-        keep = strncmp(tag, 'zef_nav_', 8) || contains(tag, 'zef_shell_flyout') ...
-            || strncmp(tag, 'zef_shell_theme', 15);
-        try
-            open_src = getappdata(h_fig, 'ZefFlyoutSource');
-            if local_ok(open_src)
-                h = obj;
-                for n = 1:6
-                    if ~local_ok(h)
-                        break
-                    end
-                    if isequal(h, open_src)
-                        keep = true;
-                        break
-                    end
-                    h = h.Parent;
-                end
-            end
-        catch
-        end
-        par = obj;
-        for k = 1:8
-            if keep || isempty(par)
-                break
-            end
-            try
-                ptag = char(par.Tag);
-            catch
-                ptag = '';
-            end
-            if contains(ptag, 'zef_shell_flyout') || strncmp(ptag, 'zef_nav_', 8) ...
-                    || strncmp(ptag, 'zef_nav_icon_', 13) || strncmp(ptag, 'zef_nav_row_', 12) ...
-                    || strncmp(ptag, 'zef_nav_hit_', 12)
-                keep = true;
-                break
-            end
-            par = par.Parent;
-        end
+    fly = getappdata(h_fig, 'ZefFlyoutPanel');
+    if local_ok(fly) && local_in_rect(pt, local_fig_rect(fly))
+        keep = true;
     end
 catch
 end
 if ~keep
-    local_dismiss(h_fig);
+    fresh = false;
+    try
+        t0 = getappdata(h_fig, 'ZefFlyoutTic');
+        fresh = ~isempty(t0) && toc(t0) < 0.4;
+    catch
+    end
+    if ~fresh
+        local_dismiss(h_fig);
+    end
+end
+try
+    fly_hit = local_fly_at(h_fig, pt);
+    if local_ok(fly_hit)
+        cb = [];
+        try
+            cb = getappdata(fly_hit, 'ZefFlyCb');
+        catch
+        end
+        if isa(cb, 'function_handle')
+            cb(fly_hit, evt);
+            return
+        end
+    end
+catch
+end
+try
+    nkey = local_nav_key_at(h_fig, pt);
+    if ~isempty(nkey)
+        nrow = zef_ui_find(h_fig, ['zef_nav_row_' nkey]);
+        if local_ok(nrow)
+            local_nav_click(nrow, evt);
+            return
+        end
+    end
+catch
+end
+used = false;
+try
+    used = zef_figure_interact(h_fig, 'down', pt);
+catch
+    used = false;
+end
+if used
+    return
 end
 prev = [];
 try
     prev = getappdata(h_fig, 'ZefShellPrevDownFcn');
+catch
+end
+try
+    if isa(prev, 'function_handle')
+        prev(src, evt);
+    elseif (ischar(prev) || isstring(prev)) && strlength(prev) > 0
+        evalin('base', char(prev));
+    end
+catch
+end
+
+end
+
+function local_window_up(src, evt)
+
+h_fig = ancestor(src, 'figure');
+if isempty(h_fig)
+    h_fig = src;
+end
+used = false;
+try
+    used = zef_figure_interact(h_fig, 'up');
+catch
+    used = false;
+end
+if used
+    return
+end
+prev = [];
+try
+    prev = getappdata(h_fig, 'ZefShellPrevUpFcn');
 catch
 end
 try
@@ -2428,6 +3684,13 @@ if ~consumed
         consumed = false;
     end
 end
+if ~consumed
+    try
+        consumed = zef_figure_interact(h_fig, 'wheel', n);
+    catch
+        consumed = false;
+    end
+end
 if consumed
     return
 end
@@ -2488,8 +3751,15 @@ for k = 1:8
     catch
     end
     if any(strcmp(typ, {'axes', 'uiaxes'}))
-        tf = true;
-        return
+        tag = '';
+        try
+            tag = char(h.Tag);
+        catch
+        end
+        if ~(strcmp(tag, 'zef_card_bg') || strncmp(tag, 'zef_card_', 9))
+            tf = true;
+            return
+        end
     end
     try
         h = h.Parent;
@@ -2505,7 +3775,8 @@ function tf = local_is_chrome_hit(obj)
 tf = false;
 h = obj;
 chrome = {'figure_sidebar', 'figure_lists', 'zef_shell_nav', 'zef_shell_header', ...
-    'zef_shell_toolbar', 'zef_shell_tabs', 'zef_shell_footer', 'zef_shell_flyout'};
+    'zef_shell_toolbar', 'zef_shell_tabs', 'zef_shell_footer', 'zef_shell_flyout', ...
+    'zef_shell_card'};
 for k = 1:10
     if ~local_ok(h)
         return
@@ -2521,7 +3792,7 @@ for k = 1:10
             return
         end
     end
-    if contains(tag, 'zef_shell_flyout')
+    if contains(tag, 'zef_shell_flyout') || strncmp(tag, 'zef_flyout_', 11)
         tf = true;
         return
     end
@@ -2632,9 +3903,19 @@ for k = 1:10
     end
     try
         tag = char(h.Tag);
-        if strcmpi(char(h.Type), 'uipanel') && contains(tag, 'zef_shell_flyout')
-            p = h;
-            return
+        if contains(tag, 'zef_shell_flyout')
+            if strcmpi(char(h.Type), 'uipanel')
+                p = h;
+                return
+            end
+            fig = ancestor(h, 'figure');
+            if local_ok(fig) && isappdata(fig, 'ZefFlyoutPanel')
+                cand = getappdata(fig, 'ZefFlyoutPanel');
+                if local_ok(cand)
+                    p = cand;
+                    return
+                end
+            end
         end
     catch
     end
@@ -2653,6 +3934,10 @@ if nargin < 1 || isempty(h_fig) || ~isgraphics(h_fig) || ~isvalid(h_fig)
     return
 end
 theme = zef_ui_theme();
+try
+    local_delete_legacy_theme_controls(h_fig);
+catch
+end
 try
     h_fig.Color = theme.color.bg;
 catch
@@ -2673,6 +3958,10 @@ for i = 1:numel(tags)
 end
 zef_ui_apply_theme(h_fig, theme);
 try
+    rmappdata(h_fig, 'ZefCardRect');
+catch
+end
+try
     zef_figure_tool_layout(h_fig);
 catch
     local_layout(h_fig);
@@ -2680,128 +3969,40 @@ end
 
 end
 
-function local_theme_pill(src, ~)
+function local_delete_legacy_theme_controls(host)
 
-h_fig = [];
-try
-    h_fig = ancestor(src, 'figure');
-catch
-end
-if ~local_ok(h_fig)
+if nargin < 1 || ~local_ok(host)
     return
 end
-anchor = zef_ui_find(h_fig, 'zef_shell_theme_pill');
-if ~local_ok(anchor)
-    anchor = src;
-end
-open_src = [];
-try
-    open_src = getappdata(h_fig, 'ZefFlyoutSource');
-catch
-end
-if local_ok(open_src) && isequal(open_src, anchor)
-    local_dismiss(h_fig);
-    return
-end
-cm = [];
-try
-    cm = getappdata(h_fig, 'ZefThemeMenu');
-catch
-end
-if isempty(cm) || ~isvalid(cm)
-    cm = uicontextmenu('Parent', h_fig);
-    uimenu(cm, 'Text', 'Light', 'Callback', @(~, ~) local_pick_theme(h_fig, 1));
-    uimenu(cm, 'Text', 'Dark', 'Callback', @(~, ~) local_pick_theme(h_fig, 2));
-    setappdata(h_fig, 'ZefThemeMenu', cm);
-end
-local_open_flyout(h_fig, anchor, local_menu_children(cm), 1);
-
-end
-
-function local_pick_theme(h_fig, val)
-
-pop = zef_ui_find(h_fig, 'zef_shell_theme');
-local_dismiss(h_fig);
-if ~local_ok(pop)
-    return
+tags = {'zef_shell_theme_sun', 'zef_shell_theme_label', ...
+    'zef_shell_theme', 'zef_shell_theme_pill'};
+for i = 1:numel(tags)
+    h = zef_ui_find(host, tags{i});
+    if local_ok(h)
+        try
+            delete(h);
+        catch
+        end
+    end
 end
 try
-    pop.Value = val;
+    h_fig = ancestor(host, 'figure');
+    if local_ok(h_fig) && isappdata(h_fig, 'ZefThemeMenu')
+        cm = getappdata(h_fig, 'ZefThemeMenu');
+        if local_ok(cm)
+            delete(cm);
+        end
+        rmappdata(h_fig, 'ZefThemeMenu');
+    end
 catch
-end
-local_theme_changed(pop);
-
-end
-
-function local_theme_changed(src, ~)
-
-val = 1;
-try
-    val = src.Value;
-catch
-end
-mode = 'light';
-if val >= 2
-    mode = 'dark';
-end
-try
-    zef = evalin('base', 'zef');
-    zef.ui_color_mode = mode;
-    assignin('base', 'zef', zef);
-catch
-end
-h_fig = ancestor(src, 'figure');
-try
-    zef_ui_broadcast_theme();
-catch
-    local_theme(h_fig);
 end
 
 end
 
 function local_clear_tools(h_fig)
 
-keys = {'pan', 'rotate', 'zoom', 'measure', 'annotate'};
-for i = 1:numel(keys)
-    b = zef_ui_find(h_fig, ['zef_tool_' keys{i}]);
-    if local_ok(b)
-        b.UserData = 0;
-        try
-            b.Value = 0;
-        catch
-        end
-    end
-end
-ax = zef_ui_axes(h_fig);
-if isempty(ax) || ~isvalid(ax)
-    try
-        datacursormode(h_fig, 'off');
-    catch
-    end
-    try
-        plotedit(h_fig, 'off');
-    catch
-    end
-    return
-end
 try
-    pan(ax, 'off');
-catch
-end
-try
-    rotate3d(ax, 'off');
-catch
-end
-try
-    zoom(ax, 'off');
-catch
-end
-try
-    datacursormode(h_fig, 'off');
-catch
-end
-try
-    plotedit(h_fig, 'off');
+    zef_figure_interact(h_fig, 'set', 'none');
 catch
 end
 
@@ -2811,20 +4012,8 @@ function local_tool_pan(src, ~)
 
 src = local_tool_src(src, 'pan');
 h_fig = ancestor(src, 'figure');
-on = ~isequal(src.UserData, 1);
-local_clear_tools(h_fig);
-src.UserData = double(on);
-if ~isempty(h_fig) && isvalid(h_fig)
-    ax = zef_ui_axes(h_fig);
-    if ~isempty(ax) && isvalid(ax)
-        try
-            pan(ax, onoff(on));
-        catch
-        end
-    end
-end
 try
-    local_refresh_toolbar(h_fig);
+    zef_figure_interact(h_fig, 'toggle', 'pan');
 catch
 end
 
@@ -2834,20 +4023,8 @@ function local_tool_rotate(src, ~)
 
 src = local_tool_src(src, 'rotate');
 h_fig = ancestor(src, 'figure');
-on = ~isequal(src.UserData, 1);
-local_clear_tools(h_fig);
-src.UserData = double(on);
-if ~isempty(h_fig) && isvalid(h_fig)
-    ax = zef_ui_axes(h_fig);
-    if ~isempty(ax) && isvalid(ax)
-        try
-            rotate3d(ax, onoff(on));
-        catch
-        end
-    end
-end
 try
-    local_refresh_toolbar(h_fig);
+    zef_figure_interact(h_fig, 'toggle', 'rotate');
 catch
 end
 
@@ -2857,20 +4034,19 @@ function local_tool_zoom(src, ~)
 
 src = local_tool_src(src, 'zoom');
 h_fig = ancestor(src, 'figure');
-on = ~isequal(src.UserData, 1);
-local_clear_tools(h_fig);
-src.UserData = double(on);
-if ~isempty(h_fig) && isvalid(h_fig)
-    ax = zef_ui_axes(h_fig);
-    if ~isempty(ax) && isvalid(ax)
-        try
-            zoom(ax, onoff(on));
-        catch
-        end
-    end
-end
 try
-    local_refresh_toolbar(h_fig);
+    zef_figure_interact(h_fig, 'zoom_by', 1.6);
+catch
+end
+
+end
+
+function local_tool_zoomout(src, ~)
+
+src = local_tool_src(src, 'zoomout');
+h_fig = ancestor(src, 'figure');
+try
+    zef_figure_interact(h_fig, 'zoom_by', 1 / 1.6);
 catch
 end
 
@@ -2893,28 +4069,73 @@ if isempty(h_fig) || ~isvalid(h_fig)
         h_fig = [];
     end
 end
-ax = zef_ui_axes(h_fig);
-if isempty(ax) || ~isvalid(ax)
+try
+    zef_figure_interact(h_fig, 'reset');
+catch
+end
+
+end
+
+function local_tool_screenshot(src, ~)
+
+h_fig = [];
+try
+    h_fig = ancestor(src, 'figure');
+catch
+end
+if ~local_ok(h_fig)
+    try
+        h_fig = evalin('base', 'zef.h_zeffiro');
+    catch
+        h_fig = [];
+    end
+end
+ax = [];
+try
+    ax = zef_ui_axes(h_fig);
+catch
+end
+try
+    figure(h_fig);
+catch
+end
+file = '';
+path = '';
+idx = 1;
+try
+    zef = evalin('base', 'zef');
+    start = pwd;
+    if isstruct(zef) && isfield(zef, 'save_file_path') && ~isempty(zef.save_file_path)
+        start = zef.save_file_path;
+    end
+    if isstruct(zef) && isfield(zef, 'use_display') && ~zef.use_display
+        return
+    end
+    [file, path, idx] = uiputfile( ...
+        {'*.png', 'PNG'; '*.jpg', 'JPEG'; '*.tiff', 'TIFF'}, ...
+        'Print figure to file as...', start);
+catch
     return
 end
+if isequal(file, 0)
+    return
+end
+out = fullfile(path, file);
 try
-    local_clear_tools(h_fig);
-    local_refresh_toolbar(h_fig);
+    if ~isempty(ax) && isvalid(ax)
+        exportgraphics(ax, out, 'Resolution', 200);
+        return
+    end
 catch
 end
 try
-    view(ax, 3);
-    axis(ax, 'vis3d');
-    axis(ax, 'tight');
-catch
-end
-
-end
-
-function local_tool_screenshot(~, ~)
-
-try
-    evalin('base', 'zef.save_switch=10; zef_save; zef = zef_update(zef);');
+    if idx == 1
+        print(h_fig, '-dpng', '-r200', out);
+    elseif idx == 2
+        print(h_fig, '-djpeg', '-r200', out);
+    else
+        print(h_fig, '-dtiff', '-r200', out);
+    end
 catch
 end
 
@@ -2988,15 +4209,8 @@ function local_tool_measure(src, ~)
 
 src = local_tool_src(src, 'measure');
 h_fig = ancestor(src, 'figure');
-on = ~isequal(src.UserData, 1);
-local_clear_tools(h_fig);
-src.UserData = double(on);
 try
-    datacursormode(h_fig, onoff(on));
-catch
-end
-try
-    local_refresh_toolbar(h_fig);
+    zef_figure_interact(h_fig, 'toggle', 'measure');
 catch
 end
 
@@ -3006,15 +4220,8 @@ function local_tool_annotate(src, ~)
 
 src = local_tool_src(src, 'annotate');
 h_fig = ancestor(src, 'figure');
-on = ~isequal(src.UserData, 1);
-local_clear_tools(h_fig);
-src.UserData = double(on);
 try
-    plotedit(h_fig, onoff(on));
-catch
-end
-try
-    local_refresh_toolbar(h_fig);
+    zef_figure_interact(h_fig, 'toggle', 'annotate');
 catch
 end
 
@@ -3145,6 +4352,7 @@ end
 
 function local_raise_chrome(h_fig)
 
+work = zef_ui_find(h_fig, 'zef_shell_card');
 view = zef_ui_find(h_fig, 'figure_view');
 if local_ok(view)
     try
@@ -3167,8 +4375,28 @@ if local_ok(tt)
     catch
     end
 end
-order = {'figure_lists', 'figure_sidebar', 'zef_shell_tabs', ...
-    'zef_shell_toolbar', 'zef_shell_header', 'zef_shell_nav', 'zef_shell_footer'};
+inner = {'zef_shell_tabs', 'zef_shell_toolbar'};
+for i = 1:numel(inner)
+    h = zef_ui_find(h_fig, inner{i});
+    if local_ok(h)
+        try
+            uistack(h, 'top');
+        catch
+        end
+    end
+end
+if local_ok(work)
+    bg = zef_ui_find(work, 'zef_card_bg');
+    if local_ok(bg)
+        try
+            uistack(bg, 'bottom');
+        catch
+        end
+    end
+end
+order = {'figure_lists', 'figure_sidebar', 'zef_shell_card', ...
+    'zef_shell_header', 'zef_shell_nav', 'zef_shell_footer', ...
+    'figure_toggle_host'};
 for i = 1:numel(order)
     h = zef_ui_find(h_fig, order{i});
     if local_ok(h)
@@ -3192,10 +4420,10 @@ end
 
 function label = local_tool_label(key)
 
-labels = struct('pan', 'Pan', 'rotate', 'Rotate', 'zoom', 'Zoom', ...
-    'reset', 'Reset View', 'screenshot', 'Screenshot', ...
+labels = struct('pan', 'Pan', 'rotate', 'Rotate', 'zoom', 'Zoom +', ...
+    'zoomout', 'Zoom −', 'reset', 'Reset', 'screenshot', 'Screenshot', ...
     'colormap', 'Colormap', 'measure', 'Measure', 'annotate', 'Annotate', ...
-    'edges', 'Toggle Edges');
+    'edges', 'Edges');
 label = key;
 try
     label = labels.(key);
@@ -3220,6 +4448,164 @@ end
 
 end
 
+function local_nav_blit_icon(row, key, x, y, side, fg, bg)
+
+if ~local_ok(row)
+    return
+end
+ax = [];
+try
+    ax = getappdata(row, 'ZefChipAx');
+catch
+end
+if ~local_ok(ax)
+    return
+end
+im = [];
+try
+    found = findall(ax, 'Type', 'image');
+    if ~isempty(found)
+        im = found(1);
+    end
+catch
+end
+if ~local_ok(im)
+    return
+end
+base = [];
+try
+    base = getappdata(ax, 'ZefChipBase');
+catch
+end
+if isempty(base)
+    try
+        base = im.CData;
+        setappdata(ax, 'ZefChipBase', base);
+    catch
+        return
+    end
+end
+if isempty(base)
+    return
+end
+rgb = base;
+side = max(8, round(double(side(1))));
+glyph = [];
+try
+    glyph = zef_ui_icons(key, side, fg, bg);
+catch
+end
+if isempty(glyph)
+    im.CData = rgb;
+    return
+end
+[hh, ww, ~] = size(rgb);
+[gh, gw, ~] = size(glyph);
+x0 = max(1, round(double(x(1))) + 1);
+y_panel = round(double(y(1)));
+r0 = hh - (y_panel + gh) + 1;
+r0 = max(1, r0);
+c1 = min(ww, x0 + gw - 1);
+r1 = min(hh, r0 + gh - 1);
+if c1 < x0 || r1 < r0
+    im.CData = rgb;
+    return
+end
+rgb(r0:r1, x0:c1, :) = glyph(1:(r1 - r0 + 1), 1:(c1 - x0 + 1), :);
+im.CData = rgb;
+
+end
+
+function local_chip_text(row, tag, label, show, x, h, theme)
+
+%LOCAL_CHIP_TEXT  Label text drawn inside the row's chip axes.
+%
+%   The chip axes (rounded-rect image) is the only painted layer of a
+%   menu row, so the label is a transparent text object in that same
+%   axes rather than a uicontrol with its own BackgroundColor. x/h are
+%   the label's left edge and the row height in panel pixels.
+
+if ~local_ok(row)
+    return
+end
+ax = [];
+try
+    ax = getappdata(row, 'ZefChipAx');
+catch
+end
+if ~local_ok(ax)
+    return
+end
+txt = [];
+try
+    found = findall(ax, 'Tag', tag);
+    for i = 1:numel(found)
+        if strcmpi(char(found(i).Type), 'text')
+            txt = found(i);
+            break
+        end
+    end
+catch
+end
+if ~local_ok(txt)
+    try
+        txt = text(ax, 0, 0, '', 'Tag', tag, ...
+            'HitTest', 'off', 'PickableParts', 'none', ...
+            'HorizontalAlignment', 'left', 'VerticalAlignment', 'middle', ...
+            'Clipping', 'on', 'Interpreter', 'none');
+    catch
+        return
+    end
+end
+try
+    txt.FontName = theme.font.name;
+    txt.FontUnits = 'pixels';
+    txt.FontSize = theme.font.size;
+    txt.Color = theme.color.text;
+catch
+end
+try
+    if show
+        txt.String = label;
+        txt.Position = [double(x) + 0.5, double(h(1)) / 2 + 0.5, 1];
+        txt.Visible = 'on';
+    else
+        txt.String = '';
+        txt.Visible = 'off';
+    end
+catch
+end
+
+end
+
+function local_nav_delete_glyph(row)
+
+ax = [];
+try
+    if isappdata(row, 'ZefGlyphAx')
+        ax = getappdata(row, 'ZefGlyphAx');
+        rmappdata(row, 'ZefGlyphAx');
+    end
+catch
+end
+if local_ok(ax)
+    try
+        delete(ax);
+    catch
+    end
+end
+try
+    extra = findall(row, '-regexp', 'Tag', '^zef_nav_glyph_');
+    for i = 1:numel(extra)
+        if local_ok(extra(i))
+            delete(extra(i));
+        end
+    end
+catch
+end
+
+end
+
 function local_show_icon(h, name, sz, fg, bg)
 
 if ~local_ok(h)
@@ -3230,12 +4616,16 @@ bh = sz;
 try
     u = h.Units;
     h.Units = 'pixels';
-    bw = max(sz, round(h.Position(3)));
-    bh = max(sz, round(h.Position(4)));
+    bw = max(1, round(h.Position(3)));
+    bh = max(1, round(h.Position(4)));
     h.Units = u;
 catch
 end
-key = {char(name), sz, bw, bh, round(double(fg(1:min(3, numel(fg)))) * 1000), ...
+side = min(bw, bh);
+if side < 8
+    side = max(8, sz);
+end
+key = {char(name), side, bw, bh, round(double(fg(1:min(3, numel(fg)))) * 1000), ...
     round(double(bg(1:min(3, numel(bg)))) * 1000)};
 try
     prev = getappdata(h, 'ZefIconKey');
@@ -3246,7 +4636,7 @@ catch
 end
 cdata = [];
 try
-    cdata = zef_ui_icons(name, sz, fg, bg);
+    cdata = zef_ui_icons(name, side, fg, bg);
 catch
 end
 try
@@ -3273,6 +4663,269 @@ end
 
 end
 
+function [lw, lh] = local_header_logo_size(max_w, max_h)
+
+lw = max(48, round(max_w));
+lh = max(18, round(max_h));
+[rgb, ~] = local_header_logo_src();
+if isempty(rgb)
+    return
+end
+ih = size(rgb, 1);
+iw = size(rgb, 2);
+if ih < 1 || iw < 1
+    return
+end
+s = min(max_w / iw, max_h / ih);
+lh = max(18, round(ih * s));
+lw = max(36, round(iw * s));
+
+end
+
+function h = local_header_height(theme, W)
+
+h = theme.space.headerH;
+try
+    h = max(h, min(56, round(h * double(W) / 1200)));
+catch
+end
+
+end
+
+function g = local_header_gap(theme, W, H)
+
+g = theme.space.headerGap;
+try
+    ref_h = max(1, double(theme.space.shellDefH));
+    ref_w = max(1, double(theme.space.shellDefW));
+    scale = 0.65 * (double(H) / ref_h) + 0.35 * (double(W) / ref_w);
+    g = round(double(g) * max(0.7, min(1.45, scale)));
+    g = max(8, min(18, g));
+catch
+end
+
+end
+
+function local_show_header_logo(h, theme)
+
+if ~local_ok(h)
+    return
+end
+bg = theme.color.headerBg;
+fg = theme.color.text;
+bw = 120;
+bh = 28;
+try
+    h.Units = 'pixels';
+    bw = max(1, round(h.Position(3)));
+    bh = max(1, round(h.Position(4)));
+catch
+end
+key = [bw, bh, round(double(bg(1:3)) * 1000), round(double(fg(1:3)) * 1000)];
+try
+    prev = getappdata(h, 'ZefLogoKey');
+    cdata = h.CData;
+    if isequal(prev, key) && ~isempty(cdata) ...
+            && size(cdata, 1) == bh && size(cdata, 2) == bw
+        return
+    end
+catch
+end
+cdata = local_header_logo_cdata(bw, bh, bg, fg);
+try
+    h.String = '';
+    h.Enable = 'inactive';
+    h.BackgroundColor = bg;
+    h.ForegroundColor = bg;
+    if ~isempty(cdata)
+        h.CData = cdata;
+    end
+    setappdata(h, 'ZefLogoKey', key);
+catch
+end
+
+end
+
+function cdata = local_header_logo_cdata(bw, bh, bg, fg)
+
+cdata = [];
+[rgb, alpha] = local_header_logo_src();
+if isempty(rgb)
+    return
+end
+bw = max(1, round(bw));
+bh = max(1, round(bh));
+bg = reshape(double(bg(1:3)), 1, 1, 3);
+fg = reshape(double(fg(1:3)), 1, 1, 3);
+ih = size(rgb, 1);
+iw = size(rgb, 2);
+s = min(bw / iw, bh / ih);
+nw = max(1, round(iw * s));
+nh = max(1, round(ih * s));
+tile = local_imscale(rgb, nh, nw);
+a = local_imscale(alpha, nh, nw);
+if size(a, 3) > 1
+    a = a(:, :, 1);
+end
+mx = max(tile, [], 3);
+mn = min(tile, [], 3);
+sat = mx - mn;
+lum = mean(tile, 3);
+gray = a > 0.05 & sat < 0.11 & lum >= 0.12 & lum <= 0.82;
+for k = 1:3
+    ch = tile(:, :, k);
+    ch(gray) = fg(k);
+    tile(:, :, k) = ch;
+end
+canvas = repmat(bg, bh, bw);
+r0 = max(1, floor((bh - nh) / 2) + 1);
+c0 = max(1, floor((bw - nw) / 2) + 1);
+r1 = min(bh, r0 + nh - 1);
+c1 = min(bw, c0 + nw - 1);
+sh = r1 - r0 + 1;
+sw = c1 - c0 + 1;
+am = a(1:sh, 1:sw);
+am3 = repmat(am, 1, 1, 3);
+src = tile(1:sh, 1:sw, :);
+canvas(r0:r1, c0:c1, :) = src .* am3 + canvas(r0:r1, c0:c1, :) .* (1 - am3);
+cdata = max(0, min(1, canvas));
+
+end
+
+function [rgb, alpha] = local_header_logo_src()
+
+persistent src_rgb src_a src_file
+rgb = [];
+alpha = [];
+file = local_header_logo_file();
+if isempty(file)
+    return
+end
+if ~isempty(src_rgb) && strcmp(src_file, file)
+    rgb = src_rgb;
+    alpha = src_a;
+    return
+end
+img = [];
+a = [];
+try
+    [img, ~, a] = imread(file);
+catch
+    try
+        img = imread(file);
+    catch
+        return
+    end
+end
+if isempty(img)
+    return
+end
+try
+    img = im2double(img);
+catch
+    img = double(img);
+    if max(img(:)) > 1.5
+        img = img / 255;
+    end
+end
+if size(img, 3) >= 4
+    a = img(:, :, 4);
+    img = img(:, :, 1:3);
+elseif size(img, 3) == 1
+    img = repmat(img, 1, 1, 3);
+end
+if isempty(a)
+    lum = mean(img, 3);
+    mx = max(img, [], 3);
+    mn = min(img, [], 3);
+    sat = mx - mn;
+    a = double(~((lum < 0.09 & sat < 0.11) | (lum > 0.95 & sat < 0.07)));
+else
+    try
+        a = im2double(a);
+    catch
+        a = double(a);
+        if max(a(:)) > 1.5
+            a = a / 255;
+        end
+    end
+    if size(a, 3) > 1
+        a = a(:, :, 1);
+    end
+end
+mask = a > 0.05;
+if any(mask(:))
+    [r, c] = find(mask);
+    pad = max(2, round(0.015 * max(size(a, 1), size(a, 2))));
+    r1 = max(1, min(r) - pad);
+    r2 = min(size(img, 1), max(r) + pad);
+    c1 = max(1, min(c) - pad);
+    c2 = min(size(img, 2), max(c) + pad);
+    img = img(r1:r2, c1:c2, :);
+    a = a(r1:r2, c1:c2);
+end
+src_rgb = img;
+src_a = a;
+src_file = file;
+rgb = img;
+alpha = a;
+
+end
+
+function file = local_header_logo_file()
+
+file = '';
+cands = {};
+try
+    hit = which('zeffiro_logo_compass.png');
+    if ~isempty(hit)
+        cands{end+1} = hit; %#ok<AGROW>
+    end
+catch
+end
+try
+    root = fileparts(which('zeffiro_interface'));
+    if ~isempty(root)
+        cands{end+1} = fullfile(root, 'assets', 'fig', 'zeffiro_logo_compass.png'); %#ok<AGROW>
+    end
+catch
+end
+try
+    here = fileparts(mfilename('fullpath'));
+    root = fileparts(fileparts(fileparts(here)));
+    cands{end+1} = fullfile(root, 'assets', 'fig', 'zeffiro_logo_compass.png'); %#ok<AGROW>
+catch
+end
+for i = 1:numel(cands)
+    if exist(cands{i}, 'file') == 2
+        file = cands{i};
+        return
+    end
+end
+
+end
+
+function out = local_imscale(in, nh, nw)
+
+out = in;
+if isempty(in)
+    return
+end
+nh = max(1, round(nh));
+nw = max(1, round(nw));
+try
+    out = imresize(in, [nh nw], 'bilinear');
+    return
+catch
+end
+ih = size(in, 1);
+iw = size(in, 2);
+yr = max(1, min(ih, round(linspace(1, ih, nh))));
+xr = max(1, min(iw, round(linspace(1, iw, nw))));
+out = in(yr, xr, :);
+
+end
+
 function src = local_hit_src(src)
 
 try
@@ -3281,6 +4934,306 @@ try
     end
 catch
 end
+
+end
+
+function r = local_menu_chip_radius(theme, h)
+
+% Menu rows read as one rounded container; 8 px keeps the chip clearly
+% rounded (the legacy 6 px button radius looked almost rectangular).
+r = 8;
+try
+    r = max(8, round(double(theme.space.btnRadius)));
+catch
+end
+ht = 32;
+try
+    ht = max(8, round(double(h(1))));
+catch
+end
+r = max(3, min(round(double(r)), max(3, floor(ht / 2) - 1)));
+
+end
+
+function local_menu_chip(parent, tag, fillc, outerc, radius)
+
+if ~local_ok(parent)
+    return
+end
+try
+    typ = lower(char(parent.Type));
+    if ~any(strcmp(typ, {'uipanel', 'panel', 'figure'}))
+        return
+    end
+catch
+    return
+end
+parent.Units = 'pixels';
+p = parent.Position;
+w = max(8, round(double(p(3))));
+h = max(8, round(double(p(4))));
+if nargin < 5 || isempty(radius)
+    radius = 6;
+end
+r = max(3, min(round(double(radius(1))), max(3, floor(min(w, h) / 2) - 1)));
+fillc = reshape(double(fillc(1:3)), 1, 3);
+outerc = reshape(double(outerc(1:3)), 1, 3);
+key = [w, h, r, round(fillc * 1000), round(outerc * 1000)];
+prev = [];
+try
+    prev = getappdata(parent, 'ZefChipKey');
+catch
+end
+fig = ancestor(parent, 'figure');
+prev_ax = [];
+try
+    prev_ax = get(fig, 'CurrentAxes');
+catch
+end
+[ax, created] = local_menu_chip_axes(parent, tag, outerc);
+same = isequal(prev, key);
+has_im = false;
+if same
+    try
+        has_im = ~isempty(findall(ax, 'Type', 'image'));
+    catch
+    end
+end
+if same && has_im
+    local_menu_chip_place(ax, [0, 0, w, h], [], outerc);
+    local_menu_chip_restore(fig, prev_ax);
+    return
+end
+rgb = [];
+try
+    rgb = zef_ui_roundrect(w, h, r, fillc, fillc, outerc);
+catch
+end
+local_menu_chip_place(ax, [0, 0, w, h], rgb, outerc);
+try
+    setappdata(parent, 'ZefChipKey', key);
+    setappdata(parent, 'ZefChipAx', ax);
+    if ~isempty(rgb)
+        setappdata(ax, 'ZefChipBase', rgb);
+    end
+catch
+end
+if created
+    try
+        uistack(ax, 'bottom');
+        kids = allchild(parent);
+        for i = 1:numel(kids)
+            ktag = '';
+            try
+                ktag = char(kids(i).Tag);
+            catch
+            end
+            if strncmp(ktag, 'zef_nav_hit_', 12)
+                uistack(kids(i), 'bottom');
+                break
+            end
+        end
+    catch
+    end
+end
+local_menu_chip_restore(fig, prev_ax);
+
+end
+
+function [ax, created] = local_menu_chip_axes(parent, tag, outerc)
+
+created = false;
+ax = [];
+try
+    if isappdata(parent, 'ZefChipAx')
+        ax = getappdata(parent, 'ZefChipAx');
+    end
+catch
+end
+if ~isempty(ax) && isvalid(ax) && strcmpi(char(ax.Type), 'axes')
+    return
+end
+found = gobjects(0);
+try
+    found = findall(parent, 'Tag', tag);
+catch
+end
+for i = 1:numel(found)
+    if isvalid(found(i)) && strcmpi(char(found(i).Type), 'axes')
+        ax = found(i);
+        try
+            setappdata(parent, 'ZefChipAx', ax);
+        catch
+        end
+        return
+    end
+end
+created = true;
+ax = axes('Parent', parent, 'Units', 'pixels', 'Tag', tag, ...
+    'HitTest', 'off', 'HandleVisibility', 'off', 'Box', 'off', ...
+    'XTick', [], 'YTick', [], 'Color', outerc);
+try
+    ax.PickableParts = 'none';
+catch
+end
+try
+    ax.XColor = 'none';
+    ax.YColor = 'none';
+catch
+end
+try
+    ax.Title.String = '';
+    ax.Title.Visible = 'off';
+catch
+end
+try
+    disableDefaultInteractivity(ax);
+catch
+end
+try
+    ax.Toolbar.Visible = 'off';
+catch
+end
+try
+    ax.PositionConstraint = 'innerposition';
+catch
+end
+try
+    setappdata(parent, 'ZefChipAx', ax);
+catch
+end
+
+end
+
+function local_menu_chip_place(ax, pos, rgb, outer)
+
+if isempty(ax) || ~isvalid(ax)
+    return
+end
+ax.Units = 'pixels';
+try
+    ax.PositionConstraint = 'innerposition';
+catch
+end
+try
+    ax.LooseInset = [0 0 0 0];
+catch
+end
+try
+    ax.Title.String = '';
+    ax.Title.Visible = 'off';
+    ax.XLabel.String = '';
+    ax.YLabel.String = '';
+    ax.XLabel.Visible = 'off';
+    ax.YLabel.Visible = 'off';
+catch
+end
+try
+    ax.XAxis.Visible = 'off';
+    ax.YAxis.Visible = 'off';
+catch
+end
+try
+    ax.Box = 'off';
+    ax.XTick = [];
+    ax.YTick = [];
+catch
+end
+try
+    ax.Position = pos;
+catch
+end
+try
+    ax.InnerPosition = pos;
+catch
+end
+try
+    ip = double(ax.InnerPosition);
+    want = double(pos);
+    pc = '';
+    try
+        pc = lower(char(ax.PositionConstraint));
+    catch
+    end
+    if ~strcmp(pc, 'innerposition') && numel(ip) >= 4 && numel(want) >= 4
+        dl = ip(1) - want(1);
+        db = ip(2) - want(2);
+        dr = (want(1) + want(3)) - (ip(1) + ip(3));
+        dt = (want(2) + want(4)) - (ip(2) + ip(4));
+        if any(abs([dl, db, dr, dt]) > 0.51)
+            ax.Position = [want(1) - dl, want(2) - db, ...
+                want(3) + dl + dr, want(4) + db + dt];
+        end
+    end
+catch
+end
+try
+    ax.Color = outer;
+catch
+end
+try
+    ax.HitTest = 'off';
+    ax.PickableParts = 'none';
+catch
+end
+if isempty(rgb)
+    return
+end
+[hh, ww, ~] = size(rgb);
+try
+    ax.XLim = [0.5, ww + 0.5];
+    ax.YLim = [0.5, hh + 0.5];
+    % YDir stays normal: the image flips via decreasing YData instead.
+    % (YDir 'reverse' misplaces vertically-centered text objects, which
+    %  these chip axes host for menu labels.)
+    ax.YDir = 'normal';
+    ax.XTick = [];
+    ax.YTick = [];
+    ax.PlotBoxAspectRatioMode = 'auto';
+    ax.DataAspectRatioMode = 'auto';
+catch
+end
+im = [];
+try
+    im = findall(ax, 'Type', 'image');
+    if ~isempty(im)
+        im = im(1);
+    end
+catch
+end
+if isempty(im) || ~isvalid(im)
+    imh = image('Parent', ax, 'CData', rgb, 'HitTest', 'off', ...
+        'XData', [1 ww], 'YData', [hh 1]);
+    try
+        imh.HitTest = 'off';
+        imh.PickableParts = 'none';
+    catch
+    end
+else
+    im.CData = rgb;
+    im.XData = [1 ww];
+    im.YData = [hh 1];
+    try
+        im.HitTest = 'off';
+        im.PickableParts = 'none';
+    catch
+    end
+end
+
+end
+
+function local_menu_chip_restore(fig, prev)
+
+if nargin >= 2 && ~isempty(prev)
+    try
+        if isvalid(prev)
+            set(fig, 'CurrentAxes', prev);
+            return
+        end
+    catch
+    end
+end
+local_restore_axes(fig);
 
 end
 
@@ -3300,7 +5253,7 @@ function tf = local_ok(h)
 
 tf = false;
 try
-    tf = ~isempty(h) && isgraphics(h) && isvalid(h);
+    tf = ~isempty(h) && isvalid(h);
 catch
 end
 

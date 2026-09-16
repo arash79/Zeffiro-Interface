@@ -83,6 +83,24 @@ classdef UiThemeTest < matlab.unittest.TestCase
             testCase.verifyEqual(helper.FontColor, theme.color.textMuted, 'AbsTol', 1e-6);
         end
 
+        function applyThemeBlendsCompassLogoOntoBackground(testCase)
+            theme = zef_ui_theme();
+            f = uifigure('Visible', 'off', 'Color', theme.color.bg);
+            testCase.Figures(end+1) = f;
+            logo = uiimage(f, 'Tag', 'h_axes2', ...
+                'ImageSource', which('zeffiro_logo_compass.png'), ...
+                'Position', [10 10 176 48]);
+            zef_ui_blend_logo(logo, theme);
+            src = logo.ImageSource;
+            testCase.verifyTrue(isnumeric(src));
+            testCase.verifyGreaterThanOrEqual(size(src, 3), 3);
+            corner = double(squeeze(src(1, 1, 1:3)))' / 255;
+            testCase.verifyEqual(corner, theme.color.bg, 'AbsTol', 0.04);
+            mid = double(squeeze(src(round(size(src, 1) / 2), ...
+                round(size(src, 2) / 2), 1:3)))' / 255;
+            testCase.verifyGreaterThan(max(abs(mid - theme.color.bg)), 0.05);
+        end
+
         function figureToolLayoutHidesSidebarWhenToggled(testCase)
             f = figure('Visible', 'off', 'Units', 'pixels', ...
                 'Position', [80 80 980 720], 'MenuBar', 'none', ...
@@ -107,6 +125,13 @@ classdef UiThemeTest < matlab.unittest.TestCase
             ax = findall(f, 'Tag', 'axes1');
             axp = local_plot_box(ax);
             testCase.verifyGreaterThan(axp(3), 700);
+            tgb = findall(f, 'Tag', 'togglecontrolsbutton');
+            testCase.verifyNotEmpty(tgb);
+            testCase.verifyEqual(char(tgb(1).Visible), 'on');
+            testCase.verifyEqual(char(tgb(1).String), 'Toggle controls');
+            par = tgb(1).Parent;
+            testCase.verifyFalse(strcmp(char(par.Tag), 'figure_sidebar'));
+            testCase.verifyEqual(char(par.Visible), 'on');
         end
 
         function figureToolGivesExtraWidthToAxes(testCase)
@@ -695,15 +720,120 @@ classdef UiThemeTest < matlab.unittest.TestCase
             testCase.verifyEqual(theme.space.navW, 168);
             testCase.verifyEqual(theme.space.headerH, 40);
             testCase.verifyEqual(theme.space.footerH, 22);
+            testCase.verifyGreaterThanOrEqual(theme.space.headerGap, 8);
+            testCase.verifyLessThanOrEqual(theme.space.headerGap, 16);
             testCase.verifyGreaterThanOrEqual(theme.space.cardGap, 6);
             testCase.verifyGreaterThanOrEqual(theme.space.cardRadius, 8);
             testCase.verifyGreaterThanOrEqual(theme.space.shellMinW, 900);
-            testCase.verifyGreaterThanOrEqual(theme.space.shellDefW, 1180);
+            testCase.verifyEqual(theme.space.shellDefW, 1000);
+            testCase.verifyEqual(theme.space.shellDefH, 646);
             testCase.verifyGreaterThanOrEqual(theme.space.labelW, 108);
             testCase.verifyGreaterThanOrEqual(theme.space.flyoutW, 260);
-            dark = zef_ui_theme(struct('ui_color_mode', 'dark', 'font_size', 12));
-            testCase.verifyEqual(dark.mode, 'dark');
-            testCase.verifyLessThan(dark.color.bg(1), 0.3);
+            testCase.verifyGreaterThan(theme.color.cardEdge(2), theme.color.cardEdge(1));
+            testCase.verifyGreaterThan(theme.color.cardEdge(3), theme.color.cardEdge(1));
+            testCase.verifyGreaterThan(theme.color.bg(1), 0.9);
+            testCase.verifyEqual(theme.color.surface, theme.color.panel, 'AbsTol', 1e-6);
+            testCase.verifyEqual(theme.color.surfaceRaised, theme.color.panel, 'AbsTol', 1e-6);
+            testCase.verifyEqual(theme.color.textPrimary, theme.color.text, 'AbsTol', 1e-6);
+            testCase.verifyEqual(theme.color.error, theme.color.danger, 'AbsTol', 1e-6);
+            testCase.verifyEqual(theme.color.success, theme.color.ready, 'AbsTol', 1e-6);
+            legacy = zef_ui_theme(struct('ui_color_mode', 'dark', 'font_size', 12));
+            testCase.verifyEqual(legacy.mode, 'light');
+            testCase.verifyEqual(legacy.color.bg, theme.color.bg, 'AbsTol', 1e-6);
+        end
+
+        function roundrectCornersMatchOuterNotFill(testCase)
+            fillc = [1 1 1];
+            borderc = [0.86 0.92 0.92];
+            outerc = [0.965 0.970 0.974];
+            rgb = zef_ui_roundrect(40, 40, 12, fillc, borderc, outerc);
+            testCase.verifyEqual(size(rgb), [40 40 3]);
+            testCase.verifyEqual(squeeze(rgb(1, 1, :)).', outerc, 'AbsTol', 0.06);
+            testCase.verifyEqual(squeeze(rgb(20, 20, :)).', fillc, 'AbsTol', 0.02);
+            disk = zef_ui_roundrect(24, 24, 12, fillc, fillc, outerc);
+            testCase.verifyEqual(squeeze(disk(1, 1, :)).', outerc, 'AbsTol', 0.06);
+            testCase.verifyEqual(squeeze(disk(12, 12, :)).', fillc, 'AbsTol', 0.02);
+        end
+
+        function cardChromeAvoidsPushbuttonBevel(testCase)
+            theme = zef_ui_theme();
+            f = figure('Visible', 'off', 'Color', theme.color.bg, 'MenuBar', 'none');
+            testCase.Figures(end+1) = f;
+            ax = axes(f, 'Tag', 'axes1', 'Units', 'pixels', 'Position', [20 20 80 60]);
+            p = uipanel(f, 'Units', 'pixels', 'Position', [120 20 180 100], ...
+                'BorderType', 'none', 'BackgroundColor', theme.color.bg, ...
+                'Tag', 'figure_sidebar');
+            zef_ui_card(p, theme);
+            bg = findall(p, 'Tag', 'zef_card_bg');
+            testCase.verifyNotEmpty(bg);
+            testCase.verifyEqual(char(bg(1).Type), 'axes');
+            btn = findall(p, 'Tag', 'zef_card_bg', 'Type', 'uicontrol');
+            testCase.verifyEmpty(btn);
+            zef_ui_card_corners(f, [20 20 400 240], theme, 12);
+            caps = findall(f, '-regexp', 'Tag', '^zef_card_c_');
+            testCase.verifyEmpty(caps);
+            found = zef_ui_axes(f);
+            testCase.verifyEqual(found, ax);
+        end
+
+        function figureCardCornersDoNotPaintOverlaySquares(testCase)
+            had_zef = evalin('base', 'exist(''zef'',''var'')');
+            old_zef = [];
+            if had_zef
+                old_zef = evalin('base', 'zef');
+            end
+            cleaner = onCleanup(@() local_restore_zef(had_zef, old_zef)); %#ok<NASGU>
+            assignin('base', 'zef', struct('ui_color_mode', 'light', 'font_size', 12));
+            light = zef_ui_theme();
+            f = figure('Visible', 'off', 'Color', light.color.bg, ...
+                'MenuBar', 'none', 'ToolBar', 'none', 'WindowStyle', 'normal');
+            testCase.Figures(end+1) = f;
+            leftover = uipanel(f, 'Tag', 'zef_card_c_tl', 'Units', 'pixels', ...
+                'Position', [20 240 12 12], 'BackgroundColor', [1 1 1]);
+            zef_ui_card_corners(f, [20 20 400 240], light, 12);
+            testCase.verifyFalse(isvalid(leftover));
+            testCase.verifyEmpty(findall(f, '-regexp', 'Tag', '^zef_card_c_'));
+            testCase.verifyEmpty(findall(f, '-regexp', 'Tag', '^zef_card_e_'));
+            zef_ui_card_corners(f, [20 20 400 240], light, 12);
+            testCase.verifyEmpty(findall(f, '-regexp', 'Tag', '^zef_card_c_'));
+            testCase.verifyEmpty(findall(f, '-regexp', 'Tag', '^zef_card_e_'));
+        end
+
+        function figureWorkspaceUsesRoundedCardWithoutOverlays(testCase)
+            f = local_figure_tool_fixture(testCase, [40 40 1200 646]);
+            f.Tag = 'figure_tool';
+            zef_ui_shell('build', f);
+            leftover = uipanel(f, 'Tag', 'zef_card_c_tl', 'Units', 'pixels', ...
+                'Position', [20 240 12 12], 'BackgroundColor', [1 0 0]);
+            leftover.Parent = f;
+            zef_figure_tool_layout(f);
+            work = findall(f, 'Tag', 'zef_shell_card');
+            testCase.verifyNotEmpty(work);
+            testCase.verifyEqual(char(work.Visible), 'on');
+            bg = findall(work, 'Tag', 'zef_card_bg');
+            testCase.verifyNotEmpty(bg);
+            testCase.verifyEqual(char(bg(1).Type), 'axes');
+            testCase.verifyEmpty(findall(f, '-regexp', 'Tag', '^zef_card_c_'));
+            testCase.verifyEmpty(findall(f, '-regexp', 'Tag', '^zef_card_e_'));
+            testCase.verifyFalse(isvalid(leftover));
+            theme = zef_ui_theme();
+            rad = theme.space.cardRadius;
+            tabs = findall(f, 'Tag', 'zef_shell_tabs');
+            tools = findall(f, 'Tag', 'zef_shell_toolbar');
+            view = findall(f, 'Tag', 'figure_view');
+            testCase.verifyEqual(char(tabs.Parent.Tag), 'zef_shell_card');
+            testCase.verifyEqual(char(tools.Parent.Tag), 'zef_shell_card');
+            testCase.verifyEqual(char(view.Parent.Tag), 'zef_shell_card');
+            testCase.verifyGreaterThanOrEqual(tabs.Position(1), rad - 1);
+            testCase.verifyGreaterThanOrEqual(view.Position(1), rad - 1);
+            testCase.verifyGreaterThanOrEqual(view.Position(2), rad - 1);
+            testCase.verifyLessThanOrEqual(tabs.Position(1) + tabs.Position(3), ...
+                work.Position(3) - rad + 1);
+            testCase.verifyLessThanOrEqual(view.Position(2) + view.Position(4), ...
+                work.Position(4) - rad + 1);
+            nav = findall(f, 'Tag', 'zef_shell_nav');
+            testCase.verifyEqual(work.Position(2) + work.Position(4), ...
+                nav.Position(2) + nav.Position(4), 'AbsTol', 2);
         end
 
         function unifiedShellPlacesNavAndSidebar(testCase)
@@ -739,6 +869,7 @@ classdef UiThemeTest < matlab.unittest.TestCase
             testCase.verifyEmpty(findall(f, 'Tag', 'zef_tab_3d'));
             testCase.verifyEqual(char(findall(f, 'Tag', 'zef_tab_figure').String), 'Figure');
             testCase.verifyNotEmpty(findall(f, 'Tag', 'zef_tool_pan'));
+            testCase.verifyEmpty(findall(f, '-regexp', 'Tag', '^zef_shell_theme'));
             names = {'Toggle controls', 'Toggle edges'};
             for i = 1:numel(names)
                 hit = findall(f, 'String', names{i});
@@ -772,8 +903,23 @@ classdef UiThemeTest < matlab.unittest.TestCase
                     testCase.verifyEqual(hit(1).Parent, row(1), keys{i});
                     ic_c = ic(1).Position(2) + ic(1).Position(4) / 2;
                     lab_c = lab(1).Position(2) + lab(1).Position(4) / 2;
+                    row_c = row(1).Position(4) / 2;
                     testCase.verifyEqual(ic_c, lab_c, 'AbsTol', 1);
-                    testCase.verifyEqual(ic(1).Position(4), lab(1).Position(4), 'AbsTol', 1);
+                    testCase.verifyEqual(ic_c, row_c, 'AbsTol', 1);
+                    testCase.verifyEqual(ic(1).Position(2), 0, 'AbsTol', 1);
+                    testCase.verifyEqual(ic(1).Position(4), row(1).Position(4), 'AbsTol', 1);
+                    testCase.verifyEqual(lab(1).Position(2), 0, 'AbsTol', 1);
+                    testCase.verifyEqual(lab(1).Position(4), row(1).Position(4), 'AbsTol', 1);
+                    testCase.verifyEqual(char(hit(1).Style), 'text', keys{i});
+                    testCase.verifyEqual(char(ic(1).Style), 'text', keys{i});
+                    testCase.verifyEqual(char(hit(1).Enable), 'inactive', keys{i});
+                    testCase.verifyEqual(char(ic(1).Visible), 'off', keys{i});
+                    if strcmpi(char(ic(1).Type), 'uiimage')
+                        testCase.verifyTrue(isprop(ic(1), 'ImageSource'), keys{i});
+                    else
+                        testCase.verifyEqual(char(ic(1).Enable), 'inactive', keys{i});
+                        testCase.verifyNotEmpty(ic(1).Callback, keys{i});
+                    end
                     if strcmp(char(lab(1).Visible), 'on')
                         gap = lab(1).Position(1) - (ic(1).Position(1) + ic(1).Position(3));
                         gaps(end+1) = gap; %#ok<AGROW>
@@ -782,9 +928,14 @@ classdef UiThemeTest < matlab.unittest.TestCase
                     testCase.verifyEqual(hit(1).Position(2), 0, 'AbsTol', 1);
                     testCase.verifyEqual(hit(1).Position(3), row(1).Position(3), 'AbsTol', 1);
                     testCase.verifyEqual(hit(1).Position(4), row(1).Position(4), 'AbsTol', 1);
+                    rgb = local_menu_chip_cdata(row(1), ['zef_nav_bg_' keys{i}]);
+                    testCase.verifyEqual(size(rgb, 2), round(row(1).Position(3)), 'AbsTol', 1);
+                    testCase.verifyEqual(size(rgb, 1), round(row(1).Position(4)), 'AbsTol', 1);
                     testCase.verifyNotEmpty(lab(1).Callback, keys{i});
                     testCase.verifyNotEmpty(hit(1).Callback, keys{i});
-                    testCase.verifyNotEmpty(ic(1).Callback, keys{i});
+                    if ~strcmpi(char(ic(1).Type), 'uiimage')
+                        testCase.verifyNotEmpty(ic(1).Callback, keys{i});
+                    end
                 end
                 if numel(gaps) > 1
                     testCase.verifyEqual(max(gaps), min(gaps), 'AbsTol', 1);
@@ -816,6 +967,165 @@ classdef UiThemeTest < matlab.unittest.TestCase
             zef_figure_tool_layout(f);
             testCase.verifyEqual(row(1).Position, pos_before);
             testCase.verifyEqual(lab1(1).Position, lab_before);
+        end
+
+        function navHoverFillsEntireRow(testCase)
+            theme = zef_ui_theme();
+            f = local_figure_tool_fixture(testCase, [40 40 1100 720]);
+            f.Tag = 'figure_tool';
+            zef_ui_shell('build', f);
+            zef_figure_tool_layout(f);
+            nav = findall(f, 'Tag', 'zef_shell_nav');
+            keys = {'project', 'export', 'import', 'edit', 'inverse', ...
+                'forward', 'multi', 'settings', 'window', 'help'};
+            for i = 1:numel(keys)
+                row = findall(f, 'Tag', ['zef_nav_row_' keys{i}]);
+                hit = findall(f, 'Tag', ['zef_nav_hit_' keys{i}]);
+                ic = findall(f, 'Tag', ['zef_nav_icon_' keys{i}]);
+                lab = findall(f, 'Tag', ['zef_nav_' keys{i}]);
+                testCase.verifyEqual(row(1).BackgroundColor, theme.color.panel, 'AbsTol', 1e-6);
+                testCase.verifyEqual(hit(1).BackgroundColor, theme.color.panel, 'AbsTol', 1e-6);
+                testCase.verifyEqual(lab(1).BackgroundColor, theme.color.panel, 'AbsTol', 1e-6);
+                cd = [];
+                try
+                    cd = hit(1).CData;
+                catch
+                end
+                testCase.verifyEmpty(cd, keys{i});
+                rgb = local_menu_chip_cdata(row(1), ['zef_nav_bg_' keys{i}]);
+                testCase.verifyEqual(size(rgb, 2), round(row(1).Position(3)), 'AbsTol', 1);
+                testCase.verifyEqual(size(rgb, 1), round(row(1).Position(4)), 'AbsTol', 1);
+            end
+            setappdata(f, 'ZefNavHoverKey', 'project');
+            setappdata(nav, 'ZefNavHoverKey', 'project');
+            try
+                rmappdata(nav, 'ZefNavPaintKey');
+            catch
+            end
+            zef_figure_tool_layout(f);
+            row = findall(f, 'Tag', 'zef_nav_row_project');
+            hit = findall(f, 'Tag', 'zef_nav_hit_project');
+            ic = findall(f, 'Tag', 'zef_nav_icon_project');
+            lab = findall(f, 'Tag', 'zef_nav_project');
+            fill = theme.color.navHover;
+            outer = theme.color.panel;
+            testCase.verifyEqual(row(1).BackgroundColor, outer, 'AbsTol', 1e-6);
+            testCase.verifyEqual(hit(1).BackgroundColor, outer, 'AbsTol', 1e-6);
+            % Single-layer rendering: only the chip axes image carries the
+            % hover fill. Icon/label uicontrols stay hidden and keep the
+            % idle (panel) background so they cannot stack a second,
+            % square rectangle over the rounded chip.
+            testCase.verifyEqual(ic(1).BackgroundColor, outer, 'AbsTol', 1e-6);
+            testCase.verifyEqual(lab(1).BackgroundColor, outer, 'AbsTol', 1e-6);
+            testCase.verifyEqual(char(ic(1).Visible), 'off');
+            testCase.verifyEqual(char(lab(1).Visible), 'off');
+            rgb = local_menu_chip_cdata(row(1), 'zef_nav_bg_project');
+            mid = double(squeeze(rgb(round(end / 2), round(end / 2), :))).';
+            corner = double(squeeze(rgb(1, 1, :))).';
+            testCase.verifyEqual(mid, fill, 'AbsTol', 0.08);
+            testCase.verifyLessThan(norm(corner - outer), norm(corner - fill));
+            % The label glyph lives in the chip axes as transparent text.
+            cax = [];
+            try
+                cax = getappdata(row(1), 'ZefChipAx');
+            catch
+            end
+            testCase.verifyNotEmpty(cax);
+            txt = findall(cax, 'Type', 'text');
+            testCase.assertNotEmpty(txt);
+            testCase.verifyEqual(char(txt(1).String), 'Project');
+            testCase.verifyEqual(char(txt(1).Visible), 'on');
+            testCase.verifyEqual(txt(1).BackgroundColor, 'none');
+            icon_box = im2double(rgb(max(1, round(end / 2) - 10):min(end, round(end / 2) + 10), ...
+                8:min(size(rgb, 2), 32), :));
+            fill_img = reshape(fill, 1, 1, 3);
+            d_icon = sqrt(sum((icon_box - fill_img) .^ 2, 3));
+            testCase.verifyGreaterThan(max(d_icon(:)), 0.05);
+            if strcmpi(char(ic(1).Type), 'uiimage')
+                src = ic(1).ImageSource;
+            else
+                src = ic(1).CData;
+            end
+            try
+                rmappdata(nav, 'ZefNavPaintKey');
+            catch
+            end
+            zef_figure_tool_layout(f);
+            ic2 = findall(f, 'Tag', 'zef_nav_icon_project');
+            if strcmpi(char(ic2(1).Type), 'uiimage')
+                testCase.verifyEqual(ic2(1).ImageSource, src);
+            else
+                testCase.verifyEqual(ic2(1).CData, src);
+            end
+            cd = [];
+            try
+                cd = hit(1).CData;
+            catch
+            end
+            testCase.verifyEmpty(cd);
+            idle_row = findall(f, 'Tag', 'zef_nav_row_export');
+            testCase.verifyEqual(idle_row(1).BackgroundColor, theme.color.panel, 'AbsTol', 1e-6);
+            pan = findall(f, 'Tag', 'zef_tool_pan');
+            labp = findall(f, 'Tag', 'zef_tool_lab_pan');
+            idle_icon = pan(1).CData;
+            zef_ui_interact(pan(1), 'paint', 'hover');
+            testCase.verifyEqual(pan(1).CData, idle_icon);
+            if ~isempty(labp)
+                testCase.verifyEqual(char(labp(1).Enable), 'inactive');
+            end
+        end
+
+        function navHoverMotionFillsRowFromPaddingAndToolbarPair(testCase)
+            theme = zef_ui_theme();
+            f = local_figure_tool_fixture(testCase, [40 40 1100 720]);
+            f.Tag = 'figure_tool';
+            zef_ui_shell('build', f);
+            zef_figure_tool_layout(f);
+            zef_ui_shell('hits', f);
+            row = findall(f, 'Tag', 'zef_nav_row_project');
+            hit = findall(f, 'Tag', 'zef_nav_hit_project');
+            ic = findall(f, 'Tag', 'zef_nav_icon_project');
+            lab = findall(f, 'Tag', 'zef_nav_project');
+            testCase.assertNotEmpty(row);
+            % getpixelposition(h, true) is already figure-relative (same
+            % frame as CurrentPoint); do not subtract the figure position.
+            ap = getpixelposition(row(1), true);
+            f.Units = 'pixels';
+            f.CurrentPoint = [ap(1) + 4, ap(2) + 2];
+            notify(f, 'WindowMouseMotion');
+            testCase.verifyEqual(char(getappdata(f, 'ZefNavHoverKey')), 'project');
+            fill = theme.color.navHover;
+            outer = theme.color.panel;
+            testCase.verifyEqual(row(1).BackgroundColor, outer, 'AbsTol', 1e-6);
+            testCase.verifyEqual(hit(1).BackgroundColor, outer, 'AbsTol', 1e-6);
+            % Hover padding hits fill the whole row via the chip axes
+            % alone; child uicontrols never paint a second background.
+            testCase.verifyEqual(ic(1).BackgroundColor, outer, 'AbsTol', 1e-6);
+            testCase.verifyEqual(lab(1).BackgroundColor, outer, 'AbsTol', 1e-6);
+            testCase.verifyEqual(char(lab(1).Visible), 'off');
+            rgb = local_menu_chip_cdata(row(1), 'zef_nav_bg_project');
+            mid = double(squeeze(rgb(round(end / 2), round(end / 2), :))).';
+            corner = double(squeeze(rgb(1, 1, :))).';
+            testCase.verifyEqual(mid, fill, 'AbsTol', 0.08);
+            testCase.verifyLessThan(norm(corner - outer), norm(corner - fill));
+            testCase.verifyEqual(size(rgb, 2), round(row(1).Position(3)), 'AbsTol', 1);
+            cd = [];
+            try
+                cd = hit(1).CData;
+            catch
+            end
+            testCase.verifyEmpty(cd);
+            pan = findall(f, 'Tag', 'zef_tool_pan');
+            labp = findall(f, 'Tag', 'zef_tool_lab_pan');
+            testCase.assertNotEmpty(pan);
+            testCase.assertNotEmpty(labp);
+            idle_c = pan(1).CData;
+            pp = getpixelposition(pan(1), true);
+            f.CurrentPoint = [pp(1) + pp(3) / 2, pp(2) + pp(4) / 2];
+            notify(f, 'WindowMouseMotion');
+            testCase.verifyEqual(pan(1).CData, idle_c);
+            testCase.verifyEqual(pan(1).BackgroundColor, theme.color.hover, 'AbsTol', 1e-6);
+            testCase.verifyEqual(labp(1).BackgroundColor, theme.color.hover, 'AbsTol', 1e-6);
         end
 
         function roundButtonCaptionDoesNotStealFocus(testCase)
@@ -869,7 +1179,7 @@ classdef UiThemeTest < matlab.unittest.TestCase
                 axp = local_plot_box(ax);
                 testCase.verifyGreaterThanOrEqual(nav.Position(2), footer.Position(4) - 1);
                 testCase.verifyLessThanOrEqual(nav.Position(2) + nav.Position(4), ...
-                    header.Position(2) + 1);
+                    header.Position(2) - 6);
                 testCase.verifyGreaterThanOrEqual(axp(1), nav.Position(1) + nav.Position(3) - 2);
                 testCase.verifyLessThanOrEqual(axp(1) + axp(3), ...
                     sidebar.Position(1) + 2);
@@ -887,7 +1197,7 @@ classdef UiThemeTest < matlab.unittest.TestCase
             f.Tag = 'figure_tool';
             zef_ui_shell('build', f);
             zef_figure_tool_layout(f);
-            keys = {'pan', 'rotate', 'zoom', 'reset', 'screenshot', ...
+            keys = {'pan', 'rotate', 'zoom', 'zoomout', 'reset', 'screenshot', ...
                 'colormap', 'measure', 'annotate', 'edges'};
             sl = findall(f, 'Tag', 'zef_tool_sliders');
             testCase.verifyNotEmpty(sl);
@@ -898,10 +1208,19 @@ classdef UiThemeTest < matlab.unittest.TestCase
                 right = lab(1).Position(1) + lab(1).Position(3);
                 testCase.verifyLessThanOrEqual(right, sl(1).Position(1) - 1, keys{i});
             end
-            sub = findall(f, 'Tag', 'zef_shell_header_sub');
-            testCase.verifyNotEmpty(sub);
-            testCase.verifyEqual(char(sub(1).String), 'I N T E R F A C E');
-            testCase.verifyGreaterThanOrEqual(sub(1).Position(3), 148);
+            logo = findall(f, 'Tag', 'zef_shell_header_logo');
+            testCase.verifyNotEmpty(logo);
+            testCase.verifyGreaterThan(logo(1).Position(3), logo(1).Position(4));
+            testCase.verifyGreaterThanOrEqual(logo(1).Position(4), 18);
+            testCase.verifyEqual(size(logo(1).CData, 1), round(logo(1).Position(4)), 'AbsTol', 1);
+            testCase.verifyEqual(size(logo(1).CData, 2), round(logo(1).Position(3)), 'AbsTol', 1);
+            old_h = logo(1).Position(4);
+            f.Position = [40 40 1600 900];
+            zef_figure_tool_layout(f);
+            logo = findall(f, 'Tag', 'zef_shell_header_logo');
+            testCase.verifyGreaterThanOrEqual(logo(1).Position(4), old_h);
+            testCase.verifyEqual(size(logo(1).CData, 1), round(logo(1).Position(4)), 'AbsTol', 1);
+            testCase.verifyEqual(size(logo(1).CData, 2), round(logo(1).Position(3)), 'AbsTol', 1);
         end
 
         function sidebarLabelsUseSharedWidth(testCase)
@@ -919,11 +1238,76 @@ classdef UiThemeTest < matlab.unittest.TestCase
             end
             dt = findall(f, 'Tag', 'status_details_text');
             pill = findall(f, 'Tag', 'status_ready_pill');
-            if ~isempty(dt) && ~isempty(pill)
+            lab = findall(f, 'Tag', 'label_details');
+            if ~isempty(pill)
+                testCase.verifyEqual(char(pill(1).Visible), 'on');
+            end
+            if ~isempty(lab) && ~isempty(pill)
+                mid_lab = lab(1).Position(2) + lab(1).Position(4) / 2;
+                mid_pill = pill(1).Position(2) + pill(1).Position(4) / 2;
+                testCase.verifyEqual(mid_pill, mid_lab, 'AbsTol', 8);
+            elseif ~isempty(dt) && ~isempty(pill)
                 top_dt = dt(1).Position(2) + dt(1).Position(4);
                 top_pill = pill(1).Position(2) + pill(1).Position(4);
-                testCase.verifyEqual(top_pill, top_dt, 'AbsTol', 4);
+                testCase.verifyGreaterThanOrEqual(top_pill, top_dt - 8);
             end
+        end
+
+        function figureListsInspectorKeepsDynamicCountsAndReady(testCase)
+            f = local_figure_tool_fixture(testCase, [40 40 1200 646]);
+            f.Tag = 'figure_tool';
+            ls = findall(f, 'Tag', 'figure_lists');
+            uicontrol(ls, 'Style', 'text', 'Tag', 'label_compartments', ...
+                'String', 'Compartments', 'Position', [10 140 120 18]);
+            uicontrol(ls, 'Style', 'text', 'Tag', 'label_sensors', ...
+                'String', 'Sensors', 'Position', [170 140 80 18]);
+            uicontrol(ls, 'Style', 'text', 'Tag', 'label_details', ...
+                'String', 'Details', 'Position', [330 140 80 18]);
+            uicontrol(ls, 'Style', 'text', 'Tag', 'status_compartments_count', ...
+                'String', '6', 'Position', [130 140 28 18]);
+            uicontrol(ls, 'Style', 'text', 'Tag', 'status_sensors_count', ...
+                'String', '8', 'Position', [250 140 28 18]);
+            uicontrol(ls, 'Style', 'text', 'Tag', 'status_sep_1', 'String', '');
+            uicontrol(ls, 'Style', 'text', 'Tag', 'status_sep_2', 'String', '');
+            zef_ui_shell('build', f);
+            zef_figure_tool_layout(f);
+            cnt = findall(f, 'Tag', 'status_compartments_count');
+            testCase.verifyEqual(char(cnt(1).String), '6');
+            testCase.verifyEqual(char(cnt(1).Visible), 'on');
+            sc = findall(f, 'Tag', 'status_sensors_count');
+            testCase.verifyEqual(char(sc(1).String), '8');
+            lab = findall(f, 'Tag', 'label_compartments');
+            testCase.verifyEqual(strtrim(char(lab(1).String)), 'Compartments');
+            pill = findall(f, 'Tag', 'status_ready_pill');
+            det = findall(f, 'Tag', 'label_details');
+            testCase.verifyEqual(char(pill(1).Visible), 'on');
+            mid_pill = pill(1).Position(2) + pill(1).Position(4) / 2;
+            mid_det = det(1).Position(2) + det(1).Position(4) / 2;
+            testCase.verifyEqual(mid_pill, mid_det, 'AbsTol', 8);
+            dlab = findall(f, 'Tag', 'status_dlab_1');
+            dval = findall(f, 'Tag', 'status_dval_1');
+            testCase.verifyNotEmpty(dlab);
+            testCase.verifyEqual(char(dlab(1).Visible), 'on');
+            testCase.verifyNotEmpty(dval);
+            testCase.verifyGreaterThan(dval(1).Position(1), dlab(1).Position(1));
+            f.Position(3) = 980;
+            zef_figure_tool_layout(f);
+            lab2 = findall(f, 'Tag', 'label_details');
+            pill2 = findall(f, 'Tag', 'status_ready_pill');
+            testCase.verifyGreaterThan(pill2(1).Position(1), lab2(1).Position(1) + lab2(1).Position(3) - 1);
+            f.Position(3) = 1400;
+            zef_figure_tool_layout(f);
+            sep = findall(f, 'Tag', 'status_sep_1');
+            sep2 = findall(f, 'Tag', 'status_sep_2');
+            testCase.verifyGreaterThan(sep2(1).Position(1), sep(1).Position(1));
+            theme = zef_ui_theme();
+            lists = findall(f, 'Tag', 'figure_lists');
+            testCase.verifyEqual(lists(1).Position(4), theme.space.statusH, 'AbsTol', 1);
+            zef_figure_tool_layout(f);
+            testCase.verifyEqual(lists(1).Position(4), theme.space.statusH, 'AbsTol', 1);
+            dt = findall(f, 'Tag', 'status_details_text');
+            testCase.verifyEqual(char(dt(1).Visible), 'off');
+            testCase.verifyLessThanOrEqual(max(dt(1).Position(3:4)), 2);
         end
 
         function flyoutWidensForLongMenuLabels(testCase)
@@ -1083,15 +1467,30 @@ classdef UiThemeTest < matlab.unittest.TestCase
             f = local_figure_tool_fixture(testCase, [40 40 720 520]);
             f.Tag = 'figure_tool';
             zef_ui_shell('build', f);
-            pill = findall(f, 'Tag', 'zef_shell_theme_pill');
-            testCase.verifyNotEmpty(pill);
-            pill(1).Callback(pill(1), []);
+            testCase.verifyEmpty(findall(f, '-regexp', 'Tag', '^zef_shell_theme'));
+            btn = findall(f, 'Tag', 'zef_nav_project');
+            testCase.verifyNotEmpty(btn);
+            setappdata(btn, 'ZefMenuHandle', root);
+            cb = btn.Callback;
+            cb(btn, []);
             fly = findall(f, '-regexp', 'Tag', '^zef_shell_flyout');
             testCase.verifyNotEmpty(fly);
             p = fly(1).Position;
             testCase.verifyGreaterThanOrEqual(p(1), 4);
             testCase.verifyLessThanOrEqual(p(1) + p(3), f.Position(3) + 1);
             testCase.verifyGreaterThanOrEqual(p(2), 0);
+        end
+
+        function layoutRemovesLegacyThemeControls(testCase)
+            f = local_figure_tool_fixture(testCase, [40 40 1024 682]);
+            f.Tag = 'figure_tool';
+            zef_ui_shell('build', f);
+            header = findall(f, 'Tag', 'zef_shell_header');
+            leftover = uicontrol(header, 'Style', 'pushbutton', ...
+                'Tag', 'zef_shell_theme_pill', 'String', 'Theme');
+            zef_ui_shell('theme', f);
+            testCase.verifyFalse(isvalid(leftover));
+            testCase.verifyEmpty(findall(f, '-regexp', 'Tag', '^zef_shell_theme'));
         end
 
         function placeWindowMovesDefaultOriginBesideSession(testCase)
@@ -1289,6 +1688,45 @@ classdef UiThemeTest < matlab.unittest.TestCase
             end
             testCase.verifyTrue(any(contains(shown, 'Exit')));
             testCase.verifyTrue(any(contains(shown, 'New project from profile')));
+            rows = findall(fly, 'Tag', 'zef_fly_item');
+            testCase.verifyGreaterThanOrEqual(numel(rows), numel(labels));
+            for i = 1:numel(rows)
+                testCase.verifyEqual(rows(i).Position(1), 8, 'AbsTol', 1);
+                testCase.verifyGreaterThanOrEqual(rows(i).Position(3), fly(1).Position(3) - 24);
+                rgb = local_menu_chip_cdata(rows(i), 'zef_fly_bg');
+                testCase.verifyEqual(size(rgb, 2), round(rows(i).Position(3)), 'AbsTol', 1);
+                testCase.verifyEqual(size(rgb, 1), round(rows(i).Position(4)), 'AbsTol', 1);
+            end
+        end
+
+        function flyoutHidesToolbarSoButtonsDoNotPunchThrough(testCase)
+            menuFig = uifigure('Visible', 'off', 'Name', 'ZEFFIRO Interface: Menu tool');
+            testCase.Figures(end+1) = menuFig;
+            root = uimenu(menuFig, 'Text', 'Project');
+            uimenu(root, 'Text', 'Open project');
+            f = local_figure_tool_fixture(testCase, [40 40 1000 646]);
+            f.Tag = 'figure_tool';
+            zef_ui_shell('build', f);
+            zef_figure_tool_layout(f);
+            pan = findall(f, 'Tag', 'zef_tool_pan');
+            testCase.assumeNotEmpty(pan);
+            testCase.verifyEqual(char(pan(1).Visible), 'on');
+            btn = findall(f, 'Tag', 'zef_nav_project');
+            setappdata(btn, 'ZefMenuHandle', root);
+            cb = btn.Callback;
+            cb(btn, []);
+            fly = findall(f, 'Tag', 'zef_shell_flyout');
+            testCase.verifyNotEmpty(fly);
+            testCase.verifyEqual(char(pan(1).Visible), 'off');
+            view = findall(f, 'Tag', 'figure_view');
+            if ~isempty(view)
+                testCase.verifyEqual(char(view(1).Visible), 'off');
+            end
+            zef_ui_shell('dismiss', f);
+            testCase.verifyEqual(char(pan(1).Visible), 'on');
+            if ~isempty(view)
+                testCase.verifyEqual(char(view(1).Visible), 'on');
+            end
         end
 
         function flyoutOverflowKeepsThemedItems(testCase)
@@ -1355,14 +1793,13 @@ classdef UiThemeTest < matlab.unittest.TestCase
         end
 
         function themeExposesTableAndStateTokens(testCase)
-            light = zef_ui_theme();
-            dark = zef_ui_theme(struct('ui_color_mode', 'dark', 'font_size', 12));
-            testCase.verifyEqual(light.color.tableRow, [1 1 1], 'AbsTol', 1e-6);
-            testCase.verifyEqual(light.color.surface, light.color.panel, 'AbsTol', 1e-6);
-            testCase.verifyEqual(light.color.error, light.color.danger, 'AbsTol', 1e-6);
-            testCase.verifyGreaterThan(dark.color.text(1), 0.7);
-            testCase.verifyLessThan(dark.color.tableRow(1), 0.3);
-            testCase.verifyLessThan(dark.color.bg(1), dark.color.panel(1) + 0.05);
+            theme = zef_ui_theme();
+            testCase.verifyEqual(theme.color.tableRow, [1 1 1], 'AbsTol', 1e-6);
+            testCase.verifyEqual(theme.color.surface, theme.color.panel, 'AbsTol', 1e-6);
+            testCase.verifyEqual(theme.color.error, theme.color.danger, 'AbsTol', 1e-6);
+            testCase.verifyGreaterThan(theme.color.bg(1), 0.9);
+            testCase.verifyLessThan(theme.color.text(1), 0.3);
+            testCase.verifyEqual(theme.color.borderSubtle, theme.color.hairline, 'AbsTol', 1e-6);
         end
 
         function applyThemePaintsTableFromTokens(testCase)
@@ -1392,10 +1829,11 @@ classdef UiThemeTest < matlab.unittest.TestCase
             b = uicontrol(f, 'Style', 'pushbutton', 'String', 'Reset', ...
                 'Position', [10 10 80 28]);
             zef_ui_broadcast_theme();
-            dark = zef_ui_theme();
-            testCase.verifyEqual(dark.mode, 'dark');
-            testCase.verifyEqual(f.Color, dark.color.bg, 'AbsTol', 1e-6);
-            testCase.verifyEqual(b.BackgroundColor, dark.color.button, 'AbsTol', 1e-6);
+            theme = zef_ui_theme();
+            testCase.verifyEqual(theme.mode, 'light');
+            testCase.verifyEqual(f.Color, theme.color.bg, 'AbsTol', 1e-6);
+            testCase.verifyEqual(b.BackgroundColor, theme.color.button, 'AbsTol', 1e-6);
+            testCase.verifyGreaterThan(theme.color.bg(1), 0.9);
         end
 
         function confirmDialogUsesThemeAndPrimaryYes(testCase)
@@ -1557,8 +1995,13 @@ classdef UiThemeTest < matlab.unittest.TestCase
                     mat2str(sizes{s}(3:4)));
                 testCase.verifyLessThan(play(1).Position(2), 0.15 * sidebar.Position(4), ...
                     mat2str(sizes{s}(3:4)));
-                testCase.verifyGreaterThan(tgb(1).Position(2) + tgb(1).Position(4), ...
-                    sidebar.Position(4) - 48, mat2str(sizes{s}(3:4)));
+                host = findall(f, 'Tag', 'figure_toggle_host');
+                testCase.verifyNotEmpty(host, mat2str(sizes{s}(3:4)));
+                hp = host(1).Position;
+                sp = sidebar.Position;
+                testCase.verifyGreaterThan(hp(2) + hp(4), sp(2) + sp(4) - 56, ...
+                    mat2str(sizes{s}(3:4)));
+                testCase.verifyEqual(char(tgb(1).Parent.Tag), 'figure_toggle_host');
                 testCase.verifyGreaterThan(scale(1).Position(2), ...
                     play(1).Position(2) + play(1).Position(4) - 2, ...
                     mat2str(sizes{s}(3:4)));
@@ -1580,15 +2023,60 @@ classdef UiThemeTest < matlab.unittest.TestCase
                 tgb = findall(f, 'Tag', 'togglecontrolsbutton');
                 testCase.verifyEqual(sidebar.Position(2), ...
                     theme.space.footerH + theme.space.cardGap, 'AbsTol', 2);
-                testCase.verifyGreaterThanOrEqual( ...
-                    sidebar.Position(2) + sidebar.Position(4), header.Position(2) - 8);
+                top_gap = header.Position(2) - (sidebar.Position(2) + sidebar.Position(4));
+                testCase.verifyGreaterThanOrEqual(top_gap, 6, mat2str(sizes{s}(3:4)));
+                testCase.verifyLessThanOrEqual(top_gap, 20, mat2str(sizes{s}(3:4)));
                 testCase.verifyLessThanOrEqual(play(1).Position(2), ...
                     theme.space.cardRadius + 8, mat2str(sizes{s}(3:4)));
                 testCase.verifyGreaterThanOrEqual(play(1).Position(2), 6, ...
                     mat2str(sizes{s}(3:4)));
-                testCase.verifyGreaterThan(tgb(1).Position(2) + tgb(1).Position(4), ...
-                    sidebar.Position(4) - 48, mat2str(sizes{s}(3:4)));
+                host = findall(f, 'Tag', 'figure_toggle_host');
+                testCase.verifyNotEmpty(host, mat2str(sizes{s}(3:4)));
+                hp = host(1).Position;
+                sp = sidebar.Position;
+                testCase.verifyGreaterThan(hp(2) + hp(4), sp(2) + sp(4) - 56, ...
+                    mat2str(sizes{s}(3:4)));
+                testCase.verifyEqual(char(tgb(1).Parent.Tag), 'figure_toggle_host');
             end
+        end
+
+        function unifiedShellSeparatesCardsFromHeaderOnResize(testCase)
+            sizes = {[40 40 980 620], [40 40 1200 646], [40 40 1400 900], ...
+                [40 40 1600 1000]};
+            gaps = zeros(1, numel(sizes));
+            for s = 1:numel(sizes)
+                f = local_figure_tool_fixture(testCase, sizes{s});
+                f.Tag = 'figure_tool';
+                zef_ui_shell('build', f);
+                zef_figure_tool_layout(f);
+                header = findall(f, 'Tag', 'zef_shell_header');
+                nav = findall(f, 'Tag', 'zef_shell_nav');
+                sidebar = findall(f, 'Tag', 'figure_sidebar');
+                work = findall(f, 'Tag', 'zef_shell_card');
+                hb = header.Position(2);
+                g_nav = hb - (nav.Position(2) + nav.Position(4));
+                g_side = hb - (sidebar.Position(2) + sidebar.Position(4));
+                g_card = hb - (work.Position(2) + work.Position(4));
+                testCase.verifyGreaterThanOrEqual(g_nav, 8, mat2str(sizes{s}(3:4)));
+                testCase.verifyLessThanOrEqual(g_nav, 20, mat2str(sizes{s}(3:4)));
+                testCase.verifyEqual(g_side, g_nav, 'AbsTol', 2, mat2str(sizes{s}(3:4)));
+                testCase.verifyEqual(g_card, g_nav, 'AbsTol', 2, mat2str(sizes{s}(3:4)));
+                gaps(s) = g_nav;
+            end
+            testCase.verifyGreaterThan(gaps(end), gaps(1));
+            f = local_figure_tool_fixture(testCase, [40 40 1200 646]);
+            f.Tag = 'figure_tool';
+            zef_ui_shell('build', f);
+            zef_figure_tool_layout(f);
+            header = findall(f, 'Tag', 'zef_shell_header');
+            nav = findall(f, 'Tag', 'zef_shell_nav');
+            compact = header.Position(2) - (nav.Position(2) + nav.Position(4));
+            f.Position = [40 40 1600 1000];
+            zef_figure_tool_layout(f);
+            header = findall(f, 'Tag', 'zef_shell_header');
+            nav = findall(f, 'Tag', 'zef_shell_nav');
+            grown = header.Position(2) - (nav.Position(2) + nav.Position(4));
+            testCase.verifyGreaterThan(grown, compact);
         end
 
         function shellInstallsWheelHandlerAtBuild(testCase)
@@ -1621,7 +2109,7 @@ classdef UiThemeTest < matlab.unittest.TestCase
         end
 
         function applyThemePaintsUiTreeFromTokens(testCase)
-            theme = zef_ui_theme(struct('ui_color_mode', 'dark', 'font_size', 12));
+            theme = zef_ui_theme();
             f = uifigure('Visible', 'off', 'Name', 'ZEFFIRO Interface: Tree fixture');
             testCase.Figures(end+1) = f;
             tr = uitree(f);
@@ -1743,6 +2231,23 @@ uicontrol(sb, 'Style', 'popupmenu', 'Tag', 'colorscaleselection', ...
     'Position', [90 32 220 22]);
 uicontrol(sb, 'Style', 'pushbutton', 'String', 'Play', ...
     'Tag', 'playbutton', 'Position', [80 10 60 28]);
+
+end
+
+function rgb = local_menu_chip_cdata(parent, tag)
+
+ax = findall(parent, 'Tag', tag, 'Type', 'axes');
+if isempty(ax)
+    ax = findall(parent, 'Type', 'axes');
+end
+if isempty(ax)
+    error('tests:NoMenuChip', 'No chip axes with tag %s', tag);
+end
+im = findall(ax(1), 'Type', 'image');
+if isempty(im)
+    error('tests:NoMenuChipImage', 'No chip image with tag %s', tag);
+end
+rgb = im(1).CData;
 
 end
 

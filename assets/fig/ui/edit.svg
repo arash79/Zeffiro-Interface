@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none" role="img">
+
+<defs>
+  <linearGradient id="tealGrad" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#0F8F90"/>
+    <stop offset="1" stop-color="#28B8B8"/>
+  </linearGradient>
+  <linearGradient id="darkGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#2F424C"/>
+    <stop offset="1" stop-color="#73848B"/>
+  </linearGradient>
+  <linearGradient id="cubeTop" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#138D8D"/>
+    <stop offset="1" stop-color="#37BBB6"/>
+  </linearGradient>
+  <radialGradient id="dotGrad" cx="35%" cy="28%" r="75%">
+    <stop offset="0" stop-color="#22C0BC"/>
+    <stop offset="0.62" stop-color="#119594"/>
+    <stop offset="1" stop-color="#087476"/>
+  </radialGradient>
+</defs>
+<g transform="rotate(-45 64 64)">
+  <path d="M56 24H72C76 24 79 27 79 31V37H49V31C49 27 52 24 56 24Z" fill="url(#tealGrad)"/>
+  <rect x="49" y="37" width="30" height="53" rx="3" fill="url(#darkGrad)"/>
+  <rect x="55" y="37" width="10" height="53" fill="#566A73" opacity="0.55"/>
+  <path d="M49 90H79L64 108L49 90Z" fill="#E6ECEE"/>
+  <path d="M58 101L64 108L70 101Z" fill="#14A7A5"/>
+</g>
+</svg>

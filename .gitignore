@@ -6,6 +6,7 @@ Desktop.ini
 
 # Local dumps that must not be committed
 .audit/
+.cursor-debug/
 gui_audit_output/
 gui_audit_output_focus/
 gui_refine_output/
@@ -34,9 +35,6 @@ matlab_crash_dump.*
 *.mexw64
 *.mexw32
 *.mexglx
-
-# Icon rasterization intermediates (SVG masters are source; PNGs are runtime)
-assets/fig/ui/Zeffiro_Modern_Icons/svg_masters/*.pdf
 
 # Python (scripts/)
 .pytest_cache/

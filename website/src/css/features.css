@@ -39,9 +39,9 @@ body[data-page="features"] .atmosphere-glow {
   width: 1px;
   background: linear-gradient(
     180deg,
-    rgba(56, 189, 248, 0.05),
-    rgba(124, 107, 255, 0.42) 46%,
-    rgba(56, 189, 248, 0.08)
+    color-mix(in srgb, var(--teal) 8%, transparent),
+    color-mix(in srgb, var(--teal-dark) 42%, transparent) 46%,
+    color-mix(in srgb, var(--teal) 10%, transparent)
   );
   pointer-events: none;
 }
@@ -54,7 +54,7 @@ body[data-page="features"] .atmosphere-glow {
   column-gap: 6px;
   min-height: 42px;
   padding: 4px 0 4px 0;
-  color: rgba(176, 184, 198, 0.86);
+  color: var(--muted);
   text-decoration: none;
   transition: color 0.35s ease;
 }
@@ -65,7 +65,7 @@ body[data-page="features"] .atmosphere-glow {
   height: 7px;
   margin-left: 3px;
   border-radius: 50%;
-  background: rgba(142, 164, 255, 0.32);
+  background: color-mix(in srgb, var(--teal) 32%, transparent);
   box-shadow: none;
   transition: background 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
 }
@@ -86,18 +86,18 @@ body[data-page="features"] .atmosphere-glow {
 }
 
 .feat-rail a:hover {
-  color: rgba(232, 235, 244, 0.92);
+  color: var(--text);
 }
 
 .feat-rail a[aria-current="location"] {
-  color: #f3f5fa;
+  color: var(--text);
   font-weight: 600;
 }
 
 .feat-rail a[aria-current="location"]::before {
-  background: #38bdf8;
+  background: var(--teal);
   transform: scale(1.22);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16), 0 0 12px rgba(124, 107, 255, 0.7);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal) 16%, transparent), 0 0 12px color-mix(in srgb, var(--teal-dark) 35%, transparent);
 }
 
 .feat-rail a[aria-current="location"] .feat-rail-idx {
@@ -128,7 +128,7 @@ body[data-page="features"] .atmosphere-glow {
 .feat-open p {
   max-width: 54ch;
   margin: 20px 0 0;
-  color: #c5cad6;
+  color: var(--muted);
   font-size: 16px;
   line-height: 1.65;
 }
@@ -138,7 +138,7 @@ body[data-page="features"] .atmosphere-glow {
   flex-direction: column;
   gap: 14px;
   padding: 8px 0 8px 22px;
-  border-left: 1px solid rgba(124, 107, 255, 0.35);
+  border-left: 1px solid color-mix(in srgb, var(--teal-dark) 28%, transparent);
 }
 
 .feat-journey li {
@@ -234,7 +234,7 @@ html.js-feat .feat-continue.is-in {
 .feat-inverse-head p,
 .feat-after,
 .feat-also li {
-  color: #c5cad6;
+  color: var(--muted);
   font-size: 15.5px;
   line-height: 1.65;
 }
@@ -251,11 +251,11 @@ html.js-feat .feat-continue.is-in {
 }
 
 .feat-facts li {
-  color: #d7dbe6;
+  color: var(--text);
   font-size: 13.5px;
   line-height: 1.45;
   padding-left: 12px;
-  border-left: 2px solid rgba(56, 189, 248, 0.35);
+  border-left: 2px solid color-mix(in srgb, var(--teal) 45%, transparent);
 }
 
 .feat-note {
@@ -307,7 +307,7 @@ html.js-feat .feat-continue.is-in {
   padding: 20px 20px 18px;
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: rgba(8, 10, 16, 0.4);
+  background: var(--bg-2);
 }
 
 .feat-family svg {
@@ -323,20 +323,24 @@ html.js-feat .feat-continue.is-in {
   font-size: 13px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--teal-dark);
+}
+
+.feat-family.is-dyn h3 {
+  color: var(--gray-dark);
 }
 
 .feat-family p {
   margin: 0;
-  color: #c8ceda;
+  color: var(--muted);
   font-size: 14.5px;
   line-height: 1.6;
 }
 
-.feat-family.is-lin { --accent: #5b8cff; }
-.feat-family.is-bay { --accent: #c084fc; }
-.feat-family.is-spa { --accent: #2dd4bf; }
-.feat-family.is-dyn { --accent: #fb7185; }
+.feat-family.is-lin { --accent: var(--teal-dark); }
+.feat-family.is-bay { --accent: var(--teal); }
+.feat-family.is-spa { --accent: var(--teal-bright); }
+.feat-family.is-dyn { --accent: var(--gray-dark); }
 
 .feat-after {
   margin: 22px 0 0;
@@ -354,7 +358,7 @@ html.js-feat .feat-continue.is-in {
   padding: 22px 24px;
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: rgba(8, 10, 16, 0.35);
+  background: var(--bg-3);
 }
 
 .feat-also ul {
@@ -383,13 +387,13 @@ html.js-feat .feat-continue.is-in {
   padding: 20px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: rgba(8, 10, 16, 0.45);
+  background: var(--bg-2);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .feat-exit:hover {
-  border-color: rgba(124, 107, 255, 0.45);
-  box-shadow: 0 0 24px rgba(80, 90, 255, 0.14);
+  border-color: color-mix(in srgb, var(--teal) 45%, transparent);
+  box-shadow: var(--shadow);
 }
 
 .feat-exit span {
@@ -465,7 +469,7 @@ html.js-feat .feat-continue.is-in {
     transform: translateY(-50%);
     padding: 6px 8px;
     border-radius: 8px;
-    background: rgba(8, 10, 16, 0.92);
+    background: var(--bg-2);
     border: 1px solid var(--line);
     white-space: nowrap;
     z-index: 7;
@@ -531,7 +535,7 @@ html.js-feat .feat-continue.is-in {
     padding: 0 12px;
     border: 1px solid var(--line);
     border-radius: 999px;
-    background: rgba(8, 10, 16, 0.45);
+    background: var(--bg-2);
     grid-template-columns: none;
     flex: 0 0 auto;
   }
@@ -559,8 +563,8 @@ html.js-feat .feat-continue.is-in {
   }
 
   .feat-rail a[aria-current="location"] {
-    border-color: rgba(56, 189, 248, 0.45);
-    box-shadow: 0 0 16px rgba(80, 90, 255, 0.16);
+    border-color: color-mix(in srgb, var(--teal) 45%, transparent);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--teal) 16%, transparent);
   }
 
   .feat-chapter,

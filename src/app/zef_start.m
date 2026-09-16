@@ -63,8 +63,14 @@ end
 % windows for the session before any Zeffiro figure is created.
 zef_window_manager('init');
 
-if zef.gpu_count > 0 & zef.use_gpu == 1
-    gpuDevice(zef.gpu_num);
+if zef.gpu_count > 0 && isfield(zef, 'use_gpu') && zef.use_gpu
+    try
+        gpuDevice(zef.gpu_num);
+    catch
+        warning('Zeffiro:GpuDeviceMissing', ...
+            "Tried using GPU with index " + zef.gpu_num + ...
+            " but no such device was found. Starting without GPU...");
+    end
 end
 
 zef.new_empty_project = 0;

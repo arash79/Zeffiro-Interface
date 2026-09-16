@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+<defs>
+  <linearGradient id="teal" x1="18" y1="18" x2="110" y2="112" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#22B8AE"/>
+    <stop offset="0.52" stop-color="#0E999B"/>
+    <stop offset="1" stop-color="#0B737C"/>
+  </linearGradient>
+  <linearGradient id="dark" x1="20" y1="16" x2="106" y2="116" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#5A6870"/>
+    <stop offset="0.48" stop-color="#40515A"/>
+    <stop offset="1" stop-color="#2E424C"/>
+  </linearGradient>
+</defs>
+<path d="M 55.7 26.9 L 57.9 15.4 L 70.1 15.4 L 72.3 26.9 L 84.4 31.9 L 94.0 25.3 L 102.7 34.0 L 96.1 43.6 L 101.1 55.7 L 112.6 57.9 L 112.6 70.1 L 101.1 72.3 L 96.1 84.4 L 102.7 94.0 L 94.0 102.7 L 84.4 96.1 L 72.3 101.1 L 70.1 112.6 L 57.9 112.6 L 55.7 101.1 L 43.6 96.1 L 34.0 102.7 L 25.3 94.0 L 31.9 84.4 L 26.9 72.3 L 15.4 70.1 L 15.4 57.9 L 26.9 55.7 L 31.9 43.6 L 25.3 34.0 L 34.0 25.3 L 43.6 31.9 Z" stroke="url(#dark)" stroke-width="7" stroke-linejoin="round"/>
+<circle cx="64" cy="64" r="19" stroke="url(#teal)" stroke-width="7"/>
+</svg>

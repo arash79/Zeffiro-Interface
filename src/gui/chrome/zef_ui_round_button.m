@@ -7,9 +7,9 @@ function zef_ui_round_button(h, theme, is_primary)
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   MATLAB cannot show CData and String together, so a sibling caption
-%   (Tag <buttonTag>_cap) carries the label. The original String stays
-%   on the button so findall(..., 'String', ...) and callbacks keep
-%   working. Call after Position is set.
+%   (Tag <buttonTag>_cap) is the visible label. The wording is stored in
+%   appdata ZefButtonLabel; h.String is cleared so CData can paint. Call
+%   after Position is set.
 %
 %   zef_ui_round_button(h)
 %   zef_ui_round_button(h, theme)
@@ -52,7 +52,11 @@ if is_primary
 end
 outer = theme.color.panel;
 try
-    if isprop(h.Parent, 'Tag') && strcmp(char(h.Parent.Tag), 'figure_sidebar')
+    ptag = '';
+    if isprop(h.Parent, 'Tag')
+        ptag = char(h.Parent.Tag);
+    end
+    if any(strcmp(ptag, {'figure_sidebar', 'figure_toggle_host', 'figure_lists'}))
         outer = theme.color.panel;
     end
 catch
@@ -129,6 +133,7 @@ if ~isempty(cap) && isvalid(cap)
     cap.ForegroundColor = fg;
     cap.BackgroundColor = fillc;
     cap.Enable = 'inactive';
+    cap.Visible = 'on';
     cap.UserData = h;
     cap.ButtonDownFcn = @local_fire;
     cap.Callback = [];
@@ -145,6 +150,7 @@ cap.String = lab;
 cap.Position = cap_pos;
 cap.ForegroundColor = fg;
 cap.BackgroundColor = fillc;
+cap.Visible = 'on';
 cap.FontWeight = 'normal';
 if is_primary
     cap.FontWeight = 'bold';

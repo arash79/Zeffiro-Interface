@@ -61,6 +61,10 @@ zef.h_zeffiro_axes_popup = figure(...
     'InvertHardcopy',true,...
     'ScreenPixelsPerInchMode','manual' );
 
+try
+    addToolbarExplorationButtons(zef.h_zeffiro_axes_popup);
+catch
+end
 zef.h_object_aux_new = copyobj(zef_ui_axes(zef.h_figure_aux), zef.h_figure_aux);
 h_cb = findall(zef.h_figure_aux, 'Type', 'colorbar');
 if ~isempty(h_cb)
@@ -79,6 +83,14 @@ for zef_i = 1 : length(zef.h_object_aux_new)
         end
         try
             axis(zef.h_object_aux_new(zef_i), 'image');
+        catch
+        end
+        try
+            enableDefaultInteractivity(zef.h_object_aux_new(zef_i));
+        catch
+        end
+        try
+            zef.h_object_aux_new(zef_i).Toolbar.Visible = 'on';
         catch
         end
     end

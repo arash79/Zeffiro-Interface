@@ -74,13 +74,18 @@ if ~isempty(logo)
             logo.ImageSource = 'zeffiro_logo_compass.png';
         end
         try
-            rmappdata(logo, 'ZefLogoOriginal');
+            setappdata(logo, 'ZefLogoOriginal', src);
+            rmappdata(logo, 'ZefLogoKey');
         catch
         end
         logo.ScaleMethod = 'fit';
         logo.HorizontalAlignment = 'right';
         logo.VerticalAlignment = 'center';
         logo.BackgroundColor = theme.color.bg;
+        try
+            zef_ui_blend_logo(logo, theme);
+        catch
+        end
     catch
     end
 end

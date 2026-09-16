@@ -12,7 +12,8 @@ Shell around a Zeffiro session: start, default fields, the GUI↔`zef` synchroni
 | `zef_close_all.m` | function | deletes `ZEFFIRO Interface*` figures; clears `zef` from base |
 | `zef_close_tools.m` | **script** | deletes tool windows except Segmentation, Figure, Menu |
 | `zef_close_figs.m` | **script** | deletes Figure-tool windows, then `zef_figure_tool` |
-| `zef_plugin.m` | **script** | reads `profile/<profile>/zeffiro_plugins.ini` |
+| `zef_plugin.m` | **script** | reads `profile/<profile>/zeffiro_plugins.ini` via `zef_read_profile_cell` |
+| `zef_read_profile_cell.m` | function | Cached CSV/INI reader used for profile files (drop-in for `readcell`) |
 | `zef_start_new_project.m` | **script** | `zeffiro_interface('zeffiro_restart', true)` then delete compartments |
 | `zef_remove_system_fields.m` | function | `zef_data = zef_remove_system_fields(zef, zef_data)` strips machine fields listed in `profile/zeffiro_interface.ini` plus a hard-coded set |
 | `zef_waitbar.m` / `zef_close_waitbar.m` / `zef_delete_waitbar.m` | function | custom progress figure; nested close via `zef_close_waitbar` |
@@ -38,7 +39,7 @@ Shell around a Zeffiro session: start, default fields, the GUI↔`zef` synchroni
 
 ## Workflow context
 
-Almost every Segmentation-tool table edit ends in `zef_update`. **Project → Exit** calls `zef_close_all`. **Window** menu items call `zef_arrange_windows`. **Project → New project from profile** / **New empty project** confirm then `zef_start_new_project` (`new_empty_project` 0 vs 1). Close disables `DeleteFcn` on matching figures first, restores MATLAB `WindowStyle` via `zef_window_manager('restore')`, and unless `zef.zeffiro_restart` is 1, `rmpath`s the whole tree.
+Almost every Segmentation-tool table edit ends in `zef_update`. **Project → Exit** calls `zef_close_all`. **Window** menu items call `zef_arrange_windows`. **Project → New project from profile** / **New empty project** confirm then `zef_start_new_project` (`new_empty_project` 0 vs 1). Close disables `DeleteFcn` on matching figures first, restores MATLAB `WindowStyle` via `zef_window_manager('restore')`, and unless `zef.zeffiro_restart` is 1, `rmpath`s `src/`, `assets/fig`, `plugins/`, `profile/`, `external/` if present, and the project root.
 
 Window menu (from `zef_menu_tool_app_exported` / `zef_menu_tool.m`): Reset windows → `zef_reset_windows`; Tools/Figures/All → Maximize / Minimize / Close / Tile via `zef_arrange_windows`. Protected windows are skipped; after tiling the hidden menu host is re-stacked via `zef_window_manager('dock_menu')` (unified shell keeps the menu hidden).
 

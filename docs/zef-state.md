@@ -15,7 +15,7 @@ Handles (`zef.h_*`) are graphics objects. `zef_save` strips them before writing 
 | `data_path` | `data/` (default folder for CLI paths with no directory) |
 | `external_path` | `external/` |
 | `profile_name` | Active INI profile folder under `profile/` (default `multicompartment_head`) |
-| `current_version` | Software version stamped at init (`6.0` in current `zef_init`) |
+| `current_version` | Project-format stamp written at init (currently `6.0`). User-facing product name is **Zeffiro Interface V2**. |
 | `start_mode` | `"display"` / `"nodisplay"` / `"default"` |
 | `save_file`, `save_file_path` | Last project MAT name and folder |
 

@@ -18,6 +18,17 @@ if nargin < 1 || isempty(h) || ~isgraphics(h) || ~isvalid(h)
     return
 end
 
+try
+    if isappdata(h, 'ZefUiThemed') && isequal(getappdata(h, 'ZefUiThemed'), true)
+        try
+            zef_ui_interact(h);
+        catch
+        end
+        return
+    end
+catch
+end
+
 name = '';
 try
     name = char(get(h, 'Name'));

@@ -6,7 +6,7 @@
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Script (not a function). Not App Designer. Creates figure
-%   "ZEFFIRO Interface: Figure tool" with uiaxes h_axes1. assignin
+%   "ZEFFIRO Interface: Figure tool" with axes h_axes1. assignin
 %   ('base','zef',zef) so string callbacks see the session. DeleteFcn
 %   zef_reopen_figure. Layout is zef_figure_tool_layout.
 %
@@ -41,7 +41,7 @@ zef.h_zeffiro = figure( ...
     'Units', 'Pixels', ...
     'Position', zef.size_temp, ...
     'Renderer', get(0, 'defaultfigureRenderer'), ...
-    'Visible', zef.use_display, ...
+    'Visible', 'off', ...
     'Color', zef_ui_theme_local.color.bg, ...
     'CloseRequestFcn', 'closereq;', ...
     'CurrentAxesMode', 'manual', ...
@@ -89,9 +89,10 @@ try
 catch
 end
 
-zef.h_axes1 = uiaxes('Parent', zef.h_figure_view, 'Visible', 'on', 'Units', 'pixels', ...
-    'Position', [1 1 498 398], 'Tag', 'axes1');
-zef.h_axes1.Color = zef_ui_theme_local.color.axesBg;
+zef.h_axes1 = axes('Parent', zef.h_figure_view, 'Visible', 'on', 'Units', 'pixels', ...
+    'Position', [1 1 498 398], 'Tag', 'axes1', ...
+    'Color', zef_ui_theme_local.color.axesBg, 'Box', 'off', ...
+    'XTick', [], 'YTick', []);
 try
     zef.h_axes1.Toolbar.Visible = 'off';
 catch
@@ -110,7 +111,7 @@ zef.h_panel_sidebar = uipanel('Parent', zef.h_zeffiro, ...
     'Tag', 'figure_sidebar');
 
 zef.h_panel_lists = uipanel('Parent', zef.h_zeffiro, ...
-    'Units', 'pixels', 'Position', [20 12 500 168], ...
+    'Units', 'pixels', 'Position', [20 12 500 zef_ui_theme_local.space.statusH], ...
     'Title', '', 'BorderType', 'line', ...
     'HighlightColor', zef_ui_theme_local.color.border, ...
     'ForegroundColor', zef_ui_theme_local.color.text, ...
@@ -272,10 +273,22 @@ zef.h_sensor_visible_color = zef_colored_list('create', ls, ...
     [170 28 150 110], 'sensor_visible_color', ...
     'Callback', 'zef_set_sensor_color; zef_update;', ...
     'Multiselect', true, ...
-    'Trigger', 'buttondown');
+    'Trigger', 'buttondown', ...
+    'ShowSwatches', false, ...
+    'ShowChecks', true);
 zef.h_system_information = zef_colored_list('create', ls, ...
     [330 28 150 110], 'system_information', ...
     'ShowSwatches', false);
+if make_shell
+    try
+        zef.h_system_information.Visible = 'off';
+        info_host = zef.h_system_information.Parent;
+        if ~isempty(info_host) && info_host ~= ls
+            info_host.Visible = 'off';
+        end
+    catch
+    end
+end
 
 uicontrol('Parent', ls, 'Units', 'pixels', 'HorizontalAlignment', 'left', ...
     'String', 'Compartments', 'Style', 'text', 'Position', [10 140 150 18], ...
@@ -316,6 +329,7 @@ uicontrol('Style', 'text', 'Parent', ls, 'Units', 'pixels', ...
 uicontrol('Style', 'text', 'Parent', ls, 'Units', 'pixels', ...
     'String', {'Nodes: 0'; 'Tetrahedra: 0'; 'Visualization: -'; 'Scale: Linear'}, ...
     'Max', 4, 'Min', 0, 'HorizontalAlignment', 'left', 'Tag', 'status_details_text', ...
+    'Visible', 'off', 'Position', [1 1 1 1], ...
     'BackgroundColor', zef_ui_theme_local.color.panel, ...
     'ForegroundColor', zef_ui_theme_local.color.text);
 uicontrol('Style', 'pushbutton', 'Parent', ls, 'Units', 'pixels', ...
@@ -385,7 +399,7 @@ if ~ismember('ZefFig', properties(zef.h_zeffiro))
 end
 set(zef.h_zeffiro, 'ZefFig', zef_fig_num);
 
-zef.h_zeffiro.SizeChangedFcn = @(src, evt) zef_figure_tool_layout(src);
+zef.h_zeffiro.SizeChangedFcn = @(src, evt) zef_figure_tool_layout(src, 'defer');
 if make_shell
     zef_ui_apply_size(zef.h_zeffiro, zef_ui_theme_local.space.shellDefW, ...
         zef_ui_theme_local.space.shellDefH, zef_ui_theme_local.space.shellMinW, ...
@@ -410,7 +424,11 @@ clear zef_ui_theme_local sb ls;
 
 zef_logoplot;
 
-zef.h_zeffiro.Visible = zef.use_display;
+if isfield(zef, 'h_zeffiro_menu') && isvalid(zef.h_zeffiro_menu)
+    zef.h_zeffiro.Visible = zef.use_display;
+else
+    zef.h_zeffiro.Visible = 'off';
+end
 zef_window_manager('standalone', zef.h_zeffiro);
 
 try
@@ -420,6 +438,11 @@ end
 
 zef.h_axes1.Units = 'pixels';
 zef_figure_tool_layout(zef.h_zeffiro);
+try
+    setappdata(zef.h_zeffiro, 'ZefUiThemed', true);
+    zef_ui_interact(zef.h_zeffiro);
+catch
+end
 
 function zef_logoplot(o, e, h) %#ok<INUSD>
 
@@ -467,6 +490,12 @@ try
     end
 catch
 end
+try
+    h_fig_logo = ancestor(h_axes, 'figure');
+    zef_figure_interact(h_fig_logo, 'set', 'none');
+    zef_figure_interact(h_fig_logo, 'forget_home');
+catch
+end
 h_axes.Tag = 'axes1';
 imh = image(h_axes, img);
 try
@@ -489,12 +518,14 @@ try
 catch
 end
 try
-    h_axes.Toolbar = [];
-catch
-    try
-        h_axes.Toolbar.Visible = 'off';
-    catch
+    if isempty(h_axes.Toolbar)
+        axtoolbar(h_axes, {'restoreview'});
     end
+catch
+end
+try
+    h_axes.Toolbar.Visible = 'off';
+catch
 end
 h_axes.Visible = 'on';
 try
@@ -524,6 +555,13 @@ end
 
 function img = local_logo_image(bg)
 
+persistent logo_bg logo_img
+bg = reshape(double(bg(1:3)), 1, 3);
+if ~isempty(logo_img) && isequal(logo_bg, bg)
+    img = logo_img;
+    return
+end
+
 fname = 'zeffiro_interface_compass.png';
 alpha = [];
 try
@@ -548,6 +586,8 @@ mask = max(abs(double(img) - bg8), [], 3) > tol;
 white = max(abs(double(img) - 255), [], 3) < 8;
 mask = mask & ~white;
 if ~any(mask(:))
+    logo_bg = bg;
+    logo_img = img;
     return
 end
 [r, c] = find(mask);
@@ -564,5 +604,7 @@ for k = 1:size(img, 3)
     ch(near_white) = bg8(k);
     img(:, :, k) = ch;
 end
+logo_bg = bg;
+logo_img = img;
 
 end

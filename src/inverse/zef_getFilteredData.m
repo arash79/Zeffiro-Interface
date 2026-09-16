@@ -53,15 +53,6 @@ switch eval('zef.normalize_data')
         data_norm = 1;
 end
 
-
-fprintf('size of f');
-disp(size(f));
-fprintf('ndims of f: %d\n', ndims(f));
-fprintf('size of data_norm');
-disp(size(data_norm));
-fprintf('class of f: %s\n', class(f));
-fprintf('class of data_norm: %s\n', class(data_norm));
-
 f = f/data_norm;
 end
 

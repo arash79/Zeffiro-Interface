@@ -13,7 +13,7 @@ function zef_ui_apply_theme(h, theme)
 %   zef_ui_apply_theme(h)
 %   zef_ui_apply_theme(h, theme)
 %
-%   See also zef_ui_theme, zef_ui_ready.
+%   See also zef_ui_theme, zef_ui_ready, zef_ui_blend_logo.
 
 if nargin < 1 || isempty(h) || ~isgraphics(h) || ~isvalid(h)
     return
@@ -83,7 +83,8 @@ try
 catch
 end
 if strcmp(tag, 'zef_card_bg') || strcmp(tag, 'zef_shell_card') ...
-        || strncmp(tag, 'zef_card_c_', 11)
+        || strcmp(tag, 'zef_card_img') || strncmp(tag, 'zef_card_c_', 11) ...
+        || strncmp(tag, 'zef_nav_fill_', 13) || strcmp(tag, 'zef_flyout_fill')
     if strcmp(tag, 'zef_shell_card')
         local_set(obj, 'BackgroundColor', theme.color.bg);
     end
@@ -102,11 +103,18 @@ switch typ
             obj.ScaleMethod = 'fit';
             obj.BackgroundColor = theme.color.bg;
             obj.VerticalAlignment = 'center';
-            obj.HorizontalAlignment = 'center';
+            tag = '';
+            try
+                tag = lower(char(obj.Tag));
+            catch
+            end
+            if ~(contains(tag, 'logo') || strcmp(tag, 'h_axes2'))
+                obj.HorizontalAlignment = 'center';
+            end
         catch
         end
         try
-            local_blend_logo(obj, theme);
+            zef_ui_blend_logo(obj, theme);
         catch
         end
         return
@@ -130,9 +138,10 @@ switch typ
         bg = theme.color.panel;
         try
             tag = char(obj.Tag);
-            if strcmp(tag, 'zef_shell_nav') || strcmp(tag, 'zef_shell_card')
+            if strcmp(tag, 'zef_shell_nav') || strcmp(tag, 'zef_shell_card') ...
+                    || strcmp(tag, 'figure_sidebar') || strcmp(tag, 'figure_lists')
                 bg = theme.color.bg;
-            elseif strncmp(tag, 'zef_nav_row_', 12)
+            elseif strncmp(tag, 'zef_nav_row_', 12) || strcmp(tag, 'zef_fly_item')
                 bg = theme.color.panel;
             elseif strcmp(tag, 'zef_shell_header')
                 bg = theme.color.headerBg;
@@ -147,7 +156,8 @@ switch typ
         local_set(obj, 'ForegroundColor', theme.color.text);
         is_nav_row = false;
         try
-            is_nav_row = strncmp(char(obj.Tag), 'zef_nav_row_', 12);
+            is_nav_row = strncmp(char(obj.Tag), 'zef_nav_row_', 12) ...
+                || strcmp(char(obj.Tag), 'zef_fly_item');
         catch
         end
         if is_nav_row
@@ -156,6 +166,13 @@ switch typ
         else
             local_set(obj, 'HighlightColor', theme.color.border);
             local_set(obj, 'BorderColor', theme.color.border);
+            try
+                if strcmpi(char(obj.BorderType), 'none')
+                    local_set(obj, 'BorderColor', bg);
+                    local_set(obj, 'HighlightColor', bg);
+                end
+            catch
+            end
         end
         local_set(obj, 'FontName', theme.font.name);
         local_set(obj, 'FontSize', theme.font.sizeSmall);
@@ -163,7 +180,8 @@ switch typ
         try
             ptag = char(obj.Tag);
             if ~strncmp(ptag, 'zef_shell_', 10) && ~strcmp(ptag, 'zef_card_bg') ...
-                    && ~strncmp(ptag, 'zef_card_', 9) && ~strncmp(ptag, 'zef_nav_row_', 12)
+                    && ~strncmp(ptag, 'zef_card_', 9) && ~strncmp(ptag, 'zef_nav_row_', 12) ...
+                    && ~strcmp(ptag, 'zef_fly_item')
                 local_try_radius(obj, theme, theme.space.cardRadius);
             end
         catch
@@ -461,7 +479,14 @@ switch style
         if strcmp(tag, 'zef_nav_sep') || strcmp(tag, 'zef_tool_sep') ...
                 || strcmp(tag, 'zef_tab_rule') || strcmp(tag, 'zef_header_rule') ...
                 || strcmp(tag, 'zef_tool_rule') || strncmp(tag, 'zef_card_e_', 11)
-            local_set(obj, 'BackgroundColor', theme.color.border);
+            edge_c = theme.color.border;
+            try
+                if strncmp(tag, 'zef_card_e_', 11)
+                    edge_c = theme.color.cardEdge;
+                end
+            catch
+            end
+            local_set(obj, 'BackgroundColor', edge_c);
             return
         end
         try
@@ -469,7 +494,8 @@ switch style
             if isprop(obj.Parent, 'Tag')
                 ptag = char(obj.Parent.Tag);
             end
-            if strcmp(ptag, 'figure_sidebar') || strcmp(ptag, 'figure_lists')
+            if strcmp(ptag, 'figure_sidebar') || strcmp(ptag, 'figure_lists') ...
+                    || strcmp(ptag, 'figure_toggle_host')
                 parent_bg = theme.color.panel;
                 local_set(obj, 'BackgroundColor', parent_bg);
             end
@@ -498,7 +524,12 @@ switch style
                 local_set(obj, 'ForegroundColor', theme.color.textMuted);
             end
         elseif strcmp(tag, 'status_ready')
-            local_set(obj, 'ForegroundColor', theme.color.textMuted);
+            fg = theme.color.ready;
+            try
+                fg = theme.color.readyText;
+            catch
+            end
+            local_set(obj, 'ForegroundColor', fg);
         elseif strcmp(tag, 'status_ready_dot')
             local_set(obj, 'BackgroundColor', theme.color.ready);
             return
@@ -535,13 +566,14 @@ switch style
         catch
         end
         if strcmp(tag, 'zef_card_bg') || strncmp(tag, 'zef_card_c_', 11) ...
-                || strcmp(tag, 'zef_shell_theme_pill')
+                || strncmp(tag, 'zef_nav_fill_', 13) || strcmp(tag, 'zef_flyout_fill')
             return
         end
         if ~(strncmp(tag, 'zef_tool_', 9) || strncmp(tag, 'zef_nav_', 8) ...
                 || strcmp(tag, 'zef_shell_help') || strcmp(tag, 'zef_shell_bell') ...
-                || strcmp(tag, 'zef_shell_profile') || strcmp(tag, 'zef_shell_theme_sun') ...
-                || contains(tag, 'header_mark') || contains(tag, 'brand_mark'))
+                || strcmp(tag, 'zef_shell_profile') ...
+                || contains(tag, 'header_mark') || contains(tag, 'header_logo') ...
+                || contains(tag, 'brand_mark'))
             local_style_button(obj, theme);
         end
         local_set(obj, 'FontSize', fit_fs);
@@ -566,7 +598,8 @@ switch style
             local_set(obj, 'ForegroundColor', theme.color.text);
             local_set(obj, 'FontWeight', 'normal');
         elseif contains(tag, 'brand_mark') || contains(tag, 'header_mark') ...
-                || strcmp(tag, 'zef_shell_theme_sun') || strcmp(tag, 'zef_shell_help') ...
+                || contains(tag, 'header_logo') ...
+                || strcmp(tag, 'zef_shell_help') ...
                 || strcmp(tag, 'zef_shell_bell') || strcmp(tag, 'zef_shell_profile')
             local_set(obj, 'BackgroundColor', theme.color.headerBg);
             if contains(tag, 'brand')
@@ -577,8 +610,6 @@ switch style
             if strcmp(tag, 'status_ready_dot')
                 local_set(obj, 'BackgroundColor', theme.color.panelAlt);
             end
-        elseif strcmp(tag, 'zef_shell_theme_pill')
-            local_set(obj, 'BackgroundColor', theme.color.headerBg);
         elseif strncmp(tag, 'zef_shell_', 10)
             local_set(obj, 'BackgroundColor', theme.color.button);
         end
@@ -661,96 +692,7 @@ end
 
 function local_blend_logo(obj, theme)
 
-src = [];
-try
-    src = obj.ImageSource;
-catch
-    return
-end
-orig = [];
-try
-    orig = getappdata(obj, 'ZefLogoOriginal');
-catch
-end
-if isempty(orig)
-    is_logo = false;
-    if ischar(src) || isstring(src)
-        s = lower(char(src));
-        is_logo = contains(s, 'zeffiro') || contains(s, 'logo');
-    elseif isnumeric(src)
-        tag = '';
-        try
-            tag = lower(char(obj.Tag));
-        catch
-        end
-        is_logo = contains(tag, 'logo') || strcmp(tag, 'h_axes2');
-    end
-    if ~is_logo
-        try
-            obj.BackgroundColor = theme.color.bg;
-            obj.ScaleMethod = 'fit';
-        catch
-        end
-        return
-    end
-    orig = src;
-    try
-        setappdata(obj, 'ZefLogoOriginal', orig);
-    catch
-    end
-end
-img = [];
-try
-    if isnumeric(orig)
-        img = orig;
-    elseif (ischar(orig) || isstring(orig)) && strlength(orig) > 0
-        img = imread(char(orig));
-    end
-catch
-    return
-end
-if isempty(img) || ndims(img) < 2
-    return
-end
-try
-    img = im2uint8(img);
-catch
-    return
-end
-bg = reshape(double(theme.color.bg(1:3)) * 255, 1, 1, 3);
-ink = reshape(double(theme.color.text(1:3)) * 255, 1, 1, 3);
-rgb = double(img(:, :, 1:min(3, size(img, 3))));
-if size(rgb, 3) == 1
-    rgb = repmat(rgb, 1, 1, 3);
-end
-alpha = [];
-if size(img, 3) >= 4
-    alpha = double(img(:, :, 4)) / 255;
-end
-mx = max(rgb, [], 3);
-mn = min(rgb, [], 3);
-lum = mean(rgb, 3);
-sat = mx - mn;
-if isempty(alpha)
-    % Compass / wordmark assets ship on a solid black (or white) plate.
-    keyed = (lum < 22 & sat < 28) | (lum > 242 & sat < 18);
-    alpha = double(~keyed);
-end
-gray_ink = sat < 28 & lum >= 40 & lum <= 210;
-for k = 1:3
-    ch = rgb(:, :, k);
-    ch(gray_ink) = ink(k);
-    rgb(:, :, k) = ch;
-end
-out = rgb .* alpha + bg .* (1 - alpha);
-try
-    obj.ImageSource = uint8(max(0, min(255, round(out))));
-    obj.BackgroundColor = theme.color.bg;
-    obj.ScaleMethod = 'fit';
-    obj.HorizontalAlignment = 'center';
-    obj.VerticalAlignment = 'center';
-catch
-end
+zef_ui_blend_logo(obj, theme);
 
 end
 

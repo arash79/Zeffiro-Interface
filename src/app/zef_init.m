@@ -77,6 +77,8 @@ zef_data.lock_transforms_on = 0;
 zef_data.lock_sensor_sets_on = 0;
 zef_data.sensors_visual_size = 3.5;
 zef_data.project_notes = '';
+% Project-format stamp for load migrations, not the user-facing product name
+% (Zeffiro Interface V2).
 zef_data.current_version = 6.0;
 zef_data.font_size = zef.font_size;
 zef_data.matlab_release = version('-release');

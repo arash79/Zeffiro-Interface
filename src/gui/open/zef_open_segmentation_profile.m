@@ -14,7 +14,7 @@
 zef_data = zef_segmentation_profile;
 zef_assign_data;
 
-zef.h_segmentation_profile_table.Data = readcell([zef.program_path '/profile/' zef.profile_name '/zeffiro_segmentation.ini'],'filetype','text','delimiter',',');
+zef.h_segmentation_profile_table.Data = zef_read_profile_cell([zef.program_path '/profile/' zef.profile_name '/zeffiro_segmentation.ini']);
 
 set(zef.h_segmentation_profile_table,'CellSelectionCallback',@zef_segmentation_profile_table_selection);
 

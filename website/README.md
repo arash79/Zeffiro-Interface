@@ -16,4 +16,4 @@ Production build (`npm run build`) writes `website/dist/`, including `docs.html`
 
 A plain `python3 -m http.server` from this folder can serve the HTML, but module scripts and the Docs viewer expect the Vite dev server or the production `dist/` output.
 
-Hero and feature images in `assets/img/` are project-rendered illustrations of Zeffiro workflows, not third-party stock. Docs, GitHub, Discussions, Issues, license, examples, and wiki tutorial links point at the official `sampsapursiainen/zeffiro_interface` project. Worked MATLAB examples in this tree live under [`+examples/`](../+examples/).
+Hero, pipeline, method, and feature images in `assets/img/` are original illustrations produced for this site, not MATLAB GUI screenshots and not third-party stock. The page typeface is Inter, loaded from Google Fonts (SIL OFL 1.1; see [`THIRD_PARTY.md`](../THIRD_PARTY.md)). Docs, GitHub, Discussions, Issues, license, examples, and wiki tutorial links point at the official `sampsapursiainen/zeffiro_interface` project. Worked MATLAB examples in this tree live under [`+examples/`](../+examples/).

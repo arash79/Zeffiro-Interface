@@ -510,14 +510,15 @@ classdef WaitbarTest < matlab.unittest.TestCase
                 old_zef = evalin('base', 'zef');
             end
             testCase.addTeardown(@() local_restore_zef(had_zef, old_zef));
-            assignin('base', 'zef', struct('ui_color_mode', 'dark', 'font_size', 12));
+            assignin('base', 'zef', struct('font_size', 12));
             h = zef_waitbar(0.4, 'Theming.');
             testCase.addTeardown(@() local_delete(h));
+            h.Color = [1 0 0];
             zef_waitbar('theme');
-            dark = zef_ui_theme();
-            testCase.verifyEqual(h.Color, dark.color.bg, 'AbsTol', 1e-6);
+            theme = zef_ui_theme();
+            testCase.verifyEqual(h.Color, theme.color.bg, 'AbsTol', 1e-6);
             msg = findall(h, 'Tag', 'progress_bar_text');
-            testCase.verifyEqual(msg.FontColor, dark.color.text, 'AbsTol', 1e-6);
+            testCase.verifyEqual(msg.FontColor, theme.color.text, 'AbsTol', 1e-6);
         end
 
     end

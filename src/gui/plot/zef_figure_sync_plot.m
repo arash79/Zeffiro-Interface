@@ -78,6 +78,10 @@ if ~isempty(ax) && isvalid(ax(1))
         setappdata(ax(1), 'ZefHasVolumePlot', true);
     catch
     end
+    try
+        zef_figure_interact(h_fig, 'reapply');
+    catch
+    end
 end
 
 end

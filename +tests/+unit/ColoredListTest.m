@@ -243,6 +243,20 @@ classdef ColoredListTest < matlab.unittest.TestCase
             testCase.verifyFalse(ud.ShowSwatches);
         end
 
+        function showChecksStoresFlagWithoutReplacingNames(testCase)
+            f = testCase.newFigure();
+            h = zef_colored_list('create', f, [0.1 0.1 0.8 0.8], 'chk', ...
+                'Backend', 'uihtml', 'ShowChecks', true, 'ShowSwatches', false);
+            zef_colored_list('set', h, {'Electrodes 1', 'Electrodes 2'}, []);
+            ud = h.UserData;
+            testCase.verifyTrue(logical(ud.ShowChecks));
+            testCase.verifyFalse(logical(ud.ShowSwatches));
+            names = tests.unit.ColoredListTest.listNames(h);
+            testCase.verifyEqual(names(:), ["Electrodes 1"; "Electrodes 2"]);
+            zef_colored_list('value', h, 1);
+            testCase.verifyEqual(zef_colored_list('value', h), 1);
+        end
+
     end
 
 end

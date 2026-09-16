@@ -20,7 +20,8 @@ end
 names = fieldnames(zef);
 for i = 1:numel(names)
     obj = zef.(names{i});
-    if isempty(obj) || ~isscalar(obj)
+    if isempty(obj) || ~isscalar(obj) || isnumeric(obj) || ischar(obj) ...
+            || iscell(obj) || islogical(obj) || isstruct(obj) || isstring(obj)
         continue
     end
     try

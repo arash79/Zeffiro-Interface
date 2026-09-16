@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none" role="img">
+
+<defs>
+  <linearGradient id="tealGrad" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#0F8F90"/>
+    <stop offset="1" stop-color="#28B8B8"/>
+  </linearGradient>
+  <linearGradient id="darkGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#2F424C"/>
+    <stop offset="1" stop-color="#73848B"/>
+  </linearGradient>
+  <linearGradient id="cubeTop" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#138D8D"/>
+    <stop offset="1" stop-color="#37BBB6"/>
+  </linearGradient>
+  <radialGradient id="dotGrad" cx="35%" cy="28%" r="75%">
+    <stop offset="0" stop-color="#22C0BC"/>
+    <stop offset="0.62" stop-color="#119594"/>
+    <stop offset="1" stop-color="#087476"/>
+  </radialGradient>
+</defs>
+<path d="M34 45C44 30 61 23 78 27C96 31 108 46 108 64C108 84 92 100 72 100C55 100 42 91 35 79" stroke="#3B4D57" stroke-width="7" stroke-linecap="round"/>
+<path d="M38 28L30 49L51 42" stroke="url(#tealGrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -10,16 +10,17 @@ Shared **window chrome**: theme tokens, layout, docking, themed controls, and fi
 
 | File | Role |
 |------|------|
-| `zef_ui_theme.m` | Color/font/spacing tokens. Light default; `zef.ui_color_mode = 'dark'` selects dark. Font size is at least 11 px even when the INI still says 8. |
+| `zef_ui_theme.m` | Canonical color/font/spacing tokens (light visual system). Font size is at least 11 px even when the INI still says 8. |
 | `zef_ui_apply_theme.m` | Paint a figure and its controls from tokens. Axes, images, colorbars, legends, and `uihtml` lists are left alone. |
-| `zef_ui_broadcast_theme.m` | Restyle every open Zeffiro window after the shell Theme control changes. |
-| `zef_ui_icons.m` | Themed PNG CData from `assets/fig/ui` via `which('zeffiro_interface')`. `zef_ui_icons('folder')` returns the icon directory. |
+| `zef_ui_broadcast_theme.m` | Restyle every open Zeffiro window from the current tokens. |
+| `zef_ui_icons.m` | Themed CData rasterized from `assets/fig/ui/*.svg` via `which('zeffiro_interface')`. `zef_ui_icons('folder')` returns the icon directory. |
+| `zef_ui_blend_logo.m` | Composite compass / wordmark PNGs onto the widget background so `uiimage` does not paint transparency as black. |
 
 ### Shell, layout dispatch, polish
 
 | File | Role |
 |------|------|
-| `zef_ui_shell.m` | Unified main-window chrome (figure tool hosts the application shell). |
+| `zef_ui_shell.m` | Unified main-window chrome (figure tool hosts the application shell). Nav flyouts hide the figure toolbar and `figure_view` while open so traditional-figure OpenGL axes and toolbar uicontrols cannot paint through the menu. Left-nav hover is one `WindowMouseMotion` listener that matches figure-relative hit maps against the pointer so the entire `zef_nav_row_*` container highlights. Each row's ONLY painted layer is a create-once chip axes (`zef_ui_roundrect` image + composited icon glyph + a transparent text object for the label); the label/icon/hit uicontrols stay hidden and exist only for tags, Strings, and callbacks, so no second square background can stack over the rounded chip. Clicks are owned solely by the figure-level `WindowButtonDownFcn` hit-map path (row/flyout panels carry no `ButtonDownFcn`; a panel callback would fire a second time per press and toggle the flyout shut). A small exit-guard timer runs only while a hover is active on a visible figure: it clears the highlight when the pointer leaves the window and re-derives the hovered row from the pointer at ~8 Hz so dropped/coalesced motion events cannot leave stale or stuck highlights. |
 | `zef_ui_is_unified.m` | True when a figure hosts that shell. |
 | `zef_ui_ready.m` | After a tool/dialog is built: pick layout by `Name`/`Tag`, then theme + polish. Waitbars (`progress_bar`) and the hidden Menu tool skip generic min-size inflate. |
 | `zef_ui_ready_new_windows.m` | Plugin callback suffix: apply `zef_ui_ready` to newly created figures. |
@@ -31,7 +32,8 @@ Shared **window chrome**: theme tokens, layout, docking, themed controls, and fi
 | `zef_ui_hide_orphans.m` | Hide leftover App Designer widgets after a grid rebuild. |
 | `zef_ui_adapt_grid.m` | Tune grid proportions from the current window size. |
 | `zef_ui_fit_dropdowns.m` / `zef_ui_fit_table.m` | Widen dropdowns / size table columns so text stays readable. |
-| `zef_ui_interact.m` | Pointer, hover, and press feedback for traditional chrome. |
+| `zef_ui_interact.m` | Pointer, hover, and press feedback for traditional chrome. Rounded `CData` buttons get a tinted fill; icon-only chrome (Figure toolbar) keeps its glyph and only changes `BackgroundColor`. On the unified shell this is driven by `zef_ui_shell`, which does not install a second motion listener. |
+| `zef_figure_interact.m` | Figure-tool camera, measure, and annotate manager. On R2025a+ uifigures native axes Interactions do not enable, so rotate/pan/zoom use a custom motion path. |
 | `zef_ui_window_label.m` | Window title helper for themed tools. |
 | `zef_ui_tag_handles.m` | Tag widget handles after App export merge. |
 | `zef_ui_ensure_visible.m` | Grow a figure when controls overflow the client area (capped to the screen). Not a work-area clamp; that is `zef_ui_clamp_position`. |
@@ -74,7 +76,7 @@ Shared **window chrome**: theme tokens, layout, docking, themed controls, and fi
 | File | Role |
 |------|------|
 | `zef_colored_list.m` | Named list with per-row color swatches (HTML pre-R2025a; `uihtml` from R2025a). |
-| `zef_ui_card.m` / `zef_ui_card_corners.m` / `zef_ui_roundrect.m` / `zef_ui_round_button.m` | Card / rounded-rect chrome. |
+| `zef_ui_card.m` / `zef_ui_card_corners.m` / `zef_ui_roundrect.m` / `zef_ui_round_button.m` | Card / rounded-rect chrome. Nav, sidebar, lists, and the Figure workspace use an axes image layer (`zef_ui_card`), not pushbutton CData. Figure tabs / toolbar / `figure_view` are children of `zef_shell_card` inset by `cardRadius`. `zef_ui_card_corners` only deletes obsolete 12 px overlay widgets that rendered as four corner rectangles on uifigures. |
 | `zef_ui_control.m` / `zef_ui_find.m` / `zef_ui_axes.m` | Find tagged controls / axes after sidebar reparenting and `cla('reset')`. |
 | `zef_assign_data.m` | Copy every field of an App-export struct onto `zef`. |
 | `zef_fig_num.m` | Next unused Figure-tool `ZefFig` index. |
@@ -88,7 +90,7 @@ Shared **window chrome**: theme tokens, layout, docking, themed controls, and fi
 
 **Theme pipeline:** `zef_ui_theme(zef)` → tokens → `zef_ui_apply_theme` / layout functions. `zef_ui_ready(h)` selects layout by figure `Tag` / name.
 
-**Icons:** `zef_ui_icons` resolves PNGs from `assets/fig/ui` using `which('zeffiro_interface')` (not a hard-coded parent-folder count).
+**Icons:** `zef_ui_icons` rasterizes SVGs from `assets/fig/ui` using `which('zeffiro_interface')` (not a hard-coded parent-folder count).
 
 **Window manager:** R2025a+ standalone/dock adapter. `zeffiro_interface` adds this folder early so `zef_close_all` can call `zef_window_manager('restore')` on restart.
 
@@ -118,14 +120,14 @@ zef_window_manager('init');    % standalone figures (R2025a+ factory is docked)
 ## Important notes
 
 - R2025a+ `figure` defaults to `WindowStyle='docked'`. Setting `'docked'` **after** `Position` re-tabs the window so tools look like they vanished. Always go through `zef_window_manager('standalone', h)` (or `'init'` at session start). `zeffiro_interface` adds this folder early so restart can `zef_window_manager('restore')`.
-- `zef_ui_theme`: light is default; `zef.ui_color_mode = 'dark'` selects the dark palette. Font size is **at least 11 px** even when the INI still says 8.
-- Icons: `zef_ui_icons` loads PNGs from `assets/fig/ui` via `which('zeffiro_interface')` (not a hard-coded `fileparts` count). SVGs in `assets/fig/ui/Zeffiro_Modern_Icons/` are not runtime.
-- `zef_colored_list` has HTML / `uihtml` backends; `tests.unit.ColoredListTest` and `tests.unit.UiThemeTest` cover tokens and lists. `tests.smoke.WindowManagementTest` covers docking.
+- `zef_ui_theme`: one canonical light visual system. Legacy `zef.ui_color_mode` is ignored. Font size is **at least 11 px** even when the INI still says 8.
+- Icons: `zef_ui_icons` rasterizes SVGs from `assets/fig/ui` via `which('zeffiro_interface')` (not a hard-coded `fileparts` count).
+- `zef_colored_list` has HTML / `uihtml` backends; `tests.unit.ColoredListTest`, `tests.unit.UiThemeTest`, `tests.unit.UiIconsTest`, `tests.unit.FigureViewContainmentTest`, and `tests.unit.FigureToolControllersTest` cover tokens, lists, SVG icons, and Figure-tool controllers. `tests.smoke.WindowManagementTest` covers docking.
 - Layout functions match **window title strings**. Renaming a tool in App Designer without updating `zef_ui_ready` falls through to `zef_layout_guide_window`.
 
 ## Developer guidance
 
 - New shared UI primitive: add here only if two or more tools need it.
 - New tool window: implement `zef_layout_<tool>` and register it in `zef_ui_ready`.
-- New toolbar icons: PNG under `assets/fig/ui/` (+ SVG master) and call `zef_ui_icons`.
+- New toolbar icons: SVG under `assets/fig/ui/` and call `zef_ui_icons`.
 - Do **not** put FEM, interpolation, or inverse math in this folder.

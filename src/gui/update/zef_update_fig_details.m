@@ -117,6 +117,12 @@ end
 
 if isfield(zef, 'h_system_information') && isvalid(zef.h_system_information)
     zef_colored_list('set', zef.h_system_information, zef.aux_field, []);
+    try
+        if local_in_figure_lists(zef.h_system_information)
+            local_hide_system_information_handle(zef.h_system_information);
+        end
+    catch
+    end
 end
 
 try
@@ -132,21 +138,11 @@ try
         end
         cc = findall(h_fig, 'Tag', 'status_compartments_count');
         if ~isempty(cc) && isvalid(cc(1))
-            set(cc(1), 'String', num2str(n_compartments));
-            if unified && n_compartments > 0
-                set(cc(1), 'Visible', 'off');
-            else
-                set(cc(1), 'Visible', 'on');
-            end
+            set(cc(1), 'String', num2str(n_compartments), 'Visible', 'on');
         end
         sc = findall(h_fig, 'Tag', 'status_sensors_count');
         if ~isempty(sc) && isvalid(sc(1))
-            set(sc(1), 'String', num2str(n_sensors));
-            if unified && n_sensors > 0
-                set(sc(1), 'Visible', 'off');
-            else
-                set(sc(1), 'Visible', 'on');
-            end
+            set(sc(1), 'String', num2str(n_sensors), 'Visible', 'on');
         end
         icc = findall(h_fig, 'Tag', 'status_comp_icon');
         if ~isempty(icc) && isvalid(icc(1))
@@ -165,32 +161,37 @@ try
             set(rd(1), 'String', 'Ready', 'Visible', 'on');
         end
         dt = findall(h_fig, 'Tag', 'status_details_text');
+        vis = '-';
+        if isfield(zef, 'on_screen')
+            if zef.on_screen == 1
+                vis = 'Volume';
+            elseif zef.on_screen == 2
+                vis = 'Surfaces';
+            end
+        end
+        scn = 'Linear';
+        if isfield(zef, 'inv_scale')
+            if zef.inv_scale == 1
+                scn = 'Logarithmic';
+            elseif zef.inv_scale == 3
+                scn = 'Square root';
+            end
+        end
+        detail_rows = { ...
+            sprintf('Nodes: %s', local_group_int(local_count_rows(zef, 'nodes'))); ...
+            sprintf('Tetrahedra: %s', local_group_int(local_count_rows(zef, 'tetra'))); ...
+            sprintf('Visualization: %s', vis); ...
+            sprintf('Scale: %s', scn)};
         if ~isempty(dt) && isvalid(dt(1))
-            if ~unified
-                set(dt(1), 'Visible', 'off');
-            else
-            vis = '-';
-            if isfield(zef, 'on_screen')
-                if zef.on_screen == 1
-                    vis = 'Volume';
-                elseif zef.on_screen == 2
-                    vis = 'Surfaces';
-                end
+            set(dt(1), 'String', detail_rows, 'Visible', 'off');
+            try
+                dt(1).Position = [1, 1, 1, 1];
+            catch
             end
-            scn = 'Linear';
-            if isfield(zef, 'inv_scale')
-                if zef.inv_scale == 1
-                    scn = 'Logarithmic';
-                elseif zef.inv_scale == 3
-                    scn = 'Square root';
-                end
-            end
-            set(dt(1), 'String', { ...
-                sprintf('Nodes: %d', local_count_rows(zef, 'nodes')); ...
-                sprintf('Tetrahedra: %d', local_count_rows(zef, 'tetra')); ...
-                sprintf('Visualization: %s', vis); ...
-                sprintf('Scale: %s', scn)}, 'Visible', 'on');
-            end
+        end
+        if unified || ~isempty(dt)
+            local_hide_system_information(h_fig);
+            local_sync_detail_rows(h_fig, detail_rows);
         end
         local_show_status_lists(h_fig, n_compartments, n_sensors);
     end
@@ -203,6 +204,98 @@ end
 
 if nargout == 0
     assignin('base','zef',zef);
+end
+
+end
+
+function tf = local_in_figure_lists(h)
+
+tf = false;
+p = h;
+for k = 1:8
+    if isempty(p) || ~isgraphics(p) || ~isvalid(p)
+        return
+    end
+    try
+        if isprop(p, 'Tag') && strcmp(char(p.Tag), 'figure_lists')
+            tf = true;
+            return
+        end
+    catch
+    end
+    try
+        p = p.Parent;
+    catch
+        return
+    end
+end
+
+end
+
+function local_hide_system_information(h_fig)
+
+lst = findall(h_fig, 'Tag', 'system_information');
+if isempty(lst) || ~isvalid(lst(1))
+    return
+end
+local_hide_system_information_handle(lst(1));
+
+end
+
+function local_hide_system_information_handle(lst)
+
+if isempty(lst) || ~isvalid(lst)
+    return
+end
+try
+    lst.Visible = 'off';
+catch
+end
+try
+    p = lst.Parent;
+    if isgraphics(p) && isvalid(p) && isprop(p, 'Tag')
+        ptag = char(p.Tag);
+        if contains(ptag, 'system_information') || strcmpi(char(p.Type), 'uipanel')
+            if ~strcmp(char(p.Tag), 'figure_lists')
+                p.Visible = 'off';
+            end
+        end
+    end
+catch
+end
+
+end
+
+function local_sync_detail_rows(h_fig, rows)
+
+if ~iscell(rows)
+    rows = cellstr(string(rows));
+end
+for i = 1:4
+    lab = findall(h_fig, 'Tag', sprintf('status_dlab_%d', i));
+    val = findall(h_fig, 'Tag', sprintf('status_dval_%d', i));
+    if isempty(lab) || isempty(val)
+        continue
+    end
+    s = '';
+    if i <= numel(rows)
+        s = strtrim(char(string(rows{i})));
+    end
+    k = find(s == ':', 1, 'first');
+    if isempty(k)
+        lab_s = s;
+        val_s = '';
+    else
+        lab_s = strtrim(s(1:k-1));
+        val_s = strtrim(s(k+1:end));
+    end
+    try
+        lab(1).String = lab_s;
+        lab(1).Visible = 'on';
+        val(1).String = val_s;
+        val(1).Visible = 'on';
+    catch
+    end
 end
 
 end
@@ -246,6 +339,32 @@ for i = 1:size(pairs, 1)
     catch
     end
 end
+
+end
+
+function s = local_group_int(n)
+
+s = '0';
+try
+    n = round(double(n(1)));
+catch
+    return
+end
+if ~isfinite(n)
+    return
+end
+sign_c = '';
+if n < 0
+    sign_c = '-';
+    n = -n;
+end
+s = sprintf('%d', n);
+out = '';
+while numel(s) > 3
+    out = [',' s(end-2:end) out]; %#ok<AGROW>
+    s = s(1:end-3);
+end
+s = [sign_c s out];
 
 end
 

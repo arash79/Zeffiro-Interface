@@ -101,8 +101,8 @@ Forbidden (still true as a rule; some legacy scripts still `evalin('base','zef')
 
 | Directory | Responsibility | Allowed deps | Forbidden deps | Public entry | Extension |
 |-----------|----------------|--------------|----------------|--------------|-----------|
-| `src/app` | Session start/close/update, waitbar, plugin INI | profile, chrome (window restore) | solvers | `zef_start`, `zef_update`, `zef_close_all` | Defaults in `zef_init` + profile INI |
-| `src/gui/chrome` | Theme, layout, docking | `zef` theme fields, assets | FEM/inverse math | `zef_ui_theme`, `zef_window_manager` | `zef_layout_*` + `zef_ui_ready` |
+| `src/app` | Session start/close/update, waitbar, plugin INI | profile, chrome (window restore) | solvers | `zef_start`, `zef_update`, `zef_close_all`, `zef_read_profile_cell` | Defaults in `zef_init` + profile INI |
+| `src/gui/chrome` | Theme, layout, docking | `zef` theme fields, assets | FEM/inverse math | `zef_ui_theme`, `zef_window_manager`, `zef_ui_icons`, `zef_figure_interact` | `zef_layout_*` + `zef_ui_ready` |
 | `src/gui/tools` | Create tool windows | chrome, callbacks | New numerical solvers | `zef_segmentation_tool`, … | App Designer export + wrapper |
 | `src/mesh` | Tetrahedral mesh | compartments, waitbar | GUI chrome | `zef_create_finite_element_mesh`, `zef_create_fem_mesh` | Mesh-tool pipeline functions |
 | `src/forward` | `zef.L` and related physics | mesh, sensors, `core.types` | Inverse classes, chrome | `zef_lead_field_matrix` | New `lead_field_type` + FEM file |

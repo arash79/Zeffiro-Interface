@@ -30,7 +30,7 @@ end
 
 data_mode = string(zef.inv_data_mode);
 
-if data_mode == "filtered_temporal" %what is this???
+if data_mode == "filtered_temporal"
 
     f = eval('zef.measurements');
     

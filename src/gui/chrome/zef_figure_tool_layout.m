@@ -1,4 +1,4 @@
-function zef_figure_tool_layout(h_fig)
+function zef_figure_tool_layout(h_fig, mode)
 %ZEF_FIGURE_TOOL_LAYOUT  Pixel layout for the Figure tool (design reference).
 %
 %   Zeffiro Interface.
@@ -14,6 +14,8 @@ function zef_figure_tool_layout(h_fig)
 %
 %   zef_figure_tool_layout
 %   zef_figure_tool_layout(h_fig)
+%   zef_figure_tool_layout(h_fig, 'defer')
+%   zef_figure_tool_layout(h_fig, 'sizechange')  % no-op if size unchanged
 %
 %   See also zef_figure_tool, zef_toggle_figure_controls.
 
@@ -27,6 +29,24 @@ end
 if isempty(h_fig) || ~isgraphics(h_fig) || ~isvalid(h_fig)
     return
 end
+if nargin >= 2 && (ischar(mode) || isstring(mode)) && strcmpi(char(mode), 'defer')
+    local_defer_layout(h_fig);
+    return
+end
+if nargin >= 2 && (ischar(mode) || isstring(mode)) && strcmpi(char(mode), 'sizechange')
+    try
+        orig = h_fig.Units;
+        h_fig.Units = 'pixels';
+        sz = round(h_fig.Position(3:4));
+        h_fig.Units = orig;
+        prev = getappdata(h_fig, 'ZefLaidSize');
+        if ~isempty(prev) && isequal(prev, sz)
+            return
+        end
+        setappdata(h_fig, 'ZefLaidSize', sz);
+    catch
+    end
+end
 
 if isappdata(h_fig, 'ZefLayoutBusy') && isequal(getappdata(h_fig, 'ZefLayoutBusy'), true)
     return
@@ -38,6 +58,60 @@ try
 catch
 end
 setappdata(h_fig, 'ZefLayoutBusy', false);
+
+try
+    orig = h_fig.Units;
+    h_fig.Units = 'pixels';
+    setappdata(h_fig, 'ZefLaidSize', round(h_fig.Position(3:4)));
+    h_fig.Units = orig;
+catch
+end
+
+end
+
+function local_defer_layout(h_fig)
+
+try
+    t = getappdata(h_fig, 'ZefLayoutTimer');
+    if isempty(t) || ~isvalid(t)
+        t = timer('Name', 'ZefFigureLayout', 'ExecutionMode', 'singleShot', ...
+            'StartDelay', 0.04, 'TimerFcn', @(~, ~) local_deferred_fire(h_fig));
+        setappdata(h_fig, 'ZefLayoutTimer', t);
+        try
+            addlistener(h_fig, 'ObjectBeingDestroyed', @(s, ~) local_kill_layout_timer(s));
+        catch
+        end
+    else
+        try
+            stop(t);
+        catch
+        end
+    end
+    start(t);
+catch
+    zef_figure_tool_layout(h_fig);
+end
+
+end
+
+function local_deferred_fire(h_fig)
+
+if isgraphics(h_fig) && isvalid(h_fig)
+    zef_figure_tool_layout(h_fig, 'sizechange');
+end
+
+end
+
+function local_kill_layout_timer(h_fig)
+
+try
+    t = getappdata(h_fig, 'ZefLayoutTimer');
+    if ~isempty(t) && isvalid(t)
+        stop(t);
+        delete(t);
+    end
+catch
+end
 
 end
 
@@ -66,10 +140,7 @@ lists = zef_ui_find(h_fig, 'figure_lists');
 ax = zef_ui_find(h_fig, 'axes1');
 tgb = zef_ui_find(h_fig, 'togglecontrolsbutton');
 
-sidebar_on = true;
-if ~isempty(tgb) && isprop(tgb, 'UserData') && isequal(tgb.UserData, 2)
-    sidebar_on = false;
-end
+sidebar_on = local_controls_on(h_fig, tgb);
 
 if ~isempty(sidebar) && isvalid(sidebar)
     sidebar.Units = 'pixels';
@@ -164,6 +235,14 @@ if ~isempty(ax) && isvalid(ax)
     ax.Units = 'pixels';
     slot = [axes_x, content_bottom, axes_w, axes_h];
     view = local_ensure_figure_view(h_fig, theme);
+    if shell
+        work = zef_ui_find(h_fig, 'zef_shell_card');
+        if ~isempty(work) && isvalid(work) && ~isempty(view) && isvalid(view)
+            [slot, axes_x, content_bottom, axes_w, axes_h] = ...
+                local_workspace_view_slot(work, view, theme);
+            content_h = axes_h;
+        end
+    end
     if ~isempty(view) && isvalid(view)
         view.Units = 'pixels';
         local_set_pos(view, slot);
@@ -204,7 +283,7 @@ if ~isempty(lists) && isvalid(lists)
         catch
         end
         try
-            zef_ui_card(lists, theme);
+            zef_ui_card(lists, theme, 16);
         catch
         end
         copy = zef_ui_find(lists, 'copyright_text');
@@ -219,9 +298,33 @@ end
 
 if sidebar_on && ~isempty(sidebar) && isvalid(sidebar)
     if shell
-    sidebar_h = max(180, H - theme.space.headerH - theme.space.footerH ...
-        - theme.space.headerGap - theme.space.cardGap);
-    local_set_pos(sidebar, [sidebar_x, theme.space.footerH + theme.space.cardGap, sidebar_w, sidebar_h]);
+        sidebar_y = theme.space.footerH + theme.space.cardGap;
+        header_h = theme.space.headerH;
+        top_gap = theme.space.headerGap;
+        try
+            if isappdata(h_fig, 'ZefShellHeaderH')
+                header_h = getappdata(h_fig, 'ZefShellHeaderH');
+            end
+            if isappdata(h_fig, 'ZefShellHeaderGap')
+                top_gap = getappdata(h_fig, 'ZefShellHeaderGap');
+            end
+        catch
+        end
+        sidebar_h = max(180, H - header_h - theme.space.footerH ...
+            - top_gap - theme.space.cardGap);
+        nav = zef_ui_find(h_fig, 'zef_shell_nav');
+        if ~isempty(nav) && isvalid(nav)
+            try
+                nav.Units = 'pixels';
+                np = double(nav.Position);
+                if numel(np) >= 4 && np(4) > 1
+                    sidebar_y = np(2);
+                    sidebar_h = max(180, np(4));
+                end
+            catch
+            end
+        end
+        local_set_pos(sidebar, [sidebar_x, sidebar_y, sidebar_w, sidebar_h]);
         try
             zef_ui_card(sidebar, theme);
         catch
@@ -236,22 +339,17 @@ if sidebar_on && ~isempty(sidebar) && isvalid(sidebar)
         sidebar.Scrollable = 'off';
     catch
     end
-    local_layout_sidebar(sidebar, theme, btn_h, pad, gap);
-    if shell
-        local_round_sidebar_buttons(sidebar, theme);
+    try
+        local_layout_sidebar(sidebar, theme, btn_h, pad, gap);
+        if shell
+            local_round_sidebar_buttons(sidebar, theme);
+        end
+    catch
     end
 end
 
-if ~isempty(tgb) && isvalid(tgb)
-    tgb.Units = 'pixels';
-    if sidebar_on && ~isempty(sidebar) && isvalid(sidebar)
-        tgb.Parent = sidebar;
-    else
-        tgb.Parent = h_fig;
-        tgb.Visible = 'on';
-        tgb.Position = [cx + cw - pad - 128, cy + ch - pad - btn_h, 128, btn_h];
-    end
-end
+local_place_persistent_toggle(h_fig, tgb, theme, sidebar_on, sidebar, ...
+    cx, cy, cw, ch, pad, btn_h, gap, shell);
 
 if shell
     local_place_gizmo(h_fig, theme, [axes_x, content_bottom, axes_w, axes_h]);
@@ -263,7 +361,7 @@ end
 
 function local_round_sidebar_buttons(panel, theme)
 
-tags = {'togglecontrolsbutton', 'toggleedgesbutton', 'resetbutton', ...
+tags = {'toggleedgesbutton', 'resetbutton', ...
     'playbutton', 'stopbutton', 'logobutton'};
 for i = 1:numel(tags)
     b = zef_ui_find(panel, tags{i});
@@ -272,6 +370,158 @@ for i = 1:numel(tags)
             zef_ui_round_button(b, theme);
         catch
         end
+    end
+end
+
+end
+
+function on = local_controls_on(h_fig, tgb)
+
+on = true;
+try
+    if isappdata(h_fig, 'ZefFigureControlsVisible')
+        v = getappdata(h_fig, 'ZefFigureControlsVisible');
+        if ~isempty(v)
+            on = logical(v(1));
+            return
+        end
+    end
+catch
+end
+if ~isempty(tgb) && isvalid(tgb) && isprop(tgb, 'UserData') && isequal(tgb.UserData, 2)
+    on = false;
+end
+
+end
+
+function local_place_persistent_toggle(h_fig, tgb, theme, sidebar_on, sidebar, ...
+    cx, cy, cw, ch, pad, btn_h, gap, shell)
+
+if isempty(tgb) || ~isvalid(tgb)
+    return
+end
+host = local_ensure_toggle_host(h_fig, theme);
+if isempty(host) || ~isvalid(host)
+    return
+end
+try
+    if ~isequal(tgb.Parent, host)
+        tgb.Parent = host;
+    end
+catch
+end
+tgb.Units = 'pixels';
+tgb.Visible = 'on';
+tgb.Enable = 'on';
+try
+    lab = strtrim(char(tgb.String));
+catch
+    lab = '';
+end
+if isempty(lab)
+    try
+        lab = char(getappdata(tgb, 'ZefButtonLabel'));
+    catch
+        lab = '';
+    end
+end
+if isempty(strtrim(lab))
+    lab = 'Toggle controls';
+end
+try
+    setappdata(tgb, 'ZefButtonLabel', lab);
+    tgb.String = lab;
+catch
+end
+try
+    tgb.UserData = 1 + double(~sidebar_on);
+catch
+end
+
+th = max(22, round(btn_h));
+tw = 128;
+hx = cx + max(0, cw - pad - tw);
+hy = cy + max(0, ch - pad - th);
+if sidebar_on && ~isempty(sidebar) && isvalid(sidebar)
+    try
+        sidebar.Units = 'pixels';
+        sp = double(sidebar.Position);
+        inner_w = max(40, sp(3) - 2 * pad);
+        half = (inner_w - gap) / 2;
+        tw = max(72, round(half));
+        hx = sp(1) + pad;
+        hy = sp(2) + sp(4) - pad - th;
+    catch
+    end
+end
+try
+    host.Units = 'pixels';
+    host.Visible = 'on';
+    host.Position = [round(hx), round(hy), round(tw), round(th)];
+catch
+end
+tgb.Position = [0, 0, round(tw), round(th)];
+local_reclaim_toggle_caption(h_fig, host);
+if shell
+    try
+        zef_ui_round_button(tgb, theme);
+    catch
+    end
+end
+local_stack_once(host, 'ZefStacked');
+cap = findall(host, 'Tag', 'togglecontrolsbutton_cap');
+if ~isempty(cap) && isvalid(cap(1))
+    cap(1).Visible = 'on';
+    local_stack_once(cap(1), 'ZefStacked');
+end
+sl = zef_ui_find(h_fig, 'zef_tool_sliders');
+if ~isempty(sl) && isvalid(sl)
+    try
+        sl.UserData = double(~sidebar_on);
+    catch
+    end
+end
+
+end
+
+function host = local_ensure_toggle_host(h_fig, theme)
+
+host = zef_ui_find(h_fig, 'figure_toggle_host');
+if ~isempty(host) && isvalid(host)
+    try
+        host.BackgroundColor = theme.color.panel;
+    catch
+    end
+    return
+end
+host = uipanel('Parent', h_fig, 'Tag', 'figure_toggle_host', ...
+    'Units', 'pixels', 'BorderType', 'none', 'Title', '', ...
+    'BackgroundColor', theme.color.panel, 'Visible', 'on', ...
+    'AutoResizeChildren', 'off');
+try
+    host.Clipping = 'off';
+catch
+end
+try
+    host.HighlightColor = theme.color.panel;
+catch
+end
+
+end
+
+function local_reclaim_toggle_caption(h_fig, host)
+
+caps = findall(h_fig, 'Tag', 'togglecontrolsbutton_cap');
+for i = 1:numel(caps)
+    if ~isvalid(caps(i))
+        continue
+    end
+    if ~isempty(host) && isvalid(host) && isequal(caps(i).Parent, host)
+        continue
+    end
+    try
+        delete(caps(i));
+    catch
     end
 end
 
@@ -309,15 +559,6 @@ slider_gap = pack.slider_gap;
 
 y = top_y;
 half = (inner_w - gap) / 2;
-tgb = zef_ui_find(panel, 'togglecontrolsbutton');
-if isempty(tgb)
-    tgb = zef_ui_find(panel.Parent, 'togglecontrolsbutton');
-end
-if ~isempty(tgb) && isvalid(tgb)
-    tgb.Units = 'pixels';
-    tgb.Parent = panel;
-    tgb.Position = [round(x0), round(y), round(half), round(btn_h)];
-end
 edges = zef_ui_find(panel, 'toggleedgesbutton');
 if ~isempty(edges) && isvalid(edges)
     edges.Units = 'pixels';
@@ -813,47 +1054,46 @@ function local_layout_status_strip(panel, theme)
 
 panel.Units = 'pixels';
 p = panel.Position;
-pad = 12;
-gap = 8;
+pad = 10;
+header_h = 18;
+header_gap = 4;
 inner_w = max(80, p(3) - 2 * pad);
-inner_h = max(40, p(4) - 8);
 copy = zef_ui_find(panel, 'copyright_text');
 if ~isempty(copy) && isvalid(copy)
     copy.Visible = 'off';
 end
-n_comp = 0;
-n_sens = 0;
-try
-    cv0 = zef_ui_find(panel, 'status_compartments_count');
-    n_comp = str2double(char(string(cv0.String)));
-catch
+hide_tags = {'status_comp_icon', 'status_sens_icon'};
+for i = 1:numel(hide_tags)
+    hx = zef_ui_find(panel, hide_tags{i});
+    if ~isempty(hx) && isvalid(hx)
+        hx.Visible = 'off';
+    end
 end
-try
-    sv0 = zef_ui_find(panel, 'status_sensors_count');
-    n_sens = str2double(char(string(sv0.String)));
-catch
-end
-if (isfinite(n_comp) && n_comp > 0) || (isfinite(n_sens) && n_sens > 0)
-    weights = [0.34 0.26 0.40];
-else
-    weights = [0.20 0.20 0.60];
-end
-usable = max(80, inner_w - 2);
-x = pad;
-col_w = usable .* weights;
+
+weights = [0.34 0.31 0.35];
+col_w = inner_w .* weights;
+x0 = pad;
+label_y = max(pad, p(4) - pad - header_h);
+body_y = pad;
+body_h = max(24, label_y - header_gap - body_y);
 titles = {'Compartments', 'Sensors', 'Details'};
 labs = {'label_compartments', 'label_sensors', 'label_details'};
-icons = {'status_comp_icon', 'status_sens_icon', ''};
-icon_keys = {'cube', 'sensors', ''};
 counts = {'status_compartments_count', 'status_sensors_count', ''};
+badges = {'status_compartments_badge', 'status_sensors_badge', ''};
 lists = {'compartment_visible_color', 'sensor_visible_color', 'system_information'};
-header_h = 15;
-label_y = p(4) - 5 - header_h;
-body_y = pad;
-body_h = max(24, label_y - 2 - body_y);
+font_name = 'Helvetica Neue';
+try
+    font_name = theme.font.name;
+catch
+end
+badge_fill = theme.color.badge;
+badge_fg = theme.color.badgeText;
+ready_bg = theme.color.readyBg;
+ready_fg = theme.color.readyText;
+hair = theme.color.hairline;
+x = x0;
 for i = 1:3
     wcol = col_w(i);
-    cnt = [];
     lab = zef_ui_find(panel, labs{i});
     if ~isempty(lab) && isvalid(lab)
         lab.Units = 'pixels';
@@ -863,70 +1103,26 @@ for i = 1:3
         lab.FontWeight = 'bold';
         lab.ForegroundColor = theme.color.text;
         lab.BackgroundColor = theme.color.panel;
-        lab.Position = [x, label_y, wcol - 4, header_h];
         try
+            lab.FontName = font_name;
             lab.FontUnits = 'pixels';
-            lab.FontSize = 11;
+            lab.FontSize = 12;
         catch
         end
+        lab.Position = [x + 4, label_y, max(48, wcol - 8), header_h];
+        tw = 88;
+        try
+            ext = lab.Extent;
+            tw = min(wcol - 16, max(48, ceil(ext(3)) + 2));
+        catch
+        end
+        lab.Position = [x + 4, label_y, tw, header_h];
+    else
+        tw = 88;
     end
-    if ~isempty(icons{i})
-        ic = zef_ui_find(panel, icons{i});
-        if ~isempty(ic) && isvalid(ic)
-            ic.Units = 'pixels';
-            ic.Parent = panel;
-            ic.Visible = 'on';
-            ic.Enable = 'inactive';
-            ic.String = '';
-            ic.Position = [x, body_y + max(0, (body_h - 28) / 2), 28, 28];
-            ic.BackgroundColor = theme.color.panel;
-            try
-                ikey = [i, 28, 22];
-                prev = getappdata(ic, 'ZefStatusIconKey');
-                if ~isequal(prev, ikey)
-                    if i == 1
-                        boxc = zef_ui_roundrect(28, 28, 6, theme.color.panelAlt, ...
-                            theme.color.border, theme.color.panel);
-                        ink = zef_ui_icons(icon_keys{i}, 20, theme.color.text, theme.color.panelAlt);
-                        if ~isempty(ink)
-                            r0 = 4; c0 = 4;
-                            ih = min(20, size(ink, 1));
-                            iw = min(20, size(ink, 2));
-                            boxc(r0:r0 + ih - 1, c0:c0 + iw - 1, :) = ink(1:ih, 1:iw, :);
-                        end
-                        ic.CData = boxc;
-                    else
-                        ink = zef_ui_icons(icon_keys{i}, 22, theme.color.text, theme.color.panel);
-                        full = repmat(reshape(theme.color.panel, 1, 1, 3), 28, 28);
-                        if ~isempty(ink)
-                            r0 = 3; c0 = 3;
-                            ih = min(22, size(ink, 1));
-                            iw = min(22, size(ink, 2));
-                            full(r0:r0 + ih - 1, c0:c0 + iw - 1, :) = ink(1:ih, 1:iw, :);
-                        end
-                        ic.CData = full;
-                    end
-                    setappdata(ic, 'ZefStatusIconKey', ikey);
-                end
-            catch
-            end
-        end
-        cnt = zef_ui_find(panel, counts{i});
-        if ~isempty(cnt) && isvalid(cnt)
-            cnt.Units = 'pixels';
-            cnt.Parent = panel;
-            cnt.Visible = 'on';
-            cnt.HorizontalAlignment = 'left';
-            cnt.FontWeight = 'bold';
-            cnt.ForegroundColor = theme.color.text;
-            cnt.BackgroundColor = theme.color.panel;
-            cnt.Position = [x + 36, body_y + max(0, (body_h - 28) / 2), max(36, wcol - 42), 28];
-            try
-            cnt.FontUnits = 'pixels';
-            cnt.FontSize = 16;
-            catch
-            end
-        end
+    if ~isempty(counts{i})
+        local_place_count_badge(panel, theme, badges{i}, counts{i}, ...
+            x + 4 + tw + 6, label_y, header_h, badge_fill, badge_fg, font_name);
     end
     lst = zef_ui_find(panel, lists{i});
     if ~isempty(lst) && isvalid(lst)
@@ -942,43 +1138,32 @@ for i = 1:3
             if isprop(host, 'Units')
                 host.Units = 'pixels';
             end
-            host.Parent = panel;
-            n_items = 0;
             try
-                udl = lst.UserData;
-                if isstruct(udl) && isfield(udl, 'N')
-                    n_items = double(udl.N);
-                end
+                host.AutoResizeChildren = 'off';
             catch
             end
-            if ~(isfinite(n_items) && n_items > 0) && i < 3
-                try
-                    ctag = counts{i};
-                    cv = zef_ui_find(panel, ctag);
-                    n_items = str2double(char(string(cv.String)));
-                catch
-                end
-            end
+            host.Parent = panel;
             if i == 3
                 host.Visible = 'off';
-            elseif ~isempty(n_items) && n_items > 0
-                host.Visible = 'on';
-                host.Position = [x, body_y, max(40, wcol - 8), body_h];
-                local_fill_list_host(host);
-                if ~isempty(cnt) && isvalid(cnt)
-                    cnt.Visible = 'off';
+                try
+                    lst.Visible = 'off';
+                catch
                 end
-                if ~isempty(icons{i})
-                    ic2 = zef_ui_find(panel, icons{i});
-                    if ~isempty(ic2) && isvalid(ic2)
-                        ic2.Visible = 'off';
-                    end
-                end
-                if ~isempty(lab) && isvalid(lab)
-                    lab.String = sprintf('%s   %d', titles{i}, n_items);
+                try
+                    host.Position = [1, 1, 1, 1];
+                catch
                 end
             else
-                host.Visible = 'off';
+                if i == 2
+                    local_enable_sensor_checks(lst);
+                end
+                host.Visible = 'on';
+                host.Position = [x + 2, body_y, max(40, wcol - 10), body_h];
+                try
+                    host.BackgroundColor = theme.color.panel;
+                catch
+                end
+                local_fill_list_host(host);
             end
         catch
         end
@@ -989,36 +1174,24 @@ for i = 1:3
             sep.Units = 'pixels';
             sep.Parent = panel;
             sep.Visible = 'on';
-            sep.BackgroundColor = theme.color.border;
-            sep.Position = [x + wcol - 1, pad, 1, inner_h - 4];
+            sep.Enable = 'inactive';
+            sep.String = '';
+            sep.BackgroundColor = hair;
+            sep.Position = [round(x + wcol) - 1, body_y + 2, 1, max(8, body_h - 4)];
         end
     end
-    x = x + wcol + gap;
+    x = x + wcol;
 end
+
 dt = zef_ui_find(panel, 'status_details_text');
-if ~isempty(dt) && isvalid(dt)
-    dt.Units = 'pixels';
-    dt.Parent = panel;
-    dt.Visible = 'on';
-    dt.HorizontalAlignment = 'left';
-    dt.ForegroundColor = theme.color.text;
-    dt.BackgroundColor = theme.color.panel;
-    det_x = pad + col_w(1) + gap + col_w(2) + gap;
-    dt_h = min(body_h, 52);
-    dt.Position = [det_x, label_y - 2 - dt_h, max(80, col_w(3) - 110), dt_h];
-    try
-        dt.FontUnits = 'pixels';
-        dt.FontSize = 10;
-    catch
-    end
-end
-pill_w = 78;
-pill_h = 26;
+det_x = x0 + col_w(1) + col_w(2);
+local_place_detail_rows(panel, theme, dt, det_x, label_y - header_gap, ...
+    col_w(3), body_h, font_name, hair);
+
+pill_w = 62;
+pill_h = 18;
 pill_x = p(3) - pad - pill_w;
-pill_y = pad + max(0, (body_h - pill_h) / 2);
-if ~isempty(dt) && isvalid(dt)
-    pill_y = dt.Position(2) + max(0, dt.Position(4) - pill_h);
-end
+pill_y = label_y + max(0, round((header_h - pill_h) / 2));
 pill = zef_ui_find(panel, 'status_ready_pill');
 restack = false;
 if ~isempty(pill) && isvalid(pill)
@@ -1033,11 +1206,11 @@ if ~isempty(pill) && isvalid(pill)
     pill.BackgroundColor = theme.color.panel;
     pill.Position = [pill_x, pill_y, pill_w, pill_h];
     try
-        pkey = [pill_w, pill_h];
+        pkey = [pill_w, pill_h, round(ready_bg * 1000)];
         prev = getappdata(pill, 'ZefPillKey');
         if ~isequal(prev, pkey)
-            pill.CData = zef_ui_roundrect(pill_w, pill_h, max(8, round(pill_h / 2)), ...
-                theme.color.panelAlt, theme.color.border, theme.color.panel);
+            pill.CData = zef_ui_roundrect(pill_w, pill_h, round(pill_h / 2), ...
+                ready_bg, ready_bg, theme.color.panel);
             setappdata(pill, 'ZefPillKey', pkey);
         end
         pill.String = '';
@@ -1046,7 +1219,8 @@ if ~isempty(pill) && isvalid(pill)
 end
 dot = zef_ui_find(panel, 'status_ready_dot');
 rd = zef_ui_find(panel, 'status_ready');
-rx = pill_x + 10;
+rx = pill_x + 8;
+dsz = 7;
 if ~isempty(dot) && isvalid(dot)
     dot.Units = 'pixels';
     restack = local_adopt(dot, panel) || restack;
@@ -1057,14 +1231,14 @@ if ~isempty(dot) && isvalid(dot)
     catch
     end
     dot.String = '';
-    dot.BackgroundColor = theme.color.panelAlt;
-    dsz = 12;
+    dot.BackgroundColor = ready_bg;
     dot.Position = [rx, pill_y + max(0, (pill_h - dsz) / 2), dsz, dsz];
     try
+        dkey = [dsz, round(ready_bg * 1000)];
         prev = getappdata(dot, 'ZefDotKey');
-        if ~isequal(prev, dsz)
-            dot.CData = local_status_dot(dsz, theme.color.ready, theme.color.panelAlt);
-            setappdata(dot, 'ZefDotKey', dsz);
+        if ~isequal(prev, dkey)
+            dot.CData = local_status_dot(dsz, theme.color.ready, ready_bg);
+            setappdata(dot, 'ZefDotKey', dkey);
         end
     catch
         dot.BackgroundColor = theme.color.ready;
@@ -1077,13 +1251,14 @@ if ~isempty(rd) && isvalid(rd)
     rd.Visible = 'on';
     rd.String = 'Ready';
     rd.HorizontalAlignment = 'left';
-    rd.ForegroundColor = theme.color.textMuted;
-    rd.BackgroundColor = theme.color.panelAlt;
+    rd.ForegroundColor = ready_fg;
+    rd.BackgroundColor = ready_bg;
     rd.FontWeight = 'normal';
-    rd.Position = [rx, pill_y + max(0, (pill_h - 16) / 2), 50, 16];
+    rd.Position = [rx, pill_y + max(0, (pill_h - 14) / 2), 40, 14];
     try
+        rd.FontName = font_name;
         rd.FontUnits = 'pixels';
-        rd.FontSize = 11;
+        rd.FontSize = 10;
     catch
     end
 end
@@ -1098,13 +1273,220 @@ end
 
 end
 
+function local_place_count_badge(panel, theme, badge_tag, count_tag, x, y, header_h, fillc, fgc, font_name)
+
+cnt = zef_ui_find(panel, count_tag);
+if isempty(cnt) || ~isvalid(cnt)
+    return
+end
+cnt.Units = 'pixels';
+cnt.Parent = panel;
+cnt.Visible = 'on';
+cnt.HorizontalAlignment = 'center';
+cnt.FontWeight = 'normal';
+cnt.ForegroundColor = fgc;
+txt = strtrim(char(string(cnt.String)));
+if isempty(txt)
+    txt = '0';
+    cnt.String = txt;
+end
+nch = max(1, numel(txt));
+bw = max(22, 12 + nch * 6);
+bh = 16;
+by = y + max(0, round((header_h - bh) / 2));
+badge = local_ensure_ctrl(panel, badge_tag, 'pushbutton');
+badge.Visible = 'on';
+badge.Enable = 'inactive';
+badge.String = '';
+badge.BackgroundColor = theme.color.panel;
+badge.Position = [x, by, bw, bh];
+try
+    bkey = [bw, bh, round(fillc * 1000)];
+    prev = getappdata(badge, 'ZefBadgeKey');
+    if ~isequal(prev, bkey)
+        badge.CData = zef_ui_roundrect(bw, bh, round(bh / 2), fillc, fillc, theme.color.panel);
+        setappdata(badge, 'ZefBadgeKey', bkey);
+    end
+catch
+end
+cnt.BackgroundColor = fillc;
+cnt.Position = [x + 4, by + 2, max(16, bw - 8), max(12, bh - 4)];
+try
+    cnt.FontName = font_name;
+    cnt.FontUnits = 'pixels';
+    cnt.FontSize = 10;
+catch
+end
+local_stack_once(cnt, 'ZefStacked');
+
+end
+
+function local_place_detail_rows(panel, theme, dt, x, y_top, col_w, body_h, font_name, hair)
+
+rows = {'Nodes: 0'; 'Tetrahedra: 0'; 'Visualization: -'; 'Scale: Linear'};
+if ~isempty(dt) && isvalid(dt)
+    dt.Units = 'pixels';
+    dt.Parent = panel;
+    dt.Visible = 'off';
+    try
+        dt.Position = [1, 1, 1, 1];
+    catch
+    end
+    try
+        raw = dt.String;
+        if ischar(raw) || isstring(raw)
+            raw = cellstr(raw);
+        end
+        if iscell(raw) && ~isempty(raw)
+            rows = raw(:);
+        end
+    catch
+    end
+end
+n = min(4, numel(rows));
+row_h = max(16, min(20, floor(body_h / 4)));
+inner_x = x + 8;
+inner_w = max(48, col_w - 18);
+lab_w = round(inner_w * 0.46);
+val_w = inner_w - lab_w;
+text_h = min(14, row_h - 2);
+for i = 1:4
+    [lab_s, val_s] = local_split_kv(rows, i);
+    if i > n
+        lab_s = '';
+        val_s = '';
+    end
+    row_bottom = y_top - i * row_h;
+    text_y = row_bottom + max(1, round((row_h - text_h) / 2));
+    lab = local_ensure_ctrl(panel, sprintf('status_dlab_%d', i), 'text');
+    val = local_ensure_ctrl(panel, sprintf('status_dval_%d', i), 'text');
+    lab.Visible = 'on';
+    val.Visible = 'on';
+    lab.String = lab_s;
+    val.String = val_s;
+    lab.HorizontalAlignment = 'left';
+    val.HorizontalAlignment = 'right';
+    lab.ForegroundColor = [0.620 0.655 0.705];
+    val.ForegroundColor = theme.color.text;
+    lab.BackgroundColor = theme.color.panel;
+    val.BackgroundColor = theme.color.panel;
+    lab.FontWeight = 'normal';
+    val.FontWeight = 'bold';
+    lab.Position = [inner_x, text_y, lab_w, text_h];
+    val.Position = [inner_x + lab_w, text_y, val_w, text_h];
+    try
+        lab.FontName = font_name;
+        val.FontName = font_name;
+        lab.FontUnits = 'pixels';
+        val.FontUnits = 'pixels';
+        lab.FontSize = 11;
+        val.FontSize = 11;
+    catch
+    end
+    rule = local_ensure_ctrl(panel, sprintf('status_drule_%d', i), 'text');
+    if i < 4
+        rule.Visible = 'on';
+        rule.Enable = 'inactive';
+        rule.String = '';
+        rule.BackgroundColor = hair;
+        rule.Position = [inner_x, row_bottom, inner_w, 1];
+    else
+        rule.Visible = 'off';
+    end
+end
+
+end
+
+function [lab, val] = local_split_kv(rows, i)
+
+lab = '';
+val = '';
+if i > numel(rows)
+    return
+end
+s = strtrim(char(string(rows{i})));
+k = find(s == ':', 1, 'first');
+if isempty(k)
+    lab = s;
+    return
+end
+lab = strtrim(s(1:k-1));
+val = strtrim(s(k+1:end));
+
+end
+
+function local_enable_sensor_checks(lst)
+
+if isempty(lst) || ~isvalid(lst)
+    return
+end
+try
+    if isappdata(lst, 'ZefSensorChecks') && isequal(getappdata(lst, 'ZefSensorChecks'), true)
+        return
+    end
+catch
+end
+ud = [];
+try
+    ud = lst.UserData;
+catch
+end
+if ~isstruct(ud)
+    return
+end
+ud.ShowChecks = true;
+ud.ShowSwatches = false;
+lst.UserData = ud;
+try
+    setappdata(lst, 'ZefSensorChecks', true);
+catch
+end
+try
+    zef_colored_list('theme', lst);
+catch
+end
+
+end
+
+function h = local_ensure_ctrl(panel, tag, style)
+
+h = zef_ui_find(panel, tag);
+if ~isempty(h) && isvalid(h)
+    try
+        if ~isequal(h.Parent, panel)
+            h.Parent = panel;
+        end
+    catch
+    end
+    return
+end
+h = uicontrol('Parent', panel, 'Style', style, 'Tag', tag, ...
+    'Units', 'pixels', 'String', '', 'Enable', 'inactive');
+try
+    h.HitTest = 'off';
+catch
+end
+
+end
+
 function view = local_ensure_figure_view(h_fig, theme)
 
 view = zef_ui_find(h_fig, 'figure_view');
+work = zef_ui_find(h_fig, 'zef_shell_card');
+parent = h_fig;
+if ~isempty(work) && isvalid(work)
+    parent = work;
+end
 if ~isempty(view) && isvalid(view)
+    try
+        if ~isequal(view.Parent, parent)
+            view.Parent = parent;
+        end
+    catch
+    end
     return
 end
-view = uipanel('Parent', h_fig, 'Units', 'pixels', ...
+view = uipanel('Parent', parent, 'Units', 'pixels', ...
     'Title', '', 'BorderType', 'none', 'Tag', 'figure_view', ...
     'BackgroundColor', theme.color.axesBg, 'ForegroundColor', theme.color.text);
 try
@@ -1115,6 +1497,37 @@ try
     view.AutoResizeChildren = 'off';
 catch
 end
+
+end
+
+function [slot, ax, ay, aw, ah] = local_workspace_view_slot(work, view, theme)
+
+work.Units = 'pixels';
+wp = double(work.Position);
+rad = 12;
+tabH = 28;
+toolH = 36;
+try
+    rad = theme.space.cardRadius;
+    tabH = theme.space.tabH;
+    toolH = theme.space.toolbarH;
+catch
+end
+try
+    if ~isequal(view.Parent, work)
+        view.Parent = work;
+    end
+catch
+end
+ix = rad;
+iy = rad;
+iw = max(40, wp(3) - 2 * rad);
+ih = max(40, wp(4) - 2 * rad - tabH - toolH);
+slot = [ix, iy, iw, ih];
+ax = wp(1) + ix;
+ay = wp(2) + iy;
+aw = iw;
+ah = ih;
 
 end
 
@@ -1157,7 +1570,7 @@ if ~dressed
         catch
         end
         try
-            ax.Toolbar = [];
+            local_hide_axes_toolbar(ax);
         catch
         end
         try
@@ -1205,15 +1618,11 @@ try
 catch
 end
 if has_volume
-    return
-end
-logo_key = round(slot(3:4));
-try
-    if isappdata(ax, 'ZefLogoSlot') && ~isempty(getappdata(ax, 'ZefLogoSlot'))
-        setappdata(ax, 'ZefLogoSlot', logo_key);
-        return
+    try
+        local_clear_gizmo(ax);
+    catch
     end
-catch
+    return
 end
 others = [];
 try
@@ -1283,53 +1692,50 @@ try
     is_logo = strcmp(char(imgs(1).Tag), 'zef_logo_img');
 catch
 end
-if is_logo
-    local_compose_logo(ax, imgs(1));
-    cdata = imgs(1).CData;
-    ih = size(cdata, 1);
-    iw = size(cdata, 2);
-    extra_x = 0;
-    extra_y = 0;
-    try
-        ax.XLim = [1, iw];
-        ax.YLim = [1, ih];
-        ax.DataAspectRatio = [1 1 1];
-    catch
-    end
-else
-ih = size(cdata, 1);
-iw = size(cdata, 2);
-if ih < 2 || iw < 2
-    return
-end
-frac = 0.72;
-extra_x = iw * (1 / frac - 1) / 2;
-extra_y = ih * (1 / frac - 1) / 2;
+logo_key = round(slot(3:4));
+same_slot = false;
 try
-    ax.XLim = [1 - extra_x, iw + extra_x];
-    ax.YLim = [1 - extra_y, ih + extra_y];
-    ax.DataAspectRatio = [1 1 1];
+    same_slot = isappdata(ax, 'ZefLogoSlot') ...
+        && isequal(getappdata(ax, 'ZefLogoSlot'), logo_key);
 catch
 end
+if is_logo
+    if ~same_slot
+        local_compose_logo(ax, imgs(1));
+        cdata = imgs(1).CData;
+        local_fill_logo_axes(ax, size(cdata, 2), size(cdata, 1));
+    end
+else
+    ih = size(cdata, 1);
+    iw = size(cdata, 2);
+    if ih < 2 || iw < 2
+        return
+    end
+    if ~same_slot
+        frac = 0.72;
+        extra_x = iw * (1 / frac - 1) / 2;
+        extra_y = ih * (1 / frac - 1) / 2;
+        try
+            ax.XLim = [1 - extra_x, iw + extra_x];
+            ax.YLim = [1 - extra_y, ih + extra_y];
+        catch
+        end
+    end
 end
 try
     disableDefaultInteractivity(ax);
 catch
 end
 try
-    ax.Toolbar = [];
-catch
-    try
-        ax.Toolbar.Visible = 'off';
-    catch
-    end
-end
-try
-    local_overlay_gizmo(ax, extra_x, extra_y, iw, ih);
+    local_hide_axes_toolbar(ax);
 catch
 end
 try
-    setappdata(ax, 'ZefLogoSlot', round(slot(3:4)));
+    local_overlay_gizmo(ax);
+catch
+end
+try
+    setappdata(ax, 'ZefLogoSlot', logo_key);
 catch
 end
 
@@ -1417,11 +1823,48 @@ for k = 1:3
 end
 imh.CData = canvas;
 try
+    imh.XData = [1, tw];
+    imh.YData = [1, th];
+catch
+end
+try
     setappdata(imh, 'ZefLogoKey', key);
 catch
 end
 try
     delete(findall(ax, 'Tag', 'zef_axes_fill'));
+catch
+end
+
+end
+
+function local_fill_logo_axes(ax, iw, ih)
+
+iw = max(1, double(iw(1)));
+ih = max(1, double(ih(1)));
+try
+    ax.XLim = [0.5, iw + 0.5];
+    ax.YLim = [0.5, ih + 0.5];
+catch
+    try
+        ax.XLim = [1, max(2, iw)];
+        ax.YLim = [1, max(2, ih)];
+    catch
+    end
+end
+try
+    ax.DataAspectRatioMode = 'auto';
+catch
+end
+try
+    ax.Units = 'pixels';
+    p = ax.InnerPosition;
+    ax.PlotBoxAspectRatio = [max(1, p(3)), max(1, p(4)), 1];
+    ax.PlotBoxAspectRatioMode = 'manual';
+catch
+end
+try
+    ax.Clipping = 'on';
 catch
 end
 
@@ -1436,7 +1879,7 @@ end
 
 end
 
-function local_overlay_gizmo(ax, extra_x, extra_y, iw, ih)
+function local_overlay_gizmo(ax)
 
 local_clear_gizmo(ax);
 theme = zef_ui_theme();
@@ -1456,18 +1899,60 @@ try
     end
 catch
 end
-span_x = iw + 2 * extra_x;
-span_y = ih + 2 * extra_y;
+vw = max(1, double(p(3)));
+vh = max(1, double(p(4)));
 gizmo_px = 46;
-gw = span_x * (gizmo_px / max(1, p(3)));
-gh = span_y * (gizmo_px / max(1, p(4)));
-x1 = 1 - extra_x + span_x - gw - span_x * 0.02;
-y1 = 1 - extra_y + span_y * 0.035;
-h = image(ax, 'XData', [x1, x1 + gw], 'YData', [y1, y1 + gh], 'CData', rgb);
+pad = 16;
+if vw < gizmo_px + 2 * pad || vh < gizmo_px + 2 * pad
+    return
+end
+xl = [0.5, vw + 0.5];
+yl = [0.5, vh + 0.5];
+try
+    xl = double(ax.XLim);
+    yl = double(ax.YLim);
+catch
+end
+if numel(xl) < 2 || numel(yl) < 2
+    return
+end
+sx = (xl(2) - xl(1)) / vw;
+sy = (yl(2) - yl(1)) / vh;
+px = vw - pad - gizmo_px;
+x1 = xl(1) + px * sx;
+x2 = xl(1) + (px + gizmo_px) * sx;
+ydir = 'normal';
+try
+    ydir = lower(char(ax.YDir));
+catch
+end
+if strcmp(ydir, 'reverse')
+    y1 = yl(1) + pad * sy;
+    y2 = yl(1) + (pad + gizmo_px) * sy;
+else
+    py = vh - pad - gizmo_px;
+    y1 = yl(1) + py * sy;
+    y2 = yl(1) + (py + gizmo_px) * sy;
+end
+try
+    hold(ax, 'on');
+catch
+end
+h = image(ax, 'XData', [x1, x2], 'YData', [y1, y2], 'CData', rgb);
+try
+    ax.XLim = xl;
+    ax.YLim = yl;
+    ax.YDir = ydir;
+catch
+end
 h.Tag = 'zef_axes_gizmo_img';
 try
     h.PickableParts = 'none';
     h.HitTest = 'off';
+catch
+end
+try
+    uistack(h, 'top');
 catch
 end
 
@@ -1510,10 +1995,13 @@ end
 function local_fill_list_host(host)
 
 try
+    host.AutoResizeChildren = 'off';
+catch
+end
+try
     fcn = host.SizeChangedFcn;
     if isa(fcn, 'function_handle')
         fcn(host, []);
-        return
     end
 catch
 end
@@ -1533,6 +2021,10 @@ try
             catch
             end
             ch(i).Position = [0 0 max(1, box(3)) max(1, box(4))];
+            try
+                zef_colored_list('theme', ch(i));
+            catch
+            end
         end
     end
     host.Units = old;
@@ -1543,7 +2035,7 @@ end
 
 function rgb = local_status_dot(sz, fg, bg)
 
-sz = max(10, round(sz));
+sz = max(8, round(sz));
 rgb = repmat(reshape(double(bg(1:3)), 1, 1, 3), sz, sz);
 [x, y] = meshgrid(1:sz, 1:sz);
 r = hypot(x - (sz + 1) / 2, y - (sz + 1) / 2);
@@ -1579,17 +2071,47 @@ end
 
 function local_stack_ready(pill, dot, rd) %#ok<INUSD>
 
-if ~isempty(rd) && isvalid(rd)
-    try
-        uistack(rd, 'top');
-    catch
-    end
+local_stack_once(rd, 'ZefStacked');
+local_stack_once(dot, 'ZefStacked');
+
 end
-if ~isempty(dot) && isvalid(dot)
-    try
-        uistack(dot, 'top');
-    catch
+
+function local_stack_once(h, key)
+
+if isempty(h) || ~isgraphics(h) || ~isvalid(h)
+    return
+end
+if nargin < 2 || isempty(key)
+    key = 'ZefStacked';
+end
+try
+    if isappdata(h, key) && isequal(getappdata(h, key), true)
+        return
     end
+catch
+end
+try
+    uistack(h, 'top');
+    setappdata(h, key, true);
+catch
+end
+
+end
+
+function local_hide_axes_toolbar(ax)
+
+if isempty(ax) || ~isgraphics(ax) || ~isvalid(ax)
+    return
+end
+try
+    if isempty(ax.Toolbar)
+        axtoolbar(ax, {'restoreview'});
+    end
+catch
+end
+try
+    ax.Toolbar.Visible = 'off';
+catch
 end
 
 end

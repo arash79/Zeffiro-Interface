@@ -332,7 +332,19 @@ if not(isequal(file_name,0))
         catch
         end
         try
-            figure(zef.h_zeffiro);
+            vis_on = false;
+            try
+                vis_on = strcmpi(char(string(zef.h_zeffiro.Visible)), 'on') ...
+                    || isequal(zef.h_zeffiro.Visible, 1);
+            catch
+            end
+            if vis_on
+                figure(zef.h_zeffiro);
+            end
+        catch
+        end
+        try
+            zef_ui_shell('hits', zef.h_zeffiro);
         catch
         end
         try

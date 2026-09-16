@@ -10,8 +10,7 @@ Logos, unified-shell line icons, and the remaining EIT GUIDE figure. `zeffiro_in
 |------|------|
 | `fig/zeffiro_small_logo.png` | Compact logo (waitbar / headers) |
 | `fig/zeffiro_logo_compass.png` / `zeffiro_interface_compass.png` | Compass brand marks |
-| `fig/ui/*.png` | Themed line icons for `zef_ui_icons` |
-| `fig/ui/Zeffiro_Modern_Icons/` | SVG masters + author notes (not runtime) |
+| `fig/ui/*.svg` | Themed line icons for `zef_ui_icons` |
 | `fig/tools/zef_find_synthetic_eit_data.fig` | Remaining GUIDE layout for synthetic EIT |
 
 ## Code functionality
@@ -38,11 +37,11 @@ cdata = zef_ui_icons('forward', 20);
 ## Important notes
 
 - Icon and logo **filenames are part of the public contract**.
-- Do not load SVGs at runtime; use PNGs via `zef_ui_icons`.
+- Line icons are SVG; `zef_ui_icons` rasterizes them at the requested size.
 - Plugin layouts do not belong under `assets/`.
 
 ## Developer guidance
 
 - Prefer App Designer exports in `src/gui/apps/` for new core tools.
-- When adding icons, update PNG + SVG master together and wire through `zef_ui_icons`.
+- When adding icons, add `fig/ui/<name>.svg` and wire through `zef_ui_icons`.
 - Pitfall: duplicating logos into every plugin folder instead of path lookup.

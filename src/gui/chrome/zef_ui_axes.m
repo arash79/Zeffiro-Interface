@@ -102,10 +102,33 @@ function h = local_first_axes(found)
 
 h = gobjects(0);
 for i = 1:numel(found)
-    if local_is_axes(found(i))
+    if local_is_axes(found(i)) && ~local_is_chrome_axes(found(i))
         h = found(i);
         return
     end
+end
+
+end
+
+function tf = local_is_chrome_axes(h)
+
+tf = false;
+tag = '';
+try
+    tag = char(h.Tag);
+catch
+end
+if strcmp(tag, 'zef_card_bg') || strcmp(tag, 'zef_card_img') ...
+        || strncmp(tag, 'zef_card_', 9) || strncmp(tag, 'zef_nav_bg_', 11) ...
+        || strcmp(tag, 'zef_fly_bg')
+    tf = true;
+    return
+end
+try
+    if ~strcmp(tag, 'axes1') && strcmpi(char(h.HandleVisibility), 'off')
+        tf = true;
+    end
+catch
 end
 
 end

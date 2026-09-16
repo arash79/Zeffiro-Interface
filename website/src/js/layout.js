@@ -8,18 +8,8 @@ import {
   pages,
 } from "./config.js";
 
-const logoMark = (gradId) => `
-  <svg class="logo-mark" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-    <defs>
-      <linearGradient id="${gradId}" x1="4" y1="40" x2="44" y2="8" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="#38bdf8"/>
-        <stop offset="0.48" stop-color="#6366f1"/>
-        <stop offset="1" stop-color="#d946ef"/>
-      </linearGradient>
-    </defs>
-    <path d="M10 12.2h27.5L10.2 35.8H38" fill="none" stroke="url(#${gradId})" stroke-width="7.2" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-`;
+const logoMark = () =>
+  `<img class="logo-mark" src="favicon.svg" alt="" width="34" height="34" />`;
 
 export function headerHTML(active) {
   const item = (id, href, label, external = false) => {
@@ -35,7 +25,7 @@ export function headerHTML(active) {
     <header class="site-header">
       <div class="header-inner">
         <a class="brand" href="${pages.overview}" aria-label="Zeffiro Interface home">
-          ${logoMark("logoGradHeader")}
+          ${logoMark()}
           <span class="brand-text">
             <span class="brand-name">ZEFFIRO</span>
             <span class="brand-sub">INTERFACE</span>
@@ -67,7 +57,7 @@ export function footerHTML() {
       <div class="container footer-grid">
         <div class="footer-brand">
           <a class="brand" href="${pages.overview}" aria-label="Zeffiro Interface home">
-            ${logoMark("logoGradFooter")}
+            ${logoMark()}
             <span class="brand-text">
               <span class="brand-name">ZEFFIRO</span>
               <span class="brand-sub">INTERFACE</span>
@@ -144,18 +134,18 @@ const ATMOSPHERE = `
     <svg class="atmosphere-field" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
       <defs>
         <radialGradient id="atmFadeShared" cx="50%" cy="42%" r="58%">
-          <stop offset="0" stop-color="#7c6bff" stop-opacity="0.16"/>
-          <stop offset="1" stop-color="#7c6bff" stop-opacity="0"/>
+          <stop offset="0" stop-color="#27A8AA" stop-opacity="0.16"/>
+          <stop offset="1" stop-color="#27A8AA" stop-opacity="0"/>
         </radialGradient>
       </defs>
       <ellipse cx="1180" cy="210" rx="420" ry="260" fill="url(#atmFadeShared)"/>
-      <g fill="none" stroke="#8ea4ff" stroke-width="0.6" opacity="0.22">
+      <g fill="none" stroke="#155F60" stroke-width="0.6" opacity="0.22">
         <path d="M120 760 L310 430 L540 520 L470 780 Z"/>
         <path d="M310 430 L540 520 L610 300 Z"/>
         <path d="M120 760 L310 430 L80 520 Z"/>
         <path d="M1320 640 L1480 410 L1560 700 Z"/>
       </g>
-      <g fill="#c084fc" opacity="0.35">
+      <g fill="#50CCC9" opacity="0.35">
         <circle cx="310" cy="430" r="2.2"/>
         <circle cx="540" cy="520" r="2.2"/>
         <circle cx="1480" cy="410" r="2"/>

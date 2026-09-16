@@ -22,7 +22,7 @@ if zef.h_segmentation_tool_toggle.UserData == 1
     position_vec(3) = 0.505*position_vec(3);
 end
 
-zef.ini_cell = readcell([zef.program_path '/profile/zeffiro_interface.ini'],'FileType','text');
+zef.ini_cell = zef_read_profile_cell([zef.program_path '/profile/zeffiro_interface.ini']);
 for zef_i =  1 : size(zef.ini_cell,1)
 
     if isequal(zef.ini_cell{zef_i,3},'segmentation_tool_default_position')

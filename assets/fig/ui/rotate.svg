@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none" role="img">
+
+<defs>
+  <linearGradient id="tealGrad" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#0F8F90"/>
+    <stop offset="1" stop-color="#28B8B8"/>
+  </linearGradient>
+  <linearGradient id="darkGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#2F424C"/>
+    <stop offset="1" stop-color="#73848B"/>
+  </linearGradient>
+  <linearGradient id="cubeTop" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#138D8D"/>
+    <stop offset="1" stop-color="#37BBB6"/>
+  </linearGradient>
+  <radialGradient id="dotGrad" cx="35%" cy="28%" r="75%">
+    <stop offset="0" stop-color="#22C0BC"/>
+    <stop offset="0.62" stop-color="#119594"/>
+    <stop offset="1" stop-color="#087476"/>
+  </radialGradient>
+</defs>
+<path d="M64 44L80 53L64 62L48 53L64 44Z" fill="#75838A" stroke="white" stroke-width="2"/>
+<path d="M48 54L63 63V82L48 73V54Z" fill="#87949A" stroke="white" stroke-width="2"/>
+<path d="M65 63L80 54V73L65 82V63Z" fill="#53656D" stroke="white" stroke-width="2"/>
+<path d="M31 51C36 36 49 26 64 24" stroke="#14A7A5" stroke-width="6" stroke-linecap="round"/>
+<path d="M58 18L66 24L59 31" stroke="#14A7A5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M82 28C95 34 103 45 104 58" stroke="#14A7A5" stroke-width="6" stroke-linecap="round"/>
+<path d="M98 53L104 60L110 53" stroke="#14A7A5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M97 77C91 91 79 100 64 102" stroke="#14A7A5" stroke-width="6" stroke-linecap="round"/>
+<path d="M70 108L62 102L69 95" stroke="#14A7A5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M46 98C33 92 25 81 24 68" stroke="#14A7A5" stroke-width="6" stroke-linecap="round"/>
+<path d="M30 73L24 66L18 73" stroke="#14A7A5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

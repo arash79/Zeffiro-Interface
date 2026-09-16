@@ -18,7 +18,7 @@ function zef = zef_apply_system_settings(zef)
 %     zef  - session. Omitted → evalin('base','zef').
 %
 %   What it does
-%     1. readcell program_path/profile/zeffiro_interface.ini.
+%     1. zef_read_profile_cell program_path/profile/zeffiro_interface.ini.
 %        Column 4 'number' → str2num if needed; 'string' → num2str.
 %        Column 3 is the zef field name; column 2 the value. Assigned
 %        only if not already isfield.
@@ -36,7 +36,7 @@ if nargin == 0
 end
 
 
-zef.ini_cell = readcell([zef.program_path '/profile/zeffiro_interface.ini'],'FileType','text');
+zef.ini_cell = zef_read_profile_cell([zef.program_path '/profile/zeffiro_interface.ini']);
 for zef_i =  1 : size(zef.ini_cell,1)
     if isequal(zef.ini_cell{zef_i,4},'number')
         if not(isnumeric(zef.ini_cell{zef_i,2}))

@@ -21,7 +21,7 @@ end
 
 set(zef.h_system_settings_table,'CellSelectionCallback',@zef_system_settings_table_selection);
 
-zef.ini_cell = readcell([zef.program_path '/profile/zeffiro_interface.ini'],'FileType','text');
+zef.ini_cell = zef_read_profile_cell([zef.program_path '/profile/zeffiro_interface.ini']);
 zef.h_system_settings_table.Data = zef.ini_cell;
 zef = rmfield(zef,'ini_cell');
 zef.h_system_settings_save.ButtonPushedFcn = 'zef_save_system_settings;';

@@ -43,7 +43,7 @@ if zef.use_log
     end
     fid = fopen(zef.current_log_file,'a');
     fprintf(fid,'%s',['**************************************************************************' newline]);
-    fprintf(fid,'%s',['ZEFFIRO Interface ' num2str(zef.current_version) ', Date: ' datestr(now) newline]);
+    fprintf(fid,'%s',['Zeffiro Interface V2, Date: ' datestr(now) newline]);
     fprintf(fid,'%s',['**************************************************************************' newline] );
     fprintf(fid,'%s',['Path: ' zef.program_path newline]);
     fprintf(fid,'%s',['**************************************************************************' newline]);

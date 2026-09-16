@@ -52,7 +52,7 @@ Those two inverse paths are **not** the same code. Inverse-tools items without *
 | `external/` | Optional third-party git submodules |
 | `assets/` | GUI icons and figures |
 | `website/` | Optional static project homepage (not on the MATLAB path) |
-| `scripts/` | Maintainer tools (tests, STL QA, icon rasterization; not on the MATLAB path) |
+| `scripts/` | Maintainer tools (tests, STL QA; not on the MATLAB path) |
 
 `src/app` (start, update, close) is not the `+core` package. Do not `addpath` a `+package` folder yourself; add the **project root** so MATLAB can resolve `core.*` / `inverse.*` / `utilities.*`.
 

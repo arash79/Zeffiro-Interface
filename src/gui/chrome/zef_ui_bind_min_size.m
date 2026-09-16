@@ -144,6 +144,26 @@ try
     end
     if grew
         src.Position = p;
+        try
+            if isprop(src, 'InnerPosition')
+                ip = double(src.InnerPosition);
+                if numel(ip) >= 4
+                    inner_grew = false;
+                    if ip(3) < mins(1)
+                        ip(3) = mins(1);
+                        inner_grew = true;
+                    end
+                    if ip(4) < mins(2)
+                        ip(4) = mins(2);
+                        inner_grew = true;
+                    end
+                    if inner_grew
+                        src.InnerPosition = ip;
+                    end
+                end
+            end
+        catch
+        end
     end
     token = [p(3), p(4)];
     prev_token = [];

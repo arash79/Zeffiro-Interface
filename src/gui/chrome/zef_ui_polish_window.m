@@ -121,6 +121,7 @@ try
         catch
         end
         if strcmp(ptag, 'figure_sidebar') || strcmp(ptag, 'figure_lists') ...
+                || strcmp(ptag, 'figure_toggle_host') ...
                 || strncmp(ptag, 'zef_shell_', 10)
             continue
         end

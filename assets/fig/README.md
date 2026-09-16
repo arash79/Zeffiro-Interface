@@ -11,8 +11,7 @@ Branding images, unified-shell icons, and the remaining EIT GUIDE figure. `zeffi
 | `zeffiro_small_logo.png` | Compact logo in tool headers / waitbar |
 | `zeffiro_logo_compass.png` | Compass-branded logo (menu / segmentation) |
 | `zeffiro_interface_compass.png` | Figure-tool header / about imagery |
-| `ui/*.png` | Themed line icons (`zef_ui_icons`) |
-| `ui/Zeffiro_Modern_Icons/svg_masters/` | Vector sources for the line icons |
+| `ui/*.svg` | Themed line icons (`zef_ui_icons`) |
 | `tools/zef_find_synthetic_eit_data.fig` | Find synthetic EIT data GUIDE UI |
 
 ## Code functionality

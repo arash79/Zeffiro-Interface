@@ -220,11 +220,16 @@ end
 
 zef = zef_start_log(zef);
 
-if isfield(zef, "h_zeffiro_window_main") ...
-        && isvalid(zef.h_zeffiro_window_main) ...
-        && zef.start_mode == "display"
+% "default" is the ordinary user entry point and must show the GUI.
+% Only start_mode "nodisplay" leaves use_display false.
+if isfield(zef, "h_zeffiro") && isvalid(zef.h_zeffiro) ...
+        && isfield(zef, "use_display") && zef.use_display
 
     zef.h_zeffiro.Visible = 1;
+    try
+        zef_ui_shell('hits', zef.h_zeffiro);
+    catch
+    end
     try
         if zef_ui_is_unified(zef.h_zeffiro)
             zef_ui_shell('hide_companions', zef);
@@ -247,23 +252,10 @@ end
 
 %% Finally, do the things specified by the input arguments.
 
-% Choose GPU device, if available. gpuDeviceCount requires Parallel
-% Computing Toolbox; zef_gpu_count returns 0 when it is missing.
-zef.gpu_count = zef_gpu_count();
-
-if zef.gpu_count > 0 && isfield(zef, 'use_gpu') && zef.use_gpu
-
-    try
-
-        gpuDevice(zef.gpu_num);
-
-    catch
-
-        warning("Tried using GPU with index " + zef.gpu_num + " but no such device was found. Starting without GPU...");
-
-    end
-
-end % if
+% GPU selection already happened in zef_start when a device is requested.
+if ~isfield(zef, 'gpu_count') || isempty(zef.gpu_count)
+    zef.gpu_count = zef_gpu_count();
+end
 
 % Open new project if given.
 

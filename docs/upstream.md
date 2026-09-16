@@ -2,6 +2,8 @@
 
 This tree is derived from [zeffiro_interface](https://github.com/sampsapursiainen/zeffiro_interface). Public function names (`zef_*`, `inverse.*Inverter`, `utilities.*`) are meant to stay recognizable. Numerical output is **not** guaranteed to match `main_development_branch`.
 
+Compatibility comparisons in this fork last used `upstream/master` at `a52ef0850cd1a1cc54826e169a05e91e9ee3a1ba` (merge of PR #273 from `main_development_branch`). The live upstream development tip at that fetch was `ad2414b693df3edc494c833485f500827276a741`.
+
 Use this page when you are comparing reconstructions, lead fields, or saved projects against an upstream clone.
 
 ## Two inverse tracks

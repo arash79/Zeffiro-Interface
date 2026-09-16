@@ -6,9 +6,9 @@ function zef_ui_broadcast_theme(theme)
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   The shell Theme control writes zef.ui_color_mode and must update
-%   already-open tools, settings dialogs, and colored lists — not only
-%   windows opened after the switch.
+%   Restyle every open Zeffiro window from the canonical UI tokens.
+%   Call after a token change (font size, etc.) so already-open tools,
+%   settings dialogs, and colored lists pick up the current palette.
 %
 %   zef_ui_broadcast_theme
 %   zef_ui_broadcast_theme(theme)

@@ -10,8 +10,9 @@ function  zef_close_all(zef)
 %   DeleteFcn so close callbacks do not re-enter teardown, deletes those
 %   figures, deletes the waitbar, and restores MATLAB figure WindowStyle
 %   via zef_window_manager('restore'). Unless zef.zeffiro_restart is 1,
-%   the Zeffiro tree is then rmpath'd. Always clears zef, zef_data, and
-%   index helpers from the base workspace.
+%   runtime folders are then rmpath'd (src, assets/fig, plugins, profile,
+%   external if present, and the project root). Always clears zef,
+%   zef_data, and index helpers from the base workspace.
 %
 %   zef_close_all
 %   zef_close_all(zef)
@@ -28,10 +29,14 @@ function  zef_close_all(zef)
 %   See also zeffiro_interface, zef_start, zef_window_manager.
 
 
+had_session = false;
 if nargin == 0
     if evalin('base','exist(''zef'',''var'')')
         zef = evalin('base','zef');
+        had_session = true;
     end
+else
+    had_session = true;
 end
 
 zef.h_window_aux = findall(groot,'-regexp','Name','ZEFFIRO Interface*');
@@ -43,22 +48,35 @@ zef_delete_waitbar;
 if exist('zef_window_manager', 'file') == 2
     zef_window_manager('restore');
 end
-if exist('zef','var')
-    if isfield(zef,'zeffiro_restart')
-        if isequal(zef.zeffiro_restart,0)
-            warning('off','MATLAB:rmpath:DirNotFound');
-            rmpath(genpath(fileparts(which('zeffiro_interface.m'))));
-            warning('on','MATLAB:rmpath:DirNotFound');
-        end
+
+% Assigning zef.h_window_aux above creates a local stub on a cold start.
+% Only rmpath when a real session was passed in.
+do_rmpath = false;
+if had_session
+    if isfield(zef, 'zeffiro_restart')
+        do_rmpath = isequal(zef.zeffiro_restart, 0);
     else
-        warning('off','MATLAB:rmpath:DirNotFound');
-        rmpath(genpath(fileparts(which('zeffiro_interface.m'))));
-        warning('on','MATLAB:rmpath:DirNotFound');
+        do_rmpath = true;
     end
-else
-    warning('off','MATLAB:rmpath:DirNotFound');
-    rmpath(genpath(fileparts(which('zeffiro_interface.m'))));
-    warning('on','MATLAB:rmpath:DirNotFound');
+end
+if do_rmpath
+    warning('off', 'MATLAB:rmpath:DirNotFound');
+    try
+        root = fileparts(which('zeffiro_interface.m'));
+        if ~isempty(root)
+            rmpath(genpath(fullfile(root, 'src')));
+            rmpath(genpath(fullfile(root, 'assets', 'fig')));
+            rmpath(genpath(fullfile(root, 'plugins')));
+            rmpath(genpath(fullfile(root, 'profile')));
+            ext = fullfile(root, 'external');
+            if exist(ext, 'dir') == 7
+                rmpath(ext);
+            end
+            rmpath(root);
+        end
+    catch
+    end
+    warning('on', 'MATLAB:rmpath:DirNotFound');
 end
 
 evalin('base','clear zef zef_data zef_i zef_j zef_k;');

@@ -76,9 +76,12 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `ParcellationColormapTest` | `zef_parcellation_colormap` returns `[]` when base `zef.parcellation_colormap` is missing, else the stored matrix |
 | `WaitbarTest` | `zef_waitbar` lifecycle on R2025a+: `0` is progress not `groot`; nested `(i,N,h,msg)` keeps one handle; nested initialize+close (including stiffness/adjacency/source_tetra and double-close) does not invalidate the parent; `zef_close_waitbar` ignores stale handles; teardown restores `WindowStyle` |
 | `ColoredListTest` | `zef_colored_list` HTML / `uihtml` (and table) backends: names, colors, selection |
-| `UiThemeTest` | `zef_ui_theme` tokens (font ≥ 11 px, teal accent, shell geometry), window-label stripping, layout resize on real figures |
+| `UiIconsTest` | `zef_ui_icons` rasterizes every `assets/fig/ui/*.svg`; folder has no PNGs; gizmo keeps RGB axes; missing names return empty |
+| `UiThemeTest` | Canonical light `zef_ui_theme` tokens (font ≥ 11 px, teal accent, shell geometry), no Theme control, rounded-card chrome without pushbutton bezels, Figure workspace rounded via `zef_ui_card` (no corner overlays), window-label stripping, layout resize on real figures, nav hover fills the entire row with one rounded `zef_ui_roundrect` chip (icon and label share the row's top/bottom; no hit-target `CData`) |
 | `ClassInverseDialogTest` | Class-solver dialogs expose method tags (`zef_inv_*`); `noise_cov` absent on eLORETA; class-solver `zef_*_start` names resolve |
 | `FigureViewContainmentTest` | Figure-tool axes stay inside the visualization slot after layout |
+| `FigureToolControllersTest` | Live camera / measure / annotate controllers; mutually exclusive modes; toolbar callbacks |
+| `ProfileCellTest` | `zef_read_profile_cell` matches `readcell` on shipped INIs; quoted fields; cache invalidation |
 | `GuiResponsivenessTest` | Resize must not install listener storms or recenter the window |
 | `WindowPlacementTest` | Clamp / centre helpers keep windows on the work area |
 | `SensorListSyncTest` | Figure-tool sensor count matches listed rows |

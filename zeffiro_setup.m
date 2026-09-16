@@ -49,6 +49,15 @@ end
 
 [this_folder, ~, ~] = fileparts ( mfilename ( "fullpath" ) ) ;
 
+start_config = fullfile ( this_folder, "src", "app", "zef_start_config.m" ) ;
+
+% Ordinary launches pass an empty submodule list. Skip gitmodules I/O
+% and do not rewrite the config when nothing will be installed.
+need_install = ~kwargs.skip_submodules && ~isempty(kwargs.submodules);
+if ~need_install && isfile(start_config)
+    return
+end
+
 % Validate kwargs.submodules, as this cannot be done in the arguments
 % block without writing a validator function.
 

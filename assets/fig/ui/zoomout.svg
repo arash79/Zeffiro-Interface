@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none" role="img">
+
+<defs>
+  <linearGradient id="tealGrad" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#0F8F90"/>
+    <stop offset="1" stop-color="#28B8B8"/>
+  </linearGradient>
+  <linearGradient id="darkGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#2F424C"/>
+    <stop offset="1" stop-color="#73848B"/>
+  </linearGradient>
+  <linearGradient id="cubeTop" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#138D8D"/>
+    <stop offset="1" stop-color="#37BBB6"/>
+  </linearGradient>
+  <radialGradient id="dotGrad" cx="35%" cy="28%" r="75%">
+    <stop offset="0" stop-color="#22C0BC"/>
+    <stop offset="0.62" stop-color="#119594"/>
+    <stop offset="1" stop-color="#087476"/>
+  </radialGradient>
+</defs>
+<circle cx="55" cy="55" r="31" stroke="#3B4D57" stroke-width="7"/>
+<path d="M78 78L103 103" stroke="#3B4D57" stroke-width="7" stroke-linecap="round"/>
+<path d="M43 55H67" stroke="#14A7A5" stroke-width="7" stroke-linecap="round"/>
+</svg>

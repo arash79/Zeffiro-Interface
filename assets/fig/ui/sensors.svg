@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none" role="img">
+
+<defs>
+  <linearGradient id="tealGrad" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#0F8F90"/>
+    <stop offset="1" stop-color="#28B8B8"/>
+  </linearGradient>
+  <linearGradient id="darkGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#2F424C"/>
+    <stop offset="1" stop-color="#73848B"/>
+  </linearGradient>
+  <linearGradient id="cubeTop" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#138D8D"/>
+    <stop offset="1" stop-color="#37BBB6"/>
+  </linearGradient>
+  <radialGradient id="dotGrad" cx="35%" cy="28%" r="75%">
+    <stop offset="0" stop-color="#22C0BC"/>
+    <stop offset="0.62" stop-color="#119594"/>
+    <stop offset="1" stop-color="#087476"/>
+  </radialGradient>
+</defs>
+<path d="M37 80C31 76 28 70 28 63V53C28 36 44 24 64 24C84 24 100 36 100 53V63C100 70 97 76 91 80" stroke="#3B4D57" stroke-width="6" stroke-linecap="round"/>
+<path d="M42 83V95C42 101 47 105 53 105M86 83V95C86 101 81 105 75 105" stroke="#3B4D57" stroke-width="6" stroke-linecap="round"/>
+<path d="M37 52C46 45 54 41 64 41C74 41 82 45 91 52M46 37L54 52M64 31V44M82 37L74 52" stroke="#3B4D57" stroke-width="4"/>
+<circle cx="37" cy="52" r="7" fill="url(#dotGrad)"/>
+<circle cx="48" cy="35" r="7" fill="url(#dotGrad)"/>
+<circle cx="64" cy="30" r="7" fill="url(#dotGrad)"/>
+<circle cx="80" cy="35" r="7" fill="url(#dotGrad)"/>
+<circle cx="91" cy="52" r="7" fill="url(#dotGrad)"/>
+<circle cx="47" cy="60" r="7" fill="url(#dotGrad)"/>
+<circle cx="64" cy="58" r="7" fill="url(#dotGrad)"/>
+<circle cx="81" cy="60" r="7" fill="url(#dotGrad)"/>
+</svg>

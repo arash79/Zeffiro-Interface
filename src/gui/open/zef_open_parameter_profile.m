@@ -16,7 +16,7 @@
 zef_data = zef_parameter_profile;
 zef_assign_data;
 
-zef.h_parameter_profile_table.Data = readcell([zef.program_path '/profile/' zef.profile_name '/zeffiro_parameters.ini'],'FileType','text','delimiter',',');
+zef.h_parameter_profile_table.Data = zef_read_profile_cell([zef.program_path '/profile/' zef.profile_name '/zeffiro_parameters.ini']);
 
 set(zef.h_parameter_profile_table,'CellSelectionCallback',@zef_parameter_profile_table_selection);
 

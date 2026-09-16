@@ -8,7 +8,7 @@ function zef_data = zef_remove_system_fields(zef, zef_data)
 %
 %   Used by project save and project load. Reads profile/zeffiro_interface.ini
 %   column 3 as system field names, unions a hard-coded list (gpu_count,
-%   start_mode, path_cell, …), and rmfield's those keys from zef_data.
+%   start_mode, path_cell, ui_color_mode, …), and rmfield's those keys from zef_data.
 %   save_file and save_file_path are kept.
 %
 %   zef_data = zef_remove_system_fields(zef, zef_data)
@@ -24,9 +24,9 @@ arguments
     zef_data (1,1) struct
 end
 
-fields_to_be_removed = {'gpu_count','compartment_activity','start_mode','colormap_cell','path_cell','use_display','current_version','matfile_object','zeffiro_restart','verbose_mode','use_waitbar','zeffiro_task_id','use_github'};
+fields_to_be_removed = {'gpu_count','compartment_activity','start_mode','colormap_cell','path_cell','use_display','current_version','matfile_object','zeffiro_restart','verbose_mode','use_waitbar','zeffiro_task_id','use_github','ui_color_mode'};
 
-ini_cell = readcell([zef.program_path '/profile/zeffiro_interface.ini'],'FileType','text');
+ini_cell = zef_read_profile_cell([zef.program_path '/profile/zeffiro_interface.ini']);
 system_fields = ini_cell(:,3);
 system_fields = setdiff(system_fields,{'save_file','save_file_path'});
 system_fields = [system_fields; fields_to_be_removed'];

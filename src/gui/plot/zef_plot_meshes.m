@@ -21,6 +21,10 @@ function [void] = zef_plot_meshes(~)
 %
 %   See also zef_visualize_surfaces, zef_plot_volume.
 zef = evalin('base','zef');
+try
+    zef_figure_interact(zef.h_zeffiro, 'forget_home');
+catch
+end
 
 f_ind = 1;
 cdata_counter = 1;
@@ -1218,8 +1222,11 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
 
 end
 
-rotate3d on;
 camva(zef.h_axes1,eval('zef.cam_va'));
+try
+    zef_figure_interact(zef.h_zeffiro, 'on_plot');
+catch
+end
 zef_figure_sync_plot(eval('zef.h_zeffiro'));
 
 end

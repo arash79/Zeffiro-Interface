@@ -49,7 +49,15 @@ Classes are listed by short name; fully qualified names are `tests.unit.ELORETAI
 | `WindowManagementTest` | `zef_window_manager` / `WindowStyle` |
 | `WaitbarTest` | `zef_waitbar` lifecycle |
 | `ColoredListTest` | HTML/`uihtml` listboxes |
-| `UiThemeTest` | `zef_ui_theme` / layout tokens |
+| `UiThemeTest` | `zef_ui_theme` / layout tokens / rounded-card chrome |
+| `UiIconsTest` | `zef_ui_icons` SVG raster / no PNG fallback |
+| `FigureViewContainmentTest` | Figure-tool axes stay inside the visualization slot |
+| `FigureToolControllersTest` | Camera / measure / annotate modes, exclusivity, toolbar callbacks |
+| `GuiResponsivenessTest` | Resize must not install listener storms or recenter the window |
+| `WindowPlacementTest` | Clamp / centre helpers keep windows on the work area |
+| `SensorListSyncTest` | Figure-tool sensor count matches listed rows |
+| `PluginIniResolutionTest` | Default-profile plugin Start functions resolve |
+| `ProfileCellTest` | Profile INI parser matches `readcell`; cache invalidates on rewrite |
 | `ZefSourceModelLoadTest` | `core.types.ZefSourceModel.from` + legacy enum MAT load |
 | `tests.support.createSyntheticInverseZef` | Shared synthetic `zef` fixture for inverse tests (`source_interpolation_ind{1}` is a column) |
 | `tests.support.createSyntheticUKFNMMZef` | Larger xyz/bump `zef` fixture for UKFNMM clustering + NMM |

@@ -20,10 +20,11 @@
 %     ZefWaitbarSize, ZefTaskId, ZefCurrentLogFile, …
 %
 %   See also zef_plugin, zef_arrange_windows, zef_window_manager.
-set(groot,'defaultFigureVisible','off')
+old_fig_vis = get(groot, 'defaultFigureVisible');
+set(groot, 'defaultFigureVisible', 'off')
 zef_data = zef_menu_tool_app_exported;
 zef_data.h_zeffiro_menu.Visible = 'off';
-set(groot,'defaultFigureVisible','on')
+set(groot, 'defaultFigureVisible', old_fig_vis)
 zef.fieldnames = fieldnames(zef_data);
 for zef_i = 1:length(zef.fieldnames)
     zef.(zef.fieldnames{zef_i}) = zef_data.(zef.fieldnames{zef_i});
@@ -92,8 +93,8 @@ set(zef.h_menu_merge_lead_field                      ,'MenuSelectedFcn','zef_mer
 set(zef.h_menu_butterfly_plot                        ,'MenuSelectedFcn','zef_butterfly_plot;zef = zef_update(zef);');
 set(zef.h_menu_find_synthetic_source                 ,'MenuSelectedFcn','find_synthetic_source;zef = zef_update(zef);');
 set(zef.h_menu_generate_eit_data                     ,'MenuSelectedFcn','zef_find_synthetic_eit_data;zef = zef_update(zef);');
-set(zef.h_menu_mesh_tool                             ,'MenuSelectedFcn','zef.h_mesh_tool = zef_window_visible(zef,zef.h_mesh_tool);');
-set(zef.h_menu_mesh_visualization_tool               ,'MenuSelectedFcn','zef.h_mesh_visualization_tool = zef_window_visible(zef,zef.h_mesh_visualization_tool);');
+set(zef.h_menu_mesh_tool                             ,'MenuSelectedFcn','if ~isfield(zef,''h_mesh_tool'') || ~isvalid(zef.h_mesh_tool); zef_mesh_tool; end; zef.h_mesh_tool = zef_window_visible(zef,zef.h_mesh_tool);');
+set(zef.h_menu_mesh_visualization_tool               ,'MenuSelectedFcn','if ~isfield(zef,''h_mesh_visualization_tool'') || ~isvalid(zef.h_mesh_visualization_tool); zef_mesh_visualization_tool; end; zef.h_mesh_visualization_tool = zef_window_visible(zef,zef.h_mesh_visualization_tool);');
 set(zef.h_menu_figure_tool                           ,'MenuSelectedFcn','zef_ui_shell(''raise_figure'');zef = zef_update(zef);');
 set(zef.h_menu_parcellation_tool                     ,'MenuSelectedFcn','zef_parcellation_tool;zef = zef_update(zef);');
 set(zef.h_menu_options                               ,'MenuSelectedFcn','zef_open_forward_and_inverse_options;zef = zef_update(zef);');
@@ -118,7 +119,7 @@ set(zef.h_menu_close_tools                           ,'MenuSelectedFcn','zef_arr
 set(zef.h_menu_close_figures                         ,'MenuSelectedFcn','zef_arrange_windows(''close'',''figs'',''all'');zef = zef_update(zef);');
 set(zef.h_menu_documentation                         ,'MenuSelectedFcn','web(''https://github.com/sampsapursiainen/zeffiro_interface/wiki'');zef = zef_update(zef);');
 set(zef.h_menu_about                                 ,'MenuSelectedFcn','zef_about_dialog;');
-set(zef.h_menu_segmentation_tool                   ,'MenuSelectedFcn','zef.h_zeffiro_window_main = zef_window_visible(zef,zef.h_zeffiro_window_main);');
+set(zef.h_menu_segmentation_tool                   ,'MenuSelectedFcn','if ~isfield(zef,''h_zeffiro_window_main'') || ~isvalid(zef.h_zeffiro_window_main); zef_segmentation_tool; end; zef.h_zeffiro_window_main = zef_window_visible(zef,zef.h_zeffiro_window_main);');
 set(zef.h_menu_parameter_profile                  ,'MenuSelectedFcn','zef_open_parameter_profile;');
 set(zef.h_menu_segmentation_profile                  ,'MenuSelectedFcn','zef_open_segmentation_profile;');
 set(zef.h_menu_init_profile                  ,'MenuSelectedFcn','zef_open_init_profile;');
@@ -144,7 +145,7 @@ zef.h_zeffiro_menu.DeleteFcn = 'zef_close_all;';
 zef_plugin;
 
 zef.menu_accelerator_vec = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-zef.h_temp = findobj(zef.h_zeffiro_window_main,{'parent',zef.h_menu_forward_tools,'-or','parent',zef.h_menu_inverse_tools,'-or','parent',zef.h_menu_multi_tools});
+zef.h_temp = findobj(zef.h_zeffiro_menu,{'parent',zef.h_menu_forward_tools,'-or','parent',zef.h_menu_inverse_tools,'-or','parent',zef.h_menu_multi_tools});
 
 
 for zef_k = 1 : length(zef.h_temp)

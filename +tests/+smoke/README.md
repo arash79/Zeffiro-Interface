@@ -10,7 +10,7 @@ Fully qualified names are `tests.smoke.<ClassName>`. Parent map: [`../README.md`
 
 | Class | What it actually checks |
 |-------|-------------------------|
-| `ArchitectureLayoutTest` | `which` of public `zef_*` names resolves under the owned folder (`src/app`, `src/gui/chrome`, `src/forward/lead_field`, `src/mesh`, `src/inverse`, `src/sensors`, `src/visualization/colormaps`, `src/io`, `src/forward/solvers`). `inverse.gmm.FitAdvGMM` / `inverse.kf.kf_update` exist; retired `plugins.ClassGMM` / `plugins.ClassKF` do not. Folders `tools/plugins`, `src/core`, `src/gui/helpers`, `src/auxiliary`, `+plugins`, `plugins/GithubPusher` are **gone**; `src/app` and `src/gui/chrome` exist; `plugins/Kalman/m/zef_KF.m` still exists; local dump folders, root screenshot helpers, and `Untitled.mat` stay absent; `zef_start` does not call `!git pull` |
+| `ArchitectureLayoutTest` | `which` of public `zef_*` names resolves under the owned folder (`src/app`, `src/gui/chrome`, `src/forward/lead_field`, `src/mesh`, `src/inverse`, `src/sensors`, `src/visualization/colormaps`, `src/io`, `src/forward/solvers`). `inverse.gmm.FitAdvGMM` / `inverse.kf.kf_update` exist; retired `plugins.ClassGMM` / `plugins.ClassKF` do not. Folders `tools/plugins`, `src/core`, `src/gui/helpers`, `src/auxiliary`, `+plugins`, `plugins/GithubPusher` are **gone**; `src/app` and `src/gui/chrome` exist; `plugins/Kalman/m/zef_KF.m` still exists; local dump folders, root screenshot helpers, `Untitled.mat`, the PNG icon rasterizer, `Zeffiro_Modern_Icons`, and moon/sun PNG icons stay absent; `zef_start` does not call `!git pull` |
 | `EndToEndSyntheticTest` | `zef_inverse_run(..., "dspm", "execution", "local")` writes nonempty `zef.reconstruction` and `run_result.reconstruction` |
 | `WindowManagementTest` | Real figures: factory docked `WindowStyle`, standalone default after `zef_window_manager('init')`, Position-before-WindowStyle order, arrange/hide/raise/dock-menu, waitbar-like constructor stays `'normal'` |
 | `FindSyntheticSourceROITest` | Headless `zef_ROI_finder` (sphere, empty-sphere snap-to-nearest, flat disk) and finite ROI synthetic measurements; does **not** open the ROI GUI |
@@ -27,7 +27,7 @@ Fully qualified names are `tests.smoke.<ClassName>`. Parent map: [`../README.md`
 
 Plugin smokes call **library functions** (`zef_ROI_finder`, `zef_simulate_jr_tree`) with struct inputs, not `*_start` GUI callbacks.
 
-`UpstreamPortRegressionTest` pins the Kalman `num2str` burn-in call and the default-profile Forward-tools registrations. `PluginIniResolutionTest` still checks that every INI Start function resolves.
+`UpstreamPortRegressionTest` pins the Kalman `num2str` burn-in call and the default-profile Forward-tools registrations. Plugin Start-function resolution lives in `tests.unit.PluginIniResolutionTest`.
 
 ## Workflow context
 

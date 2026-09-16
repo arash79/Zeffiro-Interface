@@ -7,11 +7,13 @@ function zef_ui_interact(varargin)
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Traditional uicontrols do not expose mouse-enter events. This helper
-%   binds cheap figure-level motion/press/release listeners so buttons,
-%   nav, flyouts, and toolbar chrome show a hand pointer and, where a
-%   rounded CData button is present, a hover/press fill. Idle pixels are
-%   unchanged. uifigure widgets keep native hover; they only get pointer
-%   feedback.
+%   binds cheap figure-level motion/press/release listeners so buttons
+%   and toolbar chrome show a hand pointer and, where a rounded CData
+%   button is present, a hover/press fill. Idle pixels are unchanged.
+%   Icon-only controls keep their CData and only change BackgroundColor.
+%   Nav rows and flyout menu items on the unified shell are painted by
+%   zef_ui_shell (single chip-axes layer); this helper never adds a
+%   second motion listener there.
 %
 %   zef_ui_interact(fig)
 %   zef_ui_interact(fig, 'bind')
@@ -79,6 +81,25 @@ try
     end
 catch
 end
+has_shell_motion = false;
+try
+    if isappdata(fig, 'ZefNavHoverListener')
+        lh_shell = getappdata(fig, 'ZefNavHoverListener');
+        has_shell_motion = ~isempty(lh_shell) && isvalid(lh_shell);
+    end
+catch
+end
+% The unified shell already owns WindowMouseMotion. A second listener
+% (hittest + CData swap on every pixel) queued hover for seconds on
+% R2025a+ uifigures.
+if has_shell_motion
+    try
+        setappdata(fig, 'ZefInteractBound', true);
+    catch
+    end
+    return
+end
+
 try
     if matlab.ui.internal.isUIFigure(fig)
         try
@@ -99,28 +120,17 @@ try
 catch
 end
 
-has_shell_motion = false;
 try
-    has_shell_motion = isappdata(fig, 'ZefNavHoverListener');
-    if has_shell_motion
-        lh = getappdata(fig, 'ZefNavHoverListener');
-        has_shell_motion = ~isempty(lh) && isvalid(lh);
-    end
+    lh = addlistener(fig, 'WindowMouseMotion', @(s, ~) zef_ui_interact(s, 'motion'));
+    setappdata(fig, 'ZefInteractMotion', lh);
 catch
-end
-if ~has_shell_motion
     try
-        lh = addlistener(fig, 'WindowMouseMotion', @(s, ~) zef_ui_interact(s, 'motion'));
-        setappdata(fig, 'ZefInteractMotion', lh);
-    catch
-        try
-            if ~isappdata(fig, 'ZefInteractPrevMotion')
-                prev = get(fig, 'WindowButtonMotionFcn');
-                setappdata(fig, 'ZefInteractPrevMotion', prev);
-                fig.WindowButtonMotionFcn = @(s, e) local_motion_wrap(s, e);
-            end
-        catch
+        if ~isappdata(fig, 'ZefInteractPrevMotion')
+            prev = get(fig, 'WindowButtonMotionFcn');
+            setappdata(fig, 'ZefInteractPrevMotion', prev);
+            fig.WindowButtonMotionFcn = @(s, e) local_motion_wrap(s, e);
         end
+    catch
     end
 end
 try
@@ -165,6 +175,10 @@ fig = local_fig_of(fig);
 if isempty(fig)
     return
 end
+try
+    zef_figure_interact(fig, 'move');
+catch
+end
 obj = [];
 if nargin >= 2 && local_ok(hit)
     obj = hit;
@@ -192,25 +206,9 @@ if ~isequal(prev, btn)
     catch
     end
 end
-fly = local_flyout_item(obj);
-prev_fly = [];
-try
-    prev_fly = getappdata(fig, 'ZefFlyoutHover');
-catch
-end
-if ~isequal(prev_fly, fly)
-    if local_ok(prev_fly) && ~local_is_open_fly_item(fig, prev_fly)
-        local_flyout_paint(prev_fly, false);
-    end
-    if local_ok(fly)
-        local_flyout_paint(fly, true);
-    end
-    try
-        setappdata(fig, 'ZefFlyoutHover', fly);
-    catch
-    end
-end
-local_pointer(fig, obj, btn, fly);
+% Flyout menu rows are painted solely by zef_ui_shell (which owns motion
+% on the unified shell); this helper never sees flyouts on other figures.
+local_pointer(fig, obj, btn);
 
 end
 
@@ -219,6 +217,12 @@ function local_press(fig)
 fig = local_fig_of(fig);
 if isempty(fig)
     return
+end
+try
+    if zef_figure_interact(fig, 'down')
+        return
+    end
+catch
 end
 obj = [];
 try
@@ -241,6 +245,10 @@ function local_release(fig)
 fig = local_fig_of(fig);
 if isempty(fig)
     return
+end
+try
+    zef_figure_interact(fig, 'up');
+catch
 end
 btn = [];
 try
@@ -281,31 +289,39 @@ end
 try
     setappdata(fig, 'ZefHoverHandle', []);
     setappdata(fig, 'ZefPressHandle', []);
-    setappdata(fig, 'ZefFlyoutHover', []);
 catch
 end
 
 end
 
-function local_pointer(fig, obj, btn, fly)
+function local_pointer(fig, obj, btn)
 
 if ~local_ok(fig)
     return
+end
+want = 'arrow';
+over_plot = false;
+try
+    over_plot = zef_figure_interact(fig, 'is_plot', obj);
+catch
+end
+if over_plot
+    try
+        p = zef_figure_interact(fig, 'pointer');
+        if ~isempty(p)
+            want = p;
+        end
+    catch
+    end
+elseif local_is_edit(obj)
+    want = 'ibeam';
+elseif local_ok(btn) || local_is_clickable(obj)
+    want = 'hand';
 end
 cur = 'arrow';
 try
     cur = char(fig.Pointer);
 catch
-end
-if ~isempty(cur) && ~strcmpi(cur, 'arrow') && ~strcmpi(cur, 'hand') ...
-        && ~strcmpi(cur, 'ibeam')
-    return
-end
-want = 'arrow';
-if local_is_edit(obj)
-    want = 'ibeam';
-elseif local_ok(btn) || local_ok(fly) || local_is_clickable(obj)
-    want = 'hand';
 end
 if ~strcmpi(cur, want)
     try
@@ -341,8 +357,7 @@ catch
 end
 if strncmp(tag, 'zef_nav_', 8) || strncmp(tag, 'zef_tool_', 9) ...
         || strncmp(tag, 'zef_tab_', 8) || contains(tag, 'zef_shell_flyout') ...
-        || strcmp(tag, 'zef_shell_theme_pill') || strcmp(tag, 'zef_shell_theme_label') ...
-        || strcmp(tag, 'zef_shell_theme_sun') || strcmp(tag, 'zef_shell_help') ...
+        || strcmp(tag, 'zef_shell_help') ...
         || strcmp(tag, 'zef_shell_bell') || strcmp(tag, 'zef_shell_profile')
     try
         if strcmpi(char(obj.Enable), 'off')
@@ -475,94 +490,6 @@ end
 
 end
 
-function tf = local_is_open_fly_item(fig, item)
-
-tf = false;
-open = {};
-try
-    open = getappdata(fig, 'ZefFlyoutOpenItems');
-catch
-end
-if ~iscell(open)
-    return
-end
-for i = 1:numel(open)
-    if isequal(open{i}, item)
-        tf = true;
-        return
-    end
-end
-
-end
-
-function item = local_flyout_item(obj)
-
-item = [];
-h = obj;
-for i = 1:8
-    if ~local_ok(h)
-        return
-    end
-    tag = '';
-    try
-        tag = char(h.Tag);
-    catch
-    end
-    if contains(tag, 'zef_shell_flyout') && ~strcmpi(char(h.Type), 'uicontrol')
-        return
-    end
-    try
-        if strcmpi(char(h.Type), 'uicontrol')
-            par = h.Parent;
-            ptag = '';
-            try
-                ptag = char(par.Tag);
-            catch
-            end
-            if contains(ptag, 'zef_shell_flyout')
-                style = lower(char(h.Style));
-                if any(strcmp(style, {'text', 'pushbutton'}))
-                    item = h;
-                    return
-                end
-            end
-        end
-    catch
-    end
-    try
-        h = h.Parent;
-    catch
-        return
-    end
-end
-
-end
-
-function local_flyout_paint(item, is_hover)
-
-if ~local_ok(item)
-    return
-end
-theme = [];
-try
-    theme = zef_ui_theme();
-catch
-    return
-end
-fillc = theme.color.panel;
-try
-    if is_hover
-        fillc = theme.color.hover;
-    end
-catch
-end
-try
-    item.BackgroundColor = fillc;
-catch
-end
-
-end
-
 function local_paint(btn, state)
 
 if ~local_ok(btn)
@@ -572,6 +499,15 @@ if nargin < 2 || isempty(state)
     state = 'idle';
 end
 state = lower(char(state));
+is_round = false;
+try
+    is_round = isappdata(btn, 'ZefRoundKey') && ~isempty(getappdata(btn, 'ZefRoundKey'));
+catch
+end
+if ~is_round
+    local_paint_background(btn, state);
+    return
+end
 idle = [];
 try
     idle = getappdata(btn, 'ZefRoundIdle');
@@ -608,6 +544,38 @@ if local_ok(cap) && ~isempty(fillc)
 end
 try
     setappdata(btn, 'ZefRoundState', state);
+catch
+end
+
+end
+
+function local_paint_background(btn, state)
+
+try
+    if ~isappdata(btn, 'ZefChromeIdleBg')
+        setappdata(btn, 'ZefChromeIdleBg', btn.BackgroundColor);
+    end
+catch
+end
+idle = [];
+try
+    idle = getappdata(btn, 'ZefChromeIdleBg');
+catch
+end
+if isempty(idle)
+    return
+end
+fillc = idle;
+if ~strcmp(state, 'idle')
+    try
+        theme = zef_ui_theme();
+        fillc = theme.color.hover;
+    catch
+        return
+    end
+end
+try
+    btn.BackgroundColor = fillc;
 catch
 end
 
