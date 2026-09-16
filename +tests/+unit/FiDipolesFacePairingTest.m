@@ -91,38 +91,7 @@ classdef FiDipolesFacePairingTest < matlab.unittest.TestCase
         end
 
         function stf = currentPairs(tetrahedra, brain_ind)
-            % Transcribed from src/forward/lead_field/zef_fi_dipoles.m.
-            nb = length(brain_ind);
-            if isempty(brain_ind)
-                stf = zeros(0,4);
-                return
-            end
-            face_opp = [2 3 4; 1 3 4; 1 2 4; 1 2 3];
-            keys = zeros(4*nb, 3);
-            owners = zeros(4*nb, 1);
-            oppv = zeros(4*nb, 1);
-            for f = 1:4
-                sl = (f-1)*nb + (1:nb);
-                keys(sl,:) = sort(tetrahedra(brain_ind, face_opp(f,:)), 2);
-                owners(sl) = brain_ind;
-                oppv(sl) = f;
-            end
-            [~, ~, ic] = unique(keys, 'rows');
-            counts = accumarray(ic, 1);
-            row_ok = counts(ic) == 2;
-            ic_s = ic(row_ok);
-            owners_s = owners(row_ok);
-            opp_s = oppv(row_ok);
-            [~, ord] = sort(ic_s);
-            owners_s = owners_s(ord);
-            opp_s = opp_s(ord);
-            a = owners_s(1:2:end); b = owners_s(2:2:end);
-            oa = opp_s(1:2:end);   ob = opp_s(2:2:end);
-            swap = a > b;
-            tmp = a(swap); a(swap) = b(swap); b(swap) = tmp;
-            tmp = oa(swap); oa(swap) = ob(swap); ob(swap) = tmp;
-            [~, Iu] = unique([a b], 'rows');
-            stf = [a(Iu) b(Iu) oa(Iu) ob(Iu)];
+            stf = zef_fi_shared_faces(tetrahedra, brain_ind);
         end
     end
 
@@ -193,6 +162,15 @@ classdef FiDipolesFacePairingTest < matlab.unittest.TestCase
                 testCase.verifyFalse(ismember(tetra(stf(r,2), stf(r,4)), shared), ...
                     sprintf('pair %d: opposite vertex of the second tet lies on the shared face', r));
             end
+        end
+
+        function productionDipolesMatchSharedFaces(testCase)
+            [nodes, tetra] = tests.unit.FiDipolesFacePairingTest.kuhnMesh(3);
+            bi = (1:size(tetra, 1))';
+            [~, ~, ~, ~, locs, n_pairs] = zef_fi_dipoles(nodes, tetra, bi);
+            stf = zef_fi_shared_faces(tetra, bi);
+            testCase.verifyEqual(n_pairs, size(stf, 1));
+            testCase.verifyEqual(size(locs, 1), n_pairs);
         end
 
         function nonManifoldFacesAreSkippedWithAWarning(testCase)

@@ -8,11 +8,25 @@ classdef TesDofAveragingTest < matlab.unittest.TestCase
 %   shared-array accumulation: a wrong incidence or a swapped stride would
 %   mix Cartesian components or average the wrong group.
 %
-%   The oracles below are transcribed from upstream
-%   m/forward_simulation/lead_field/zef_lead_field_tes_fem.m and from
-%   src/forward/lead_field/zef_lead_field_tes_fem.m.
+%   The upstream oracle is transcribed from
+%   m/forward_simulation/lead_field/zef_lead_field_tes_fem.m. The current
+%   form is zef_average_tes_dof_current, which zef_lead_field_tes_fem calls.
 %
-%   See also zef_lead_field_tes_fem, zef_decompose_dof_space.
+%   See also zef_lead_field_tes_fem, zef_decompose_dof_space,
+%            zef_average_tes_dof_current.
+
+    methods (TestClassSetup)
+        function addLeadFieldFolderToPath(testCase)
+            if ~isempty(which('zef_average_tes_dof_current'))
+                return
+            end
+            here = fileparts(mfilename('fullpath'));
+            repo = fileparts(fileparts(here));
+            testCase.applyFixture( ...
+                matlab.unittest.fixtures.PathFixture( ...
+                fullfile(repo, 'src', 'forward', 'lead_field')));
+        end
+    end
 
     methods (Static)
         function [dof_ind, dof_count, R1, R2, R3] = fixture(K, K3, L)
@@ -48,15 +62,7 @@ classdef TesDofAveragingTest < matlab.unittest.TestCase
         end
 
         function L = currentAverage(dof_ind, dof_count, R1, R2, R3)
-            K = numel(dof_ind);
-            K3 = numel(dof_count);
-            Lch = size(R1, 2);
-            L = zeros(3*K3, Lch);
-            S_dof = sparse(dof_ind(:), (1:K)', 1, K3, K);
-            dc = dof_count(:);
-            L(1:3:end,:) = (S_dof * R1) ./ dc;
-            L(2:3:end,:) = (S_dof * R2) ./ dc;
-            L(3:3:end,:) = (S_dof * R3) ./ dc;
+            L = zef_average_tes_dof_current(dof_ind, dof_count, R1, R2, R3);
         end
     end
 

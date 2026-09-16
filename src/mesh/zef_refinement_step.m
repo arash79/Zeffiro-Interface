@@ -150,13 +150,7 @@ if eval('zef.refinement_on')
 
         zef_waitbar(3,length_waitbar,h,'Surface refinement.');
 
-        is_full = edge_ind(:,5) == 1;
-        edge_ind(:,4) = 0;
-        if any(is_full)
-            [unique_full, ~] = unique(edge_ind(is_full, 1:2), 'rows', 'stable');
-            [tf, loc] = ismember(edge_ind(:,1:2), unique_full, 'rows');
-            edge_ind(tf,4) = loc(tf);
-        end
+        edge_ind(:,4) = zef_mid_edge_node_index(edge_ind);
 
         zef_waitbar(4,length_waitbar,h,'Surface refinement.');
 

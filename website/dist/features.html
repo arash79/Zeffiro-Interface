@@ -93,8 +93,12 @@
             <li><code>utilities.duneuro2zef</code> — DUNEuro MATLAB project → native mesh/sensors/lead field (Open project detects these files)</li>
           </ul>
           <p class="feat-note">
-            The converters write anatomy. They do not assemble a lead field. There is no
-            generic DICOM-to-mesh button in <code>src/io</code>.
+            <code>utilities.fs2zef</code> and <code>utilities.sn2zef</code> write anatomy
+            (surfaces / STLs / a <code>.zef</code> manifest).
+            <code>utilities.brainstorm2zef</code> builds a live Zeffiro session and mesh.
+            <code>utilities.duneuro2zef</code> imports a DUNEuro MATLAB dump, including
+            <code>L</code> when the file contains one; it does not run Zeffiro FEM.
+            There is no generic DICOM-to-mesh button in <code>src/io</code>.
           </p>
           <a class="text-link" href="docs.html#getting-started">Import walk-through in Docs</a>
         </div>

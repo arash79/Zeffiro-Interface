@@ -34,13 +34,12 @@ function [stensil, signs, source_moments, source_directions, source_locations, n
 %     source_locations   - [n_pairs × 3] midpoints
 %     n_of_adj_tetra     - n_pairs
 %
-%   See also zef_ew_dipoles, zef_lead_field_matrix.
+%   See also zef_fi_shared_faces, zef_ew_dipoles, zef_lead_field_matrix.
 
 
 % Matrix sizes
 
 n_of_nodes = size(nodes, 1);
-n_of_tetra_in_brain = length(brain_ind);
 n_of_tetra = size(tetrahedra, 1);
 
 % Shared faces among brain tetrahedra: one unique-key pass over all 4
@@ -48,61 +47,9 @@ n_of_tetra = size(tetrahedra, 1);
 % Equivalent to the previous 6 sortrows of opposite-face combinations;
 % neighbour tet sets and opposite-vertex node pairs are the same.
 
-if isempty(brain_ind)
-    sorted_tetra_faces = zeros(0, 4);
-else
-    face_opp = [
-        2 3 4
-        1 3 4
-        1 2 4
-        1 2 3
-        ];
-    keys = zeros(4 * n_of_tetra_in_brain, 3);
-    owners = zeros(4 * n_of_tetra_in_brain, 1);
-    opp = zeros(4 * n_of_tetra_in_brain, 1);
-    for f = 1:4
-        sl = (f - 1) * n_of_tetra_in_brain + (1:n_of_tetra_in_brain);
-        keys(sl, :) = sort(tetrahedra(brain_ind, face_opp(f, :)), 2);
-        owners(sl) = brain_ind;
-        opp(sl) = f;
-    end
-    [~, ~, ic] = unique(keys, 'rows');
-    counts = accumarray(ic, 1);
-
-    % Only faces with exactly two incidences yield a dipole: one incidence is
-    % a boundary face of the brain submesh, and more than two means the
-    % submesh is non-manifold, where the midpoint-of-opposite-vertices
-    % construction below is not defined. Boundary faces are expected and
-    % silent, but a non-manifold face costs the caller source positions with
-    % nothing else to signal it, so say so. The upstream formulation paired
-    % consecutive duplicates instead, which on a 4-way shared face emitted
-    % dipoles between arbitrary members of the group.
-    n_non_manifold = nnz(counts > 2);
-    if n_non_manifold > 0
-        warning('zef_fi_dipoles:nonManifoldFaces', ...
-            ['%d face(s) of the brain submesh are shared by more than two ' ...
-            'tetrahedra, so no face-interior dipole is defined there and ' ...
-            'they are skipped. Check the mesh for duplicated or ' ...
-            'overlapping elements.'], n_non_manifold);
-    end
-
-    row_ok = counts(ic) == 2;
-    ic_s = ic(row_ok);
-    owners_s = owners(row_ok);
-    opp_s = opp(row_ok);
-    [ic_s, ord] = sort(ic_s);
-    owners_s = owners_s(ord);
-    opp_s = opp_s(ord);
-    a = owners_s(1:2:end);
-    b = owners_s(2:2:end);
-    oa = opp_s(1:2:end);
-    ob = opp_s(2:2:end);
-    swap = a > b;
-    tmp = a(swap); a(swap) = b(swap); b(swap) = tmp;
-    tmp = oa(swap); oa(swap) = ob(swap); ob(swap) = tmp;
-    [~, Iu] = unique([a b], 'rows');
-    sorted_tetra_faces = [a(Iu) b(Iu) oa(Iu) ob(Iu)];
-end
+% Shared faces among brain tetrahedra. Faces with one incidence are
+% brain-boundary; more than two incidences are non-manifold and skipped.
+sorted_tetra_faces = zef_fi_shared_faces(tetrahedra, brain_ind);
 
 % Set node pairs that share a face.
 

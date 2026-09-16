@@ -8,11 +8,23 @@ classdef CreateFemMeshStencilTest < matlab.unittest.TestCase
 %   would produce a non-conforming mesh that later refinement, conductivity
 %   assignment and the lead field all silently consume.
 %
-%   The oracles below are transcribed from upstream m/zef_create_fem_mesh.m
-%   and from src/mesh/zef_create_fem_mesh.m. They take the same lattice
-%   that meshgrid produces and return tetra and label_ind.
+%   The upstream loop oracle is transcribed from upstream
+%   m/zef_create_fem_mesh.m. The current fill is zef_lattice_cubes_to_tetra,
+%   which zef_create_fem_mesh calls.
 %
-%   See also zef_create_fem_mesh.
+%   See also zef_create_fem_mesh, zef_lattice_cubes_to_tetra.
+
+    methods (TestClassSetup)
+        function addMeshFolderToPath(testCase)
+            if ~isempty(which('zef_lattice_cubes_to_tetra'))
+                return
+            end
+            here = fileparts(mfilename('fullpath'));
+            repo = fileparts(fileparts(here));
+            testCase.applyFixture( ...
+                matlab.unittest.fixtures.PathFixture(fullfile(repo, 'src', 'mesh')));
+        end
+    end
 
     methods (Static)
         function S = mode1Stencils()
@@ -85,51 +97,8 @@ classdef CreateFemMeshStencilTest < matlab.unittest.TestCase
             end
         end
 
-        function [tetra, label_ind] = currentFill(X, Y, Z, mode, labeling)
-            size_xyz = size(X);
-            n_x = size_xyz(2) - 1;
-            n_y = size_xyz(1) - 1;
-            n_z = size_xyz(3) - 1;
-            n_cubes = n_x * n_y * n_z;
-            [i_z, i_y, i_x] = ndgrid(1:n_z, 1:n_y, 1:n_x);
-            ix = i_x(:);
-            iy = i_y(:);
-            iz = i_z(:);
-            cx = [0 1 1 0 0 1 1 0];
-            cy = [0 0 1 1 0 0 1 1];
-            cz = [0 0 0 0 1 1 1 1];
-            ind_mat_2 = sub2ind(size_xyz, iy + cy, ix + cx, iz + cz);
-            if mode == 1
-                St = tests.unit.CreateFemMeshStencilTest.mode1Stencils();
-                S = zeros(5, 4, 2, 2, 2);
-                for px = 1:2
-                    for py = 1:2
-                        for pz = 1:2
-                            S(:,:,px,py,pz) = St{px,py,pz};
-                        end
-                    end
-                end
-                px = 2 - mod(ix, 2);
-                py = 2 - mod(iy, 2);
-                pz = 2 - mod(iz, 2);
-                lin_s = sub2ind([2 2 2], px, py, pz);
-                Sflat = reshape(S, 5, 4, 8);
-                col_idx = reshape(permute(Sflat(:,:,lin_s), [2 1 3]), 20, n_cubes)';
-                gathered = ind_mat_2((1:n_cubes)' + (col_idx - 1) * n_cubes);
-                tetra = reshape(gathered', 4, [])';
-                n_tets = 5;
-            else
-                st = tests.unit.CreateFemMeshStencilTest.mode2Stencil();
-                col_idx = repmat(reshape(st', 1, 24), n_cubes, 1);
-                gathered = ind_mat_2((1:n_cubes)' + (col_idx - 1) * n_cubes);
-                tetra = reshape(gathered', 4, [])';
-                n_tets = 6;
-            end
-            if labeling == 1
-                label_ind = repelem(ind_mat_2, n_tets, 1);
-            else
-                label_ind = tetra;
-            end
+        function [tetra, label_ind] = currentFill(X, ~, ~, mode, labeling)
+            [tetra, label_ind] = zef_lattice_cubes_to_tetra(X, mode, labeling);
         end
     end
 

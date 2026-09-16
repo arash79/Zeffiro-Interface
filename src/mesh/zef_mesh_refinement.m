@@ -152,13 +152,7 @@ if not(isempty(compartment_ind))
         edge_ind = sortrows(edge_ind,[1 2 5]);
         clear edge_ind_2 nodes_new distance_vec_new;
 
-        is_full = edge_ind(:,5) == 1;
-        edge_ind(:,4) = 0;
-        if any(is_full)
-            [unique_full, ~] = unique(edge_ind(is_full, 1:2), 'rows', 'stable');
-            [tf, loc] = ismember(edge_ind(:,1:2), unique_full, 'rows');
-            edge_ind(tf,4) = loc(tf);
-        end
+        edge_ind(:,4) = zef_mid_edge_node_index(edge_ind);
 
         [edge_val_aux edge_ind_2] = unique(edge_ind(:,4));
         clear edge_val_aux;

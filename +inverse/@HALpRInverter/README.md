@@ -1,6 +1,6 @@
 # inverse.HALpRInverter
 
-ℓ_p hierarchical MAP: `q=1` is a sparse L1 hierarchy (`L1_optimization`); `q=2` is weighted ℓ₂ IRLS with optional sLORETA-style scaling. Use it when you want sparsity that IAS’s Gaussian–gamma model does not give you, and you have the EXP common library on the path.
+ℓ_p hierarchical MAP: `q=1` is a sparse L1 hierarchy (`L1_optimization`); `q=2` is weighted ℓ₂ IRLS with optional sLORETA-style scaling. Use it when you want sparsity that IAS’s Gaussian–gamma model does not give you.
 
 Registry id: `halpr`. Inverse tools → HALpR opens a class-inverter dialog. GUI Standardized Hierarchical L1 MAP still calls `zef_sl1_iteration`.
 
@@ -14,7 +14,7 @@ Registry id: `halpr`. Inverse tools → HALpR opens a class-inverter dialog. GUI
 
 ## Code functionality
 
-**Deps:** `plugins/EXP/common/L1_optimization.m` on path.
+**Deps:** `src/inverse/L1_optimization.m` on path (`genpath(src)`).
 
 **q semantics:** `q=1` → sparse L1 hierarchy; `q=2` → quadratic / IRLS branch with optional Standardized `T_scale`. The IRLS scale is `max(abs(f))^2`, not algebraic `max(f)` (upstream). A zero frame returns `z = 0`. Sensitivity-weighted mode requires `mod(size(L,2),3)==0`.
 

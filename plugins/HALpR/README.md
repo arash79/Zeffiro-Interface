@@ -2,7 +2,7 @@
 
 Thin Inverse-tools window around `inverse.HALpRInverter`. Distinct from Inverse tools → **Standardized Hierarchical L1 MAP Inversion (quadprog)**, which still runs `zef_sl1_iteration`.
 
-Start opens a parameter dialog; **Start** on that dialog calls `zef_inverse_run(zef, "halpr", …)`. The MAP loop uses `L1_optimization` from `plugins/EXP/common`.
+Start opens a parameter dialog; **Start** on that dialog calls `zef_inverse_run(zef, "halpr", …)`. The MAP loop uses `L1_optimization` from `src/inverse`.
 
 ℓ_p hierarchy: `q=1` is sparse L1; `q=2` is weighted ℓ₂ IRLS. Method paper on the class: [doi:10.1016/j.clinph.2023.12.001](https://doi.org/10.1016/j.clinph.2023.12.001).
 
@@ -48,7 +48,7 @@ Sensitivity-weighted mode requires `mod(size(L,2),3)==0`. A zero measurement fra
 ## Pitfalls
 
 - Do not treat this dialog as a wrapper around `zef_sl1_iteration`. They are different code.
-- EXP `L1_optimization` must be on the worker path for cluster jobs.
+- `L1_optimization` must be on the worker path for cluster jobs (`src/inverse`).
 - Tests: `tests.unit.HALpRInverterTest`; start name in `tests.unit.ClassInverseDialogTest`.
 
 ## Related

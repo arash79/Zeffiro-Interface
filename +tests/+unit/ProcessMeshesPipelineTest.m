@@ -34,5 +34,15 @@ classdef ProcessMeshesPipelineTest < matlab.unittest.TestCase
             testCase.verifyTrue(all(zef.domain_labels >= 1));
             testCase.verifyTrue(all(zef.domain_labels <= 1));
         end
+
+        function createFemMeshMode2AlsoFillsClosedCube(testCase)
+            zef = tests.support.createSyntheticMeshZef();
+            zef.initial_mesh_mode = 2;
+            zef = zef_process_meshes(zef);
+            zef = zef_create_fem_mesh(zef);
+            testCase.verifyGreaterThan(size(zef.tetra, 1), 1);
+            testCase.verifyEqual(size(zef.tetra, 2), 4);
+            testCase.verifyEqual(numel(zef.domain_labels), size(zef.tetra, 1));
+        end
     end
 end

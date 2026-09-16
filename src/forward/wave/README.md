@@ -57,5 +57,6 @@ Exact working directory and `parameters.m` layout follow the asteroid radar stud
 ## Developer guidance
 
 - Keep wave numerics isolated from quasi-static lead-field FEM; share only generic linear-algebra helpers if needed.
+- These files are **scripts** on `genpath(src)`. Do not add another `create_system.m` / `compute_data.m` elsewhere on the MATLAB path.
 - When changing Born / QAM demod, update save/load pairs together.
 - Pitfall: running wave scripts inside a multicompartment head session and looking for `zef.L`.

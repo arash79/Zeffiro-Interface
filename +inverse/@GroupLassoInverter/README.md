@@ -1,6 +1,6 @@
 # inverse.GroupLassoInverter
 
-Group LASSO penalizes the ℓ₂ norm of each 3-component source together, so a location is either on (all three components) or off, rather than shrinking axes independently. The MAP loop calls `LG_optimization` in `plugins/EXP/common`.
+Group LASSO penalizes the ℓ₂ norm of each 3-component source together, so a location is either on (all three components) or off, rather than shrinking axes independently. The MAP loop calls `LG_optimization` in `src/inverse`.
 
 Registry ids: `grouplasso`, `group_lasso`. Inverse tools → Group Lasso opens a class-inverter dialog. Related legacy GUI remains EXP / Lasso.
 
@@ -14,7 +14,7 @@ Registry ids: `grouplasso`, `group_lasso`. Inverse tools → Group Lasso opens a
 
 ## Code functionality
 
-**Dependencies:** `plugins/EXP/common/LG_optimization.m` must be on the MATLAB path (plugins path is added by `zeffiro_interface`).
+**Dependencies:** `src/inverse/LG_optimization.m` must be on the MATLAB path (`genpath(src)` from `zeffiro_interface`).
 
 **Inputs:** `run_frame_loop` calls `invert` once per frame with a single measurement column. `procFile`, `source_direction_mode`, and `source_positions` are unused here (kept for the shared inverter signature). `size(L,2)` must be a multiple of 3. Partial NaNs in a MAP iterate are replaced by the mean of finite `|z|` (one warning); an all-NaN iterate errors.
 

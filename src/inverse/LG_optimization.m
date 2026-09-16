@@ -14,9 +14,10 @@ function x = LG_optimization(A,sigma,y,gamma,x,maxiter,estimation_type)
 %   scaling rather than an n×n sparse D. estimation_type==3 adds FOCUSS
 %   T_scale and ridge reg·sum(d)·I, reusing that Gram. Else the ridge is
 %   I (not the unused Frobenius ridge) and a dual gap (reltol 1e-4) is
-%   tracked. Scaling by 1/sigma is skipped when sigma==1.
+%   tracked. Scaling by 1/sigma is skipped when sigma==1. Lives in
+%   src/inverse so class solvers resolve it without genpath(plugins).
 %
-%   See also L1_optimization, exp_iteration.
+%   See also L1_optimization, exp_iteration, inverse.GroupLassoInverter.
 
 dualObj = -Inf;
 reltol = 1e-4;

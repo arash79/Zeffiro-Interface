@@ -95,7 +95,9 @@ source_ind = [1:size(tetrahedra,1)]';
 cholinc_tol = 1e-3;
 if size(electrodes,2) == 4
     electrode_model = 'CEM';
-    L = max(electrodes(:,1));
+    % CEM ids often inherit uint32 face indices. MATLAB integer+double
+    % arithmetic stays integer, and datevec(now+eta) then errors.
+    L = double(max(electrodes(:,1)));
     ele_ind = electrodes;
     impedance_vec = ones(max(electrodes(:,1)),1);
     impedance_inf = 1;

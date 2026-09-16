@@ -20,6 +20,7 @@
 | `zef_normalizeInverseReconstruction.m` | Peak vector-norm scale |
 | `zef_inverse_gamma_gpu.m` / `zef_gamma_gpu.m` | Inverse-gamma / gamma PDF helpers |
 | `zef_find_gaussian_prior.m` / `zef_find_g_hyperprior.m` / `zef_find_ig_hyperprior.m` | SNR / hyperprior helpers used by IAS/RAMUS and plugins |
+| `L1_optimization.m` / `LG_optimization.m` | EXP / HALpR / Group Lasso inner MAP loops (also called from `plugins/EXP`) |
 
 ## Code functionality
 
@@ -76,7 +77,7 @@ zef_kf_start;
 ## Important notes
 
 - Most Inverse-tools menus still run legacy `plugins/*` iterations. Four **(class solver)** entries (eLORETA, UKF-NMM, HALpR, Group Lasso) call `zef_inverse_run` from `zef_open_class_inverse`. Scripts and tests should still prefer `zef_inverse_run` directly.
-- RAMUS / GroupLasso / HALpR need multires / EXP optimizers prepared first.
+- RAMUS / GroupLasso / HALpR need a multiresolution decomposition or the `src/inverse` EXP optimizers (`L1_optimization` / `LG_optimization`) on the worker path.
 - Averaging differs: ClassObj always means the window; legacy gated by `inv_time_interval_averaging`.
 - DTI structural process-noise Q is **legacy Kalman plugin only**, not `inverse.KalmanInverter`.
 - `"sloreta"` / `"sbl"` may still default CSM `method_type` to dSPM unless `MethodParams.method_type` is set.

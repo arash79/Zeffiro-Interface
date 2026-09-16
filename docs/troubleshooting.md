@@ -55,7 +55,7 @@ The path is relative to `pwd`. `cd` to the repository root, or pass an absolute 
 
 ## Group LASSO / HALpR / RAMUS fail on cluster workers
 
-EXP `LG_optimization` / `L1_optimization` and RAMUS `multiresolution_dec` must be available on the worker. Plugins path comes from `zeffiro_interface`; cluster jobs must reconstruct that environment. RAMUS without a decomposition is not a complete run.
+EXP `LG_optimization` / `L1_optimization` (`src/inverse`) and RAMUS `multiresolution_dec` must be available on the worker. `zeffiro_interface` puts `src/` on the path; cluster jobs must reconstruct that environment. RAMUS without a decomposition is not a complete run.
 
 ## Tests find nothing
 

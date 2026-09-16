@@ -12,7 +12,7 @@ Parent map: [`../README.md`](../README.md).
 |----------|------------------|----------|
 | `createSyntheticInverseZef` | Almost every inverse test | 4 sensors, 2 sources, `L` is `randn(4,6)` (mode 1: 3 components × 2 sources), 3 measurement frames |
 | `createSyntheticUKFNMMZef` | UKFNMM unit + dispatch tests | Defaults: 8 sensors, 6 sources, 12 frames, `fs=100` Hz, Gaussian bumps in time + 2% noise. Name-value overrides for all of those |
-| `createSyntheticMeshZef` | Mesh pipeline unit tests | Closed 20 mm cube compartment `c1`, refinement off, empty sensors |
+| `createSyntheticMeshZef` | Mesh pipeline and cube FEM assembly tests | Closed 20 mm cube compartment `c1`, refinement off, empty sensors, `surface_sources=0` |
 
 ## Code functionality
 
@@ -62,6 +62,7 @@ zef_nmm = tests.support.createSyntheticUKFNMMZef("n_frames", 20);
 - `L` is unstructured random (or random with a known bump image). Reconstruction “looks” like noise except in UKFNMM bump tests.
 - Interpolation index **must stay a column**. A row vector breaks post-process expansion and has caused false test failures.
 - Fixtures do not set `source_model` / `lead_field_type`; class invert does not need them once `L` exists.
+- `createSyntheticMeshZef` sets `surface_sources=0`, `n_sources=10000`, and `dof_decomposition_type=2` (same as `zef_init`) so cube FEM assembly can run without a base-workspace session.
 
 ## Developer guidance
 

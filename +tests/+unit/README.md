@@ -18,10 +18,10 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `DipoleScanMNEOptTest` | Dipole Scan `pagesvd` vs SVD loop; mixed/fixed orientation; MNE `W*f` vs plugin-style kernel; dispatch smoke |
 | `BeamformerInverterOptTest` | Cached `B*f` vs per-source loop across LCMV / UNG / unit-gain × regularization × column-norm settings; LCMV recovers an exact noiseless source when \(C=I\); missing `error_cov` errors |
 | `InverseScientificIdentityTest` | Dipole-scan GoF \(=1\) at a known source; eLORETA \(W_i^{-1}=(L_i^\top M^{-1}L_i)^{-1/2}\); Kalman identity-\(A\) test, mixed-diagonal predict, constant-state tracking, class RTS |
-| `DownloaderSafetyTest` | `zeffiro_downloader` quotes git arguments, restores cwd, rejects non-URL remotes |
+| `DownloaderSafetyTest` | Structural: source still quotes git args and uses `onCleanup`. Behavioral: non-URL remotes error `InvalidGitAddress` |
 | `StiffnessMatrixIdentityTest` | P1 stiffness on the unit tet matches \(\nabla\lambda_i\cdot(\sigma\nabla\lambda_j)V\); anisotropic \(\sigma_{xy}/\sigma_{xz}/\sigma_{yz}\) and a random SPD tensor; two-tet assembly |
 | `ProjectLoadLegacyTest` | Single-struct MAT files are not overwritten; non-struct singles error; `zef_remove_system_fields` drops `gpu_count` / `path_cell` and keeps `save_file` |
-| `ProjectSaveExportTest` | Headless lead-field export and handle stripping |
+| `ProjectSaveExportTest` | Headless lead-field export, handle stripping, save/load round-trip of `L` |
 | `Duneuro2ZefTest` | DUNEuro `eegL` layouts → interleaved `zef.L`; 0-based tets; hex split; mm/m; tensors; extra fields; unsupported inputs; converted MAT is not re-detected as DUNEuro; `run` matches `convert`; `find_files` size priority; export-folder detection |
 | `BuildElectrodesCEMTest` | P1 CEM `A,B,C` vs analytic triangle mass; two-triangle \(C_{ee}=1/Z\); infinite-\(Z\) early return; point fallback |
 | `DTIActiveCompartmentMapTest` | Active-compartment map skips off tags; iso fallback uses that map, not tag position |
@@ -35,9 +35,9 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `IASInverterOptTest` | IAS `invert` vs legacy `W = d.*(W'*inv(A))`; `d_sqrt = sqrt(θ)` (prior std, not variance) |
 | `RAMUSInverterOptTest` | Same kernel comparison on `inverse.RAMUSInverter` with synthetic multires `dec` / `ind` / `cnt` lattices |
 | `KalmanApproxRtsStandardizationTest` | Scaled Denman–Beavers `P^{-1/2}`; approx RTS multiplies `Z*m` |
-| `MegCartesianInterpolationGuardTest` | Cartesian MEG interpolation refuses St. Venant |
+| `MegCartesianInterpolationGuardTest` | `zef_require_meg_cartesian_interpolation` allows Whitney/H(div) and errors on St. Venant; structural check that MEG FEM files call the guard |
 | `EegFaceBasedDirectionModeTest` | EEG `face_based` / default `mesh based` throw `UnsupportedDirectionMode` before assembling `L` |
-| `SessionWantsGpuTest` | FEM GPU gate does not `evalin('base','zef.gpu_count')` |
+| `SessionWantsGpuTest` | `zef_session_wants_gpu` on the session argument; structural check that MEG/EIT FEM do not `evalin('base','zef.gpu_count')` |
 | `LeadFieldSensorsAuxTest` | Types 1–10 PEM `/1000`, MEG xyz `/1000`, CEM unscaled; anisotropic MEG refuses EEG table |
 | `PemReferenceLoadTest` | Infinite-Z PEM zeros electrode 1 only inside a PCG block |
 | `EITGradientProductTest` | `D_A` matches `∫∇ψ_i·∇ψ_j`; inherited off-diagonal junk is not present |
@@ -54,25 +54,27 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `ClassGMMOptTest` | Mahalanobis / E-step / weighted EM of `inverse.gmm` vs original formulas; package isolation from retired `plugins.ClassGMM` |
 | `KalmanStandardizationExponentTest` | Class Kalman sLORETA exponent default 1/2 vs legacy `zef.standardization_exponent` (default 1); bitwise match when the exponent is aligned |
 | `MNEDepthWeightingTest` | Class MNE `theta` stays a per-source Dale/Lin vector, not `mean(theta)` |
-| `RAMUSAggregationTest` | Scatter/average identities: divide by `n_dec * n_levels * sum(sparsity.^[0:n_levels-1])`; `multiresolution_count` unused |
+| `RAMUSAggregationTest` | Empty-dec error id; RAMUS-only `method_type` `"sLORETA each step"` |
 | `PrecomputeCacheKeyTest` | CSM / MNE / eLORETA / Beamformer / DipoleScan cached operators invalidate when `L` or settings change |
 
 ### Mesh, FEM interpolation, lead-field kernels
 
 | Class | What it actually checks |
 |-------|-------------------------|
-| `CreateFemMeshStencilTest` | Vectorized cube→tet fill vs the upstream i_x/i_y/i_z loop (5-tet and 6-tet stencils, parity diagonals) |
-| `FiDipolesFacePairingTest` | Unique-key FI face pairing vs upstream `sortrows` on a Kuhn cube grid |
-| `MeshRefinementEdgeIndexTest` | Mid-edge node numbering: `unique`/`ismember` vs the upstream sequential loop |
-| `NearestNeighbourGroupTest` | `accumarray` neighbour groups vs `find(p_nn==i)` in H(div)/Whitney interpolation |
+| `CreateFemMeshStencilTest` | `zef_lattice_cubes_to_tetra` vs the upstream i_x/i_y/i_z loop (5-tet and 6-tet stencils, parity diagonals) |
+| `FiDipolesFacePairingTest` | `zef_fi_shared_faces` vs upstream `sortrows`; `zef_fi_dipoles` pair count |
+| `MeshRefinementEdgeIndexTest` | `zef_mid_edge_node_index` vs the upstream sequential loop |
+| `NearestNeighbourGroupTest` | `zef_nearest_neighbour_groups` vs `find(p_nn==i)` in H(div)/Whitney interpolation |
 | `MEGGradiometerDistanceLawTest` | Gradiometer load uses \(\|r_{\mathrm{sensor}}-r_{\mathrm{centroid}}\|^{-3}\), not the overwritten directional vector |
 | `MEGLoadVectorVectorizationTest` | Magnetometer/gradiometer `accumarray` nodal load vs the upstream tetra loop |
-| `TesDofAveragingTest` | TES current-density DOF average: sparse incidence vs the scatter loops |
+| `TesDofAveragingTest` | `zef_average_tes_dof_current` vs the scatter loops |
 | `VolumeScalarMatrixUFGTest` | NSE `uFG` convection kernel vs a dense triple-loop oracle (`zef_barycentric_weighting` `'uFG'`) |
 | `AnisotropicConductivityGuardTest` | Lead-field types 6–10 error unless `sigma(:,3:8)` is present |
-| `ProcessMeshesPipelineTest` | Cube surface translation via `zef_process_meshes`; `zef_create_fem_mesh` fills labeled tets |
+| `ProcessMeshesPipelineTest` | Cube surface translation via `zef_process_meshes`; `zef_create_fem_mesh` fills labeled tets (modes 1 and 2) |
 | `EegLeadFieldAssemblyTest` | PEM Whitney EEG FEM on a cube lattice: finite `L`, 2×6, mean-zero columns |
-| `EnsureParpoolTest` | CPU meshing / MEG / EIT / transfer / wave Born go through `zef_ensure_parpool`; those files do not call `gcp` / `parpool` directly |
+| `MegLeadFieldAssemblyTest` | Magnetometer Whitney MEG FEM on a cube lattice: finite `L`; cartesian occupancy may drop sources (`size(L,2)` is a multiple of 3, not necessarily `3*n_source`) |
+| `EitLeadFieldAssemblyTest` | CEM EIT FEM on a cube lattice: finite Jacobian from a bipolar `current_pattern`; uint32 CEM face ids; type-1 DOF decomposition |
+| `EnsureParpoolTest` | Structural: CPU meshing / MEG / EIT / transfer / wave Born source contains `zef_ensure_parpool` and those FEM files do not call `gcp`/`parpool` directly. Behavioral: helper returns logical and is a no-op without PCT; existing matching pool is reused |
 
 ### Types and chrome
 
@@ -92,7 +94,7 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `WindowPlacementTest` | Clamp / centre helpers keep windows on the work area |
 | `SensorListSyncTest` | Figure-tool sensor count matches listed rows |
 | `SensorTableSyncTest` | 8-column sensor-set table; stale 7-column GUI data cannot overwrite imported `Electrodes` / Visible; fs2zef `electrodes.dat` import + save/reload keeps `Electrodes 1` |
-| `PluginIniResolutionTest` | Every Start function named in `profile/multicompartment_head/zeffiro_plugins.ini` exists on the path |
+| `PluginIniResolutionTest` | Every Start function named in `profile/*/zeffiro_plugins.ini` exists on the path |
 
 ## Code functionality
 
@@ -104,7 +106,7 @@ Typical inverse test:
 4. Compare against an in-file reference loop, or against a second inverter configured to the old algorithm.
 5. Close waitbars in `TestMethodTeardown` where the kernel opens one.
 
-HALpR / GroupLasso call `L1_optimization` / `LG_optimization` from `plugins/EXP/common` (on `genpath(plugins)` after `zeffiro_interface`). Those tests fail if EXP is not on the path.
+HALpR / GroupLasso call `L1_optimization` / `LG_optimization` from `src/inverse` (on `genpath(src)` after `zeffiro_interface`).
 
 Chrome tests create **real** `figure` / `uifigure` windows (`Visible` often `'off'`), track them in a `Figures` property, and delete them in teardown. `WaitbarTest` and `UiThemeTest` also snapshot `groot` `defaultFigureWindowStyle` because `zef_window_manager('init')` sets it to `'normal'`.
 

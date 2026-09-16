@@ -72,6 +72,7 @@ The typeset manual under `documentation/` can lag the code. Folder READMEs and `
 - Keep `core.ZefSourceModel` at `+core/` so older `.mat` files load.
 - Do not resurrect retired directories that `ArchitectureLayoutTest` asserts absent: `tools/plugins`, `src/core`, `src/gui/helpers`, `src/auxiliary`, `+plugins`.
 - Do not restore `plugins/GithubPusher` (credential-in-URL git helper). Use ordinary git / GitHub from a terminal.
+- Do not restore `plugins/SensitivityTool`; Monte Carlo sensitivity lives in `utilities.sensitivity` / `zef_sensitivity_run`.
 - Do not commit `gui_audit_output/`, `gui_refine_output/`, `Untitled.mat`, or other local MATLAB desktop saves. They are gitignored.
 
 ## Reporting bugs

@@ -2,7 +2,7 @@
 
 Thin Inverse-tools window around `inverse.GroupLassoInverter`. Distinct from Inverse tools → **Standardized Hierarchical L1/L2 MAP Inversion (Lasso)**, which still runs legacy `exp_iteration` in `plugins/EXP`.
 
-Start opens a parameter dialog; **Start** on that dialog calls `zef_inverse_run(zef, "grouplasso", …)`. The MAP loop uses `LG_optimization` from `plugins/EXP/common` (must stay on the path).
+Start opens a parameter dialog; **Start** on that dialog calls `zef_inverse_run(zef, "grouplasso", …)`. The MAP loop uses `LG_optimization` from `src/inverse`.
 
 ## Where this fits
 
@@ -41,7 +41,7 @@ Registered on all bundled profiles, including asteroid gravity/radar.
 [zef, r] = zef_inverse_run(zef, "grouplasso", "execution", "local");
 ```
 
-Cluster workers need `genpath(plugins)` so `LG_optimization` resolves.
+Cluster workers need `src/inverse` so `LG_optimization` resolves.
 
 ## Pitfalls
 

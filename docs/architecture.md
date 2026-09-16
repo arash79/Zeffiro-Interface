@@ -135,7 +135,7 @@ Profile `zeffiro_plugins.ini` CSV: `label, parent_menu_tag, callback`. Parent ta
 
 Class inverse ids are **not** in that INI; they are in `utilities.cluster.inverse_method_registry`. Profile INIs list **(class solver)** callbacks (`zef_eloreta_start`, `zef_mne_class_start`, …) that open `zef_open_class_inverse` rather than a legacy iteration.
 
-Retired directory names (`tools/plugins`, `src/core`, `src/gui/helpers`, `src/auxiliary`, `+plugins`) and the removed `plugins/GithubPusher` helper must stay absent from git. `tests.smoke.ArchitectureLayoutTest` fails if they reappear. A local leftover copy on disk is not part of the published tree and is not on the MATLAB path.
+Retired directory names (`tools/plugins`, `src/core`, `src/gui/helpers`, `src/auxiliary`, `+plugins`) and the removed `plugins/GithubPusher` helper and `plugins/SensitivityTool` must stay absent from git. `tests.smoke.ArchitectureLayoutTest` fails if they reappear. A local leftover copy on disk is not part of the published tree and is not on the MATLAB path.
 
 ## Known constraints
 

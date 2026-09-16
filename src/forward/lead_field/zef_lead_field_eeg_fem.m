@@ -129,7 +129,9 @@ impedance_inf = 1;
 
 if size(electrodes,2) == 4
     electrode_model = 'CEM';
-    n_of_electrodes = max(electrodes(:,1));
+    % CEM ids often inherit uint32 face indices. MATLAB integer+double
+    % arithmetic stays integer, and datevec(now+eta) then errors.
+    n_of_electrodes = double(max(electrodes(:,1)));
     ele_ind = electrodes;
     impedance_vec = ones(max(electrodes(:,1)),1);
 else

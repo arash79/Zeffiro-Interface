@@ -10,17 +10,25 @@ classdef NearestNeighbourGroupTest < matlab.unittest.TestCase
 %   is i; a wrong grouping would attach the wrong H(div)/Whitney stencil to
 %   a source and silently move lead-field columns.
 %
-%   See also zef_hdiv_interpolation, zef_whitney_interpolation.
+%   See also zef_hdiv_interpolation, zef_whitney_interpolation,
+%            zef_nearest_neighbour_groups.
+
+    methods (TestClassSetup)
+        function addLeadFieldFolderToPath(testCase)
+            if ~isempty(which('zef_nearest_neighbour_groups'))
+                return
+            end
+            here = fileparts(mfilename('fullpath'));
+            repo = fileparts(fileparts(here));
+            testCase.applyFixture( ...
+                matlab.unittest.fixtures.PathFixture( ...
+                fullfile(repo, 'src', 'forward', 'lead_field')));
+        end
+    end
 
     methods (Static)
         function groups = currentGroups(p_nn, n_sources)
-            if isempty(p_nn)
-                groups = {};
-                return
-            end
-            groups = accumarray( ...
-                p_nn(:), (1:numel(p_nn))', [n_sources, 1], ...
-                @(x) {x}, {zeros(0, 1)});
+            groups = zef_nearest_neighbour_groups(p_nn, n_sources);
         end
 
         function groups = upstreamGroups(p_nn, n_sources)

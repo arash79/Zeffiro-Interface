@@ -7,8 +7,7 @@
 %
 %   Script. zef_parameters_focal_epilepsy then load(training_data_file_name)
 %   (expects variable training_data). Opens project_file_name if zef missing.
-%   addpath(genpath(zef.program_path/scripts)). For each trial:
-%   zef_dataBank_set_reconstructions, then helper
+%   For each trial: zef_dataBank_set_reconstructions, then package helper
 %   zef_cluster_reconstructions_focal_epilepsy (needs supervised clustering
 %   off or an existing credibility .mat — first pass typically uses
 %   cred_val_points). Increments credibility_data_aux(J_aux,snr_ind).
@@ -26,7 +25,6 @@ if not(exist('zef', 'var'))
     zef = zeffiro_interface('start_mode','nodisplay','open_project',project_file_name);
 end
 zef_start_dataBank;
-addpath(genpath([zef.program_path filesep 'scripts']));
 
 waitbar_counter = 0;
 % credibility_data_aux accumulates selection counts; J_aux set by clustering.

@@ -40,7 +40,8 @@ function zef = zef_create_fem_mesh(zef)
 %     reuna_distance_vec.
 %
 %   See also zef_create_finite_element_mesh, zef_process_meshes,
-%            zef_postprocess_fem_mesh, zef_mesh_refinement, zef_pml_mesh.
+%            zef_lattice_cubes_to_tetra, zef_postprocess_fem_mesh,
+%            zef_mesh_refinement, zef_pml_mesh.
 
 if nargin == 0
     zef = evalin('base','zef');
@@ -71,7 +72,6 @@ if isempty(pml_ind_aux)
     y_vec = [y_lim(1):mesh_res:y_lim(2)];
     z_vec = [z_lim(1):mesh_res:z_lim(2)];
     [X, Y, Z] = meshgrid(x_vec,y_vec,z_vec);
-    n_cubes = (length(x_vec)-1)*(length(y_vec)-1)*(length(z_vec)-1);
 else
 
     % PML: grow a graded outer lattice beyond the inner bounding radius.
@@ -92,91 +92,19 @@ else
     end
 
     [X, Y, Z, pml_ind] = zef_pml_mesh(pml_inner_radius,pml_outer_radius,mesh_res,pml_max_size);
-    n_cubes = prod(size(X)-1);
 end
-
-size_xyz = size(X);
 
 h = zef_waitbar(0,1,'Initial mesh.');
 
 %************************************************************
 
-% Vectorized cube→tet fill. Loop order is i_x (slowest), i_y, i_z (fastest),
-% matching the historical nested loops so tetra row order is unchanged.
-% Corner numbering is 1–4 bottom, 5–8 top. ndgrid(1:n_z,1:n_y,1:n_x)
-% produces that same linear cube order.
+% Cube→tet fill. Loop order is i_x (slowest), i_y, i_z (fastest), matching
+% the historical nested loops so tetra row order is unchanged.
 
 nodes = [X(:) Y(:) Z(:)];
-n_x = size_xyz(2) - 1;
-n_y = size_xyz(1) - 1;
-n_z = size_xyz(3) - 1;
-[i_z, i_y, i_x] = ndgrid(1:n_z, 1:n_y, 1:n_x);
-ix = i_x(:);
-iy = i_y(:);
-iz = i_z(:);
-cx = [0 1 1 0 0 1 1 0];
-cy = [0 0 1 1 0 0 1 1];
-cz = [0 0 0 0 1 1 1 1];
-ind_mat_2 = sub2ind(size_xyz, iy + cy, ix + cx, iz + cz);
 mesh_labeling_approach = eval('zef.mesh_labeling_approach');
-
-if isequal(eval('zef.initial_mesh_mode'),1)
-
-    % Five tets per cube. Stencil depends on (i_x,i_y,i_z) parity so
-    % neighbouring cubes share the same diagonal on a common face.
-    ind_mat_1{1}{2}{1} = [2 5 6 7; 7 5 4 2;  2 3 4 7; 1 2 4 5 ; 4 7 8 5];
-    ind_mat_1{1}{2}{2} = [6 2 1 3; 1 3 8 6; 8 7 6 3;  5 8 6 1; 3 8 4 1 ];
-    ind_mat_1{2}{2}{2} = [5 2 1 4; 4 2 7 5; 5 8 7 4;  5 7 6 2;  3 7 4 2];
-    ind_mat_1{2}{2}{1} = [1 5 6 8; 6 8 3 1; 3 4 1 8; 2 3 1 6 ; 3 7 8 6  ];
-    ind_mat_1{1}{1}{2} = [4 3 7 2; 2 7 4 5;  5 7 6 2; 1 5 2 4;  8 7 5 4 ];
-    ind_mat_1{2}{1}{2} = [3 6 8 1; 1 3 4 8; 5 8 6 1; 1 6 2 3  ; 8 7 6 3  ];
-    ind_mat_1{1}{1}{1} = [7 8 3 6; 8 1 3 6; 2 3 1 6;  1 5 6 8 ; 1 3 4 8   ];
-    ind_mat_1{2}{1}{1} = [ 7 8 4 5; 5 4 7 2;  2 4 1 5; 2 5 6 7   ;  2 3 4 7 ];
-
-    S = zeros(5, 4, 2, 2, 2);
-    for px = 1:2
-        for py = 1:2
-            for pz = 1:2
-                S(:,:,px,py,pz) = ind_mat_1{px}{py}{pz};
-            end
-        end
-    end
-    px = 2 - mod(ix, 2);
-    py = 2 - mod(iy, 2);
-    pz = 2 - mod(iz, 2);
-    lin_s = sub2ind([2 2 2], px, py, pz);
-    Sflat = reshape(S, 5, 4, 8);
-    col_idx = reshape(permute(Sflat(:,:,lin_s), [2 1 3]), 20, n_cubes)';
-    gathered = ind_mat_2((1:n_cubes)' + (col_idx - 1) * n_cubes);
-    tetra = reshape(gathered', 4, [])';
-    if isequal(mesh_labeling_approach, 1)
-        label_ind = repelem(ind_mat_2, 5, 1);
-    elseif isequal(mesh_labeling_approach, 2)
-        label_ind = tetra;
-    end
-
-    %************************************************************
-
-elseif isequal(eval('zef.initial_mesh_mode'),2)
-
-    % Six tets per cube; one stencil for every cube (no parity flip).
-    ind_mat_1 = [     3     4     1     7 ;
-        2     3     1     7 ;
-        1     2     7     6 ;
-        7     1     6     5 ;
-        7     4     1     8 ;
-        7     8     1     5  ];
-
-    col_idx = repmat(reshape(ind_mat_1', 1, 24), n_cubes, 1);
-    gathered = ind_mat_2((1:n_cubes)' + (col_idx - 1) * n_cubes);
-    tetra = reshape(gathered', 4, [])';
-    if isequal(mesh_labeling_approach, 1)
-        label_ind = repelem(ind_mat_2, 6, 1);
-    elseif isequal(mesh_labeling_approach, 2)
-        label_ind = tetra;
-    end
-
-end
+[tetra, label_ind] = zef_lattice_cubes_to_tetra( ...
+    X, eval('zef.initial_mesh_mode'), mesh_labeling_approach);
 
 zef_waitbar(1,1,h,'Initial mesh.');
 

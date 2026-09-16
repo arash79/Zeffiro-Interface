@@ -1,12 +1,13 @@
 classdef EnsureParpoolTest < matlab.unittest.TestCase
 %ENSUREPARPOOLTEST  CPU parfor callers size a pool only through zef_ensure_parpool.
+%
+%   cpuParallelCallersUseHelper and megEitMeshTransferDoNotCallGcpDirectly
+%   are structural (source contracts). helperIsNoOpWithoutParallelToolbox
+%   and helperLeavesMatchingPoolAlone call the helper.
 
     methods (Test)
-        function helperIsOnPath(testCase)
-            testCase.verifyNotEmpty(which("zef_ensure_parpool"));
-        end
-
         function cpuParallelCallersUseHelper(testCase)
+            % Structural: these CPU parfor files must call the helper by name.
             root = fileparts(which("zeffiro_interface"));
             testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
             files = [ ...
@@ -39,5 +40,43 @@ classdef EnsureParpoolTest < matlab.unittest.TestCase
                 testCase.verifyEmpty(regexp(src, '(?<![A-Za-z_])parpool\(', 'once'), files(k));
             end
         end
+
+        function helperIsNoOpWithoutParallelToolbox(testCase)
+            started = zef_ensure_parpool(1);
+            testCase.verifyClass(started, "logical");
+            has_pct = exist("parpool", "file") == 2 ...
+                && license("test", "Distrib_Computing_Toolbox") ...
+                && ~isempty(ver("parallel"));
+            if ~has_pct
+                testCase.verifyFalse(started);
+            end
+        end
+
+        function helperLeavesMatchingPoolAlone(testCase)
+            has_pct = exist("parpool", "file") == 2 ...
+                && license("test", "Distrib_Computing_Toolbox") ...
+                && ~isempty(ver("parallel"));
+            testCase.assumeTrue(has_pct, "Parallel Computing Toolbox is not available");
+            pool = gcp("nocreate");
+            if isempty(pool)
+                pool = parpool(1);
+                testCase.addTeardown(@local_delete_pool);
+            end
+            n = pool.NumWorkers;
+            started = zef_ensure_parpool(n);
+            testCase.verifyTrue(started);
+            testCase.verifyEqual(gcp("nocreate").NumWorkers, n);
+        end
     end
 end
+
+function local_delete_pool()
+try
+    p = gcp("nocreate");
+    if ~isempty(p)
+        delete(p);
+    end
+catch
+end
+end
+

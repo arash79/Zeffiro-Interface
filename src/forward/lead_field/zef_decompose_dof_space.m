@@ -12,8 +12,8 @@ function [ ...
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
 %   Builds a source lattice from brain tetrahedra and, for each brain tetra,
-%   the nearest lattice site. Type comes from varargin{3} or
-%   zef.dof_decomposition_type in the base workspace:
+%   the nearest lattice site. Type comes from varargin{3}, else
+%   zef.dof_decomposition_type in the base workspace, else 2 (zef_init):
 %     1  tetra barycentra of source_ind, KD-tree nearest neighbour
 %     2  rectangular lattice sized from n_sources and the brain bounding box
 %     3  identity: one DOF per brain tetra
@@ -23,8 +23,10 @@ function [ ...
 %     tetrahedra   - T-by-4 node indices.
 %     brain_ind    - linear indices of tetrahedra that may hold activity.
 %     varargin{1}  - source tetra indices (default: brain_ind).
-%     varargin{2}  - wanted source count n_sources (default: zef.n_sources).
-%     varargin{3}  - dof_decomposition_type (default: zef.dof_decomposition_type).
+%     varargin{2}  - wanted source count n_sources (default: zef.n_sources
+%                    in base, else 10000).
+%     varargin{3}  - dof_decomposition_type (default: zef.dof_decomposition_type
+%                    in base, else 2).
 %
 %   Outputs
 %     nearest_neighbour_inds     - for each brain tetra, index into the
@@ -46,20 +48,20 @@ if not(isempty(varargin))
     if length(varargin) > 1
         n_sources = varargin{2};
     else
-        n_sources = evalin('base','zef.n_sources');
+        n_sources = local_session_field('n_sources', 10000);
     end
 
     if length(varargin) > 2
         dof_decomposition_type = varargin{3};
     else
-        dof_decomposition_type = evalin('base','zef.dof_decomposition_type');
+        dof_decomposition_type = local_session_field('dof_decomposition_type', 2);
     end
 
 else
 
     source_ind = brain_ind;
-    n_sources = evalin('base','zef.n_sources');
-    dof_decomposition_type = evalin('base','zef.dof_decomposition_type');
+    n_sources = local_session_field('n_sources', 10000);
+    dof_decomposition_type = local_session_field('dof_decomposition_type', 2);
 
 end
 
@@ -216,4 +218,16 @@ acz = max(1, round( lrz * (cp3 - min(cp3)) ./ (max(cp3) - min(cp3))));
 
 out_indices = (acz-1) * lrx * lry + (acx-1) * lry + acy;
 
+end
+
+function val = local_session_field(name, default)
+% Defaults match zef_init when the session is not in the base workspace.
+try
+    val = evalin('base', ['zef.' name]);
+    if isempty(val)
+        val = default;
+    end
+catch
+    val = default;
+end
 end

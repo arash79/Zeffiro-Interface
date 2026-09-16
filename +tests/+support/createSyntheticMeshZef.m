@@ -9,8 +9,10 @@ function zef = createSyntheticMeshZef()
 %   zef = createSyntheticMeshZef()
 %
 %   Not a test. One active compartment `c1` with an outward-wound cube
-%   surface, identity affine, refinement off, and empty sensors. Intended
-%   for zef_process_meshes / zef_create_fem_mesh, not inverse dispatch.
+%   surface, identity affine, refinement off, empty sensors, and the
+%   zef_init defaults use_gpu=0 / surface_sources=0 / n_sources=10000 /
+%   dof_decomposition_type=2. Intended for zef_process_meshes /
+%   zef_create_fem_mesh and cube FEM assembly tests, not inverse dispatch.
 
 zef = struct();
 zef.compartment_tags = {'c1'};
@@ -77,4 +79,7 @@ zef.gpu_count = 0;
 zef.parallel_processes = 1;
 zef.parallel_vectors = 1;
 zef.processes_per_core = 1;
+zef.surface_sources = 0;
+zef.n_sources = 10000;
+zef.dof_decomposition_type = 2;
 end

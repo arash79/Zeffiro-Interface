@@ -13,9 +13,10 @@ function x = L1_optimization(A,sigma,y,gamma,x,maxiter,estimation_type)
 %   x = d .* A' (A diag(d) A' + reg sum(d) I)^{-1} b with
 %   reg = sqrt(0.5*pi/m)*||A||_F. estimation_type==3 also applies
 %   T_scale from the FOCUSS residual, reusing that Gram. Called from
-%   exp_iteration and inverse.HALpRInverter.
+%   exp_iteration and inverse.HALpRInverter. Lives in src/inverse so
+%   class solvers resolve it without genpath(plugins).
 %
-%   See also LG_optimization, exp_iteration.
+%   See also LG_optimization, exp_iteration, inverse.HALpRInverter.
 
 [m,~]=size(A);
 if sigma ~= 1

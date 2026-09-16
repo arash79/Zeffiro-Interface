@@ -151,7 +151,7 @@ Per-location dipole fit; reconstruction holds **goodness-of-fit**, not amplitude
 
 ### Group LASSO / HALpR (`grouplasso`, `halpr`)
 
-Hierarchical \(\ell_1/\ell_2\) MAP using EXP plugin optimizers (`LG_optimization`, `L1_optimization`). Those files must be on the path (`genpath(plugins)`). HALpR \(q=1\) vs \(q=2\) changes sparsity vs quadratic IRLS. For \(q=2\) the IRLS weight scale is \(\max|f|^2\) (polarity-invariant peak); a zero frame returns \(z=0\). Group Lasso requires a lead field whose column count is a multiple of 3. Related DOI on the HALpR class: [10.1016/j.clinph.2023.12.001](https://doi.org/10.1016/j.clinph.2023.12.001).
+Hierarchical \(\ell_1/\ell_2\) MAP using the inner loops `LG_optimization` and `L1_optimization` in `src/inverse` (also called from the EXP plugin). HALpR \(q=1\) vs \(q=2\) changes sparsity vs quadratic IRLS. For \(q=2\) the IRLS weight scale is \(\max|f|^2\) (polarity-invariant peak); a zero frame returns \(z=0\). Group Lasso requires a lead field whose column count is a multiple of 3. Related DOI on the HALpR class: [10.1016/j.clinph.2023.12.001](https://doi.org/10.1016/j.clinph.2023.12.001).
 
 ## Choosing a method (practical)
 

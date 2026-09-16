@@ -149,7 +149,14 @@ Keep **LF source interp.** on (or call `zef_source_interpolation`). Inverse plug
 
 Session electrodes are `N×3` (point) or `N×6` (complete electrode model). The FEM does not take that 6-column array as-is; attachment builds a 4-column index table first. Column order and units: [conventions.md](conventions.md).
 
-A lead-field solve can take minutes to hours depending on mesh size, source count (`n_sources`, default 10000), and GPU. Unknown `lead_field_type` values are silently ignored: `zef.L` stays unchanged.
+A lead-field solve can take minutes to hours depending on mesh size, source count (`n_sources`, default 10000), and GPU. Unknown `lead_field_type` values warn (`zef_lead_field_matrix:UnknownType`) and leave `zef.L` unchanged.
+
+Ready `.mat` demos (mesh and often `L` already present) live under [`data/example_projects/`](../data/example_projects/README.md):
+
+```matlab
+zef = zeffiro_interface('open_project', fullfile(pwd, 'data', 'example_projects', ...
+    'multicompartment_head_project.mat'), 'use_gpu', false);
+```
 
 ## 7. A first inverse (programmatic)
 

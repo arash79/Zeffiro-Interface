@@ -207,7 +207,7 @@ end
 end
 
 function x = i_lg_sparse_d(A, sigma, y, gamma, x, maxiter, estimation_type)
-% Reference LG kernel matching plugins/EXP/common/LG_optimization.m.
+% Reference LG kernel matching src/inverse/LG_optimization.m.
 dualObj = -Inf;
 reltol = 1e-4;
 [m, ~] = size(A);

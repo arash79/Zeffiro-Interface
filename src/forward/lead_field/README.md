@@ -41,7 +41,7 @@ INI Script cells typically name these wrappers. `zef_eeg_lead_field`, `zef_eit_l
 
 **FEM sketch:** stiffness (`zef_stiffness_matrix`) → `zef_pem2cem` on CEM EEG/TES/EIT → electrode coupling (`zef_build_electrodes` for EEG/TES; EIT still inlines the same integrals with opposite `B` sign) → PCG for nodal potentials → interpolation `G` → modality map (EEG Schur, TES current-density gradient, MEG Biot–Savart, EIT conductivity Jacobian). PEM EIT is rejected with `zef_lead_field_eit_fem:PEMNotSupported` (the inherited PEM branch never built a right-hand side).
 
-EEG and TES call `zef_transfer_matrix` for that PCG. MEG and EIT **inline the same loops** (GPU Jacobi `1./diag(A)`; CPU SSOR or `ichol` nofill). They do not call `zef_transfer_matrix`. CPU PCG `parfor` goes through `zef_ensure_parpool` so missing Parallel Computing Toolbox does not abort (loops then run sequentially). Gravity does not use this electrode-transfer PCG. NSE/wave use `src/forward/solvers`.
+EEG and TES call `zef_transfer_matrix` for that PCG. MEG and EIT **inline the same loops** (GPU Jacobi `1./diag(A)`; CPU SSOR or `ichol` nofill). They do not call `zef_transfer_matrix`. CPU PCG `parfor` goes through `zef_ensure_parpool` so missing Parallel Computing Toolbox does not abort (loops then run sequentially). CEM electrode counts (`max` of column 1) are coerced to `double` so waitbar ETA `datevec` math does not inherit `uint32` face indices. EIT and TES pass `zef.n_sources` and `zef.dof_decomposition_type` into `zef_decompose_dof_space` so a session that is not in the base workspace still decomposes. Gravity does not use this electrode-transfer PCG. NSE/wave use `src/forward/solvers`.
 
 ### Interpolation, DOFs, and dipole stencils
 
@@ -51,13 +51,16 @@ EEG and TES call `zef_transfer_matrix` for that PCG. MEG and EIT **inline the sa
 | `zef_lead_field_interpolation.m` | Interpolation matrix **G** construction. |
 | `zef_whitney_interpolation.m` | Whitney (edge) interpolation; uses PBO/MPO. |
 | `zef_hdiv_interpolation.m` | H(div) (face-interior) interpolation. |
+| `zef_nearest_neighbour_groups.m` | Invert nearest-source labels for Whitney / H(div). |
+| `zef_average_tes_dof_current.m` | Average TES current-density triplets per DOF. |
+| `zef_fi_dipoles.m` | Face-interior dipole stencils for H(div). |
+| `zef_fi_shared_faces.m` | Brain tet pairs that share exactly one face (`zef_fi_dipoles`). |
 | `zef_st_venant_interpolation.m` | St. Venant interpolation. |
 | `zef_pbo_system.m` | Position-based optimization weights for one source. |
 | `zef_mpo_system.m` | Mean position/orientation weights for one source. |
 | `zef_L2_norm.m` | Euclidean row (or whole-array) norm used by PBO/MPO/St. Venant. |
 | `zef_ew_dipoles.m` | Edge-Whitney dipole stencils. |
-| `zef_fi_dipoles.m` | Face-interior dipole stencils for H(div). |
-| `zef_decompose_dof_space.m` | Map brain tets to a reduced source lattice (`dof_decomposition_type` 1–3). |
+| `zef_decompose_dof_space.m` | Map brain tets to a reduced source lattice (`dof_decomposition_type` 1–3). Missing `n_sources` / type fall back to `zef_init` defaults when the session is not in base. |
 | `zef_lead_field_filter.m` | Drop columns whose column-norm exceeds a quantile (after every EEG/MEG/EIT/TES wrapper). |
 | `zef_transfer_matrix.m` | EEG/TES electrode PCG. GPU Jacobi; CPU SSOR or `ichol` nofill. MEG/EIT do not call this file. CPU `parfor` uses `zef_ensure_parpool`. |
 
@@ -95,7 +98,7 @@ Does **not** use `lead_field_type`. Density `zef.rho`. `gravity_field_type` 1–
 | 5 | TES / tES | `sigma(:,1)` | `zef_lead_field_tes_fem` |
 | 6–10 | Anisotropic twins of 1–5 | `sigma(:,3:8)` | same FEM backends |
 
-Unknown type → **no error**; `zef.L` left unchanged. Impedances for CEM (types 1, 4, 5, 6, 9, 10) when `size(sensors,2)==6`.
+Unknown type → warning `zef_lead_field_matrix:UnknownType`; `zef.L` left unchanged. Impedances for CEM (types 1, 4, 5, 6, 9, 10) when `size(sensors,2)==6`.
 
 Source model: `core.types.ZefSourceModel.from(zef.source_model)`. Direction mode 1/2/3 → cartesian/normal/face_based. CPU `preconditioner` 1/2 → ichol nofill / SSOR; GPU ignores it (Jacobi). `preconditioner_tolerance` is copied to `cholinc_tol` and not read. Coordinates: copies `nodes`/`sensors` to `*_aux` and divides millimetre **xyz** by 1000 before FEM. CEM EEG/EIT/TES instead pass `sensors_attached_volume` as a 4-column **index** table and do not scale it. Session `zef.sensors` stays `N×3` or `N×6`. Full layout: [docs/conventions.md](../../../docs/conventions.md).
 

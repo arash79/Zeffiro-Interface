@@ -19,6 +19,7 @@ classdef MegCartesianInterpolationGuardTest < matlab.unittest.TestCase
         end
 
         function testMegFemCallSitesGuardCartesian(testCase)
+            % Structural: cartesian MEG FEM must call the guard by name.
             root = fileparts(which("zeffiro_interface"));
             testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
             mag = fileread(fullfile(root, "src", "forward", "lead_field", "zef_lead_field_meg_fem.m"));

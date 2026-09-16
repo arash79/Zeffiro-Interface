@@ -105,7 +105,9 @@ cholinc_tol = 1e-3;
 % CEM or PEM part
 if size(electrodes,2) == 4
     electrode_model = 'CEM';
-    L = max(electrodes(:,1));
+    % CEM ids often inherit uint32 face indices. MATLAB integer+double
+    % arithmetic stays integer, and datevec(now+eta) then errors.
+    L = double(max(electrodes(:,1)));
     ele_ind = electrodes;
     impedance_vec = ones(max(electrodes(:,1)),1);
     impedance_inf = 1;
@@ -273,16 +275,27 @@ R_tes = R_tes*Aux_mat;
 J = eye(size(B'*R_tes));
 S_tes = ( (eye(L)-(1/L)*ones(L,L)) ) * (inv(C) * (J+(B'*R_tes))) * J;
 
+if ~isfield(zef, 'n_sources') || isempty(zef.n_sources)
+    zef.n_sources = 10000;
+end
+if ~isfield(zef, 'dof_decomposition_type') || isempty(zef.dof_decomposition_type)
+    zef.dof_decomposition_type = 2;
+end
+
 if isfield(zef,'redo_eit_dec')
     if eval('zef.redo_eit_dec') == 1
-        [dof_ind, dof_count, dof_positions] = zef_decompose_dof_space(nodes,tetrahedra,brain_ind,source_ind,zef.n_sources);
+        [dof_ind, dof_count, dof_positions] = zef_decompose_dof_space( ...
+            nodes, tetrahedra, brain_ind, source_ind, ...
+            zef.n_sources, zef.dof_decomposition_type);
     else
         dof_ind   = eval('zef.dof_ind');
         dof_count = eval('zef.dof_count');
         dof_positions = eval('zef.source_positions');
     end
 else
-    [dof_ind, dof_count, dof_positions] = zef_decompose_dof_space(nodes,tetrahedra,brain_ind,source_ind,zef.n_sources);
+    [dof_ind, dof_count, dof_positions] = zef_decompose_dof_space( ...
+        nodes, tetrahedra, brain_ind, source_ind, ...
+        zef.n_sources, zef.dof_decomposition_type);
 end
 
 % Map transfer potentials through −grad(σ) so each source tetra contributes
@@ -293,22 +306,8 @@ R_tes_3 = -Grad_3*R_tes;
 
 clear R_tes;
 
-K3 = length(dof_count);
-L_tes = zeros(3*K3,L);
-
-S_dof = sparse(dof_ind(:), (1:K)', 1, K3, K);
-dc = dof_count(:);
-
-L_tes(1:3:end,:) = (S_dof * R_tes_1) ./ dc;
-clear R_tes_1;
-
-L_tes(2:3:end,:) = (S_dof * R_tes_2) ./ dc;
-clear R_tes_2;
-
-L_tes(3:3:end,:) = (S_dof * R_tes_3) ./ dc;
-clear R_tes_3;
-
-clear S_dof dc;
+L_tes = zef_average_tes_dof_current(dof_ind, dof_count, R_tes_1, R_tes_2, R_tes_3);
+clear R_tes_1 R_tes_2 R_tes_3;
 
 
 dof_directions = ones(size(dof_positions));

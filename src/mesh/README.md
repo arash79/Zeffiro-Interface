@@ -14,7 +14,8 @@ NSE volume/surface scalar products are in `barycentric/` and are **not** used fo
 |------|------|------|
 | `zef_create_finite_element_mesh.m` | function | Mesh-tool **Create FEM mesh** (`h_pushbutton21`). Chain: optional `zef_downsample_surfaces` → `zef_process_meshes` → `zef_create_fem_mesh` → `zef_postprocess_fem_mesh` → clear `source_ind` → `zef_update`. Does **not** assemble `zef.L`. |
 | `zef_process_meshes.m` | function | Active `<tag>_points/_triangles` → `reuna_p` / `reuna_t` plus sensor transforms. Always run before the lattice builder. Optional `explode_param` for visualization. |
-| `zef_create_fem_mesh.m` | function | Lattice → tets. Mode 1: 5 tets/cube (parity-dependent stencils); mode 2: 6 tets. PML via `zef_pml_mesh` when a compartment has `_sources == -1`. Then labeling and optional refinement. CPU labeling uses `parfor`; `zef_ensure_parpool` starts a pool only when Parallel Computing Toolbox is present. |
+| `zef_create_fem_mesh.m` | function | Lattice → tets via `zef_lattice_cubes_to_tetra`. Mode 1: 5 tets/cube (parity-dependent stencils); mode 2: 6 tets. PML via `zef_pml_mesh` when a compartment has `_sources == -1`. Then labeling and optional refinement. CPU labeling uses `parfor`; `zef_ensure_parpool` starts a pool only when Parallel Computing Toolbox is present. |
+| `zef_lattice_cubes_to_tetra.m` | function | Cartesian `meshgrid` lattice → tetra / `label_ind`. Called from `zef_create_fem_mesh`. |
 | `zef_postprocess_fem_mesh.m` | function | Smooth / second-pass refine / `zef_tetra_turn` / pack `sigma`, `brain_ind`, per-compartment `surface_triangles`. |
 | `zef_postprocess_finite_element_mesh.m` | **script** | Mesh-tool **Postprocess FEM mesh** (`h_pushbutton34`): calls `zef_postprocess_fem_mesh` then `zef_update`. |
 | `zef_downsample_surfaces.m` | function | Resample / smooth / inflate surfaces toward `max_surface_face_count` × `zef_find_relative_resolution`. |
@@ -32,7 +33,7 @@ These scripts are invoked from `zef_create_fem_mesh` / `zef_postprocess_fem_mesh
 | `zef_choose_domain_labels.m` | Picks one domain label per tet from candidate columns using labeling priority. |
 | `zef_find_subdomain_ind.m` | Local 1..K subdomain index within each domain label. |
 | `zef_refinement_step.m` | Surface-refinement pass on the tet mesh. |
-| `zef_mesh_refinement.m` | 8-to-1 tet split (mid-edge nodes; four corner tets + four octahedron tets). |
+| `zef_mesh_refinement.m` | 8-to-1 tet split (mid-edge nodes via `zef_mid_edge_node_index`; four corner tets + four octahedron tets). |
 | `zef_get_tetra_to_refine.m` | Adaptive volume-refinement candidates near a surface. |
 | `zef_triangular_mesh_refinement.m` | 4-to-1 split of every triangle (used when a surface needs *more* faces). |
 | `zef_smoothing_step.m` | Taubin smoothing of FEM nodes; may inflate FEM surfaces toward segmentation. |

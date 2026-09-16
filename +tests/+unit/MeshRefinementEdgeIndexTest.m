@@ -11,9 +11,21 @@ classdef MeshRefinementEdgeIndexTest < matlab.unittest.TestCase
 %   wrong. This class pins the vectorised form against the upstream loop.
 %
 %   The upstream loop is reproduced verbatim in referenceLoop as the
-%   comparison oracle; vectorisedForm mirrors the shipped code.
+%   comparison oracle; vectorisedForm calls zef_mid_edge_node_index.
 %
-%   See also tests.smoke.SyntaxIntegrityTest.
+%   See also zef_mesh_refinement, zef_refinement_step, zef_mid_edge_node_index.
+
+    methods (TestClassSetup)
+        function addMeshFolderToPath(testCase)
+            if ~isempty(which('zef_mid_edge_node_index'))
+                return
+            end
+            here = fileparts(mfilename('fullpath'));
+            repo = fileparts(fileparts(here));
+            testCase.applyFixture( ...
+                matlab.unittest.fixtures.PathFixture(fullfile(repo, 'src', 'mesh')));
+        end
+    end
 
     methods (Test)
         function matchesUpstreamLoopOnRandomInputs(testCase)
@@ -121,15 +133,7 @@ classdef MeshRefinementEdgeIndexTest < matlab.unittest.TestCase
         end
 
         function col4 = vectorisedForm(edge_ind)
-            % Mirrors the shipped src/mesh/zef_mesh_refinement.m block.
-            is_full = edge_ind(:,5) == 1;
-            edge_ind(:,4) = 0;
-            if any(is_full)
-                [unique_full, ~] = unique(edge_ind(is_full, 1:2), 'rows', 'stable');
-                [tf, loc] = ismember(edge_ind(:,1:2), unique_full, 'rows');
-                edge_ind(tf,4) = loc(tf);
-            end
-            col4 = edge_ind(:,4);
+            col4 = zef_mid_edge_node_index(edge_ind);
         end
     end
 end

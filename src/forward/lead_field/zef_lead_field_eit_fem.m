@@ -36,7 +36,7 @@ function [L_eit, bg_data, dof_positions, dof_directions, dof_ind, dof_count] = l
 %     dof_directions  - source orientation placeholders
 %     dof_ind, dof_count - tetra→source occupancy (zef.eit_ind, zef.eit_count)
 %
-%   See also zef_lead_field_matrix, zef_make_eit_dec.
+%   See also zef_lead_field_matrix, zef_make_eit_dec, zef_decompose_dof_space.
 
 
 
@@ -97,7 +97,9 @@ source_ind = [1:size(tetrahedra,1)]';
 cholinc_tol = 1e-3;
 if size(electrodes,2) == 4
     electrode_model = 'CEM';
-    L = max(electrodes(:,1));
+    % CEM ids often inherit uint32 face indices. MATLAB integer+double
+    % arithmetic stays integer, and datevec(now+eta) then errors.
+    L = double(max(electrodes(:,1)));
     ele_ind = electrodes;
     impedance_vec = ones(max(electrodes(:,1)),1);
     impedance_inf = 1;
@@ -516,17 +518,30 @@ end
 
 Aux_mat_6 = eye(L,L) - (1/L)*ones(L,L);
 
+% Pass n_sources / type from this zef argument. zef_decompose_dof_space
+% otherwise evalin('base'), which fails when the session is not in base
+% (tests, function-style callers). Defaults match zef_init.
+if ~isfield(zef, 'n_sources') || isempty(zef.n_sources)
+    zef.n_sources = 10000;
+end
+if ~isfield(zef, 'dof_decomposition_type') || isempty(zef.dof_decomposition_type)
+    zef.dof_decomposition_type = 2;
+end
 
 if isfield(zef,'redo_eit_dec')
     if eval('zef.redo_eit_dec') == 1
-        [dof_ind, dof_count, dof_positions] = zef_decompose_dof_space(nodes,tetrahedra,brain_ind,source_ind);
+        [dof_ind, dof_count, dof_positions] = zef_decompose_dof_space( ...
+            nodes, tetrahedra, brain_ind, source_ind, ...
+            zef.n_sources, zef.dof_decomposition_type);
     else
         dof_ind = eval('zef.eit_ind');
         dof_count = eval('zef.eit_count');
         dof_positions = eval('zef.source_positions');
     end
 else
-    [dof_ind, dof_count, dof_positions] = zef_decompose_dof_space(nodes,tetrahedra,brain_ind,source_ind);
+    [dof_ind, dof_count, dof_positions] = zef_decompose_dof_space( ...
+        nodes, tetrahedra, brain_ind, source_ind, ...
+        zef.n_sources, zef.dof_decomposition_type);
 end
 
 % Background electrode data for the injected current patterns, then the

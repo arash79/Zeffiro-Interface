@@ -13,7 +13,6 @@ Shared **App Designer** Exponential Prior (EXP) tool used by the default-profile
 | `exp_app.mlapp` | App Designer UI |
 | `exp_iteration.m` | Unified IAS/EM/sLORETA MAP |
 | `exp_make_multires_dec.m` | Random coarse lattices from base `zef.exp_multires_*` |
-| `L1_optimization.m` / `LG_optimization.m` | Inner loops |
 
 ## Code functionality
 
@@ -46,4 +45,4 @@ User-facing menu and SNR formula: [`../README.md`](../README.md).
 
 ## Developer guidance
 
-Keep estimation_type tags and inner-loop names aligned with `exp_iteration`. When changing multires field names, update both `EXP.parameters.exp_multires_*` writers and `exp_make_multires_dec` readers of top-level `zef.exp_multires_*`.
+Keep estimation_type tags and inner-loop names aligned with `exp_iteration`. Inner MAP loops live in `src/inverse/L1_optimization.m` and `LG_optimization.m` (shared with class HALpR / Group Lasso). When changing multires field names, update both `EXP.parameters.exp_multires_*` writers and `exp_make_multires_dec` readers of top-level `zef.exp_multires_*`.

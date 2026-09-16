@@ -18,8 +18,6 @@ Map FreeSurfer **FA / v1 / register.dat** volumes onto the FEM mesh as anisotrop
 | `zef_dti_tensor_interpolate_mesh_space.m` | Tet centroids → SPD [M×6] |
 | `zef_dti_get_mesh2voxel.m` | Mesh→FA-voxel 4×4 (also reused by Kalman structural Q / streamlines) |
 | `zef_dti_resolve_mesh2voxel.m` | Errors if `register.dat` is present but orig.mgz/tkr is missing |
-| `zef_dti_tensor_interpolate_mesh_space.m` | Tet centroids → SPD [M×6] |
-| `zef_dti_get_mesh2voxel.m` | Mesh→FA-voxel 4×4 (also reused by Kalman structural Q / streamlines) |
 | `zef_nii_conductivity_to_sigma.m` | Skip FA; isotropic NIfTI → diagonal σ columns |
 | `zef_dti_streamlines.m` | Voxel-space streamline QA |
 | `zef_visualize_nii_slices.m` | Slice visualization |

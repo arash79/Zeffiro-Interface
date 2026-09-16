@@ -17,6 +17,7 @@ classdef SessionWantsGpuTest < matlab.unittest.TestCase
         end
 
         function testFemFilesDoNotEvalinGpuCount(testCase)
+            % Structural: MEG/EIT FEM must use zef_session_wants_gpu, not evalin.
             root = fileparts(which("zeffiro_interface"));
             testCase.assumeNotEmpty(root, "zeffiro_interface is not on the MATLAB path");
             files = [ ...

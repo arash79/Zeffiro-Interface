@@ -17,23 +17,21 @@ classdef ProjectLoadLegacyTest < matlab.unittest.TestCase
             before = whos("-file", fullfile(folder, file_name));
             testCase.verifyEqual({before.name}, {'zef'});
 
-            session = i_nodisplay_session();
-            try
-                session = zef_load(session, file_name, folder);
-            catch ME
-                % Init/profile after merge may still throw on a tiny fixture.
-                % The contract under test is that the MAT file is intact.
-                testCase.verifyNotEqual(ME.identifier, "zef_load:UnsupportedLegacyMat");
-            end
+            session = zeffiro_interface( ...
+                "start_mode", "nodisplay", ...
+                "use_gpu", false, ...
+                "skip_submodules", true, ...
+                "zeffiro_restart", true);
+            testCase.addTeardown(@() i_close_session(session));
+            session = zef_load(session, file_name, folder);
 
             after = whos("-file", fullfile(folder, file_name));
             testCase.verifyEqual({after.name}, {'zef'});
             restored = load(fullfile(folder, file_name), "zef");
             testCase.verifyEqual(restored.zef.L, payload.L);
             testCase.verifyEqual(restored.zef.measurements, payload.measurements);
-            if isfield(session, "L")
-                testCase.verifyEqual(session.L, payload.L);
-            end
+            testCase.verifyEqual(session.L, payload.L);
+            testCase.verifyEqual(session.measurements, payload.measurements);
         end
 
         function testSystemFieldsAreStrippedFromSavedStruct(testCase)
@@ -90,4 +88,12 @@ zef.code_path = fileparts(which("zeffiro_interface"));
 zef.program_path = zef.code_path;
 zef.sensor_tags = {};
 zef.compartment_tags = {};
+end
+
+function i_close_session(zef)
+try
+    zef.zeffiro_restart = 1;
+    zef_close_all(zef);
+catch
+end
 end

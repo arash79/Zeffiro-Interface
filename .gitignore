@@ -36,7 +36,7 @@ matlab_crash_dump.*
 *.mexw32
 *.mexglx
 
-# Python (scripts/)
+# Python
 .pytest_cache/
 **/__pycache__/
 *.pyc
