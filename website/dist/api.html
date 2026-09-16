@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>API Reference — Zeffiro Interface</title>
+    <meta name="description" content="Public MATLAB entry points for Zeffiro Interface." />
+    <link rel="icon" href="./assets/favicon-2bEG1JbA.svg" type="image/svg+xml" />
+    <script type="module" crossorigin src="./assets/boot-CRWvUvPG.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/boot-Ccf1F9Np.css">
+  </head>
+  <body data-page="api">
+    <div data-header></div>
+    <noscript>
+      <nav aria-label="Primary">
+        <a href="index.html">Overview</a>
+        <a href="features.html">Features</a>
+        <a href="docs.html">Docs</a>
+        <a href="community.html">Community</a>
+      </nav>
+    </noscript>
+    <main id="main">
+      <header class="page-hero">
+        <div class="container">
+          <p class="kicker">API Reference</p>
+          <h1>The session is<br /><span class="grad-text">one struct.</span></h1>
+          <p>
+            MATLAB <code>help zeffiro_interface</code> is the authoritative argument list. The records
+            below are the public objects the project documents for scripting. Source links go to the
+            official GitHub repository.
+          </p>
+        </div>
+      </header>
+      <section class="feature-block">
+        <div class="container api-list">
+          <article class="api-card">
+            <h3><code>zeffiro_interface</code></h3>
+            <p>
+              Launch and CLI. Adds <code>src/</code>, <code>plugins/</code>, <code>profile/</code>, and
+              <code>assets/</code> to the path and opens the core tools. Name-value arguments include
+              <code>start_mode</code>, <code>import_to_new_project</code>, and <code>zeffiro_restart</code>.
+            </p>
+            <a class="text-link" href="https://github.com/sampsapursiainen/zeffiro_interface/blob/master/zeffiro_interface.m" target="_blank" rel="noopener noreferrer">zeffiro_interface.m →</a>
+          </article>
+          <article class="api-card">
+            <h3><code>zef</code></h3>
+            <p>
+              Session struct in the base workspace. Documented fields used by inversion include
+              <code>zef.L</code>, <code>zef.measurements</code>, <code>zef.source_positions</code>,
+              <code>zef.source_directions</code>, and <code>zef.reconstruction</code>.
+            </p>
+            <a class="text-link" href="https://github.com/sampsapursiainen/zeffiro_interface/wiki" target="_blank" rel="noopener noreferrer">Wiki overview →</a>
+          </article>
+          <article class="api-card">
+            <h3><code>zef_inverse_run</code></h3>
+            <p>
+              Programmatic inverse dispatch. Constructs <code>inverse.*Inverter</code> classes (MNE,
+              eLORETA, IAS, RAMUS, Kalman, HALpR, Group Lasso, UKF-NMM, and others registered in
+              the method table).
+            </p>
+            <a class="text-link" href="features.html#inverse">Method list →</a>
+          </article>
+          <article class="api-card">
+            <h3><code>zeffiro_setup</code> / <code>zeffiro_downloader</code></h3>
+            <p>
+              Optional git submodules and a fresh-install helper. The wiki install page is the
+              public setup guide.
+            </p>
+            <a class="text-link" href="https://github.com/sampsapursiainen/zeffiro_interface/wiki/Downloading-and-Setting-Up-Zeffiro" target="_blank" rel="noopener noreferrer">Setup wiki →</a>
+          </article>
+        </div>
+      </section>
+    </main>
+    <div data-footer></div>
+  </body>
+</html>

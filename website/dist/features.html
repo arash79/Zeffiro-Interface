@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Features — Zeffiro Interface</title>
+    <meta
+      name="description"
+      content="What Zeffiro Interface actually builds: multicompartment FEM heads, EEG/MEG/EIT/TES lead fields, and class plus plugin inverse methods."
+    />
+    <link rel="icon" href="./assets/favicon-2bEG1JbA.svg" type="image/svg+xml" />
+    <script type="module" crossorigin src="./assets/boot-CRWvUvPG.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/boot-Ccf1F9Np.css">
+    <link rel="stylesheet" crossorigin href="./assets/features-CgyDmFTs.css">
+  </head>
+  <body data-page="features">
+    <div data-header></div>
+    <noscript>
+      <nav aria-label="Primary">
+        <a href="index.html">Overview</a>
+        <a href="features.html">Features</a>
+        <a href="docs.html">Docs</a>
+        <a href="community.html">Community</a>
+      </nav>
+    </noscript>
+    <main id="main" class="feat-page">
+      <aside class="feat-rail-slot">
+        <nav class="feat-rail" data-feat-rail aria-label="Sections">
+          <a href="#anatomy" aria-current="location"><span class="feat-rail-idx">01</span><span class="feat-rail-name">Anatomy</span></a>
+          <a href="#volume"><span class="feat-rail-idx">02</span><span class="feat-rail-name">Volume</span></a>
+          <a href="#forward"><span class="feat-rail-idx">03</span><span class="feat-rail-name">Forward</span></a>
+          <a href="#inverse"><span class="feat-rail-idx">04</span><span class="feat-rail-name">Inverse</span></a>
+          <a href="#observe"><span class="feat-rail-idx">05</span><span class="feat-rail-name">Observe</span></a>
+        </nav>
+      </aside>
+      <div class="feat-body">
+      <header class="feat-open">
+        <div class="feat-open-copy">
+          <p class="kicker">Features</p>
+          <h1>A volume conductor<br /><span class="grad-text">you can invert.</span></h1>
+          <p>
+            Zeffiro Interface is MATLAB software for a realistic head: closed tissue surfaces,
+            a labeled tetrahedral mesh, conductivity, sensors, and a lead field
+            <code>zef.L</code>. Inverse methods then estimate sources from measurements.
+            This page describes capabilities that exist in the tree — not a product checklist.
+          </p>
+        </div>
+        <ol class="feat-journey" aria-label="Implemented workflow">
+          <li>
+            <span>01</span>
+            <strong>Surfaces</strong>
+            <em>Import a <code>.zef</code> segmentation. Compartments, not a volume yet.</em>
+          </li>
+          <li>
+            <span>02</span>
+            <strong>Tetrahedra</strong>
+            <em>Create FEM mesh fills the interior and writes <code>nodes</code> / <code>tetra</code>.</em>
+          </li>
+          <li>
+            <span>03</span>
+            <strong>Lead field</strong>
+            <em>Attach sensors and assemble <code>L</code> for EEG, MEG, EIT, or TES.</em>
+          </li>
+          <li>
+            <span>04</span>
+            <strong>Sources</strong>
+            <em>Choose a rule for <code>y ≈ Lx</code>. Write <code>zef.reconstruction</code>.</em>
+          </li>
+        </ol>
+      </header>
+
+      <section class="feat-chapter" id="anatomy" data-feat-chapter>
+        <div class="feat-copy">
+          <p class="feat-index">01 — Anatomy</p>
+          <h2>Compartments first, volume later</h2>
+          <p>
+            A session starts from closed tissue surfaces. The bundled demo is FreeSurfer-style
+            <code>.asc</code> files plus a manifest at
+            <code>data/segmentations/multicompartment_head_project/import_segmentation.zef</code>.
+            After import, the Segmentation tool lists compartments (scalp, skull, CSF, …).
+            <code>zef.nodes</code> and <code>zef.tetra</code> stay empty until you mesh.
+          </p>
+          <p>
+            Each compartment has an activity flag. Sources are placed only where
+            <code>_sources</code> is constrained or unconstrained field. Inactive tissue,
+            active surface, and a bounding-box / PML layer are separate states — they are
+            not interchangeable.
+          </p>
+          <ul class="feat-facts">
+            <li><code>utilities.fs2zef.run</code> — FreeSurfer volumes → surfaces and a <code>.zef</code></li>
+            <li><code>utilities.sn2zef.run</code> — SimNIBS tissues → STLs and a manifest</li>
+            <li><code>utilities.brainstorm2zef.run</code> — Brainstorm protocol → live Zeffiro project</li>
+            <li><code>utilities.duneuro2zef</code> — DUNEuro/FieldTrip export → mesh, sensors, optional lead fields</li>
+          </ul>
+          <p class="feat-note">
+            The converters write anatomy. They do not assemble a lead field. There is no
+            generic DICOM-to-mesh button in <code>src/io</code>.
+          </p>
+          <a class="text-link" href="docs.html#getting-started">Import walk-through in Docs</a>
+        </div>
+        <div class="feat-visual" aria-hidden="true">
+          <figure class="feat-photo">
+            <img
+              src="./assets/multicompartment-QFIowldO.webp"
+              alt=""
+              width="1240"
+              height="1268"
+            />
+          </figure>
+        </div>
+      </section>
+
+      <section class="feat-chapter is-flip" id="volume" data-feat-chapter>
+        <span id="fem" hidden></span>
+        <div class="feat-copy">
+          <p class="feat-index">02 — Volume conductor</p>
+          <h2>A labeled tetrahedral mesh</h2>
+          <p>
+            Mesh tool → <strong>Create FEM mesh</strong> runs
+            <code>zef_create_finite_element_mesh</code>. Closed surfaces are filled with a
+            Cartesian lattice (five or six tets per cube), then labeled by tissue.
+            Optional refinement, Taubin smoothing, and a PML lattice when a compartment
+            is marked as bounding box.
+          </p>
+          <p>
+            Conductivity is per tetrahedron: isotropic <code>sigma(:,1)</code> in S/m,
+            or an anisotropic tensor in <code>sigma(:,3:8)</code> for lead-field types 6–10.
+            The DTI Conductivity Tool maps FreeSurfer FA / NIfTI into those columns.
+            Applying DTI does not rebuild <code>zef.L</code> by itself.
+          </p>
+          <p>
+            The mesh step does not create the lead field. GPU paths in this repository
+            are for transfer PCG, some inverse helpers, NSE, and wave — not for tet generation.
+          </p>
+          <a class="text-link" href="docs.html#getting-started/5-create-a-tetrahedral-mesh">Mesh steps in Docs</a>
+        </div>
+        <div class="feat-visual" aria-hidden="true">
+          <figure class="feat-photo is-wide">
+            <img
+              src="./assets/tetrahedral-D7ZK_Bma.webp"
+              alt=""
+              width="1448"
+              height="1086"
+            />
+          </figure>
+        </div>
+      </section>
+
+      <section class="feat-chapter" id="forward" data-feat-chapter>
+        <span id="lead-field" hidden></span>
+        <div class="feat-copy">
+          <p class="feat-index">03 — Forward problem</p>
+          <h2>Sensors become columns of L</h2>
+          <p>
+            Session electrodes are <code>N×3</code> (point electrode model) or
+            <code>N×6</code> (complete electrode model). EEG / EIT / TES FEM does not
+            take the six-column array as-is: <code>zef_attach_sensors_volume</code>
+            builds a four-column attachment table. Positions are parsed from
+            <code>.dat</code> or headered CSV via <code>core.io.electrodes</code>.
+          </p>
+          <p>
+            <code>zef_lead_field_matrix</code> dispatches types 1–10: EEG, MEG
+            magnetometers, MEG gradiometers, EIT, and TES, each with an isotropic
+            and an anisotropic twin. Source columns are Whitney, H(div), or St. Venant
+            interpolants. Inverse methods only read <code>L</code>; they do not assemble it.
+          </p>
+          <p>
+            Optional CUDA uses Jacobi PCG on the transfer solve. CPU uses SSOR or
+            no-fill incomplete Cholesky. Keep source interpolation on, or inverse
+            code errors on a missing <code>source_interpolation_ind</code>.
+          </p>
+          <a class="text-link" href="docs.html#getting-started/6-sensors-and-a-lead-field">Lead-field steps in Docs</a>
+        </div>
+        <div class="feat-visual" aria-hidden="true">
+          <figure class="feat-photo is-wide">
+            <img
+              src="./assets/leadfield-PxHNcpVF.webp"
+              alt=""
+              width="1447"
+              height="1087"
+            />
+          </figure>
+        </div>
+      </section>
+
+      <section class="feat-inverse" id="inverse" data-feat-chapter>
+        <span id="methods" hidden></span>
+        <div class="feat-inverse-head">
+          <p class="feat-index">04 — Inverse problem</p>
+          <h2>One matrix, many rules for x</h2>
+          <p>
+            <code>n_s ≫ n_e</code>, so many source vectors fit the sensors. Every inverse
+            method in this repository is a rule for choosing one <code>x</code>. Both
+            tracks write <code>zef.reconstruction</code>. They do not share solver code.
+          </p>
+          <p>
+            Inverse-tools menus labelled <strong>(class solver)</strong> call
+            <code>zef_inverse_run</code> and construct <code>inverse.*Inverter</code>.
+            Other Inverse-tools entries still run <code>plugins/*</code> iterations.
+            Scripts and cluster jobs should use registry ids, not GUI callback names.
+          </p>
+          <a class="text-link" href="docs.html#methods">Forward and inverse in Docs</a>
+        </div>
+        <div class="feat-families">
+          <article class="feat-family is-lin">
+            <svg viewBox="0 0 120 64" aria-hidden="true"><path d="M8 48 L40 18 L72 36 L112 12" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="112" cy="12" r="3" fill="currentColor"/></svg>
+            <h3>Linear maps</h3>
+            <p>
+              Weighted MNE; dSPM / sLORETA / SBL on a minimum-norm backbone (CSM);
+              eLORETA’s reweighted filter; LCMV / UNG beamformers; dipole-scan goodness of fit.
+              Fast when you want a distributed or scanned estimate from <code>L</code> and a frame of <code>y</code>.
+            </p>
+          </article>
+          <article class="feat-family is-bay">
+            <svg viewBox="0 0 120 64" aria-hidden="true"><path d="M10 50 C28 50 28 14 50 14 C72 14 72 50 90 50 C102 50 108 36 112 28" fill="none" stroke="currentColor" stroke-width="1.6"/><ellipse cx="50" cy="38" rx="22" ry="14" fill="currentColor" opacity="0.18"/></svg>
+            <h3>Hierarchical Bayesian</h3>
+            <p>
+              IAS MAP with gamma / inverse-gamma hyperpriors. RAMUS averages IAS over
+              random sparse source subsets at several resolutions — the route aimed at
+              concurrent cortical and deeper activity when those compartments are active.
+            </p>
+          </article>
+          <article class="feat-family is-spa">
+            <svg viewBox="0 0 120 64" aria-hidden="true"><g fill="currentColor"><circle cx="22" cy="34" r="3"/><circle cx="48" cy="18" r="5"/><circle cx="70" cy="42" r="2.4"/><circle cx="96" cy="26" r="4"/></g><path d="M8 56 H112" stroke="currentColor" stroke-width="1" opacity="0.35"/></svg>
+            <h3>Sparse maps</h3>
+            <p>
+              Group Lasso and HALpR (hierarchical Lp) via the EXP optimizers. Use when
+              the scientific question wants few active groups or a heavy-tailed prior,
+              not a smooth minimum-norm smear.
+            </p>
+          </article>
+          <article class="feat-family is-dyn">
+            <svg viewBox="0 0 120 64" aria-hidden="true"><path d="M8 40 Q28 12 48 36 T88 28 T112 44" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="48" cy="36" r="3" fill="currentColor"/><circle cx="88" cy="28" r="3" fill="currentColor"/></svg>
+            <h3>State-space</h3>
+            <p>
+              Class Kalman (KF / sLORETA-KF / EnKF, optional RTS). UKF-NMM: spatial Kalman
+              on a modified lead field, then Jansen–Rit neural-mass parameters with an
+              unscented Kalman step. DTI structural process-noise <code>Q</code> exists
+              only on the legacy Kalman plugin, not on <code>inverse.KalmanInverter</code>.
+            </p>
+          </article>
+        </div>
+        <p class="feat-after">
+          After a reconstruction, <code>inverse.gmm</code> can cluster the map. That is
+          not itself a registry inverse id. Kalman / UKFNMM share predict–update kernels
+          in <code>inverse.kf</code>.
+        </p>
+      </section>
+
+      <section class="feat-chapter is-flip" id="observe" data-feat-chapter>
+        <span id="dynamic" hidden></span>
+        <div class="feat-copy">
+          <p class="feat-index">05 — Observe</p>
+          <h2>See the mesh, the map, the traces</h2>
+          <p>
+            The Figure tool owns the 3-D axes. Mesh visualization draws volume and
+            surfaces, clipping planes, and cameras. After an inverse, colour the tetrahedra
+            from <code>zef.reconstruction</code>. Overlays include cones, contours,
+            DTI streamlines, and source markers.
+          </p>
+          <p>
+            Time is first-class: frame sliders, movie loops, a butterfly window, and
+            parcellation time series when an atlas or user spheres have been painted
+            onto the source space. Measurements and reconstructions import as
+            <code>.mat</code> / <code>.dat</code> — not as native EDF or FIF.
+          </p>
+          <p>
+            The whole session is the <code>zef</code> struct. <code>zef_save</code> /
+            <code>zef_load</code> persist scientific fields (handles stripped). Scripts
+            call the same functions the buttons call, including
+            <code>zef_inverse_run(zef, 'eloreta', 'execution', 'local')</code>.
+          </p>
+          <a class="text-link" href="docs.html#zef-state">zef fields in Docs</a>
+        </div>
+        <div class="feat-visual" aria-hidden="true">
+          <figure class="feat-photo">
+            <img
+              src="./assets/source_localization-PVUu0hmS.webp"
+              alt=""
+              width="1254"
+              height="1254"
+            />
+          </figure>
+        </div>
+      </section>
+
+      <section class="feat-also" id="also">
+        <div class="feat-also-inner">
+          <p class="feat-index">Also in the tree</p>
+          <ul>
+            <li>NSE hemodynamics on <code>zef.nse_field</code> — not a replacement for <code>L</code></li>
+            <li>Wave / ToRRe leap-frog drivers, including a GPU time stepper</li>
+            <li>Asteroid gravity lead fields via <code>gravity_field_type</code>, not types 1–10</li>
+            <li>Cluster dispatch of class inverse jobs through <code>utilities.cluster</code></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="feat-continue" id="continue">
+        <div class="feat-continue-copy">
+          <p class="kicker">Continue</p>
+          <h2>How to use it, who published it, where the code lives</h2>
+        </div>
+        <div class="feat-exits">
+          <a class="feat-exit" href="docs.html">
+            <span>Documentation</span>
+            <strong>Guides from the repository docs/</strong>
+          </a>
+          <a class="feat-exit" href="papers.html">
+            <span>Publications</span>
+            <strong>Verified papers that define the methods</strong>
+          </a>
+          <a class="feat-exit" href="https://github.com/sampsapursiainen/zeffiro_interface" target="_blank" rel="noopener noreferrer">
+            <span>GitHub</span>
+            <strong>Clone and run <code>zef = zeffiro_interface</code></strong>
+          </a>
+        </div>
+      </section>
+      </div>
+    </main>
+    <div data-footer></div>
+  </body>
+</html>

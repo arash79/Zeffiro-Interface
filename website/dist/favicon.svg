@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Zeffiro Interface">
+  <title>Zeffiro Interface</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="24" cy="24" rx="15.2" ry="15.2" stroke="#27A8AA" stroke-width="2.4"/>
+    <ellipse cx="24" cy="24" rx="8.4" ry="8.4" stroke="#969696" stroke-width="1.6"/>
+    <ellipse cx="24" cy="24" rx="5.2" ry="15.2" stroke="#50CCC9" stroke-width="1.35" stroke-dasharray="2.2 2.4"/>
+    <ellipse cx="24" cy="24" rx="15.2" ry="5.6" transform="rotate(-28 24 24)" stroke="#27A8AA" stroke-width="1.35" stroke-dasharray="2.4 2.6"/>
+    <path d="M6 38 L42 10" stroke="#50CCC9" stroke-width="1.2" stroke-dasharray="2.1 2.3"/>
+    <path d="M10 8 L40 40" stroke="#155F60" stroke-width="1.15" stroke-dasharray="2.1 2.3" opacity="0.85"/>
+  </g>
+</svg>
