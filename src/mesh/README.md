@@ -12,7 +12,7 @@ NSE volume/surface scalar products are in `barycentric/` and are **not** used fo
 
 | File | Kind | Role |
 |------|------|------|
-| `zef_create_finite_element_mesh.m` | function | Mesh-tool **Create FEM mesh** (`h_pushbutton21`). Chain: optional `zef_downsample_surfaces` → `zef_process_meshes` → `zef_create_fem_mesh` → `zef_postprocess_fem_mesh` → clear `source_ind` → `zef_update`. Does **not** assemble `zef.L`. |
+| `zef_create_finite_element_mesh.m` | function | Mesh-tool **Create FEM mesh** (`h_pushbutton21`). Chain: optional `zef_downsample_surfaces` → `zef_process_meshes` → `zef_create_fem_mesh` → `zef_postprocess_fem_mesh` → clear `source_ind` → sync sensors table and mesh-tool widgets from `zef` → `zef_update`. Does **not** assemble `zef.L`. |
 | `zef_process_meshes.m` | function | Active `<tag>_points/_triangles` → `reuna_p` / `reuna_t` plus sensor transforms. Always run before the lattice builder. Optional `explode_param` for visualization. |
 | `zef_create_fem_mesh.m` | function | Lattice → tets via `zef_lattice_cubes_to_tetra`. Mode 1: 5 tets/cube (parity-dependent stencils); mode 2: 6 tets. PML via `zef_pml_mesh` when a compartment has `_sources == -1`. Then labeling and optional refinement. CPU labeling uses `parfor`; `zef_ensure_parpool` starts a pool only when Parallel Computing Toolbox is present. |
 | `zef_lattice_cubes_to_tetra.m` | function | Cartesian `meshgrid` lattice → tetra / `label_ind`. Called from `zef_create_fem_mesh`. |

@@ -160,13 +160,21 @@ end
             zef.sensor_tags = {};
         end
         
-        % The sensors table is only authoritative when it has one 8-column
-        % row per sensor_tags entry. A leftover 7-column default row
-        % ("Sensors 1", Visible=0) would otherwise be written onto a
-        % newly prepended tag after Import / zef_add_sensors.
-        sensors_table_authoritative = not(isempty(zef.aux_field_1)) ...
+        % The sensors table is only authoritative when it was filled from
+        % the current zef (or edited by the user after that), has one
+        % 8-column row per sensor_tags entry, AND those rows describe the
+        % same point tables that zef already holds. After File → Open /
+        % nodisplay open_project the live table still shows the empty
+        % default set ("Sensors 1", Visible=0, Points empty) while
+        % sensor_tags is the loaded tag. Writing that row onto the loaded
+        % set produced "Sensors 1 1" labels and hid the electrodes.
+        sensors_table_synced = isfield(zef, 'sensors_table_synced') ...
+            && isequal(zef.sensors_table_synced, true);
+        sensors_table_authoritative = sensors_table_synced ...
+            && not(isempty(zef.aux_field_1)) ...
             && size(zef.aux_field_1, 1) == length(zef.sensor_tags) ...
-            && size(zef.aux_field_1, 2) >= 8;
+            && size(zef.aux_field_1, 2) >= 8 ...
+            && not(local_sensors_table_stale(zef, zef.aux_field_1));
 
         if sensors_table_authoritative
             for zef_i = 1 : size(zef.aux_field_1,1)
@@ -363,16 +371,40 @@ end
         end
     end
 
-    if isfield(zef,'h_mesh_tool')
-        if isvalid(zef.h_mesh_tool)
-            zef_update_mesh_tool;
-        end
-    end
+    % Mesh-tool widgets already write zef via their ValueChangedFcn
+    % (zef_update_mesh_tool). Pulling them here overwrites open_project /
+    % run_script values (mesh_resolution=1, max_surface_face_count=Inf,
+    % refinement_on) with the startup widget defaults (3, 1, false).
 
 
     if nargout == 0
         assignin('base','zef',zef);
     end
 
+end
+end
+
+function stale = local_sensors_table_stale(zef, table_data)
+stale = false;
+if isempty(table_data) || size(table_data, 2) < 7
+    return
+end
+n = min(size(table_data, 1), length(zef.sensor_tags));
+for i = 1:n
+    tag = zef.sensor_tags{i};
+    if ~isfield(zef, [tag '_points'])
+        continue
+    end
+    has_pts = ~isempty(zef.([tag '_points']));
+    table_pts = table_data{i, 7};
+    if isempty(table_pts)
+        table_flag = false;
+    else
+        table_flag = logical(table_pts(1));
+    end
+    if has_pts && ~table_flag
+        stale = true;
+        return
+    end
 end
 end

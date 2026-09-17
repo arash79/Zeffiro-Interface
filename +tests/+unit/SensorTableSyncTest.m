@@ -90,6 +90,118 @@ classdef SensorTableSyncTest < matlab.unittest.TestCase
             testCase.verifyEqual(string(names{1}), "Electrodes 1");
         end
 
+        function openProjectStaleStartupRowDoesNotClobberElectrodes(testCase)
+            % zef_start fills the sensors table with the empty default set.
+            % open_project then replaces sensor_tags with the loaded tag
+            % without rebuilding the table. zef_create_finite_element_mesh
+            % used to call zef_update and copy "Sensors 1"/Visible=0 onto s2.
+            zef = i_default_s_session();
+            zef = i_attach_update_handles(testCase, zef);
+            zef = zef_build_sensors_table(zef);
+            testCase.verifyEqual(char(string(zef.h_sensors_table.Data{1,2})), 'Sensors 1');
+            testCase.verifyEqual(logical(zef.h_sensors_table.Data{1,7}), false);
+
+            zef = zef_create_sensors(zef, 's2');
+            zef.s2_name = 'Electrodes';
+            zef.s2_visible = 1;
+            zef.s2_on = 1;
+            zef.s2_points = load(i_electrodes_dat());
+            zef.s2_name_list = arrayfun(@(k) num2str(k), 1:size(zef.s2_points, 1), 'UniformOutput', false);
+            zef.sensor_tags = {'s2'};
+            zef.current_sensors = 's2';
+            % Same flag zef_merge_project_data sets: live table is leftover.
+            zef.sensors_table_synced = false;
+
+            zef = zef_update(zef);
+            testCase.verifyEqual(char(string(zef.s2_name)), 'Electrodes');
+            testCase.verifyEqual(double(zef.s2_visible), 1);
+            testCase.verifyEqual(char(string(zef.current_sensors)), 's2');
+            testCase.verifyGreaterThan(nnz(zef.s2_visible_list), 0);
+            [names, ~, n] = zef_sensor_list_items(zef);
+            testCase.verifyEqual(n, 72);
+            testCase.verifyEqual(string(names{1}), "Electrodes 1");
+            testCase.verifyEqual(string(names{72}), "Electrodes 72");
+            testCase.verifyEqual(char(string(zef.h_sensors_table.Data{1,2})), 'Electrodes');
+            testCase.verifyEqual(logical(zef.h_sensors_table.Data{1,5}), true);
+        end
+
+        function mergeProjectDataMarksSensorsTableUnsynced(testCase)
+            zef = i_default_s_session();
+            zef = i_attach_update_handles(testCase, zef);
+            zef = zef_build_sensors_table(zef);
+            testCase.verifyTrue(logical(zef.sensors_table_synced));
+
+            zef_data = struct();
+            zef_data.sensor_tags = {'s2'};
+            zef_data.current_sensors = 's2';
+            zef_data.s2_name = 'Electrodes';
+            zef_data.s2_visible = 1;
+            zef_data.s2_on = 1;
+            zef_data.s2_points = load(i_electrodes_dat());
+            zef_data.s2_name_list = arrayfun(@(k) num2str(k), 1:72, 'UniformOutput', false);
+            zef_data.s2_imaging_method_name = 'EEG';
+            zef_data.s2_names_visible = 0;
+            zef_data.s2_visible_list = ones(72, 1);
+            zef_data.mesh_resolution = 1;
+            zef_data.refinement_on = 1;
+            zef_data.max_surface_face_count = Inf;
+
+            zef = zef_merge_project_data(zef, zef_data);
+            testCase.verifyFalse(logical(zef.sensors_table_synced));
+            testCase.verifyEqual(char(string(zef.s2_name)), 'Electrodes');
+            testCase.verifyEqual(char(string(zef.h_sensors_table.Data{1,2})), 'Sensors 1');
+
+            zef = zef_create_sensors(zef, 's2');
+            zef.mesh_resolution = 1;
+            zef.refinement_on = 1;
+            zef.max_surface_face_count = Inf;
+            zef = zef_update(zef);
+            testCase.verifyEqual(char(string(zef.s2_name)), 'Electrodes');
+            testCase.verifyEqual(double(zef.s2_visible), 1);
+            testCase.verifyGreaterThan(nnz(zef.s2_visible_list), 0);
+            testCase.verifyEqual(zef.mesh_resolution, 1);
+            testCase.verifyEqual(double(zef.refinement_on), 1);
+            testCase.verifyEqual(zef.max_surface_face_count, Inf);
+            [names, ~, n] = zef_sensor_list_items(zef);
+            testCase.verifyEqual(n, 72);
+            testCase.verifyEqual(string(names{1}), "Electrodes 1");
+        end
+
+        function createFemTailRebuildPreservesElectrodesAndMeshParams(testCase)
+            zef = i_default_s_session();
+            zef = i_attach_update_handles(testCase, zef);
+            zef = zef_build_sensors_table(zef);
+            zef = zef_create_sensors(zef, 's2');
+            zef.s2_name = 'Electrodes';
+            zef.s2_visible = 1;
+            zef.s2_on = 1;
+            zef.s2_points = load(i_electrodes_dat());
+            zef.s2_name_list = arrayfun(@(k) num2str(k), 1:size(zef.s2_points, 1), 'UniformOutput', false);
+            zef.sensor_tags = {'s2'};
+            zef.current_sensors = 's2';
+            zef.sensors_table_synced = false;
+            zef.mesh_resolution = 1;
+            zef.refinement_on = 1;
+            zef.max_surface_face_count = Inf;
+            zef = i_attach_mesh_tool(testCase, zef, 3, false, 1);
+
+            zef = zef_build_sensors_table(zef);
+            zef = zef_apply_mesh_tool_values(zef);
+            zef = zef_update(zef);
+
+            testCase.verifyEqual(char(string(zef.s2_name)), 'Electrodes');
+            testCase.verifyEqual(double(zef.s2_visible), 1);
+            testCase.verifyEqual(zef.mesh_resolution, 1);
+            testCase.verifyEqual(double(zef.refinement_on), 1);
+            testCase.verifyEqual(zef.max_surface_face_count, Inf);
+            testCase.verifyEqual(zef.h_edit65.Value, 1);
+            testCase.verifyEqual(logical(zef.h_refinement_on.Value), true);
+            testCase.verifyEqual(zef.h_max_surface_face_count.Value, Inf);
+            [names, ~, n] = zef_sensor_list_items(zef);
+            testCase.verifyEqual(n, 72);
+            testCase.verifyEqual(string(names{1}), "Electrodes 1");
+        end
+
         function sevenColumnMatchingRowsStillRebuildFromZef(testCase)
             zef = i_two_set_session();
             zef = i_attach_update_handles(testCase, zef);
@@ -219,6 +331,19 @@ zef.h_menu_lock_on = uimenu(fig, 'Text', 'Lock on');
 zef.h_menu_lock_sensor_sets_on = uimenu(fig, 'Text', 'Lock on');
 zef.h_menu_lock_sensor_names_on = uimenu(fig, 'Text', 'Lock on');
 zef.h_menu_lock_transforms_on = uimenu(fig, 'Text', 'Lock on');
+end
+
+function zef = i_attach_mesh_tool(testCase, zef, resolution, refinement, max_faces)
+fig = uifigure('Visible', 'off');
+testCase.Figures = [testCase.Figures, fig];
+zef.h_mesh_tool = fig;
+zef.h_edit65 = uieditfield(fig, 'numeric');
+zef.h_edit65.Value = resolution;
+zef.h_refinement_on = uicheckbox(fig);
+zef.h_refinement_on.Value = refinement;
+zef.h_max_surface_face_count = uieditfield(fig, 'numeric');
+zef.h_max_surface_face_count.Limits = [-Inf Inf];
+zef.h_max_surface_face_count.Value = max_faces;
 end
 
 function p = i_repo_root()

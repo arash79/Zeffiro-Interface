@@ -61,6 +61,12 @@ for i = 1:numel(restore)
     zef.(restore{i}) = live.(restore{i});
 end
 
+% Live handles keep the startup sensors table ("Sensors 1", Visible off,
+% empty Points) even though sensor_tags now point at the loaded set.
+% zef_update must rebuild that table from zef, not write the leftover row
+% onto s2 (Electrodes → "Sensors 1 1", electrode rings hidden).
+zef.sensors_table_synced = false;
+
 end
 
 function tf = local_is_live_gui(val)

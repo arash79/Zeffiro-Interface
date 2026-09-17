@@ -24,7 +24,7 @@ arguments
     zef_data (1,1) struct
 end
 
-fields_to_be_removed = {'gpu_count','compartment_activity','start_mode','colormap_cell','path_cell','use_display','current_version','matfile_object','zeffiro_restart','verbose_mode','use_waitbar','zeffiro_task_id','use_github','ui_color_mode'};
+fields_to_be_removed = {'gpu_count','compartment_activity','start_mode','colormap_cell','path_cell','use_display','current_version','matfile_object','zeffiro_restart','verbose_mode','use_waitbar','zeffiro_task_id','use_github','ui_color_mode','sensors_table_synced'};
 
 ini_cell = zef_read_profile_cell([zef.program_path '/profile/zeffiro_interface.ini']);
 system_fields = ini_cell(:,3);

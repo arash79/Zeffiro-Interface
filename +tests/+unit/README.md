@@ -93,7 +93,7 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `GuiResponsivenessTest` | Resize must not install listener storms or recenter the window |
 | `WindowPlacementTest` | Clamp / centre helpers keep windows on the work area |
 | `SensorListSyncTest` | Figure-tool sensor count matches listed rows |
-| `SensorTableSyncTest` | 8-column sensor-set table; stale 7-column GUI data cannot overwrite imported `Electrodes` / Visible; fs2zef `electrodes.dat` import + save/reload keeps `Electrodes 1` |
+| `SensorTableSyncTest` | 8-column sensor-set table; open_project merge + Create FEM `zef_update` cannot overwrite loaded `Electrodes` / Visible / mesh_resolution / Inf face count; fs2zef `electrodes.dat` import + save/reload keeps `Electrodes 1` |
 | `PluginIniResolutionTest` | Every Start function named in `profile/*/zeffiro_plugins.ini` exists on the path |
 
 ## Code functionality

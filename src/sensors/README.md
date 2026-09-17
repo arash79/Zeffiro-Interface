@@ -7,7 +7,7 @@ A **sensor set** is one EEG cap, MEG helmet, EIT electrode array, or similar: po
 | File | Kind | Role |
 |------|------|------|
 | `zef_create_sensors.m` | function | Default `<tag>_*` |
-| `zef_build_sensors_table.m` | function | Fill sensors table from zef (8 columns: Index/Name/Modality/On/Visible/Tags/Points/Directions) |
+| `zef_build_sensors_table.m` | function | Fill sensors table from zef (8 columns: Index/Name/Modality/On/Visible/Tags/Points/Directions) and set `sensors_table_synced` |
 | `zef_attach_sensors_volume.m` | function | Snap to volume/surface; returns attachment table |
 | `zef_fix_sensors_get_functions_array_size.m` | function | Pad/trim `_get_functions` cell |
 | `zef_sensor_get_function_eval.m` | function | `feval` placement string |

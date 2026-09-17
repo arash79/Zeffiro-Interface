@@ -296,7 +296,7 @@ if not(isequal(file_name,0))
         end
     end
 
-    if zef.use_display && isfield(zef,'h_sensors_table') && isvalid(zef.h_sensors_table)
+    if isfield(zef,'h_sensors_table') && isvalid(zef.h_sensors_table)
         if isfield(zef,'sensor_tags') && iscell(zef.sensor_tags) && not(isempty(zef.sensor_tags))
             try
                 zef = zef_build_sensors_table(zef);
@@ -306,6 +306,10 @@ if not(isequal(file_name,0))
             catch
             end
         end
+    end
+    try
+        zef = zef_apply_mesh_tool_values(zef);
+    catch
     end
 
     try
