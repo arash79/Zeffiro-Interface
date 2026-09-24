@@ -12,7 +12,10 @@ function [names, colors, n] = zef_sensor_list_items(zef)
 %
 %   [names, colors, n] = zef_sensor_list_items(zef)
 %
-%   See also zef_update_fig_details, zef_init_sensors_name_table.
+%   Electrode sets are labeled by zef_sensor_contact_presentation
+%   ("Electrode N"), not by the stored set name.
+%
+%   See also zef_sensor_contact_presentation, zef_update_fig_details.
 
 names = {};
 colors = zeros(0, 3);
@@ -25,10 +28,6 @@ if isfield(zef, 'current_sensors') && ~isempty(zef.current_sensors) ...
         && isfield(zef, [zef.current_sensors '_points'])
     points = zef.([zef.current_sensors '_points']);
     n_pts = size(points, 1);
-    name_list = {};
-    if isfield(zef, [zef.current_sensors '_name_list'])
-        name_list = zef.([zef.current_sensors '_name_list']);
-    end
     color_table = [];
     if isfield(zef, [zef.current_sensors '_color_table'])
         color_table = zef.([zef.current_sensors '_color_table']);
@@ -40,29 +39,9 @@ if isfield(zef, 'current_sensors') && ~isempty(zef.current_sensors) ...
         catch
         end
     end
-    set_name = char(string(zef.current_sensors));
-    if isfield(zef, [zef.current_sensors '_name'])
-        try
-            set_name = char(string(zef.([zef.current_sensors '_name'])));
-        catch
-        end
-    end
-    names = cell(1, n_pts);
+    names = zef_sensor_contact_presentation(zef, zef.current_sensors, n_pts);
     colors = zeros(n_pts, 3);
     for i = 1:n_pts
-        nm = '';
-        if iscell(name_list) && numel(name_list) >= i
-            nm = strtrim(char(string(name_list{i})));
-        elseif ~iscell(name_list) && ~isempty(name_list) && size(name_list, 1) >= i
-            try
-                nm = strtrim(char(string(name_list(i, :))));
-            catch
-            end
-        end
-        if isempty(nm) || ~isempty(regexp(nm, '^\d+$', 'once'))
-            nm = sprintf('%s %d', set_name, i);
-        end
-        names{i} = nm;
         rgb = set_color;
         if size(color_table, 1) >= i && size(color_table, 2) >= 3
             rgb = color_table(i, 1:3);

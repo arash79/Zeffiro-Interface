@@ -8,13 +8,13 @@ function zef = zef_update(zef)
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Central GUI-to-state sync. Reads the segmentation-tool compartment table
-%   (rows map to zef.compartment_tags in reverse order), writes
-%   <tag>_priority and parameter_profile scalars/strings, drops inactive
-%   compartment fields, then similarly syncs sensors, transforms, and
-%   figure-tool sliders. CellEditCallback is cleared while table Data is
-%   rewritten to avoid recursive callbacks. Returns immediately if the
-%   compartment table handle is missing (project load before GUI init).
+%   Central GUI sync. The compartment table is the editor for compartment
+%   rows. The sensors table is the editor only after zef_build_sensors_table
+%   has filled it from zef (sensors_table_synced). Loading a project clears
+%   that flag so a startup row cannot rename or hide the loaded set.
+%   Mesh and mesh-visualization values live on zef; this function copies
+%   them onto widgets. Those widgets write zef only from their own
+%   ValueChangedFcn, when the user edits that control.
 %
 %   zef = zef_update(zef)
 %   zef_update          % reads and writes zef in the base workspace
@@ -160,21 +160,16 @@ end
             zef.sensor_tags = {};
         end
         
-        % The sensors table is only authoritative when it was filled from
-        % the current zef (or edited by the user after that), has one
-        % 8-column row per sensor_tags entry, AND those rows describe the
-        % same point tables that zef already holds. After File → Open /
-        % nodisplay open_project the live table still shows the empty
-        % default set ("Sensors 1", Visible=0, Points empty) while
-        % sensor_tags is the loaded tag. Writing that row onto the loaded
-        % set produced "Sensors 1 1" labels and hid the electrodes.
+        % sensors_table_synced is set by zef_build_sensors_table and cleared
+        % when a project replaces zef underneath the live table. Until
+        % then the table is a startup view and must not be written back.
+        % One 8-column row per sensor tag is the Segmentation-tool layout.
         sensors_table_synced = isfield(zef, 'sensors_table_synced') ...
             && isequal(zef.sensors_table_synced, true);
         sensors_table_authoritative = sensors_table_synced ...
             && not(isempty(zef.aux_field_1)) ...
             && size(zef.aux_field_1, 1) == length(zef.sensor_tags) ...
-            && size(zef.aux_field_1, 2) >= 8 ...
-            && not(local_sensors_table_stale(zef, zef.aux_field_1));
+            && size(zef.aux_field_1, 2) >= 8;
 
         if sensors_table_authoritative
             for zef_i = 1 : size(zef.aux_field_1,1)
@@ -364,47 +359,15 @@ end
         clear zef_i zef_j zef_k zef_n;
 
     end
-
-    if isfield(zef,'h_mesh_visualization_tool');
-        if isvalid(zef.h_mesh_visualization_tool)
-            zef_update_mesh_visualization_tool;
-        end
     end
 
-    % Mesh-tool widgets already write zef via their ValueChangedFcn
-    % (zef_update_mesh_tool). Pulling them here overwrites open_project /
-    % run_script values (mesh_resolution=1, max_surface_face_count=Inf,
-    % refinement_on) with the startup widget defaults (3, 1, false).
-
+    % Model → widgets. User edits of these tools go the other way through
+    % ValueChangedFcn (zef_update_mesh_tool / zef_update_mesh_visualization_tool).
+    zef = zef_apply_mesh_tool_values(zef);
+    zef = zef_apply_mesh_visualization_tool_values(zef);
 
     if nargout == 0
         assignin('base','zef',zef);
     end
 
-end
-end
-
-function stale = local_sensors_table_stale(zef, table_data)
-stale = false;
-if isempty(table_data) || size(table_data, 2) < 7
-    return
-end
-n = min(size(table_data, 1), length(zef.sensor_tags));
-for i = 1:n
-    tag = zef.sensor_tags{i};
-    if ~isfield(zef, [tag '_points'])
-        continue
-    end
-    has_pts = ~isempty(zef.([tag '_points']));
-    table_pts = table_data{i, 7};
-    if isempty(table_pts)
-        table_flag = false;
-    else
-        table_flag = logical(table_pts(1));
-    end
-    if has_pts && ~table_flag
-        stale = true;
-        return
-    end
-end
 end

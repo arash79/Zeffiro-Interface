@@ -7,7 +7,7 @@ A **sensor set** is one EEG cap, MEG helmet, EIT electrode array, or similar: po
 | File | Kind | Role |
 |------|------|------|
 | `zef_create_sensors.m` | function | Default `<tag>_*` |
-| `zef_build_sensors_table.m` | function | Fill sensors table from zef (8 columns: Index/Name/Modality/On/Visible/Tags/Points/Directions) and set `sensors_table_synced` |
+| `zef_build_sensors_table.m` | function | Fill the sensors table from zef (8 columns) and mark it synced |
 | `zef_attach_sensors_volume.m` | function | Snap to volume/surface; returns attachment table |
 | `zef_fix_sensors_get_functions_array_size.m` | function | Pad/trim `_get_functions` cell |
 | `zef_sensor_get_function_eval.m` | function | `feval` placement string |
@@ -19,6 +19,12 @@ A **sensor set** is one EEG cap, MEG helmet, EIT electrode array, or similar: po
 ## Code functionality
 
 Prefix fields like compartments: `s_points`, `s_directions`, `s_name_list`, `s_imaging_method_name`, …. `zef.current_sensors` is the active tag. `zef.imaging_method` must match lead-field type.
+
+Those `<tag>_*` fields are the sensor model. `zef_canonicalize_sensors` runs once when a project is opened. It sets `sensors_canonical`, which is saved with the project. A set that has coordinates, is switched off, and has no contact marked on is shown on that first open: that combination is the factory default plus an old name-table refresh that wrote zeros whenever the set was off. A set that is on, or that is off while some contacts stay marked on, is not changed. Coordinates, the set name, and `<tag>_name_list` are left as stored.
+
+The Segmentation-tool sensors table is a view of name, modality, on, visible, and names-visible. `zef_build_sensors_table` fills that view and sets `sensors_table_synced`. `zef_update` writes the table back only while the flag is set and the table still has one 8-column row per tag. `zef_merge_project_data` clears the flag so the startup row is rebuilt from the loaded set instead of editing it.
+
+Electrode sets (EEG, EIT, TES) use one presentation, from `zef_sensor_contact_presentation`. The Figure-tool list is `Electrode 1`, `Electrode 2`, …. The text on the electrode is `1`, `2`, …. MEG keeps the stored channel name. Plotting draws a contact when the set is visible and `zef_sensor_draw_indices` selects that row. An empty contact list means unspecified (draw all). A stored list is applied as written, including all zeros.
 
 **Attachment** (required before `zef.L` for EEG/EIT/TES; MEG does **not** attach):
 

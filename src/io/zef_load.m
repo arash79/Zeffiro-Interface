@@ -174,6 +174,9 @@ if not(isequal(file_name,0))
     zef_data.code_path = zef.code_path;
     zef_data.program_path = zef.program_path;
 
+    % A live session is already canonical. The file is canonical only when
+    % it carries the flag. Merge copies the file value when present.
+    zef.sensors_canonical = false;
     zef = zef_merge_project_data(zef, zef_data);
     if ~isfield(zef, 'current_version') || isempty(zef.current_version)
         zef.current_version = 2.2;
@@ -231,6 +234,7 @@ if not(isequal(file_name,0))
             zef = zef_create_sensors(zef, zef.sensor_tags{zef_i});
         end
     end
+    zef = zef_canonicalize_sensors(zef);
 
     for zef_i = 1 : length(zef.compartment_tags)
         if zef_i <= length(zef.compartment_tags)
@@ -307,10 +311,8 @@ if not(isequal(file_name,0))
             end
         end
     end
-    try
-        zef = zef_apply_mesh_tool_values(zef);
-    catch
-    end
+    zef = zef_apply_mesh_tool_values(zef);
+    zef = zef_apply_mesh_visualization_tool_values(zef);
 
     try
         if ~isempty(h_waitbar) && isvalid(h_waitbar)

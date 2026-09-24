@@ -301,16 +301,8 @@ sensors(:,1) = sensors(:,1).*(1 + sensor_explosion_parameter_2.*exp(sensor_explo
 sensors(:,2) = sensors(:,2).*(1 + sensor_explosion_parameter_2.*exp(sensor_explosion_parameter_1.*((max(sensors(:,3))-sensors(:,3))/(max(sensors(:,3))-min(sensors(:,3))))));
 sensors(:,3) = sensors(:,3)+sign(sensor_explosion_parameter_2).*(max(sensors(:,3))-sensors(:,3));
 %January 2023
-sensors_visible = find(eval(['zef.' sensor_tag '_visible_list']));
-sensors_color_table = eval(['zef.' sensor_tag '_color_table']);
-sensors_name = eval(['zef.' sensor_tag '_name_list']);
 aux_scale_val = eval('zef.sensors_visual_size');
-if not(isempty(sensors_visible))
-    sensors = sensors(sensors_visible,:);
-    sensors_name = sensors_name(sensors_visible);
-    sensors_color_table = sensors_color_table(sensors_visible,:);
-    sensors_get_functions = sensors_get_functions(sensors_visible);
-end
+[sensors, sensors_name, sensors_color_table, sensors_get_functions, sensors_visible] = zef_select_drawn_sensors(zef, sensor_tag, sensors, sensors_get_functions);
 %April 2021
 [X_s, Y_s, Z_s] = sphere(20);
 sphere_scale = aux_scale_val;

@@ -76,6 +76,7 @@ function zef = import_electrodes_callback(zef)
     zef.sensors = electrode_data ;
     zef.(points_field_name) = electrode_data ( :, 1 : 3 ) ;
     zef.(name_field_name)   = electrode_labels ;
+    zef = zef_accept_sensor_points(zef, char(name_field_prefix));
 
     % Append CEM columns to _points when present (outer, inner, impedance).
     if size ( electrode_data, 2 ) == 6

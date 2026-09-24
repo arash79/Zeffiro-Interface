@@ -46,6 +46,7 @@ Or open from the GUI **Project → Open** and browse to this folder.
 - Large binaries — avoid re-saving casually in git without need.
 - Projects may assume a matching profile (`multicompartment_head`, `asteroid_gravity`, …).
 - May contain lead fields computed with a specific MATLAB/toolbox revision; recompute if solvers misbehave.
+- `multicompartment_head_project.mat` was saved with set name `Sensors 1`, the set switched off, and every contact flag zero. Opening it canonicalizes that cap: the electrodes are shown, the Figure list reads `Electrode 1`, `Electrode 2`, …, and the labels on the electrodes are the numbers. Saving the project stores that result; a later open does not migrate it again.
 
 ## Developer guidance
 

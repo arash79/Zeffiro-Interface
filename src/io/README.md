@@ -20,8 +20,8 @@ Project saves strip GUI handles (`zef_remove_object_handles`), close tools/figs,
 
 | File | Role |
 |------|------|
-| `zef_load.m` | Open project MAT; DUNEuro MATLAB dumps are converted via `utilities.duneuro2zef.convert` before merge; batched load; rebuild sensors/compartments/GUI; converts legacy single-var MAT |
-| `zef_merge_project_data.m` | Copy scientific fields from loaded MAT onto live `zef` while **preserving** live unified-shell figures / uicontrols / App objects (strips stale handles from the file). Marks `sensors_table_synced=false` so `zef_update` cannot copy the leftover startup sensor row onto the loaded set. |
+| `zef_load.m` | Open project MAT; DUNEuro MATLAB dumps are converted via `utilities.duneuro2zef.convert` before merge; batched load; `zef_canonicalize_sensors` once; rebuild sensors/compartments/GUI from the loaded fields; converts legacy single-var MAT |
+| `zef_merge_project_data.m` | Copy scientific fields from the loaded MAT onto live `zef`, keeping live figures and controls. Clears `sensors_table_synced` so the startup sensors table is rebuilt from the loaded set instead of editing it. |
 
 ### Import
 

@@ -13,8 +13,8 @@ Scripts that **create** the main Zeffiro windows and attach every button and men
 | `zef_mesh_visualization_tool.m` | Mesh visualization tool |
 | `zef_parcellation_tool.m` / `_open` / `_window` | Lazy parcellation UI |
 | `zef_tool_start.m` | Raise existing tool or `evalc` create + tag |
-| `zef_update_mesh_tool.m` / `zef_update_mesh_visualization_tool.m` | Widget → `zef` scripts (mesh-tool widgets write on ValueChangedFcn; `zef_update` does **not** pull them) |
-| `zef_apply_mesh_tool_values.m` | `zef` → Mesh-tool widgets after load / remesh so the GUI matches script-set values |
+| `zef_update_mesh_tool.m` / `zef_update_mesh_visualization_tool.m` | Widget → `zef` on ValueChangedFcn only |
+| `zef_apply_mesh_tool_values.m` / `zef_apply_mesh_visualization_tool_values.m` | `zef` → widgets. `zef_update` uses these and does not read the widgets back |
 | `zef_set_figure_tool_sliders.m` | Reset or sync figure sliders |
 | `zef_segmentation_tool_toggle.m` | Narrow/wide layout |
 | `zef_reopen_menu_tool.m` | Rebuild menu preserving log/task metadata |

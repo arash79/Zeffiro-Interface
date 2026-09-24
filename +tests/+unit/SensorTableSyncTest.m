@@ -71,23 +71,147 @@ classdef SensorTableSyncTest < matlab.unittest.TestCase
             testCase.verifyEqual(double(zef.s2_visible), 1);
             [names, ~, n] = zef_sensor_list_items(zef);
             testCase.verifyEqual(n, 3);
-            testCase.verifyEqual(string(names{1}), "Electrodes 1");
-            testCase.verifyEqual(string(names{2}), "Electrodes 2");
-            testCase.verifyEqual(string(names{3}), "Electrodes 3");
+            testCase.verifyEqual(string(names{1}), "Electrode 1");
+            testCase.verifyEqual(string(names{2}), "Electrode 2");
+            testCase.verifyEqual(string(names{3}), "Electrode 3");
         end
 
-        function extraIndexComesFromDefaultSetNameNotDisplayFormatting(testCase)
+        function electrodeListIgnoresStoredSetName(testCase)
             zef = struct();
             zef.current_sensors = 's2';
             zef.s2_points = rand(4, 3);
+            zef.s2_imaging_method_name = 'EEG';
             zef.s2_name = 'Sensors 1';
             zef.s2_name_list = {'1', '2', '3', '4'};
             [names, ~, n] = zef_sensor_list_items(zef);
             testCase.verifyEqual(n, 4);
-            testCase.verifyEqual(string(names{1}), "Sensors 1 1");
+            testCase.verifyEqual(string(names{1}), "Electrode 1");
+            testCase.verifyEqual(string(names{4}), "Electrode 4");
+            [~, annotations] = zef_sensor_contact_presentation(zef, 's2');
+            testCase.verifyEqual(string(annotations{1}), "1");
+            testCase.verifyEqual(string(annotations{4}), "4");
             zef.s2_name = 'Electrodes';
+            zef.s2_name_list = {'Fp1', 'Cz', 'Oz', 'Ref'};
             names = zef_sensor_list_items(zef);
-            testCase.verifyEqual(string(names{1}), "Electrodes 1");
+            [~, annotations] = zef_sensor_contact_presentation(zef, 's2');
+            testCase.verifyEqual(string(names{1}), "Electrode 1");
+            testCase.verifyEqual(string(annotations{2}), "2");
+            testCase.verifyEqual(char(string(zef.s2_name_list{1})), 'Fp1');
+        end
+
+        function exampleHeadProjectCanonicalizesOnce(testCase)
+            p = fullfile(i_repo_root(), 'data', 'example_projects', ...
+                'multicompartment_head_project.mat');
+            testCase.assumeTrue(isfile(p), 'example head project is not in the tree');
+            raw = load(p, 'sensor_tags', 'current_sensors', 's_name', 's_visible', ...
+                's_visible_list', 's_points', 's_name_list', 's_on', ...
+                's_names_visible', 's_imaging_method_name');
+            testCase.verifyEqual(char(string(raw.s_name)), 'Sensors 1');
+            testCase.verifyEqual(double(raw.s_visible), 0);
+            testCase.verifyEqual(nnz(raw.s_visible_list), 0);
+            testCase.verifyEqual(size(raw.s_points, 1), 72);
+
+            zef = i_default_s_session();
+            zef = i_attach_update_handles(testCase, zef);
+            zef = zef_build_sensors_table(zef);
+            points_before = raw.s_points;
+            zef.sensors_canonical = false;
+            zef = zef_merge_project_data(zef, raw);
+            zef = zef_canonicalize_sensors(zef);
+            zef = zef_build_sensors_table(zef);
+            zef = zef_update(zef);
+
+            testCase.verifyEqual(char(string(zef.s_name)), 'Sensors 1');
+            testCase.verifyEqual(char(string(zef.s_name_list{1})), '1');
+            testCase.verifyEqual(double(zef.s_visible), 1);
+            testCase.verifyEqual(zef.s_visible_list, ones(72, 1));
+            testCase.verifyEqual(zef.s_points, points_before);
+            testCase.verifyTrue(logical(zef.sensors_canonical));
+            testCase.verifyEqual(logical(zef.h_sensors_table.Data{1,5}), true);
+            [names, ~, n] = zef_sensor_list_items(zef);
+            testCase.verifyEqual(n, 72);
+            testCase.verifyEqual(string(names{1}), "Electrode 1");
+            testCase.verifyEqual(string(names{72}), "Electrode 72");
+            [~, annotations] = zef_sensor_contact_presentation(zef, 's');
+            testCase.verifyEqual(string(annotations{1}), "1");
+            testCase.verifyEqual(string(annotations{72}), "72");
+
+            zef.s_visible = 0;
+            again = zef_canonicalize_sensors(zef);
+            testCase.verifyEqual(double(again.s_visible), 0);
+            testCase.verifyEqual(again.s_visible_list, ones(72, 1));
+            testCase.verifyEqual(again.s_points, points_before);
+            testCase.verifyEqual(char(string(again.s_name)), 'Sensors 1');
+        end
+
+        function hiddenNamedCapAndPartialContactsSurviveUpdate(testCase)
+            zef = i_two_set_session();
+            zef = i_attach_update_handles(testCase, zef);
+            zef.s2_visible = 0;
+            zef.s2_visible_list = zeros(size(zef.s2_points, 1), 1);
+            zef = zef_build_sensors_table(zef);
+            zef = zef_update(zef);
+            testCase.verifyEqual(char(string(zef.s2_name)), 'Electrodes');
+            testCase.verifyEqual(double(zef.s2_visible), 0);
+            testCase.verifyEqual(nnz(zef.s2_visible_list), 0);
+
+            zef.s2_visible = 1;
+            zef.s2_visible_list = [1; 0; 1];
+            zef = zef_build_sensors_table(zef);
+            zef = zef_update(zef);
+            testCase.verifyEqual(double(zef.s2_visible), 1);
+            testCase.verifyEqual(zef.s2_visible_list, [1; 0; 1]);
+            testCase.verifyEqual(size(zef.s2_points, 1), 3);
+        end
+
+        function hiddenSetDoesNotEraseContactVisibility(testCase)
+            zef = i_two_set_session();
+            zef = i_attach_update_handles(testCase, zef);
+            zef.s2_visible = 0;
+            zef.s2_visible_list = [1; 0; 1];
+            zef = zef_build_sensors_table(zef);
+            zef = zef_update(zef);
+            testCase.verifyEqual(double(zef.s2_visible), 0);
+            testCase.verifyEqual(zef.s2_visible_list, [1; 0; 1]);
+            testCase.verifyEqual(zef.h_sensors_name_table.Data{1, 3}, 1);
+            testCase.verifyEqual(zef.h_sensors_name_table.Data{2, 3}, 0);
+        end
+
+        function canonicalizationLeavesExplicitContactHide(testCase)
+            zef = i_two_set_session();
+            zef.s2_visible = 1;
+            zef.s2_visible_list = [0; 0; 0];
+            zef.sensors_canonical = false;
+            zef = zef_canonicalize_sensors(zef);
+            testCase.verifyEqual(double(zef.s2_visible), 1);
+            testCase.verifyEqual(zef.s2_visible_list, [0; 0; 0]);
+            testCase.verifyTrue(logical(zef.sensors_canonical));
+            zef.s2_visible = 0;
+            zef.s2_visible_list = [1; 0; 1];
+            zef = zef_canonicalize_sensors(zef);
+            testCase.verifyEqual(double(zef.s2_visible), 0);
+            testCase.verifyEqual(zef.s2_visible_list, [1; 0; 1]);
+        end
+
+        function explicitHiddenContactsStayHiddenWhileSetIsOn(testCase)
+            zef = i_two_set_session();
+            zef = i_attach_update_handles(testCase, zef);
+            zef.s2_visible = 1;
+            zef.s2_visible_list = [0; 0; 0];
+            zef = zef_build_sensors_table(zef);
+            zef = zef_update(zef);
+            testCase.verifyEqual(double(zef.s2_visible), 1);
+            testCase.verifyEqual(zef.s2_visible_list, [0; 0; 0]);
+        end
+
+        function unspecifiedContactListBecomesVisibleWhenSetIsOn(testCase)
+            zef = i_two_set_session();
+            zef = i_attach_update_handles(testCase, zef);
+            zef.s2_visible = 1;
+            zef.s2_visible_list = [];
+            zef = zef_build_sensors_table(zef);
+            zef = zef_update(zef);
+            testCase.verifyEqual(zef.s2_visible_list, [1; 1; 1]);
         end
 
         function openProjectStaleStartupRowDoesNotClobberElectrodes(testCase)
@@ -119,8 +243,8 @@ classdef SensorTableSyncTest < matlab.unittest.TestCase
             testCase.verifyGreaterThan(nnz(zef.s2_visible_list), 0);
             [names, ~, n] = zef_sensor_list_items(zef);
             testCase.verifyEqual(n, 72);
-            testCase.verifyEqual(string(names{1}), "Electrodes 1");
-            testCase.verifyEqual(string(names{72}), "Electrodes 72");
+            testCase.verifyEqual(string(names{1}), "Electrode 1");
+            testCase.verifyEqual(string(names{72}), "Electrode 72");
             testCase.verifyEqual(char(string(zef.h_sensors_table.Data{1,2})), 'Electrodes');
             testCase.verifyEqual(logical(zef.h_sensors_table.Data{1,5}), true);
         end
@@ -164,7 +288,7 @@ classdef SensorTableSyncTest < matlab.unittest.TestCase
             testCase.verifyEqual(zef.max_surface_face_count, Inf);
             [names, ~, n] = zef_sensor_list_items(zef);
             testCase.verifyEqual(n, 72);
-            testCase.verifyEqual(string(names{1}), "Electrodes 1");
+            testCase.verifyEqual(string(names{1}), "Electrode 1");
         end
 
         function createFemTailRebuildPreservesElectrodesAndMeshParams(testCase)
@@ -186,7 +310,6 @@ classdef SensorTableSyncTest < matlab.unittest.TestCase
             zef = i_attach_mesh_tool(testCase, zef, 3, false, 1);
 
             zef = zef_build_sensors_table(zef);
-            zef = zef_apply_mesh_tool_values(zef);
             zef = zef_update(zef);
 
             testCase.verifyEqual(char(string(zef.s2_name)), 'Electrodes');
@@ -199,7 +322,31 @@ classdef SensorTableSyncTest < matlab.unittest.TestCase
             testCase.verifyEqual(zef.h_max_surface_face_count.Value, Inf);
             [names, ~, n] = zef_sensor_list_items(zef);
             testCase.verifyEqual(n, 72);
-            testCase.verifyEqual(string(names{1}), "Electrodes 1");
+            testCase.verifyEqual(string(names{1}), "Electrode 1");
+        end
+
+        function updateCopiesVisualizationFieldsOntoWidgets(testCase)
+            zef = i_default_s_session();
+            zef = i_attach_update_handles(testCase, zef);
+            zef = zef_build_sensors_table(zef);
+            fig = uifigure('Visible', 'off');
+            testCase.Figures = [testCase.Figures, fig];
+            zef.h_mesh_visualization_tool = fig;
+            zef.h_edit80 = uieditfield(fig, 'numeric');
+            zef.h_edit80.Value = 0;
+            zef.azimuth = 40;
+            zef.h_edit_cp_a = uieditfield(fig, 'text');
+            zef.h_edit_cp_a.Value = '9';
+            zef.cp_a = 0.25;
+            zef.cp_on = 1;
+
+            zef = zef_update(zef);
+
+            testCase.verifyEqual(zef.azimuth, 40);
+            testCase.verifyEqual(zef.h_edit80.Value, 40);
+            testCase.verifyEqual(zef.cp_a, 0.25);
+            testCase.verifyEqual(string(zef.h_edit_cp_a.Value), "0.25");
+            testCase.verifyEqual(string(zef.h_edit_cp_a.Enable), "on");
         end
 
         function sevenColumnMatchingRowsStillRebuildFromZef(testCase)
@@ -251,22 +398,23 @@ classdef SensorTableSyncTest < matlab.unittest.TestCase
             testCase.verifyEqual(zef.s2_points(1,:), [-22.7323 74.1356 35.6314], 'AbsTol', 1e-4);
             [names, ~, n] = zef_sensor_list_items(zef);
             testCase.verifyEqual(n, 72);
-            testCase.verifyEqual(string(names{1}), "Electrodes 1");
-            testCase.verifyEqual(string(names{2}), "Electrodes 2");
-            testCase.verifyEqual(string(names{72}), "Electrodes 72");
+            testCase.verifyEqual(string(names{1}), "Electrode 1");
+            testCase.verifyEqual(string(names{2}), "Electrode 2");
+            testCase.verifyEqual(string(names{72}), "Electrode 72");
             out = struct();
             out.s2_name = zef.s2_name;
             out.s2_visible = zef.s2_visible;
             out.s2_points = zef.s2_points;
             out.current_sensors = zef.current_sensors;
             out.s2_name_list = zef.s2_name_list;
+            out.s2_imaging_method_name = zef.s2_imaging_method_name;
             save(fullfile(tmp, 'sensors_roundtrip.mat'), '-struct', 'out');
             loaded = load(fullfile(tmp, 'sensors_roundtrip.mat'));
             testCase.verifyEqual(char(string(loaded.s2_name)), 'Electrodes');
             testCase.verifyEqual(double(loaded.s2_visible), 1);
             testCase.verifyEqual(size(loaded.s2_points, 1), 72);
             names = zef_sensor_list_items(loaded);
-            testCase.verifyEqual(string(names{1}), "Electrodes 1");
+            testCase.verifyEqual(string(names{1}), "Electrode 1");
         end
     end
 end

@@ -6,11 +6,10 @@ function zef = zef_apply_mesh_tool_values(zef)
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Inverse of zef_update_mesh_tool. After open_project / a run_script that
-%   sets mesh_resolution, max_surface_face_count, etc., the Mesh tool still
-%   holds startup defaults. The next zef_update would write those defaults
-%   back onto zef. Push zef → widgets first (with ValueChangedFcn cleared
-%   so the write does not recurse).
+%   Inverse of zef_update_mesh_tool. Mesh settings live on zef. Widgets
+%   copy them for display. A control edit still writes back through
+%   ValueChangedFcn. zef_update must not read the widgets, or startup
+%   defaults replace a project or script value the user did not edit.
 %
 %   zef = zef_apply_mesh_tool_values(zef)
 %

@@ -20,7 +20,12 @@ zef_ui_ready(zef.h_parcellation_tool);
 
 
 if not(isempty(zef.time_series_tools_name_list))
-    set(zef.h_time_series_tools_list,'string',zef.time_series_tools_name_list,'Value',1);
+    % A listbox treats newline characters inside an item as additional rows.
+    % Keep each tool description on one line so that the selected row remains
+    % aligned with the corresponding entry in time_series_tools_file_list.
+    tool_names = cellfun(@(name) strtrim(regexprep(name, '\s+', ' ')), ...
+        zef.time_series_tools_name_list, 'UniformOutput', false);
+    set(zef.h_time_series_tools_list,'String',tool_names,'Value',1);
 end
 
 zef = zef_update_parcellation(zef);
