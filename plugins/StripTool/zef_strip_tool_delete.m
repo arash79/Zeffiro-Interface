@@ -38,6 +38,10 @@ else
 end
 zef.([zef.current_sensors '_strip_cell']) = struct_aux_1;
 
+% Drop cylinders that belonged to the deleted lead and reapply the rest.
+[zef, report] = zef_strip_apply_burr_holes(zef, 'reapply');
+zef.strip_burr_report = report;
+
 zef.strip_tool.current_strip = 1;
 zef_colored_list('value', zef.strip_tool.h_strip_list, 1);
 

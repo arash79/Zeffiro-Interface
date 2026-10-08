@@ -303,6 +303,19 @@ for zef_j = 1 : size(parameter_profile,1)
     end
 end
 
+% Strip-tool burr holes are a lead specification, not extra surfaces.
+% This runs after sigma has been rebuilt from the compartment scalars of
+% the mesh just created, so an older tetrahedral array cannot select a
+% different path. 'generate' means fresh: do not restore the previous
+% volume's conductivity record.
+if exist('zef_strip_burr_mode', 'file') == 2 && exist('zef_strip_apply_burr_holes', 'file') == 2
+    [zef, report] = zef_strip_apply_burr_holes(zef, zef_strip_burr_mode('generate'));
+    zef.strip_burr_report = report;
+    if exist('zef_strip_burr_dialogs', 'file') == 2
+        zef_strip_burr_dialogs(zef, report);
+    end
+end
+
 if nargout == 0
     assignin('base','zef',zef);
 end

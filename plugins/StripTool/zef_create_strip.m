@@ -25,18 +25,10 @@ strip_struct.points = points;
 strip_struct.triangles = triangles;
 
 for i = 1 : 2
-
-    strip_struct.orientation_axis{i} = 1/norm(strip_struct.orientation_axis{i})*strip_struct.orientation_axis{i};
-
-    strip_struct.rotation_angle{i} = acos(dot([0 ; 0 ; 1], strip_struct.orientation_axis{i}));
-    if strip_struct.rotation_angle{i} > 0
-    strip_struct.rotation_axis{i} = cross([0 ; 0 ; 1], strip_struct.orientation_axis{i});
-    else 
-    strip_struct.rotation_axis{i} = [1; 0 ; 0];
-    end
-    strip_struct.rotation_axis{i} = 1/norm(strip_struct.rotation_axis{i})*strip_struct.rotation_axis{i};
-    strip_struct.orientation_axis_normal{i} = cross(strip_struct.rotation_axis{i}, strip_struct.orientation_axis{i});
-   
+    % Shared with the burr-hole frame so the cylinder stays concentric
+    % with this lead, including a shaft aimed along -z (cross([0;0;1], axis)
+    % is then zero and the historical 1/norm would be NaN).
+    strip_struct = zef_strip_orient_body(strip_struct, i);
 end
 
 end

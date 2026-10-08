@@ -46,6 +46,15 @@ struct_aux.encapsulation_length = str2num(zef.strip_tool.h_encapsulation_length.
 struct_aux.encapsulation_thickness = str2num(zef.strip_tool.h_encapsulation_thickness.String);
 struct_aux.strip_n_sectors = str2num(zef.strip_tool.h_strip_n_sectors.String);
 
+if isfield(zef.strip_tool,'h_burr_hole_on') && isgraphics(zef.strip_tool.h_burr_hole_on)
+    struct_aux.burr_hole_on = double(zef.strip_tool.h_burr_hole_on.Value ~= 0);
+end
+if not(isfield(struct_aux,'burr_holes'))
+    struct_aux.burr_holes = zef_strip_burr_normalize([]);
+else
+    struct_aux.burr_holes = zef_strip_burr_normalize(struct_aux.burr_holes);
+end
+
 if not(isfield(struct_aux,'strip_status'))
 struct_aux.strip_status = 'Tentative';
 end
@@ -81,6 +90,10 @@ end
 names_aux{i} = sprintf('ID: %s, Tag: %s, Model: %s, Status: %s, Encapsulation: %s', ...
     num2str(cell_aux{i}.strip_id), char(string(cell_aux{i}.strip_tag)), ...
     char(string(model_str)), char(string(cell_aux{i}.strip_status)), str_aux);
+if isfield(cell_aux{i},'burr_hole_on') && ~isempty(cell_aux{i}.burr_hole_on) ...
+        && double(cell_aux{i}.burr_hole_on(1)) ~= 0
+    names_aux{i} = [names_aux{i} ', Burr hole: On'];
+end
 colors_aux(i, :) = color_aux;
 
 end
@@ -88,6 +101,21 @@ end
 zef_colored_list('set', zef.strip_tool.h_strip_list, names_aux, colors_aux);
 if isfield(zef.strip_tool, 'current_strip') && ~isempty(zef.strip_tool.current_strip)
     zef_colored_list('value', zef.strip_tool.h_strip_list, zef.strip_tool.current_strip);
+end
+
+zef = zef_strip_tool_burr_refresh(zef);
+if isfield(zef.strip_tool,'h_window') && isgraphics(zef.strip_tool.h_window) ...
+        && ~(isfield(zef.strip_tool,'burr_layout_lock') && zef.strip_tool.burr_layout_lock)
+    zef.strip_tool.burr_layout_lock = true;
+    layout_error = [];
+    try
+        zef_layout_strip_tool(zef.strip_tool.h_window);
+    catch layout_error
+    end
+    zef.strip_tool.burr_layout_lock = false;
+    if ~isempty(layout_error)
+        rethrow(layout_error);
+    end
 end
 
 end

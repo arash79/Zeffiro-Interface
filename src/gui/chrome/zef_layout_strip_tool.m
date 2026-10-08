@@ -30,11 +30,11 @@ if isappdata(fig, 'ZefStripLayout')
     return
 end
 
-zef_ui_apply_size(fig, 680, 404, 640, 388);
+zef_ui_apply_size(fig, 740, 760, 700, 700);
 fig.SizeChangedFcn = @(src, ~) local_place(src, theme);
 setappdata(fig, 'ZefPixelResize', @(src) local_place(src, theme));
 local_place(fig, theme);
-zef_ui_bind_min_size(fig, 640, 388);
+zef_ui_bind_min_size(fig, 700, 700);
 setappdata(fig, 'ZefStripLayout', true);
 
 end
@@ -107,9 +107,22 @@ local_xyz(fig, panel, st, 'h_encapsulation_orientation_axis', cols.x1f, y, cols.
 local_label(fig, panel, 'Encapsulation conductivity (S/m):', 'zef_strip_lab_ec', 'Conductivity', cols.x2, y, cols.lab2, row_h, theme, fs);
 local_field(fig, panel, st, 'h_encapsulation_conductivity', cols.x2f, y, cols.fld, row_h, theme, fs, 'center');
 local_include(fig, panel, st, cols.x3, y, cols.lab3 + cols.gap + cols.fld3, row_h, theme, fs);
+y = y - row_gap - row_h;
+local_burr_toggle(fig, panel, st, inset, y, card_w - 2 * inset, row_h, theme, fs);
 local_hide_stray_labels(fig);
 
-list_top = card_y - gap;
+burr_open = local_burr_open(fig, st);
+burr_h = 0;
+if burr_open
+    burr_h = 206;
+end
+burr_y = card_y - gap - burr_h;
+local_place_burr(fig, st, theme, card_x, burr_y, card_w, burr_h, burr_open);
+if burr_open
+    list_top = burr_y - gap;
+else
+    list_top = card_y - gap;
+end
 lab_h = 18;
 lab_y = list_top - lab_h;
 local_title(fig, fig, 'section_strip_list', 'Strips', pad, lab_y, 120, lab_h, theme);
@@ -138,6 +151,7 @@ h = inset + title_h + title_gap ...
     + 3 * row_h + 2 * row_gap ...
     + 10 + 1 + 8 + title_h + title_gap ...
     + 2 * row_h + row_gap ...
+    + row_h + row_gap ...
     + inset;
 
 end
@@ -590,6 +604,159 @@ for i = 1:numel(boxes)
         boxes(i).BackgroundColor = theme.color.panel;
     catch
     end
+end
+
+end
+
+function local_burr_toggle(fig, panel, st, x, y, w, h, theme, fs)
+
+hnd = local_handle(fig, st, 'h_burr_hole_on');
+if isempty(hnd)
+    return
+end
+local_into(panel, hnd);
+hnd.Style = 'checkbox';
+hnd.String = 'Create burr hole';
+hnd.Units = 'pixels';
+hnd.Position = [x, y, max(160, w), h];
+hnd.FontUnits = 'pixels';
+hnd.FontName = theme.font.name;
+hnd.FontSize = fs;
+hnd.BackgroundColor = theme.color.panel;
+hnd.ForegroundColor = theme.color.text;
+hnd.HorizontalAlignment = 'left';
+hnd.Visible = 'on';
+
+end
+
+function on = local_burr_open(fig, st)
+
+on = false;
+hnd = local_handle(fig, st, 'h_burr_hole_on');
+if isempty(hnd)
+    return
+end
+try
+    on = double(hnd.Value) ~= 0;
+catch
+end
+
+end
+
+function local_place_burr(fig, st, theme, x, y, w, h, open)
+
+panel = local_handle(fig, st, 'h_burr_panel');
+if isempty(panel)
+    return
+end
+local_into(fig, panel);
+panel.Units = 'pixels';
+panel.Position = [x, y, max(200, w), max(1, h)];
+panel.BorderType = 'none';
+panel.BackgroundColor = theme.color.panel;
+if open
+    panel.Visible = 'on';
+else
+    panel.Visible = 'off';
+    return
+end
+
+fs = theme.font.size;
+pad = 8;
+row = 22;
+gap = 4;
+y_row = h - pad - row;
+local_burr_text(fig, panel, 'zef_strip_lab_burr_comp', 'Compartment', ...
+    pad, y_row, 100, row, theme, fs, 'right');
+local_burr_control(fig, panel, st, 'h_burr_compartment', ...
+    pad + 106, y_row, max(80, w - pad - 106 - pad), row, theme, fs);
+
+y_row = y_row - gap - row;
+local_burr_text(fig, panel, 'zef_strip_lab_burr_rad', 'Radius (mm)', ...
+    pad, y_row, 100, row, theme, fs, 'right');
+local_burr_control(fig, panel, st, 'h_burr_radius', ...
+    pad + 106, y_row, 72, row, theme, fs);
+local_burr_text(fig, panel, 'zef_strip_lab_burr_cond', 'Replacement (S/m)', ...
+    pad + 186, y_row, 130, row, theme, fs, 'right');
+local_burr_control(fig, panel, st, 'h_burr_conductivity', ...
+    pad + 322, y_row, max(64, w - pad - 322 - pad), row, theme, fs);
+
+y_row = y_row - gap - 24;
+local_burr_control(fig, panel, st, 'h_burr_set', pad, y_row, 72, 24, theme, fs);
+local_burr_control(fig, panel, st, 'h_burr_remove', pad + 80, y_row, 84, 24, theme, fs);
+local_burr_control(fig, panel, st, 'h_burr_apply', pad + 172, y_row, 130, 24, theme, fs);
+apply = local_handle(fig, st, 'h_burr_apply');
+if ~isempty(apply)
+    try
+        zef_ui_round_button(apply, theme, true);
+    catch
+    end
+end
+
+list_h = 68;
+y_list = y_row - gap - list_h;
+local_burr_control(fig, panel, st, 'h_burr_list', pad, y_list, max(80, w - 2 * pad), list_h, theme, fs);
+status_h = max(36, y_list - 8);
+local_burr_control(fig, panel, st, 'h_burr_status', pad, 4, max(80, w - 2 * pad), status_h, theme, fs);
+
+end
+
+function local_burr_text(fig, parent, tag, str, x, y, w, h, theme, fs, align)
+
+lab = findall(fig, 'Tag', tag);
+if isempty(lab)
+    lab = uicontrol(parent, 'Style', 'text', 'Tag', tag, 'String', str, ...
+        'Units', 'pixels', 'HorizontalAlignment', align);
+else
+    lab = lab(1);
+    local_into(parent, lab);
+end
+if ~isempty(str)
+    lab.String = str;
+end
+lab.Units = 'pixels';
+lab.Position = [x, y, max(20, w), max(14, h)];
+lab.HorizontalAlignment = align;
+lab.Visible = 'on';
+try
+    lab.FontUnits = 'pixels';
+    lab.FontName = theme.font.name;
+    lab.FontSize = max(10, fs - 1);
+    lab.FontWeight = 'normal';
+    lab.ForegroundColor = theme.color.text;
+    lab.BackgroundColor = theme.color.panel;
+catch
+end
+
+end
+
+function local_burr_control(fig, parent, st, name, x, y, w, h, theme, fs)
+
+hnd = local_handle(fig, st, name);
+if isempty(hnd)
+    return
+end
+local_into(parent, hnd);
+try
+    hnd.Units = 'pixels';
+    hnd.Position = [x, y, max(18, w), h];
+    hnd.Visible = 'on';
+    if isprop(hnd, 'FontUnits')
+        hnd.FontUnits = 'pixels';
+        hnd.FontName = theme.font.name;
+        hnd.FontSize = fs;
+    end
+    if isprop(hnd, 'BackgroundColor') && ~strcmpi(char(hnd.Style), 'text')
+        if strcmpi(char(hnd.Style), 'pushbutton')
+            hnd.BackgroundColor = theme.color.button;
+        else
+            hnd.BackgroundColor = theme.color.inputBg;
+        end
+    end
+    if isprop(hnd, 'ForegroundColor')
+        hnd.ForegroundColor = theme.color.text;
+    end
+catch
 end
 
 end

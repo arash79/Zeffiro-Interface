@@ -264,12 +264,11 @@ if ~isempty(tt) && isvalid(tt)
     local_place_time_text(tt, theme, axes_x, content_bottom, axes_w, content_h);
 end
 
-cb = findall(h_fig, 'Tag', 'rightColorbar');
-if ~isempty(cb) && isvalid(cb(1)) && sidebar_on
+% The colorbar shares the axes parent (figure_view). Figure-absolute
+% coordinates would be read in that panel and can cover the plot.
+if ~isempty(ax) && isvalid(ax)
     try
-        cb(1).Units = 'pixels';
-        cb_w = 18;
-        cb(1).Position = [axes_x + axes_w - cb_w - 4, content_bottom + 24, cb_w, max(80, axes_h - 48)];
+        zef_figure_place_colorbar(ax, 'reposition');
     catch
     end
 end

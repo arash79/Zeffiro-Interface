@@ -22,6 +22,7 @@ axes(zef.h_axes1)
 h_strip = findobj(zef.h_axes1.Children,'Tag','additional: strip');
 h_strip_contact = findobj(zef.h_axes1.Children,'Tag','additional: strip contact');
 h_strip_encapsulation = findobj(zef.h_axes1.Children,'Tag','additional: strip encapsulation');
+h_strip_burr = findobj(zef.h_axes1.Children,'Tag','additional: strip burr');
 
 if not(isempty(h_strip))
     delete(h_strip)
@@ -33,6 +34,10 @@ end
 
 if not(isempty(h_strip_encapsulation))
     delete(h_strip_encapsulation)
+end
+
+if not(isempty(h_strip_burr))
+    delete(h_strip_burr)
 end
 
 hold on
@@ -64,6 +69,29 @@ h_strip = trimesh(strip_struct.triangles{1}(triangle_ind,:),points{1}(:,1),point
 h_strip.FaceColor = [0 1 1];
 h_strip.EdgeColor = 'none';
 h_strip.Tag = 'additional: strip';
+
+if isfield(strip_struct,'burr_hole_on') && ~isempty(strip_struct.burr_hole_on) ...
+        && double(strip_struct.burr_hole_on(1)) ~= 0 ...
+        && isfield(strip_struct,'burr_holes') && ~isempty(strip_struct.burr_holes)
+    burr_colors = [0.90 0.32 0.12; 0.93 0.62 0.08; 0.55 0.22 0.72; 0.12 0.45 0.72];
+    for burr_i = 1:numel(strip_struct.burr_holes)
+        try
+            [burr_tri, burr_pts] = zef_strip_burr_surface(strip_struct, ...
+                strip_struct.burr_holes(burr_i).radius_mm);
+        catch ME
+            warning('zef:BurrHolePreview', '%s', ME.message);
+            continue
+        end
+        if isempty(burr_tri)
+            continue
+        end
+        h_burr = trimesh(burr_tri, burr_pts(:,1), burr_pts(:,2), burr_pts(:,3));
+        h_burr.FaceColor = burr_colors(mod(burr_i - 1, size(burr_colors, 1)) + 1, :);
+        h_burr.FaceAlpha = 0.28;
+        h_burr.EdgeColor = 'none';
+        h_burr.Tag = 'additional: strip burr';
+    end
+end
 
 hold off
 

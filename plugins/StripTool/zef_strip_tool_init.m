@@ -163,6 +163,21 @@ else
 zef.strip_tool.h_strip_angle.String = num2str(struct_aux.strip_angle);
 end
 
+if isfield(zef.strip_tool,'h_burr_hole_on') && isgraphics(zef.strip_tool.h_burr_hole_on)
+    if not(isfield(struct_aux,'burr_hole_on')) || isempty(struct_aux.burr_hole_on)
+        zef.strip_tool.h_burr_hole_on.Value = 0;
+    else
+        zef.strip_tool.h_burr_hole_on.Value = double(struct_aux.burr_hole_on(1) ~= 0);
+    end
+end
+if isfield(zef.strip_tool,'h_burr_radius') && isgraphics(zef.strip_tool.h_burr_radius)
+    zef.strip_tool.h_burr_radius.String = '3';
+end
+if isfield(zef.strip_tool,'h_burr_conductivity') && isgraphics(zef.strip_tool.h_burr_conductivity)
+    zef.strip_tool.h_burr_conductivity.String = '';
+end
+zef.strip_tool.burr_fill_edits = true;
+
 if isfield(struct_aux,'strip_status')
     % After Embed the strip is a real compartment; freeze geometry widgets
     % so the user cannot edit tip/orientation without deleting first.

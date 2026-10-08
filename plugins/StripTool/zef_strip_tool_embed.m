@@ -48,6 +48,11 @@ strip_struct.strip_status = 'Embedded';
 cell_aux{zef.strip_tool.current_strip} = strip_struct;
 zef.([zef.current_sensors '_strip_cell']) = cell_aux;
 
+% Conductivity cylinders use the stored rows. With the option off this
+% restores any previous cylinder and otherwise leaves sigma unchanged.
+[zef, report] = zef_strip_apply_burr_holes(zef, 'reapply');
+zef.strip_burr_report = report;
+
 zef = zef_strip_tool_init(zef);
 zef = zef_strip_tool_update(zef);
 

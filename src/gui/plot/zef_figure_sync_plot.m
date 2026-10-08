@@ -73,6 +73,12 @@ if ~isempty(ax) && isvalid(ax(1))
             end
         catch
         end
+        % InnerPosition updates can stretch a manual colorbar that still
+        % has the default full-parent rectangle. Pin it after the slot move.
+        try
+            zef_figure_place_colorbar(ax(1), 'reposition');
+        catch
+        end
     end
     try
         setappdata(ax(1), 'ZefHasVolumePlot', true);
