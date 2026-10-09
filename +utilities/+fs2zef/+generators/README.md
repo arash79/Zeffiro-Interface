@@ -10,7 +10,7 @@ Write the CSV manifest `import_segmentation.zef` after FreeSurfer surface export
 
 ## Code functionality
 
-`generate_zef_import(output_dir, ...)` scans `*.asc` / `*.stl` (skips FreeSurfer **label** `.asc` files), looks up color/sigma/activity from `+config/compartment_mappings` and the LUT, optional CRAS `affine_transform` from `+transforms`, and writes `import_segmentation.zef` (or `options.output_file`).
+`generate_zef_import(output_dir, ...)` scans `*.asc` / `*.stl` (skips FreeSurfer **label** `.asc` files), looks up color/sigma/activity from `+config/compartment_mappings` and the LUT, optional CRAS `affine_transform` from `+transforms`, and writes `import_segmentation.zef` (or `options.output_file`). `inner_skull`, `outer_skull`, and `outer_skin` receive `compute_ras_center_translation` (`t = -cras` of `reference_volume`) instead of the segmentation-to-reference affine.
 
 Name-values used by `run`: `include_electrodes`, `include_box`, `compute_transforms`, `reference_volume`, `segmentation_volume`, `path_prefix`, `merge_left_right`.
 

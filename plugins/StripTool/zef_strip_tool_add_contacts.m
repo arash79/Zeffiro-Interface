@@ -24,6 +24,11 @@ strip_struct = zef.([zef.current_sensors '_strip_cell']);
 strip_struct = strip_struct{zef.strip_tool.current_strip};
 strip_struct = zef_get_strip_parameters(strip_struct);
 strip_struct = zef_create_strip(strip_struct);
+% The sensor strings below read this cell. Store the same mesh that
+% produced the contact points, including a lead that has not been embedded.
+cell_aux = zef.([zef.current_sensors '_strip_cell']);
+cell_aux{zef.strip_tool.current_strip} = strip_struct;
+zef.([zef.current_sensors '_strip_cell']) = cell_aux;
 
 points_2 = zeros(strip_struct.strip_n_contacts, 3);
 

@@ -23,6 +23,8 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `ProjectLoadLegacyTest` | Single-struct MAT files are not overwritten; non-struct singles error; `zef_remove_system_fields` drops `gpu_count` / `path_cell` and keeps `save_file` |
 | `ProjectSaveExportTest` | Headless lead-field export, handle stripping, save/load round-trip of `L` |
 | `Duneuro2ZefTest` | DUNEuro `eegL` layouts → interleaved `zef.L`; 0-based tets; hex split; mm/m; tensors; extra fields; unsupported inputs; converted MAT is not re-detected as DUNEuro; `run` matches `convert`; `find_files` size priority; export-folder detection |
+| `Sn2zefRunAlignmentTest` | `sn2zef.run` forwards `alignment_mode` (not `force_coreg`) and writes the FreeSurfer CRAS translation (`t = -cras`) into `import_segmentations.zef` |
+| `Fs2zefHeadSurfaceAffineTest` | Watershed `inner_skull` / `outer_skull` / `outer_skin` import rows get `t = -CRAS`; pial and volume meshes do not |
 | `BuildElectrodesCEMTest` | P1 CEM `A,B,C` vs analytic triangle mass; two-triangle \(C_{ee}=1/Z\); infinite-\(Z\) early return; point fallback |
 | `DTIActiveCompartmentMapTest` | Active-compartment map skips off tags; iso fallback uses that map, not tag position |
 | `FAToConductivityOrientationTest` | Model-3 FA→σ principal axis follows `v1`; missing `v1` defaults to \(+\hat x\) |

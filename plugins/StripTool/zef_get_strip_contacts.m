@@ -9,12 +9,17 @@ function [contacts, sensor_info, triangle_ind] = zef_get_strip_contacts(contact_
 %   [contacts, sensor_info, triangle_ind] = zef_get_strip_contacts(...)
 %       contact_index, strip_struct, zef, domain_type, global_index)
 %
-%   domain_type default 'model_geometry'. 'points'/'model_points': xyz;
-%   'sensor_info': empty contacts plus strip_id. Models 1/2/3 keep their
-%   layouts. Models 4/5 place an 8-column DiSC lattice. Called from plot,
-%   add_contacts, and sensor get_functions. Does not write zef.
+%   domain_type default 'model_geometry'. 'points'/'model_points': the
+%   active-channel center. 'sensor_info': empty contacts plus strip_id.
+%   Models 1/2/3 keep their layouts. Models 4/5 use the lithographic
+%   disk from zef_strip_disc_patch. On a volume mesh that contains no
+%   vertex inside that disk, the mesh query returns one point-contact
+%   row [node, 1, 0] and sensor_info.electrode_representation is
+%   'point_unresolved'. A disk that the mesh does resolve is
+%   'finite_area'. Called from plot, add_contacts, and sensor
+%   get_functions. Does not write zef.
 %
-%   See also zef_get_strip_parameters.
+%   See also zef_get_strip_parameters, zef_strip_disc_site.
 
 if nargin < 4
     domain_type = 'model_geometry';
@@ -80,13 +85,11 @@ angle_aux = (2*pi/4)*mod(contact_index,4) + (pi/4)*mod(row_ind_aux,2);
 end
 
 if ismember(strip_struct.strip_model,[4 5])
-% Shores et al. 2026 Fig. 1C / Fig. 8: 8 columns on a 0.8 mm shaft.
-% Alternate rows shift by half a column (diamond). Row centers run from
-% one pitch above the tip across a 7.5 mm span. Roll is strip_angle in
-% zef_strip_coordinate_transform, not here.
-[angle_aux, z_center_aux] = local_disc_site(contact_index, strip_struct.strip_model);
+% Active channel center. Roll is strip_angle in the transform below.
+[angle_aux, z_center_aux] = zef_strip_disc_site(contact_index, strip_struct.strip_model, strip_struct.strip_radius);
 contacts(3) = z_center_aux;
 [contacts(1), contacts(2)] = pol2cart(angle_aux,strip_struct.strip_radius);
+sensor_info.electrode_representation = 'center';
 end
 
 contacts(1:3) = zef_strip_coordinate_transform(strip_struct,'forward',contacts(1:3));
@@ -106,6 +109,7 @@ strip_struct.points = zef_strip_coordinate_transform(strip_struct,'reverse');
 triangles = zef.reuna_t{compartment_ind};
 end
 
+mesh_node_map = [];
 if isequal(domain_type,'mesh')
 
 compartment_ind = find(ismember(zef.compartment_tags,strip_struct.compartment_tag{1}),1);
@@ -120,7 +124,7 @@ if not(triangles_flag_aux)
 I_aux = find(zef.domain_labels <= compartment_ind);
 triangles = zef_surface_mesh();
 end    
-[points_aux,triangles_aux] = zef_get_submesh(zef.nodes,triangles);
+[points_aux,triangles_aux,mesh_node_map] = zef_get_submesh(zef.nodes,triangles);
 strip_struct.points{1} = points_aux; 
 strip_struct.triangles{1} = triangles_aux; 
 strip_struct.points = zef_strip_coordinate_transform(strip_struct,'reverse');
@@ -166,41 +170,34 @@ point_ind = point_ind(point_ind_aux);
 end
 
 if ismember(strip_struct.strip_model,[4 5])
-[angle_aux, z_center_aux, pitch_aux] = local_disc_site(contact_index, strip_struct.strip_model);
-point_ind = find(strip_struct.points{1}(:,3)>=z_center_aux-0.5*pitch_aux & strip_struct.points{1}(:,3)<=z_center_aux+0.5*pitch_aux);
-[center_point_x_aux, center_point_y_aux] = pol2cart(angle_aux,strip_struct.strip_radius);
-center_point_aux = [center_point_x_aux; center_point_y_aux; z_center_aux];
-if isempty(point_ind)
-point_ind_aux = [];
+lattice = zef_strip_disc_lattice(strip_struct.strip_model, strip_struct.strip_radius);
+physical_index = lattice.active_physical(contact_index);
+[triangle_ind, ~] = zef_strip_disc_patch(strip_struct, physical_index);
+if isempty(triangle_ind) && isequal(domain_type,'mesh') && ~isempty(mesh_node_map)
+    [~, z_center_aux] = zef_strip_disc_site(contact_index, strip_struct.strip_model, strip_struct.strip_radius);
+    [x_aux, y_aux] = pol2cart(lattice.angle(physical_index), strip_struct.strip_radius);
+    target = [x_aux, y_aux, z_center_aux];
+    [~, local_node] = min(sum((strip_struct.points{1} - target) .^ 2, 2));
+    contacts = [mesh_node_map(local_node), 1, 0];
+    triangle_ind = zeros(0, 1);
+    sensor_info.electrode_representation = 'point_unresolved';
 else
-point_ind_aux = find(sqrt(sum((strip_struct.points{1}(point_ind,:)'-center_point_aux).^2))<=0.060);
+    contacts = triangles(triangle_ind,:);
+    if isempty(triangle_ind)
+        sensor_info.electrode_representation = 'absent';
+    else
+        sensor_info.electrode_representation = 'finite_area';
+    end
 end
-point_ind = point_ind(point_ind_aux);
-end
-
+else
 triangle_ind = find(sum(ismember(strip_struct.triangles{1},point_ind),2)==3);
 contacts = triangles(triangle_ind,:);
+end
 if not(isempty(global_index))
 contacts = [global_index(ones(size(contacts,1),1),1) contacts];
 end
 
 end
 end
-
-end
-
-function [angle_aux, z_center_aux, pitch_aux] = local_disc_site(contact_index, strip_model)
-
-n_columns_aux = 8;
-if isequal(strip_model, 4)
-    n_rows_aux = 8;
-else
-    n_rows_aux = 16;
-end
-pitch_aux = 7.5 / (n_rows_aux - 1);
-row_ind_aux = ceil(contact_index / n_columns_aux);
-column_ind_aux = mod(contact_index - 1, n_columns_aux);
-angle_aux = column_ind_aux * (2 * pi / n_columns_aux) + mod(row_ind_aux - 1, 2) * (pi / n_columns_aux);
-z_center_aux = pitch_aux * row_ind_aux;
 
 end

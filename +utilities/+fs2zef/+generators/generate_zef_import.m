@@ -33,7 +33,8 @@ function zef_file = generate_zef_import(output_dir, options)
 %
 %     % Transform computation
 %     .compute_transforms (char/logical) - 'auto', true, or false (default: 'auto')
-%     .reference_volume (string)    - Path to reference .mgz (default: auto-detect orig.mgz)
+%     .reference_volume (string)    - Path to reference .mgz (default: auto-detect orig.mgz).
+%                                     Also supplies CRAS for the scanner-RAS head surfaces.
 %     .segmentation_volume (string) - Path to source .mgz for transforms
 %
 %     % Compartment configuration
@@ -59,7 +60,8 @@ function zef_file = generate_zef_import(output_dir, options)
 %      - FreeSurferColorLUT.txt
 %      - compartment_mappings.m (custom overrides)
 %   4. Determine merge value (0=left, 1=right, -1=single)
-%   5. Compute affine transforms if needed
+%   5. Compute affine transforms if needed. inner_skull, outer_skull, and
+%      outer_skin get a separate translation by the negative RAS center.
 %   6. Generate CSV lines with all parameters
 %   7. Sort by compartment name + merge value
 %   8. Write to import_segmentation.zef
@@ -157,6 +159,36 @@ function zef_file = generate_zef_import(output_dir, options)
     else
         affine_str = '';
     end
+
+    % Watershed head surfaces are scanner RAS. Shift them onto the surface-RAS
+    % frame used by the mri_mc meshes, independent of the volume-to-volume affine.
+    head_affine_str = "";
+    if any_scanner_ras_head_surface(mesh_files)
+        reference_volume = options.reference_volume;
+        if strlength(reference_volume) == 0
+            reference_volume = find_reference_volume(output_dir);
+        end
+        head_error = "";
+        if strlength(reference_volume) > 0 && isfile(reference_volume)
+            try
+                head_affine = utilities.fs2zef.transforms.compute_ras_center_translation( ...
+                    reference_volume, 'verbose', options.verbose);
+                head_affine_str = string(mat2str(head_affine));
+            catch ME
+                head_error = string(ME.message);
+            end
+        end
+        if strlength(head_affine_str) == 0
+            if strlength(head_error) > 0
+                detail = head_error;
+            else
+                detail = "pass reference_volume as the subject's orig.mgz";
+            end
+            warning('generate_zef_import:MissingHeadAffine', ...
+                ['inner_skull, outer_skull, and outer_skin are in scanner RAS and need ' ...
+                 'a translation by the negative RAS center (%s).'], detail);
+        end
+    end
     
     % Generate header lines
     header_lines = {};
@@ -190,7 +222,7 @@ function zef_file = generate_zef_import(output_dir, options)
     for k = 1:numel(mesh_files)
         try
             line = process_mesh_file(mesh_files(k), output_dir, lut, ...
-                compartment_maps, affine_str, path_prefix, options);
+                compartment_maps, affine_str, head_affine_str, path_prefix, options);
             if ~isempty(line)
                 seg_count = seg_count + 1;
                 seg_lines{seg_count} = line;
@@ -356,7 +388,7 @@ function is_label_file = is_freesurfer_label_asc(file_path)
 
 end % function
 
-function line = process_mesh_file(mesh_file, output_dir, lut, compartment_maps, affine_str, path_prefix, options)
+function line = process_mesh_file(mesh_file, output_dir, lut, compartment_maps, affine_str, head_affine_str, path_prefix, options)
     % Process a single mesh file and generate its ZEF import line
     
     [~, base_name, ext] = fileparts(mesh_file.name);
@@ -386,9 +418,14 @@ function line = process_mesh_file(mesh_file, output_dir, lut, compartment_maps, 
     line = sprintf('%s,merge,%d', line, merge_val);
     
     line = sprintf('%s,parameter_name,sigma,parameter_value,%.2f', line, sigma);
+
+    row_affine = affine_str;
+    if is_scanner_ras_head_surface(base_name) && strlength(string(head_affine_str)) > 0
+        row_affine = head_affine_str;
+    end
     
-    if ~isempty(affine_str) && strlength(affine_str) > 0
-        line = sprintf('%s,affine_transform,%s', line, affine_str);
+    if ~isempty(row_affine) && strlength(string(row_affine)) > 0
+        line = sprintf('%s,affine_transform,%s', line, row_affine);
     end
     
     line = sprintf('%s,activity,%d', line, activity);
@@ -468,6 +505,22 @@ function lookup_names = get_surface_color_lookup_names(base_name, compartment_na
     end
 
 end % function
+
+function tf = any_scanner_ras_head_surface(mesh_files)
+    tf = false;
+    for ii = 1:numel(mesh_files)
+        [~, base_name] = fileparts(mesh_files(ii).name);
+        if is_scanner_ras_head_surface(base_name)
+            tf = true;
+            return;
+        end
+    end
+end
+
+function tf = is_scanner_ras_head_surface(base_name)
+    % mri_watershed surfaces saved without -useSRAS. Not pial or white.
+    tf = any(normalize_name(base_name) == ["inner_skull", "outer_skull", "outer_skin"]);
+end
 
 function [compartment_name, hemisphere] = parse_compartment_name(base_name)
     % Parse filename to extract compartment name and hemisphere

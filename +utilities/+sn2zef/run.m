@@ -40,20 +40,20 @@ function run(zef, subject_id, outFolder, inflation_parameter, options)
 %   .verbose                   - Print progress (default: false).
 %   .include_atlas             - Write sn_atlas_points.dat (default: true).
 %   .atlas_voxel_stride        - Subsample atlas voxels (default: 4).
-%   .force_coreg               - Collected here and forwarded to
-%                                export_segmentation_meshes (that worker
-%                                does not declare this name; see README).
+%   .alignment_mode            - 'translation' (default) or 'coregistration'.
+%                                Forwarded to export_segmentation_meshes.
+%                                Translation keeps STL vertices in SimNIBS
+%                                vox2ras and writes the FreeSurfer CRAS
+%                                translation (t = -cras, identity rotation)
+%                                as affine_transform on each segmentation row.
+%                                Coregistration resamples the volume with
+%                                mri_coreg so vertices are already in
+%                                FreeSurfer space and no affine is written.
+%   .force_coreg               - Legacy alias used only when alignment_mode
+%                                is omitted. true → 'coregistration',
+%                                false → 'translation'.
 %   .freesurfer_subject_folder - FreeSurfer subject dir (mri/orig.mgz).
 %                                Defaults to SUBJECTS_DIR/<subject_id>.
-%
-% Alignment is delegated to export_segmentation_meshes. This wrapper does
-% not pass alignment_mode, so the worker default is 'translation' (native
-% NIfTI vox2ras on vertices). The affine_matrix the worker returns is
-% discarded here ([~, vertex_info] = ...) and import_segmentations.zef is
-% written without affine_transform. options.force_coreg is forwarded as a
-% name-value; the worker currently accepts alignment_mode, not force_coreg.
-% For mri_coreg, call export_segmentation_meshes(..., 'alignment_mode',
-% 'coregistration') directly.
 %
 % Outputs:
 %
@@ -79,9 +79,7 @@ function run(zef, subject_id, outFolder, inflation_parameter, options)
     if ~isfield(options, 'atlas_voxel_stride')
         options.atlas_voxel_stride = 4;
     end
-    if ~isfield(options, 'force_coreg')
-        options.force_coreg = false;
-    end
+    alignment_mode = resolve_alignment_mode(options);
     if ~isfield(options, 'freesurfer_subject_folder')
         subjects_dir = getenv("SUBJECTS_DIR");
         if strlength(subjects_dir) == 0
@@ -136,12 +134,14 @@ function run(zef, subject_id, outFolder, inflation_parameter, options)
         fprintf('sn2zef: extracting surfaces from "%s"\n', nii_path);
     end
 
-    [~, vertex_info] = utilities.sn2zef.export_segmentation_meshes( ...
+    [affine_matrix, vertex_info] = utilities.sn2zef.export_segmentation_meshes( ...
         zef, inFolder, outFolder, inflation_parameter, fs_folder, ...
         'verbose', logical(options.verbose), ...
         'include_atlas', logical(options.include_atlas), ...
         'atlas_voxel_stride', double(options.atlas_voxel_stride), ...
-        'force_coreg', logical(options.force_coreg));
+        'alignment_mode', alignment_mode);
+
+    affine_clause = affine_transform_clause(affine_matrix);
 
     lut = vertex_info.lut;
 
@@ -185,9 +185,12 @@ function run(zef, subject_id, outFolder, inflation_parameter, options)
             electrodesSource);
     end
 
-    %% Atlas points (written by the worker when include_atlas). Vertices use
-    % the worker's T (SimNIBS vox2ras in the default translation mode), not
-    % automatically FreeSurfer tkr-RAS. run discards affine_matrix above.
+    %% Atlas points (written by the worker when include_atlas). In translation
+    % mode the worker bakes the FreeSurfer CRAS translation into those points.
+    % STL vertices stay in SimNIBS vox2ras and the same matrix is stored as
+    % affine_transform so zef_process_meshes applies it at mesh time.
+    % Coregistration mode leaves both in FreeSurfer space and affine_clause
+    % is empty.
 
     have_atlas_points = false;
     atlas_pts_path = '';
@@ -220,9 +223,9 @@ function run(zef, subject_id, outFolder, inflation_parameter, options)
 
         segLines{k} = sprintf( ...
             ['type,segmentation,name,%s,filename,%s,merge,%d,' ...
-             'parameter_name,sigma,parameter_value,1.79,activity,0,' ...
+             'parameter_name,sigma,parameter_value,1.79%s,activity,0,' ...
              'color,%s,inflate,0'], ...
-            row.name, absPath, merge_val, mat2str(row.rgb));
+            row.name, absPath, merge_val, affine_clause, mat2str(row.rgb));
 
         if have_atlas_points
             segLines{k} = sprintf('%s,atlas_points_filename,%s', ...
@@ -276,6 +279,56 @@ function merge_val = right_hemisphere_merge_flag(name)
     else
         merge_val = 0;
     end
+end % function
+
+function alignment_mode = resolve_alignment_mode(options)
+    allowed = ["translation", "coregistration"];
+    has_mode = isfield(options, 'alignment_mode') && ...
+        strlength(strtrim(string(options.alignment_mode))) > 0;
+    has_force = isfield(options, 'force_coreg') && ~isempty(options.force_coreg);
+
+    if has_mode
+        alignment_mode = lower(strtrim(string(options.alignment_mode)));
+    else
+        alignment_mode = "translation";
+    end
+
+    if has_force
+        if logical(options.force_coreg)
+            from_force = "coregistration";
+        else
+            from_force = "translation";
+        end
+        if has_mode && from_force ~= alignment_mode
+            error('sn2zef:AmbiguousAlignment', ...
+                ['options.alignment_mode ("%s") conflicts with options.force_coreg. ' ...
+                 'Pass alignment_mode only.'], alignment_mode);
+        end
+        if ~has_mode
+            alignment_mode = from_force;
+        end
+    end
+
+    if ~any(alignment_mode == allowed)
+        error('sn2zef:BadAlignmentMode', ...
+            'options.alignment_mode must be ''translation'' or ''coregistration'' (got "%s").', ...
+            alignment_mode);
+    end
+end % function
+
+function clause = affine_transform_clause(affine_matrix)
+    clause = '';
+    if isempty(affine_matrix)
+        return;
+    end
+    if ~isnumeric(affine_matrix) || ~isequal(size(affine_matrix), [4 4]) || ...
+            any(~isfinite(affine_matrix(:)))
+        error('sn2zef:BadAffine', ...
+            'export_segmentation_meshes returned an affine that is not a finite 4-by-4 matrix.');
+    end
+    % mat2str uses spaces and semicolons, so the comma-separated .zef row
+    % keeps the matrix as one field (same encoding as fs2zef).
+    clause = sprintf(',affine_transform,%s', mat2str(double(affine_matrix)));
 end % function
 
 function zef = ensure_inflation_fields(zef, inflation_parameter)

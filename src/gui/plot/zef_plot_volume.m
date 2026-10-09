@@ -225,10 +225,13 @@ if eval(['zef.' sensor_tag '_visible'])
             h = surf(sensors(i,1) + X_s, sensors(i,2) + Y_s, sensors(i,3) + Z_s);
             h.Tag = 'sensor';
             h.EdgeColor = 'none';
+            zef_mark_sensor_graphic(h, sensors_visible, i);
             %April 2021
             if eval(['zef.' eval('zef.current_sensors') '_names_visible'])
                 h_text = text(sensors(i,1),sensors(i,2),sensors(i,3),sensors_name{i});
                 set(h_text,'FontSize',eval('zef.h_axes1.FontSize'));
+                h_text.Tag = 'sensor_name';
+                zef_mark_sensor_graphic(h_text, sensors_visible, i);
             end
             set(h,'facecolor',sensors_color_table(i,:));
             %April 2021
@@ -242,6 +245,8 @@ if eval(['zef.' sensor_tag '_visible'])
             for i = 1 : size(sensors_name_points,1)
                 h_text = text(sensors_name_points(i,1),sensors_name_points(i,2),sensors_name_points(i,3),sensors_name{i});
                 set(h_text,'FontSize',eval('zef.h_axes1.FontSize'));
+                h_text.Tag = 'sensor_name';
+                zef_mark_sensor_graphic(h_text, sensors_visible, i);
             end
         end
         if not(isempty(sensors))
@@ -253,6 +258,7 @@ if eval(['zef.' sensor_tag '_visible'])
                 h(i) = trisurf(min_t_aux,min_n_aux(:,1),min_n_aux(:,2),min_n_aux(:,3));
                 set(h(i),'Tag','sensor');
                 set(h(i),'facecolor',sensors_color_table(unique_sensors_aux_1(i),:));
+                zef_mark_sensor_graphic(h(i), sensors_visible, unique_sensors_aux_1(i));
             end
             set(h,'edgecolor','none');
             set(h,'facealpha',eval('zef.layer_transparency'));
@@ -264,6 +270,7 @@ if eval(['zef.' sensor_tag '_visible'])
                 h(i) = surf(sensors_point_like(i,1) + X_s, sensors_point_like(i,2) + Y_s, sensors_point_like(i,3) + Z_s);
                 set(h(i),'facecolor',sensors_color_table(sensors_point_like_id(i),:));
                 set(h(i),'Tag','sensor');
+                zef_mark_sensor_graphic(h(i), sensors_visible, unique_sensors_point_like(i));
             end
             %April 2021
             set(h,'edgecolor','none');

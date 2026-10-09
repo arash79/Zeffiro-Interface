@@ -1,29 +1,30 @@
 ## Folder purpose
 
-Build the SimNIBS RAS → FreeSurfer RAS header affine (4×4) from volume headers only. Does not run `mri_coreg` and does not rewrite STL files.
+Build a 4×4 FreeSurfer CRAS translation from the FreeSurfer reference volume only. Does not run `mri_coreg`, does not read the SimNIBS header, and does not rewrite STL files.
 
 ## Main contents
 
 | File | Role |
 |------|------|
-| `compute_simnibs_to_freesurfer_translation.m` | Header-based SimNIBS→FS transform |
+| `compute_simnibs_to_freesurfer_translation.m` | Translation \(t = -\mathrm{cras}\) from the FreeSurfer volume |
 
 ## Code functionality
 
-From the two `vox2ras` linear parts \(R_\mathrm{sim}\), \(R_\mathrm{fs}\) and CRAS centres:
+`MRIread` on the FreeSurfer reference supplies the RAS center. The linear part is identity:
 
 \[
-R = R_\mathrm{fs}\, R_\mathrm{sim}^{-1},\qquad
-t = c_\mathrm{fs} - R\, c_\mathrm{sim}.
+\mathrm{cras} = [c_r;\, c_a;\, c_s],\qquad t = -\mathrm{cras}.
 \]
 
-If \(R_\mathrm{sim}\) is ill-conditioned (`cond > 1e8`) or the divide throws, falls back to pure translation \(t = c_\mathrm{fs} - c_\mathrm{sim}\) (legacy centre shift). That fallback does not correct relative rotation.
+The returned matrix is `eye(4)` with \(t\) in the last column. `simnibs_nii` is unused and kept so existing callers can still pass the SimNIBS volume path.
 
-`export_segmentation_meshes` calls this only in `'alignment_mode','translation'`. Atlas points (`save_volume_atlas_points`) can apply the same matrix after voxel→RAS.
+This is the same scanner-RAS → surface-RAS shift as `utilities.fs2zef.transforms.compute_ras_center_translation`. It does not cancel a relative rotation between the SimNIBS `vox2ras` and the FreeSurfer `vox2ras`.
+
+`export_segmentation_meshes` calls this only in `'alignment_mode','translation'`. Atlas points (`save_volume_atlas_points`) apply the same matrix after voxel→RAS.
 
 ## Workflow context
 
-SimNIBS `final_tissues.nii.gz` and FreeSurfer `mri/orig.mgz` are often the same anatomy in different RAS frames. Closed STL vertices from `export_segmentation_meshes` in translation mode are in SimNIBS `vox2ras`. Zeffiro can place them on FreeSurfer anatomy if a 4×4 `affine_transform` is stored on each `.zef` segmentation row and applied in `zef_process_meshes`. Parent: `../README.md`. Applied at mesh time: `src/mesh/README.md`.
+Closed STL vertices from `export_segmentation_meshes` in translation mode stay in SimNIBS `vox2ras`. Zeffiro shifts them by the FreeSurfer CRAS when that 4×4 is stored as `affine_transform` on each `.zef` segmentation row and applied in `zef_process_meshes`. Parent: `../README.md`. Applied at mesh time: `src/mesh/README.md`.
 
 ## Usage instructions
 
@@ -34,16 +35,16 @@ A = utilities.sn2zef.transforms.compute_simnibs_to_freesurfer_translation( ...
 
 | Argument | Meaning |
 |----------|---------|
-| `simnibs_nii` | Path to `final_tissues.nii.gz` (`mustBeFile`) |
-| `freesurfer_mgz` | Path to `mri/orig.mgz` |
-| `'verbose'` | Print CRAS and the 4×4 (default false) |
+| `simnibs_nii` | Unused. Retained so callers can still pass `final_tissues.nii.gz`. Not checked with `mustBeFile`. |
+| `freesurfer_mgz` | Path to `mri/orig.mgz` (`mustBeFile`). CRAS is read from this volume. |
+| `'verbose'` | Print the translation (mm) and the 4×4 (default false) |
 
-Requires `FREESURFER_HOME` so `MRIread` is on the path (same `matlab/` / `fsfast/toolbox` addpath as the STL worker).
+Requires `FREESURFER_HOME`. Adds `FREESURFER_HOME/matlab` when that folder is not already on the path.
 
 ## Important notes
 
-`utilities.sn2zef.run` currently **discards** the returned affine (`[~, vertex_info] = …`) and writes `import_segmentations.zef` **without** `affine_transform`. Importing that folder as-is leaves surfaces in the STL vertex frame (SimNIBS RAS). To get FreeSurfer RAS via this matrix, call the worker yourself and put the 4×4 into the `.zef`, or use `'alignment_mode','coregistration'` so vertices are already in FS space (`affine_matrix` is then `[]`).
+`utilities.sn2zef.run` writes that 4×4 onto every segmentation row as `affine_transform` when `alignment_mode` is `'translation'` (the default). STL vertices stay in SimNIBS RAS; `zef_process_meshes` applies the matrix. Atlas points are already multiplied by the same matrix in `save_volume_atlas_points`, and import does not transform them again. `'alignment_mode','coregistration'` resamples the volume first, so vertices are already in FreeSurfer space and `affine_matrix` is `[]` (no `affine_transform` field). Legacy `options.force_coreg` is only an alias for that mode when `alignment_mode` is omitted.
 
 ## Developer guidance
 
-Document translation vs coregistration modes whenever changing `export_segmentation_meshes`. Prefer embedding affine in `.zef` over silent vertex rewrites unless the pipeline explicitly chooses apply-on-disk.
+The matrix is a pure CRAS translation. Do not document it as a two-header `vox2ras` map. Document translation vs coregistration modes whenever changing `export_segmentation_meshes`. Prefer embedding the affine in `.zef` over silent vertex rewrites unless the pipeline explicitly chooses apply-on-disk.

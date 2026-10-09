@@ -1,5 +1,5 @@
 function [affine_matrix, vertex_transform] = export_segmentation_meshes(zef, inFolder, outFolder, inflation_parameter, freesurfer_subject_folder, options)
-%EXPORT_SEGMENTATION_MESHES  Volume-based SimNIBS tissues → STL in FreeSurfer tkr-RAS.
+%EXPORT_SEGMENTATION_MESHES  Volume-based SimNIBS tissues → STL plus optional affine.
 %
 %   Zeffiro Interface.
 %   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
@@ -9,8 +9,8 @@ function [affine_matrix, vertex_transform] = export_segmentation_meshes(zef, inF
 %   [affine_matrix, vertex_transform] = export_segmentation_meshes(...)
 %
 %   Segments final_tissues.nii.gz per label (not Gmsh .msh sheets). Aligns via
-%   mri_coreg/LTA or header translation; writes STLs and optional atlas points.
-%   affine_matrix is [] when vertices are already in FS tkr-RAS.
+%   mri_coreg/LTA or a FreeSurfer CRAS translation; writes STLs and optional
+%   atlas points. affine_matrix is [] when vertices are already in FreeSurfer space.
 
 %
 % export_segmentation_meshes
@@ -18,10 +18,11 @@ function [affine_matrix, vertex_transform] = export_segmentation_meshes(zef, inF
 % Exports each tissue label from a SimNIBS final_tissues.nii.gz volume as
 % individual STL surface files. Supports two alignment modes:
 %
-%   'translation' (default) - Extract from native SimNIBS volume and compute
-%     a header-based affine (rotation + translation from vox2ras + CRAS) to
-%     FreeSurfer space, stored in ZEF affine_transform. No intensity-based
-%     coregistration.
+%   'translation' (default) - Extract from the native SimNIBS volume. STL
+%     vertices stay in that volume's vox2ras. The returned affine is the
+%     FreeSurfer CRAS translation t = -[c_r; c_a; c_s] from mri/orig.mgz
+%     (identity rotation), stored in ZEF affine_transform. The SimNIBS header
+%     is not part of this matrix. No intensity-based coregistration.
 %
 %   'coregistration' - Align volume to FreeSurfer using mri_coreg/mri_vol2vol,
 %     then extract surfaces. Vertices are already in FreeSurfer space;
@@ -57,8 +58,8 @@ function [affine_matrix, vertex_transform] = export_segmentation_meshes(zef, inF
 %
 % Outputs:
 %
-%   affine_matrix - 4x4 SimNIBS→FS matrix for ZEF affine_transform (header-based
-%     linear map in translation mode), or [] in coregistration mode (vertices
+%   affine_matrix - 4x4 translation for ZEF affine_transform in translation
+%     mode (t = -cras of mri/orig.mgz), or [] in coregistration mode (vertices
 %     already in FreeSurfer space).
 %
 %   vertex_transform (optional second output) - struct with fields:
@@ -141,7 +142,7 @@ function [affine_matrix, vertex_transform] = export_segmentation_meshes(zef, inF
         end
         volume_path_for_export = simnibs_nii;
         if options.verbose
-            fprintf('Using header-based SimNIBS→FreeSurfer affine (no intensity coregistration).\n');
+            fprintf('Using FreeSurfer CRAS translation t = -cras (no intensity coregistration).\n');
         end
     else
         % Coregistration mode: align volume to FreeSurfer

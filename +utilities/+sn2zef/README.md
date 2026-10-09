@@ -9,12 +9,12 @@ Extract **closed compartment surfaces** from SimNIBS `final_tissues.nii.gz` (vox
 | Entry | Role |
 |-------|------|
 | `run.m` | Primary volume → STL / `.zef` pipeline |
-| `export_segmentation_meshes.m` | NIfTI + FreeSurfer coreg path |
+| `export_segmentation_meshes.m` | NIfTI surfaces; CRAS translation or `mri_coreg` |
 | `export_from_gmsh_mesh.m` / `meshLoadGmsh4.m` | Gmsh 4 reader path (third-party reader) |
 | `readSNLUT.m` | Tissue LUT parser (`final_tissues_LUT.txt`) |
 | `save_volume_atlas_points.m` | Atlas point export from labelled volumes |
 | `run_and_print_command.m` | Shell/command logging helper |
-| `+transforms/` | SimNIBS ↔ FreeSurfer translation helpers |
+| `+transforms/` | FreeSurfer CRAS translation (`t = -cras`) for translation-mode export |
 
 ## Code functionality
 
@@ -48,6 +48,7 @@ utilities.sn2zef.export_from_gmsh_mesh(...);  % see file help
 - Environment variables and subject folder layout must match SimNIBS conventions.
 - `meshLoadGmsh4` is vendor code — do not relicense or strip headers.
 - Output coordinate units must match Zeffiro import expectations (typically mm).
+- Default `alignment_mode` is `translation`: STL vertices stay in SimNIBS RAS and `import_segmentations.zef` stores the FreeSurfer CRAS translation `t = -cras` (identity rotation) as `affine_transform`. The SimNIBS header is not part of that matrix. `coregistration` (or legacy `force_coreg=true`) runs `mri_coreg` and omits that field because vertices are already in FreeSurfer space.
 
 ## Developer guidance
 

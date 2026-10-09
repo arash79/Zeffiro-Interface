@@ -275,19 +275,18 @@ function output_info = run(subject_id, segmentation_files, output_dir, options)
         fprintf('STEP 5: Generating ZEF import file...\n');
     end
     
-    % Determine reference volume for transforms
-    if options.compute_transforms
-        if strlength(options.reference_volume) == 0
-            ref_vol = fullfile(mri_dir, 'orig.mgz');
-        else
-            ref_vol = fullfile(mri_dir, options.reference_volume);
-        end
-        
-        if ~isfile(ref_vol)
-            warning('fs2zef:NoReference', ...
-                'Reference volume not found: %s\nSkipping transform computation', ref_vol);
-            options.compute_transforms = false;
-        end
+    % Reference volume supplies the segmentation-to-orig translation and the
+    % RAS-center translation written on inner_skull, outer_skull, and outer_skin.
+    if strlength(options.reference_volume) == 0
+        ref_vol = fullfile(mri_dir, 'orig.mgz');
+    else
+        ref_vol = fullfile(mri_dir, options.reference_volume);
+    end
+
+    if options.compute_transforms && ~isfile(ref_vol)
+        warning('fs2zef:NoReference', ...
+            'Reference volume not found: %s\nSkipping transform computation', ref_vol);
+        options.compute_transforms = false;
     end
     
     % Get electrode file

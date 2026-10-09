@@ -25,7 +25,7 @@ Pipeline steps inside the script:
 1. `mri_segstats` → label list (optional LUT via `--lut` or `$FREESURFER_HOME`).
 2. Per label: `mri_mc` (with `mri_binarize` fallback) → `mris_convert`.
 3. Writes `output_dir/ascii/*.asc` and `output_dir/mesh/*.stl`.
-4. Also attempts inner/outer skull and skin surfaces when present under `$SUBJECTS_DIR`.
+4. Also converts `surf_inner_skull_surface`, `surf_outer_skull_surface`, and `surf_outer_skin_surface` when present. Those watershed files are scanner RAS; the import script, not this shell step, stores the RAS-center translation.
 
 **Environment:** `SUBJECTS_DIR`, FreeSurfer on `PATH`, bash available (macOS/Linux/WSL).
 
