@@ -10,6 +10,9 @@ function zef_mark_sensor_graphic(graphic, sensors_visible, filtered_index)
 %   (after visibility and clipping). sensors_visible maps that row back
 %   to the project contact index. Strip-tool deletion reads UserData so
 %   it can remove one lead's glyphs and leave every other electrode.
+%   A graphics object is stamped with dot assignment. A numeric handle
+%   (from storing trisurf/surf in a double array) is stamped with set.
+%   The root handle 0 is ignored: isgraphics(0) is true.
 %
 %   zef_mark_sensor_graphic(graphic, sensors_visible, filtered_index)
 %
@@ -34,9 +37,20 @@ end
 if isempty(sensor_index) || ~isscalar(sensor_index)
     return
 end
+payload = struct('sensor_index', sensor_index);
 for index = 1:numel(graphic)
-    if isgraphics(graphic(index))
-        graphic(index).UserData = struct('sensor_index', sensor_index);
+    item = graphic(index);
+    % h = zeros(...) then h(i) = trisurf/surf stores a numeric handle.
+    % isgraphics accepts that double, and also accepts 0 (the root).
+    % Dot assignment only works on a graphics object; set() accepts the
+    % numeric handle. Never stamp the root.
+    if isnumeric(item)
+        if isempty(item) || ~isscalar(item) || item == 0 || ~isgraphics(item)
+            continue
+        end
+        set(item, 'UserData', payload);
+    elseif isgraphics(item)
+        item.UserData = payload;
     end
 end
 end

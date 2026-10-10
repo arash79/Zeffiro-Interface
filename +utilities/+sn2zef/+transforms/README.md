@@ -43,7 +43,7 @@ Requires `FREESURFER_HOME`. Adds `FREESURFER_HOME/matlab` when that folder is no
 
 ## Important notes
 
-`utilities.sn2zef.run` writes that 4×4 onto every segmentation row as `affine_transform` when `alignment_mode` is `'translation'` (the default). STL vertices stay in SimNIBS RAS; `zef_process_meshes` applies the matrix. Atlas points are already multiplied by the same matrix in `save_volume_atlas_points`, and import does not transform them again. `'alignment_mode','coregistration'` resamples the volume first, so vertices are already in FreeSurfer space and `affine_matrix` is `[]` (no `affine_transform` field). Legacy `options.force_coreg` is only an alias for that mode when `alignment_mode` is omitted.
+`utilities.sn2zef.run` writes that 4×4 onto every segmentation row and onto the electrode sensor row as `affine_transform` when `alignment_mode` is `'translation'` (the default). STL vertices and `electrodes.dat` stay in SimNIBS RAS; `zef_process_meshes` applies the matrix once to both. Do not also multiply the electrode file by this matrix. Atlas points are already multiplied by the same matrix in `save_volume_atlas_points`, and import does not transform them again. `'alignment_mode','coregistration'` resamples the volume first, so vertices are already in FreeSurfer space and `affine_matrix` is `[]` (no `affine_transform` field). Legacy `options.force_coreg` is only an alias for that mode when `alignment_mode` is omitted.
 
 ## Developer guidance
 

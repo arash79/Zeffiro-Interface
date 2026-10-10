@@ -11,8 +11,10 @@ function zef_store_cdata(varargin)
 %   zef_store_cdata(data_status, cdata_info)
 %
 %   Called from zef_plot_volume / zef_plot_meshes while drawing a frame.
-%   Finds zef.h_zeffiro axes1 children with CData. data_status==1 (default)
-%   clears UserData first. If zef.store_cdata is true, appends a struct
+%   Finds zef.h_zeffiro axes1 children with CData. A scalar UserData struct
+%   that only identifies an electrode (sensor_index or strip_id) is left
+%   in place. Other children: data_status==1 (default) clears UserData
+%   first. If zef.store_cdata is true, appends a struct
 %   with CData, inv_time_1/2/3, frame_start/stop/step, frame_vec,
 %   number_of_frames, and time_text.String. zef_play_cdata reads that
 %   stack. System INI Store CData maps to zef.store_cdata.
@@ -38,6 +40,14 @@ h_c = h_axes.Children;
 for i = 1 : length(h_c)
 
     if find(ismember(properties(h_c(i)),'CData'))
+        % Electrode glyphs keep a scalar identity struct in UserData.
+        % Replacing it with the CData frame stack drops the contact index
+        % the strip tool reads back after a plot.
+        payload = h_c(i).UserData;
+        if isstruct(payload) && isscalar(payload) && ~isfield(payload, 'CData') ...
+                && (isfield(payload, 'sensor_index') || isfield(payload, 'strip_id'))
+            continue
+        end
         if isequal(data_status,1)
             h_c(i).UserData = [];
         end

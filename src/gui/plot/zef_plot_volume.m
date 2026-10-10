@@ -251,7 +251,7 @@ if eval(['zef.' sensor_tag '_visible'])
         end
         if not(isempty(sensors))
             unique_sensors_aux_1 = unique(sensors(:,1));
-            h = zeros(length(unique_sensors_aux_1),1);
+            h = gobjects(length(unique_sensors_aux_1),1);
             for i = 1 : length(unique_sensors_aux_1)
                 unique_sensors_aux_2 = find(sensors(:,1)==unique_sensors_aux_1(i));
                 [min_n_aux, min_t_aux] = zef_minimal_mesh(nodes,sensors(unique_sensors_aux_2,2:4));
@@ -265,7 +265,7 @@ if eval(['zef.' sensor_tag '_visible'])
             set(h,'edgealpha',eval('zef.layer_transparency'));
         end
         if not(isempty(sensors_point_like))
-            h = zeros(size(sensors_point_like,1),1);
+            h = gobjects(size(sensors_point_like,1),1);
             for i = 1 : size(sensors_point_like,1)
                 h(i) = surf(sensors_point_like(i,1) + X_s, sensors_point_like(i,2) + Y_s, sensors_point_like(i,3) + Z_s);
                 set(h(i),'facecolor',sensors_color_table(sensors_point_like_id(i),:));

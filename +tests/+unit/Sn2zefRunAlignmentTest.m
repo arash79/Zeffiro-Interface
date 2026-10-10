@@ -86,6 +86,18 @@ classdef Sn2zefRunAlignmentTest < matlab.unittest.TestCase
                 fullfile(m2m, 'final_tissues.nii.gz'), ...
                 fullfile(fs_subject, 'orig.mgz'));
             testCase.verifyEqual(affine, expected, 'AbsTol', 1e-8);
+            assert_shared_affine(testCase, manifest, expected);
+
+            here = fileparts(mfilename('fullpath'));
+            project_root = fileparts(fileparts(here));
+            source_electrodes = fullfile(project_root, '+utilities', '+fs2zef', 'data', 'electrodes.dat');
+            copied_electrodes = fullfile(out_folder, 'electrodes.dat');
+            testCase.verifyTrue(isfile(copied_electrodes));
+            testCase.verifyEqual(fileread(copied_electrodes), fileread(source_electrodes));
+
+            electrodes = readmatrix(copied_electrodes);
+            head = stlread(fullfile(out_folder, 'White_Matter.stl'));
+            assert_same_affine_frame(testCase, electrodes, head.Points, expected);
 
             legacy_out = fullfile(root, 'out_legacy');
             utilities.sn2zef.run(struct(), subject_id, legacy_out, 0, ...
@@ -94,6 +106,8 @@ classdef Sn2zefRunAlignmentTest < matlab.unittest.TestCase
                 'FileType', 'text', 'Delimiter', ',');
             legacy_affine = affine_from_manifest(legacy_manifest);
             testCase.verifyEqual(legacy_affine, expected, 'AbsTol', 1e-8);
+            assert_shared_affine(testCase, legacy_manifest, expected);
+            assert_same_affine_frame(testCase, electrodes, head.Points, legacy_affine);
         end
     end
 end
@@ -105,7 +119,57 @@ function restore_env(names, saved)
 end
 
 function affine = affine_from_manifest(manifest)
-    affine = [];
+    affines = affines_from_manifest(manifest);
+    if isempty(affines)
+        error('Sn2zefRunAlignmentTest:NoAffine', ...
+            'import_segmentations.zef has no affine_transform field.');
+    end
+    affine = affines{1};
+end
+
+function assert_shared_affine(testCase, manifest, expected)
+    affines = affines_from_manifest(manifest);
+    testCase.verifyGreaterThanOrEqual(numel(affines), 2);
+    for k = 1:numel(affines)
+        testCase.verifyEqual(affines{k}, expected, 'AbsTol', 1e-8);
+    end
+    testCase.verifyTrue(row_has_token(manifest, 1, 'sensors'));
+    testCase.verifyTrue(row_has_token(manifest, 1, 'affine_transform'));
+end
+
+function assert_same_affine_frame(testCase, electrodes, vertices, affine)
+    % zef_process_meshes applies one homogeneous product to compartment
+    % vertices and to electrode rows. A point that starts on the head must
+    % still lie on the transformed head, and the copied electrode file must
+    % still be the untransformed coordinates.
+    electrodes_t = apply_mesh_affine(electrodes, affine);
+    vertices_t = apply_mesh_affine(vertices, affine);
+    shift = affine(1:3, 4).';
+
+    testCase.verifyEqual(electrodes_t - electrodes, repmat(shift, size(electrodes, 1), 1), ...
+        'AbsTol', 1e-8);
+    testCase.verifyEqual(vertices_t - vertices, repmat(shift, size(vertices, 1), 1), ...
+        'AbsTol', 1e-6);
+
+    parked = vertices(1, :);
+    testCase.verifyEqual(apply_mesh_affine(parked, affine), vertices_t(1, :), ...
+        'AbsTol', 1e-6);
+
+    baked = apply_mesh_affine(electrodes, affine);
+    if norm(affine - eye(4), 'fro') > 1e-8
+        testCase.verifyGreaterThan(max(abs(electrodes(:) - baked(:))), 1e-6);
+    end
+end
+
+function points_t = apply_mesh_affine(points, affine)
+    % Same product as zef_process_meshes: homogeneous rows times A'.
+    homogeneous = [points, ones(size(points, 1), 1)];
+    points_t = homogeneous * affine.';
+    points_t = points_t(:, 1:3);
+end
+
+function affines = affines_from_manifest(manifest)
+    affines = {};
     for row = 1:size(manifest, 1)
         for col = 1:size(manifest, 2) - 1
             token = manifest{row, col};
@@ -113,19 +177,33 @@ function affine = affine_from_manifest(manifest)
                 token = char(token);
             end
             if ischar(token) && strcmp(token, 'affine_transform')
-                value = manifest{row, col + 1};
-                if isstring(value)
-                    value = char(value);
-                end
-                if isnumeric(value)
-                    affine = value;
-                else
-                    affine = str2num(value); %#ok<ST2NM>
-                end
-                return;
+                affines{end + 1} = parse_affine_value(manifest{row, col + 1}); %#ok<AGROW>
             end
         end
     end
-    error('Sn2zefRunAlignmentTest:NoAffine', ...
-        'import_segmentations.zef has no affine_transform field.');
+end
+
+function found = row_has_token(manifest, row, name)
+    found = false;
+    for col = 1:size(manifest, 2)
+        token = manifest{row, col};
+        if isstring(token)
+            token = char(token);
+        end
+        if ischar(token) && strcmp(token, name)
+            found = true;
+            return;
+        end
+    end
+end
+
+function affine = parse_affine_value(value)
+    if isstring(value)
+        value = char(value);
+    end
+    if isnumeric(value)
+        affine = value;
+    else
+        affine = str2num(value); %#ok<ST2NM>
+    end
 end

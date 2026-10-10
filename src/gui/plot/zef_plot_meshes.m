@@ -578,7 +578,7 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
             end
             if not(isempty(sensors))
                 unique_sensors_aux_1 = unique(sensors(:,1));
-                h = zeros(length(unique_sensors_aux_1),1);
+                h = gobjects(length(unique_sensors_aux_1),1);
                 for i = 1 : length(unique_sensors_aux_1)
                     surface_index_aux = length(reuna_p)-electrode_surface_index+1;
                         if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
@@ -597,7 +597,7 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                 set(h,'edgealpha',eval('zef.layer_transparency'));
             end
             if not(isempty(sensors_point_like))
-                h = zeros(size(sensors_point_like,1),1);
+                h = gobjects(size(sensors_point_like,1),1);
                 for i = 1 : size(sensors_point_like,1)
                     h(i) = surf(sensors_point_like(i,1) + X_s, sensors_point_like(i,2) + Y_s, sensors_point_like(i,3) + Z_s);
                     set(h(i),'Tag','sensor');

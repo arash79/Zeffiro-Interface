@@ -42,13 +42,16 @@ function run(zef, subject_id, outFolder, inflation_parameter, options)
 %   .atlas_voxel_stride        - Subsample atlas voxels (default: 4).
 %   .alignment_mode            - 'translation' (default) or 'coregistration'.
 %                                Forwarded to export_segmentation_meshes.
-%                                Translation keeps STL vertices in SimNIBS
-%                                vox2ras and writes the FreeSurfer CRAS
-%                                translation (t = -cras, identity rotation)
-%                                as affine_transform on each segmentation row.
-%                                Coregistration resamples the volume with
-%                                mri_coreg so vertices are already in
-%                                FreeSurfer space and no affine is written.
+%                                Translation keeps STL vertices and electrode
+%                                coordinates in SimNIBS vox2ras and writes the
+%                                FreeSurfer CRAS translation (t = -cras,
+%                                identity rotation) as affine_transform on
+%                                each segmentation row and on the electrode
+%                                sensor row. zef_process_meshes applies that
+%                                matrix once to both. Coregistration resamples
+%                                the volume with mri_coreg so vertices are
+%                                already in FreeSurfer space and no affine is
+%                                written.
 %   .force_coreg               - Legacy alias used only when alignment_mode
 %                                is omitted. true → 'coregistration',
 %                                false → 'translation'.
@@ -59,7 +62,8 @@ function run(zef, subject_id, outFolder, inflation_parameter, options)
 %
 %   None. Writes to outFolder:
 %     • <Tissue_Name>.stl         - one STL per tissue label
-%     • electrodes.dat            - copied from +fs2zef/data if available
+%     • electrodes.dat            - copied unchanged from +fs2zef/data
+%                                   if available (same space as the STLs)
 %     • sn_atlas_points.dat       - parcellation points (when include_atlas)
 %     • import_segmentations.zef  - ZEF import script
 %
@@ -173,7 +177,11 @@ function run(zef, subject_id, outFolder, inflation_parameter, options)
         return;
     end
 
-    %% Copy electrode positions from +fs2zef helpers (best effort)
+    %% Copy electrode positions from +fs2zef helpers (best effort).
+    % Leave the coordinates in the same space as the STL vertices. The sensor
+    % row below receives affine_clause, and zef_process_meshes multiplies
+    % electrode rows by that matrix the same way it multiplies compartment
+    % vertices. Rewriting electrodes.dat here would apply the translation twice.
 
     thisDir = fileparts(mfilename('fullpath'));
     electrodesSource = fullfile(thisDir, '..', '+fs2zef', 'data', 'electrodes.dat');
@@ -186,11 +194,12 @@ function run(zef, subject_id, outFolder, inflation_parameter, options)
     end
 
     %% Atlas points (written by the worker when include_atlas). In translation
-    % mode the worker bakes the FreeSurfer CRAS translation into those points.
-    % STL vertices stay in SimNIBS vox2ras and the same matrix is stored as
-    % affine_transform so zef_process_meshes applies it at mesh time.
-    % Coregistration mode leaves both in FreeSurfer space and affine_clause
-    % is empty.
+    % mode the worker bakes the FreeSurfer CRAS translation into those points,
+    % because import does not transform atlas points. STL vertices and
+    % electrode coordinates stay in SimNIBS vox2ras. The same matrix is stored
+    % as affine_transform on each segmentation row and on the sensor row so
+    % zef_process_meshes applies it once at mesh time. Coregistration mode
+    % leaves the meshes in FreeSurfer space and affine_clause is empty.
 
     have_atlas_points = false;
     atlas_pts_path = '';
@@ -203,8 +212,8 @@ function run(zef, subject_id, outFolder, inflation_parameter, options)
     %% Build header and segmentation lines for the .zef script
 
     hdrLines = { ...
-        sprintf('type,sensors,name,Electrodes,filename,%s,filetype,points,modality,EEG', ...
-                fullfile(outFolder, 'electrodes.dat')); ...
+        sprintf('type,sensors,name,Electrodes,filename,%s,filetype,points,modality,EEG%s', ...
+                fullfile(outFolder, 'electrodes.dat'), affine_clause); ...
         'type,box,name,Box' ...
     };
 

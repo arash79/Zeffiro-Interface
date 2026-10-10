@@ -48,7 +48,7 @@ utilities.sn2zef.export_from_gmsh_mesh(...);  % see file help
 - Environment variables and subject folder layout must match SimNIBS conventions.
 - `meshLoadGmsh4` is vendor code — do not relicense or strip headers.
 - Output coordinate units must match Zeffiro import expectations (typically mm).
-- Default `alignment_mode` is `translation`: STL vertices stay in SimNIBS RAS and `import_segmentations.zef` stores the FreeSurfer CRAS translation `t = -cras` (identity rotation) as `affine_transform`. The SimNIBS header is not part of that matrix. `coregistration` (or legacy `force_coreg=true`) runs `mri_coreg` and omits that field because vertices are already in FreeSurfer space.
+- Default `alignment_mode` is `translation`: STL vertices and `electrodes.dat` stay in SimNIBS RAS. `import_segmentations.zef` stores the FreeSurfer CRAS translation `t = -cras` (identity rotation) as `affine_transform` on every segmentation row and on the electrode sensor row. `zef_process_meshes` applies that matrix once to both. The SimNIBS header is not part of the matrix, and the electrode file is not rewritten. `coregistration` (or legacy `force_coreg=true`) runs `mri_coreg` and omits that field because vertices are already in FreeSurfer space.
 
 ## Developer guidance
 

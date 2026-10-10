@@ -193,6 +193,25 @@ classdef StripToolLeadDeleteTest < matlab.unittest.TestCase
             zef_mark_sensor_graphic(glyph, [], 3);
             testCase.verifyEqual(glyph.UserData.sensor_index, 3);
         end
+
+        function sensorGraphicStampAcceptsNumericHandle(testCase)
+            % trisurf assigned into a double array becomes a numeric handle.
+            % isgraphics accepts it; dot assignment does not.
+            figure_handle = figure('Visible', 'off');
+            testCase.addTeardown(@() delete(figure_handle));
+            axes_handle = axes('Parent', figure_handle);
+            patch_handle = trisurf([1 2 3], [0 1 0], [0 0 1], [0 0 0], 'Parent', axes_handle);
+            stored = zeros(1, 1);
+            stored(1) = patch_handle;
+            testCase.verifyClass(stored, 'double');
+            testCase.verifyTrue(isgraphics(stored(1)));
+            zef_mark_sensor_graphic(stored(1), [4; 9], 2);
+            stamped = findobj(axes_handle, 'Type', 'Patch');
+            testCase.verifyEqual(stamped.UserData.sensor_index, 9);
+            root_data = get(groot, 'UserData');
+            zef_mark_sensor_graphic(0, [], 1);
+            testCase.verifyEqual(get(groot, 'UserData'), root_data);
+        end
     end
 
     methods (Static, Access = private)
