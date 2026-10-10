@@ -12,8 +12,9 @@ function s_points = zef_cem_electrode(zef,s_points)
 %   imaging_method==1 (EEG) and the handle is non-empty.
 %
 %   Reads zef.<current_sensors>_electrode_outer_radius, _inner_radius,
-%   _electrode_impedance (scalars are replicated to N rows). Returns
-%   [x y z outer_radius inner_radius impedance]. Empty s_points → [].
+%   _electrode_impedance. Scalars are replicated to N rows. A vector left
+%   short by append-contacts is aligned with zef_electrode_property_column.
+%   Returns [x y z outer_radius inner_radius impedance]. Empty s_points → [].
 %
 %   s_points = zef_cem_electrode(zef, s_points)
 %
@@ -27,23 +28,13 @@ else
     % Get the number of sensor points
     n_sensors = size(s_points, 1);
     
-    % Get electrode properties
-    outer_radius = eval(['zef.' current_sensors '_electrode_outer_radius(:)']);
-    inner_radius = eval(['zef.' current_sensors '_electrode_inner_radius(:)']);
-    impedance = eval(['zef.' current_sensors '_electrode_impedance(:)']);
-    
-    % Expand scalar properties to match the number of sensors
-    if isscalar(outer_radius)
-        outer_radius = repmat(outer_radius, n_sensors, 1);
-    end
-    if isscalar(inner_radius)
-        inner_radius = repmat(inner_radius, n_sensors, 1);
-    end
-    if isscalar(impedance)
-        impedance = repmat(impedance, n_sensors, 1);
-    end
-    
-    % Concatenate
+    outer_radius = zef_electrode_property_column( ...
+        eval(['zef.' current_sensors '_electrode_outer_radius']), n_sensors);
+    inner_radius = zef_electrode_property_column( ...
+        eval(['zef.' current_sensors '_electrode_inner_radius']), n_sensors);
+    impedance = zef_electrode_property_column( ...
+        eval(['zef.' current_sensors '_electrode_impedance']), n_sensors);
+
     s_points = [s_points(:,1:3), outer_radius, inner_radius, impedance];
 end
 end

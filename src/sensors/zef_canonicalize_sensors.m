@@ -22,6 +22,8 @@ function zef = zef_canonicalize_sensors(zef)
 %     index. The Tags checkbox still turns those labels off afterwards.
 %   Coordinates, the set name, and <tag>_name_list are not rewritten.
 %   Fields for a tag that is not in sensor_tags are removed.
+%   An electrode impedance or radius vector shorter than the point table
+%   is aligned to one value per sensor. A scalar is left as a scalar.
 %
 %   zef = zef_canonicalize_sensors(zef)
 
@@ -59,6 +61,7 @@ for i = 1:numel(zef.sensor_tags)
     else
         zef = local_pad_visibility(zef, tag, n);
     end
+    zef = local_align_electrode_properties(zef, tag, n);
 end
 
 if ~isempty(saved_current)
@@ -126,6 +129,23 @@ if ~isfield(zef, field) || isempty(zef.(field))
     return
 end
 set_on = logical(zef.(field)(1));
+
+end
+
+function zef = local_align_electrode_properties(zef, tag, n)
+
+names = {'electrode_impedance', 'electrode_inner_radius', 'electrode_outer_radius'};
+for k = 1:numel(names)
+    field = [tag '_' names{k}];
+    if ~isfield(zef, field)
+        continue
+    end
+    value = zef.(field);
+    if ~isnumeric(value) || isempty(value) || numel(value) == 1
+        continue
+    end
+    zef.(field) = zef_electrode_property_column(value, n);
+end
 
 end
 

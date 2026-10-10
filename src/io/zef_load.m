@@ -118,7 +118,13 @@ if not(isequal(file_name,0))
             zeffiro_variable_data = aux_struct.('zeffiro_variable_data');
         end
         if not(isempty(zeffiro_variable_data))
-            [matfile_fieldnames, I_mf] = setdiff(matfile_fieldnames, zeffiro_variable_data(:,2));
+            % Tool startup defers fields listed here until that tool
+            % opens. A lead's strip cell is sensor data: contact
+            % get_functions evaluate it, so it has to be in the session
+            % as soon as the project is open.
+            lazy_names = zeffiro_variable_data(:,2);
+            lazy_names = lazy_names(~cellfun(@local_is_strip_cell, lazy_names));
+            [matfile_fieldnames, I_mf] = setdiff(matfile_fieldnames, lazy_names);
         end
     end
 
@@ -385,5 +391,15 @@ end
 if nargout == 0
     assignin('base','zef',zef);
 end
+
+end
+
+function tf = local_is_strip_cell(name)
+
+tf = false;
+if ~(ischar(name) || isstring(name))
+    return
+end
+tf = endsWith(char(name), '_strip_cell');
 
 end

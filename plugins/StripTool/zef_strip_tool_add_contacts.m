@@ -10,15 +10,24 @@ function zef = zef_strip_tool_add_contacts(zef)
 %
 %   Add-contacts button. zef_create_strip then zef_get_strip_contacts
 %   ('points') for each contact; concatenates onto
-%   <current_sensors>_points / impedance / radii. Sets get_functions
-%   so later sensor evals stay bound to this strip_id.
+%   <current_sensors>_points / impedance / radii. A scalar property is
+%   expanded to the sensors already in the set before the new rows are
+%   appended. Sets get_functions so later sensor evals stay bound to
+%   this strip_id.
 %
 %   See also zef_get_strip_contacts, zef_strip_tool_embed.
 
 points_1 = zef.([zef.current_sensors '_points']);
-impedance_1 = zef.([zef.current_sensors '_electrode_impedance']);
-inner_radius_1 = zef.([zef.current_sensors '_electrode_inner_radius']);
-outer_radius_1 = zef.([zef.current_sensors '_electrode_outer_radius']);
+n_old = size(points_1, 1);
+if n_old < 1
+    impedance_1 = zeros(0, 1);
+    inner_radius_1 = zeros(0, 1);
+    outer_radius_1 = zeros(0, 1);
+else
+    impedance_1 = zef_electrode_property_column(zef.([zef.current_sensors '_electrode_impedance']), n_old);
+    inner_radius_1 = zef_electrode_property_column(zef.([zef.current_sensors '_electrode_inner_radius']), n_old);
+    outer_radius_1 = zef_electrode_property_column(zef.([zef.current_sensors '_electrode_outer_radius']), n_old);
+end
 
 strip_struct = zef.([zef.current_sensors '_strip_cell']);
 strip_struct = strip_struct{zef.strip_tool.current_strip};

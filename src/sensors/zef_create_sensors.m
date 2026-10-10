@@ -8,8 +8,10 @@ function zef = zef_create_sensors(zef,sensor_tag,field_cell_update)
 %
 %   Initializes missing zef.<tag>_* sensor fields (points, directions,
 %   imaging method name, electrode geometry defaults, get_functions, etc.)
-%   and prepends sensor_tag to zef.sensor_tags when new. Sets
-%   zef.current_sensors for legacy tags 's' and 's1'.
+%   and prepends sensor_tag to zef.sensor_tags when new. Legacy tags
+%   's' and 's1' become current only when no sensor set is current yet.
+%   Ensuring fields for an existing tag does not retarget the set that
+%   a loaded project already selected.
 %
 %   zef = zef_create_sensors(zef, sensor_tag)
 %   zef = zef_create_sensors(zef, sensor_tag, field_cell_update)
@@ -24,8 +26,18 @@ function zef = zef_create_sensors(zef,sensor_tag,field_cell_update)
 %
 %   See also zef_build_sensors_table, zef_fix_sensors_get_functions_array_size.
 
-if isequal(sensor_tag,'s') || isequal(sensor_tag,'s1')
-    eval(['zef.current_sensors =''' sensor_tag ''';']);
+if ismember(sensor_tag, {'s','s1'})
+    current_name = '';
+    if isfield(zef, 'current_sensors') && ~isempty(zef.current_sensors)
+        current_name = char(string(zef.current_sensors));
+    end
+    known_tags = {};
+    if isfield(zef, 'sensor_tags') && iscell(zef.sensor_tags)
+        known_tags = zef.sensor_tags;
+    end
+    if isempty(current_name) || ~any(strcmp(current_name, known_tags))
+        zef.current_sensors = sensor_tag;
+    end
 end
 zef_struct_name = 'zef';
 if nargin == 2
