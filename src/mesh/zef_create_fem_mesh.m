@@ -51,6 +51,21 @@ end
 % aux_active_compartment_ind into this workspace (not as zef fields).
 zef_segmentation_counter_step;
 
+% Solid-angle labeling is positive inside a closed surface only when the
+% area vectors point outward. Generators are supposed to emit that winding;
+% this pass corrects components that arrived reversed, without changing the
+% test itself. Open patches are left as they are.
+for k = 1:numel(zef.reuna_p)
+    if isempty(zef.reuna_p{k}) || isempty(zef.reuna_t{k})
+        continue
+    end
+    zef.reuna_t{k} = zef_orient_surface_outward(zef.reuna_p{k}, zef.reuna_t{k});
+    if isfield(zef, 'reuna_mesh_ind') && numel(zef.reuna_mesh_ind) >= k
+        compartment_tag = zef.compartment_tags{zef.reuna_mesh_ind(k)};
+        zef.([compartment_tag '_triangles']) = zef.reuna_t{k};
+    end
+end
+
 % Bounding box of non-PML surfaces (reuna_type == -1 is skipped).
 x_lim = [0 0];
 y_lim = [0 0];
@@ -327,6 +342,27 @@ end
     end
     %*********************
 
+end
+
+% Lattice spacing is zef.mesh_resolution everywhere. Compartments thinner
+% than that spacing, and fine patches on an otherwise coarse surface, are
+% split locally and then labeled again. Set zef.feature_refinement_on = 0
+% to keep the uniform lattice only.
+feature_on = ~isfield(zef, 'feature_refinement_on') || logical(zef.feature_refinement_on);
+zef.feature_refinement_report = struct('refined', false, 'passes', 0, ...
+    'unresolved', false, 'message', '', 'min_target', mesh_res);
+if feature_on && ~isempty(tetra)
+    [nodes, tetra, domain_labels, distance_vec, feature_report] = ...
+        zef_refine_small_features(zef, nodes, tetra, domain_labels, distance_vec, mesh_res);
+    zef.feature_refinement_report = feature_report;
+    if feature_report.refined
+        label_ind = uint32(tetra);
+        labeling_flag = 1;
+        zef_mesh_labeling_step;
+    end
+    if feature_report.unresolved && ~isempty(feature_report.message)
+        warning('zef:FeatureRefinement', '%s', feature_report.message);
+    end
 end
 
 if isequal(zef.priority_mode,3)

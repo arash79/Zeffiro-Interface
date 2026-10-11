@@ -264,9 +264,12 @@ function [affine_matrix, vertex_transform] = export_segmentation_meshes(zef, inF
             pts_ras = (T * pts_hom')';
             pts_ras = pts_ras(:, 1:3);
 
-            % STL winding: swap 2nd/3rd triangle indices so outward normals
-            % match the Brainstorm extraction (same flip as fs2zef writers).
-            tris_flipped = tris(:, [1 3 2]);
+            % Column swap is a reflection, and zef_bst_get_atlas_surfaces
+            % already reorders faces once. A second unconditional swap
+            % leaves the closed surface with inward area vectors, so the
+            % solid-angle test treats the interior as outside. Orient after
+            % the vertex map: det(T) may add one more reflection.
+            tris = zef_orient_surface_outward(pts_ras, tris);
 
             if i <= size(atlas_struct.Labels, 1) && size(atlas_struct.Labels, 2) >= 2
                 label_name = atlas_struct.Labels{i, 2};
@@ -282,7 +285,7 @@ function [affine_matrix, vertex_transform] = export_segmentation_meshes(zef, inF
             end
 
             stl_path = fullfile(outFolder, sprintf('%s.stl', label_name));
-            stlwrite(triangulation(tris_flipped, pts_ras), stl_path);
+            stlwrite(triangulation(tris, pts_ras), stl_path);
             fprintf('Wrote %s\n', stl_path);
 
         catch ME
