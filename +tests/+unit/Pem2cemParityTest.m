@@ -20,14 +20,14 @@ classdef Pem2cemParityTest < matlab.unittest.TestCase
             testCase.verifyTrue(all(out(:,4) > 0));
         end
 
-        function testBuriedBarycentricRowsError(testCase)
+        function testBuriedBarycentricRowsStayAPointSample(testCase)
             tetra = [1 2 3 4; 1 2 3 5];
             ele_ind = [ ...
                 1, 1, 0.25, 0; ...
                 1, 2, 0.25, 0; ...
                 1, 3, 0.25, 0; ...
                 1, 4, 0.25, 0];
-            testCase.verifyError(@() zef_pem2cem(ele_ind, tetra), "zef_pem2cem:BuriedNotSupported");
+            testCase.verifyEqual(zef_pem2cem(ele_ind, tetra), ele_ind);
         end
     end
 end

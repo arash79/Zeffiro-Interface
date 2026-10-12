@@ -13,11 +13,14 @@ function [contacts, sensor_info, triangle_ind] = zef_get_strip_contacts(contact_
 %   active-channel center. 'sensor_info': empty contacts plus strip_id.
 %   Models 1/2/3 keep their layouts. Models 4/5 use the lithographic
 %   disk from zef_strip_disc_patch. On a volume mesh that contains no
-%   vertex inside that disk, the mesh query returns one point-contact
-%   row [node, 1, 0] and sensor_info.electrode_representation is
-%   'point_unresolved'. A disk that the mesh does resolve is
-%   'finite_area'. Called from plot, add_contacts, and sensor
-%   get_functions. Does not write zef.
+%   vertex inside that disk, a tetrahedron that contains the contact
+%   centre (at most 250000 tetrahedra are searched) returns four
+%   barycentric rows [node, lambda, 0] and
+%   sensor_info.electrode_representation is 'point_barycentric'.
+%   Without such a tetrahedron the row is [node, 1, 0] and the
+%   representation is 'point_unresolved'. A disk that the mesh does
+%   resolve is 'finite_area'. Called from plot, add_contacts, and
+%   sensor get_functions. Does not write zef.
 %
 %   See also zef_get_strip_parameters, zef_strip_disc_site.
 
@@ -178,9 +181,16 @@ if isempty(triangle_ind) && isequal(domain_type,'mesh') && ~isempty(mesh_node_ma
     [x_aux, y_aux] = pol2cart(lattice.angle(physical_index), strip_struct.strip_radius);
     target = [x_aux, y_aux, z_center_aux];
     [~, local_node] = min(sum((strip_struct.points{1} - target) .^ 2, 2));
-    contacts = [mesh_node_map(local_node), 1, 0];
     triangle_ind = zeros(0, 1);
-    sensor_info.electrode_representation = 'point_unresolved';
+    target_world = zef_strip_coordinate_transform(strip_struct, 'forward', target);
+    barycentric = local_barycentric_rows(zef, target_world);
+    if isempty(barycentric)
+        contacts = [mesh_node_map(local_node), 1, 0];
+        sensor_info.electrode_representation = 'point_unresolved';
+    else
+        contacts = barycentric;
+        sensor_info.electrode_representation = 'point_barycentric';
+    end
 else
     contacts = triangles(triangle_ind,:);
     if isempty(triangle_ind)
@@ -200,4 +210,41 @@ end
 end
 end
 
+end
+
+function rows = local_barycentric_rows(zef, target_world)
+
+rows = zeros(0, 3);
+if ~isstruct(zef) || ~isfield(zef, 'tetra') || ~isfield(zef, 'nodes')
+    return
+end
+tetra = zef.tetra;
+nodes = zef.nodes;
+if isempty(tetra) || isempty(nodes) || size(tetra, 1) > 250000 || size(target_world, 2) ~= 3
+    return
+end
+tetra = double(tetra);
+nodes = double(nodes);
+target_world = double(target_world(1, 1:3));
+edge_1 = nodes(tetra(:, 2), :) - nodes(tetra(:, 1), :);
+edge_2 = nodes(tetra(:, 3), :) - nodes(tetra(:, 1), :);
+edge_3 = nodes(tetra(:, 4), :) - nodes(tetra(:, 1), :);
+volume = zef_determinant(edge_1, edge_2, edge_3);
+sensor = target_world - nodes(tetra(:, 1), :);
+lambda_2 = zef_determinant(sensor, edge_2, edge_3) ./ volume;
+lambda_3 = zef_determinant(edge_1, sensor, edge_3) ./ volume;
+lambda_4 = zef_determinant(edge_1, edge_2, sensor) ./ volume;
+lambda_1 = 1 - lambda_2 - lambda_3 - lambda_4;
+tolerance = 1e-8;
+inside = lambda_1 >= -tolerance & lambda_2 >= -tolerance & lambda_3 >= -tolerance & lambda_4 >= -tolerance ...
+    & lambda_1 <= 1 + tolerance & lambda_2 <= 1 + tolerance & lambda_3 <= 1 + tolerance & lambda_4 <= 1 + tolerance ...
+    & abs(volume) > 0;
+tetra_index = find(inside, 1, 'first');
+if isempty(tetra_index)
+    return
+end
+lambda = [lambda_1(tetra_index); lambda_2(tetra_index); lambda_3(tetra_index); lambda_4(tetra_index)];
+lambda = max(lambda, 0);
+lambda = lambda / sum(lambda);
+rows = [double(tetra(tetra_index, :)'), lambda, zeros(4, 1)];
 end

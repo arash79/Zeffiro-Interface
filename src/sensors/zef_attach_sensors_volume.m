@@ -44,7 +44,14 @@ function  [sensors_attached_volume] = zef_attach_sensors_volume(zef,sensors,vara
 %
 %   Which surface: zef.<current_sensors>_electrode_surface_index (default
 %   1). If the outermost reuna_type is Bounding box (_sources == -1),
-%   the index is counted from the last non-box surface.
+%   the index is counted from the last non-box surface. Ordinary sensors
+%   are then bound to that compartment. On a volume mesh the candidate
+%   nodes are the hull nodes closer to it than to an embedded shaft or
+%   its encapsulation, so a scalp electrode is not moved onto the implant.
+%   The anchor is the nearest point of the selected surface; the stored
+%   node is the nearest remaining hull node to that anchor. Shaft
+%   contacts are the rows whose get_function is zef_get_strip_contacts
+%   and are not part of this search.
 %
 %   Output table (consumed by zef_pem2cem / zef_build_electrodes and by
 %   the CEM trisurf plot path):
@@ -164,6 +171,7 @@ if ismember(zef.imaging_method,[1,4,5])
         electrode_model = 1;
     end
 
+    triangle_keep = [];
     if electrode_model == 1 || isequal(attach_type,'points')
 
         % PEM / label-points: snap each contact to a single vertex.
@@ -204,8 +212,12 @@ if ismember(zef.imaging_method,[1,4,5])
 
             unique_surface_triangles = unique(zef.surface_triangles{end-electrode_surface_index+1});
             ele_nodes = zef.nodes(unique_surface_triangles,:);
+            [ele_nodes, unique_surface_triangles, triangle_keep] = local_exclude_implants( ...
+                zef, geometry_nodes, electrode_surface_index, ele_nodes, unique_surface_triangles, center_points_aux);
 
-            if not(isempty(find(sensors(:,4) == 0)))
+            buried_rows = find(sensors(:,4) == 0 & sensors(:,5) == 0);
+            buried_rows = setdiff(buried_rows, I_get_functions);
+            if ~isempty(buried_rows)
                 diff_vec_1 = (zef.nodes(zef.tetra(:,2),:) - zef.nodes(zef.tetra(:,1),:));
                 diff_vec_2 = (zef.nodes(zef.tetra(:,3),:) - zef.nodes(zef.tetra(:,1),:));
                 diff_vec_3 = (zef.nodes(zef.tetra(:,4),:) - zef.nodes(zef.tetra(:,1),:));
@@ -256,8 +268,7 @@ i_ind = 0;
 
                 if isequal(attach_type,'mesh')
 
-                    [min_val, min_ind] = min(sqrt(sum((ele_nodes - repmat(sensors(i,1:3),size(ele_nodes,1),1)).^2,2)));
-                    min_ind = unique_surface_triangles(min_ind);
+                    min_ind = local_selected_node(sensors(i,1:3), geometry_nodes, ele_nodes, unique_surface_triangles);
                     sensors_aux = [sensors_aux ; i min_ind 1 0];
 
                 end
@@ -277,10 +288,13 @@ i_ind = 0;
                 % triangle becomes one [id n1 n2 n3] row.
                 if isequal(attach_type,'mesh')
 
-                    [min_val, min_ind] = min(sqrt(sum((ele_nodes - repmat(sensors(i,1:3),size(ele_nodes,1),1)).^2,2)));
-                    sensors(i,1:3) = ele_nodes(min_ind,:);
+                    min_ind = local_selected_node(sensors(i,1:3), geometry_nodes, ele_nodes, unique_surface_triangles);
+                    sensors(i,1:3) = zef.nodes(min_ind,:);
                     [dist_val] = (sqrt(sum((center_points_aux - repmat(sensors(i,1:3),size(center_points_aux,1),1)).^2,2)));
                     dist_ind = find(dist_val < sensors(i,4) & dist_val >= sensors(i,5));
+                    if ~isempty(triangle_keep)
+                        dist_ind = dist_ind(triangle_keep(dist_ind));
+                    end
                     sensors_aux = [sensors_aux ; i*ones(length(dist_ind),1) zef.surface_triangles{end-electrode_surface_index+1}(dist_ind,:)];
 
                 elseif isequal(attach_type,'geometry')
@@ -311,4 +325,53 @@ if nargout == 0
     eval('zef_assign_data;');
 end
 
+end
+
+function [ele_nodes, ele_ids, triangle_keep] = local_exclude_implants(zef, geometry_nodes, electrode_surface_index, ele_nodes, ele_ids, centroids)
+
+triangle_keep = [];
+if isempty(ele_nodes) || isempty(geometry_nodes) || exist('zef_implant_surface_nodes', 'file') ~= 2
+    return
+end
+selected_tag = local_selected_tag(zef, electrode_surface_index);
+device_nodes = zef_implant_surface_nodes(zef, selected_tag);
+if isempty(device_nodes)
+    return
+end
+[~, selected_distance] = knnsearch(geometry_nodes, ele_nodes);
+[~, device_distance] = knnsearch(device_nodes, ele_nodes);
+keep_node = selected_distance <= device_distance;
+if any(keep_node)
+    ele_nodes = ele_nodes(keep_node, :);
+    ele_ids = ele_ids(keep_node);
+end
+if ~isempty(centroids)
+    [~, selected_distance] = knnsearch(geometry_nodes, centroids);
+    [~, device_distance] = knnsearch(device_nodes, centroids);
+    triangle_keep = selected_distance <= device_distance;
+end
+end
+
+function tag = local_selected_tag(zef, electrode_surface_index)
+
+tag = '';
+if ~isfield(zef, 'reuna_type') || isempty(zef.reuna_type) || size(zef.reuna_type, 2) < 4
+    return
+end
+n_surfaces = size(zef.reuna_type, 1);
+if isequal(zef.reuna_type{end, 1}, -1)
+    position = n_surfaces - electrode_surface_index;
+else
+    position = n_surfaces - electrode_surface_index + 1;
+end
+position = min(max(position, 1), n_surfaces);
+tag = char(string(zef.reuna_type{position, 4}));
+end
+
+function node_id = local_selected_node(sensor_xyz, geometry_nodes, ele_nodes, ele_ids)
+
+[~, geometry_index] = min(sum((geometry_nodes - sensor_xyz).^2, 2));
+anchor = geometry_nodes(geometry_index, :);
+[~, node_index] = min(sum((ele_nodes - anchor).^2, 2));
+node_id = ele_ids(node_index);
 end

@@ -20,9 +20,10 @@ function sensors_attached_volume = zef_pem2cem(sensors_attached_volume,tetra);
 %       index: tets that contain that node are passed as I to
 %       zef_surface_mesh, and the rows become [id, t1, t2, t3] for those
 %       skin triangles.
-%     - Four barycentric tet rows [id, node, λ, 0] (buried CEM from
-%       zef_attach_sensors_volume) are not a scalar node test and error
-%       (zef_pem2cem:BuriedNotSupported).
+%     - Four barycentric tet rows [id, node, λ, 0] are a point sample
+%       inside one tetrahedron. They are copied through. zef_build_electrodes
+%       applies the weights; expanding them with find(tetra==node) would
+%       replace the point by every skin triangle of those nodes.
 %
 %   sensors_attached_volume = zef_pem2cem(sensors_attached_volume, tetra)
 %
@@ -53,11 +54,8 @@ for i = 1 : n_electrodes
         && all(sensors_attached_volume(ele_ind_aux, 3) >= 0) ...
         && all(sensors_attached_volume(ele_ind_aux, 3) <= 1);
     if bary_block
-        error('zef_pem2cem:BuriedNotSupported', ...
-            ['Electrode %d has four barycentric tet rows (buried CEM). ' ...
-             'Those rows are not a single surface node; expanding them with ' ...
-             'find(tetra==node_vector) is not a valid CEM triangle test. ' ...
-             'Use surface CEM (nonzero outer radius) or PEM.'], i);
+        sensors_aux = [sensors_aux ; sensors_attached_volume(ele_ind_aux,:)];
+        continue
     end
 
     if isempty(I)
@@ -69,7 +67,7 @@ for i = 1 : n_electrodes
         [J,~] = find(tetra==sensors_attached_volume(ele_ind_aux,2));
         ele_tri = zef_surface_mesh(tetra,[],J);
 
-        sensors_aux = [sensors_aux ; i(ones(size(ele_tri,1),1),1) ele_tri];
+        sensors_aux = [sensors_aux ; i(ones(size(ele_tri,1),1),1) double(ele_tri)];
 
     end
 end

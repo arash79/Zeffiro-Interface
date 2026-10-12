@@ -546,6 +546,9 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
     if eval(['zef.' sensor_tag '_visible'])
         if electrode_model == 1 || not(ismember(eval('zef.imaging_method'),[1,4,5]))
             for i = 1 : size(sensors,1)
+                if zef_sensor_is_strip_contact(sensors_get_functions, i)
+                    continue
+                end
                 h = surf(sensors(i,1) + X_s, sensors(i,2) + Y_s, sensors(i,3) + Z_s);
                 h.Tag = 'sensor';
                 zef_mark_sensor_graphic(h, sensors_visible, i);
@@ -580,6 +583,9 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                 unique_sensors_aux_1 = unique(sensors(:,1));
                 h = gobjects(length(unique_sensors_aux_1),1);
                 for i = 1 : length(unique_sensors_aux_1)
+                    if zef_sensor_is_strip_contact(sensors_get_functions, unique_sensors_aux_1(i))
+                        continue
+                    end
                     surface_index_aux = length(reuna_p)-electrode_surface_index+1;
                         if not(isempty(sensors_get_functions{unique_sensors_aux_1(i)}))
                             [~, sensor_info] = zef_sensor_get_function_eval(sensors_get_functions{unique_sensors_aux_1(i)}, zef,'sensor_info');
@@ -592,21 +598,30 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                     set(h(i),'Tag','sensor');
                     zef_mark_sensor_graphic(h(i), sensors_visible, unique_sensors_aux_1(i));
                 end
+                h = h(isgraphics(h));
+                if ~isempty(h)
                 set(h,'edgecolor','none');
                 set(h,'facealpha',eval('zef.layer_transparency'));
                 set(h,'edgealpha',eval('zef.layer_transparency'));
+                end
             end
             if not(isempty(sensors_point_like))
                 h = gobjects(size(sensors_point_like,1),1);
                 for i = 1 : size(sensors_point_like,1)
+                    if zef_sensor_is_strip_contact(sensors_get_functions, sensors_aux(sensors_point_like_index(i), 1))
+                        continue
+                    end
                     h(i) = surf(sensors_point_like(i,1) + X_s, sensors_point_like(i,2) + Y_s, sensors_point_like(i,3) + Z_s);
                     set(h(i),'Tag','sensor');
                     set(h(i),'facecolor',sensors_color_table(sensors_point_like_id(i),:));
                     zef_mark_sensor_graphic(h(i), sensors_visible, sensors_aux(sensors_point_like_index(i), 1));
                 end
                 %April 2021;
+                h = h(isgraphics(h));
+                if ~isempty(h)
                 set(h,'edgecolor','none')
                 set(h,'facealpha',eval('zef.layer_transparency'));
+                end
             end
         end
 
@@ -890,10 +905,7 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
 
                         else
 
-                            [min_n_aux, min_t_aux] = zef_minimal_mesh(reuna_p{i},reuna_t{i});
-                            h_surf = trimesh(min_t_aux,min_n_aux(:,1),min_n_aux(:,2),min_n_aux(:,3),'edgecolor','none','facecolor',color_str);
-                            set(h_surf,'Tag','surface');
-                            set(h_surf,'facealpha',eval('zef.layer_transparency'));
+                            zef_plot_compartment_mesh(zef, compartment_tags{k}, reuna_p{i}, reuna_t{i}, color_str, eval('zef.layer_transparency'));
                             lighting phong;
                         end
 
@@ -1163,11 +1175,7 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
             if on_val
                 i = i + 1;
                 if visible_val
-                    [min_n_aux, min_t_aux] = zef_minimal_mesh(reuna_p{i},reuna_t{i});
-                    if not(isempty(min_n_aux))
-                        h_surf = trimesh(min_t_aux,min_n_aux(:,1),min_n_aux(:,2),min_n_aux(:,3),'edgecolor','none','facecolor',color_str);
-                        set(h_surf,'Tag','surface');
-                        set(h_surf,'facealpha',eval('zef.layer_transparency'));
+                    if zef_plot_compartment_mesh(zef, compartment_tags{k}, reuna_p{i}, reuna_t{i}, color_str, eval('zef.layer_transparency'))
                         any_surface = true;
                     end
                 end

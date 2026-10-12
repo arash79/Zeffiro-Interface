@@ -222,6 +222,9 @@ if eval(['zef.' sensor_tag '_visible'])
     if electrode_model == 1 | not(ismember(eval('zef.imaging_method'),[1,4,5]))
         % Point electrodes and MEG/EIT-without-CEM: one sphere per row.
         for i = 1 : size(sensors,1)
+            if zef_sensor_is_strip_contact(sensors_get_functions, i)
+                continue
+            end
             h = surf(sensors(i,1) + X_s, sensors(i,2) + Y_s, sensors(i,3) + Z_s);
             h.Tag = 'sensor';
             h.EdgeColor = 'none';
@@ -253,6 +256,9 @@ if eval(['zef.' sensor_tag '_visible'])
             unique_sensors_aux_1 = unique(sensors(:,1));
             h = gobjects(length(unique_sensors_aux_1),1);
             for i = 1 : length(unique_sensors_aux_1)
+                if zef_sensor_is_strip_contact(sensors_get_functions, unique_sensors_aux_1(i))
+                    continue
+                end
                 unique_sensors_aux_2 = find(sensors(:,1)==unique_sensors_aux_1(i));
                 [min_n_aux, min_t_aux] = zef_minimal_mesh(nodes,sensors(unique_sensors_aux_2,2:4));
                 h(i) = trisurf(min_t_aux,min_n_aux(:,1),min_n_aux(:,2),min_n_aux(:,3));
@@ -260,21 +266,30 @@ if eval(['zef.' sensor_tag '_visible'])
                 set(h(i),'facecolor',sensors_color_table(unique_sensors_aux_1(i),:));
                 zef_mark_sensor_graphic(h(i), sensors_visible, unique_sensors_aux_1(i));
             end
+            h = h(isgraphics(h));
+            if ~isempty(h)
             set(h,'edgecolor','none');
             set(h,'facealpha',eval('zef.layer_transparency'));
             set(h,'edgealpha',eval('zef.layer_transparency'));
+            end
         end
         if not(isempty(sensors_point_like))
             h = gobjects(size(sensors_point_like,1),1);
             for i = 1 : size(sensors_point_like,1)
+                if zef_sensor_is_strip_contact(sensors_get_functions, unique_sensors_point_like(i))
+                    continue
+                end
                 h(i) = surf(sensors_point_like(i,1) + X_s, sensors_point_like(i,2) + Y_s, sensors_point_like(i,3) + Z_s);
                 set(h(i),'facecolor',sensors_color_table(sensors_point_like_id(i),:));
                 set(h(i),'Tag','sensor');
                 zef_mark_sensor_graphic(h(i), sensors_visible, unique_sensors_point_like(i));
             end
             %April 2021
+            h = h(isgraphics(h));
+            if ~isempty(h)
             set(h,'edgecolor','none');
             set(h,'facealpha',eval('zef.layer_transparency'));
+            end
         end
     end
     if ismember(eval('zef.imaging_method'),[2,3])
@@ -752,20 +767,41 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
         if isa(face_compartment,'gpuArray')
             face_compartment = gather(face_compartment);
         end
+        active_tags = cell(1, n_compartments);
+        active_count = 0;
+        for tag_index = 1:numel(compartment_tags)
+            if evalin('base', ['zef.' compartment_tags{tag_index} '_on'])
+                active_count = active_count + 1;
+                active_tags{active_count} = compartment_tags{tag_index};
+            end
+        end
         for i = 1 : n_compartments
 
             if visible_vec(i)
-                I_3 = find(face_compartment == i);
                 color_str = color_cell{i};
+                compartment_alpha = 1;
+                if not(ismember(eval('zef.visualization_type'),[2,4])) || not(ismember(i,aux_active_compartment_ind))
+                    compartment_alpha = eval('zef.layer_transparency');
+                end
+                shaft_points = [];
+                shaft_triangles = [];
+                if exist('zef_strip_from_compartment', 'file') == 2 && active_count >= i ...
+                        && ~isempty(zef_strip_from_compartment(zef, active_tags{i}))
+                    [shaft_points, shaft_triangles] = zef_compartment_surface(zef, active_tags{i});
+                end
+                if ~isempty(shaft_points)
+                    zef_plot_compartment_mesh(zef, active_tags{i}, shaft_points, shaft_triangles, color_str, compartment_alpha);
+                    lighting phong;
+                else
+                I_3 = find(face_compartment == i);
                 if not(isempty(I_3))
 
                     [min_n_aux, min_t_aux] = zef_minimal_mesh(nodes,surface_triangles(I_3,:));
                     h_surf = trimesh(min_t_aux,min_n_aux(:,1),min_n_aux(:,2),min_n_aux(:,3),'edgecolor','none','facecolor',color_str,'facelighting','flat');
                     set(h_surf,'Tag','surface')
-                    if not(ismember(eval('zef.visualization_type'),[2,4])) || not(ismember(i,aux_active_compartment_ind))
-                        set(h_surf,'facealpha',eval('zef.layer_transparency'));
-                    end
+                    set(h_surf,'facealpha',compartment_alpha);
                     lighting phong;
+                end
                 end
             end
         end

@@ -458,6 +458,43 @@ classdef StripToolDiscTest < matlab.unittest.TestCase
             end
         end
 
+        function unresolvedCentersStayDistinctInTheLeadField(testCase)
+            % A 1 mm lattice does not contain an 0.080 mm disk, so each
+            % active site is a barycentric point in the tetrahedron that
+            % holds its centre. DiSC-64 channels 1 and 5 are 0.230 mm
+            % apart and must not collapse to one measurement.
+            s = tests.unit.StripToolDiscTest.baseStrip(4);
+            s.strip_length = 4;
+            s.strip_n_sectors = 12;
+            s = zef_create_strip(s);
+            s.compartment_tag = {'lead'};
+            [x, y, z] = ndgrid(-2:1:2, -2:1:2, -1:1:3);
+            cloud = [x(:), y(:), z(:)];
+            triangulation = delaunayTriangulation(cloud);
+            zef = struct();
+            zef.compartment_tags = {'lead'};
+            zef.nodes = triangulation.Points;
+            zef.tetra = triangulation.ConnectivityList;
+            zef.surface_triangles = {triangulation.freeBoundary()};
+            [first_faces, first_info] = zef_get_strip_contacts(1, s, zef, 'mesh');
+            [second_faces, second_info] = zef_get_strip_contacts(5, s, zef, 'mesh');
+            testCase.verifyEqual(first_info.electrode_representation, 'point_barycentric');
+            testCase.verifyEqual(second_info.electrode_representation, 'point_barycentric');
+            first_rows = [ones(size(first_faces, 1), 1), first_faces];
+            second_rows = [2 * ones(size(second_faces, 1), 1), second_faces];
+            testCase.verifyGreaterThan(norm(first_rows(:, 2:3) - second_rows(:, 2:3)), 0);
+            source = tests.unit.StripToolDiscTest.sourceNear( ...
+                zef.nodes, zef.tetra, [1.2, 0, 0.04]);
+            tissue = 0.33 * ones(size(zef.tetra, 1), 1);
+            L = tests.unit.StripToolDiscTest.leadfield( ...
+                zef.nodes, zef.tetra, tissue, first_rows, second_rows, source);
+            testCase.verifySize(L, [3, 3]);
+            testCase.verifyTrue(all(isfinite(L), 'all'));
+            testCase.verifyGreaterThan(norm(L(1, :) - L(2, :)), 0);
+            scale = max(1e-12, max(abs(L), [], 'all'));
+            testCase.verifyLessThan(max(abs(sum(L, 1))) / scale, 1e-6);
+        end
+
         function popupNamesTheTwoDesigns(testCase)
             old_vis = get(0, 'DefaultFigureVisible');
             cleaner = onCleanup(@() set(0, 'DefaultFigureVisible', old_vis)); %#ok<NASGU>
