@@ -48,10 +48,6 @@ strip_struct.strip_status = 'Embedded';
 cell_aux{zef.strip_tool.current_strip} = strip_struct;
 zef.([zef.current_sensors '_strip_cell']) = cell_aux;
 
-% A shaft placed on the untransformed anatomy must receive the head
-% affine, or meshing moves the head and leaves the implant behind.
-zef = zef_strip_align_affine(zef);
-
 % Conductivity cylinders use the stored rows. With the option off this
 % restores any previous cylinder and otherwise leaves sigma unchanged.
 [zef, report] = zef_strip_apply_burr_holes(zef, 'reapply');

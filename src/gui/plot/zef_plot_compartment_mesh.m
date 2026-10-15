@@ -22,6 +22,9 @@ inactive = zeros(0, 3);
 if exist('zef_strip_face_sets', 'file') == 2
     [body, active, inactive] = zef_strip_face_sets(zef, compartment_tag, points, triangles);
 end
+if exist('zef_strip_is_encapsulation', 'file') == 2 && zef_strip_is_encapsulation(zef, compartment_tag)
+    alpha = min(alpha, 0.35);
+end
 drew = local_draw(points, body, color, alpha, 'surface') || drew;
 drew = local_draw(points, active, [0 0 0], 1, 'strip contact') || drew;
 drew = local_draw(points, inactive, [0.55 0.55 0.55], 1, 'strip contact inactive') || drew;

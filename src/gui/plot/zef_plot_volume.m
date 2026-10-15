@@ -783,6 +783,10 @@ while loop_movie && loop_count <= eval('zef.loop_movie_count')
                 if not(ismember(eval('zef.visualization_type'),[2,4])) || not(ismember(i,aux_active_compartment_ind))
                     compartment_alpha = eval('zef.layer_transparency');
                 end
+                if exist('zef_strip_is_encapsulation', 'file') == 2 && active_count >= i ...
+                        && zef_strip_is_encapsulation(zef, active_tags{i})
+                    compartment_alpha = min(compartment_alpha, 0.35);
+                end
                 shaft_points = [];
                 shaft_triangles = [];
                 if exist('zef_strip_from_compartment', 'file') == 2 && active_count >= i ...

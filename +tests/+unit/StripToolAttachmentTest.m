@@ -51,29 +51,22 @@ classdef StripToolAttachmentTest < matlab.unittest.TestCase
             testCase.verifyEmpty(active_only);
         end
 
-        function shaftPlacedInTheUntransformedHeadInheritsItsAffine(testCase)
-            zef = struct();
-            zef.compartment_tags = {'shaft', 'scalp'};
-            zef.sensor_tags = {'s2'};
-            zef.current_sensors = 's2';
-            zef.s2_electrode_surface_index = 1;
-            zef.scalp_on = 1;
-            zef.shaft_on = 1;
-            zef.scalp_sources = 0;
-            zef.scalp_points = [0 0 0; 1 0 0; 0 1 0];
-            head_affine = eye(4);
-            head_affine(1:3, 4) = [-0.5; 17.5; -22.5];
-            zef.scalp_affine_transform = {head_affine};
-            zef.shaft_points = [0 0 -10; 0 0 0; 0 0 10];
-            zef.shaft_affine_transform = {eye(4)};
-            zef.s2_strip_cell = {struct('compartment_tag', {{'shaft'}}, 'tip_point', [0; 0; -10])};
-            zef = zef_strip_align_affine(zef);
-            testCase.verifyEqual(zef.shaft_affine_transform{1}, eye(4));
-            testCase.verifyEqual(zef.shaft_points(2, :), [-0.5 17.5 -22.5], 'AbsTol', 1e-12);
-            testCase.verifyEqual(zef.s2_strip_cell{1}.tip_point, [-0.5; 17.5; -32.5], 'AbsTol', 1e-12);
-
-            zef = zef_strip_align_affine(zef);
-            testCase.verifyEqual(zef.shaft_points(2, :), [-0.5 17.5 -22.5], 'AbsTol', 1e-12);
+        function plottedPlacementIsWhatEmbeddingStores(testCase)
+            % The compartment mesh is the forward transform of the tip the
+            % user set. A head translation must not be baked into that tip.
+            root = fileparts(fileparts(fileparts(mfilename('fullpath'))));
+            addpath(fullfile(root, 'plugins', 'StripTool'));
+            strip_struct = tests.unit.StripToolAttachmentTest.baseStrip(4);
+            strip_struct.tip_point = [5; -12; 40];
+            strip_struct.encapsulation_on = 1;
+            strip_struct.encapsulation_shift = [0; 0; 0];
+            strip_struct = zef_create_strip(strip_struct);
+            world = zef_strip_coordinate_transform(strip_struct, 'forward');
+            again = zef_strip_coordinate_transform(strip_struct, 'forward');
+            testCase.verifyLessThan(max(abs(world{1}(:) - again{1}(:))), 1e-9);
+            testCase.verifyEqual(strip_struct.tip_point, [5; -12; 40]);
+            testCase.verifyGreaterThan(min(world{1}(:, 3)), 39);
+            testCase.verifyLessThan(max(world{1}(:, 3)), 40 + strip_struct.strip_length + 1);
         end
 
         function diskModelsKeepSeparateBarycentricSamples(testCase)

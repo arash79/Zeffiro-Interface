@@ -52,9 +52,9 @@ end
 zef_segmentation_counter_step;
 
 % Solid-angle labeling is positive inside a closed surface only when the
-% area vectors point outward. Generators are supposed to emit that winding;
-% this pass corrects components that arrived reversed, without changing the
-% test itself. Open patches are left as they are.
+% area vectors point out of the material. A shell's inner wall must point
+% into the cavity so the hole is not labeled as that compartment. Open
+% patches are left as they are.
 for k = 1:numel(zef.reuna_p)
     if isempty(zef.reuna_p{k}) || isempty(zef.reuna_t{k})
         continue

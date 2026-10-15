@@ -106,10 +106,6 @@ if not(isempty(varargin))
     explode_param = varargin{1};
 end
 
-if exist('zef_strip_align_affine', 'file') == 2
-    zef = zef_strip_align_affine(zef);
-end
-
 i = 0;
 sensors = [];
 reuna_p = cell(0);

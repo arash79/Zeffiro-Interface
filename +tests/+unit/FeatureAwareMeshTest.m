@@ -275,6 +275,41 @@ classdef FeatureAwareMeshTest < matlab.unittest.TestCase
             oriented = zef_orient_surface_outward(points, triangles);
             testCase.verifyEqual(oriented, triangles);
         end
+
+        function shellCavityIsNotInterior(testCase)
+            [outer_points, outer_triangles] = tests.unit.FeatureAwareMeshTest.sphere_surface([0 0 0], 10, 12, 8);
+            [inner_points, inner_triangles] = tests.unit.FeatureAwareMeshTest.sphere_surface([0 0 0], 7, 12, 8);
+            inner_triangles = inner_triangles(:, [1 3 2]);
+            points = [outer_points; inner_points];
+            triangles = [outer_triangles; inner_triangles + size(outer_points, 1)];
+            oriented = zef_orient_surface_outward(points, triangles);
+            cavity = tests.unit.FeatureAwareMeshTest.solid_angle(points, oriented, [0 0 0]);
+            material = tests.unit.FeatureAwareMeshTest.solid_angle(points, oriented, [8.5 0 0]);
+            testCase.verifyLessThan(abs(cavity), 0.25);
+            testCase.verifyGreaterThan(material, 0.25);
+        end
+
+        function shellMeshDoesNotFillItsCavity(testCase)
+            [brain_points, brain_triangles] = tests.unit.FeatureAwareMeshTest.sphere_surface([0 0 0], 5, 12, 8);
+            [outer_points, outer_triangles] = tests.unit.FeatureAwareMeshTest.sphere_surface([0 0 0], 14, 12, 8);
+            [inner_points, inner_triangles] = tests.unit.FeatureAwareMeshTest.sphere_surface([0 0 0], 11, 12, 8);
+            inner_triangles = inner_triangles(:, [1 3 2]);
+            shell_points = [outer_points; inner_points];
+            shell_triangles = [outer_triangles; inner_triangles + size(outer_points, 1)];
+            [scalp_points, scalp_triangles] = tests.unit.FeatureAwareMeshTest.sphere_surface([0 0 0], 17, 12, 8);
+            zef = tests.unit.FeatureAwareMeshTest.session(1.5, false);
+            zef = tests.unit.FeatureAwareMeshTest.add_compartment(zef, 'c_brain', 'Brain', brain_points, brain_triangles);
+            zef = tests.unit.FeatureAwareMeshTest.add_compartment(zef, 'c_shell', 'Shell', shell_points, shell_triangles);
+            zef = tests.unit.FeatureAwareMeshTest.add_compartment(zef, 'c_scalp', 'Scalp', scalp_points, scalp_triangles);
+            zef.compartment_tags = {'c_brain', 'c_shell', 'c_scalp'};
+            zef = zef_process_meshes(zef);
+            zef = zef_create_fem_mesh(zef);
+            tests.unit.FeatureAwareMeshTest.assert_nondegenerate(testCase, zef);
+            testCase.verifyEqual(tests.unit.FeatureAwareMeshTest.nearest_label(zef, [0 0 0]), 1);
+            testCase.verifyEqual(tests.unit.FeatureAwareMeshTest.nearest_label(zef, [8 0 0]), 3);
+            testCase.verifyEqual(tests.unit.FeatureAwareMeshTest.nearest_label(zef, [12.5 0 0]), 2);
+            testCase.verifyEqual(tests.unit.FeatureAwareMeshTest.nearest_label(zef, [15.5 0 0]), 3);
+        end
     end
 
     methods (Static, Access = private)
