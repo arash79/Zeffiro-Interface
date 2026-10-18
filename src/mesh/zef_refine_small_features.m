@@ -11,14 +11,8 @@ function [nodes, tetra, domain_labels, distance_vec, report] = zef_refine_small_
 %   cell is labeled by the outermost compartment among its vertices. This
 %   pass estimates that thickness from inward rays (stopping at an inner
 %   surface, so a shell is not confused with the diameter of its outer
-%   wall). A hit closer than an edge still counts: that is a thin wall,
-%   not the source triangle. Samples are spaced across that wall so the
-%   neighborhood of one sample meets the next; a few hundred probes would
-%   leave the rest of the wall on the coarse lattice. Fine patches
-%   (electrode disks, not a handful of sliver edges) are sampled
-%   separately. When too many tetrahedra qualify, each sample keeps the
-%   tetrahedra nearest to it, up to an equal share of the cap, so one
-%   fine feature cannot crowd out the others.
+%   wall) and, separately, a finer triangle population on the same
+%   surface (electrode disks, not a handful of sliver edges).
 %
 %   Only tetrahedra near those samples are split, via zef_mesh_refinement.
 %   Regions whose surfaces are coarser than the requested spacing stay on
@@ -65,39 +59,11 @@ for pass = 1:max_passes
         report.message = sprintf(['Feature refinement marked %d tetrahedra, ', ...
             'above the %d cap, so the finest requested spacing was not applied everywhere.'], ...
             nnz(mark), max_marked);
-        % One fine feature must not take every slot. Lattice edges are
-        % almost equal, so the longest edge does not identify the wall;
-        % the tetrahedra nearest each sample do. Every sample keeps an
-        % equal share. Copy the per-sample targets: this pass must not
-        % drop samples that later passes still need.
-        [neighbors, neighbor_distance] = local_neighbors( ...
-            nodes, tetra, sample_points, sample_radius);
-        sample_h_cap = sample_h;
-        if numel(neighbors) > max_marked
-            pick = unique(round(linspace(1, numel(neighbors), max_marked)), 'stable');
-            neighbors = neighbors(pick);
-            neighbor_distance = neighbor_distance(pick);
-            sample_h_cap = sample_h(pick);
-        end
-        share = max(1, floor(max_marked / max(1, numel(neighbors))));
-        selected = false(size(tetra, 1), 1);
-        for sample = 1:numel(neighbors)
-            near = neighbors{sample};
-            dist = neighbor_distance{sample};
-            if isempty(near)
-                continue
-            end
-            keep = longest(near) > 1.5 * sample_h_cap(sample);
-            near = near(keep);
-            dist = dist(keep);
-            if isempty(near)
-                continue
-            end
-            [~, order] = sort(dist, 'ascend');
-            take = min(share, numel(order));
-            selected(near(order(1:take))) = true;
-        end
-        mark = selected;
+        ratio = longest ./ local_requirement(nodes, tetra, sample_points, sample_h, sample_radius);
+        ratio(~mark) = -inf;
+        [~, order] = sort(ratio, 'descend');
+        mark(:) = false;
+        mark(order(1:max_marked)) = true;
     end
     refine_index = find(mark);
     [nodes, tetra, domain_labels, distance_vec] = zef_mesh_refinement( ...
@@ -162,7 +128,7 @@ function [origins, target] = local_thickness_samples(points, triangles, inner, m
 origins = zeros(0, 3);
 target = zeros(0, 1);
 probe = local_probe_index(size(triangles, 1), 24);
-[hit, origins_probe] = local_probe_thickness(points, triangles, inner, probe, mesh_res);
+[hit, origins_probe] = local_probe_thickness(points, triangles, inner, probe);
 if numel(hit) < 8
     return
 end
@@ -171,13 +137,10 @@ typical = ordered(max(1, round(0.2 * numel(ordered))));
 thin = hit < 1.8 * mesh_res;
 if typical < 1.8 * mesh_res || nnz(thin) >= 0.25 * numel(hit)
     area = local_area(points, triangles);
-    % Each kept sample later claims tetrahedra within about one cell.
-    % A square grid of spacing s is covered by balls of radius s/sqrt(2),
-    % so spacing 0.7 cells leaves a margin when triangles are uneven.
-    spacing = 0.7 * mesh_res;
-    n_probe = min(size(triangles, 1), max(numel(probe), ceil(area / spacing ^ 2)));
+    spacing = max(min(hit), mesh_res);
+    n_probe = min(400, max(numel(probe), ceil(area / spacing ^ 2)));
     probe = local_probe_index(size(triangles, 1), n_probe);
-    [hit, origins_probe] = local_probe_thickness(points, triangles, inner, probe, mesh_res);
+    [hit, origins_probe] = local_probe_thickness(points, triangles, inner, probe);
 end
 keep = isfinite(hit) & hit < 1.8 * mesh_res & hit > 0;
 if ~any(keep)
@@ -188,20 +151,22 @@ target = max(hit(keep) / 2, floor_h);
 
 end
 
-function [hit, origins] = local_probe_thickness(points, triangles, inner, probe, mesh_res)
+function [hit, origins] = local_probe_thickness(points, triangles, inner, probe)
 
-% Only a wall closer than about two cells can disappear. Far hits are
-% discarded by the caller, so each ray tests triangles near its origin
-% instead of the whole surface.
-max_distance = 1.8 * mesh_res;
 n_probe = numel(probe);
 hit = inf(n_probe, 1);
 origins = zeros(n_probe, 3);
-directions = zeros(n_probe, 3);
-source = zeros(n_probe, 3);
+edge_lengths = local_edge_lengths(points, triangles);
+edge_lengths = sort(edge_lengths(edge_lengths > 0));
+if isempty(edge_lengths)
+    minimum_t = 1e-3;
+else
+    % Skip hits on the source triangle and its immediate neighbors. A real
+    % opposite wall sits farther than about half a typical edge.
+    minimum_t = max(1e-3, 0.5 * edge_lengths(max(1, round(0.5 * numel(edge_lengths)))));
+end
 for sample = 1:n_probe
     triangle = triangles(probe(sample), :);
-    source(sample, :) = triangle;
     v1 = points(triangle(1), :);
     edge_1 = points(triangle(2), :) - v1;
     edge_2 = points(triangle(3), :) - v1;
@@ -210,90 +175,22 @@ for sample = 1:n_probe
     if length_normal <= 1e-12
         continue
     end
-    directions(sample, :) = -normal / length_normal;
-    origins(sample, :) = (v1 + points(triangle(2), :) + points(triangle(3), :)) / 3;
-end
-margin = local_search_margin(points, triangles);
-hit = local_near_distance(origins, directions, points, triangles, ...
-    max_distance, margin, source);
-for previous = 1:numel(inner)
-    if isempty(inner{previous}.triangles)
-        continue
+    inward = -normal / length_normal;
+    origin = (v1 + points(triangle(2), :) + points(triangle(3), :)) / 3;
+    origins(sample, :) = origin;
+    distance = local_ray(origin, inward, points, triangles, minimum_t);
+    for previous = 1:numel(inner)
+        if isempty(inner{previous}.triangles)
+            continue
+        end
+        distance = min(distance, local_ray(origin, inward, ...
+            inner{previous}.points, inner{previous}.triangles, minimum_t));
     end
-    other = local_near_distance(origins, directions, inner{previous}.points, ...
-        inner{previous}.triangles, max_distance, ...
-        local_search_margin(inner{previous}.points, inner{previous}.triangles), []);
-    hit = min(hit, other);
+    hit(sample) = distance;
 end
 finite_hit = isfinite(hit);
 hit = hit(finite_hit);
 origins = origins(finite_hit, :);
-
-end
-
-function margin = local_search_margin(points, triangles)
-
-edges = vecnorm(points(triangles(:, 2), :) - points(triangles(:, 1), :), 2, 2);
-edges = sort(edges(edges > 0));
-if isempty(edges)
-    margin = 1;
-    return
-end
-margin = edges(max(1, round(0.9 * numel(edges))));
-
-end
-
-function distance = local_near_distance(origins, directions, points, triangles, max_distance, margin, source)
-
-n_probe = size(origins, 1);
-distance = inf(n_probe, 1);
-active = vecnorm(directions, 2, 2) > 0;
-if ~any(active) || isempty(triangles)
-    return
-end
-centroids = (points(triangles(:, 1), :) + points(triangles(:, 2), :) + points(triangles(:, 3), :)) / 3;
-nearby = rangesearch(centroids, origins(active, :), max_distance + margin);
-active_index = find(active);
-n_active = numel(active_index);
-candidate_count = zeros(n_active, 1);
-candidates = cell(n_active, 1);
-for sample = 1:n_active
-    candidate = nearby{sample};
-    if isempty(candidate)
-        continue
-    end
-    candidate = candidate(:);
-    if ~isempty(source)
-        verts = source(active_index(sample), :);
-        share = any(triangles(candidate, :) == verts(1) | ...
-            triangles(candidate, :) == verts(2) | triangles(candidate, :) == verts(3), 2);
-        candidate = candidate(~share);
-    end
-    candidates{sample} = candidate;
-    candidate_count(sample) = numel(candidate);
-end
-total = sum(candidate_count);
-if total == 0
-    return
-end
-probe_id = zeros(total, 1);
-triangle_id = zeros(total, 1);
-offset = 0;
-for sample = 1:n_active
-    n_candidate = candidate_count(sample);
-    if n_candidate == 0
-        continue
-    end
-    rows = offset + (1:n_candidate);
-    probe_id(rows) = active_index(sample);
-    triangle_id(rows) = candidates{sample};
-    offset = offset + n_candidate;
-end
-found = local_rays(origins(probe_id, :), directions(probe_id, :), points, triangles(triangle_id, :));
-accepted = found <= max_distance;
-if any(accepted)
-    distance = accumarray(probe_id(accepted), found(accepted), [n_probe, 1], @min, inf);
-end
 
 end
 
@@ -364,30 +261,37 @@ end
 
 end
 
-function distance = local_rays(origin, direction, points, triangles)
+function distance = local_ray(origin, direction, points, triangles, minimum_t)
 
-% One ray per row. Rows that miss, or that hit the source triangle, are inf.
-distance = inf(size(triangles, 1), 1);
+distance = inf;
 if isempty(triangles)
     return
 end
-v0 = points(triangles(:, 1), :);
-v1 = points(triangles(:, 2), :);
-v2 = points(triangles(:, 3), :);
-edge_1 = v1 - v0;
-edge_2 = v2 - v0;
-pvec = cross(direction, edge_2, 2);
-determinant = sum(edge_1 .* pvec, 2);
-valid = abs(determinant) > 1e-12;
-inverse = zeros(size(determinant));
-inverse(valid) = 1 ./ determinant(valid);
-tvec = origin - v0;
-u = sum(tvec .* pvec, 2) .* inverse;
-qvec = cross(tvec, edge_1, 2);
-v = sum(direction .* qvec, 2) .* inverse;
-t = sum(edge_2 .* qvec, 2) .* inverse;
-hit = valid & u >= 0 & v >= 0 & (u + v) <= 1 & t > 1e-4;
-distance(hit) = t(hit);
+chunk = 8000;
+n_triangles = size(triangles, 1);
+for start = 1:chunk:n_triangles
+    selection = start:min(start + chunk - 1, n_triangles);
+    tri = triangles(selection, :);
+    v0 = points(tri(:, 1), :);
+    v1 = points(tri(:, 2), :);
+    v2 = points(tri(:, 3), :);
+    edge_1 = v1 - v0;
+    edge_2 = v2 - v0;
+    pvec = cross(repmat(direction, numel(selection), 1), edge_2, 2);
+    determinant = sum(edge_1 .* pvec, 2);
+    valid = abs(determinant) > 1e-12;
+    inverse = zeros(size(determinant));
+    inverse(valid) = 1 ./ determinant(valid);
+    tvec = origin - v0;
+    u = sum(tvec .* pvec, 2) .* inverse;
+    qvec = cross(tvec, edge_1, 2);
+    v = sum(repmat(direction, numel(selection), 1) .* qvec, 2) .* inverse;
+    t = sum(edge_2 .* qvec, 2) .* inverse;
+    hit = valid & u >= 0 & v >= 0 & (u + v) <= 1 & t > minimum_t;
+    if any(hit)
+        distance = min(distance, min(t(hit)));
+    end
+end
 
 end
 
@@ -420,10 +324,20 @@ end
 
 end
 
-function [neighbors, distances] = local_neighbors(nodes, tetra, sample_points, sample_radius)
+function requirement = local_requirement(nodes, tetra, sample_points, sample_h, sample_radius)
+
+requirement = inf(size(tetra, 1), 1);
+neighbors = local_neighbors(nodes, tetra, sample_points, sample_radius);
+for sample = 1:numel(neighbors)
+    near = neighbors{sample};
+    requirement(near) = min(requirement(near), sample_h(sample));
+end
+
+end
+
+function neighbors = local_neighbors(nodes, tetra, sample_points, sample_radius)
 
 neighbors = {};
-distances = {};
 if isempty(sample_points)
     return
 end
@@ -432,9 +346,7 @@ centroids = (nodes(tetra(:, 1), :) + nodes(tetra(:, 2), :) + ...
     nodes(tetra(:, 3), :) + nodes(tetra(:, 4), :)) / 4;
 [neighbors, distances] = rangesearch(centroids, sample_points, max(sample_radius));
 for sample = 1:numel(neighbors)
-    keep = distances{sample} <= sample_radius(sample);
-    neighbors{sample} = neighbors{sample}(keep);
-    distances{sample} = distances{sample}(keep);
+    neighbors{sample} = neighbors{sample}(distances{sample} <= sample_radius(sample));
 end
 
 end
