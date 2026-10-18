@@ -64,6 +64,8 @@ classdef FeatureAwareMeshTest < matlab.unittest.TestCase
             exporter = fileread(which('utilities.sn2zef.export_segmentation_meshes'));
             testCase.verifyTrue(contains(exporter, 'zef_orient_surface_outward'));
             testCase.verifyFalse(contains(exporter, 'tris(:, [1 3 2])'));
+            testCase.verifyTrue(contains(exporter, 'zeros(size(atlas_struct.Labels, 1), 1)'));
+            testCase.verifyFalse(contains(exporter, 'ones(size(atlas_struct.Labels, 1), 1)'));
         end
 
         function freesurferAsciiBundledSurfacesAreAlreadyOutward(testCase)
@@ -309,6 +311,48 @@ classdef FeatureAwareMeshTest < matlab.unittest.TestCase
             testCase.verifyEqual(tests.unit.FeatureAwareMeshTest.nearest_label(zef, [8 0 0]), 3);
             testCase.verifyEqual(tests.unit.FeatureAwareMeshTest.nearest_label(zef, [12.5 0 0]), 2);
             testCase.verifyEqual(tests.unit.FeatureAwareMeshTest.nearest_label(zef, [15.5 0 0]), 3);
+        end
+
+        function undilatedAtlasShellKeepsItsWall(testCase)
+            % Same extractor sn2zef calls. Exclusive voxel labels with no
+            % dilation share the interface, so the inner tissue does not
+            % occupy the bone wall.
+            n = 24;
+            center = (n + 1) / 2;
+            [x, y, z] = ndgrid(1:n, 1:n, 1:n);
+            radius = sqrt((x - center) .^ 2 + (y - center) .^ 2 + (z - center) .^ 2);
+            cube = zeros(n, n, n);
+            cube(radius < 8) = 1;
+            cube(radius >= 8 & radius < 11) = 2;
+            cube(radius >= 11 & radius < 13) = 3;
+            atlas.Cube = cube;
+            atlas.Labels = {1, 'brain', [200 80 80]; 2, 'bone', [180 180 180]; 3, 'scalp', [200 160 140]};
+            atlas.Comment = 'nest';
+            atlas.SkipZefWaitbar = true;
+            extractor = struct('inflate_strength', 0.8, 'inflate_n_iterations', 0, ...
+                'use_gpu', 0, 'gpu_count', 0, 'use_gpu_graphic', 0);
+            surfaces = utilities.brainstorm2zef.zef_bst_get_atlas_surfaces( ...
+                extractor, atlas, 0, cell(0), '', zeros(3, 1));
+            testCase.verifyGreaterThanOrEqual(numel(surfaces), 3);
+            origin = mean(surfaces(1).Points, 1);
+            brain_radius = median(sqrt(sum((surfaces(1).Points - origin) .^ 2, 2)));
+            zef = tests.unit.FeatureAwareMeshTest.session(1.5, false);
+            names = {'brain', 'bone', 'scalp'};
+            tags = {'c_brain', 'c_bone', 'c_scalp'};
+            for index = 1:3
+                zef = tests.unit.FeatureAwareMeshTest.add_compartment( ...
+                    zef, tags{index}, names{index}, surfaces(index).Points, surfaces(index).Triangles);
+            end
+            zef.compartment_tags = tags;
+            zef = zef_process_meshes(zef);
+            zef = zef_create_fem_mesh(zef);
+            tests.unit.FeatureAwareMeshTest.assert_nondegenerate(testCase, zef);
+            testCase.verifyEqual(tests.unit.FeatureAwareMeshTest.nearest_label(zef, origin), 1);
+            testCase.verifyEqual(tests.unit.FeatureAwareMeshTest.nearest_label( ...
+                zef, origin + [brain_radius + 1.5, 0, 0]), 2);
+            testCase.verifyEqual(tests.unit.FeatureAwareMeshTest.nearest_label( ...
+                zef, origin + [brain_radius + 4, 0, 0]), 3);
+            testCase.verifyGreaterThan(nnz(zef.domain_labels == 2), 0);
         end
     end
 

@@ -231,10 +231,13 @@ function [affine_matrix, vertex_transform] = export_segmentation_meshes(zef, inF
             'Try 0-20 for a first test, then raise if needed.'], inflation_parameter);
     end
 
-    % Extract surfaces (Brainstorm tetrahedral + marching-cubes style)
+    % Extract one closed surface per label. Do not dilate: a one-ring
+    % expansion pushes each tissue into its neighbor, and innermost-wins
+    % labeling then assigns the neighbor's wall to the inner tissue.
+    % Upstream atlas extraction leaves volume_extension at zero.
     b = utilities.brainstorm2zef.zef_bst_get_atlas_surfaces(...
         zef, atlas_struct, inflation_parameter, ...
-        cell(0), '', ones(size(atlas_struct.Labels, 1), 1));
+        cell(0), '', zeros(size(atlas_struct.Labels, 1), 1));
 
     fprintf(1, 'sn2zef: surface extraction finished (%d meshes).\n', numel(b));
 
