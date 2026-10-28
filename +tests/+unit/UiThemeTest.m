@@ -2005,6 +2005,9 @@ classdef UiThemeTest < matlab.unittest.TestCase
                 fcn(f, struct());
             end
             drawnow;
+            % Guide windows defer the layout pass to a one-shot timer
+            % (see zef_ui_bind_min_size): wait for it before measuring.
+            local_wait_deferred_layout(f);
             edits(1).Units = 'pixels';
             btns(1).Units = 'pixels';
             testCase.verifyGreaterThan(edits(1).Position(3), w0);
@@ -2338,4 +2341,20 @@ if size(mid, 1) == 3
 end
 contrast = max(max(abs(mid - fillc), [], 2));
 
+end
+
+function local_wait_deferred_layout(f)
+%LOCAL_WAIT_DEFERRED_LAYOUT  Pause until the one-shot resize timer ran.
+
+deadline = tic;
+while true
+    if ~isappdata(f, 'ZefResizeBusy') ...
+            || ~isequal(getappdata(f, 'ZefResizeBusy'), true)
+        return
+    end
+    if toc(deadline) > 3
+        return
+    end
+    pause(0.05);
+end
 end
