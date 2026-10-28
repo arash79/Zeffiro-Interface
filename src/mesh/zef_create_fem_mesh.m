@@ -13,15 +13,17 @@ function zef = zef_create_fem_mesh(zef)
 %   surfaces, then process_meshes, then this function, then postprocess.
 %
 %   Pipeline
-%     1. zef_segmentation_counter_step (script) injects mesh_res, reuna_type,
-%        pml_ind_aux, submesh_cell, aux_active_compartment_ind, name_tags.
-%        A compartment with <tag>_sources == -1 is treated as PML.
+%     1. zef_segmentation_counter_step returns mesh resolution, surface
+%        types, the PML index, submesh ranges, source-compartment indices,
+%        and name tags. Those are copied into this workspace because
+%        zef_refinement_step still reads them as caller variables.
 %     2. Axis-aligned bounding box of all non-PML surfaces. Regular grid
 %        with spacing mesh_res, or zef_pml_mesh if a PML compartment exists.
 %     3. Split each cube into 5 tets (initial_mesh_mode 1, parity-dependent
 %        stencils so faces match) or 6 tets (mode 2, one stencil).
 %     4. zef_mesh_labeling_step assigns tissue IDs by solid-angle tests
-%        against the surfaces and drops exterior tetrahedra.
+%        against the surfaces and drops exterior tetrahedra. The mesh
+%        arrays go in and come back as arguments.
 %     5. Optional surface, volume, and adaptive refinement, each followed
 %        by relabeling when zef.mesh_relabeling is true.
 %
@@ -47,9 +49,16 @@ if nargin == 0
     zef = evalin('base','zef');
 end
 
-% Script: writes mesh_res, reuna_type, pml_ind_aux, submesh_cell, name_tags,
-% aux_active_compartment_ind into this workspace (not as zef fields).
-zef_segmentation_counter_step;
+% Resolution, surface types, and compartment index. Refinement still
+% reads submesh_ind_1 from this workspace.
+ctx = zef_segmentation_counter_step(zef);
+mesh_res = ctx.mesh_res;
+reuna_type = ctx.reuna_type;
+pml_ind_aux = ctx.pml_ind_aux;
+submesh_cell = ctx.submesh_cell;
+aux_active_compartment_ind = ctx.aux_active_compartment_ind;
+name_tags = ctx.name_tags;
+submesh_ind_1 = ctx.submesh_ind_1;
 
 % Solid-angle labeling is positive inside a closed surface only when the
 % area vectors point out of the material. A shell's inner wall must point
@@ -144,8 +153,11 @@ refinement_volume_compartments = zef.refinement_volume_compartments;
 refinement_flag = 1;
 
 % labeling_flag 1 = initial solid-angle labeling (drops exterior tets).
+% Flag 1 overwrites both arrays; they must exist so the call is valid.
+domain_labels = [];
+distance_vec = [];
 labeling_flag = 1;
-zef_mesh_labeling_step;
+[tetra, nodes, domain_labels, distance_vec, label_ind] = zef_mesh_labeling_step(zef, tetra, nodes, label_ind, labeling_flag, domain_labels, distance_vec, h);
 
 refinement_compartments_aux = refinement_surface_compartments;
 
@@ -173,7 +185,7 @@ if eval('zef.refinement_on')
                     pml_ind = [];
                     label_ind = uint32(tetra);
                     labeling_flag = 2;
-                    zef_mesh_labeling_step;
+                    [tetra, nodes, domain_labels, distance_vec, label_ind] = zef_mesh_labeling_step(zef, tetra, nodes, label_ind, labeling_flag, domain_labels, distance_vec, h);
 
                 end
             end
@@ -189,7 +201,7 @@ if eval('zef.refinement_on')
                         pml_ind = [];
                         label_ind = uint32(tetra);
                         labeling_flag = 2;
-                        zef_mesh_labeling_step;
+                        [tetra, nodes, domain_labels, distance_vec, label_ind] = zef_mesh_labeling_step(zef, tetra, nodes, label_ind, labeling_flag, domain_labels, distance_vec, h);
 
                     end
                 end
@@ -202,7 +214,7 @@ else
     pml_ind = [];
     label_ind = uint32(tetra);
     labeling_flag = 2;
-    zef_mesh_labeling_step;
+    [tetra, nodes, domain_labels, distance_vec, label_ind] = zef_mesh_labeling_step(zef, tetra, nodes, label_ind, labeling_flag, domain_labels, distance_vec, h);
 
     end
 
@@ -238,7 +250,7 @@ if eval('zef.refinement_on')
                     pml_ind = [];
                     label_ind = uint32(tetra);
                     labeling_flag = 2;
-                    zef_mesh_labeling_step;
+                    [tetra, nodes, domain_labels, distance_vec, label_ind] = zef_mesh_labeling_step(zef, tetra, nodes, label_ind, labeling_flag, domain_labels, distance_vec, h);
 
 
                 end
@@ -258,7 +270,7 @@ if eval('zef.refinement_on')
                         pml_ind = [];
                         label_ind = uint32(tetra);
                         labeling_flag = 2;
-                        zef_mesh_labeling_step;
+                        [tetra, nodes, domain_labels, distance_vec, label_ind] = zef_mesh_labeling_step(zef, tetra, nodes, label_ind, labeling_flag, domain_labels, distance_vec, h);
 
                     end
 
@@ -305,7 +317,7 @@ end
                     pml_ind = [];
                     label_ind = uint32(tetra);
                     labeling_flag = 2;
-                    zef_mesh_labeling_step;
+                    [tetra, nodes, domain_labels, distance_vec, label_ind] = zef_mesh_labeling_step(zef, tetra, nodes, label_ind, labeling_flag, domain_labels, distance_vec, h);
 
                 end
             end
@@ -328,7 +340,7 @@ end
                         pml_ind = [];
                         label_ind = uint32(tetra);
                         labeling_flag = 2;
-                        zef_mesh_labeling_step;
+                        [tetra, nodes, domain_labels, distance_vec, label_ind] = zef_mesh_labeling_step(zef, tetra, nodes, label_ind, labeling_flag, domain_labels, distance_vec, h);
 
                     end
 
@@ -358,7 +370,7 @@ if feature_on && ~isempty(tetra)
     if feature_report.refined
         label_ind = uint32(tetra);
         labeling_flag = 1;
-        zef_mesh_labeling_step;
+        [tetra, nodes, domain_labels, distance_vec, label_ind] = zef_mesh_labeling_step(zef, tetra, nodes, label_ind, labeling_flag, domain_labels, distance_vec, h);
     end
     if feature_report.unresolved && ~isempty(feature_report.message)
         warning('zef:FeatureRefinement', '%s', feature_report.message);
@@ -370,7 +382,7 @@ if isequal(zef.priority_mode,3)
     pml_ind = [];
     label_ind = uint32(tetra);
     labeling_flag = 3;
-    zef_mesh_labeling_step;
+    [tetra, nodes, domain_labels, distance_vec, label_ind] = zef_mesh_labeling_step(zef, tetra, nodes, label_ind, labeling_flag, domain_labels, distance_vec, h);
     end
 end
 

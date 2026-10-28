@@ -5,9 +5,10 @@
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Script, not a function. Mutates caller-workspace nodes (and may
-%   relabel via zef_mesh_labeling_step). Requires zef, tetra, domain
-%   labels, priority_vec, pml_vec, h. Called from
+%   Script, not a function. Mutates caller-workspace nodes. When
+%   mesh_relabeling is on, calls zef_mesh_labeling_step and writes the
+%   returned mesh arrays back into this workspace. Requires zef, tetra,
+%   domain labels, distance_vec, priority_vec, pml_vec, h. Called from
 %   zef_postprocess_fem_mesh when zef.mesh_smoothing_on.
 %
 %   Mesh tool **Mesh smoothing** stores zef.mesh_smoothing_on.
@@ -54,20 +55,10 @@ if zef.mesh_smoothing_on
     for smoothing_repetition_ind  = 1 : 2*zef.mesh_smoothing_repetitions
 
         if zef.mesh_relabeling && smoothing_repetition_ind > 2
-
-            if smoothing_repetition_ind == 1
-                zef_segmentation_counter_step;
-            elseif smoothing_repetition_ind > 1
-
-                if zef.mesh_relabeling
-                    pml_ind = [];
-                    labeling_flag = 2;
-                    label_ind = uint32(tetra);
-                    zef_mesh_labeling_step;
-                end
-
-            end
-
+            pml_ind = [];
+            labeling_flag = 2;
+            label_ind = uint32(tetra);
+            [tetra, nodes, domain_labels, distance_vec, label_ind] = zef_mesh_labeling_step(zef, tetra, nodes, label_ind, labeling_flag, domain_labels, distance_vec, h);
         end
 
         N = size(nodes, 1);

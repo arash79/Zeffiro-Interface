@@ -63,6 +63,7 @@ zef_nmm = tests.support.createSyntheticUKFNMMZef("n_frames", 20);
 - Interpolation index **must stay a column**. A row vector breaks post-process expansion and has caused false test failures.
 - Fixtures do not set `source_model` / `lead_field_type`; class invert does not need them once `L` exists.
 - `createSyntheticMeshZef` sets `surface_sources=0`, `n_sources=10000`, and `dof_decomposition_type=2` (same as `zef_init`) so cube FEM assembly can run without a base-workspace session.
+- `mesh_labeling_reference.mat` is the captured output of that cube through `zef_create_fem_mesh` and labeling flags 2 and 3. `tests.unit.MeshLabelingStepTest` compares against it. Do not regenerate it from the function under test.
 
 ## Developer guidance
 

@@ -12,8 +12,9 @@ Tissue compartments (scalp, skull, CSF, brain, …): each is a closed surface pl
 | `zef_turn_compartment_onoff.m` | function | Batch `_on` |
 | `zef_get_active_compartments.m` | function | Indices of On tags and source tissues (`*_sources` in `{1,2}`); optional property vectors (e.g. `'name'`) |
 | `zef_compartment_to_subcompartment.m` | function | Index map to submesh ranges |
-| `zef_tetra_in_compartment.m` | function | Inside test for labeling |
-| `zef_point_in_compartment.m` | function | Inside test + distance |
+| `zef_tetra_in_compartment.m` | function | Inside test. Session struct, or base `zef` |
+| `zef_point_in_compartment.m` | function | Inside test plus distance. Session argument |
+| `zef_meshing_runtime.m` | function | Session fields those tests read |
 
 ## Code functionality
 
@@ -21,7 +22,7 @@ Each tag (e.g. `sc1`) owns dynamic fields: `_on`, `_sigma`, `_color`, `_points`,
 
 Table columns (from `zef_init_fields_compartment_table`): **Index**, **On**, **Name**, **Visible**, **Surface nodes**, **Surface triangles**, **Merge**, **Invert normal**, **Activity**, plus parameter-profile Segmentation columns. **Index** is labeling priority (lower first). Rows are reverse of `zef.compartment_tags`.
 
-Inside tests: `zef_tetra_in_compartment` in the meshing loop; `zef_point_in_compartment` adds a distance vector. Cost scales with mesh resolution × tissue count. `zef_compartment_to_subcompartment` maps compartment index to active submesh face ranges for source placement.
+Inside tests read session fields through `zef_meshing_runtime` (accuracy, threshold, GPU, parallel block size). `zef_point_in_compartment` takes the session as an argument. `zef_tetra_in_compartment` takes the same struct when the caller has it, and otherwise reads `zef` from the base workspace. A passed `meshing_threshold` is the cutoff that is applied. The waitbar handle is an argument; these functions do not read a caller variable named `h`.
 
 `zef_get_active_compartments(zef)` walks `compartment_tags` and returns indices of compartments with `_on` true, plus the subset whose `_sources` is **1 or 2** (Constrained field / Unconstrained field). It excludes `_sources == 0` (Inactive), `_sources == 3` (Active surface), and `_sources == -1` (Bounding box / PML). Optional second argument is a property name (`'name'`, `'sigma'`, …) returned for those two groups. Callers: `zef_find_relative_resolution` (mesh downsampling multipliers) and `zef_open_forward_and_inverse_options` (compartment dropdown labels).
 

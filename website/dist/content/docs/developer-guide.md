@@ -48,7 +48,7 @@ Where to put new work, and the usual recipes for a solver, plugin, converter, or
 
 **Safe to call from scripts and plugins:** `zeffiro_interface`, `zef_update`, `zef_close_all`, `zef_create_finite_element_mesh`, `zef_lead_field_matrix`, `zef_inverse_run`, `zef_load` / `zef_save`, `core.types.ZefSourceModel`, `core.io.electrodes.*`, `utilities.*.run` converters, `utilities.cluster.dispatch_inverse` (usually via `zef_inverse_run`).
 
-**Internal:** `zef_ui_*` layout helpers, mesh scripts that mutate caller workspace (`zef_refinement_step`, `zef_smoothing_step`), inverter `invert` internals, generated `zef_start_config.m`.
+**Internal:** `zef_ui_*` layout helpers, mesh scripts that still mutate the caller workspace (`zef_refinement_step`, `zef_smoothing_step`), inverter `invert` internals, generated `zef_start_config.m`. `zef_mesh_labeling_step` and `zef_segmentation_counter_step` are functions; use their return values.
 
 MATLAB does not hide `src/` internals (everything is on `genpath`). Ownership is by folder + this guide, not `private/` for the whole tree.
 

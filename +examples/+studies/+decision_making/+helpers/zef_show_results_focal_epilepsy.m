@@ -16,8 +16,8 @@
 if size(zef.resection_points, 1) > 1
     A=alphaShape(zef.resection_points(:,1), zef.resection_points(:,2), zef.resection_points(:,3),3.4);
     [AF, AP]=alphaTriangulation(A);
-    dist_resection = examples.studies.decision_making.helpers.zef_distance_to_resection(z_ref_points,AP,AF);
-    dist_final_resection_max = examples.studies.decision_making.helpers.zef_distance_to_resection(z_final_max_point,AP,AF);
+    dist_resection = examples.studies.decision_making.helpers.zef_distance_to_resection(z_ref_points,AP,AF,zef);
+    dist_final_resection_max = examples.studies.decision_making.helpers.zef_distance_to_resection(z_final_max_point,AP,AF,zef);
 else
     dist_resection = examples.studies.decision_making.helpers.zef_distance_to_resection(z_ref_points,zef.resection_points);
     dist_final_resection_max = examples.studies.decision_making.helpers.zef_distance_to_resection(z_final_max_point,zef.resection_points);

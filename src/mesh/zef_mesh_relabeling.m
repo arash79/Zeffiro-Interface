@@ -11,7 +11,7 @@ function   [domain_labels, distance_vec, label_vec] = zef_mesh_relabeling(zef, t
 %   zef_point_in_compartment whether their nodes sit inside that surface.
 %   Tets that should move in or out get a new domain_labels value.
 %   distance_vec is updated at nodes that test inside. Called only from
-%   the script zef_mesh_labeling_step (flags 2 and 3).
+%   zef_mesh_labeling_step (flags 2 and 3).
 %
 %   [domain_labels, distance_vec, label_vec] = zef_mesh_relabeling( ...
 %       zef, tetra, nodes, domain_labels, distance_vec, use_labeling_priority, h)
@@ -103,7 +103,7 @@ if zef.extensive_relabeling
                     I_3 = tetra(I_1(I_2),:);
                     [I_4,~,I_5] = unique(I_3);
                     I_6 = find(test_ind(I_4) < 0);
-                    [I_7,distance_vec_aux] = zef_point_in_compartment(zef,zef.reuna_p{i_labeling},reuna_t_aux,nodes(I_4(I_6),:),[compartment_counter n_compartments]);
+                    [I_7,distance_vec_aux] = zef_point_in_compartment(zef,zef.reuna_p{i_labeling},reuna_t_aux,nodes(I_4(I_6),:),[compartment_counter n_compartments],[],h);
                     test_ind(I_4(I_6)) = 0;
                     test_ind(I_4(I_6(I_7))) = 1;
                     distance_vec(I_4(I_6(I_7))) = distance_vec_aux;
@@ -133,7 +133,7 @@ end
                     I_3 = tetra(I_1(I_2),:);
                     [I_4,~,I_5] = unique(I_3);
                     I_6 = find(test_ind(I_4) < 0);
-                    [I_7,distance_vec_aux] = zef_point_in_compartment(zef,zef.reuna_p{i_labeling},reuna_t_aux,nodes(I_4(I_6),:),[compartment_counter n_compartments]);
+                    [I_7,distance_vec_aux] = zef_point_in_compartment(zef,zef.reuna_p{i_labeling},reuna_t_aux,nodes(I_4(I_6),:),[compartment_counter n_compartments],[],h);
                     test_ind(I_4(I_6)) = 0;
                     test_ind(I_4(I_6(I_7))) = 1;
                     distance_vec(I_4(I_6(I_7))) = distance_vec_aux;

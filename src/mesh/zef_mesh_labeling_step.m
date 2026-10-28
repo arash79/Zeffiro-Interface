@@ -1,38 +1,38 @@
-%ZEF_MESH_LABELING_STEP  Script: assign or refresh tet tissue IDs during meshing.
+function [tetra, nodes, domain_labels, distance_vec, label_ind] = zef_mesh_labeling_step(zef, tetra, nodes, label_ind, labeling_flag, domain_labels, distance_vec, h)
+%ZEF_MESH_LABELING_STEP  Assign or refresh tetrahedron tissue IDs.
 %
 %   Zeffiro Interface.
 %   Copyright © 2018- Sampsa Pursiainen & ZI Development Team
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Not a function. zef_create_fem_mesh (and zef_smoothing_step when
-%   mesh_relabeling is on) call it by name so it reads/writes the caller
-%   workspace. Do not run it from the command line unless those variables
-%   already exist.
+%   Mesh arrays are arguments and return values. The function does not
+%   read or write the caller workspace, and it does not assign zef.nodes.
 %
-%   Caller must provide
-%     zef, nodes, tetra, h (waitbar)
-%     labeling_flag  - 1 initial, 2 post-refinement, 3 priority_mode==3 final
-%     label_ind      - for flag 1: T×8 cube-corner indices (or T×4 tet
-%                      vertices, depending on mesh_labeling_approach).
-%                      For flags 2/3 create_fem_mesh sets this to tetra.
-%     domain_labels, distance_vec  - required for flags 2 and 3; flag 1
-%                      overwrites both.
+%   [tetra, nodes, domain_labels, distance_vec, label_ind] = ...
+%       zef_mesh_labeling_step(zef, tetra, nodes, label_ind, labeling_flag, ...
+%           domain_labels, distance_vec, h)
+%
+%   Inputs
+%     zef            - session (surfaces, priority_mode, smoothing flags).
+%     tetra          - T×4 vertex indices.
+%     nodes          - V×3 coordinates.
+%     label_ind      - flag 1: T×8 cube-corner indices, or T×4 tet vertices
+%                      when mesh_labeling_approach asks for that. Flags 2
+%                      and 3: callers pass uint32(tetra).
+%     labeling_flag  - 1 initial, 2 after refinement or smoothing, 3 final
+%                      pass when priority_mode == 3.
+%     domain_labels  - T×1 subdomain ids. Flag 1 overwrites this; pass [].
+%     distance_vec   - V×1 nodal distances. Flag 1 overwrites this; pass [].
+%     h              - waitbar handle passed through to the labeling helpers.
 %
 %   labeling_flag
-%     1  Initial solid-angle labeling (zef_solid_angle_labeling). Drops
-%        tets whose vertices are not all inside some compartment
-%        (sum(sign(node_labels)) < n_vertices). Compacts unused nodes.
-%        zef.priority_mode 1: no priority in zef_choose_domain_labels;
-%        2 or 3: use labeling priority. Optional zef_distance_smoothing
-%        of nodes when zef.distance_smoothing_on.
-%     2  Relabel after refinement/smoothing. Calls zef_mesh_relabeling.
-%        priority_mode ≤ 2: no priority; == 3: use priority.
-%     3  Same relabel path as 2 but always without priority. create_fem_mesh
-%        uses this at the end when priority_mode == 3.
-%
-%   Writes back: tetra, nodes, domain_labels, distance_vec, label_ind
-%   (flag 1 only). Does not assign zef.nodes itself.
+%     1  Solid-angle labeling (zef_solid_angle_labeling). Drops tetrahedra
+%        whose vertices are not all inside some compartment. Compacts
+%        unused nodes. priority_mode 1 does not use labeling priority;
+%        priority_mode 2 or 3 does. Optional distance smoothing.
+%     2  zef_mesh_relabeling. priority_mode <= 2: no priority; == 3: use it.
+%     3  Same relabel path as 2, always without labeling priority.
 %
 %   See also zef_create_fem_mesh, zef_mesh_relabeling, zef_solid_angle_labeling,
 %            zef_choose_domain_labels.
@@ -52,7 +52,7 @@ if isequal(labeling_flag,1)
     tetra = tetra(I,:);
     label_ind = label_ind(I,:);
     domain_labels = node_labels(label_ind);
- 
+
     if zef.distance_smoothing_on
     [nodes] = zef_distance_smoothing(tetra, nodes, distance_vec, zef.distance_smoothing_exp, zef.smoothing_strength,zef.smoothing_steps_dist);
     end
@@ -82,7 +82,7 @@ elseif isequal(labeling_flag,2)
         end
 
 [domain_labels, distance_vec] = zef_mesh_relabeling(zef, tetra, nodes, domain_labels, distance_vec, use_labeling_priority, h);
- 
+
 if zef.distance_smoothing_on
     [nodes] = zef_distance_smoothing(tetra, nodes, distance_vec, zef.distance_smoothing_exp, zef.smoothing_strength, zef.smoothing_steps_dist);
 end
@@ -94,9 +94,11 @@ elseif isequal(labeling_flag,3)
 
 use_labeling_priority = 0;
 [domain_labels, distance_vec] = zef_mesh_relabeling(zef, tetra, nodes, domain_labels, distance_vec, use_labeling_priority, h);
- 
+
 if zef.distance_smoothing_on
     [nodes] = zef_distance_smoothing(tetra, nodes, distance_vec, zef.distance_smoothing_exp, zef.smoothing_strength,zef.smoothing_steps_dist);
+end
+
 end
 
 end

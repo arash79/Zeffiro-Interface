@@ -73,6 +73,9 @@ Fully qualified names are `tests.unit.<ClassName>`. Parent map: [`../README.md`]
 | `VolumeScalarMatrixUFGTest` | NSE `uFG` convection kernel vs a dense triple-loop oracle (`zef_barycentric_weighting` `'uFG'`) |
 | `AnisotropicConductivityGuardTest` | Lead-field types 6–10 error unless `sigma(:,3:8)` is present |
 | `ProcessMeshesPipelineTest` | Cube surface translation via `zef_process_meshes`; `zef_create_fem_mesh` fills labeled tets (modes 1 and 2) |
+| `MeshLabelingStepTest` | `zef_mesh_labeling_step` function vs the captured script oracle (`mesh_labeling_reference.mat`): mode 1, mode 2, priority 3, relabel flags 2 and 3 |
+| `SegmentationCounterTest` | `zef_segmentation_counter_step` on the synthetic cube (script oracle) and on an off / PML / source tag list |
+| `CompartmentInclusionTest` | Oriented-cube inside test: point and tetra paths agree; a passed session is used; threshold 2 rejects every query |
 | `EegLeadFieldAssemblyTest` | PEM Whitney EEG FEM on a cube lattice: finite `L`, 2×6, mean-zero columns |
 | `MegLeadFieldAssemblyTest` | Magnetometer Whitney MEG FEM on a cube lattice: finite `L`; cartesian occupancy may drop sources (`size(L,2)` is a multiple of 3, not necessarily `3*n_source`) |
 | `EitLeadFieldAssemblyTest` | CEM EIT FEM on a cube lattice: finite Jacobian from a bipolar `current_pattern`; uint32 CEM face ids; type-1 DOF decomposition |

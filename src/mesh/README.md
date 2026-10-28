@@ -20,14 +20,14 @@ NSE volume/surface scalar products are in `barycentric/` and are **not** used fo
 | `zef_postprocess_finite_element_mesh.m` | **script** | Mesh-tool **Postprocess FEM mesh** (`h_pushbutton34`): calls `zef_postprocess_fem_mesh` then `zef_update`. |
 | `zef_downsample_surfaces.m` | function | Resample / smooth / inflate surfaces toward `max_surface_face_count` × `zef_find_relative_resolution`. |
 
-### Labeling, refinement, smoothing (caller-workspace scripts)
+### Labeling, refinement, smoothing
 
-These scripts are invoked from `zef_create_fem_mesh` / `zef_postprocess_fem_mesh` and write locals into the **caller** workspace. Do not convert them to functions without updating those callers.
+`zef_segmentation_counter_step` and `zef_mesh_labeling_step` are functions. Pass `zef` (and, for labeling, the mesh arrays) and use what they return. `zef_create_fem_mesh` still copies the counter fields into local variables because `zef_refinement_step` reads `submesh_ind_1` from the caller workspace. `zef_refinement_step` and `zef_smoothing_step` are still scripts. Do not convert either script to a function without updating every caller.
 
 | File | Role |
 |------|------|
-| `zef_segmentation_counter_step.m` | Injects `mesh_res`, `reuna_type`, `pml_ind_aux`, `submesh_cell`, `name_tags`, `aux_active_compartment_ind`. |
-| `zef_mesh_labeling_step.m` | Assigns tet tissue IDs (solid-angle tests) and drops exterior tetrahedra. |
+| `zef_segmentation_counter_step.m` | Function. Active-compartment index: mesh resolution, PML index, source-compartment indices, subdomain map. |
+| `zef_mesh_labeling_step.m` | Function. Assigns tet tissue IDs (solid-angle tests) and drops exterior tetrahedra. Mesh arrays are arguments and return values. |
 | `zef_mesh_relabeling.m` | Re-tests tet membership after refine/smooth (`zef_point_in_compartment`). |
 | `zef_solid_angle_labeling.m` | Per-node inside tests walking `reuna_p` / `reuna_t`; first surface that claims a node wins. |
 | `zef_choose_domain_labels.m` | Picks one domain label per tet from candidate columns using labeling priority. |
@@ -126,7 +126,7 @@ A = zef_stiffness_matrix(nodes, tetra, volume, sigma_packed);
 - Create does not compute `zef.L`; run a forward script afterward.
 - `zef_create_finite_element_mesh` and `zef_postprocess_finite_element_mesh` live here. Mesh-tool **Resample field** / **Resample surfaces** scripts (`zef_field_downsampling`, `zef_surface_downsampling`) still live under `src/forward/lead_field` because they also touch `zef.L` / source interpolation.
 - Units: surfaces typically mm; some solvers (NSE) scale to metres internally.
-- Several pipeline steps are **scripts** (`zef_segmentation_counter_step`, `zef_mesh_labeling_step`, `zef_refinement_step`, `zef_smoothing_step`). They require `zef` and mesh arrays in the caller workspace.
+- `zef_refinement_step` and `zef_smoothing_step` are still **scripts**. They require mesh arrays in the caller workspace. `zef_segmentation_counter_step` and `zef_mesh_labeling_step` are functions; ignoring their return values leaves the caller unchanged.
 
 ## Developer guidance
 

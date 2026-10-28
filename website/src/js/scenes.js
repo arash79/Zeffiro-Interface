@@ -75,6 +75,7 @@ export function initScenes() {
   };
 
   let resizeSnap = 0;
+  let snapping = false;
   const onResize = () => {
     onScroll();
     window.clearTimeout(resizeSnap);
@@ -88,7 +89,17 @@ export function initScenes() {
   window.addEventListener("resize", onResize, { passive: true });
   window.addEventListener("orientationchange", onResize, { passive: true });
   window.addEventListener("pageshow", () => requestAnimationFrame(update));
-  window.addEventListener("scrollend", update, { passive: true });
+  window.addEventListener("scrollend", () => {
+    if (snapping) {
+      snapping = false;
+      update();
+      return;
+    }
+    const before = window.scrollY;
+    snapToScene();
+    if (Math.abs(window.scrollY - before) > 2) snapping = true;
+    update();
+  }, { passive: true });
   motion.addEventListener("change", () => window.location.reload());
 
   goRequested();

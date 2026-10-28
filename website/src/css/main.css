@@ -72,7 +72,7 @@ html:has(body[data-page="overview"]) {
     scroll-snap-type: y mandatory;
   }
   body[data-page="overview"] {
-    --content-width: min(2800px, calc(100% - 2 * var(--page-gutter)));
+    --content-width: calc(100% - 2 * var(--page-gutter));
   }
   body[data-page="overview"] .scene {
     height: 100dvh;
@@ -444,10 +444,10 @@ body[data-page="overview"] .site-header {
 .hero-visual {
   position: relative;
   z-index: 1;
-  width: min(43vw, 1200px, 100%);
+  width: min(43vw, 100%);
   height: auto;
   aspect-ratio: 3 / 4;
-  max-height: min(76dvh, 1500px);
+  max-height: 76dvh;
   margin: 0 auto;
   transform-style: preserve-3d;
   transition: transform 0.35s ease;
@@ -818,7 +818,7 @@ body[data-page="overview"] .site-header {
 
 .method-art {
   margin-top: auto;
-  height: clamp(184px, 20dvh, 320px);
+  height: clamp(184px, 20dvh, 420px);
   overflow: hidden;
 }
 
@@ -850,7 +850,7 @@ body[data-page="overview"] .site-header {
 .action-card {
   color: inherit;
   flex: 0 0 auto;
-  width: clamp(196px, min(15.6vw, 28dvh), 420px);
+  width: clamp(196px, min(15.6vw, 28dvh), 640px);
 }
 
 .action-card figure {
@@ -1398,8 +1398,8 @@ html[data-at="mid"] .scene-lab .section-kicker {
 
 .scene-lab {
   position: relative;
-  --lab-width: min(2800px, calc(100% - 2 * var(--page-gutter) - clamp(48px, 5.5vw, 112px)));
-  --pipe-thumb: clamp(132px, 10.2vw, 320px);
+  --lab-width: calc(100% - 2 * var(--page-gutter) - clamp(48px, 5.5vw, 112px));
+  --pipe-thumb: clamp(132px, min(10.2vw, 26dvh), 480px);
 }
 
 .scene-lab .pipeline .container,
@@ -1423,6 +1423,15 @@ html[data-at="mid"] .scene-lab .section-kicker {
   min-height: 100dvh;
   padding-top: 32px;
   gap: 0;
+}
+
+/* A short final slide on a tall display stays in the middle of its
+   viewport. Shorter laptop heights keep the original top alignment. */
+@media (min-width: 1025px) and (min-height: 1000px) {
+  .scene-final .scene-stage {
+    justify-content: center;
+    padding-top: 0;
+  }
 }
 
 .scene3-main {
@@ -1505,6 +1514,7 @@ html[data-at="mid"] .scene-lab .section-kicker {
   }
   body[data-page="overview"] .scene {
     height: auto;
+    min-height: 100dvh;
     max-height: none;
     overflow: visible;
   }

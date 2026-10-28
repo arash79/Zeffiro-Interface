@@ -6,41 +6,46 @@ function [I] = zef_tetra_in_compartment(reuna_p,reuna_t,nodes,varargin)
 %   See: https://github.com/sampsapursiainen/zeffiro_interface
 %   Licensed under the GNU General Public License v3.0 (see LICENSE).
 %
-%   Same solid-angle inclusion test as zef_point_in_compartment but reads
-%   meshing settings from the base zef workspace and returns only node
-%   indices I (no distance vector). Supports optional compartment_info and
-%   meshing_threshold in varargin.
+%   Inclusion uses zef_meshing_runtime. Pass the session struct in
+%   varargin, or leave it out to read zef from the base workspace.
+%   Optional numeric arguments are compartment_info and meshing_threshold.
+%   An optional graphics handle is the waitbar. A numeric meshing_threshold
+%   is the cutoff that is applied.
 %
 %   I = zef_tetra_in_compartment(reuna_p, reuna_t, nodes)
 %   I = zef_tetra_in_compartment(reuna_p, reuna_t, nodes, compartment_info)
 %   I = zef_tetra_in_compartment(reuna_p, reuna_t, nodes, compartment_info, meshing_threshold)
+%   I = zef_tetra_in_compartment(reuna_p, reuna_t, nodes, zef)
 %
-%   Inputs
-%     reuna_p, reuna_t - surface mesh vertices and triangles.
-%     nodes            - coordinates to classify.
-%
-%   Output
-%     I - indices of nodes classified as inside the surface.
-%
-%   See also zef_point_in_compartment.
+%   See also zef_point_in_compartment, zef_meshing_runtime.
 
-if evalin('base','exist(''zef'')')
-    if evalin('base','isfield(zef,''meshing_threshold'')')
-        meshing_threshold = evalin('base','zef.meshing_threshold');
-    else
-        meshing_threshold = 0.5;
-    end
-else
-    meshing_threshold = 0.5;
-end
-
+settings = [];
 compartment_info = [];
-if not(isempty(varargin))
-    compartment_info = varargin{1};
-    if length(varargin) > 1
-        meshing_threshold = varargin{2};
+threshold_override = [];
+h_waitbar = [];
+n_numeric = 0;
+for k = 1:numel(varargin)
+    arg = varargin{k};
+    if isstruct(arg)
+        settings = arg;
+    elseif ~isempty(arg) && isgraphics(arg)
+        h_waitbar = arg;
+    else
+        n_numeric = n_numeric + 1;
+        if n_numeric == 1
+            compartment_info = arg;
+        else
+            threshold_override = arg;
+        end
     end
 end
+
+runtime = zef_meshing_runtime(settings);
+meshing_threshold = runtime.meshing_threshold;
+if ~isempty(threshold_override)
+    meshing_threshold = threshold_override;
+end
+meshing_accuracy = runtime.meshing_accuracy;
 
 max_x = max(reuna_p(:,1));
 min_x = min(reuna_p(:,1));
@@ -50,8 +55,6 @@ max_z = max(reuna_p(:,3));
 min_z = min(reuna_p(:,3));
 max_norm = max(sqrt(sum(reuna_p.^2,2)));
 nodes_norm_vec = sqrt(sum(nodes.^2,2));
-
-meshing_accuracy = evalin('base','zef.meshing_accuracy');
 
 if meshing_accuracy < 1
     P.faces = reuna_t;
@@ -84,17 +87,16 @@ tic;
 ind_vec_aux = zeros(length_I,1);
 nodes_aux = nodes(I,:)';
 
-use_gpu  = evalin('base','zef.use_gpu');
-gpu_num  = evalin('base','zef.gpu_num');
+use_gpu  = runtime.use_gpu;
 
-if use_gpu == 1 & evalin('base','zef.gpu_count') > 0
+if use_gpu == 1 & runtime.gpu_count > 0
     nodes_aux = gpuArray(nodes_aux);
     aux_vec_1 = gpuArray(aux_vec_1);
     aux_vec_4 = gpuArray(aux_vec_4);
     ind_vec_aux = gpuArray(ind_vec_aux);
 end
 
-par_num = evalin('base','zef.parallel_vectors');
+par_num = runtime.parallel_vectors;
 bar_ind = ceil(length_I/(50*par_num));
 i_ind = 0;
 
@@ -112,19 +114,19 @@ for i = 1 : par_num : length_I
 
     time_val = toc;
 
-    if not(isempty(compartment_info))
+    if not(isempty(compartment_info)) && ~isempty(h_waitbar)
         if  mod(i_ind,bar_ind)==0
-            zef_waitbar(i,length_I,evalin('caller','h'),['Compartment ' int2str(compartment_info(1)) ' of ' int2str(compartment_info(2)) '. Ready: ' datestr(datevec(now+(length_I/i - 1)*time_val/86400)) '.']);
+            zef_waitbar(i,length_I,h_waitbar,['Compartment ' int2str(compartment_info(1)) ' of ' int2str(compartment_info(2)) '. Ready: ' datestr(datevec(now+(length_I/i - 1)*time_val/86400)) '.']);
         end
     end
 
 end
 
-if not(isempty(compartment_info))
-    zef_waitbar(1,1,evalin('caller','h'),['Compartment ' int2str(compartment_info(1)) ' of ' int2str(compartment_info(2)) '. Ready: ' datestr(datevec(now)) '.']);
+if not(isempty(compartment_info)) && ~isempty(h_waitbar)
+    zef_waitbar(1,1,h_waitbar,['Compartment ' int2str(compartment_info(1)) ' of ' int2str(compartment_info(2)) '. Ready: ' datestr(datevec(now)) '.']);
 end
 
 ind_vec(I) = gather(ind_vec_aux);
-I = find(ind_vec > evalin('base','zef.meshing_threshold'));
+I = find(ind_vec > meshing_threshold);
 
 end

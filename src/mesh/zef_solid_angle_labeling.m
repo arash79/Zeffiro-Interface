@@ -71,7 +71,7 @@ if compartment_counter < n_compartments
                 end
             end
 
-                [I_1,distance_vec_aux] = zef_point_in_compartment(zef,zef.reuna_p{i_labeling},reuna_t_aux,nodes(I_2,:),[compartment_counter n_compartments]);
+                [I_1,distance_vec_aux] = zef_point_in_compartment(zef,zef.reuna_p{i_labeling},reuna_t_aux,nodes(I_2,:),[compartment_counter n_compartments],[],h);
                 I(I_2(I_1)) = compartment_counter;
                 distance_vec(I_2(I_1)) = distance_vec_aux;
 
