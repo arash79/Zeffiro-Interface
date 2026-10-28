@@ -144,8 +144,25 @@ if isequal(arrange_function,'minimize')
 end
 
 if isequal(arrange_function,'close')
+    % A tool's CloseRequestFcn/DeleteFcn (zef_closereq deletes every
+    % figure carrying the same ZefTool tag) can cascade-delete siblings
+    % or throw on stale session state. Re-check each handle before
+    % closing it, and never let one broken callback abort closing the
+    % remaining windows.
     for i = 1 : length(h_aux)
-        close(h_aux(i));
+        h = h_aux(i);
+        if ~isgraphics(h) || ~isvalid(h)
+            continue
+        end
+        try
+            close(h);
+        catch
+            try
+                set(h, 'CloseRequestFcn', '');
+                delete(h);
+            catch
+            end
+        end
     end
 end
 
