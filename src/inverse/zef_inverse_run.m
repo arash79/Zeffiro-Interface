@@ -27,6 +27,20 @@ function [zef, run_result] = zef_inverse_run(zef, method_id, opts)
 %     WorkDir    - cluster working directory, default pwd.
 %     BundleDir  - bundle output directory, default pwd/cluster_bundles.
 %     ResultDir  - result directory, default pwd/cluster_results.
+%     ComputeLocalizationMetrics
+%                - logical, default false. When true, score the returned
+%                  reconstruction against a true source (see TrueSource)
+%                  and attach utilities.sensitivity.localization_metrics
+%                  output to run_result.localization_metrics and
+%                  zef.localization_metrics. Off by default; when off,
+%                  behavior and outputs are unchanged.
+%     TrueSource  - ground truth as N-by-(>=6) [x y z nx ny nz] or a
+%                  struct('position', N-by-3, 'direction', N-by-3).
+%                  Default [] resolves from zef.inv_synth_source; the
+%                  run errors (MissingTrueSource) when neither exists.
+%     DispersionRadius
+%                - positive radius in mm for the dispersion metric.
+%                  Default 30.
 %
 %   Outputs
 %     zef         - input struct with reconstruction and
@@ -50,6 +64,9 @@ arguments
     opts.WorkDir (1,1) string = string(pwd)
     opts.BundleDir (1,1) string = fullfile(string(pwd), "cluster_bundles")
     opts.ResultDir (1,1) string = fullfile(string(pwd), "cluster_results")
+    opts.ComputeLocalizationMetrics (1,1) logical = false
+    opts.TrueSource = []
+    opts.DispersionRadius (1,1) double {mustBePositive} = 30
 end
 
 bundle = zef_inverse_extract_bundle(zef, method_id, "MethodParams", opts.MethodParams);
@@ -79,5 +96,47 @@ end
 
 zef.reconstruction = run_result.reconstruction;
 zef.reconstruction_information = run_result.reconstruction_information;
+
+% Optional source-localization accuracy metrics (off by default).
+% Disabled runs are byte-identical to previous behavior: only the
+% argument parsing above runs. Enabled runs additionally score the
+% reconstruction peak against the given or session synthetic source and
+% attach the result to run_result and zef as .localization_metrics.
+if opts.ComputeLocalizationMetrics
+    run_result.localization_metrics = local_compute_metrics( ...
+        zef, run_result, opts);
+    zef.localization_metrics = run_result.localization_metrics;
+end
+
+end
+
+function metrics = local_compute_metrics(zef, run_result, opts)
+%LOCAL_COMPUTE_METRICS  Resolve ground truth and score the reconstruction.
+
+true_source = opts.TrueSource;
+if isempty(true_source)
+    if isfield(zef, "inv_synth_source") && ~isempty(zef.inv_synth_source)
+        true_source = zef.inv_synth_source;
+    else
+        error("zef_inverse_run:MissingTrueSource", ...
+            "Localization metrics were requested but no ground truth is " + ...
+            "available. Pass TrueSource ([x y z nx ny nz]) or set " + ...
+            "zef.inv_synth_source (e.g. via the Find synthetic source tool).");
+    end
+end
+if ~isfield(zef, "source_positions") || isempty(zef.source_positions)
+    error("zef_inverse_run:MissingSourcePositions", ...
+        "Localization metrics need zef.source_positions (the interpolation source space).");
+end
+reconstruction = run_result.reconstruction;
+if isempty(reconstruction)
+    error("zef_inverse_run:EmptyReconstruction", ...
+        "The %s run returned no reconstruction to score.", string(run_result.method_id));
+end
+metrics = utilities.sensitivity.localization_metrics( ...
+    reconstruction, zef.source_positions, true_source, ...
+    "DispersionRadius", opts.DispersionRadius);
+metrics.method_id = string(run_result.method_id);
+metrics.true_source = true_source;
 
 end

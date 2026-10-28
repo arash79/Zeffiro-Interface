@@ -8,7 +8,12 @@ function zef = zef_open_class_inverse(zef, spec)
 %
 %   Builds a themed uifigure whose controls map onto zef inv_* fields
 %   (consumed by CommonInverseParameters.withPropertiesFromZef) and onto
-%   MethodParams for the named registry id. Start calls zef_inverse_run.
+%   MethodParams for the named registry id. The shared card also carries
+%   an optional 'Localization metrics' checkbox: when checked, Start runs
+%   zef_inverse_run with ComputeLocalizationMetrics, requires ground
+%   truth (zef.inv_synth_source or an explicit TrueSource), and reports
+%   distance / angular deviation / dispersion after the run. Start calls
+%   zef_inverse_run.
 %   Callers: zef_eloreta_window, zef_ukfnmm_window, zef_halpr_window,
 %   zef_grouplasso_window, and the zef_*_class_window wrappers.
 %
@@ -198,7 +203,12 @@ fields = { ...
     local_num('inv_time_3', 'Time step (s)', local_get(zef, 'inv_time_3', 0.001)), ...
     local_drop('normalize_data', 'Data normalization', ...
         {'Maximum entry', 'Maximum column norm', 'Average column norm', 'None'}, ...
-        local_get(zef, 'normalize_data', 1))};
+        local_get(zef, 'normalize_data', 1)), ...
+    local_chk('compute_localization_metrics', 'Localization metrics', ...
+        ['Compare the reconstruction peak against the synthetic source ', ...
+         '(zef.inv_synth_source): distance (mm), angular deviation (deg), ', ...
+         'and dispersion (mm). Requires ground truth; runs that lack it ', ...
+         'are rejected before the solver starts.'], false)};
 
 end
 
@@ -213,6 +223,13 @@ function f = local_drop(name, label, items, value)
 
 f = struct('name', name, 'label', label, 'kind', 'dropdown', ...
     'value', value, 'items', {items}, 'scope', 'zef');
+
+end
+
+function f = local_chk(name, label, tooltip, value)
+
+f = struct('name', name, 'label', label, 'kind', 'checkbox', ...
+    'value', value, 'items', {{}}, 'scope', 'metrics', 'tooltip', tooltip);
 
 end
 
@@ -267,6 +284,12 @@ switch kind
         end
     case 'checkbox'
         h = uicheckbox(form, 'Text', '', 'Value', logical(spec.value));
+        if isfield(spec, 'tooltip') && ~isempty(spec.tooltip)
+            try
+                h.TooltipString = char(string(spec.tooltip));
+            catch
+            end
+        end
     otherwise
         h = uieditfield(form, 'text', ...
             'Value', local_num2str(spec.value), ...
@@ -310,9 +333,16 @@ catch
 end
 names = fieldnames(widgets);
 method_params = struct();
+want_metrics = false;
 for i = 1:numel(names)
     w = widgets.(names{i});
     val = local_read_widget(w);
+    if strcmp(w.spec.scope, 'metrics')
+        if strcmp(w.spec.name, 'compute_localization_metrics')
+            want_metrics = logical(val);
+        end
+        continue
+    end
         if strcmp(w.spec.scope, 'zef')
             if strcmp(w.spec.name, 'normalize_data')
                 items = w.spec.items;
@@ -334,6 +364,12 @@ for i = 1:numel(names)
             method_params.(w.spec.name) = val;
         end
 end
+if want_metrics && (~isfield(zef, 'inv_synth_source') || isempty(zef.inv_synth_source))
+    uialert(fig, ['Localization metrics need a synthetic (true) source. ', ...
+        'Create one with the Find synthetic source tool or set ', ...
+        'zef.inv_synth_source = [x y z nx ny nz] in millimetres.'], spec.title);
+    return
+end
 if ~isfield(zef, 'L') || isempty(zef.L)
     uialert(fig, 'A lead field (zef.L) is required before inversion.', spec.title);
     return
@@ -345,8 +381,12 @@ end
 assignin('base', 'zef', zef);
 try
     [zef, run_result] = zef_inverse_run(zef, string(spec.method_id), ...
-        'execution', 'local', 'MethodParams', method_params); %#ok<ASGLU>
+        'execution', 'local', 'MethodParams', method_params, ...
+        'ComputeLocalizationMetrics', want_metrics);
     assignin('base', 'zef', zef);
+    if want_metrics && isfield(run_result, 'localization_metrics')
+        local_report_metrics(fig, run_result.localization_metrics, spec.title);
+    end
 catch err
     uialert(fig, err.message, spec.title);
 end
@@ -377,6 +417,40 @@ switch kind
                 val = num;
             end
         end
+end
+
+end
+
+function local_report_metrics(fig, metrics, title)
+%LOCAL_REPORT_METRICS  Show the optional localization metrics after a run.
+
+try
+    pf = metrics.per_frame;
+    parts = strings(1, numel(pf));
+    for k = 1:numel(pf)
+        if ~pf(k).valid
+            parts(k) = "Frame " + k + ": unavailable (" + pf(k).message + ")";
+            continue
+        end
+        ang = local_fmt(pf(k).angular_deviation_deg);
+        sym = local_fmt(pf(k).angular_deviation_symmetrized_deg);
+        parts(k) = "Frame " + k + ": distance " + local_fmt(pf(k).distance_mm) ...
+            + " mm, angle " + ang + " (sign-symmetrized " + sym ...
+            + "), dispersion " + local_fmt(pf(k).dispersion_mm) + " mm";
+    end
+    uialert(fig, strjoin(parts, newline), ...
+        [title ' - localization metrics'], 'Icon', 'info');
+catch
+end
+
+end
+
+function s = local_fmt(v)
+
+if isempty(v) || ~isfinite(v)
+    s = "unavailable";
+else
+    s = string(sprintf('%.3g', v));
 end
 
 end

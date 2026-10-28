@@ -12,6 +12,7 @@ Synthesizes dipole-probe measurements from `zef.L`, runs `zef_inverse_run`, and 
 | `run_monte_carlo` | Noise realizations → inverse → per-run metrics |
 | `synthesize_measurements` | Build `F` from `L` and probe indices |
 | `compute_metrics` | Per-probe distance / angle / magnitude / dispersion / `max_ind` |
+| `localization_metrics` | Single-run distance / angular deviation / dispersion of one reconstruction vs a true source (used by the optional `zef_inverse_run` hook and the class-solver dialogs) |
 | `aggregate_statistics` | Mean/std across `runs` cells |
 
 ## Code functionality

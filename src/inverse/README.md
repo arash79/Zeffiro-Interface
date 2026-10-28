@@ -8,7 +8,7 @@
 
 | File | Role |
 |------|------|
-| `zef_inverse_run.m` | Bundle → local `dispatch_inverse` or cluster submit/collect → write reconstruction |
+| `zef_inverse_run.m` | Bundle → local `dispatch_inverse` or cluster submit/collect → write reconstruction; optional `ComputeLocalizationMetrics` scores the reconstruction against `TrueSource` / `zef.inv_synth_source` via `utilities.sensitivity.localization_metrics` |
 | `zef_inverse_extract_bundle.m` | Serialize `L`, `procFile`, frames `F`. Reorders blocked plugin `L` to **interleaved** xyz for class inverters |
 | `zef_process_inversion.m` | In-process class path (`computeInversionWithZI`) + optional smoother |
 | `zef_processLeadfields.m` | Subset/reorient `L`; build `procFile` (**needs** `source_interpolation_ind`). Output `L` is **blocked** (x-block, y-block, z-block). |
