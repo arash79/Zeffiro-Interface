@@ -2,7 +2,7 @@
 
 ## Folder purpose
 
-Named **look-up table (LUT)** functions for the Figure tool **Colormap:** popup, plus a pointwise brightness/contrast reshape. Registration is by **function name** in `zef_init` (`zef.colormap_cell` / `zef.colormap_items`), **not** by scanning this directory.
+Named **look-up table (LUT)** functions for the Figure tool **Colormap:** popup, plus a pointwise brightness/contrast reshape. Registration is by **function name** in `zef_session_defaults` (`zef.colormap_cell` / `zef.colormap_items`), **not** by scanning this directory.
 
 Index 13 (`Parcellation`) is `zef_parcellation_colormap` in `src/parcellation`, not this folder.
 
@@ -19,7 +19,7 @@ Index 13 (`Parcellation`) is `zef_parcellation_colormap` in `src/parcellation`, 
 | `zef_easter_colormap.m` | 14 | Easter |
 | `zef_greyscale_colormap.m` | 15 | Greyscale (`linspace(0.15,0.95).^param`) |
 
-`zef_init` also lists `'zef_parcellation_colormap'` at index 13 (implemented under `src/parcellation`).
+`zef_session_defaults` also lists `'zef_parcellation_colormap'` at index 13 (implemented under `src/parcellation`).
 
 ## Code functionality
 
@@ -38,7 +38,7 @@ Brightness/contrast sliders call `zef_brightness_and_contrast` on that RGB matri
 ## Workflow context
 
 ```
-zef_init → colormap_items / colormap_cell
+zef_session_defaults → colormap_items / colormap_cell
 Figure tool Colormap: popup → zef.update_colormap (index)
   → zef_colormap(index) → named LUT in this folder
   → optional zef_brightness_and_contrast
@@ -60,7 +60,7 @@ Do not `feval` a LUT without the two scalar arguments; that is the contract `col
 
 ## Important notes
 
-- Adding a `.m` file here does **nothing** until you append its function name to `zef_init` `colormap_cell` **and** a matching label to `colormap_items`.
+- Adding a `.m` file here does **nothing** until you append its function name to `zef_session_defaults` `colormap_cell` **and** a matching label to `colormap_items`. `zef_init` and `zef_fill_missing_defaults` both apply that catalog.
 - `zef_colormap` uses `eval` on the function name string. Names must be valid MATLAB identifiers already on the path.
 - Parcellation LUT reads `zef.parcellation_colormap` from base and returns `[]` if the field is missing (`tests.unit.ParcellationColormapTest`).
 - `ArchitectureLayoutTest` asserts `which('zef_colormap')` contains `src/visualization/colormaps`.
@@ -68,6 +68,6 @@ Do not `feval` a LUT without the two scalar arguments; that is the contract `col
 ## Developer guidance
 
 - Keep existing function names stable; the Figure tool stores an integer index, not a filename the user chose.
-- New LUT: copy an existing `zef_*_colormap.m`, return `size×3` in `[0,1]`, register in `zef_init`, document the new index in this table.
+- New LUT: copy an existing `zef_*_colormap.m`, return `size×3` in `[0,1]`, register in `zef_session_defaults`, document the new index in this table.
 - Do not mix graph-bank plotters or movie writers into this folder.
 - Pitfall: inserting a LUT in the middle of `colormap_cell` — every saved project that stored `update_colormap` as an index will point at the wrong map.

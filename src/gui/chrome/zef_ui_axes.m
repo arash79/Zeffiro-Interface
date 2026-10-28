@@ -18,7 +18,7 @@ function h = zef_ui_axes(h_figure)
 %   h = zef_ui_axes
 %   h = zef_ui_axes(h_figure)
 %
-%   See also zef_ui_control, zef_figure_tool, zef_logoplot.
+%   See also zef_ui_control, zef_figure_tool, zef_show_figure_logo.
 
 h = gobjects(0);
 if nargin < 1

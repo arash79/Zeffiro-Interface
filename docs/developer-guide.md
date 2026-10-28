@@ -16,7 +16,7 @@ Where to put new work, and the usual recipes for a solver, plugin, converter, or
 | Project / segmentation I/O | `src/io` | |
 | Anatomy converter (FS, SimNIBS, …) | `+utilities/+fs2zef` (or sibling) | Public name `utilities.<name>.run` |
 | GUI window (core tools) | `src/gui/apps` + `src/gui/tools` | Layout in `src/gui/chrome`; events in `callbacks`; sync in `update` |
-| Visualization LUT | `src/visualization/colormaps` | Register in `zef_init` `colormap_cell` |
+| Visualization LUT | `src/visualization/colormaps` | Register in `zef_session_defaults` `colormap_cell` |
 | Mesh-vis graph | `src/visualization/graph_bank` | Dir-discovered next to `zef_histogram` |
 | Plugin | `plugins/` | See `plugins/README.md` |
 | Unit test | `+tests/+unit` | Fixtures: `tests.support.createSyntheticInverseZef` |

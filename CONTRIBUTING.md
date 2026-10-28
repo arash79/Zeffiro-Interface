@@ -22,7 +22,7 @@ When submitting code via pull / merge requests, follow MATLAB’s documented hab
 
 2. [Indent your code][indent] and avoid deep nesting of indented blocks.
 
-Existing session scripts (`zef_init`, mesh refine/smooth steps, some I/O) still require `zef` in the caller or base workspace. Do not convert those to functions unless you update every caller in the same change. Do not add new `eval` / `evalin` / `assignin` except where those scripts already require it ([developer-guide.md](docs/developer-guide.md)).
+Existing session scripts (`zef_init`, mesh refine/smooth steps, some I/O) still require `zef` in the caller or base workspace. `zef_init` is startup only. Default field values live in `zef_session_defaults`; an open project fills gaps with `zef_fill_missing_defaults`. Do not add new `eval` / `evalin` / `assignin` except where those scripts already require it ([developer-guide.md](docs/developer-guide.md)).
 
 [functions]: https://se.mathworks.com/help/matlab/functions.html
 [argument validation]: https://se.mathworks.com/help/matlab/matlab_prog/function-argument-validation-1.html

@@ -75,8 +75,6 @@ end
 
 zef.new_empty_project = 0;
 
-zef_data = struct;
-
 zef_init;
 
 zef_segmentation_tool;

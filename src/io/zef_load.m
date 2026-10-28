@@ -30,7 +30,7 @@ function zef = zef_load(zef,file_name,path_name)
 %
 %   See also zef_save, zef_start_new_project, zef_apply_system_settings,
 %            zef_create_sensors, zef_create_compartment,
-%            utilities.duneuro2zef.convert.
+%            zef_fill_missing_defaults, utilities.duneuro2zef.convert.
 %
 if nargin == 0
     zef = evalin('base','zef');
@@ -184,6 +184,7 @@ if not(isequal(file_name,0))
     % it carries the flag. Merge copies the file value when present.
     zef.sensors_canonical = false;
     zef = zef_merge_project_data(zef, zef_data);
+    zef = zef_fill_missing_defaults(zef);
     if ~isfield(zef, 'current_version') || isempty(zef.current_version)
         zef.current_version = 2.2;
     end
@@ -339,12 +340,15 @@ if not(isequal(file_name,0))
             zef = zef_update(zef);
         catch
         end
+        % Nothing is drawn yet. on_screen is the current view, not a
+        % preference, and the previous project's value must not survive.
+        zef.on_screen = 0;
         try
             zef = zef_update_fig_details(zef);
         catch
         end
         try
-            zef_figure_tool_layout(zef.h_zeffiro);
+            zef_show_figure_logo(zef, true);
         catch
         end
         try
@@ -384,6 +388,12 @@ if not(isequal(file_name,0))
         catch
         end
         drawnow;
+    else
+        zef.on_screen = 0;
+        try
+            zef_show_figure_logo(zef, true);
+        catch
+        end
     end
 
 end

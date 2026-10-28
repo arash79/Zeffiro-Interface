@@ -16,7 +16,7 @@
 | `zef_plot_hyperprior` / `zef_plot_roi` | Inverse diagnostic figures |
 | `zef_plot_parcellation_time_series` | Parcel time series (uses time_series_tools) |
 | `zef_butterfly_plot` / `zef_butterfly_plot_start` / `zef_butterfly_plot_app` | Butterfly window |
-| `zef_print_meshes` | Print-oriented mesh export |
+| `zef_show_figure_logo` | Clear `h_axes1` and draw the compass logo (Logo button and project open) |
 
 ## Code functionality
 

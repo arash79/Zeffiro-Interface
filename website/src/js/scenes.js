@@ -62,9 +62,31 @@ export function initScenes() {
     }, 160);
   };
 
+  const snapToScene = () => {
+    if (!document.documentElement.classList.contains("js-scenes")) return;
+    if (window.matchMedia("(max-width: 1024px)").matches) return;
+    const vh = window.innerHeight || 1;
+    const index = Math.round(window.scrollY / vh);
+    const scene = scenes[Math.max(0, Math.min(scenes.length - 1, index))];
+    if (!scene) return;
+    if (Math.abs(scene.getBoundingClientRect().top) > 2) {
+      scene.scrollIntoView({ behavior: "instant", block: "start" });
+    }
+  };
+
+  let resizeSnap = 0;
+  const onResize = () => {
+    onScroll();
+    window.clearTimeout(resizeSnap);
+    resizeSnap = window.setTimeout(() => {
+      snapToScene();
+      update();
+    }, 80);
+  };
+
   window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll, { passive: true });
-  window.addEventListener("orientationchange", onScroll, { passive: true });
+  window.addEventListener("resize", onResize, { passive: true });
+  window.addEventListener("orientationchange", onResize, { passive: true });
   window.addEventListener("pageshow", () => requestAnimationFrame(update));
   window.addEventListener("scrollend", update, { passive: true });
   motion.addEventListener("change", () => window.location.reload());

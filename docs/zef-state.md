@@ -2,7 +2,7 @@
 
 Zeffiro does not use a class as the project object. Everything the GUI and most scripts share is one MATLAB struct, **`zef`**, typically in the base workspace.
 
-This page lists fields that matter for meshing, forward, and inverse work. Visualization sliders, window positions, and similar chrome are omitted; they are created in `src/app/zef_init.m` and the various `zef_update_*` functions. Defaults below are from `zef_init` unless noted.
+This page lists fields that matter for meshing, forward, and inverse work. Visualization sliders, window positions, and similar chrome are omitted; they are created in `src/app/zef_session_defaults.m` and the various `zef_update_*` functions. Defaults below are from that catalog unless noted. `zef_init` applies the catalog at startup and then reseeds compartments and sensors. Opening a project calls `zef_fill_missing_defaults` instead, so a loaded project is not replaced by the profile.
 
 Handles (`zef.h_*`) are graphics objects. `zef_save` strips them before writing a `.mat` file (`zef_remove_object_handles`). Do not treat saved projects as a dump of live figure state.
 
@@ -118,7 +118,7 @@ Class solvers copy a subset of `inv_*` via `withPropertiesFromZef`. Prefer `Meth
 
 There is no single “owner” type. By convention:
 
-- `zeffiro_interface` / `zef_start` / `zef_init` create and default it
+- `zeffiro_interface` / `zef_start` / `zef_init` create it. The default catalog is `zef_session_defaults`.
 - `zef_update` syncs GUI tables into fields
 - `src/mesh` writes mesh arrays
 - `src/forward` writes `L` and source geometry

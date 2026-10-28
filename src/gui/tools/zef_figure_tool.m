@@ -10,7 +10,7 @@
 %   ('base','zef',zef) so string callbacks see the session. DeleteFcn
 %   zef_reopen_figure. Layout is zef_figure_tool_layout.
 %
-%   See also zef_plot_volume, zef_set_figure_tool_sliders, zef_figure_tool_layout.
+%   See also zef_plot_volume, zef_set_figure_tool_sliders, zef_figure_tool_layout, zef_show_figure_logo.
 
 zef_ui_theme_local = zef_ui_theme(zef);
 
@@ -260,7 +260,7 @@ zef.h_stop_movie = uicontrol('Style', 'togglebutton', 'Parent', sb, 'Visible', '
     'Callback', @zef_callbackstop);
 zef.h_logoplot = uicontrol('Style', 'pushbutton', 'Parent', sb, 'Visible', 'on', 'Units', 'pixels', ...
     'Position', [220 8 65 28], 'String', 'Logo', 'Tag', 'logobutton', ...
-    'Callback', @zef_logoplot);
+    'Callback', @zef_show_figure_logo);
 
 set(zef.h_loop_movie_count, 'String', num2str(zef.loop_movie_count));
 
@@ -422,7 +422,7 @@ end
 zef = rmfield(zef, 'size_temp');
 clear zef_ui_theme_local sb ls;
 
-zef_logoplot;
+zef_show_figure_logo(zef.h_axes1);
 
 if isfield(zef, 'h_zeffiro_menu') && isvalid(zef.h_zeffiro_menu)
     zef.h_zeffiro.Visible = zef.use_display;
@@ -444,167 +444,3 @@ try
 catch
 end
 
-function zef_logoplot(o, e, h) %#ok<INUSD>
-
-if nargin == 0
-    h_axes = evalin('caller', 'zef.h_axes1');
-else
-    h_fig = ancestor(o, 'figure');
-    h_axes = zef_ui_axes(h_fig);
-end
-if isempty(h_axes) || ~isvalid(h_axes(1))
-    return
-end
-h_axes = h_axes(1);
-
-bg = [1 1 1];
-try
-    th = zef_ui_theme();
-    bg = th.color.axesBg;
-catch
-end
-
-img = [];
-try
-    img = local_logo_image(bg);
-catch
-    try
-        img = imread('zeffiro_interface_compass.png', 'BackgroundColor', bg);
-    catch
-    end
-end
-if isempty(img)
-    return
-end
-
-cla(h_axes, 'reset');
-try
-    if isappdata(h_axes, 'ZefHasVolumePlot')
-        rmappdata(h_axes, 'ZefHasVolumePlot');
-    end
-    if isappdata(h_axes, 'ZefAxesDressed')
-        rmappdata(h_axes, 'ZefAxesDressed');
-    end
-    if isappdata(h_axes, 'ZefLogoSlot')
-        rmappdata(h_axes, 'ZefLogoSlot');
-    end
-catch
-end
-try
-    h_fig_logo = ancestor(h_axes, 'figure');
-    zef_figure_interact(h_fig_logo, 'set', 'none');
-    zef_figure_interact(h_fig_logo, 'forget_home');
-catch
-end
-h_axes.Tag = 'axes1';
-imh = image(h_axes, img);
-try
-    imh.Tag = 'zef_logo_img';
-    setappdata(imh, 'ZefLogoSrc', im2double(img));
-catch
-end
-h_axes.YDir = 'reverse';
-h_axes.XTick = [];
-h_axes.YTick = [];
-h_axes.Box = 'off';
-h_axes.Color = bg;
-try
-    h_axes.XColor = 'none';
-    h_axes.YColor = 'none';
-catch
-end
-try
-    disableDefaultInteractivity(h_axes);
-catch
-end
-try
-    if isempty(h_axes.Toolbar)
-        axtoolbar(h_axes, {'restoreview'});
-    end
-catch
-end
-try
-    h_axes.Toolbar.Visible = 'off';
-catch
-end
-h_axes.Visible = 'on';
-try
-    tt = findall(ancestor(h_axes, 'figure'), 'Tag', 'time_text');
-    if ~isempty(tt) && isvalid(tt(1))
-        set(tt(1), 'String', '', 'Visible', 'off');
-    end
-catch
-end
-try
-    delete(h_axes.Legend);
-    delete(h_axes.XLabel);
-    delete(h_axes.YLabel);
-    delete(h_axes.ZLabel);
-catch
-end
-
-try
-    if nargin > 0
-        zef_figure_tool_layout(ancestor(h_axes, 'figure'));
-    end
-catch
-end
-h_axes.Tag = 'axes1';
-
-end
-
-function img = local_logo_image(bg)
-
-persistent logo_bg logo_img
-bg = reshape(double(bg(1:3)), 1, 3);
-if ~isempty(logo_img) && isequal(logo_bg, bg)
-    img = logo_img;
-    return
-end
-
-fname = 'zeffiro_interface_compass.png';
-alpha = [];
-try
-    [img, ~, alpha] = imread(fname);
-catch
-    img = imread(fname, 'BackgroundColor', bg);
-end
-if size(img, 3) == 1
-    img = repmat(img, [1 1 3]);
-end
-if ~isempty(alpha)
-    a = im2double(alpha);
-    if size(a, 3) > 1
-        a = a(:, :, 1);
-    end
-    bg8 = reshape(double(uint8(max(0, min(255, round(255 * bg))))), 1, 1, 3);
-    img = uint8(double(img) .* a + bg8 .* (1 - a));
-end
-tol = 14;
-bg8 = reshape(double(uint8(max(0, min(255, round(255 * bg))))), 1, 1, 3);
-mask = max(abs(double(img) - bg8), [], 3) > tol;
-white = max(abs(double(img) - 255), [], 3) < 8;
-mask = mask & ~white;
-if ~any(mask(:))
-    logo_bg = bg;
-    logo_img = img;
-    return
-end
-[r, c] = find(mask);
-pad = 12;
-r1 = max(1, min(r) - pad);
-r2 = min(size(img, 1), max(r) + pad);
-c1 = max(1, min(c) - pad);
-c2 = min(size(img, 2), max(c) + pad);
-img = img(r1:r2, c1:c2, :);
-bg8 = uint8(max(0, min(255, round(255 * bg))));
-near_white = max(abs(double(img) - 255), [], 3) < 28;
-for k = 1:size(img, 3)
-    ch = img(:, :, k);
-    ch(near_white) = bg8(k);
-    img(:, :, k) = ch;
-end
-logo_bg = bg;
-logo_img = img;
-
-end

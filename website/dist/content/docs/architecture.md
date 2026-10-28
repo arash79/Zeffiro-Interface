@@ -101,7 +101,7 @@ Forbidden (still true as a rule; some legacy scripts still `evalin('base','zef')
 
 | Directory | Responsibility | Allowed deps | Forbidden deps | Public entry | Extension |
 |-----------|----------------|--------------|----------------|--------------|-----------|
-| `src/app` | Session start/close/update, waitbar, plugin INI | profile, chrome (window restore) | solvers | `zef_start`, `zef_update`, `zef_close_all`, `zef_read_profile_cell` | Defaults in `zef_init` + profile INI |
+| `src/app` | Session start/close/update, waitbar, plugin INI | profile, chrome (window restore) | solvers | `zef_start`, `zef_update`, `zef_close_all`, `zef_read_profile_cell` | Defaults in `zef_session_defaults`; startup reseed in `zef_init` |
 | `src/gui/chrome` | Theme, layout, docking | `zef` theme fields, assets | FEM/inverse math | `zef_ui_theme`, `zef_window_manager`, `zef_ui_icons`, `zef_figure_interact` | `zef_layout_*` + `zef_ui_ready` |
 | `src/gui/tools` | Create tool windows | chrome, callbacks | New numerical solvers | `zef_segmentation_tool`, … | App Designer export + wrapper |
 | `src/mesh` | Tetrahedral mesh | compartments, waitbar | GUI chrome | `zef_create_finite_element_mesh`, `zef_create_fem_mesh` | Mesh-tool pipeline functions |
@@ -128,6 +128,8 @@ Do not `addpath` a `+package` folder. Do not `genpath` the whole repository (tha
 ## State
 
 Session state is the struct `zef`, usually in the base workspace. GUI widgets are `zef.h_*`. New numerical code should take `zef` (or extracted arrays) as arguments rather than `evalin('base')` when practical. Existing mesh refine/smooth and some I/O scripts still require `zef` in the caller or base workspace; do not convert those without updating every caller ([developer-guide.md](developer-guide.md)).
+
+Opening a project does not rebuild the session and does not run `zef_init`. `zef_merge_project_data` keeps the session shell and replaces project payload. The shell is machine fields (`zef_system_field_names`), live figures, `h_*` handles, profile tables (`parameter_profile`, `init_profile`), import-dialog `file` / `file_path`, and the catalog in `zef_session_defaults` except project payload (mesh, lead field, measurements, reconstruction, parcellation results, and the same). `sensors_canonical` stays on the session until the file itself sets it. Any other field the file does not contain is removed. A `<tag>_*` field is also removed when that compartment or sensor tag was on the previous project and is not listed on the new one. `zef_fill_missing_defaults` then writes catalog defaults only where the field is absent. Compartment and sensor identity come from the file; startup is the only path that reseeds them from the profile.
 
 ## Plugin model
 
