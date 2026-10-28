@@ -671,20 +671,32 @@ local_burr_text(fig, panel, 'zef_strip_lab_burr_comp', 'Compartment', ...
 local_burr_control(fig, panel, st, 'h_burr_compartment', ...
     pad + 106, y_row, max(80, w - pad - 106 - pad), row, theme, fs);
 
+% Radius / replacement row: two label+field groups of equal field width,
+% distributed across the full panel width so the row does not lean left.
 y_row = y_row - gap - row;
+inner = max(184, w - 2 * pad);
+% 106 = first gutter (label width + gap); 22 = gutter between groups;
+% 136 = second gutter (label width + gap). Remaining width splits evenly.
+fld_w = max(56, floor((inner - 106 - 22 - 136) / 2));
+x_grp2 = pad + 106 + fld_w + 22;
 local_burr_text(fig, panel, 'zef_strip_lab_burr_rad', 'Radius (mm)', ...
     pad, y_row, 100, row, theme, fs, 'right');
 local_burr_control(fig, panel, st, 'h_burr_radius', ...
-    pad + 106, y_row, 72, row, theme, fs);
+    pad + 106, y_row, fld_w, row, theme, fs);
 local_burr_text(fig, panel, 'zef_strip_lab_burr_cond', 'Replacement (S/m)', ...
-    pad + 186, y_row, 130, row, theme, fs, 'right');
+    x_grp2, y_row, 130, row, theme, fs, 'right');
 local_burr_control(fig, panel, st, 'h_burr_conductivity', ...
-    pad + 322, y_row, max(64, w - pad - 322 - pad), row, theme, fs);
+    x_grp2 + 136, y_row, max(56, w - pad - (x_grp2 + 136)), row, theme, fs);
 
+% Action row: Set / Remove lead at the left, the primary Apply to mesh
+% anchored to the trailing edge (same composition as the main tool's
+% Add/Embed/Add contacts/Delete + Plot row).
 y_row = y_row - gap - 24;
 local_burr_control(fig, panel, st, 'h_burr_set', pad, y_row, 72, 24, theme, fs);
 local_burr_control(fig, panel, st, 'h_burr_remove', pad + 80, y_row, 84, 24, theme, fs);
-local_burr_control(fig, panel, st, 'h_burr_apply', pad + 172, y_row, 130, 24, theme, fs);
+apply_w = 130;
+local_burr_control(fig, panel, st, 'h_burr_apply', ...
+    max(pad + 172, w - pad - apply_w), y_row, apply_w, 24, theme, fs);
 apply = local_handle(fig, st, 'h_burr_apply');
 if ~isempty(apply)
     try

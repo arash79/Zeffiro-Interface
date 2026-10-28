@@ -261,7 +261,13 @@ if n_pair > 0
     lab_w = local_label_width(labels);
     try
         nm_lab = lower(char(fig.Name));
-        if contains(nm_lab, 'forward and inverse') || contains(nm_lab, 'hierarchical prior')
+        if contains(nm_lab, 'forward and inverse')
+            % Longest labels ("Number of surface refinements
+            % (post-process):") need ~296 px at 12 px Helvetica Neue.
+            % 300 px keeps every label on one line so right-aligned
+            % labels never clip; fields still get >200 px per column.
+            lab_w = max(lab_w, 300);
+        elseif contains(nm_lab, 'hierarchical prior')
             lab_w = max(lab_w, 200);
         end
     catch
@@ -381,7 +387,7 @@ if n_pair > 0
     if n_form_cols == 1
         form = uigridlayout(root, [n_form_rows 2]);
         form.ColumnWidth = {lab_w, '1x'};
-        form.RowHeight = local_col_heights(pairs, 1:n_pair, lb_h);
+        form.RowHeight = local_col_heights(pairs, 1:n_pair, lb_h, '', lab_w);
         form.RowSpacing = 6;
         form.ColumnSpacing = 10;
         form.Padding = [10 16 10 10];
@@ -415,7 +421,7 @@ if n_pair > 0
         idx_r = find(col_of == 2);
         nL = numel(idx_l) + double(~isempty(hdr_l));
         nR = numel(idx_r) + double(~isempty(hdr_r));
-        rhL = local_col_heights(pairs, idx_l, lb_h, hdr_l);
+        rhL = local_col_heights(pairs, idx_l, lb_h, hdr_l, lab_w);
         rhL{end + 1} = '1x';
         left_form = uigridlayout(form, [max(nL, 1) + 1 2]);
         left_form.Layout.Column = 1;
@@ -428,7 +434,7 @@ if n_pair > 0
             left_form.BackgroundColor = theme.color.panel;
         catch
         end
-        rhR = local_col_heights(pairs, idx_r, lb_h, hdr_r);
+        rhR = local_col_heights(pairs, idx_r, lb_h, hdr_r, lab_w);
         rhR{end + 1} = '1x';
         right_form = uigridlayout(form, [max(nR, 1) + 1 2]);
         right_form.Layout.Column = 2;
@@ -781,13 +787,16 @@ end
 
 end
 
-function rh = local_col_heights(pairs, idx, lb_h, hdr)
+function rh = local_col_heights(pairs, idx, lb_h, hdr, col_w)
 
 if nargin < 3 || isempty(lb_h)
     lb_h = 64;
 end
 if nargin < 4
     hdr = '';
+end
+if nargin < 5 || isempty(col_w)
+    col_w = 240;
 end
 extra = double(~isempty(hdr));
 n = numel(idx);
@@ -813,13 +822,49 @@ for k = 1:numel(idx)
     try
         if ~isempty(lab) && ~isempty(fld)
             nlab = numel(strtrim(char(string(lab.Text))));
-            if nlab > 26
+            if local_needs_wrap_width(nlab, col_w)
                 rh{rr} = max(rh{rr}, 40);
             end
         end
     catch
     end
 end
+
+end
+
+function tf = local_needs_wrap(form, nlab)
+%LOCAL_NEEDS_WRAP  True when the label text cannot fit its label column.
+%   Right-aligned uilabels clip instead of wrapping on some platforms, so
+%   prefer single-line labels whenever the text plausibly fits the column.
+%   6.4 px/char at a 12 px font overestimates Helvetica Neue (~5.9 px/char),
+%   so wrap is only enabled when the fit is genuinely impossible.
+
+tf = false;
+if isempty(nlab) || nlab <= 0
+    return
+end
+col_w = 240;
+try
+    cw = form.ColumnWidth{1};
+    if isnumeric(cw) && cw > 0
+        col_w = cw;
+    end
+catch
+end
+tf = local_needs_wrap_width(nlab, col_w);
+
+end
+
+function tf = local_needs_wrap_width(nlab, col_w)
+
+tf = false;
+if nargin < 2 || isempty(col_w)
+    col_w = 240;
+end
+if isempty(nlab) || nlab <= 0
+    return
+end
+tf = (6.4 * double(nlab) + 8) > double(col_w);
 
 end
 
@@ -885,7 +930,7 @@ for k = 1:numel(idx)
                         nlab = numel(strtrim(char(string(lab.Text))));
                     catch
                     end
-                    if nlab > 26
+                    if local_needs_wrap(form, nlab)
                         lab.WordWrap = 'on';
                         try
                             rh = form.RowHeight;
@@ -1641,7 +1686,9 @@ map = { ...
     'Hight-cut frequency (Hz):', 'High-cut frequency (Hz):'; ...
     'Hyperprior tail length (dB)::', 'Hyperprior tail length (dB):'; ...
     'Burn in', 'Burn in:'; ...
-    'Burn in:', 'Burn in:'};
+    'Burn in:', 'Burn in:'; ...
+    'Labeling prority mode:', 'Labeling priority mode:'; ...
+    'Labeling prority mode', 'Labeling priority mode'};
 for i = 1:size(map, 1)
     if strcmp(strtrim(txt), map{i, 1})
         txt = map{i, 2};
